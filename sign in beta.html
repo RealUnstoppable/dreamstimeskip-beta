@@ -24,6 +24,7 @@
             align-items: center;
             width: 100%;
             max-width: 400px;
+            padding: 20px;
         }
         
         /* Form and Welcome Container Styles */
@@ -65,7 +66,7 @@
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color .3s, box-shadow .3s;
         }
         
         input:focus {
@@ -85,22 +86,18 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
-            transition: background-color 0.3s;
+            transition: background-color .3s, opacity .3s;
         }
         
         button:hover {
             background-color: #0056b3;
         }
-        
-        #sign-out-btn {
-            background-color: #dc3545;
-            margin-top: 15px;
-        }
-        
-        #sign-out-btn:hover {
-            background-color: #c82333;
-        }
 
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+        
         /* Toggle Link Styles */
         .toggle-link {
             margin-top: 20px;
@@ -121,15 +118,9 @@
             font-size: 14px;
             height: 20px;
         }
-
-        /* Registered Accounts Section (can be removed, as it was for localStorage) */
-        .accounts-container {
-            display: none;
-        }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
@@ -215,13 +206,11 @@
             
             messageEl.textContent = '';
             submitBtn.disabled = true;
-            submitBtn.style.opacity = '0.7';
 
             if (isSignUp) {
                 if (!username || !email || !password) {
                     showMessage("All fields are required.");
                     submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
                     return;
                 }
                 try {
@@ -236,30 +225,42 @@
                     sessionStorage.setItem('newUser', 'true');
                     // Redirection is handled by onAuthStateChanged listener
                 } catch (error) {
-                    showMessage(error.message);
+                    showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
                 }
             } else {
                 try {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const userDocRef = doc(db, "users", userCredential.user.uid);
-                    const userDoc = await getDoc(userDocRef);
+                    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
                     if (userDoc.exists() && userDoc.data().isBanned) {
                         await signOut(auth);
-                        showMessage("Your account has been suspended.");
+                        showMessage("This account has been suspended.");
                         submitBtn.disabled = false;
-                        submitBtn.style.opacity = '1';
                     }
-                    // Redirection is handled by onAuthStateChanged listener if not banned
+                     // Redirection is handled by onAuthStateChanged listener if not banned
                 } catch (error) {
-                    showMessage(error.message);
+                    showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
                 }
             }
         });
+
+        function getFirebaseErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/invalid-email':
+                    return 'Please enter a valid email address.';
+                case 'auth/user-not-found':
+                case 'auth/wrong-password':
+                    return 'Invalid email or password.';
+                case 'auth/email-already-in-use':
+                    return 'An account with this email already exists.';
+                case 'auth/weak-password':
+                    return 'Password should be at least 6 characters.';
+                default:
+                    return 'An unexpected error occurred. Please try again.';
+            }
+        }
         
         function showMessage(msg) { messageEl.textContent = msg; }
         updateFormView();
