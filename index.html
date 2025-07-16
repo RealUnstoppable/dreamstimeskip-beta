@@ -293,10 +293,10 @@
       const auth = getAuth(app);
       const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-      // --- SCRIPT FOR DYNAMIC NAVBAR BUTTON ---
       const navCtaContainer = document.getElementById('nav-cta-container');
       const mobileCtaLink = document.querySelector('.nav-links li:last-child a');
 
+      // This listener checks the user's login state and updates the UI accordingly.
       onAuthStateChanged(auth, user => {
         if (user) {
             // User is logged in

@@ -166,12 +166,14 @@
         const db = getFirestore(app);
         const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-        // Redirect user if they are already logged in
+        // This listener is the key to preventing the loop.
+        // It waits for Firebase to establish a session and then redirects.
         onAuthStateChanged(auth, user => {
             if (user) {
                 const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
                 window.location.replace(destination);
             }
+            // If there is no user, the script does nothing, allowing the sign-in form to be used.
         });
 
         const form = document.getElementById('auth-form');
@@ -223,7 +225,7 @@
                         isAdmin: userCredential.user.email === ADMIN_EMAIL
                     });
                     sessionStorage.setItem('newUser', 'true');
-                    // Redirection is handled by onAuthStateChanged listener
+                    // Redirection is handled by the onAuthStateChanged listener above
                 } catch (error) {
                     showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;
@@ -234,11 +236,11 @@
                     const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
                     if (userDoc.exists() && userDoc.data().isBanned) {
-                        await signOut(auth);
+                        await signOut(auth); // Important: sign out the banned user
                         showMessage("This account has been suspended.");
                         submitBtn.disabled = false;
                     }
-                     // Redirection is handled by onAuthStateChanged listener if not banned
+                     // Redirection is handled by the onAuthStateChanged listener if not banned
                 } catch (error) {
                     showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;

@@ -247,12 +247,14 @@
         const db = getFirestore(app);
         const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-        // **FIX:** Authentication check now happens first, before any other code runs.
+        // This listener is the key to preventing the redirect loop.
+        // The page is hidden by default and only shown if the user is the correct admin.
         onAuthStateChanged(auth, user => {
             if (user && user.email === ADMIN_EMAIL) {
-                document.body.style.display = 'flex'; // Show page only if user is admin
+                document.body.style.display = 'flex'; // Show page content
                 initializeAdminPage(user);
             } else {
+                // If not admin or not logged in, redirect away.
                 window.location.replace('sign in beta.html');
             }
         });
@@ -314,7 +316,7 @@
                 }
             });
 
-            // Corrected navigation logic
+            // Corrected navigation logic for tabs
             document.querySelectorAll('.sidebar-nav a').forEach(link => {
                 link.addEventListener('click', e => {
                     const targetId = e.currentTarget.getAttribute('href');
