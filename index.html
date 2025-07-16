@@ -15,49 +15,50 @@
     <style>
         #siri-orb {
             position: fixed;
-            /* Changed from bottom-right to center */
-            top: 50%;
+            /* Positioned at the bottom-center */
+            bottom: 30px;
             left: 50%;
             width: 60px;
             height: 60px;
             background: radial-gradient(circle, #6e45e2, #88d3ce);
-            border-radius: 50%; /* Makes it a circle */
+            border-radius: 50%;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
             z-index: 1000;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            /* Updated for a more fluid animation */
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px rgba(110, 69, 226, 0.6);
             animation: pulse 2.5s infinite;
         }
 
-        /* Pulsating animation updated for centering */
+        /* Pulsating animation updated for horizontal centering */
         @keyframes pulse {
             0% {
-                transform: translate(-50%, -50%) scale(0.95);
+                transform: translateX(-50%) scale(0.95);
                 box-shadow: 0 0 0 0 rgba(110, 69, 226, 0.7);
             }
             70% {
-                transform: translate(-50%, -50%) scale(1);
+                transform: translateX(-50%) scale(1);
                 box-shadow: 0 0 0 12px rgba(110, 69, 226, 0);
             }
             100% {
-                transform: translate(-50%, -50%) scale(0.95);
+                transform: translateX(-50%) scale(0.95);
                 box-shadow: 0 0 0 0 rgba(110, 69, 226, 0);
             }
         }
 
-        /* Expanded state updated for centering */
+        /* Expanded state updated for horizontal centering */
         #siri-orb.expanded {
             width: 220px;
-            border-radius: 50px; /* Pill shape */
+            border-radius: 50px;
             background: #000;
             animation: none;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            /* Ensures it stays centered when expanded */
-            transform: translate(-50%, -50%);
+            /* Ensures it stays horizontally centered when expanded */
+            transform: translateX(-50%);
         }
 
         /* Text inside the pill */
@@ -67,7 +68,7 @@
             font-size: 1rem;
             text-decoration: none;
             opacity: 0;
-            transition: opacity 0.3s ease 0.2s;
+            transition: opacity 0.3s ease 0.4s; /* Slightly increased delay for smoothness */
             white-space: nowrap;
             transform: translateY(20px);
         }
@@ -246,7 +247,7 @@
     </footer>
 
     <div id="siri-orb">
-        <a href="/" class="orb-text">Return Home?</a>
+        <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
     </div>
     
     <script src="script.js"></script>
