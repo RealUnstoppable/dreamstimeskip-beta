@@ -15,7 +15,6 @@
     <style>
         #siri-orb {
             position: fixed;
-            /* Positioned at the bottom-center */
             bottom: 30px;
             left: 50%;
             width: 60px;
@@ -28,13 +27,11 @@
             align-items: center;
             overflow: hidden;
             z-index: 1000;
-            /* Updated for a more fluid animation */
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px rgba(110, 69, 226, 0.6);
             animation: pulse 2.5s infinite;
         }
 
-        /* Pulsating animation updated for horizontal centering */
         @keyframes pulse {
             0% {
                 transform: translateX(-50%) scale(0.95);
@@ -50,30 +47,26 @@
             }
         }
 
-        /* Expanded state updated for horizontal centering */
         #siri-orb.expanded {
             width: 220px;
             border-radius: 50px;
             background: #000;
             animation: none;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            /* Ensures it stays horizontally centered when expanded */
             transform: translateX(-50%);
         }
 
-        /* Text inside the pill */
         .orb-text {
             color: white;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-size: 1rem;
             text-decoration: none;
             opacity: 0;
-            transition: opacity 0.3s ease 0.4s; /* Slightly increased delay for smoothness */
+            transition: opacity 0.3s ease 0.4s;
             white-space: nowrap;
             transform: translateY(20px);
         }
 
-        /* Text visibility in expanded state */
         #siri-orb.expanded .orb-text {
             opacity: 1;
             transform: translateY(0);
@@ -90,8 +83,11 @@
                 <li><a href="#unstoppable">Unstoppable</a></li>
                 <li><a href="#dts">Dreams TimeSkip</a></li>
                 <li><a href="#harmony">HarmonyTunes</a></li>
+                <li><a href="sign in beta.html">Sign In / Sign Up</a></li>
             </ul>
-            <a href="mailto:unstoppableplays2016@hotmail.com" class="cta-button nav-cta">Contact</a>
+            <div id="nav-cta-container">
+                 <a href="sign in beta.html" class="cta-button nav-cta">Sign In / Sign Up</a>
+            </div>
             <button class="hamburger" aria-label="Open menu">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -253,41 +249,48 @@
     <script src="script.js"></script>
 
     <script>
+        // --- SCRIPT FOR THE "SIRI" ORB ---
         document.addEventListener('DOMContentLoaded', () => {
             const siriOrb = document.getElementById('siri-orb');
             let inactivityTimeout;
 
-            // Function to collapse the pill back into an orb
-            const collapseOrb = () => {
-                siriOrb.classList.remove('expanded');
-            };
+            const collapseOrb = () => siriOrb.classList.remove('expanded');
 
-            // Function to start or reset the 5-second inactivity timer
             const startInactivityTimer = () => {
-                clearTimeout(inactivityTimeout); // Clear any previous timer
-                inactivityTimeout = setTimeout(collapseOrb, 5000); // Set a new 5-second timer
+                clearTimeout(inactivityTimeout);
+                inactivityTimeout = setTimeout(collapseOrb, 5000);
             };
 
-            // Event listener for clicking the orb
             siriOrb.addEventListener('click', (event) => {
-                // If the click is on the link itself, allow it to navigate
-                if (event.target.tagName === 'A') {
-                    // You can let the link navigation proceed without interference.
-                    return;
-                }
-
-                // Check if the orb is currently expanded
-                const isExpanded = siriOrb.classList.contains('expanded');
-
-                if (!isExpanded) {
-                    // If it's not expanded, expand it
+                if (event.target.tagName === 'A') return;
+                
+                if (!siriOrb.classList.contains('expanded')) {
                     siriOrb.classList.add('expanded');
-                    startInactivityTimer(); // Start the timer
+                    startInactivityTimer();
                 } else {
-                    // If it's already expanded, clicking it again resets the timer
                     startInactivityTimer();
                 }
             });
+        });
+
+        // --- SCRIPT FOR DYNAMIC NAVBAR BUTTON ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const navCtaContainer = document.getElementById('nav-cta-container');
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+
+            let buttonHtml;
+
+            if (loggedInUser) {
+                // User is logged in
+                const destination = loggedInUser.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
+                buttonHtml = `<a href="${destination}" class="cta-button nav-cta">My Account</a>`;
+            } else {
+                // User is not logged in
+                buttonHtml = '<a href="sign in beta.html" class="cta-button nav-cta">Sign In / Sign Up</a>';
+            }
+            
+            navCtaContainer.innerHTML = buttonHtml;
         });
     </script>
 </body>

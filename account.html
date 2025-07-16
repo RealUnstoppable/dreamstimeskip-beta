@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | DTS HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0A0A0A;
+            --primary-card-color: #141414;
+            --secondary-card-color: #1f1f1f;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --text-primary: #F5F5F7;
+            --text-secondary: #A3A3A3;
+            --accent-blue: #2563EB;
+            --accent-red: #DC2626;
+            --accent-green: #16A34A;
+            --font-main: 'Inter', sans-serif;
+        }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        .account-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            gap: 30px;
+        }
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 20px;
+            background-color: var(--primary-card-color);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            line-height: 1.2;
+        }
+        .sidebar-header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+            word-wrap: break-word;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar-nav a {
+            display: block;
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sidebar-nav a:hover {
+            background-color: var(--primary-card-color);
+            color: var(--text-primary);
+        }
+        .sidebar-nav a.active {
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+        .sign-out-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background-color: var(--primary-card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .sign-out-btn:hover {
+            background-color: var(--accent-red);
+            color: var(--text-primary);
+            border-color: var(--accent-red);
+        }
+
+        .main-content {
+            flex-grow: 1;
+        }
+        .content-section {
+            display: none;
+            background-color: var(--primary-card-color);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .content-section.active {
+            display: block;
+        }
+        .content-section h3 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: var(--secondary-card-color);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .card h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .order, .subscription {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .order:last-child, .subscription:last-child {
+            border-bottom: none;
+        }
+        
+        /* Form elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: #2c2c2c;
+            color: var(--text-primary);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1D4ED8;
+        }
+        .btn-secondary {
+            background-color: var(--secondary-card-color);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover {
+            border-color: var(--text-secondary);
+        }
+        .btn-danger {
+            background-color: var(--accent-red);
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #B91C1C;
+        }
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+        }
+        
+        #delete-account-card {
+            border-color: var(--accent-red);
+        }
+        .notification {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+        }
+        .notification.success {
+            background-color: rgba(22, 163, 74, 0.2);
+            color: var(--accent-green);
+        }
+        .notification.error {
+            background-color: rgba(220, 38, 38, 0.2);
+            color: var(--accent-red);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 20px 10px; }
+            .account-layout { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .main-content { width: 100%; }
+            .content-section { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="account-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2 id="welcome-header">Welcome!</h2>
+                <p id="user-email-sidebar"></p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#dashboard" id="nav-dashboard" class="active">Dashboard</a></li>
+                    <li><a href="#orders" id="nav-orders">My Orders</a></li>
+                    <li><a href="#subscriptions" id="nav-subscriptions">Subscriptions</a></li>
+                    <li><a href="#settings" id="nav-settings">Settings</a></li>
+                    <li><a href="#support" id="nav-support">Support</a></li>
+                </ul>
+            </nav>
+            <button class="sign-out-btn" id="sign-out">Sign Out</button>
+        </aside>
+
+        <main class="main-content">
+            <section id="dashboard" class="content-section active">
+                <h3>Dashboard</h3>
+                <div class="card">
+                    <h4>Quick Overview</h4>
+                    <p>Welcome to your personal hub. You can manage your orders, subscriptions, and account settings here.</p>
+                </div>
+                <div class="card">
+                    <h4>Newsletter</h4>
+                    <p>Stay in the loop with news, announcements, and exclusive beta access.</p>
+                    <button class="btn btn-primary" id="newsletter-signup">Sign Up for Newsletter</button>
+                    <div id="newsletter-notification" class="notification"></div>
+                </div>
+            </section>
+
+            <section id="orders" class="content-section">
+                <h3>My Orders</h3>
+                <div class="card">
+                    <div id="orders-list">
+                        <div class="order">
+                            <span>Order #UNS-1024 - Unstoppable Hoodie</span>
+                            <span>$49.99</span>
+                        </div>
+                        <div class="order">
+                            <span>Order #DTS-3051 - DTS Founder's Pack</span>
+                            <span>$99.99</span>
+                        </div>
+                        <p style="margin-top: 20px; color: var(--text-secondary);">This is sample data. Order history is not yet available.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="subscriptions" class="content-section">
+                <h3>Subscriptions & Payment</h3>
+                <div class="card">
+                    <h4>Active Subscriptions</h4>
+                    <div id="subscription-list">
+                        <div class="subscription">
+                            <div>
+                                <strong>DTS Hub Premium</strong><br>
+                                <small>$9.99 / month</small>
+                            </div>
+                            <button class="btn btn-secondary" id="cancel-sub-btn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Payment Method</h4>
+                    <p>Visa ending in <strong>1234</strong></p>
+                    <p style="color: var(--text-secondary);">Functionality to change payment method is coming soon.</p>
+                </div>
+            </section>
+
+            <section id="settings" class="content-section">
+                <h3>Settings</h3>
+                <div class="card">
+                    <h4>Update Profile</h4>
+                    <form id="update-profile-form">
+                        <div class="form-group">
+                            <label for="update-username">Username</label>
+                            <input type="text" id="update-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update-email">Email</label>
+                            <input type="email" id="update-email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div id="profile-notification" class="notification"></div>
+                    </form>
+                </div>
+                <div class="card">
+                    <h4>Change Password</h4>
+                    <form id="change-password-form">
+                        <div class="form-group">
+                            <label for="current-password">Current Password</label>
+                            <input type="password" id="current-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-password">New Password</label>
+                            <input type="password" id="new-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                         <div id="password-notification" class="notification"></div>
+                    </form>
+                </div>
+                 <div class="card" id="delete-account-card">
+                    <h4>Delete Account</h4>
+                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                </div>
+            </section>
+
+            <section id="support" class="content-section">
+                <h3>Contact Support</h3>
+                <div class="card">
+                    <p>If you need help or have any questions, please reach out to our support team. We're happy to assist you!</p>
+                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- AUTHENTICATION & DATA ---
+            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            const isNewUser = sessionStorage.getItem('newUser') === 'true';
+
+            if (!loggedInUser) {
+                // If no user is logged in, redirect to the sign-in page
+                window.location.href = 'sign in beta.html';
+                return;
+            }
+
+            // Get all users to perform updates
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            // --- DOM ELEMENTS ---
+            const welcomeHeader = document.getElementById('welcome-header');
+            const userEmailSidebar = document.getElementById('user-email-sidebar');
+            const navLinks = document.querySelectorAll('.sidebar-nav a');
+            const contentSections = document.querySelectorAll('.content-section');
+            const signOutBtn = document.getElementById('sign-out');
+
+            // --- PAGE INITIALIZATION ---
+            const initializePage = () => {
+                if (isNewUser) {
+                    welcomeHeader.textContent = `Welcome to Unstoppable, ${loggedInUser.username}!`;
+                    sessionStorage.removeItem('newUser'); // Remove flag after showing message
+                } else {
+                    welcomeHeader.textContent = `Welcome back, ${loggedInUser.username}!`;
+                }
+                userEmailSidebar.textContent = loggedInUser.email;
+
+                // Pre-fill settings forms
+                document.getElementById('update-username').value = loggedInUser.username;
+                document.getElementById('update-email').value = loggedInUser.email;
+            };
+
+            // --- NAVIGATION ---
+            const handleNavClick = (e) => {
+                e.preventDefault();
+                const targetId = e.currentTarget.getAttribute('href').substring(1);
+
+                // Update active link
+                navLinks.forEach(link => link.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+
+                // Update active content section
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+            };
+
+            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
+            
+            // --- ACTIONS & EVENT LISTENERS ---
+
+            // Sign Out
+            signOutBtn.addEventListener('click', () => {
+                localStorage.removeItem('loggedInUser');
+                window.location.href = 'sign in beta.html';
+            });
+
+            // Helper to show notifications
+            const showNotification = (element, message, type) => {
+                element.textContent = message;
+                element.className = 'notification'; // Reset classes
+                element.classList.add(type);
+                element.style.display = 'block';
+                setTimeout(() => { element.style.display = 'none'; }, 4000);
+            };
+
+            // Newsletter Signup
+            document.getElementById('newsletter-signup').addEventListener('click', () => {
+                const notificationEl = document.getElementById('newsletter-notification');
+                showNotification(notificationEl, 'Admin (catalinandrian1@gmail.com) has been notified of your subscription request!', 'success');
+            });
+            
+            // Cancel Subscription
+            document.getElementById('cancel-sub-btn').addEventListener('click', () => {
+                 if (confirm('Are you sure you want to cancel your DTS Hub Premium subscription?')) {
+                    alert('Subscription cancelled successfully. (This is a demo)');
+                    document.getElementById('subscription-list').innerHTML = '<p>No active subscriptions.</p>';
+                 }
+            });
+
+            // Update Profile
+            document.getElementById('update-profile-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newUsername = document.getElementById('update-username').value;
+                const newEmail = document.getElementById('update-email').value;
+                const notificationEl = document.getElementById('profile-notification');
+
+                const userIndex = users.findIndex(u => u.email === loggedInUser.email);
+                
+                // Check if new email is already taken by another user
+                const emailExists = users.some((user, index) => user.email === newEmail && index !== userIndex);
+                if (emailExists) {
+                    showNotification(notificationEl, 'This email is already in use by another account.', 'error');
+                    return;
+                }
+
+                // Update user data
+                if (userIndex !== -1) {
+                    users[userIndex].username = newUsername;
+                    users[userIndex].email = newEmail;
+                    localStorage.setItem('users', JSON.stringify(users));
+
+                    // Update the currently logged-in user session
+                    loggedInUser.username = newUsername;
+                    loggedInUser.email = newEmail;
+                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
+                    // Refresh sidebar
+                    initializePage();
+                    showNotification(notificationEl, 'Profile updated successfully!', 'success');
+                }
+            });
+
+            // Change Password
+            document.getElementById('change-password-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const notificationEl = document.getElementById('password-notification');
+
+                if (currentPassword !== loggedInUser.password) {
+                    showNotification(notificationEl, 'Current password is incorrect.', 'error');
+                    return;
+                }
+
+                const userIndex = users.findIndex(u => u.email === loggedInUser.email);
+                 if (userIndex !== -1) {
+                    users[userIndex].password = newPassword;
+                    localStorage.setItem('users', JSON.stringify(users));
+
+                    loggedInUser.password = newPassword;
+                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+                    
+                    showNotification(notificationEl, 'Password changed successfully!', 'success');
+                    e.target.reset(); // Clear the form
+                 }
+            });
+
+            // Delete Account
+            document.getElementById('delete-account-btn').addEventListener('click', () => {
+                if (confirm('DANGER: Are you absolutely sure you want to delete your account? This action is permanent.')) {
+                    // Remove user from the users array
+                    const updatedUsers = users.filter(u => u.email !== loggedInUser.email);
+                    localStorage.setItem('users', JSON.stringify(updatedUsers));
+                    
+                    // Sign out and redirect
+                    signOutBtn.click();
+                }
+            });
+
+            // --- RUN INITIALIZATION ---
+            initializePage();
+        });
+    </script>
+</body>
+</html>
