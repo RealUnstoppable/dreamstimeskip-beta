@@ -269,24 +269,23 @@
         const db = getFirestore(app);
         const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-        // This is the key to fixing the loop.
-        // The page remains hidden until Firebase confirms the user's login state.
+        // **FIX:** The page is hidden by default and only shown after Firebase confirms the user state.
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {
-                    document.body.style.display = 'flex'; // Now, show the page content
+                    document.body.style.display = 'flex'; // Show the page now that we have the user data.
                     initializePage(user, userDoc.data());
                     setupEventListeners(user);
                 } else {
-                    // If user is in Auth but not Firestore, something is wrong.
+                    // This can happen if a user is created in Auth but the database write fails.
                     alert("Could not find user data. Signing out.");
                     signOut(auth);
                 }
             } else {
-                // If no user is logged in, redirect to the sign-in page.
+                // If no user is logged in, redirect them to sign in.
                 window.location.replace('sign in beta.html');
             }
         });
@@ -331,9 +330,11 @@
             });
 
             document.getElementById('delete-account-btn').addEventListener('click', async () => {
-                if (!confirm('DANGER: This action is permanent. Are you sure you want to delete your account?')) return;
+                if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
                 try {
+                    // Must delete the Firestore document first
                     await deleteDoc(doc(db, "users", user.uid));
+                    // Then delete the user from Auth
                     await deleteUser(user);
                     alert('Your account has been permanently deleted.');
                 } catch (error) {

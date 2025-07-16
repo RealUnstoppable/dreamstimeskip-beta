@@ -125,7 +125,7 @@
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
             <form id="auth-form">
-                <div class="input-group" id="username-group">
+                <div class="input-group" id="username-group" style="display: none;">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username">
                 </div>
@@ -170,8 +170,15 @@
         // It waits for Firebase to establish a session and then redirects.
         onAuthStateChanged(auth, user => {
             if (user) {
-                const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-                window.location.replace(destination);
+                // To prevent a redirect loop, first check if we have the user's data in Firestore.
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then(docSnap => {
+                    if (docSnap.exists()) {
+                        const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
+                        window.location.replace(destination);
+                    }
+                    // If doc doesn't exist yet, do nothing and let the form submission handle it.
+                });
             }
             // If there is no user, the script does nothing, allowing the sign-in form to be used.
         });
@@ -217,6 +224,7 @@
                 }
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // **THE FIX:** After creating the user, we immediately create their database record.
                     await setDoc(doc(db, "users", userCredential.user.uid), {
                         username: username,
                         email: userCredential.user.email,
@@ -225,7 +233,8 @@
                         isAdmin: userCredential.user.email === ADMIN_EMAIL
                     });
                     sessionStorage.setItem('newUser', 'true');
-                    // Redirection is handled by the onAuthStateChanged listener above
+                    // Now we can safely redirect.
+                    window.location.replace('account.html');
                 } catch (error) {
                     showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;
@@ -235,12 +244,15 @@
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
-                    if (userDoc.exists() && userDoc.data().isBanned) {
-                        await signOut(auth); // Important: sign out the banned user
-                        showMessage("This account has been suspended.");
+                    if (userDoc.exists() && !userDoc.data().isBanned) {
+                        const destination = userCredential.user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
+                        // Now we can safely redirect.
+                        window.location.replace(destination);
+                    } else {
+                        await signOut(auth);
+                        showMessage("This account is suspended or does not exist.");
                         submitBtn.disabled = false;
                     }
-                     // Redirection is handled by the onAuthStateChanged listener if not banned
                 } catch (error) {
                     showMessage(getFirebaseErrorMessage(error));
                     submitBtn.disabled = false;
@@ -254,6 +266,7 @@
                     return 'Please enter a valid email address.';
                 case 'auth/user-not-found':
                 case 'auth/wrong-password':
+                case 'auth/invalid-credential':
                     return 'Invalid email or password.';
                 case 'auth/email-already-in-use':
                     return 'An account with this email already exists.';
