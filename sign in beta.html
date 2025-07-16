@@ -122,33 +122,9 @@
             height: 20px;
         }
 
-        /* Registered Accounts Section */
+        /* Registered Accounts Section (can be removed, as it was for localStorage) */
         .accounts-container {
-            background-color: #1e1e1e;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            width: 100%;
-            box-sizing: border-box;
-            display: none; /* Hidden by default */
-        }
-
-        #accounts-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        #accounts-list li {
-            background-color: #2c2c2c;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            border-left: 4px solid #007bff;
+            display: none;
         }
     </style>
 </head>
@@ -175,33 +151,38 @@
             <p id="message"></p>
             <a href="#" class="toggle-link" id="toggle-form">Don't have an account? Sign Up</a>
         </div>
-        
-        <div class="welcome-container" id="welcome-container" style="display: none;">
-            <h1 id="welcome-message"></h1>
-            <button id="sign-out-btn">Sign Out</button>
-        </div>
-
-        <button id="view-accounts-btn" style="margin-top: 20px; width: auto; padding: 10px 20px; display: none;">View Registered Accounts</button>
-
-        <div class="accounts-container" id="accounts-container">
-            <h2>Registered Accounts</h2>
-            <ul id="accounts-list"></ul>
-        </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- AUTHENTICATION CHECK ---
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
-        
-        if (loggedInUser) {
-            const destination = loggedInUser.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-            window.location.href = destination;
-            return;
-        }
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // --- DOM ELEMENTS ---
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+            authDomain: "dts-hub-website.firebaseapp.com",
+            projectId: "dts-hub-website",
+            storageBucket: "dts-hub-website.appspot.com",
+            messagingSenderId: "48345990988",
+            appId: "1:48345990988:web:e3662c9b508168546471e9",
+            measurementId: "G-ZN3YJPHVGX"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+
+        // Redirect user if they are already logged in
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
+                window.location.replace(destination);
+            }
+        });
+
         const form = document.getElementById('auth-form');
         const formTitle = document.getElementById('form-title');
         const submitBtn = document.getElementById('submit-btn');
@@ -216,80 +197,72 @@
             usernameGroup.style.display = isSignUp ? 'block' : 'none';
             document.getElementById('username').required = isSignUp;
             submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
-            toggleLink.textContent = isSignUp ? 'Already have an account? Sign In' : 'Don\'t have an account? Sign Up';
+            toggleLink.textContent = isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up";
             messageEl.textContent = '';
         };
 
-        toggleLink.addEventListener('click', (e) => {
+        toggleLink.addEventListener('click', e => {
             e.preventDefault();
             isSignUp = !isSignUp;
             updateFormView();
         });
         
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const username = document.getElementById('username').value.trim();
             
-            let users = JSON.parse(localStorage.getItem('users')) || [];
+            messageEl.textContent = '';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.7';
 
             if (isSignUp) {
-                // --- Sign Up Logic ---
-                if (users.some(user => user.email === email)) {
-                    showMessage('User with this email already exists.', 'error');
-                    return;
-                }
                 if (!username || !email || !password) {
-                     showMessage('All fields are required for sign up.', 'error');
+                    showMessage("All fields are required.");
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
                     return;
                 }
-
-                const newUser = { 
-                    username, 
-                    email, 
-                    password,
-                    isBanned: false, // NEW: Ban status
-                    signupDate: Date.now() // NEW: Timestamp for metrics
-                };
-                users.push(newUser);
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                sessionStorage.setItem('newUser', 'true');
-                localStorage.setItem('loggedInUser', JSON.stringify(newUser));
-                window.location.href = 'account.html';
-
+                try {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    await setDoc(doc(db, "users", userCredential.user.uid), {
+                        username: username,
+                        email: userCredential.user.email,
+                        signupDate: serverTimestamp(),
+                        isBanned: false,
+                        isAdmin: userCredential.user.email === ADMIN_EMAIL
+                    });
+                    sessionStorage.setItem('newUser', 'true');
+                    // Redirection is handled by onAuthStateChanged listener
+                } catch (error) {
+                    showMessage(error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
             } else {
-                // --- Sign In Logic ---
-                let user = users.find(u => u.email === email);
+                try {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const userDocRef = doc(db, "users", userCredential.user.uid);
+                    const userDoc = await getDoc(userDocRef);
 
-                if (user && user.isBanned) {
-                    showMessage('Your account has been suspended by an administrator.', 'error');
-                    return;
-                }
-
-                if (user && user.password === password) {
-                    // Set last login timestamp for performance metrics
-                    user.lastLogin = Date.now();
-                    localStorage.setItem('users', JSON.stringify(users)); // Save updated user data
-                    
-                    localStorage.setItem('loggedInUser', JSON.stringify(user));
-                    
-                    // Redirect to admin or regular account page
-                    const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-                    window.location.href = destination;
-                } else {
-                    showMessage('Invalid email or password.', 'error');
+                    if (userDoc.exists() && userDoc.data().isBanned) {
+                        await signOut(auth);
+                        showMessage("Your account has been suspended.");
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                    }
+                    // Redirection is handled by onAuthStateChanged listener if not banned
+                } catch (error) {
+                    showMessage(error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
                 }
             }
         });
         
-        function showMessage(msg, type) {
-            messageEl.textContent = msg;
-            messageEl.style.color = type === 'success' ? '#28a745' : '#ff4d4d';
-        }
+        function showMessage(msg) { messageEl.textContent = msg; }
         updateFormView();
-    });
-</script>
+    </script>
 </body>
 </html>

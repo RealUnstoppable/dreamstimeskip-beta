@@ -48,35 +48,70 @@
             border: 1px solid var(--border-color);
         }
         .sidebar-header h2 {
-            font-size: 1.2rem; margin: 0 0 5px 0;
+            font-size: 1.2rem;
+            margin: 0 0 5px;
             color: var(--accent-yellow);
         }
         .sidebar-header p {
-            font-size: 0.9rem; color: var(--text-secondary); margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
             word-wrap: break-word;
         }
-        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
         .sidebar-nav a {
-            display: block; padding: 15px 20px; color: var(--text-secondary);
-            text-decoration: none; border-radius: 8px; margin-bottom: 5px;
-            font-weight: 500; transition: background-color 0.2s, color 0.2s;
+            display: block;
+            padding: 15px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
         }
-        .sidebar-nav a:hover { background-color: var(--primary-card-color); color: var(--text-primary); }
-        .sidebar-nav a.active { background-color: var(--accent-blue); color: var(--text-primary); }
+        .sidebar-nav a:hover {
+            background-color: var(--primary-card-color);
+            color: var(--text-primary);
+        }
+        .sidebar-nav a.active {
+            background-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
         .sign-out-btn {
-            width: 100%; margin-top: 20px; padding: 15px 20px;
-            background-color: var(--primary-card-color); border: 1px solid var(--border-color);
-            color: var(--text-secondary); font-weight: 500; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s, color 0.2s;
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background-color: var(--primary-card-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
         }
-        .sign-out-btn:hover { background-color: var(--accent-red); color: var(--text-primary); border-color: var(--accent-red); }
-
-        .main-content { flex-grow: 1; }
-        .content-section { display: none; }
-        .content-section.active { display: block; }
-        .content-section > h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; }
-        
-        /* Performance Metrics */
+        .sign-out-btn:hover {
+            background-color: var(--accent-red);
+            color: var(--text-primary);
+            border-color: var(--accent-red);
+        }
+        .main-content {
+            flex-grow: 1;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .content-section > h3 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -99,8 +134,6 @@
             color: var(--text-secondary);
             margin-top: 5px;
         }
-
-        /* User Management Table */
         .user-table-container {
             background-color: var(--primary-card-color);
             border: 1px solid var(--border-color);
@@ -116,16 +149,27 @@
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
         }
-        .user-table th { font-weight: 600; color: var(--text-secondary); }
-        .user-table tr:last-child td { border-bottom: none; }
+        .user-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
         .status-badge {
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
         }
-        .status-badge.active { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
-        .status-badge.banned { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
+        .status-badge.active {
+            background-color: rgba(22, 163, 74, 0.2);
+            color: var(--accent-green);
+        }
+        .status-badge.banned {
+            background-color: rgba(220, 38, 38, 0.2);
+            color: var(--accent-red);
+        }
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -135,22 +179,27 @@
             border: 1px solid transparent;
             transition: all 0.2s;
         }
-        .btn-ban { background-color: var(--accent-red); color: white; }
-        .btn-unban { background-color: var(--accent-green); color: white; }
+        .btn-ban {
+            background-color: var(--accent-red);
+            color: white;
+        }
+        .btn-unban {
+            background-color: var(--accent-green);
+            color: white;
+        }
     </style>
 </head>
 <body>
-
     <div class="admin-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2 id="welcome-header">Admin Panel</h2>
+                <h2>Admin Panel</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#performance" id="nav-performance" class="active">Performance</a></li>
-                    <li><a href="#users" id="nav-users">User Management</a></li>
+                    <li><a href="#performance" class="nav-link active">Performance</a></li>
+                    <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="account.html">My Account Settings</a></li>
                 </ul>
             </nav>
@@ -170,16 +219,11 @@
                         <div class="label">New Sign-ups (24h)</div>
                     </div>
                     <div class="metric-card">
-                        <div class="value" id="active-users">-</div>
-                        <div class="label">Active Users (24h)</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="value" id="total-purchases">-</div>
+                        <div class="value" id="total-purchases">173</div>
                         <div class="label">Total Purchases (Demo)</div>
                     </div>
                 </div>
             </section>
-
             <section id="users" class="content-section">
                 <h3>User Management</h3>
                 <div class="user-table-container">
@@ -201,134 +245,116 @@
         </main>
     </div>
 
-<script>
-    // --- ADMIN REDIRECT CHECK ---
-const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-if (loggedInUser && loggedInUser.email === ADMIN_EMAIL) {
-    window.location.href = 'admin.html';
-    return; // Stop further script execution on this page
-}
-// The rest of your account.html script follows...
-document.addEventListener('DOMContentLoaded', () => {
-    // --- ADMIN AUTHENTICATION ---
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-    const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+            authDomain: "dts-hub-website.firebaseapp.com",
+            projectId: "dts-hub-website",
+            storageBucket: "dts-hub-website.appspot.com",
+            messagingSenderId: "48345990988",
+            appId: "1:48345990988:web:e3662c9b508168546471e9",
+            measurementId: "G-ZN3YJPHVGX"
+        };
 
-    if (!loggedInUser || loggedInUser.email !== ADMIN_EMAIL) {
-        // If not logged in or not an admin, redirect away.
-        window.location.href = 'sign in beta.html';
-        return;
-    }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-    // --- DOM ELEMENTS ---
-    const userEmailSidebar = document.getElementById('user-email-sidebar');
-    const navLinks = document.querySelectorAll('.sidebar-nav a[href^="#"]');
-    const contentSections = document.querySelectorAll('.content-section');
-    const signOutBtn = document.getElementById('sign-out');
-
-    // --- PAGE INITIALIZATION ---
-    userEmailSidebar.textContent = loggedInUser.email;
-
-    // --- NAVIGATION ---
-    const handleNavClick = (e) => {
-        e.preventDefault();
-        const targetId = e.currentTarget.getAttribute('href').substring(1);
-        navLinks.forEach(link => link.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        contentSections.forEach(section => {
-            section.classList.toggle('active', section.id === targetId);
+        // Check user authentication status
+        onAuthStateChanged(auth, user => {
+            if (user && user.email === ADMIN_EMAIL) {
+                document.getElementById('user-email-sidebar').textContent = user.email;
+                loadAdminData();
+            } else {
+                // If not admin or not logged in, redirect to sign-in page
+                window.location.replace('sign in beta.html');
+            }
         });
-    };
-    navLinks.forEach(link => link.addEventListener('click', handleNavClick));
 
-    // --- DATA & LOGIC ---
-    let allUsers = JSON.parse(localStorage.getItem('users')) || [];
-
-    // Performance Metrics Logic
-    const calculatePerformanceMetrics = () => {
-        const now = Date.now();
-        const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-
-        const totalUsers = allUsers.length;
-        const newSignups = allUsers.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-        const activeUsers = allUsers.filter(u => u.lastLogin && u.lastLogin > twentyFourHoursAgo).length;
-        
-        document.getElementById('total-users').textContent = totalUsers;
-        document.getElementById('new-signups').textContent = newSignups;
-        document.getElementById('active-users').textContent = activeUsers;
-        document.getElementById('total-purchases').textContent = '173'; // Placeholder
-    };
-
-    // User Management Logic
-    const renderUserTable = () => {
-        const userListBody = document.getElementById('user-list-body');
-        userListBody.innerHTML = ''; // Clear table
-
-        allUsers.forEach(user => {
-            if (user.email === ADMIN_EMAIL) return; // Don't show admin in the list
-
-            const row = document.createElement('tr');
+        // Load all users from Firestore and update the dashboard
+        async function loadAdminData() {
+            const usersCollection = collection(db, "users");
+            const usersSnapshot = await getDocs(usersCollection);
+            const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            const statusBadge = user.isBanned
-                ? '<span class="status-badge banned">Banned</span>'
-                : '<span class="status-badge active">Active</span>';
+            renderUserTable(users);
+            calculatePerformanceMetrics(users);
+        }
 
-            const actionButton = user.isBanned
-                ? `<button class="btn-sm btn-unban" data-email="${user.email}">Unban</button>`
-                : `<button class="btn-sm btn-ban" data-email="${user.email}">Ban</button>`;
+        // Populate the user management table
+        function renderUserTable(users) {
+            const userListBody = document.getElementById('user-list-body');
+            userListBody.innerHTML = ''; // Clear previous data
+            
+            users.filter(user => !user.isAdmin).forEach(user => {
+                const row = document.createElement('tr');
+                const statusBadge = user.isBanned 
+                    ? `<span class="status-badge banned">Banned</span>` 
+                    : `<span class="status-badge active">Active</span>`;
+                
+                const actionButton = user.isBanned 
+                    ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` 
+                    : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
 
-            const signupDate = user.signupDate 
-                ? new Date(user.signupDate).toLocaleDateString() 
-                : 'N/A';
+                const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
 
-            row.innerHTML = `
-                <td>${user.username}</td>
-                <td>${user.email}</td>
-                <td>${signupDate}</td>
-                <td>${statusBadge}</td>
-                <td>${actionButton}</td>
-            `;
-            userListBody.appendChild(row);
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${signupDate}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionButton}</td>
+                `;
+                userListBody.appendChild(row);
+            });
+        }
+
+        // Calculate and display performance metrics
+        function calculatePerformanceMetrics(users) {
+            const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+            const newSignups = users.filter(u => u.signupDate?.toDate().getTime() > twentyFourHoursAgo).length;
+
+            document.getElementById('total-users').textContent = users.length;
+            document.getElementById('new-signups').textContent = newSignups;
+        }
+
+        // Handle clicks for banning or unbanning users
+        document.getElementById('user-list-body').addEventListener('click', async (e) => {
+            const userId = e.target.dataset.id;
+            if (!userId) return;
+
+            const shouldBeBanned = e.target.classList.contains('btn-ban');
+            
+            if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
+                const userDocRef = doc(db, "users", userId);
+                await updateDoc(userDocRef, { isBanned: shouldBeBanned });
+                loadAdminData(); // Refresh the table
+            }
         });
-    };
 
-    const toggleBanStatus = (email, shouldBeBanned) => {
-        const userIndex = allUsers.findIndex(u => u.email === email);
-        if (userIndex !== -1) {
-            allUsers[userIndex].isBanned = shouldBeBanned;
-            localStorage.setItem('users', JSON.stringify(allUsers));
-            renderUserTable(); // Re-render the table to show the change
-        }
-    };
+        // Handle navigation between dashboard tabs
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                
+                e.currentTarget.classList.add('active');
+                const targetId = e.currentTarget.getAttribute('href');
+                document.querySelector(targetId).classList.add('active');
+            });
+        });
 
-    // --- EVENT LISTENERS ---
-    signOutBtn.addEventListener('click', () => {
-        localStorage.removeItem('loggedInUser');
-        window.location.href = 'sign in beta.html';
-    });
-
-    document.getElementById('user-list-body').addEventListener('click', (e) => {
-        const target = e.target;
-        const userEmail = target.dataset.email;
-
-        if (target.classList.contains('btn-ban')) {
-            if (confirm(`Are you sure you want to ban ${userEmail}?`)) {
-                toggleBanStatus(userEmail, true);
-            }
-        }
-        if (target.classList.contains('btn-unban')) {
-             if (confirm(`Are you sure you want to unban ${userEmail}?`)) {
-                toggleBanStatus(userEmail, false);
-            }
-        }
-    });
-
-    // --- INITIAL RENDER ---
-    calculatePerformanceMetrics();
-    renderUserTable();
-});
-</script>
+        // Sign out functionality
+        document.getElementById('sign-out').addEventListener('click', () => {
+            signOut(auth);
+        });
+    </script>
 </body>
 </html>

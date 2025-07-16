@@ -18,6 +18,7 @@
             --accent-blue: #2563EB;
             --accent-red: #DC2626;
             --accent-green: #16A34A;
+            --accent-yellow: #FBBF24;
             --font-main: 'Inter', sans-serif;
         }
         body {
@@ -38,6 +39,22 @@
         .sidebar {
             width: 250px;
             flex-shrink: 0;
+        }
+        .btn-admin-back {
+            display: block;
+            background-color: var(--accent-yellow);
+            color: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        .btn-admin-back:hover {
+            opacity: 0.85;
         }
         .sidebar-header {
             padding: 20px;
@@ -97,7 +114,6 @@
             color: var(--text-primary);
             border-color: var(--accent-red);
         }
-
         .main-content {
             flex-grow: 1;
         }
@@ -138,8 +154,6 @@
         .order:last-child, .subscription:last-child {
             border-bottom: none;
         }
-        
-        /* Form elements */
         .form-group {
             margin-bottom: 20px;
         }
@@ -170,55 +184,14 @@
             border: 1px solid transparent;
             transition: all 0.2s;
         }
-        .btn-primary {
-            background-color: var(--accent-blue);
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #1D4ED8;
-        }
-        .btn-secondary {
-            background-color: var(--secondary-card-color);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-        .btn-secondary:hover {
-            border-color: var(--text-secondary);
-        }
-        .btn-danger {
-            background-color: var(--accent-red);
-            color: white;
-        }
-        .btn-danger:hover {
-            background-color: #B91C1C;
-        }
-        .btn-link {
-            background: none;
-            border: none;
-            color: var(--accent-blue);
-            cursor: pointer;
-            padding: 0;
-            text-decoration: underline;
-        }
-        
-        #delete-account-card {
-            border-color: var(--accent-red);
-        }
-        .notification {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            margin-top: 15px;
-            display: none;
-        }
-        .notification.success {
-            background-color: rgba(22, 163, 74, 0.2);
-            color: var(--accent-green);
-        }
-        .notification.error {
-            background-color: rgba(220, 38, 38, 0.2);
-            color: var(--accent-red);
-        }
+        .btn-primary { background-color: var(--accent-blue); color: white; }
+        .btn-primary:hover { background-color: #1D4ED8; }
+        .btn-danger { background-color: var(--accent-red); color: white; }
+        .btn-danger:hover { background-color: #B91C1C; }
+        #delete-account-card { border-color: var(--accent-red); }
+        .notification { padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 15px; display: none; }
+        .notification.success { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
+        .notification.error { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
 
         @media (max-width: 768px) {
             body { padding: 20px 10px; }
@@ -230,25 +203,24 @@
     </style>
 </head>
 <body>
-
     <div class="account-layout">
         <aside class="sidebar">
+            <div id="admin-back-button-container"></div>
             <div class="sidebar-header">
-                <h2 id="welcome-header">Welcome!</h2>
+                <h2 id="welcome-header">Loading...</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="#dashboard" id="nav-dashboard" class="active">Dashboard</a></li>
-                    <li><a href="#orders" id="nav-orders">My Orders</a></li>
-                    <li><a href="#subscriptions" id="nav-subscriptions">Subscriptions</a></li>
-                    <li><a href="#settings" id="nav-settings">Settings</a></li>
-                    <li><a href="#support" id="nav-support">Support</a></li>
+                    <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#orders" class="nav-link">My Orders</a></li>
+                    <li><a href="#subscriptions" class="nav-link">Subscriptions</a></li>
+                    <li><a href="#settings" class="nav-link">Settings</a></li>
+                    <li><a href="#support" class="nav-link">Support</a></li>
                 </ul>
             </nav>
             <button class="sign-out-btn" id="sign-out">Sign Out</button>
         </aside>
-
         <main class="main-content">
             <section id="dashboard" class="content-section active">
                 <h3>Dashboard</h3>
@@ -263,45 +235,18 @@
                     <div id="newsletter-notification" class="notification"></div>
                 </div>
             </section>
-
             <section id="orders" class="content-section">
                 <h3>My Orders</h3>
                 <div class="card">
-                    <div id="orders-list">
-                        <div class="order">
-                            <span>Order #UNS-1024 - Unstoppable Hoodie</span>
-                            <span>$49.99</span>
-                        </div>
-                        <div class="order">
-                            <span>Order #DTS-3051 - DTS Founder's Pack</span>
-                            <span>$99.99</span>
-                        </div>
-                        <p style="margin-top: 20px; color: var(--text-secondary);">This is sample data. Order history is not yet available.</p>
-                    </div>
+                     <p style="color: var(--text-secondary);">Order history is not yet available.</p>
                 </div>
             </section>
-
             <section id="subscriptions" class="content-section">
                 <h3>Subscriptions & Payment</h3>
                 <div class="card">
-                    <h4>Active Subscriptions</h4>
-                    <div id="subscription-list">
-                        <div class="subscription">
-                            <div>
-                                <strong>DTS Hub Premium</strong><br>
-                                <small>$9.99 / month</small>
-                            </div>
-                            <button class="btn btn-secondary" id="cancel-sub-btn">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Payment Method</h4>
-                    <p>Visa ending in <strong>1234</strong></p>
-                    <p style="color: var(--text-secondary);">Functionality to change payment method is coming soon.</p>
+                     <p style="color: var(--text-secondary);">Subscription management is not yet available.</p>
                 </div>
             </section>
-
             <section id="settings" class="content-section">
                 <h3>Settings</h3>
                 <div class="card">
@@ -313,206 +258,136 @@
                         </div>
                         <div class="form-group">
                             <label for="update-email">Email</label>
-                            <input type="email" id="update-email" required>
+                            <input type="email" id="update-email" disabled>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                         <div id="profile-notification" class="notification"></div>
                     </form>
                 </div>
-                <div class="card">
-                    <h4>Change Password</h4>
-                    <form id="change-password-form">
-                        <div class="form-group">
-                            <label for="current-password">Current Password</label>
-                            <input type="password" id="current-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-password">New Password</label>
-                            <input type="password" id="new-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Password</button>
-                         <div id="password-notification" class="notification"></div>
-                    </form>
-                </div>
-                 <div class="card" id="delete-account-card">
+                <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
                     <p>This action is permanent and cannot be undone. All your data will be removed.</p>
                     <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
                 </div>
             </section>
-
             <section id="support" class="content-section">
                 <h3>Contact Support</h3>
                 <div class="card">
-                    <p>If you need help or have any questions, please reach out to our support team. We're happy to assist you!</p>
+                    <p>If you need help, please reach out. We're happy to assist!</p>
                     <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
                 </div>
             </section>
         </main>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- AUTHENTICATION & DATA ---
-            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            const isNewUser = sessionStorage.getItem('newUser') === 'true';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+            authDomain: "dts-hub-website.firebaseapp.com",
+            projectId: "dts-hub-website",
+            storageBucket: "dts-hub-website.appspot.com",
+            messagingSenderId: "48345990988",
+            appId: "1:48345990988:web:e3662c9b508168546471e9",
+            measurementId: "G-ZN3YJPHVGX"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            if (!loggedInUser) {
-                // If no user is logged in, redirect to the sign-in page
-                window.location.href = 'sign in beta.html';
-                return;
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    initializePage(user, userDoc.data());
+                    setupEventListeners(user);
+                } else {
+                    signOut(auth);
+                }
+            } else {
+                window.location.replace('sign in beta.html');
+            }
+        });
+
+        function initializePage(user, userData) {
+            const adminBackBtnContainer = document.getElementById('admin-back-button-container');
+            if (userData.isAdmin) {
+                const backButton = document.createElement('a');
+                backButton.href = 'admin.html';
+                backButton.className = 'btn-admin-back';
+                backButton.textContent = '← Back to Admin';
+                adminBackBtnContainer.appendChild(backButton);
             }
 
-            // Get all users to perform updates
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            
-            // --- DOM ELEMENTS ---
             const welcomeHeader = document.getElementById('welcome-header');
-            const userEmailSidebar = document.getElementById('user-email-sidebar');
-            const navLinks = document.querySelectorAll('.sidebar-nav a');
-            const contentSections = document.querySelectorAll('.content-section');
-            const signOutBtn = document.getElementById('sign-out');
+            if (sessionStorage.getItem('newUser')) {
+                welcomeHeader.textContent = `Welcome, ${userData.username}!`;
+                sessionStorage.removeItem('newUser');
+            } else {
+                welcomeHeader.textContent = `Welcome back, ${userData.username}!`;
+            }
 
-            // --- PAGE INITIALIZATION ---
-            const initializePage = () => {
-                if (isNewUser) {
-                    welcomeHeader.textContent = `Welcome to Unstoppable, ${loggedInUser.username}!`;
-                    sessionStorage.removeItem('newUser'); // Remove flag after showing message
-                } else {
-                    welcomeHeader.textContent = `Welcome back, ${loggedInUser.username}!`;
-                }
-                userEmailSidebar.textContent = loggedInUser.email;
+            document.getElementById('user-email-sidebar').textContent = user.email;
+            document.getElementById('update-username').value = userData.username;
+            document.getElementById('update-email').value = user.email;
+        }
 
-                // Pre-fill settings forms
-                document.getElementById('update-username').value = loggedInUser.username;
-                document.getElementById('update-email').value = loggedInUser.email;
-            };
-
-            // --- NAVIGATION ---
-            const handleNavClick = (e) => {
-                e.preventDefault();
-                const targetId = e.currentTarget.getAttribute('href').substring(1);
-
-                // Update active link
-                navLinks.forEach(link => link.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-
-                // Update active content section
-                contentSections.forEach(section => {
-                    if (section.id === targetId) {
-                        section.classList.add('active');
-                    } else {
-                        section.classList.remove('active');
-                    }
-                });
-            };
-
-            navLinks.forEach(link => link.addEventListener('click', handleNavClick));
-            
-            // --- ACTIONS & EVENT LISTENERS ---
-
-            // Sign Out
-            signOutBtn.addEventListener('click', () => {
-                localStorage.removeItem('loggedInUser');
-                window.location.href = 'sign in beta.html';
+        function setupEventListeners(user) {
+            document.getElementById('sign-out').addEventListener('click', () => {
+                signOut(auth).then(() => window.location.replace('index.html'));
             });
 
-            // Helper to show notifications
+            document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newUsername = document.getElementById('update-username').value;
+                const notificationEl = document.getElementById('profile-notification');
+                const userDocRef = doc(db, "users", user.uid);
+                
+                try {
+                    await updateDoc(userDocRef, { username: newUsername });
+                    showNotification(notificationEl, 'Profile updated successfully!', 'success');
+                    document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
+            });
+
+            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+                if (!confirm('DANGER: This will permanently delete your account. Are you sure?')) return;
+                try {
+                    await deleteDoc(doc(db, "users", user.uid));
+                    await deleteUser(user);
+                    alert('Account permanently deleted.');
+                } catch (error) {
+                     alert(`Error: ${error.message}. Please sign in again to perform this action.`);
+                     signOut(auth);
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    const targetId = e.currentTarget.getAttribute('href');
+                    document.querySelector(targetId).classList.add('active');
+                });
+            });
+
             const showNotification = (element, message, type) => {
                 element.textContent = message;
-                element.className = 'notification'; // Reset classes
+                element.className = 'notification';
                 element.classList.add(type);
                 element.style.display = 'block';
                 setTimeout(() => { element.style.display = 'none'; }, 4000);
             };
-
-            // Newsletter Signup
-            document.getElementById('newsletter-signup').addEventListener('click', () => {
-                const notificationEl = document.getElementById('newsletter-notification');
-                showNotification(notificationEl, 'Admin (catalinandrian1@gmail.com) has been notified of your subscription request!', 'success');
-            });
-            
-            // Cancel Subscription
-            document.getElementById('cancel-sub-btn').addEventListener('click', () => {
-                 if (confirm('Are you sure you want to cancel your DTS Hub Premium subscription?')) {
-                    alert('Subscription cancelled successfully. (This is a demo)');
-                    document.getElementById('subscription-list').innerHTML = '<p>No active subscriptions.</p>';
-                 }
-            });
-
-            // Update Profile
-            document.getElementById('update-profile-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newUsername = document.getElementById('update-username').value;
-                const newEmail = document.getElementById('update-email').value;
-                const notificationEl = document.getElementById('profile-notification');
-
-                const userIndex = users.findIndex(u => u.email === loggedInUser.email);
-                
-                // Check if new email is already taken by another user
-                const emailExists = users.some((user, index) => user.email === newEmail && index !== userIndex);
-                if (emailExists) {
-                    showNotification(notificationEl, 'This email is already in use by another account.', 'error');
-                    return;
-                }
-
-                // Update user data
-                if (userIndex !== -1) {
-                    users[userIndex].username = newUsername;
-                    users[userIndex].email = newEmail;
-                    localStorage.setItem('users', JSON.stringify(users));
-
-                    // Update the currently logged-in user session
-                    loggedInUser.username = newUsername;
-                    loggedInUser.email = newEmail;
-                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-                    // Refresh sidebar
-                    initializePage();
-                    showNotification(notificationEl, 'Profile updated successfully!', 'success');
-                }
-            });
-
-            // Change Password
-            document.getElementById('change-password-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const currentPassword = document.getElementById('current-password').value;
-                const newPassword = document.getElementById('new-password').value;
-                const notificationEl = document.getElementById('password-notification');
-
-                if (currentPassword !== loggedInUser.password) {
-                    showNotification(notificationEl, 'Current password is incorrect.', 'error');
-                    return;
-                }
-
-                const userIndex = users.findIndex(u => u.email === loggedInUser.email);
-                 if (userIndex !== -1) {
-                    users[userIndex].password = newPassword;
-                    localStorage.setItem('users', JSON.stringify(users));
-
-                    loggedInUser.password = newPassword;
-                    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-                    
-                    showNotification(notificationEl, 'Password changed successfully!', 'success');
-                    e.target.reset(); // Clear the form
-                 }
-            });
-
-            // Delete Account
-            document.getElementById('delete-account-btn').addEventListener('click', () => {
-                if (confirm('DANGER: Are you absolutely sure you want to delete your account? This action is permanent.')) {
-                    // Remove user from the users array
-                    const updatedUsers = users.filter(u => u.email !== loggedInUser.email);
-                    localStorage.setItem('users', JSON.stringify(updatedUsers));
-                    
-                    // Sign out and redirect
-                    signOutBtn.click();
-                }
-            });
-
-            // --- RUN INITIALIZATION ---
-            initializePage();
-        });
+        }
     </script>
 </body>
 </html>

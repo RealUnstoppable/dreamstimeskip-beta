@@ -249,7 +249,6 @@
     <script src="script.js"></script>
 
     <script>
-        // --- SCRIPT FOR THE "SIRI" ORB ---
         document.addEventListener('DOMContentLoaded', () => {
             const siriOrb = document.getElementById('siri-orb');
             let inactivityTimeout;
@@ -272,26 +271,56 @@
                 }
             });
         });
+    </script>
+    
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
-        // --- SCRIPT FOR DYNAMIC NAVBAR BUTTON ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const navCtaContainer = document.getElementById('nav-cta-container');
-            const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-            const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+        authDomain: "dts-hub-website.firebaseapp.com",
+        projectId: "dts-hub-website",
+        storageBucket: "dts-hub-website.appspot.com",
+        messagingSenderId: "48345990988",
+        appId: "1:48345990988:web:e3662c9b508168546471e9",
+        measurementId: "G-ZN3YJPHVGX"
+      };
 
-            let buttonHtml;
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-            if (loggedInUser) {
-                // User is logged in
-                const destination = loggedInUser.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-                buttonHtml = `<a href="${destination}" class="cta-button nav-cta">My Account</a>`;
-            } else {
-                // User is not logged in
-                buttonHtml = '<a href="sign in beta.html" class="cta-button nav-cta">Sign In / Sign Up</a>';
-            }
+      // --- SCRIPT FOR DYNAMIC NAVBAR BUTTON ---
+      const navCtaContainer = document.getElementById('nav-cta-container');
+      const mobileCtaLink = document.querySelector('.nav-links li:last-child a');
+
+      onAuthStateChanged(auth, user => {
+        if (user) {
+            // User is logged in
+            const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
             
-            navCtaContainer.innerHTML = buttonHtml;
-        });
+            // Update desktop button
+            navCtaContainer.innerHTML = `<a href="${destination}" class="cta-button nav-cta">My Account</a>`;
+            
+            // Update mobile link
+            mobileCtaLink.href = destination;
+            mobileCtaLink.textContent = "My Account";
+
+        } else {
+            // User is logged out
+            const destination = 'sign in beta.html';
+            
+            // Update desktop button
+            navCtaContainer.innerHTML = `<a href="${destination}" class="cta-button nav-cta">Sign In / Sign Up</a>`;
+            
+            // Update mobile link
+            mobileCtaLink.href = destination;
+            mobileCtaLink.textContent = "Sign In / Sign Up";
+        }
+      });
     </script>
 </body>
 </html>
