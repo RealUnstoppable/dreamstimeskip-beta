@@ -10,28 +10,28 @@ const products = [
         name: 'Unstoppable Hoodie',
         price: 59.99,
         description: 'Premium black hoodie with the Unstoppable logo. Built for comfort and style.',
-        imageUrl: 'UnstoppableHoodieModel300x300.png'
+        imageUrl: '/images/UnstoppableHoodieModel300x300.png'
     },
     {
         id: 'dts-model-tee',
         name: 'DTS Model Tee',
         price: 24.99,
         description: 'Iconic tee featuring the official Dreams TimeSkip character art.',
-        imageUrl: 'DreamsTimeSkipModel300x300.jpg'
+        imageUrl: 'images/DreamsTimeSkipModel300x300.jpg'
     },
     {
         id: 'harmonytunes-shirt',
         name: 'HarmonyTunes Shirt',
         price: 24.99,
         description: 'Vibrant shirt with the HarmonyTunes logo. Perfect for music lovers.',
-        imageUrl: 'HarmonyTunesModel300x300.png'
+        imageUrl: 'images/HarmonyTunesModel300x300.png'
     },
     {
         id: 'unstoppable-mousepad',
         name: 'Unstoppable Mousepad',
         price: 19.99,
         description: 'High-performance mousepad for gaming precision.',
-        imageUrl: 'unstoppablemousepadmodel2-300x300.jpg'
+        imageUrl: 'images/unstoppablemousepadmodel2-300x300.jpg'
     }
 ];
 
