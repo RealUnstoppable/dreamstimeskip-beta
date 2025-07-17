@@ -227,32 +227,26 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { collection, getDocs, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-            authDomain: "dts-hub-website.firebaseapp.com",
-            projectId: "dts-hub-website",
-            storageBucket: "dts-hub-website.appspot.com",
-            messagingSenderId: "48345990988",
-            appId: "1:48345990988:web:e3662c9b508168546471e9",
-            measurementId: "G-ZN3YJPHVGX"
-        };
+        // FIX: Authentication check now happens first, using the database flag instead of a hardcoded email.
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
-
-        // **FIX:** Authentication check now happens first, before any other code runs.
-        onAuthStateChanged(auth, user => {
-            if (user && user.email === ADMIN_EMAIL) {
-                document.body.style.display = 'flex'; // Show page only if user is admin
-                initializeAdminPage(user);
+                // Check if the user document exists and if they are an admin.
+                if (userDoc.exists() && userDoc.data().isAdmin) {
+                    document.body.style.display = 'flex'; // Show page only if user is admin
+                    initializeAdminPage(user);
+                } else {
+                    // If not an admin, redirect to the standard account page.
+                    window.location.replace('account.html');
+                }
             } else {
+                // If no user is logged in, redirect to the sign-in page.
                 window.location.replace('sign in beta.html');
             }
         });
@@ -276,6 +270,7 @@
             const userListBody = document.getElementById('user-list-body');
             userListBody.innerHTML = '';
             
+            // Filter out the admin user from the displayed list
             users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
@@ -310,16 +305,15 @@
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     const userDocRef = doc(db, "users", userId);
                     await updateDoc(userDocRef, { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    loadAdminData(); // Refresh data after action
                 }
             });
 
-            // Corrected navigation logic for tabs
             document.querySelectorAll('.sidebar-nav a').forEach(link => {
                 link.addEventListener('click', e => {
                     const targetId = e.currentTarget.getAttribute('href');
                     if (!targetId.startsWith("#")) {
-                        return; // Allows the link to "account.html" to work normally
+                        return; 
                     }
                     e.preventDefault();
                     

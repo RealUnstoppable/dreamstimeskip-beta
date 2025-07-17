@@ -250,49 +250,31 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-            authDomain: "dts-hub-website.firebaseapp.com",
-            projectId: "dts-hub-website",
-            storageBucket: "dts-hub-website.appspot.com",
-            messagingSenderId: "48345990988",
-            appId: "1:48345990988:web:e3662c9b508168546471e9",
-            measurementId: "G-ZN3YJPHVGX"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
-
-        // **FIX:** The page is hidden by default and only shown after Firebase confirms the user state.
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {
-                    document.body.style.display = 'flex'; // Show the page now that we have the user data.
+                    document.body.style.display = 'flex'; 
                     initializePage(user, userDoc.data());
                     setupEventListeners(user);
                 } else {
-                    // This can happen if a user is created in Auth but the database write fails.
                     alert("Could not find user data. Signing out.");
                     signOut(auth);
                 }
             } else {
-                // If no user is logged in, redirect them to sign in.
                 window.location.replace('sign in beta.html');
             }
         });
 
         function initializePage(user, userData) {
-            // Show the 'Back to Admin' button only if the user is an admin
-            if (user.email === ADMIN_EMAIL) {
+            // FIX: Check isAdmin flag from database, not hardcoded email
+            if (userData.isAdmin) {
                 document.getElementById('admin-back-button').style.display = 'block';
             }
 
@@ -329,17 +311,32 @@
                 }
             });
 
+            // FIX: Corrected and secured account deletion logic
             document.getElementById('delete-account-btn').addEventListener('click', async () => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
+                
                 try {
-                    // Must delete the Firestore document first
-                    await deleteDoc(doc(db, "users", user.uid));
-                    // Then delete the user from Auth
+                    const userId = user.uid; // Store UID before user object is invalidated
+                    
+                    // Step 1: Delete the user from Firebase Authentication first.
+                    // This is the most likely step to fail if the session is old.
                     await deleteUser(user);
+
+                    // Step 2: If Auth deletion is successful, then delete the Firestore document.
+                    await deleteDoc(doc(db, "users", userId));
+
                     alert('Your account has been permanently deleted.');
+                    window.location.replace('index.html'); // Redirect after successful deletion
+
                 } catch (error) {
-                     alert(`Error: ${error.message}. To protect your account, please sign out and sign back in, then try again.`);
-                     signOut(auth);
+                    // Step 3: Handle errors, especially the need to re-authenticate.
+                    if (error.code === 'auth/requires-recent-login') {
+                        alert('This action is sensitive and requires recent authentication. Please sign out, sign back in, and then try again.');
+                        signOut(auth); // Sign the user out so they can log in again.
+                    } else {
+                        // Handle other potential errors (e.g., network issues)
+                        alert(`An error occurred while deleting your account: ${error.message}`);
+                    }
                 }
             });
 

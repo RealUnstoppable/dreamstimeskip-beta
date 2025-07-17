@@ -237,7 +237,7 @@
             
             <div class="footer-bottom">
                 <p>&copy; 2025 DreamsTimeSkip LLC. All Rights Reserved.</p>
-                <p>Designed in collaboration with Gemini.</p>
+                <p>Designed in collaboration with Unstoppable.</p>
             </div>
         </div>
     </footer>
@@ -274,33 +274,21 @@
     </script>
     
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-
-      // Your web app's Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-        authDomain: "dts-hub-website.firebaseapp.com",
-        projectId: "dts-hub-website",
-        storageBucket: "dts-hub-website.appspot.com",
-        messagingSenderId: "48345990988",
-        appId: "1:48345990988:web:e3662c9b508168546471e9",
-        measurementId: "G-ZN3YJPHVGX"
-      };
-
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+      import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
       const navCtaContainer = document.getElementById('nav-cta-container');
       const mobileCtaLink = document.querySelector('.nav-links li:last-child a');
 
       // This listener checks the user's login state and updates the UI accordingly.
-      onAuthStateChanged(auth, user => {
+      onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // User is logged in
-            const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
+            // User is logged in, check if they are an admin
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            
+            const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
             
             // Update desktop button
             navCtaContainer.innerHTML = `<a href="${destination}" class="cta-button nav-cta">My Account</a>`;

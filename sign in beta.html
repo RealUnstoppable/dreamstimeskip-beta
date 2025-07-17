@@ -145,42 +145,24 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-            authDomain: "dts-hub-website.firebaseapp.com",
-            projectId: "dts-hub-website",
-            storageBucket: "dts-hub-website.appspot.com",
-            messagingSenderId: "48345990988",
-            appId: "1:48345990988:web:e3662c9b508168546471e9",
-            measurementId: "G-ZN3YJPHVGX"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
         const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
 
-        // This listener is the key to preventing the loop.
-        // It waits for Firebase to establish a session and then redirects.
-        onAuthStateChanged(auth, user => {
+        // This listener prevents a redirect loop.
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // To prevent a redirect loop, first check if we have the user's data in Firestore.
                 const userDocRef = doc(db, "users", user.uid);
-                getDoc(userDocRef).then(docSnap => {
-                    if (docSnap.exists()) {
-                        const destination = user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-                        window.location.replace(destination);
-                    }
-                    // If doc doesn't exist yet, do nothing and let the form submission handle it.
-                });
+                const docSnap = await getDoc(userDocRef);
+                
+                if (docSnap.exists()) {
+                    const isAdmin = docSnap.data().isAdmin || false;
+                    const destination = isAdmin ? 'admin.html' : 'account.html';
+                    window.location.replace(destination);
+                }
             }
-            // If there is no user, the script does nothing, allowing the sign-in form to be used.
         });
 
         const form = document.getElementById('auth-form');
@@ -224,16 +206,14 @@
                 }
                 try {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    // **THE FIX:** After creating the user, we immediately create their database record.
                     await setDoc(doc(db, "users", userCredential.user.uid), {
                         username: username,
                         email: userCredential.user.email,
                         signupDate: serverTimestamp(),
                         isBanned: false,
-                        isAdmin: userCredential.user.email === ADMIN_EMAIL
+                        isAdmin: userCredential.user.email === ADMIN_EMAIL // Set admin status on creation
                     });
                     sessionStorage.setItem('newUser', 'true');
-                    // Now we can safely redirect.
                     window.location.replace('account.html');
                 } catch (error) {
                     showMessage(getFirebaseErrorMessage(error));
@@ -245,8 +225,7 @@
                     const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
                     if (userDoc.exists() && !userDoc.data().isBanned) {
-                        const destination = userCredential.user.email === ADMIN_EMAIL ? 'admin.html' : 'account.html';
-                        // Now we can safely redirect.
+                        const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
                         window.location.replace(destination);
                     } else {
                         await signOut(auth);
