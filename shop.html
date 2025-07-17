@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merch Store | DTS HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="shop.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">DTS <span>HUB</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html#bento">Overview</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+                <li><a href="index.html#harmony">HarmonyTunes</a></li>
+            </ul>
+            <div id="nav-cta-container">
+                 <a href="sign in beta.html" class="cta-button nav-cta">Sign In</a>
+            </div>
+            <button class="hamburger" aria-label="Open menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="shop-main">
+        <section class="shop-header">
+            <h1>Unstoppable Collection</h1>
+            <p>High-quality gear for the dedicated fan. Log in to save your cart.</p>
+        </section>
+
+        <section id="product-grid" class="product-grid">
+            </section>
+    </main>
+
+    <button id="cart-button" class="cart-fab">
+        <span id="cart-icon">🛒</span>
+        <span id="cart-item-count" class="cart-item-count">0</span>
+    </button>
+
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-modal-header">
+                <h2>Your Cart</h2>
+                <button id="close-cart-btn" class="close-cart-btn">&times;</button>
+            </div>
+            <div id="cart-items-container" class="cart-items-container">
+                </div>
+            <div class="cart-modal-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">$0.00</span>
+                </div>
+                <button id="checkout-btn" class="btn-checkout" disabled>Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="shop.js"></script>
+</body>
+</html>
