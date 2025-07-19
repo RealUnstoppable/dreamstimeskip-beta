@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 const products = [
@@ -21,9 +21,9 @@ const products = [
     },
     {
         id: 'harmonytunes-shirt',
-        name: 'HarmonyTunes Shirt',
+        name: 'HarmonyTunes Cap',
         price: 24.99,
-        description: 'Vibrant shirt with the HarmonyTunes logo. Perfect for music lovers.',
+        description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
         imageUrl: 'images/HarmonyTunesModel300x300.png'
     },
     {
@@ -49,6 +49,8 @@ const cartItemCountEl = document.getElementById('cart-item-count');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
 const navCtaContainer = document.getElementById('nav-cta-container');
+const hamburger = document.querySelector('.hamburger'); // <-- ADDED for mobile nav
+const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile nav
 
 
 // --- RENDER FUNCTIONS ---
@@ -117,7 +119,7 @@ async function handleUpdateQuantity(productId, quantity) {
     if (quantity <= 0) {
         await handleRemoveFromCart(productId);
     } else {
-        cart[productId] = quantity;
+        cart[productId] = parseInt(quantity, 10);
         await saveCart();
         renderCart();
     }
@@ -129,7 +131,7 @@ async function handleRemoveFromCart(productId) {
     renderCart();
 }
 
-// --- FIREBASE INTEGRATION ---
+// --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
     if (currentUser) {
@@ -139,23 +141,10 @@ async function saveCart() {
         } catch (error) {
             console.error("Error saving cart to Firestore:", error);
         }
-    }
-}
-
-async function loadCart() {
-    if (currentUser) {
-        const userCartRef = doc(db, 'carts', currentUser.uid);
-        const docSnap = await getDoc(userCartRef);
-        if (docSnap.exists()) {
-            cart = docSnap.data().items || {};
-        } else {
-            cart = {};
-        }
     } else {
-        // For logged-out users, we could use localStorage, but for now we'll just reset.
-        cart = {};
+        // **MODIFIED**: Save cart to localStorage for logged-out users
+        localStorage.setItem('localCart', JSON.stringify(cart));
     }
-    renderCart();
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
@@ -169,6 +158,12 @@ function updateUserNav(user) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+    // **ADDED**: Hamburger menu toggle
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+
     // Product grid listeners
     productGrid.addEventListener('click', (e) => {
         if (e.target.classList.contains('add-to-cart-btn')) {
@@ -217,9 +212,33 @@ document.addEventListener('DOMContentLoaded', () => {
     renderProducts();
     setupEventListeners();
 
+    // **MODIFIED**: Reworked auth state change to handle local cart
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
+        const localCartData = localStorage.getItem('localCart');
+        const localCart = localCartData ? JSON.parse(localCartData) : {};
+
+        if (user) {
+            // User is signed in
+            const userCartRef = doc(db, 'carts', user.uid);
+            const docSnap = await getDoc(userCartRef);
+            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
+
+            // Merge local and firestore carts
+            const mergedCart = { ...firestoreCart };
+            for (const [productId, quantity] of Object.entries(localCart)) {
+                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
+            }
+            
+            cart = mergedCart;
+            await saveCart(); // Save merged cart to Firestore
+            localStorage.removeItem('localCart'); // Clear local cart after merging
+        } else {
+            // User is signed out, load from localStorage
+            cart = localCart;
+        }
+
         updateUserNav(user);
-        await loadCart();
+        renderCart(); // Render the final cart state
     });
 });

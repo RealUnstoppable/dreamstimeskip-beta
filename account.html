@@ -41,7 +41,7 @@
             flex-shrink: 0;
         }
         .btn-admin-back {
-            display: none; /* Hidden by default, shown for admin via JS */
+            display: none;
             background-color: var(--accent-yellow);
             color: var(--bg-color);
             padding: 12px;
@@ -201,6 +201,7 @@
             </div>
             <nav class="sidebar-nav">
                 <ul>
+                    <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
                     <li><a href="#support" class="nav-link">Support</a></li>
@@ -250,7 +251,7 @@
     </div>
 
     <script type="module">
-        import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+        import { auth, db } from './auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
@@ -273,7 +274,6 @@
         });
 
         function initializePage(user, userData) {
-            // FIX: Check isAdmin flag from database, not hardcoded email
             if (userData.isAdmin) {
                 document.getElementById('admin-back-button').style.display = 'block';
             }
@@ -311,48 +311,35 @@
                 }
             });
 
-            // FIX: Corrected and secured account deletion logic
             document.getElementById('delete-account-btn').addEventListener('click', async () => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
                 
                 try {
-                    const userId = user.uid; // Store UID before user object is invalidated
-                    
-                    // Step 1: Delete the user from Firebase Authentication first.
-                    // This is the most likely step to fail if the session is old.
+                    const userId = user.uid;
                     await deleteUser(user);
-
-                    // Step 2: If Auth deletion is successful, then delete the Firestore document.
                     await deleteDoc(doc(db, "users", userId));
-
                     alert('Your account has been permanently deleted.');
-                    window.location.replace('index.html'); // Redirect after successful deletion
-
+                    window.location.replace('index.html');
                 } catch (error) {
-                    // Step 3: Handle errors, especially the need to re-authenticate.
                     if (error.code === 'auth/requires-recent-login') {
                         alert('This action is sensitive and requires recent authentication. Please sign out, sign back in, and then try again.');
-                        signOut(auth); // Sign the user out so they can log in again.
+                        signOut(auth);
                     } else {
-                        // Handle other potential errors (e.g., network issues)
                         alert(`An error occurred while deleting your account: ${error.message}`);
                     }
                 }
             });
 
-            // Handle navigation between dashboard tabs
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
                     e.currentTarget.classList.add('active');
-                    const targetId = e.currentTarget.getAttribute('href');
-                    document.querySelector(targetId).classList.add('active');
+                    document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                 });
             });
 
-            // Helper function for showing success/error messages
             const showNotification = (element, message, type) => {
                 element.textContent = message;
                 element.className = 'notification';

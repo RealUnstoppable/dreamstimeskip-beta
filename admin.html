@@ -251,9 +251,6 @@
                             <option value="summary">Summary</option>
                             <option value="signups">Sign-ups</option>
                             <option value="purchases">Purchases</option>
-                            <option value="checkouts">Checkouts</option>
-                            <option value="carts">Active Carts</option>
-                            <option value="time">Time on Site</option>
                         </select>
                     </div>
                     <canvas id="performance-chart"></canvas>
@@ -276,7 +273,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { collection, getDocs, doc, updateDoc, getDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        let performanceChart; // To hold the chart instance
+        let performanceChart; 
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -301,19 +298,17 @@
         }
 
         async function loadAdminData() {
-            // Fetch users
             const usersCollection = collection(db, "users");
             const usersSnapshot = await getDocs(usersCollection);
             const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            // Fetch carts (for demo purposes, as we don't have purchase data)
             const cartsCollection = collection(db, "carts");
             const cartsSnapshot = await getDocs(cartsCollection);
             const carts = cartsSnapshot.docs.map(d => ({ userId: d.id, ...d.data() }));
 
             renderUserTable(users);
             calculatePerformanceMetrics(users, carts);
-            renderChart('summary', users); // Initial chart render
+            renderChart('summary', users);
         }
 
         function renderUserTable(users) {
@@ -337,27 +332,22 @@
         }
 
         function calculatePerformanceMetrics(users, carts) {
-            // Sign-ups
             const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
             const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-
-            // Active Carts
             const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
 
-            // Demo placeholders
             document.getElementById('total-users').textContent = users.length;
             document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('total-purchases').textContent = '173'; // Demo data
-            document.getElementById('checkouts').textContent = '89'; // Demo data
+            document.getElementById('total-purchases').textContent = '173';
+            document.getElementById('checkouts').textContent = '89';
             document.getElementById('active-carts').textContent = activeCarts;
-            document.getElementById('avg-time').textContent = '8m 42s'; // Demo data
+            document.getElementById('avg-time').textContent = '8m 42s';
         }
 
         function renderChart(view, usersData) {
             const ctx = document.getElementById('performance-chart').getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
 
-            // Sample data - replace with real data
             const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
             let datasets = [];
             let chartType = 'line';
@@ -366,20 +356,16 @@
 
             switch(view) {
                 case 'signups':
-                    datasets = [{ label: 'New Sign-ups', data: [5, 9, 3, 5, 2, 3, 7], borderColor: '#2563EB', tension: 0.1 }];
+                    datasets = [{ label: 'New Sign-ups', data: [5, 9, 3, 5, 2, 3, 7], borderColor: '#2563EB', tension: 0.4, fill: true, backgroundColor: 'rgba(37, 99, 235, 0.2)' }];
                     break;
                 case 'purchases':
-                    datasets = [{ label: 'Purchases', data: [12, 19, 8, 15, 10, 13, 17], borderColor: '#16A34A', tension: 0.1 }];
+                    datasets = [{ label: 'Purchases', data: [12, 19, 8, 15, 10, 13, 17], borderColor: '#16A34A', tension: 0.4, fill: true, backgroundColor: 'rgba(22, 163, 74, 0.2)' }];
                     break;
-                case 'checkouts':
-                    datasets = [{ label: 'Checkouts', data: [8, 15, 6, 11, 7, 9, 12], borderColor: '#FBBF24', tension: 0.1 }];
-                    break;
-                // Add other cases here
-                default: // Summary
+                default:
                     chartType = 'bar';
                     datasets = [
-                        { label: 'Sign-ups', data: [34, 45, 28, 50, 39, 41, 55], backgroundColor: '#2563EB' },
-                        { label: 'Purchases', data: [80, 92, 75, 88, 95, 101, 112], backgroundColor: '#16A34A' }
+                        { label: 'Sign-ups', data: [34, 45, 28, 50, 39, 41, 55], backgroundColor: 'rgba(37, 99, 235, 0.8)' },
+                        { label: 'Purchases', data: [80, 92, 75, 88, 95, 101, 112], backgroundColor: 'rgba(22, 163, 74, 0.8)' }
                     ];
                     break;
             }
@@ -393,13 +379,37 @@
                 data: { labels, datasets },
                 options: {
                     responsive: true,
-                    scales: { y: { beginAtZero: true } },
-                    plugins: { legend: { labels: { color: 'white' } } }
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    scales: { 
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'white' }
+                        },
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: 'white' }
+                        }
+                    },
+                    plugins: { 
+                        legend: { 
+                            labels: { color: 'white' } 
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            padding: 10
+                        }
+                    }
                 }
             });
         }
-
--        function setupEventListeners() {
+        function setupEventListeners() {
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
                 if (!userId) return;
@@ -421,7 +431,9 @@
             });
 
             document.getElementById('graph-selector').addEventListener('change', (e) => {
-                renderChart(e.target.value);
+                loadAdminData().then(() => {
+                    renderChart(e.target.value);
+                });
             });
 
             document.getElementById('sign-out').addEventListener('click', () => {

@@ -85,9 +85,8 @@
                 <li><a href="#harmony">HarmonyTunes</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="blog.html">Blog</a></li>
-                <li><a href="sign in beta.html">Sign In / Sign Up</a></li>
+                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
             </ul>
-            </div>
             <button class="hamburger" aria-label="Open menu">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -274,39 +273,40 @@
     </script>
     
     <script type="module">
-      import { auth, db } from './auth.js'; // FIX: Import from centralized auth file
+      import { auth, db } from './auth.js';
       import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
       import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-      const navCtaContainer = document.getElementById('nav-cta-container');
-      const mobileCtaLink = document.querySelector('.nav-links li:last-child a');
+      // Select the single authentication link by its ID
+      const authLink = document.getElementById('auth-link');
 
       // This listener checks the user's login state and updates the UI accordingly.
       onAuthStateChanged(auth, async (user) => {
         if (user) {
-            // User is logged in, check if they are an admin
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            
-            const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
-            
-            // Update desktop button
-            navCtaContainer.innerHTML = `<a href="${destination}" class="cta-button nav-cta">My Account</a>`;
-            
-            // Update mobile link
-            mobileCtaLink.href = destination;
-            mobileCtaLink.textContent = "My Account";
+            // User is signed in
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                // Check if the user is an admin to determine the destination
+                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                
+                // Update the link's href and text
+                authLink.href = destination;
+                authLink.textContent = "My Account";
+
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                // Fallback for safety
+                authLink.href = 'account.html';
+                authLink.textContent = "My Account";
+            }
 
         } else {
-            // User is logged out
-            const destination = 'sign in beta.html';
-            
-            // Update desktop button
-            navCtaContainer.innerHTML = `<a href="${destination}" class="cta-button nav-cta">Sign In / Sign Up</a>`;
-            
-            // Update mobile link
-            mobileCtaLink.href = destination;
-            mobileCtaLink.textContent = "Sign In / Sign Up";
+            // User is signed out
+            // Update the link to point to the sign-in page
+            authLink.href = 'sign in beta.html';
+            authLink.textContent = "Sign In / Sign Up";
         }
       });
     </script>
