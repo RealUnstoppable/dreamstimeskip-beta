@@ -142,6 +142,9 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-bottom: 30px;
+            height: 400px; /* Set a fixed height for the container */
+            display: flex;
+            flex-direction: column;
         }
         .graph-header {
             display: flex;
@@ -339,77 +342,132 @@
 
             document.getElementById('total-users').textContent = users.length;
             document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('total-purchases').textContent = '173';
-            document.getElementById('checkouts').textContent = '89';
+            document.getElementById('total-purchases').textContent = '173'; // Static data for now
+            document.getElementById('checkouts').textContent = '89'; // Static data for now
             document.getElementById('active-carts').textContent = activeCarts;
-            document.getElementById('avg-time').textContent = '8m 42s';
+            document.getElementById('avg-time').textContent = '8m 42s'; // Static data for now
         }
 
         function renderChart(view, usersData) {
             const ctx = document.getElementById('performance-chart').getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
-
-            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            let datasets = [];
-            let chartType = 'line';
-
+            
             graphTitleEl.textContent = document.querySelector(`#graph-selector option[value=${view}]`).textContent;
-
-            switch(view) {
-                case 'signups':
-                    datasets = [{ label: 'New Sign-ups', data: [5, 9, 3, 5, 2, 3, 7], borderColor: '#2563EB', tension: 0.4, fill: true, backgroundColor: 'rgba(37, 99, 235, 0.2)' }];
-                    break;
-                case 'purchases':
-                    datasets = [{ label: 'Purchases', data: [12, 19, 8, 15, 10, 13, 17], borderColor: '#16A34A', tension: 0.4, fill: true, backgroundColor: 'rgba(22, 163, 74, 0.2)' }];
-                    break;
-                default:
-                    chartType = 'bar';
-                    datasets = [
-                        { label: 'Sign-ups', data: [34, 45, 28, 50, 39, 41, 55], backgroundColor: 'rgba(37, 99, 235, 0.8)' },
-                        { label: 'Purchases', data: [80, 92, 75, 88, 95, 101, 112], backgroundColor: 'rgba(22, 163, 74, 0.8)' }
-                    ];
-                    break;
-            }
 
             if (performanceChart) {
                 performanceChart.destroy();
             }
 
-            performanceChart = new Chart(ctx, {
-                type: chartType,
-                data: { labels, datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 1000,
-                        easing: 'easeInOutQuart'
-                    },
-                    scales: { 
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: 'white' }
+            let chartConfig;
+
+            switch(view) {
+                case 'signups':
+                    chartConfig = {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{ 
+                                label: 'New Sign-ups', 
+                                data: [5, 9, 3, 5, 2, 3, 7], 
+                                borderColor: '#2563EB', 
+                                tension: 0.4, 
+                                fill: true, 
+                                backgroundColor: 'rgba(37, 99, 235, 0.2)' 
+                            }]
                         },
-                        x: {
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: 'white' }
-                        }
-                    },
-                    plugins: { 
-                        legend: { 
-                            labels: { color: 'white' } 
+                        options: getChartOptions(false) // Not a pie chart
+                    };
+                    break;
+                case 'purchases':
+                    chartConfig = {
+                        type: 'line',
+                        data: {
+                            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                            datasets: [{ 
+                                label: 'Purchases', 
+                                data: [12, 19, 8, 15, 10, 13, 17], 
+                                borderColor: '#16A34A', 
+                                tension: 0.4, 
+                                fill: true, 
+                                backgroundColor: 'rgba(22, 163, 74, 0.2)' 
+                            }]
                         },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            titleFont: { size: 14 },
-                            bodyFont: { size: 12 },
-                            padding: 10
+                        options: getChartOptions(false) // Not a pie chart
+                    };
+                    break;
+                default: // 'summary'
+                    const totalSignups = 296; // Static data for demo
+                    const totalPurchases = 173; // Static data for demo
+                    chartConfig = {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Total Sign-ups', 'Total Purchases'],
+                            datasets: [{
+                                data: [totalSignups, totalPurchases],
+                                backgroundColor: ['rgba(37, 99, 235, 0.8)', 'rgba(22, 163, 74, 0.8)'],
+                                borderColor: ['#2563EB', '#16A34A'],
+                                borderWidth: 2,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: getChartOptions(true) // Is a pie chart
+                    };
+                    break;
+            }
+            
+            performanceChart = new Chart(ctx, chartConfig);
+        }
+
+        function getChartOptions(isPieChart = false) {
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        position: isPieChart ? 'top' : 'bottom',
+                        labels: { 
+                            color: 'white',
+                            font: { size: 12 }
+                        } 
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        callbacks: {
+                             label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed;
+                                }
+                                return label;
+                            }
                         }
                     }
                 }
-            });
+            };
+
+            if (!isPieChart) {
+                options.scales = {
+                    y: { 
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: 'white' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: 'white' }
+                    }
+                };
+            }
+
+            return options;
         }
+
         function setupEventListeners() {
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
@@ -432,9 +490,7 @@
             });
 
             document.getElementById('graph-selector').addEventListener('change', (e) => {
-                loadAdminData().then(() => {
-                    renderChart(e.target.value);
-                });
+                renderChart(e.target.value);
             });
 
             document.getElementById('sign-out').addEventListener('click', () => {
