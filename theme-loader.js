@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account | DTS HUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="themes.css">
+    <link rel="stylesheet" href="themes.css"> 
     <style>
         :root {
             --bg-color: #0A0A0A;
@@ -68,9 +68,9 @@
         .badge-premium { background-color: var(--accent-blue); color: white; }
         .badge-ultimate { background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); color: white; }
         .feature-locked { opacity: 0.5; cursor: not-allowed; }
-        .feature-locked label, .feature-locked input, .feature-locked select { pointer-events: none; }
+        .feature-locked label, .feature-locked input, .feature-locked select, .feature-locked button { pointer-events: none; }
         .custom-theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .custom-theme-grid input[type="color"] { width: 50px; height: 30px; padding: 0; border: none; background: none; }
+        .custom-theme-grid input[type="color"] { width: 50px; height: 30px; padding: 0; border: none; background: none; cursor: pointer; }
     </style>
 </head>
 <body style="display: none;">
@@ -138,8 +138,8 @@
                     </form>
                 </div>
                 
-                <div class="card" id="custom-theme-card" style="display: none;">
-                    <h4>Custom Theme Creator (Ultimate)</h4>
+                <div class="card" id="custom-theme-card">
+                    <h4>Custom Theme Creator</h4>
                     <form id="custom-theme-form">
                         <div class="custom-theme-grid">
                             <div class="form-group"><label for="custom-bg-color">Background</label><input type="color" id="custom-bg-color" data-var="--bg-color"></div>
@@ -154,12 +154,16 @@
 
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
+                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
                     <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
                 </div>
             </section>
              <section id="support" class="content-section">
                 <h3>Contact Support</h3>
-                <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                <div class="card">
+                    <p>If you need help, please reach out. We're happy to assist!</p>
+                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                </div>
             </section>
         </main>
     </div>
@@ -169,14 +173,19 @@
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
+        // --- Main Auth State Listener ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
                 if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    applyTheme(userData); // Apply theme first
                     document.body.style.display = 'flex'; 
-                    initializePage(user, userDoc.data());
-                    setupEventListeners(user, userDoc.data());
+                    initializePage(user, userData);
+                    setupEventListeners(user, userData);
                 } else {
+                    alert("Could not find user data. Signing out.");
                     signOut(auth);
                 }
             } else {
@@ -184,6 +193,29 @@
             }
         });
 
+        // --- Helper Functions ---
+        const showNotification = (element, message, type) => {
+            element.textContent = message;
+            element.className = `notification ${type}`;
+            element.style.display = 'block';
+            setTimeout(() => { element.style.display = 'none'; }, 4000);
+        };
+
+        function applyTheme(userData) {
+            document.body.dataset.theme = userData.theme || 'dark';
+            document.body.dataset.accent = userData.accentColor || 'blue';
+
+            // Apply custom theme colors if they exist (Ultimate feature)
+            if (userData.customTheme) {
+                const root = document.documentElement;
+                root.style.setProperty('--bg-color', userData.customTheme['custom-bg-color']);
+                root.style.setProperty('--primary-card-color', userData.customTheme['custom-card-color']);
+                root.style.setProperty('--text-primary', userData.customTheme['custom-text-color']);
+                // Note: a real implementation would need more variables for a full theme
+            }
+        }
+
+        // --- Page Initialization ---
         function initializePage(user, userData) {
             // General setup
             if (userData.isAdmin) document.getElementById('admin-back-button').style.display = 'block';
@@ -197,96 +229,137 @@
             document.getElementById('membership-level').textContent = levelCapitalized;
             if (level === 'premium' || level === 'ultimate') {
                 const badge = `<span class="badge badge-${level}">${levelCapitalized}</span>`;
-                document.getElementById('welcome-header').innerHTML += badge;
+                document.getElementById('welcome-header').innerHTML += ` ${badge}`;
             }
 
-            // Theme setup based on membership
+            // Lock/Unlock features based on membership
             const displaySettingsCard = document.getElementById('display-settings-card');
             const customThemeCard = document.getElementById('custom-theme-card');
             
             if (level === 'standard') {
                 displaySettingsCard.classList.add('feature-locked');
-                displaySettingsCard.querySelector('h4').textContent = 'Display Settings (Premium required)';
-            } else {
-                displaySettingsCard.classList.remove('feature-locked');
-                displaySettingsCard.querySelector('h4').textContent = 'Display Settings';
+                displaySettingsCard.querySelector('h4').textContent = 'Display Settings (Premium Required)';
             }
-
-            if (level === 'ultimate') {
-                customThemeCard.style.display = 'block';
-                // Load custom colors if they exist
+            
+            if (level !== 'ultimate') {
+                customThemeCard.classList.add('feature-locked');
+                customThemeCard.querySelector('h4').textContent = 'Custom Theme Creator (Ultimate Required)';
+            } else {
+                // Load custom colors into the color pickers if they exist
                 if (userData.customTheme) {
                     for (const [key, value] of Object.entries(userData.customTheme)) {
-                        document.getElementById(key).value = value;
+                       const el = document.getElementById(key);
+                       if (el) el.value = value;
                     }
                 }
             }
             
-            // Load saved theme settings
+            // Load saved theme settings into the form
             document.getElementById('theme-select').value = userData.theme || 'dark';
             const currentAccent = userData.accentColor || 'blue';
-            document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`).checked = true;
+            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
+            if (accentRadio) accentRadio.checked = true;
         }
 
+        // --- Event Listeners ---
         function setupEventListeners(user, userData) {
-            document.getElementById('sign-out').addEventListener('click', () => signOut(auth));
+            const userDocRef = doc(db, "users", user.uid);
+
+            document.getElementById('sign-out').addEventListener('click', () => {
+                signOut(auth).then(() => {
+                    window.location.replace('index.html');
+                });
+            });
             
             document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const newUsername = document.getElementById('update-username').value;
-                await updateDoc(doc(db, "users", user.uid), { username: newUsername });
-                showNotification(document.getElementById('profile-notification'), 'Username updated!', 'success');
+                const notificationEl = document.getElementById('profile-notification');
+                try {
+                    await updateDoc(userDocRef, { username: newUsername });
+                    showNotification(notificationEl, 'Username updated successfully!', 'success');
+                    // Update welcome header in real-time
+                    document.getElementById('welcome-header').textContent = `Welcome, ${newUsername}!`;
+                    // Re-add badge if it exists
+                    const level = userData.membershipLevel;
+                     if (level === 'premium' || level === 'ultimate') {
+                        const levelCapitalized = level.charAt(0).toUpperCase() + level.slice(1);
+                        document.getElementById('welcome-header').innerHTML += ` <span class="badge badge-${level}">${levelCapitalized}</span>`;
+                    }
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
             });
 
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if (userData.membershipLevel === 'standard') return;
+                if ((userData.membershipLevel || 'standard') === 'standard') return;
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
-                await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
-                showNotification(document.getElementById('theme-notification'), 'Theme saved!', 'success');
+                const notificationEl = document.getElementById('theme-notification');
+                
+                try {
+                    await updateDoc(userDocRef, { theme, accentColor });
+                    showNotification(notificationEl, 'Theme saved! Applying now...', 'success');
+                    // Re-fetch data and apply theme to show changes instantly
+                    const updatedDoc = await getDoc(userDocRef);
+                    if (updatedDoc.exists()) applyTheme(updatedDoc.data());
+                } catch(error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
             });
 
             document.getElementById('custom-theme-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                if (userData.membershipLevel !== 'ultimate') return;
                 const customTheme = {
                     'custom-bg-color': document.getElementById('custom-bg-color').value,
                     'custom-card-color': document.getElementById('custom-card-color').value,
                     'custom-text-color': document.getElementById('custom-text-color').value,
                     'custom-accent-color': document.getElementById('custom-accent-color').value
                 };
-                await updateDoc(doc(db, "users", user.uid), { customTheme });
-                showNotification(document.getElementById('custom-theme-notification'), 'Custom theme applied!', 'success');
+                const notificationEl = document.getElementById('custom-theme-notification');
+                try {
+                    await updateDoc(userDocRef, { customTheme });
+                    showNotification(notificationEl, 'Custom theme applied!', 'success');
+                    const updatedDoc = await getDoc(userDocRef);
+                    if (updatedDoc.exists()) applyTheme(updatedDoc.data());
+                } catch(error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
             });
 
-             document.getElementById('delete-account-btn').addEventListener('click', async () => {
-                if (confirm('DANGER: Are you sure you want to permanently delete your account?')) {
-                    try {
-                        await deleteDoc(doc(db, "users", user.uid));
-                        await deleteUser(user);
-                        alert('Account deleted.');
-                    } catch (error) {
-                        alert(`Error: ${error.message}. Please sign out and sign back in to continue.`);
+            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+                if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
+                
+                try {
+                    // CORRECT ORDER: Delete auth user first, then their database record.
+                    await deleteUser(user);
+                    await deleteDoc(userDocRef);
+                    alert('Your account has been permanently deleted.');
+                    window.location.replace('index.html');
+                } catch (error) {
+                    // Provide helpful feedback for the most common error.
+                    if (error.code === 'auth/requires-recent-login') {
+                        alert('This is a sensitive action and requires you to have signed in recently. Please sign out, sign back in, and then try again.');
+                        signOut(auth);
+                    } else {
+                        alert(`An error occurred while deleting your account: ${error.message}`);
                     }
                 }
             });
 
+            // Tab navigation
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
-                    document.querySelectorAll('.nav-link, .content-section').forEach(el => el.classList.remove('active'));
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
                     e.currentTarget.classList.add('active');
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                 });
             });
         }
-        
-        const showNotification = (element, message, type) => {
-            element.textContent = message;
-            element.className = `notification ${type}`;
-            element.style.display = 'block';
-            setTimeout(() => { element.style.display = 'none'; }, 3000);
-        };
     </script>
 </body>
 </html>
