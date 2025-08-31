@@ -10,7 +10,17 @@
     --accent-blue: #2563EB;
     --accent-green: #16A34A;
     --font-main: 'Inter', sans-serif;
+    
+    /* Default Accent Color */
+    --accent-color: var(--accent-blue); 
 }
+
+/* --- THEME ACCENT COLORS --- */
+[data-accent="blue"] { --accent-color: var(--accent-blue); }
+[data-accent="red"] { --accent-color: var(--accent-red); }
+[data-accent="green"] { --accent-color: var(--accent-green); }
+[data-accent="purple"] { --accent-color: var(--accent-purple); }
+
 
 *, *::before, *::after {
     box-sizing: border-box;
@@ -63,7 +73,7 @@ body {
     letter-spacing: -1px;
 }
 .nav-logo span {
-    color: var(--accent-blue);
+    color: var(--accent-color);
 }
 
 .nav-links {
@@ -85,7 +95,7 @@ body {
 
 .cta-button {
     display: inline-block;
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color);
     color: var(--text-primary);
     padding: 10px 24px;
     border-radius: 50px;
@@ -97,7 +107,7 @@ body {
 }
 .cta-button:hover {
     background-color: transparent;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-color);
     transform: scale(1.05);
 }
 
@@ -343,7 +353,7 @@ p.section-subtitle {
     text-decoration: none;
     transition: color 0.3s ease;
 }
-.footer-column a:hover { color: var(--accent-blue); }
+.footer-column a:hover { color: var(--accent-color); }
 .footer-newsletter p { font-size: 0.9rem; margin-bottom: 15px; }
 .signup-form { display: flex; gap: 10px; }
 .signup-form input {
@@ -358,7 +368,7 @@ p.section-subtitle {
 .signup-form button {
     padding: 12px 18px;
     border: none;
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color);
     color: white;
     border-radius: 8px;
     cursor: pointer;

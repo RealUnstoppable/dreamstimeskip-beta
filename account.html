@@ -8,6 +8,7 @@
      <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="themes.css">
     <style>
         :root {
             --bg-color: #0A0A0A;
@@ -154,7 +155,7 @@
             margin-bottom: 8px;
             font-weight: 500;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border-color);
@@ -215,7 +216,7 @@
                 <h3>Dashboard</h3>
                 <div class="card">
                     <h4>Quick Overview</h4>
-                    <p>Welcome to your personal settings. You can manage your account settings here.</p>
+                    <p>Welcome to your personal hub. Here you can manage your account settings, view your order history, and customize your site experience.</p>
                 </div>
             </section>
             <section id="settings" class="content-section">
@@ -235,6 +236,35 @@
                         <div id="profile-notification" class="notification"></div>
                     </form>
                 </div>
+
+                <div class="card">
+                    <h4>Display Settings</h4>
+                    <form id="theme-settings-form">
+                        <div class="form-group">
+                            <label for="theme-select">Theme</label>
+                            <select id="theme-select">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div>
+                                <input type="radio" id="accent-blue" name="accent-color" value="blue">
+                                <label for="accent-blue">Blue</label>
+                                <input type="radio" id="accent-red" name="accent-color" value="red">
+                                <label for="accent-red">Red</label>
+                                <input type="radio" id="accent-green" name="accent-color" value="green">
+                                <label for="accent-green">Green</label>
+                                <input type="radio" id="accent-purple" name="accent-color" value="purple">
+                                <label for="accent-purple">Purple</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <div id="theme-notification" class="notification"></div>
+                    </form>
+                </div>
+
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
                     <p>This action is permanent and cannot be undone. All your data will be removed.</p>
@@ -290,6 +320,11 @@
             document.getElementById('user-email-sidebar').textContent = user.email;
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
+
+            // Load theme settings
+            document.getElementById('theme-select').value = userData.theme || 'dark';
+            const currentAccent = userData.accentColor || 'blue';
+            document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`).checked = true;
         }
 
         function setupEventListeners(user) {
@@ -307,6 +342,24 @@
                     await updateDoc(userDocRef, { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
+            });
+
+            document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const theme = document.getElementById('theme-select').value;
+                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const notificationEl = document.getElementById('theme-notification');
+                const userDocRef = doc(db, "users", user.uid);
+
+                try {
+                    await updateDoc(userDocRef, { theme, accentColor });
+                    showNotification(notificationEl, 'Theme updated successfully!', 'success');
+                    // Optional: Apply theme immediately without a page reload
+                    document.body.dataset.theme = theme;
+                    document.body.dataset.accent = accentColor;
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 }
@@ -350,5 +403,6 @@
             };
         }
     </script>
+    <script type="module" src="theme-loader.js"></script>
 </body>
 </html>
