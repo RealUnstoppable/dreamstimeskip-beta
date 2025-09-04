@@ -1,33 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Merch Store | DTS HUB</title>
+    <link rel="icon" type="image/png" href="/images/Unstoppable%20Collection%20Logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="icon" type="image/png" href="/images/Unstoppable Collection Logo.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="shop.css">
     <link rel="stylesheet" href="themes.css">
 </head>
+
 <body>
 
-   <header class="main-header">
+    <header class="main-header">
         <nav class="navbar">
             <a href="index.html" class="nav-logo">DTS <span>HUB</span></a>
             <ul class="nav-links">
                 <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
-                <li><a href="index.html#harmony">HarmonyTunes</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="blog.html">Blog</a></li>
+                <li><a href="memberships.html">Memberships</a></li>
+                <li><a href="sign-in.html" id="auth-link">Sign In / Sign Up</a></li>
             </ul>
-            <div id="nav-cta-container">
-                 <a href="sign in beta.html" class="cta-button nav-cta">Sign In</a>
-            </div>
+            <div id="membership-status-container"></div>
             <button class="hamburger" aria-label="Open menu">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -43,7 +42,7 @@
         </section>
 
         <section id="product-grid" class="product-grid">
-            </section>
+        </section>
     </main>
 
     <button id="cart-button" class="cart-fab">
@@ -58,7 +57,7 @@
                 <button id="close-cart-btn" class="close-cart-btn">&times;</button>
             </div>
             <div id="cart-items-container" class="cart-items-container">
-                </div>
+            </div>
             <div class="cart-modal-footer">
                 <div class="cart-total">
                     <span>Total:</span>
@@ -68,8 +67,11 @@
             </div>
         </div>
     </div>
-    
-    <script type="module" src="shop.js"></script>
-    <script type="module" src="theme-loader.js"></script>
+
+    <script src="js/script.js"></script>
+    <script type="module" src="js/shop.js"></script>
+    <script type="module" src="js/theme-loader.js"></script>
+    <script type="module" src="js/auth.js"></script>
 </body>
+
 </html>

@@ -1,36 +1,42 @@
-// theme-loader.js
+// js/theme-loader.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-const applyTheme = (userData) => {
-    const theme = userData?.theme || 'dark';
-    const accentColor = userData?.accentColor || 'blue';
-    
-    document.body.dataset.theme = theme;
-    document.body.dataset.accent = accentColor;
+const applyTheme = (theme, accentColor) => {
+    document.body.dataset.theme = theme || 'dark';
+    document.body.dataset.accent = accentColor || 'blue';
 
-    // Apply custom theme for Ultimate members
-    if (userData?.membershipLevel === 'ultimate' && userData?.customTheme) {
-        for (const [elementId, colorValue] of Object.entries(userData.customTheme)) {
-            const cssVar = document.getElementById(elementId)?.dataset.var;
-            if (cssVar) {
-                document.body.style.setProperty(cssVar, colorValue);
-            }
-        }
+    // Persist theme for non-logged-in users
+    if (!auth.currentUser) {
+        localStorage.setItem('userTheme', document.body.dataset.theme);
+        localStorage.setItem('userAccent', document.body.dataset.accent);
     }
 };
 
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            applyTheme(userDoc.exists() ? userDoc.data() : null);
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                applyTheme(userData.theme, userData.accentColor);
+            } else {
+                // Fallback for new users or data not found
+                applyTheme('dark', 'blue');
+            }
         } catch (error) {
-            console.error("Error loading theme:", error);
-            applyTheme(null);
+            console.error("Error loading theme from Firestore:", error);
+            applyTheme('dark', 'blue');
         }
     } else {
-        applyTheme(null);
+        // Load theme from localStorage for guests
+        const localTheme = localStorage.getItem('userTheme');
+        const localAccent = localStorage.getItem('userAccent');
+        applyTheme(localTheme, localAccent);
     }
 });
+
+// Expose a function to be called from the account page for instant theme updates
+window.updateTheme = applyTheme;

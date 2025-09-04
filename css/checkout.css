@@ -1,0 +1,70 @@
+/* css/checkout.css */
+
+.checkout-container {
+    max-width: 800px;
+    margin: 120px auto 60px;
+    padding: 0 40px;
+}
+
+.checkout-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 10px;
+}
+
+.form-group input {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-card-color);
+    color: var(--text-primary);
+}
+
+.checkout-summary {
+    margin-top: 40px;
+    background-color: var(--primary-card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.checkout-summary h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.place-order-button {
+    width: 100%;
+    margin-top: 40px;
+}

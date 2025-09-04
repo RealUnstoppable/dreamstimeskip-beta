@@ -1,3 +1,4 @@
+// js/script.js
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Mobile Menu Toggle ---
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     revealElements.forEach(el => {
         scrollObserver.observe(el);
     });
-    
+
     // --- Parallax for Brand Sections ---
     const brandSections = document.querySelectorAll('.brand-section');
     const sectionObserver = new IntersectionObserver((entries) => {
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('is-visible');
             } else {
-                 entry.target.classList.remove('is-visible');
+                entry.target.classList.remove('is-visible');
             }
         });
     }, { threshold: 0.2 });
@@ -85,5 +86,20 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
         });
     });
+
+    // --- Cookie Consent Banner ---
+    const cookieConsentBanner = document.getElementById('cookie-consent-banner');
+    const cookieConsentButton = document.getElementById('cookie-consent-button');
+
+    if (cookieConsentBanner && cookieConsentButton) {
+        if (!localStorage.getItem('cookieConsent')) {
+            cookieConsentBanner.style.display = 'block';
+        }
+
+        cookieConsentButton.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'true');
+            cookieConsentBanner.style.display = 'none';
+        });
+    }
 
 });

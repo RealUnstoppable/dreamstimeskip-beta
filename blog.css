@@ -1,4 +1,4 @@
-/* blog.css */
+/* css/blog.css */
 
 :root {
     --bg-color: #0A0A0A;
@@ -54,7 +54,7 @@
 
 .blog-post-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
 }
 
 .blog-post-image {
