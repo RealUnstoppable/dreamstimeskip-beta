@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,7 @@
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="themes.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <style>
         :root {
             --bg-color: #0A0A0A;
@@ -23,6 +24,7 @@
             --accent-yellow: #FBBF24;
             --font-main: 'Inter', sans-serif;
         }
+
         body {
             font-family: var(--font-main);
             background-color: var(--bg-color);
@@ -32,16 +34,19 @@
             justify-content: center;
             padding: 40px 20px;
         }
+
         .account-layout {
             display: flex;
             width: 100%;
             max-width: 1200px;
             gap: 30px;
         }
+
         .sidebar {
             width: 250px;
             flex-shrink: 0;
         }
+
         .btn-admin-back {
             display: none;
             background-color: var(--accent-yellow);
@@ -55,9 +60,11 @@
             transition: opacity 0.2s;
             cursor: pointer;
         }
+
         .btn-admin-back:hover {
             opacity: 0.85;
         }
+
         .sidebar-header {
             padding: 20px;
             background-color: var(--primary-card-color);
@@ -65,22 +72,26 @@
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
+
         .sidebar-header h2 {
             font-size: 1.2rem;
             margin: 0 0 5px 0;
             line-height: 1.2;
         }
+
         .sidebar-header p {
             font-size: 0.9rem;
             color: var(--text-secondary);
             margin: 0;
             word-wrap: break-word;
         }
+
         .sidebar-nav ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .sidebar-nav a {
             display: block;
             padding: 15px 20px;
@@ -91,14 +102,17 @@
             font-weight: 500;
             transition: background-color 0.2s, color 0.2s;
         }
+
         .sidebar-nav a:hover {
             background-color: var(--primary-card-color);
             color: var(--text-primary);
         }
+
         .sidebar-nav a.active {
             background-color: var(--accent-blue);
             color: var(--text-primary);
         }
+
         .sign-out-btn {
             width: 100%;
             margin-top: 20px;
@@ -111,14 +125,17 @@
             cursor: pointer;
             transition: background-color 0.2s, color 0.2s;
         }
+
         .sign-out-btn:hover {
             background-color: var(--accent-red);
             color: var(--text-primary);
             border-color: var(--accent-red);
         }
+
         .main-content {
             flex-grow: 1;
         }
+
         .content-section {
             display: none;
             background-color: var(--primary-card-color);
@@ -126,14 +143,17 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
         }
+
         .content-section.active {
             display: block;
         }
+
         .content-section h3 {
             font-size: 1.8rem;
             margin-top: 0;
             margin-bottom: 30px;
         }
+
         .card {
             background-color: var(--secondary-card-color);
             padding: 25px;
@@ -141,21 +161,26 @@
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
+
         .card h4 {
             margin-top: 0;
             margin-bottom: 15px;
             font-size: 1.2rem;
         }
+
         .form-group {
             margin-bottom: 20px;
         }
+
         .form-group label {
             display: block;
             color: var(--text-secondary);
             margin-bottom: 8px;
             font-weight: 500;
         }
-        .form-group input, .form-group select {
+
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 12px;
             border: 1px solid var(--border-color);
@@ -165,6 +190,7 @@
             box-sizing: border-box;
             font-size: 1rem;
         }
+
         .btn {
             padding: 12px 24px;
             border-radius: 6px;
@@ -176,24 +202,71 @@
             border: 1px solid transparent;
             transition: all 0.2s;
         }
-        .btn-primary { background-color: var(--accent-blue); color: white; }
-        .btn-primary:hover { background-color: #1D4ED8; }
-        .btn-danger { background-color: var(--accent-red); color: white; }
-        .btn-danger:hover { background-color: #B91C1C; }
-        #delete-account-card { border-color: var(--accent-red); }
-        .notification { padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 15px; display: none; }
-        .notification.success { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
-        .notification.error { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1D4ED8;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #B91C1C;
+        }
+
+        #delete-account-card {
+            border-color: var(--accent-red);
+        }
+
+        .notification {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .notification.success {
+            background-color: rgba(22, 163, 74, 0.2);
+            color: var(--accent-green);
+        }
+
+        .notification.error {
+            background-color: rgba(220, 38, 38, 0.2);
+            color: var(--accent-red);
+        }
 
         @media (max-width: 768px) {
-            body { padding: 20px 10px; }
-            .account-layout { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .main-content { width: 100%; }
-            .content-section { padding: 25px; }
+            body {
+                padding: 20px 10px;
+            }
+
+            .account-layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .content-section {
+                padding: 25px;
+            }
         }
     </style>
 </head>
+
 <body style="display: none;">
     <div class="account-layout">
         <aside class="sidebar">
@@ -217,7 +290,8 @@
                 <h3>Dashboard</h3>
                 <div class="card">
                     <h4>Quick Overview</h4>
-                    <p>Welcome to your personal hub. Here you can manage your account settings, view your order history, and customize your site experience.</p>
+                    <p>Welcome to your personal hub. Here you can manage your account settings, view your order history,
+                        and customize your site experience.</p>
                 </div>
             </section>
             <section id="settings" class="content-section">
@@ -286,14 +360,14 @@
         import { auth, db } from './auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {
-                    document.body.style.display = 'flex'; 
+                    document.body.style.display = 'flex';
                     initializePage(user, userDoc.data());
                     setupEventListeners(user);
                 } else {
@@ -338,7 +412,7 @@
                 const newUsername = document.getElementById('update-username').value;
                 const notificationEl = document.getElementById('profile-notification');
                 const userDocRef = doc(db, "users", user.uid);
-                
+
                 try {
                     await updateDoc(userDocRef, { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
@@ -368,7 +442,7 @@
 
             document.getElementById('delete-account-btn').addEventListener('click', async () => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
-                
+
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -404,6 +478,7 @@
             };
         }
     </script>
-    <script type="module" src="theme-loader.js"></script>
+    <script type="module" src="/js/theme-loader.js"></script>
 </body>
+
 </html>

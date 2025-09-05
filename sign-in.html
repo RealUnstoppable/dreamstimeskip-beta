@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In / Sign Up</title>
-     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <style>
         /* General Body Styles */
         body {
@@ -27,9 +28,10 @@
             max-width: 400px;
             padding: 20px;
         }
-        
+
         /* Form and Welcome Container Styles */
-        .form-container, .welcome-container {
+        .form-container,
+        .welcome-container {
             background-color: #1e1e1e;
             padding: 40px;
             border-radius: 10px;
@@ -38,13 +40,13 @@
             box-sizing: border-box;
             text-align: center;
         }
-        
+
         h1 {
             margin-bottom: 25px;
             color: #ffffff;
             font-weight: 600;
         }
-        
+
         /* Input Field Styles */
         .input-group {
             margin-bottom: 20px;
@@ -57,7 +59,7 @@
             color: #a0a0a0;
             font-size: 14px;
         }
-        
+
         input {
             width: 100%;
             padding: 12px;
@@ -69,13 +71,13 @@
             font-size: 16px;
             transition: border-color .3s, box-shadow .3s;
         }
-        
+
         input:focus {
             border-color: #007bff;
             box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
             outline: none;
         }
-        
+
         /* Button Styles */
         button {
             width: 100%;
@@ -89,7 +91,7 @@
             font-weight: bold;
             transition: background-color .3s, opacity .3s;
         }
-        
+
         button:hover {
             background-color: #0056b3;
         }
@@ -98,7 +100,7 @@
             background-color: #555;
             cursor: not-allowed;
         }
-        
+
         /* Toggle Link Styles */
         .toggle-link {
             margin-top: 20px;
@@ -107,7 +109,7 @@
             text-decoration: none;
             font-size: 14px;
         }
-        
+
         .toggle-link:hover {
             text-decoration: underline;
         }
@@ -115,12 +117,14 @@
         /* Message/Notification Styles */
         #message {
             margin-top: 15px;
-            color: #ff4d4d; /* Default to error color */
+            color: #ff4d4d;
+            /* Default to error color */
             font-size: 14px;
             height: 20px;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="form-container" id="form-container">
@@ -138,6 +142,9 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" required>
                 </div>
+                <p id="message"></p>
+                <a href="#" class="toggle-link" id="toggle-form">Forgot Password?</a>
+                <br><br>
                 <button type="submit" id="submit-btn">Sign In</button>
             </form>
             <p id="message"></p>
@@ -157,7 +164,7 @@
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userDocRef);
-                
+
                 if (docSnap.exists()) {
                     const isAdmin = docSnap.data().isAdmin || false;
                     const destination = isAdmin ? 'admin.html' : 'account.html';
@@ -172,7 +179,7 @@
         const toggleLink = document.getElementById('toggle-form');
         const usernameGroup = document.getElementById('username-group');
         const messageEl = document.getElementById('message');
-        
+
         let isSignUp = false;
 
         const updateFormView = () => {
@@ -189,13 +196,13 @@
             isSignUp = !isSignUp;
             updateFormView();
         });
-        
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const username = document.getElementById('username').value.trim();
-            
+
             messageEl.textContent = '';
             submitBtn.disabled = true;
 
@@ -256,9 +263,10 @@
                     return 'An unexpected error occurred. Please try again.';
             }
         }
-        
+
         function showMessage(msg) { messageEl.textContent = msg; }
         updateFormView();
     </script>
 </body>
+
 </html>
