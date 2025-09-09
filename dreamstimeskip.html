@@ -97,12 +97,14 @@
         .flip-card {
             display: inline-block;
             position: relative;
-            width: 80px;
-            height: 100px;
-            perspective: 500px;
+            /* MODIFIED: Increased size */
+            width: 90px;
+            height: 110px;
+            perspective: 600px;
             font-size: 4rem;
             font-weight: 800;
-            line-height: 100px;
+            /* MODIFIED: Adjusted line-height to match new height */
+            line-height: 110px;
             border-radius: 8px;
         }
 
@@ -276,10 +278,12 @@
         /* Responsive */
         @media (max-width: 500px) {
             .flip-card {
-                width: 60px;
-                height: 75px;
+                /* MODIFIED: Increased mobile size */
+                width: 65px;
+                height: 80px;
                 font-size: 2.5rem;
-                line-height: 75px;
+                /* MODIFIED: Adjusted line-height */
+                line-height: 80px;
             }
             .countdown-container {
                 gap: 10px;
@@ -292,11 +296,11 @@
 
     <header class="main-header">
         <nav class="navbar">
-            <a href="index.html" class="nav-logo">un <span></span></a>
+            <a href="index.html" class="nav-logo">DTS <span>HUB</span></a>
             <ul class="nav-links">
                 <li><a href="index.html#bento">Overview</a></li>
                 <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+                <li><a href="#dts">Dreams TimeSkip</a></li>
                 <li><a href="index.html#harmony">HarmonyTunes</a></li>
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="blog.html">Blog</a></li>
@@ -427,9 +431,18 @@
             });
         }
         
-        // --- Countdown Timer Logic ---
-        const countdownDate = new Date();
-        countdownDate.setMonth(countdownDate.getMonth() + 1);
+        // --- Persistent Countdown Timer Logic ---
+        let countdownTarget = localStorage.getItem('dreamsOgLaunchTarget');
+
+        if (!countdownTarget) {
+            // Set the target for 1 month (30 days) from now if it's not already set
+            const oneMonthFromNow = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
+            countdownTarget = oneMonthFromNow;
+            localStorage.setItem('dreamsOgLaunchTarget', countdownTarget);
+        }
+
+        const countdownDate = new Date(parseInt(countdownTarget));
+
 
         const daysEl = document.getElementById('days');
         const hoursEl = document.getElementById('hours');
@@ -442,6 +455,13 @@
             const now = new Date().getTime();
             const distance = countdownDate - now;
 
+            if (distance < 0) {
+                clearInterval(interval);
+                // Optionally, display a launch message here
+                document.getElementById('countdown').innerHTML = "<h1>Launched!</h1>";
+                return;
+            }
+
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
@@ -453,12 +473,6 @@
                 minutes: String(minutes).padStart(2, '0'),
                 seconds: String(seconds).padStart(2, '0'),
             };
-
-            if (distance < 0) {
-                clearInterval(interval);
-                // Handle countdown end
-                return;
-            }
 
             updateFlipCard(daysEl, currentTime.days, previousTime.days);
             updateFlipCard(hoursEl, currentTime.hours, previousTime.hours);
@@ -474,28 +488,37 @@
             const topHalf = element.querySelector('.top-half');
             const bottomHalf = element.querySelector('.bottom-half');
 
-            topHalf.textContent = newTime;
-            bottomHalf.textContent = newTime;
-
+            // Set the initial state before the flip
+            if (!topHalf.textContent) topHalf.textContent = newTime;
+            if (!bottomHalf.textContent) bottomHalf.textContent = newTime;
+            
             const topFlip = document.createElement('div');
             topFlip.classList.add('top-flip');
-            topFlip.textContent = oldTime || '00';
+            topFlip.textContent = oldTime || newTime; // Use newTime on first load
 
             const bottomFlip = document.createElement('div');
             bottomFlip.classList.add('bottom-flip');
             bottomFlip.textContent = newTime;
             
-            topFlip.addEventListener('animationend', () => topFlip.remove());
-            bottomFlip.addEventListener('animationend', () => bottomFlip.remove());
+            topFlip.addEventListener('animationend', () => {
+                topHalf.textContent = newTime;
+                topFlip.remove();
+            });
+            bottomFlip.addEventListener('animationend', () => {
+                bottomHalf.textContent = newTime;
+                bottomFlip.remove();
+            });
 
             element.append(topFlip, bottomFlip);
         }
         
+        // Run once on load then set interval
         updateCountdown();
         const interval = setInterval(updateCountdown, 1000);
     });
     </script>
     <script type="module" src="theme-loader.js"></script>
-
+    <script type="module" src="/js/auth.js"></script>
+    <script type="module" src="/js/newsletter.js"></script>
 </body>
 </html>
