@@ -628,3 +628,4 @@ p.section-subtitle {
         text-align: center;
     }
 }
+.status-indicator.down { color: #a3a316; background-color: rgba(22, 163, 74, 0.1); }
