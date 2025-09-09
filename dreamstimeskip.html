@@ -97,13 +97,11 @@
         .flip-card {
             display: inline-block;
             position: relative;
-            /* MODIFIED: Increased size */
             width: 90px;
             height: 110px;
             perspective: 600px;
             font-size: 4rem;
             font-weight: 800;
-            /* MODIFIED: Adjusted line-height to match new height */
             line-height: 110px;
             border-radius: 8px;
         }
@@ -119,6 +117,7 @@
             overflow: hidden;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+            text-align: center;
         }
 
         .top-half {
@@ -278,11 +277,9 @@
         /* Responsive */
         @media (max-width: 500px) {
             .flip-card {
-                /* MODIFIED: Increased mobile size */
                 width: 65px;
                 height: 80px;
                 font-size: 2.5rem;
-                /* MODIFIED: Adjusted line-height */
                 line-height: 80px;
             }
             .countdown-container {
@@ -296,7 +293,7 @@
 
     <header class="main-header">
         <nav class="navbar">
-            <a href="index.html" class="nav-logo">DTS <span>HUB</span></a>
+            <a href="index.html" class="nav-logo">un<span></span></a>
             <ul class="nav-links">
                 <li><a href="index.html#bento">Overview</a></li>
                 <li><a href="index.html#unstoppable">Unstoppable</a></li>
@@ -431,18 +428,10 @@
             });
         }
         
-        // --- Persistent Countdown Timer Logic ---
-        let countdownTarget = localStorage.getItem('dreamsOgLaunchTarget');
-
-        if (!countdownTarget) {
-            // Set the target for 1 month (30 days) from now if it's not already set
-            const oneMonthFromNow = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
-            countdownTarget = oneMonthFromNow;
-            localStorage.setItem('dreamsOgLaunchTarget', countdownTarget);
-        }
-
-        const countdownDate = new Date(parseInt(countdownTarget));
-
+        // --- UNIVERSAL Countdown Timer Logic ---
+        // This date is the same for everyone.
+        // FORMAT: YYYY-MM-DDTHH:MM:SS (Using a timezone offset like -04:00 for EDT is recommended)
+        const countdownDate = new Date("2025-10-09T12:00:00-04:00").getTime();
 
         const daysEl = document.getElementById('days');
         const hoursEl = document.getElementById('hours');
@@ -457,8 +446,7 @@
 
             if (distance < 0) {
                 clearInterval(interval);
-                // Optionally, display a launch message here
-                document.getElementById('countdown').innerHTML = "<h1>Launched!</h1>";
+                document.getElementById('countdown').innerHTML = "<h1 style='font-size: 2.5rem;'>The Wait Is Over!</h1>";
                 return;
             }
 
@@ -488,13 +476,9 @@
             const topHalf = element.querySelector('.top-half');
             const bottomHalf = element.querySelector('.bottom-half');
 
-            // Set the initial state before the flip
-            if (!topHalf.textContent) topHalf.textContent = newTime;
-            if (!bottomHalf.textContent) bottomHalf.textContent = newTime;
-            
             const topFlip = document.createElement('div');
             topFlip.classList.add('top-flip');
-            topFlip.textContent = oldTime || newTime; // Use newTime on first load
+            topFlip.textContent = (oldTime !== undefined) ? oldTime : newTime;
 
             const bottomFlip = document.createElement('div');
             bottomFlip.classList.add('bottom-flip');
@@ -504,6 +488,7 @@
                 topHalf.textContent = newTime;
                 topFlip.remove();
             });
+
             bottomFlip.addEventListener('animationend', () => {
                 bottomHalf.textContent = newTime;
                 bottomFlip.remove();
@@ -512,8 +497,7 @@
             element.append(topFlip, bottomFlip);
         }
         
-        // Run once on load then set interval
-        updateCountdown();
+        updateCountdown(); // Run once immediately to prevent initial flicker
         const interval = setInterval(updateCountdown, 1000);
     });
     </script>
