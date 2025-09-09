@@ -279,6 +279,8 @@ p.section-subtitle {
     border-radius: 20px;
 }
 .status-indicator.online { color: #16A34A; background-color: rgba(22, 163, 74, 0.1); }
+.status-indicator.offline { color: #a31616; background-color: rgba(22, 163, 74, 0.1); }
+.status-indicator.down { color: #a3a316; background-color: rgba(22, 163, 74, 0.1); }
 #bento-founder p { font-style: italic; }
 
 /* --- SCROLL-SNAPPING SECTIONS --- */
