@@ -206,6 +206,60 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- 0. Local Fact Database ---
+            const localFacts = [
+                "A group of flamingos is called a 'flamboyance'.",
+                "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible.",
+                "The national animal of Scotland is the unicorn.",
+                "A day on Venus is longer than a year on Venus.",
+                "Octopuses have three hearts.",
+                "There are more trees on Earth than stars in the Milky Way galaxy.",
+                "Bananas are berries, but strawberries aren't.",
+                "The Eiffel Tower can be 15 cm taller during the summer due to the expansion of the iron on hot days.",
+                "A crocodile cannot stick its tongue out.",
+                "Wombat poop is cube-shaped.",
+                "The heart of a blue whale is so big, a human could swim through its arteries.",
+                "It's impossible for most people to lick their own elbow.",
+                "A bolt of lightning is six times hotter than the sun.",
+                "Sloths can take up to a month to digest a single leaf.",
+                "The first oranges weren't orange.",
+                "There’s an island in Japan populated only by friendly rabbits.",
+                "A shrimp's heart is in its head.",
+                "Sea otters hold hands when they sleep so they don't float away from each other.",
+                "The blob of toothpaste on a toothbrush has a name: a 'nurdle'.",
+                "There is a town in Norway called 'Hell'.",
+                "Goats have rectangular pupils.",
+                "An ostrich's eye is bigger than its brain.",
+                "The unicorn is the national animal of Scotland.",
+                "Some cats are allergic to humans.",
+                "Humans share 50% of their DNA with bananas.",
+                "The inventor of the Pringles can is now buried in one.",
+                "In Switzerland, it is illegal to own just one guinea pig.",
+                "The longest English word is 189,819 letters long.",
+                "A single cloud can weigh more than 1 million pounds.",
+                "A 'jiffy' is an actual unit of time: 1/100th of a second.",
+                "The Hawaiian alphabet has only 13 letters.",
+                "Banging your head against a wall for one hour burns 150 calories.",
+                "In the 16th Century, Turkish women could legally divorce their husbands if they didn’t pour coffee for them.",
+                "The word 'nerd' was first coined by Dr. Seuss in 'If I Ran the Zoo'.",
+                "Chewing gum boosts concentration.",
+                "Hot water will turn into ice faster than cold water.",
+                "A small child could swim through the veins of a blue whale.",
+                "Ketchup was sold in the 1830s as medicine.",
+                "There are more fake flamingos in the world than real ones.",
+                "A duel between three people is called a truel.",
+                "Dragonflies have six legs but cannot walk.",
+                "The moon has moonquakes.",
+                "The King of Hearts is the only king without a mustache.",
+                "The ampersand symbol (&) is formed from the letters in 'et,' the Latin word for 'and'.",
+                "It rains diamonds on Saturn and Jupiter.",
+                "You are more likely to be killed by a vending machine than a shark.",
+                "Nintendo was founded in 1889 as a playing card company.",
+                "A sneeze travels at about 100 miles per hour.",
+                "Cap'n Crunch's full name is Horatio Magellan Crunch.",
+                "A group of pandas is called an 'embarrassment'."
+            ];
+
             // --- 1. Element References ---
             const factTextEl = document.getElementById('fact-text');
             const factDateEl = document.getElementById('fact-date');
@@ -221,7 +275,6 @@
             let factCache = JSON.parse(localStorage.getItem('factCache')) || {};
             let isCalendarGenerated = false;
 
-            // --- DATE FIX: Create a timezone-safe YYYY-MM-DD string from local date parts ---
             const getLocalDateString = (date) => {
                 const year = date.getFullYear();
                 const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -230,52 +283,42 @@
             };
             const todayDateString = getLocalDateString(today);
 
-            // --- 3. Core Fact Fetching & Caching Logic ---
-            const getFactForDate = async (dateString) => {
+            // --- 3. Core Fact Fetching & Caching Logic (MODIFIED) ---
+            const getFactForDate = (dateString) => {
+                // If a fact for this date is already cached, return it.
                 if (factCache[dateString]) {
                     return factCache[dateString];
                 }
                 
-                const isToday = dateString === todayDateString;
-                const baseApiUrl = 'https://uselessfacts.jsph.pl/api/v2/facts/';
-                const endpoint = isToday ? 'today' : 'random';
+                // Get all facts that have already been used.
+                const usedFacts = new Set(Object.values(factCache));
                 
-                let attempts = 0;
-                const maxAttempts = 10; // Safety break to prevent infinite loops
+                // Find all facts from our local list that haven't been used yet.
+                const availableFacts = localFacts.filter(fact => !usedFacts.has(fact));
                 
-                while (attempts < maxAttempts) {
-                    try {
-                        const response = await fetch(`${baseApiUrl}${endpoint}?language=en`);
-                        if (!response.ok) throw new Error('Network response error');
-                        const data = await response.json();
-                        const newFact = data.text;
-
-                        // --- DUPLICATE CHECK: Ensure the new fact isn't already in our cache ---
-                        const existingFacts = Object.values(factCache);
-                        if (!existingFacts.includes(newFact)) {
-                            factCache[dateString] = newFact;
-                            localStorage.setItem('factCache', JSON.stringify(factCache));
-                            return newFact;
-                        }
-                        // If fact is a duplicate, the loop will continue to fetch another one.
-                        console.log("Duplicate fact found, fetching another.");
-
-                    } catch (error) {
-                        console.error("Could not fetch fact:", error);
-                        return 'Could not load a fact for this day.';
-                    }
-                    attempts++;
+                let newFact;
+                if (availableFacts.length > 0) {
+                    // Pick a random fact from the available ones.
+                    newFact = availableFacts[Math.floor(Math.random() * availableFacts.length)];
+                } else {
+                    // If we've run out of unique facts, provide a fallback.
+                    newFact = "You've seen all the available facts! Check back later for more.";
                 }
-                return 'Could not find a unique fact after several attempts.';
+
+                // Cache the new fact for the given date and save to local storage.
+                factCache[dateString] = newFact;
+                localStorage.setItem('factCache', JSON.stringify(factCache));
+                
+                return newFact;
             };
 
             // --- 4. UI Update Functions ---
-            const displayFact = async (dateString) => {
+            const displayFact = (dateString) => {
                 factTextEl.textContent = 'Loading...';
                 const [year, month, day] = dateString.split('-').map(Number);
                 const date = new Date(year, month - 1, day);
                 
-                const fact = await getFactForDate(dateString);
+                const fact = getFactForDate(dateString); // No 'await' needed
                 
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
                 factDateEl.textContent = `Fact for ${date.toLocaleDateString('en-US', options)}`;
@@ -346,11 +389,11 @@
             };
 
             // --- 6. Event Listeners & Handlers ---
-            const showTooltip = async (e) => {
+            const showTooltip = (e) => {
                 const target = e.target;
                 if (!target.dataset.date) return;
                 factTooltip.textContent = 'Fetching fact...';
-                const fact = await getFactForDate(target.dataset.date);
+                const fact = getFactForDate(target.dataset.date); // No 'await' needed
                 factTooltip.textContent = fact;
                 const rect = target.getBoundingClientRect();
                 factTooltip.style.left = `${rect.left + window.scrollX}px`;
@@ -374,7 +417,12 @@
             closeModalBtn.addEventListener('click', toggleModal);
             calendarGridContainer.addEventListener('mouseover', showTooltip);
             calendarGridContainer.addEventListener('mouseout', hideTooltip);
-            calendarGridContainer.addEventListener('click', (e) => { if (e.target.dataset.date) showTooltip(e); });
+            calendarGridContainer.addEventListener('click', (e) => { 
+                if (e.target.dataset.date) {
+                    displayFact(e.target.dataset.date);
+                    toggleModal();
+                } 
+            });
             document.querySelector('.hamburger').addEventListener('click', () => {
                 document.querySelector('.hamburger').classList.toggle('active');
                 document.querySelector('.nav-links').classList.toggle('active');
@@ -398,7 +446,6 @@
             initializePage();
         });
     </script>
-
     <script type="module" src="/js/auth.js"></script>
     
 </body>
