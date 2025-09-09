@@ -231,6 +231,7 @@
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
+                    <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
                     <li><a href="account.html">My Account Settings</a></li>
                 </ul>
             </nav>
@@ -267,6 +268,15 @@
                     <table class="user-table">
                         <thead><tr><th>Username</th><th>Email</th><th>Sign-up Date</th><th>Status</th><th>Action</th></tr></thead>
                         <tbody id="user-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section id="newsletter" class="content-section">
+                <h3>Newsletter Subscribers</h3>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead><tr><th>Email</th><th>Subscription Date</th></tr></thead>
+                        <tbody id="newsletter-list-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -311,7 +321,12 @@
             const cartsSnapshot = await getDocs(cartsCollection);
             const carts = cartsSnapshot.docs.map(d => ({ userId: d.id, ...d.data() }));
 
+            const newsletterCollection = collection(db, "newsletterSubscribers");
+            const newsletterSnapshot = await getDocs(newsletterCollection);
+            const newsletterSubscribers = newsletterSnapshot.docs.map(d => d.data());
+
             renderUserTable(users);
+            renderNewsletterTable(newsletterSubscribers);
             calculatePerformanceMetrics(users, carts);
             renderChart('summary', users);
         }
@@ -333,6 +348,21 @@
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
                 userListBody.appendChild(row);
+            });
+        }
+
+        function renderNewsletterTable(subscribers) {
+            const newsletterListBody = document.getElementById('newsletter-list-body');
+            newsletterListBody.innerHTML = '';
+            
+            subscribers.forEach(subscriber => {
+                const row = document.createElement('tr');
+                const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
+                
+                row.innerHTML = `
+                    <td>${subscriber.email}</td>
+                    <td>${subscriptionDate}</td>`;
+                newsletterListBody.appendChild(row);
             });
         }
 
