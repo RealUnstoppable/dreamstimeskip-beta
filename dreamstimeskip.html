@@ -1,1 +1,501 @@
-<h2> dreamstimeskip test </h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreams OG Launch | DTS HUB</title>
+    <meta name="description" content="Relive your childhood. The original Dreams TimeSkip experience is returning.">
+    
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="themes.css">
+
+    <style>
+        /* --- Page Specific Styles --- */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #000; /* Black background for this page */
+        }
+
+        /* --- Video Hero Section --- */
+        .video-hero-container {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        #bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -2;
+            transform: translateX(-50%) translateY(-50%);
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+            z-index: -1;
+        }
+
+        .hero-content {
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .hero-content h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(90deg, #d1c4e9, #f5f5f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .hero-content p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* --- Countdown Timer --- */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .time-block {
+            text-align: center;
+        }
+
+        .flip-card {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 100px;
+            perspective: 500px;
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 100px;
+            border-radius: 8px;
+        }
+
+        .top-half, .bottom-half,
+        .top-flip, .bottom-flip {
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            left: 0;
+            background: #1c1c1c;
+            color: #f5f5f7;
+            overflow: hidden;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .top-half {
+            top: 0;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-half {
+            bottom: 0;
+            border-radius: 0 0 8px 8px;
+            align-items: flex-end;
+            line-height: 0;
+        }
+        
+        .top-flip {
+            top: 0;
+            border-radius: 8px 8px 0 0;
+            transform-origin: bottom;
+            transform: rotateX(0deg);
+            animation: flip-top 0.5s ease-in forwards;
+        }
+
+        .bottom-flip {
+            bottom: 0;
+            border-radius: 0 0 8px 8px;
+            transform-origin: top;
+            transform: rotateX(90deg);
+            line-height: 0;
+            animation: flip-bottom 0.5s ease-out 0.5s forwards;
+        }
+
+        @keyframes flip-top {
+            100% { transform: rotateX(-90deg); }
+        }
+        @keyframes flip-bottom {
+            100% { transform: rotateX(0deg); }
+        }
+
+        .time-label {
+            color: var(--text-secondary);
+            margin-top: 15px;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        
+        /* --- Hero Buttons --- */
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: transparent;
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+
+        .btn-secondary {
+            background-color: #333;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* --- Info Cards Section --- */
+        .info-section {
+            padding: 100px 40px;
+            background-color: var(--bg-color);
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .info-card {
+            background-color: var(--primary-card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .card-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 15px;
+        }
+
+        .card-content p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .card-cta {
+            align-self: flex-end;
+            margin-top: 20px;
+            background-color: #fff;
+            color: #111;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .card-cta:hover {
+            background-color: #ccc;
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .flip-card {
+                width: 60px;
+                height: 75px;
+                font-size: 2.5rem;
+                line-height: 75px;
+            }
+            .countdown-container {
+                gap: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">un <span></span></a>
+            <ul class="nav-links">
+                <li><a href="index.html#bento">Overview</a></li>
+                <li><a href="index.html#unstoppable">Unstoppable</a></li>
+                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+                <li><a href="index.html#harmony">HarmonyTunes</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
+            </ul>
+            <button class="hamburger" aria-label="Open menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <section class="video-hero-container">
+            <div class="video-overlay"></div>
+            <video autoplay muted loop id="bg-video">
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-flying-through-a-dark-abstract-tunnel-4982-large.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="hero-content">
+                <h1>Dreams OG Launch</h1>
+                <p>Relive your childhood.</p>
+                <div id="countdown" class="countdown-container">
+                    <div class="time-block">
+                        <div id="days" class="flip-card"><div class="top-half">00</div><div class="bottom-half">00</div></div>
+                        <div class="time-label">Days</div>
+                    </div>
+                    <div class="time-block">
+                        <div id="hours" class="flip-card"><div class="top-half">00</div><div class="bottom-half">00</div></div>
+                        <div class="time-label">Hours</div>
+                    </div>
+                    <div class="time-block">
+                        <div id="minutes" class="flip-card"><div class="top-half">00</div><div class="bottom-half">00</div></div>
+                        <div class="time-label">Minutes</div>
+                    </div>
+                    <div class="time-block">
+                        <div id="seconds" class="flip-card"><div class="top-half">00</div><div class="bottom-half">00</div></div>
+                        <div class="time-label">Seconds</div>
+                    </div>
+                </div>
+                <div class="hero-buttons">
+                    <a href="https://discord.gg/aYuEdG9Gh7" class="btn btn-primary">Join the Discord</a>
+                    <a href="#" class="btn btn-secondary">Join the Realms</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Trailer thumbnail" class="card-image">
+                    <div class="card-content">
+                        <h3>Watch The Trailer</h3>
+                        <p>Get a glimpse of what's to come. The official trailer showcases the new world, features, and the adventure that awaits.</p>
+                        <a href="#" class="card-cta">Watch Now</a>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <img src="https://placehold.co/600x400/0a0a0a/f5f5f7?text=Coming+Soon" alt="New features placeholder" class="card-image">
+                    <div class="card-content">
+                        <h3>Everything New</h3>
+                        <p>From custom biomes to revamped quests and new bosses, discover all the updates that make this the ultimate OG experience.</p>
+                        <a href="#" class="card-cta">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h5>Navigate</h5>
+                    <ul>
+                        <li><a href="index.html#bento">Overview</a></li>
+                        <li><a href="index.html#unstoppable">Unstoppable</a></li>
+                        <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+                        <li><a href="index.html#harmony">HarmonyTunes</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h5>Connect</h5>
+                    <ul>
+                        <li><a href="#">YouTube</a></li>
+                        <li><a href="#">TikTok</a></li>
+                        <li><a href="#">Twitter / X</a></li>
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h5>Company</h5>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Shop</a></li>
+                        <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column footer-newsletter">
+                    <h5>Stay in the Loop</h5>
+                    <p>Sign up for news, announcements, and exclusive beta access.</p>
+                    <form class="signup-form">
+                        <input type="email" placeholder="your.email@example.com" required>
+                        <button type="submit">Sign Up</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Unstoppable LLC. All Rights Reserved.</p>
+                <p>Designed in collaboration with Unstoppable Design, LLC.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Mobile Menu Toggle ---
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        if (hamburger && navLinks) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+        
+        // --- Countdown Timer Logic ---
+        const countdownDate = new Date();
+        countdownDate.setMonth(countdownDate.getMonth() + 1);
+
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        let previousTime = {};
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = countdownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            const currentTime = {
+                days: String(days).padStart(2, '0'),
+                hours: String(hours).padStart(2, '0'),
+                minutes: String(minutes).padStart(2, '0'),
+                seconds: String(seconds).padStart(2, '0'),
+            };
+
+            if (distance < 0) {
+                clearInterval(interval);
+                // Handle countdown end
+                return;
+            }
+
+            updateFlipCard(daysEl, currentTime.days, previousTime.days);
+            updateFlipCard(hoursEl, currentTime.hours, previousTime.hours);
+            updateFlipCard(minutesEl, currentTime.minutes, previousTime.minutes);
+            updateFlipCard(secondsEl, currentTime.seconds, previousTime.seconds);
+
+            previousTime = currentTime;
+        }
+
+        function updateFlipCard(element, newTime, oldTime) {
+            if (newTime === oldTime) return;
+
+            const topHalf = element.querySelector('.top-half');
+            const bottomHalf = element.querySelector('.bottom-half');
+
+            topHalf.textContent = newTime;
+            bottomHalf.textContent = newTime;
+
+            const topFlip = document.createElement('div');
+            topFlip.classList.add('top-flip');
+            topFlip.textContent = oldTime || '00';
+
+            const bottomFlip = document.createElement('div');
+            bottomFlip.classList.add('bottom-flip');
+            bottomFlip.textContent = newTime;
+            
+            topFlip.addEventListener('animationend', () => topFlip.remove());
+            bottomFlip.addEventListener('animationend', () => bottomFlip.remove());
+
+            element.append(topFlip, bottomFlip);
+        }
+        
+        updateCountdown();
+        const interval = setInterval(updateCountdown, 1000);
+    });
+    </script>
+    <script type="module" src="theme-loader.js"></script>
+
+</body>
+</html>

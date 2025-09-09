@@ -629,3 +629,10 @@ p.section-subtitle {
     }
 }
 .status-indicator.down { color: #a3a316; background-color: rgba(22, 163, 74, 0.1); }
+.nav-logo{
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -5.5px;
+}
