@@ -84,7 +84,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     text-decoration: none;
-    letter-spacing: -1px;
+    letter-spacing: -5px;
 }
 
 .nav-logo span {

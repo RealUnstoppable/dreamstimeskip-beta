@@ -70,7 +70,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     text-decoration: none;
-    letter-spacing: -1px;
+    letter-spacing: -5px;
 }
 .nav-logo span {
     color: var(--accent-color);
@@ -451,11 +451,4 @@ p.section-subtitle {
     #bento-unstoppable, #bento-dts, #bento-harmony, #bento-founder, #bento-shop, #bento-status, #bento-fotd { grid-column: span 1; }
     
     .footer-bottom { justify-content: center; text-align: center; }
-}
-.nav-logo{
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    text-decoration: none;
-    letter-spacing: -50px;
 }
