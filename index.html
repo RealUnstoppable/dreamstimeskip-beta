@@ -73,9 +73,115 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* --- START: Pre-register Popup Styles --- */
+        #preregister-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001; /* Higher than the Siri orb */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        #preregister-popup-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background-color: #111;
+            padding: 2.5rem;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        #preregister-popup-overlay.visible .popup-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .popup-content img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .popup-content h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0 0 1.5rem 0;
+            line-height: 1.3;
+        }
+
+        .popup-preregister-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #6e45e2, #88d3ce);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .popup-preregister-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(110, 69, 226, 0.4);
+        }
+
+        .popup-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .popup-close-btn:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+        /* --- END: Pre-register Popup Styles --- */
     </style>
-    </head>
+</head>
 <body>
+
+    <div id="preregister-popup-overlay">
+        <div class="popup-content">
+            <button class="popup-close-btn" aria-label="Close popup">&times;</button>
+            <img src="Pencil-1-logo-light.png" alt="A sleek, modern digital pencil">
+            <h2>The last pencil you'll ever buy.</h2>
+            <a href="sign in beta.html" class="popup-preregister-btn">Pre-register Now</a>
+        </div>
+    </div>
 
     <header class="main-header">
         <nav class="navbar">
@@ -317,5 +423,47 @@
       });
     </script>
     <script type="module" src="theme-loader.js"></script>
+
+    <script>
+        // --- START: Pre-register Popup Script ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const popupOverlay = document.getElementById('preregister-popup-overlay');
+            const closeBtn = popupOverlay.querySelector('.popup-close-btn');
+            const preregisterBtn = popupOverlay.querySelector('.popup-preregister-btn');
+
+            // Function to show the popup
+            const showPopup = () => {
+                popupOverlay.classList.add('visible');
+            };
+
+            // Function to hide the popup
+            const hidePopup = () => {
+                popupOverlay.classList.remove('visible');
+                // Store in sessionStorage that the popup has been seen
+                sessionStorage.setItem('popupShown', 'true');
+            };
+
+            // Show the popup after a short delay, but only if it hasn't been shown in this session
+            if (!sessionStorage.getItem('popupShown')) {
+                setTimeout(showPopup, 1000); // 1-second delay
+            }
+
+            // Event listeners to close the popup
+            closeBtn.addEventListener('click', hidePopup);
+            preregisterBtn.addEventListener('click', (e) => {
+                // e.preventDefault(); // Uncomment this if you want to stop the link from navigating
+                console.log('Pre-register button clicked!');
+                hidePopup();
+            });
+
+            // Also close if the user clicks on the dark overlay
+            popupOverlay.addEventListener('click', (event) => {
+                if (event.target === popupOverlay) {
+                    hidePopup();
+                }
+            });
+        });
+        // --- END: Pre-register Popup Script ---
+    </script>
 </body>
 </html>
