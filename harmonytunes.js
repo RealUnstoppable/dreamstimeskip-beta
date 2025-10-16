@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: no repeat, 1: repeat playlist, 2: repeat song
     let currentSongIndex = 0;
     let playlists = {
-        "Minecraft - Volume Alpha": [
+        "Dreams TimeSkip - Original Soundtrack": [
              // Simulating fetching from YouTube
             { title: "Key", artist: "C418", duration: "1:05", src: "No Pole x Where Have You Been (Remix).mp3"},
             { title: "Subwoofer Lullaby", artist: "C418", duration: "3:28", src: "No Pole x Where Have You Been (Remix).mp3"},
@@ -42,10 +42,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { title: "Wet Hands", artist: "C418", duration: "1:30", src: "No Pole x Where Have You Been (Remix).mp3"},
             { title: "Clark", artist: "C418", duration: "3:11", src: "No Pole x Where Have You Been (Remix).mp3"},
             { title: "Sweden", artist: "C418", duration: "3:35", src: "No Pole x Where Have You Been (Remix).mp3"},
+            { title: "Dreams TimeSkip - Original Soundtrack", artist: "Unstoppable Media, LLC", duration: "4:00", src: "/music/ES_Deroc Decuple - FormatxX.mp3"}
         ],
         "My Favorites": []
     };
-    let currentPlaylist = playlists["Minecraft - Volume Alpha"];
+    let currentPlaylist = playlists["Dreams TimeSkip - Original Soundtrack"];
 
     // --- FUNCTIONS ---
     function loadPlaylist(playlist) {
