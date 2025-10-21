@@ -216,3 +216,39 @@ body {
   width: 12px; height: 12px;
   background: white; border-radius: 50%; cursor: pointer;
 }
+/* Add this to your harmonytunes.css file */
+
+.control-button.active {
+    color: var(--accent-green) !important;
+}
+
+.song-table .playing {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.song-table .playing .song-title {
+    color: var(--accent-green);
+}
+
+.song-table .playing .song-index {
+    display: none;
+}
+
+.song-table .playing .playing-icon {
+    display: inline !important;
+    color: var(--accent-green);
+    font-size: 10px;
+}
+
+.repeat-indicator {
+    position: absolute;
+    font-size: 10px;
+    bottom: 0px;
+    right: 0px;
+    color: var(--accent-green);
+    font-weight: bold;
+}
+
+.control-button {
+    position: relative;
+}

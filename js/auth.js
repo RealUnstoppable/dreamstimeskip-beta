@@ -46,7 +46,7 @@ onAuthStateChanged(auth, async (user) => {
     } else {
         // User is signed out
         if (authLink) {
-            authLink.href = 'sign-in.html';
+            authLink.href = 'sign in beta.html';
             authLink.textContent = "Sign In / Sign Up";
         }
 

@@ -1,10 +1,10 @@
-// js/shop.js
+// shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
-export const products = [
+const products = [
     {
         id: 'unstoppable-hoodie',
         name: 'Unstoppable Hoodie',
@@ -17,21 +17,21 @@ export const products = [
         name: 'DTS Model Tee',
         price: 24.99,
         description: 'Iconic tee featuring the official Dreams TimeSkip character art.',
-        imageUrl: '/images/DreamsTimeSkipModel300x300.jpg'
+        imageUrl: 'images/DreamsTimeSkipModel300x300.jpg'
     },
     {
-        id: 'harmonytunes-cap',
+        id: 'harmonytunes-shirt',
         name: 'HarmonyTunes Cap',
         price: 24.99,
         description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
-        imageUrl: '/images/HarmonyTunesModel300x300.png'
+        imageUrl: 'images/HarmonyTunesModel300x300.png'
     },
     {
         id: 'unstoppable-mousepad',
         name: 'Unstoppable Mousepad',
         price: 19.99,
         description: 'High-performance mousepad for gaming precision.',
-        imageUrl: '/images/unstoppablemousepadmodel2-300x300.jpg'
+        imageUrl: 'images/unstoppablemousepadmodel2-300x300.jpg'
     }
 ];
 
@@ -48,23 +48,25 @@ const cartItemsContainer = document.getElementById('cart-items-container');
 const cartItemCountEl = document.getElementById('cart-item-count');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
+const navCtaContainer = document.getElementById('nav-cta-container');
+const hamburger = document.querySelector('.hamburger'); // <-- ADDED for mobile nav
+const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile nav
+
 
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
-    if (!productGrid) return;
     productGrid.innerHTML = products.map(product => `
-        <a href="/product.html?id=${product.id}" class="product-card-link">
-            <div class="product-card">
-                <img src="${product.imageUrl}" alt="${product.name}" class="product-image">
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <div class="product-footer">
-                        <span class="product-price">$${product.price.toFixed(2)}</span>
-                        <button class="view-product-btn" data-id="${product.id}">View Details</button>
-                    </div>
+        <div class="product-card">
+            <img src="${product.imageUrl}" alt="${product.name}" class="product-image">
+            <div class="product-info">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <div class="product-footer">
+                    <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                 </div>
             </div>
-        </a>
+        </div>
     `).join('');
 }
 
@@ -75,7 +77,7 @@ function renderCart() {
     } else {
         cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
             const product = products.find(p => p.id === productId);
-            if (!product) return '';
+            if (!product) return ''; // Should not happen
             return `
                 <div class="cart-item">
                     <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img">
@@ -99,7 +101,7 @@ function updateCartSummary() {
     const itemCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
     const totalPrice = Object.entries(cart).reduce((sum, [productId, quantity]) => {
         const product = products.find(p => p.id === productId);
-        return sum + (product ? product.price * quantity : 0);
+        return sum + (product.price * quantity);
     }, 0);
 
     cartItemCountEl.textContent = itemCount;
@@ -107,14 +109,10 @@ function updateCartSummary() {
 }
 
 // --- CART LOGIC ---
-export async function addToCart(productId, quantity = 1) {
-    cart[productId] = (cart[productId] || 0) + quantity;
+async function handleAddToCart(productId) {
+    cart[productId] = (cart[productId] || 0) + 1;
     await saveCart();
     renderCart();
-    // New Feature: Give visual feedback
-    const cartIcon = document.getElementById('cart-icon');
-    cartIcon.classList.add('pulse');
-    setTimeout(() => cartIcon.classList.remove('pulse'), 500);
 }
 
 async function handleUpdateQuantity(productId, quantity) {
@@ -135,7 +133,7 @@ async function handleRemoveFromCart(productId) {
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 async function saveCart() {
-    updateCartSummary();
+    updateCartSummary(); // Update UI immediately for responsiveness
     if (currentUser) {
         try {
             const userCartRef = doc(db, 'carts', currentUser.uid);
@@ -144,15 +142,39 @@ async function saveCart() {
             console.error("Error saving cart to Firestore:", error);
         }
     } else {
+        // **MODIFIED**: Save cart to localStorage for logged-out users
         localStorage.setItem('localCart', JSON.stringify(cart));
+    }
+}
+
+// --- AUTHENTICATION & UI UPDATES ---
+function updateUserNav(user) {
+    if (user) {
+        navCtaContainer.innerHTML = `<a href="account.html" class="cta-button nav-cta">My Account</a>`;
+    } else {
+        navCtaContainer.innerHTML = `<a href="sign in beta.html" class="cta-button nav-cta">Sign In</a>`;
     }
 }
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+    // **ADDED**: Hamburger menu toggle
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+    });
+
+    // Product grid listeners
+    productGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('add-to-cart-btn')) {
+            const productId = e.target.dataset.id;
+            handleAddToCart(productId);
+        }
+    });
+
     // Cart modal listeners
-    if (cartButton) cartButton.addEventListener('click', () => cartModal.style.display = 'block');
-    if (closeCartBtn) closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
+    cartButton.addEventListener('click', () => cartModal.style.display = 'block');
+    closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
     window.addEventListener('click', (e) => {
         if (e.target === cartModal) {
             cartModal.style.display = 'none';
@@ -160,57 +182,63 @@ function setupEventListeners() {
     });
 
     // Cart item action listeners
-    if (cartItemsContainer) {
-        cartItemsContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-item-btn')) {
-                const productId = e.target.dataset.id;
-                handleRemoveFromCart(productId);
-            }
-        });
-        cartItemsContainer.addEventListener('change', (e) => {
-            if (e.target.classList.contains('item-quantity-input')) {
-                const productId = e.target.dataset.id;
-                const quantity = parseInt(e.target.value, 10);
-                handleUpdateQuantity(productId, quantity);
-            }
-        });
-    }
-
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            if (!currentUser) {
-                alert('Please sign in to proceed to checkout.');
-                window.location.href = 'sign-in.html';
-            } else {
-                window.location.href = 'checkout.html';
-            }
-        });
-    }
+    cartItemsContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-item-btn')) {
+            const productId = e.target.dataset.id;
+            handleRemoveFromCart(productId);
+        }
+    });
+    cartItemsContainer.addEventListener('change', (e) => {
+        if (e.target.classList.contains('item-quantity-input')) {
+            const productId = e.target.dataset.id;
+            const quantity = parseInt(e.target.value, 10);
+            handleUpdateQuantity(productId, quantity);
+        }
+    });
+    
+    checkoutBtn.addEventListener('click', () => {
+        if(!currentUser) {
+            alert('Please sign in to proceed to checkout.');
+            window.location.href = 'sign in beta.html';
+        } else {
+             alert('Checkout functionality is not yet implemented. Thank you for testing!');
+        }
+    });
 }
+
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     renderProducts();
     setupEventListeners();
 
+    // **MODIFIED**: Reworked auth state change to handle local cart
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         const localCartData = localStorage.getItem('localCart');
         const localCart = localCartData ? JSON.parse(localCartData) : {};
 
         if (user) {
+            // User is signed in
             const userCartRef = doc(db, 'carts', user.uid);
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
-            const mergedCart = { ...firestoreCart, ...localCart };
 
+            // Merge local and firestore carts
+            const mergedCart = { ...firestoreCart };
+            for (const [productId, quantity] of Object.entries(localCart)) {
+                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
+            }
+            
             cart = mergedCart;
-            await saveCart();
-            localStorage.removeItem('localCart');
+            await saveCart(); // Save merged cart to Firestore
+            localStorage.removeItem('localCart'); // Clear local cart after merging
         } else {
+            // User is signed out, load from localStorage
             cart = localCart;
         }
 
-        renderCart();
+        updateUserNav(user);
+        renderCart(); // Render the final cart state
     });
 });

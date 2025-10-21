@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="themes.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <style>
         .memberships-main { max-width: 1200px; margin: 0 auto; padding: 120px 40px 60px; text-align: center; }
         .memberships-header h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -2px; margin-bottom: 15px; }
@@ -31,17 +31,24 @@
     </style>
 </head>
 <body>
+    
     <header class="main-header">
         <nav class="navbar">
             <a href="index.html" class="nav-logo">un<span></span></a>
             <ul class="nav-links">
+                <li><a href="#bento">Overview</a></li>
+                <li><a href="#unstoppable">Unstoppable</a></li>
+                <li><a href="#dts">Dreams TimeSkip</a></li>
+                <li><a href="#harmony">HarmonyTunes</a></li>
                 <li><a href="shop.html">Shop</a></li>
-                <li><a href="blog.html">Blog</a></li>
                 <li><a href="memberships.html">Memberships</a></li>
+                <li><a href="blog.html">Blog</a></li>
                 <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
             </ul>
-             <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <button class="hamburger" aria-label="Open menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </button>
         </nav>
     </header>
@@ -92,8 +99,8 @@
             </div>
         </section>
     </main>
-    
-    <script type="module" src="theme-loader.js"></script>
+
+    <script type="module" src="/js/theme-loader.js"></script>
     <script type="module">
         import { auth, db } from './auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -132,5 +139,6 @@
             }
         });
     </script>
+    <script src="/js/auth.js"></script>
 </body>
 </html>
