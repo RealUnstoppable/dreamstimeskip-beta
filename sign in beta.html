@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In / Sign Up</title>
      <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+
     <style>
         /* General Body Styles */
         body {
@@ -119,6 +120,30 @@
             font-size: 14px;
             height: 20px;
         }
+.back-button{
+position: relative;
+top: 20px;
+left: 0px;
+background: blue;
+border: solid blue 1px;
+border-radius: 5px;
+color: var(--text-primary);
+font-size: 1rem;
+cursor: pointer;
+animation: fadeIn 300ms;
+}
+
+.back-button:hover{
+    position: relative;
+    top: 20px;
+    left: 0px;
+    background: none;
+     border-radius: 5px;
+    border: solid 1px #007bff;
+    color: var(--text-primary);
+    font-size: 1rem;
+    cursor: pointer;
+}
     </style>
 </head>
 <body>
@@ -142,6 +167,7 @@
             </form>
             <p id="message"></p>
             <a href="#" class="toggle-link" id="toggle-form">Don't have an account? Sign Up</a>
+             <button class="back-button" onclick="window.history.back();"> &larr; Back</button>
         </div>
     </div>
 
