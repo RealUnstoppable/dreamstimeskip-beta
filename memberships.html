@@ -14,20 +14,146 @@
         .memberships-main { max-width: 1200px; margin: 0 auto; padding: 120px 40px 60px; text-align: center; }
         .memberships-header h1 { font-size: clamp(2.5rem, 6vw, 4rem); font-weight: 800; letter-spacing: -2px; margin-bottom: 15px; }
         .memberships-header p { font-size: clamp(1rem, 2vw, 1.2rem); color: var(--text-secondary); max-width: 600px; margin: 0 auto 60px; }
-        .pricing-table { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; text-align: left; }
+        
+        .pricing-table { 
+            display: grid; 
+            grid-template-columns: 1fr; /* Mobile-first: single column */
+            gap: 30px; 
+            text-align: left; 
+            max-width: 500px; /* Constrain width on mobile */
+            margin: 0 auto; /* Center the single column */
+        }
+        
+        /* Tablet and up: 2 columns */
+        @media (min-width: 768px) {
+            .pricing-table {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                max-width: 1200px; /* Allow full width */
+            }
+        }
+
         .plan-card { background-color: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; }
-        .plan-card.highlight { border-color: var(--accent-color); transform: scale(1.05); }
+        .plan-card.highlight { 
+            border-color: var(--accent-color); 
+            /* Mobile-first: highlight doesn't scale, just borders */
+        }
+        
+        /* Desktop: highlighted plan scales */
+        @media (min-width: 1024px) {
+             .plan-card.highlight {
+                transform: scale(1.05);
+             }
+        }
+
         .plan-card h3 { font-size: 1.8rem; font-weight: 700; color: var(--accent-color); }
         .plan-card .price { font-size: 2.5rem; font-weight: 800; margin: 10px 0; }
         .plan-card .price span { font-size: 1rem; font-weight: 500; color: var(--text-secondary); }
         .plan-card .description { color: var(--text-secondary); margin-bottom: 30px; min-height: 40px; }
-        .plan-card ul { list-style: none; padding: 0; margin: 0 0 30px; flex-grow: 1; }
+        .plan-card ul { list-style: none; padding: 0; margin: 0 0 10px; flex-grow: 1; } /* Reduced margin-bottom */
         .plan-card li { margin-bottom: 15px; display: flex; align-items: center; }
         .plan-card li::before { content: '✔'; color: var(--accent-green); margin-right: 10px; font-size: 1.2rem; }
+        
+        .view-more-link {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-decoration: underline;
+            cursor: pointer;
+            display: inline-block;
+            margin-bottom: 30px; /* Replaced the ul margin-bottom */
+            transition: color 0.2s;
+        }
+        .view-more-link:hover {
+            color: var(--text-primary);
+        }
+
         .btn-subscribe { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-subscribe:disabled { background-color: #555; cursor: not-allowed; }
         .btn-standard { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
         .btn-premium { background-color: var(--accent-color); color: white; }
         .btn-ultimate { background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); color: white; }
+
+        .features-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1002;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .features-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .features-modal-content {
+            background-color: var(--primary-card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            width: 90%; /* Mobile-first width */
+            max-width: 400px; /* Max width for larger screens */
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .features-modal-overlay.visible .features-modal-content {
+            transform: scale(1);
+        }
+
+        .features-modal-content h3 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .features-modal-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        .features-modal-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        .features-modal-list li::before {
+            content: '✔';
+            color: var(--accent-green);
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .features-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .features-modal-close:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
     </style>
 </head>
 <body>
@@ -72,6 +198,7 @@
                 </ul>
                 <button class="btn-subscribe btn-standard" disabled>Your Current Plan</button>
             </div>
+            
             <div class="plan-card highlight">
                 <h3>Premium</h3>
                 <p class="price">$4.99 <span>/ month</span></p>
@@ -82,8 +209,10 @@
                     <li>Exclusive profile badge</li>
                     <li>Early access to new merch drops</li>
                 </ul>
+                <a href="#" class="view-more-link" data-plan="premium">view more</a>
                 <button class="btn-subscribe btn-premium" data-plan="premium">Choose Premium</button>
             </div>
+
             <div class="plan-card">
                 <h3>Ultimate</h3>
                 <p class="price">$9.99 <span>/ month</span></p>
@@ -93,23 +222,96 @@
                     <li>Full access to all themes</li>
                     <li>Custom theme creator</li>
                     <li>"Supporter" status & badge</li>
-                    <li>Directly support the creator</li>
                 </ul>
+                <a href="#" class="view-more-link" data-plan="ultimate">view more</a>
                 <button class="btn-subscribe btn-ultimate" data-plan="ultimate">Go Ultimate</button>
             </div>
         </section>
     </main>
 
+    <div id="features-modal" class="features-modal-overlay">
+        <div class="features-modal-content">
+            <button id="features-modal-close" class="features-modal-close" aria-label="Close popup">&times;</button>
+            <h3 id="features-modal-title">Premium Features</h3>
+            <ul id="features-modal-list">
+                </ul>
+        </div>
+    </div>
+
     <script type="module" src="/js/theme-loader.js"></script>
     <script type="module">
-        import { auth, db } from './auth.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth } from './auth.js';
+        // Note: No Firestore imports needed here anymore for this logic
 
-        document.querySelector('.pricing-table').addEventListener('click', async (e) => {
-            if (e.target.matches('.btn-subscribe')) {
+        // --- Definitions for features ---
+        const fullFeatures = {
+            premium: {
+                title: 'Premium Features',
+                features: [
+                    'Reduced ad experience',
+                    'Full access to all themes',
+                    'Exclusive profile badge',
+                    'Early access to new merch drops',
+                    '10% off all shop items',
+                    'Access to exclusive Discord channels'
+                ]
+            },
+            ultimate: {
+                title: 'Ultimate Features',
+                features: [
+                    'Completely Ad-Free',
+                    'Full access to all themes',
+                    'Custom theme creator',
+                    '"Supporter" status & badge',
+                    'Directly support the creator',
+                    '25% off all shop items',
+                    'Access to exclusive Discord channels',
+                    'Monthly entry into merch giveaways'
+                ]
+            }
+        };
+
+        // --- Modal DOM Elements ---
+        const modalOverlay = document.getElementById('features-modal');
+        const modalCloseBtn = document.getElementById('features-modal-close');
+        const modalTitle = document.getElementById('features-modal-title');
+        const modalList = document.getElementById('features-modal-list');
+        const pricingTable = document.querySelector('.pricing-table');
+
+        // --- Function to open modal ---
+        const openFeatureModal = (plan) => {
+            if (!fullFeatures[plan]) return;
+            
+            const planData = fullFeatures[plan];
+            modalTitle.textContent = planData.title;
+            modalList.innerHTML = planData.features.map(feature => `<li>${feature}</li>`).join('');
+            
+            modalOverlay.classList.add('visible');
+        };
+
+        // --- Function to close modal ---
+        const closeFeatureModal = () => {
+            modalOverlay.classList.remove('visible');
+        };
+
+        // --- Event Listener Logic ---
+        pricingTable.addEventListener('click', (e) => {
+            // --- Handle "View More" clicks ---
+            if (e.target.matches('.view-more-link')) {
+                e.preventDefault(); // Stop links from navigating
                 const plan = e.target.dataset.plan;
-                if (!plan) return;
+                if (plan) {
+                    openFeatureModal(plan);
+                }
+                return;
+            }
+
+            // --- Handle "Subscribe" button clicks ---
+            if (e.target.matches('.btn-subscribe')) {
+                e.preventDefault(); // Stop links from navigating
+                
+                const plan = e.target.dataset.plan;
+                if (!plan) return; // Ignore standard/disabled buttons
 
                 const user = auth.currentUser;
                 if (!user) {
@@ -118,28 +320,29 @@
                     return;
                 }
 
-                if (confirm(`Are you sure you want to upgrade to the ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan?`)) {
-                    const userDocRef = doc(db, "users", user.uid);
-                    try {
-                        // In a real app, this would be after a successful payment.
-                        // For this demo, we'll set the expiration to one year from now.
-                        const expirationDate = Timestamp.fromMillis(Date.now() + 365 * 24 * 60 * 60 * 1000);
-                        
-                        await updateDoc(userDocRef, {
-                            membershipLevel: plan,
-                            membershipExpires: expirationDate
-                        });
-                        alert('Upgrade successful! Your new plan is now active.');
-                        window.location.href = 'account.html';
-                    } catch (error) {
-                        alert('An error occurred during the upgrade. Please try again.');
-                        console.error("Upgrade error: ", error);
-                    }
+                // --- MODIFIED: Redirect to specific checkout page ---
+                const button = e.target;
+                button.disabled = true;
+                button.textContent = 'Redirecting...';
+
+                if (plan === 'premium') {
+                    window.location.href = 'checkout-premium.html';
+                } else if (plan === 'ultimate') {
+                    window.location.href = 'checkout-ultimate.html';
                 }
             }
         });
+
+        // --- Modal Close Event Listeners ---
+        modalCloseBtn.addEventListener('click', closeFeatureModal);
+        modalOverlay.addEventListener('click', (e) => {
+            // Close if the user clicks on the dark overlay itself
+            if (e.target === modalOverlay) {
+                closeFeatureModal();
+            }
+        });
+
     </script>
-    <script src="/js/auth.js"></script>
-        <script type="module" src="/js/theme-loader.js"></script>
+    <script src="/js/script.js"></script> <script type="module" src="/js/theme-loader.js"></script>
 </body>
 </html>
