@@ -67,31 +67,6 @@
     </div>
   
   <script src="/js/script.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const siriOrb = document.getElementById('siri-orb');
-            let inactivityTimeout;
-
-            const collapseOrb = () => siriOrb.classList.remove('expanded');
-
-            const startInactivityTimer = () => {
-                clearTimeout(inactivityTimeout);
-                inactivityTimeout = setTimeout(collapseOrb, 5000);
-            };
-
-            siriOrb.addEventListener('click', (event) => {
-                if (event.target.tagName === 'A') return;
-                
-                if (!siriOrb.classList.contains('expanded')) {
-                    siriOrb.classList.add('expanded');
-                    startInactivityTimer();
-                } else {
-                    startInactivityTimer();
-                }
-            });
-        });
-    </script>
     
     <script type="module">
       import { auth, db } from './auth.js';
