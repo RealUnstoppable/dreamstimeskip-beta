@@ -68,50 +68,5 @@
 
     <script type="module" src="/js/shop.js"></script>
     <script type="module" src="/js/theme-loader.js"></script>
-
-    <script type="module">
-      import { auth, db } from './auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-      // Select the single authentication link by its ID
-      const authLink = document.getElementById('auth-link');
-
-      // This listener checks the user's login state and updates the UI accordingly.
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // User is signed in
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                
-                // Check if the user is an admin to determine the destination
-                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
-                
-                // Update the link's href and text
-                if (authLink) { // Check if the element exists
-                    authLink.href = destination;
-                    authLink.textContent = "My Account";
-                }
-
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                // Fallback for safety
-                if (authLink) {
-                    authLink.href = 'account.html';
-                    authLink.textContent = "My Account";
-                }
-            }
-
-        } else {
-            // User is signed out
-            // Update the link to point to the sign-in page
-            if (authLink) {
-                authLink.href = 'sign in beta.html';
-                authLink.textContent = "Sign In / Sign Up";
-            }
-        }
-      });
-    </script>
 </body>
 </html>
