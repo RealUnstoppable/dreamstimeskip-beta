@@ -49,6 +49,30 @@
         <span id="cart-icon">🛒</span>
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
+
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-modal-header">
+                <h2>Your Cart</h2>
+                <button id="close-cart-btn" class="close-cart-btn">&times;</button>
+            </div>
+            <div id="cart-items-container" class="cart-items-container">
+                </div>
+            <div class="cart-modal-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">$0.00</span>
+                </div>
+                <button id="checkout-btn" class="btn-checkout" disabled>Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="/js/shop.js"></script>
+    <script type="module" src="/js/theme-loader.js"></script>
+
+</body>
+</html>
  <script type="module" src="/js/script.js"></script>
      <script type="module">
       import { auth, db } from './auth.js';
@@ -88,26 +112,3 @@
         }
       });
     </script>
-    <div id="cart-modal" class="cart-modal">
-        <div class="cart-modal-content">
-            <div class="cart-modal-header">
-                <h2>Your Cart</h2>
-                <button id="close-cart-btn" class="close-cart-btn">&times;</button>
-            </div>
-            <div id="cart-items-container" class="cart-items-container">
-                </div>
-            <div class="cart-modal-footer">
-                <div class="cart-total">
-                    <span>Total:</span>
-                    <span id="cart-total-price">$0.00</span>
-                </div>
-                <button id="checkout-btn" class="btn-checkout" disabled>Proceed to Checkout</button>
-            </div>
-        </div>
-    </div>
-    
-    <script type="module" src="/js/shop.js"></script>
-    <script type="module" src="/js/theme-loader.js"></script>
-
-</body>
-</html>
