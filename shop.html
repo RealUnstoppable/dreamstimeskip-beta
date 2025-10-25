@@ -12,7 +12,39 @@
     <link rel="stylesheet" href="/css/shop.css">
     <link rel="stylesheet" href="/css/themes.css">
 </head>
-    <script type="module">
+   
+<body>
+   <header class="main-header">
+        <nav class="navbar">
+            <a href="index.html" class="nav-logo">un<span></span></a>
+            <ul class="nav-links">
+                <li><a href="index.html#bento">Overview</a></li>
+                <li><a href="index.html#unstoppable">Unstoppable</a></li>
+                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+                <li><a href="index.html#harmony">HarmonyTunes</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="memberships.html">Memberships</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
+            </ul>
+            <button class="hamburger" aria-label="Open menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="shop-main">
+        <section class="shop-header">
+            <h1>Unstoppable Collection</h1>
+            <p>High-quality gear for the dedicated fan. Log in to save your cart.</p>
+        </section>
+
+        <section id="product-grid" class="product-grid">
+            </section>
+    </main>
+     <script type="module">
       import { auth, db } from './auth.js';
       import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
       import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
@@ -50,39 +82,6 @@
         }
       });
     </script>
-<body>
-   <header class="main-header">
-        <nav class="navbar">
-            <a href="index.html" class="nav-logo">un<span></span></a>
-            <ul class="nav-links">
-                <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
-                <li><a href="index.html#harmony">HarmonyTunes</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="memberships.html">Memberships</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
-    </header>
-
-    <main class="shop-main">
-        <section class="shop-header">
-            <h1>Unstoppable Collection</h1>
-            <p>High-quality gear for the dedicated fan. Log in to save your cart.</p>
-        </section>
-
-        <section id="product-grid" class="product-grid">
-            </section>
-    </main>
-    
-
     <button id="cart-button" class="cart-fab">
         <span id="cart-icon">🛒</span>
         <span id="cart-item-count" class="cart-item-count">0</span>
