@@ -178,7 +178,44 @@
             </button>
         </nav>
     </header>
+<script type="module">
+      import { auth, db } from './auth.js';
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
+      // Select the single authentication link by its ID
+      const authLink = document.getElementById('auth-link');
+
+      // This listener checks the user's login state and updates the UI accordingly.
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // User is signed in
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                // Check if the user is an admin to determine the destination
+                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                
+                // Update the link's href and text
+                authLink.href = destination;
+                authLink.textContent = "My Account";
+
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                // Fallback for safety
+                authLink.href = 'account.html';
+                authLink.textContent = "My Account";
+            }
+
+        } else {
+            // User is signed out
+            // Update the link to point to the sign-in page
+            authLink.href = 'sign in beta.html';
+            authLink.textContent = "Sign In / Sign Up";
+        }
+      });
+    </script>
     <main class="memberships-main">
         <section class="memberships-header">
             <h1>Choose Your Plan</h1>
@@ -239,147 +276,4 @@
     </div>
 
     <script type="module" src="/js/theme-loader.js"></script>
-    <script type="module">
-        import { auth } from './auth.js';
-        // Note: No Firestore imports needed here anymore for this logic
-
-        // --- Definitions for features ---
-        const fullFeatures = {
-            premium: {
-                title: 'Premium Features',
-                features: [
-                    'Reduced ad experience',
-                    'Full access to all themes',
-                    'Exclusive profile badge',
-                    'Early access to new merch drops',
-                    '10% off all shop items',
-                    'Access to exclusive Discord channels'
-                ]
-            },
-            ultimate: {
-                title: 'Ultimate Features',
-                features: [
-                    'Completely Ad-Free',
-                    'Full access to all themes',
-                    'Custom theme creator',
-                    '"Supporter" status & badge',
-                    'Directly support the creator',
-                    '25% off all shop items',
-                    'Access to exclusive Discord channels',
-                    'Monthly entry into merch giveaways'
-                ]
-            }
-        };
-
-        // --- Modal DOM Elements ---
-        const modalOverlay = document.getElementById('features-modal');
-        const modalCloseBtn = document.getElementById('features-modal-close');
-        const modalTitle = document.getElementById('features-modal-title');
-        const modalList = document.getElementById('features-modal-list');
-        const pricingTable = document.querySelector('.pricing-table');
-
-        // --- Function to open modal ---
-        const openFeatureModal = (plan) => {
-            if (!fullFeatures[plan]) return;
-            
-            const planData = fullFeatures[plan];
-            modalTitle.textContent = planData.title;
-            modalList.innerHTML = planData.features.map(feature => `<li>${feature}</li>`).join('');
-            
-            modalOverlay.classList.add('visible');
-        };
-
-        // --- Function to close modal ---
-        const closeFeatureModal = () => {
-            modalOverlay.classList.remove('visible');
-        };
-
-        // --- Event Listener Logic ---
-        pricingTable.addEventListener('click', (e) => {
-            // --- Handle "View More" clicks ---
-            if (e.target.matches('.view-more-link')) {
-                e.preventDefault(); // Stop links from navigating
-                const plan = e.target.dataset.plan;
-                if (plan) {
-                    openFeatureModal(plan);
-                }
-                return;
-            }
-
-            // --- Handle "Subscribe" button clicks ---
-            if (e.target.matches('.btn-subscribe')) {
-                e.preventDefault(); // Stop links from navigating
-                
-                const plan = e.target.dataset.plan;
-                if (!plan) return; // Ignore standard/disabled buttons
-
-                const user = auth.currentUser;
-                if (!user) {
-                    alert('Please sign in to choose a plan.');
-                    window.location.href = 'sign in beta.html';
-                    return;
-                }
-
-                // --- MODIFIED: Redirect to specific checkout page ---
-                const button = e.target;
-                button.disabled = true;
-                button.textContent = 'Redirecting...';
-
-                if (plan === 'premium') {
-                    window.location.href = 'checkout-premium.html';
-                } else if (plan === 'ultimate') {
-                    window.location.href = 'checkout-ultimate.html';
-                }
-            }
-        });
-
-        // --- Modal Close Event Listeners ---
-        modalCloseBtn.addEventListener('click', closeFeatureModal);
-        modalOverlay.addEventListener('click', (e) => {
-            // Close if the user clicks on the dark overlay itself
-            if (e.target === modalOverlay) {
-                closeFeatureModal();
-            }
-        });
-
-    </script>
-    <script src="/js/script.js"></script> <script type="module">
-      import { auth, db } from './auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-      // Select the single authentication link by its ID
-      const authLink = document.getElementById('auth-link');
-
-      // This listener checks the user's login state and updates the UI accordingly.
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // User is signed in
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                
-                // Check if the user is an admin to determine the destination
-                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
-                
-                // Update the link's href and text
-                authLink.href = destination;
-                authLink.textContent = "My Account";
-
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                // Fallback for safety
-                authLink.href = 'account.html';
-                authLink.textContent = "My Account";
-            }
-
-        } else {
-            // User is signed out
-            // Update the link to point to the sign-in page
-            authLink.href = 'sign in beta.html';
-            authLink.textContent = "Sign In / Sign Up";
-        }
-      });
-    </script>
-</body>
-</html>
+   
