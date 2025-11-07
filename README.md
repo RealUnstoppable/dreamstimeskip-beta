@@ -1,2 +1,5 @@
 # dreamstimeskip-beta
 Dreams TimeSkip Beta Website
+ <script type="module">
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>

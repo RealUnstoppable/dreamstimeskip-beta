@@ -284,11 +284,9 @@
         </main>
     </div>
 
-    <script type="module">
-        import { auth, db } from './auth.js';
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { collection, getDocs, doc, updateDoc, getDoc, query, where, Timestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+   <script type="module">
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         let performanceChart; 
 
         onAuthStateChanged(auth, async (user) => {
@@ -499,6 +497,7 @@
 
             return options;
         }
+    
 
         function setupEventListeners() {
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
@@ -530,6 +529,6 @@
             });
         }
     </script>
- 
+
 </body>
 </html>

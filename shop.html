@@ -75,11 +75,9 @@
 </body>
 </html>
  <script type="module" src="/js/script.js"></script>
-     <script type="module">
-      import { auth, db } from './auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+      <script type="module">
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
       // Select the single authentication link by its ID
       const authLink = document.getElementById('auth-link');
 

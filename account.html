@@ -283,29 +283,11 @@
         </main>
     </div>
 
+  
     <script type="module">
-        import { auth, db } from './auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-
-                if (userDoc.exists()) {
-                    document.body.style.display = 'flex'; 
-                    initializePage(user, userDoc.data());
-                    setupEventListeners(user);
-                } else {
-                    alert("Could not find user data. Signing out.");
-                    signOut(auth);
-                }
-            } else {
-                window.location.replace('sign in beta.html');
-            }
-        });
-
         function initializePage(user, userData) {
             if (userData.isAdmin) {
                 document.getElementById('admin-back-button').style.display = 'block';

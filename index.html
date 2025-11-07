@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script type="module" src="/js/theme-loader.js"></script>
+     <script type="module" src="/js/theme-loader.js"></script>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DreamsTimekip Hub | The Unstoppable Ecosystem (Beta)</title>
@@ -195,6 +195,7 @@
                 <li><a href="shop.html">Shop</a></li>
                 <li><a href="memberships.html">Memberships</a></li>
                 <li><a href="blog.html">Blog</a></li>
+                <li><a href="portfolio.html">Design</a></li>
                 <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
             </ul>
             <button class="hamburger" aria-label="Open menu">
@@ -387,10 +388,8 @@
     </script>
     
     <script type="module">
-      import { auth, db } from './auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
       // Select the single authentication link by its ID
       const authLink = document.getElementById('auth-link');
 

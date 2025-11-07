@@ -513,7 +513,9 @@
             </div>
         </div>
     </footer>
-
+<script type="module">
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Mobile Menu Toggle ---
@@ -634,7 +636,7 @@
         }
 
         // Initialize both countdowns
-        new Countdown("2025-10-09T12:00:00-04:00", "countdown-1");
+        new Countdown("2025-12-09T12:00:00-04:00", "countdown-1");
         new Countdown("2027-01-15T12:00:00-05:00", "countdown-2", true);
 
 
@@ -681,7 +683,7 @@
     );
 
     </script>
-    <script type="module" src="auth.js"></script>
+   
     <script type="module" src="/js/newsletter.js"></script>
 </body>
 </html>
