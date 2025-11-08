@@ -1,7 +1,7 @@
 // shop.js
-import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { auth, db } from './js/auth.js';
+import { onAuthStateChanged } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 const products = [
@@ -197,12 +197,8 @@ function setupEventListeners() {
     });
     
     checkoutBtn.addEventListener('click', () => {
-        if(!currentUser) {
-            alert('Please sign in to proceed to checkout.');
-            window.location.href = 'sign in beta.html';
-        } else {
-             alert('Checkout functionality is not yet implemented. Thank you for testing!');
-        }
+        // Updated to point to the new checkout.html page
+        window.location.href = 'checkout.html';
     });
 }
 

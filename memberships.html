@@ -67,7 +67,19 @@
             color: var(--text-primary);
         }
 
-        .btn-subscribe { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-subscribe { 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s;
+            text-align: center; /* Added for <a> tag */
+            text-decoration: none; /* Added for <a> tag */
+            display: inline-block; /* Added for <a> tag */
+        }
         .btn-subscribe:disabled { background-color: #555; cursor: not-allowed; }
         .btn-standard { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
         .btn-premium { background-color: var(--accent-color); color: white; }
@@ -180,8 +192,10 @@
         </nav>
     </header>
 <script type="module">
-        import { auth, db } from './js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
+      import { auth, db } from './js/auth.js';
+      import { onAuthStateChanged } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      import { doc, getDoc } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
       // Select the single authentication link by its ID
       const authLink = document.getElementById('auth-link');
 
@@ -246,7 +260,7 @@
                     <li>Early access to new merch drops</li>
                 </ul>
                 <a href="#" class="view-more-link" data-plan="premium">view more</a>
-                <button class="btn-subscribe btn-premium" data-plan="premium">Choose Premium</button>
+                <a href="checkout-premium.html" class="btn-subscribe btn-premium" data-plan="premium">Choose Premium</a>
             </div>
 
             <div class="plan-card">
@@ -260,7 +274,7 @@
                     <li>"Supporter" status & badge</li>
                 </ul>
                 <a href="#" class="view-more-link" data-plan="ultimate">view more</a>
-                <button class="btn-subscribe btn-ultimate" data-plan="ultimate">Go Ultimate</button>
+                <a href="checkout-ultimate.html" class="btn-subscribe btn-ultimate" data-plan="ultimate">Go Ultimate</a>
             </div>
         </section>
     </main>

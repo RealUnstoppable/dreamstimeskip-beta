@@ -172,10 +172,10 @@ animation: fadeIn 300ms;
         </div>
     </div>
 
+   ...
     <script type="module">
-        import { auth, db } from './js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
-        const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+        import { auth, db } from './js/auth.js'; // FIX: Import from centralized auth file
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
 
         // This listener prevents a redirect loop.
         onAuthStateChanged(auth, async (user) => {

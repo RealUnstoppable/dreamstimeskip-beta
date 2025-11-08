@@ -447,9 +447,21 @@
             initializePage();
         });
     </script>
-   <script type="module">
-        import { auth, db } from './js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
+   ...
+    <script type="module">
+      import { auth, db } from './js/auth.js';
+      import { onAuthStateChanged } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in
+        } else {
+          // User is signed out
+        }
+      });
+    </script>
+    <script type="module" src="./js/auth.js"></script>
+</body>
+</html>
       // Select the single authentication link by its ID
       const authLink = document.getElementById('auth-link');
 
