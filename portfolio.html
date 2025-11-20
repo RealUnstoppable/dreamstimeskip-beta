@@ -215,7 +215,9 @@
         </footer>
 
     </div>
-    
+    <script type="module">
+        import { auth, db } from './js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
     <!-- JavaScript for Fade-in Effect -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
