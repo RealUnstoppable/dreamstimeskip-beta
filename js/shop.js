@@ -1,10 +1,10 @@
 // shop.js
-import { auth, db } from './js/auth.js';
-import { onAuthStateChanged } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https-://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
-const products = [
+export const products = [
     {
         id: 'unstoppable-hoodie',
         name: 'Unstoppable Hoodie',

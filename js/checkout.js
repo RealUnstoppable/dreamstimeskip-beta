@@ -148,6 +148,6 @@ onAuthStateChanged(auth, async (user) => {
         userCart = docSnap.exists() ? docSnap.data().items : {};
         renderCheckoutPage();
     } else {
-        window.location.replace('/sign-in.html');
+        window.location.replace('/sign in beta.html');
     }
 });
