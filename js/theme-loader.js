@@ -1,4 +1,10 @@
 // js/theme-loader.js
+(function() {
+    const localTheme = localStorage.getItem('userTheme');
+    const localAccent = localStorage.getItem('userAccent');
+    if (localTheme) document.body.dataset.theme = localTheme;
+    if (localAccent) document.body.dataset.accent = localAccent;
+})();
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";

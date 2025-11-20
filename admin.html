@@ -288,7 +288,10 @@
         import { auth, db } from './js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         let performanceChart; 
-import { doc, getDoc, collection, getDocs, Timestamp, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { 
+    doc, getDoc, collection, getDocs, Timestamp, updateDoc, query, orderBy, limit 
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
@@ -313,11 +316,12 @@ import { doc, getDoc, collection, getDocs, Timestamp, updateDoc } from "https://
 
         async function loadAdminData() {
             const usersCollection = collection(db, "users");
-            const usersSnapshot = await getDocs(usersCollection);
+            const recentUsersQuery = query(collection(db, "users"), orderBy("signupDate", "desc"), limit(50));
+const usersSnapshot = await getDocs(recentUsersQuery);
             const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
             const cartsCollection = collection(db, "carts");
-            const cartsSnapshot = await getDocs(cartsCollection);
+            const cartsSnapshot = await getDocs(query(collection(db, "carts"), limit(50)));
             const carts = cartsSnapshot.docs.map(d => ({ userId: d.id, ...d.data() }));
 
             const newsletterCollection = collection(db, "newsletterSubscribers");

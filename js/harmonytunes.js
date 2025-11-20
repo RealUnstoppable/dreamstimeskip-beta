@@ -71,6 +71,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${song.duration}</td>
             `;
             songListBody.appendChild(row);
+            // Inside the playlist.forEach loop...
+row.innerHTML = `
+    <td><span class="song-index">${index + 1}</span><span class="playing-icon" style="display:none;">▶</span></td>
+    <td class="song-title">
+        ${song.title}
+        <button class="fav-btn" onclick="event.stopPropagation(); addToFavorites(${index})">❤</button>
+    </td>
+    <td>${song.artist}</td>
+    <td>${song.duration}</td>
+`;
         });
     }
 
@@ -293,4 +303,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZE ---
     loadPlaylist(currentPlaylist);
+    window.addToFavorites = (index) => {
+    const song = currentPlaylist[index];
+    const favorites = playlists["My Favorites"];
+
+    // Check if already in favorites to avoid duplicates
+    if (!favorites.some(f => f.title === song.title)) {
+        favorites.push(song);
+        alert(`Added "${song.title}" to Favorites!`);
+    } else {
+        alert("Song is already in your favorites.");
+    }
+};
 });

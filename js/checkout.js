@@ -129,7 +129,7 @@ async function handlePlaceOrder(e) {
 
         messageEl.textContent = 'Order placed successfully! Redirecting...';
         messageEl.style.color = 'var(--accent-green)';
-        setTimeout(() => window.location.href = '/account.html', 3000);
+        setTimeout(() => window.location.href = './account.html', 3000);
 
     } catch (error) {
         console.error("Error placing order:", error);
