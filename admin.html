@@ -286,13 +286,21 @@
 
    <script type="module">
         import { auth, db } from './js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"; // Added query/limit for Priority 3 below
-let performanceChart;
-        import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { 
-    doc, getDoc, collection, getDocs, Timestamp, updateDoc, query, orderBy, limit 
-} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { 
+        doc, 
+        getDoc, 
+        collection, 
+        getDocs, 
+        Timestamp, 
+        updateDoc, 
+        query, 
+        orderBy, 
+        limit 
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+    let performanceChart;
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
