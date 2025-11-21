@@ -25,19 +25,7 @@ onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
 
-    if (user) { 
-        // --- TEMP: SEND VERIFICATION EMAIL ---
-        if (user.email === 'catalinandrian1@gmail.com' && !user.emailVerified) {
-            try {
-                await sendEmailVerification(user);
-                alert(`A verification email has been sent to ${user.email}. Please check your inbox (and spam folder).`);
-            } catch (error) {
-                console.error("Error sending verification email:", error);
-                if (error.code === 'auth/too-many-requests') {
-                    alert("Too many requests. Please check your email or wait a while before trying again.");
-                }
-            }
-        }
+ 
         // -------------------------------------
         // User is signed in
         const userDocRef = doc(db, "users", user.uid);
