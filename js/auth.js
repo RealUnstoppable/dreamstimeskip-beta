@@ -103,7 +103,7 @@ if (document.getElementById('auth-form')) {
                     email: userCredential.user.email,
                     signupDate: serverTimestamp(),
                     isBanned: false,
-                    isAdmin: userCredential.user.email === ADMIN_EMAIL, // Set admin status on creation
+                    isAdmin: false, // Always false on creation for security
                     membershipLevel: 'free'
                 });
                 sessionStorage.setItem('newUser', 'true');
