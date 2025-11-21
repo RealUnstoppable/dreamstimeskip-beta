@@ -287,6 +287,125 @@
                 </ul>
         </div>
     </div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Data for the memberships
+        const planDetails = {
+            premium: {
+                title: "Premium Plan Features",
+                features: [
+                    "<strong>Exclusive Channels:</strong> Access to #standard-plan-members, #standard-battlepass, & #standard-giveaway.",
+                    "<strong>Standard Battle Pass:</strong> Full access (unlock other passes after completion).",
+                    "<strong>XP Multiplier x3:</strong> Complete Battlepasses faster and claim rewards.",
+                    "<strong>Loot Boxes (Monthly):</strong> 30 (1★), 25 (2★), 20 (3★), 10 (4★), and 5 (5★) boxes.",
+                    "<strong>Mystery Boxes:</strong> 6 per month (Containing Epic to Mythic items).",
+                    "<strong>Map Downloads:</strong> Get 10k Map Downloads and Personal Base Downloads.",
+                    "<strong>Realms Bank:</strong> Personal Gold Rank protected from robbers (Start limit: 200 Gold).",
+                    "<strong>Exclusive Roles:</strong> Unique roles for your Discord and Realms account.",
+                    "<strong>Texture/Music Submissions:</strong> Submit 2 Texture and Sound changes each MONTH.",
+                    "<strong>Priority Queue:</strong> Enjoy faster login times for Events, Quests, and Gameplay.",
+                    "<strong>SKIP!:</strong> Skip loading screens and ads.",
+                    "<strong>Appear Animated:</strong> Appear animated in our Event Videos.",
+                    "<strong>2x Boosts:</strong> Earn XP, Coin, and Gold 2x FASTER than regular players.",
+                    "<strong>Bonus Coins:</strong> Get +10k coins a week (store in bank to keep safe).",
+                    "<strong>EPIC Items:</strong> Obtain Epic Items and Weapons.",
+                    "<strong>Early-Access Content:</strong> Alpha, BETA, Pre-Release features, art, and game design previews.",
+                    "<strong>Monthly Newsletter:</strong> Discord and Realms updates with member-exclusive previews.",
+                    "<strong>Party Bonuses:</strong> Increased drops and loot rewards when in a party.",
+                    "<strong>Guild Expansion:</strong> +3 Guild Slots.",
+                    "<strong>Plot Change Requests:</strong> Submit Character Plot requests.",
+                    "<strong>Bonus Quests:</strong> Available for EXTRA rewards.",
+                    "<strong>Giveaways:</strong> Opt-in enabled + get 2 Bonus Tickets.",
+                    "<strong>Discord Quickies:</strong> Get the latest and newest features as soon as they drop.",
+                    "<strong>Supporter Status:</strong> You help keep the realms free for everyone!"
+                ]
+            },
+            ultimate: {
+                title: "Ultimate Plan Features",
+                features: [
+                    "<strong>Exclusive Channels:</strong> Access to #premium-plan-members, #premium-battlepass, & #premium-giveaways.",
+                    "<strong>Premium Pass!:</strong> Access to Premium Battle Pass included (unlock others after completion).",
+                    "<strong>Battlepass XP Multiplier x4:</strong> Complete Battlepasses faster and claim rewards.",
+                    "<strong>Loot Boxes (Monthly):</strong> 50 (1★), 40 (2★), 30 (3★), 20 (4★), and 10 (5★) boxes.",
+                    "<strong>Mystery Boxes:</strong> 8 per month (Containing Legendary to Mythic items).",
+                    "<strong>Map Downloads:</strong> Get 15k Map Downloads and Personal Base Downloads.",
+                    "<strong>Realms Bank:</strong> Personal Gold Rank protected from robbers (Start limit: 325 Gold).",
+                    "<strong>Exclusive Roles:</strong> EXCLUSIVE roles for your Discord and Realms account.",
+                    "<strong>Texture/Music Submissions:</strong> Submit 3 Texture and Sound changes each MONTH.",
+                    "<strong>Priority Queue:</strong> Enjoy faster login times for Events, Quests, and Gameplay.",
+                    "<strong>SKIP!:</strong> Skip loading screens and ADS.",
+                    "<strong>Appear Animated:</strong> Appear Animated in Event Videos and Event Cutscenes.",
+                    "<strong>Boosts:</strong> Earn XP, Coin, and Gold 3.5x FASTER than regular players.",
+                    "<strong>Bonus Coins:</strong> Get +15k coins a week (store these in your bank to avoid losing them).",
+                    "<strong>LEGENDARY Items:</strong> Obtain Legendary Items and Weapons.",
+                    "<strong>Early-Access Content:</strong> Pre-testing Alpha, BETA, Pre-Release, upcoming art, game design, & content previews.",
+                    "<strong>[SURPRISE]:</strong> COMING SOON! shhhh... 🤫",
+                    "<strong>Monthly Newsletter:</strong> Member exclusive previews on Discord and Realms updates.",
+                    "<strong>Increased Drops:</strong> Bonus rewards from chests and drop loot when in a party.",
+                    "<strong>Guild Expansion:</strong> +4 Guild Slots.",
+                    "<strong>Plot Change Requests:</strong> Priority Character Plot Requests.",
+                    "<strong>Bonus Quests:</strong> Bonus Quests available for EXTRA rewards.",
+                    "<strong>Giveaways:</strong> Opt-in enabled and get 3 Bonus Tickets.",
+                    "<strong>Discord Quickies:</strong> Get the latest and newest features as soon as they drop.",
+                    "<strong>Premium Features:</strong> Premium Members get new features every Month.",
+                    "<strong>Support Us:</strong> By buying a membership you help us keep the realms free for everyone."
+                ]
+            }
+        };
 
+        // Elements
+        const modal = document.getElementById('features-modal');
+        const modalTitle = document.getElementById('features-modal-title');
+        const modalList = document.getElementById('features-modal-list');
+        const closeBtn = document.getElementById('features-modal-close');
+        const viewMoreLinks = document.querySelectorAll('.view-more-link');
 
-   
+        // Function to open modal
+        const openModal = (planType) => {
+            const data = planDetails[planType];
+            if (!data) return;
+
+            // Update content
+            modalTitle.textContent = data.title;
+            modalList.innerHTML = data.features
+                .map(feature => `<li>${feature}</li>`)
+                .join('');
+
+            // Show modal
+            modal.classList.add('visible');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        };
+
+        // Function to close modal
+        const closeModal = () => {
+            modal.classList.remove('visible');
+            document.body.style.overflow = ''; // Restore scrolling
+        };
+
+        // Event Listeners
+        viewMoreLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const plan = link.getAttribute('data-plan');
+                openModal(plan);
+            });
+        });
+
+        closeBtn.addEventListener('click', closeModal);
+
+        // Close when clicking outside the content box
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('visible')) {
+                closeModal();
+            }
+        });
+    });
+</script>
+   </body>
