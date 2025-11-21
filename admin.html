@@ -232,7 +232,6 @@
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
-                    <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
                     <li><a href="account.html">My Account Settings</a></li>
                 </ul>
@@ -264,7 +263,6 @@
                     <canvas id="performance-chart"></canvas>
                 </div>
             </section>
-            
             <section id="users" class="content-section">
                 <h3>User Management</h3>
                 <div class="user-table-container">
@@ -274,20 +272,6 @@
                     </table>
                 </div>
             </section>
-
-            <section id="downloads" class="content-section">
-                <h3>Download Statistics</h3>
-                <div class="metrics-grid">
-                     <div class="metric-card">
-                        <div class="value" id="download-count-infosheet">-</div>
-                        <div class="label">Realm Info Sheet</div>
-                    </div>
-                </div>
-                <p style="color: var(--text-secondary); margin-top: 20px;">
-                    These stats track the number of times the "Download Official Info Sheet" button is clicked on the "What's New" page.
-                </p>
-            </section>
-
             <section id="newsletter" class="content-section">
                 <h3>Newsletter Subscribers</h3>
                 <div class="user-table-container">
@@ -302,20 +286,20 @@
 
    <script type="module">
         import { auth, db } from './js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { 
-            doc, 
-            getDoc, 
-            collection, 
-            getDocs, 
-            Timestamp, 
-            updateDoc, 
-            query, 
-            orderBy, 
-            limit 
-        } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { 
+        doc, 
+        getDoc, 
+        collection, 
+        getDocs, 
+        Timestamp, 
+        updateDoc, 
+        query, 
+        orderBy, 
+        limit 
+    } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-        let performanceChart;
+    let performanceChart;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -340,30 +324,18 @@
         }
 
         async function loadAdminData() {
-            // Users & Carts
             const usersCollection = collection(db, "users");
             const recentUsersQuery = query(collection(db, "users"), orderBy("signupDate", "desc"), limit(50));
-            const usersSnapshot = await getDocs(recentUsersQuery);
+const usersSnapshot = await getDocs(recentUsersQuery);
             const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
             const cartsCollection = collection(db, "carts");
             const cartsSnapshot = await getDocs(query(collection(db, "carts"), limit(50)));
             const carts = cartsSnapshot.docs.map(d => ({ userId: d.id, ...d.data() }));
 
-            // Newsletter
             const newsletterCollection = collection(db, "newsletterSubscribers");
             const newsletterSnapshot = await getDocs(newsletterCollection);
             const newsletterSubscribers = newsletterSnapshot.docs.map(d => d.data());
-
-            // Download Stats (NEW)
-            const statsRef = doc(db, "site_stats", "downloads");
-            const statsDoc = await getDoc(statsRef);
-            if (statsDoc.exists()) {
-                const data = statsDoc.data();
-                document.getElementById('download-count-infosheet').textContent = data.infoSheet || 0;
-            } else {
-                document.getElementById('download-count-infosheet').textContent = 0;
-            }
 
             renderUserTable(users);
             renderNewsletterTable(newsletterSubscribers);
