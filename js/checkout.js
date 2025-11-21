@@ -118,10 +118,13 @@ async function handlePlaceOrder(e) {
             for (const [productId, quantity] of Object.entries(userCart)) {
                 const productStatRef = doc(db, "product_stats", productId);
                 const statDoc = await transaction.get(productStatRef);
-                const newCount = (statDoc.data()?.orderedCount || 0) + quantity;
-                transaction.set(productStatRef, { orderedCount: newCount }, { merge: true });
+                if (!statDoc.exists()) {
+    transaction.set(productStatRef, { orderedCount: quantity });
+} else {
+    const newCount = statDoc.data().orderedCount + quantity;
+    transaction.update(productStatRef, { orderedCount: newCount });
+}
             }
-
             // 3. Clear the user's cart
             const userCartRef = doc(db, 'carts', currentUser.uid);
             transaction.set(userCartRef, { items: {} });
