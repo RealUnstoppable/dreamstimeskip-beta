@@ -168,6 +168,109 @@
         }
 
     </style>
+    <style>
+    /* ... existing styles ... */
+
+    /* --- UPDATED POPUP STYLES --- */
+    .features-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px); /* Increased blur for smoother look */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1002;
+        opacity: 0;
+        visibility: hidden;
+        /* Smoother transition using cubic-bezier */
+        transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.4s ease;
+    }
+
+    .features-modal-overlay.visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .features-modal-content {
+        background-color: var(--primary-card-color);
+        border: 1px solid var(--border-color);
+        border-radius: 16px; /* Slightly more rounded */
+        padding: 50px; /* INCREASED PADDING (was 25px) */
+        width: 90%;
+        max-width: 500px; /* Slightly wider for better text fit */
+        max-height: 85vh;
+        overflow-y: auto;
+        position: relative;
+        transform: scale(0.9);
+        /* Smoother scale transition */
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .features-modal-overlay.visible .features-modal-content {
+        transform: scale(1);
+    }
+
+    .features-modal-content h3 {
+        font-size: 1.8rem;
+        margin-top: 0;
+        margin-bottom: 30px;
+        color: var(--accent-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 15px;
+    }
+
+    /* Targets the specific list ID to ensure checkmarks appear */
+    #features-modal-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        text-align: left;
+    }
+
+    #features-modal-list li {
+        display: flex;
+        align-items: flex-start; /* Aligns checkmark to top of multi-line text */
+        margin-bottom: 18px; /* More space between items */
+        font-size: 1.05rem;
+        line-height: 1.5;
+        color: var(--text-primary);
+    }
+
+    /* The Checkmark Style */
+    #features-modal-list li::before {
+        content: '✔';
+        color: var(--accent-green);
+        margin-right: 15px; /* More space between check and text */
+        font-size: 1.2rem;
+        font-weight: bold;
+        flex-shrink: 0; /* Prevents checkmark from squishing */
+        margin-top: 2px; /* Visual alignment adjustment */
+    }
+
+    .features-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 2.5rem;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s, transform 0.2s;
+        z-index: 10;
+    }
+
+    .features-modal-close:hover {
+        color: var(--text-primary);
+        transform: rotate(90deg);
+    }
+</style>
 </head>
 <body>
     
