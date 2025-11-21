@@ -25,7 +25,7 @@ onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
 
- 
+ if (user) {
         // -------------------------------------
         // User is signed in
         const userDocRef = doc(db, "users", user.uid);
