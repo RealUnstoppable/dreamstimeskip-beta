@@ -287,11 +287,45 @@
     <script type="module">
         import { auth, db } from './js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        // ADDED: getDoc was missing
+        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
+        // --- NEW: Main Entry Point (This was missing!) ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is logged in, fetch their data
+                try {
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        
+                        // 1. Populate the page
+                        initializePage(user, userData);
+                        
+                        // 2. Activate buttons
+                        setupEventListeners(user);
+                        
+                        // 3. Show the page (Fixes white screen)
+                        document.body.style.display = 'flex';
+                    } else {
+                        console.error("User document does not exist.");
+                        // Optional: create a default doc or logout
+                    }
+                } catch (error) {
+                    console.error("Error loading profile:", error);
+                }
+            } else {
+                // Not logged in -> Go to Sign In
+                window.location.replace('sign in beta.html');
+            }
+        });
+
         function initializePage(user, userData) {
             if (userData.isAdmin) {
-                document.getElementById('admin-back-button').style.display = 'block';
+                const adminBtn = document.getElementById('admin-back-button');
+                if (adminBtn) adminBtn.style.display = 'block';
             }
 
             const welcomeHeader = document.getElementById('welcome-header');
@@ -309,7 +343,8 @@
             // Load theme settings
             document.getElementById('theme-select').value = userData.theme || 'dark';
             const currentAccent = userData.accentColor || 'blue';
-            document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`).checked = true;
+            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
+            if (accentRadio) accentRadio.checked = true;
         }
 
         function setupEventListeners(user) {
@@ -342,9 +377,12 @@
                 try {
                     await updateDoc(userDocRef, { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
-                    // Optional: Apply theme immediately without a page reload
+                    // Apply theme immediately
                     document.body.dataset.theme = theme;
                     document.body.dataset.accent = accentColor;
+                    // Update localStorage for persistence if they log out
+                    localStorage.setItem('userTheme', theme);
+                    localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 }
@@ -369,13 +407,21 @@
                 }
             });
 
+            // Navigation Handling
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
+                    
+                    // Remove active class from all links and sections
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                    
+                    // Add active class to clicked link
                     e.currentTarget.classList.add('active');
-                    document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
+                    
+                    // Show target section
+                    const targetId = e.currentTarget.getAttribute('href');
+                    document.querySelector(targetId).classList.add('active');
                 });
             });
 
