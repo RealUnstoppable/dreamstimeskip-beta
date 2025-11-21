@@ -249,7 +249,7 @@
                     <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Purchases</div></div>
                     <div class="metric-card"><div class="value" id="checkouts">-</div><div class="label">Completed Checkouts</div></div>
                     <div class="metric-card"><div class="value" id="active-carts">-</div><div class="label">Users with Active Carts</div></div>
-                    <div class="metric-card"><div class="value" id="avg-time">-</div><div class="label">Avg. Session Time</div></div>
+                    <div class="metric-card"><div class="value" id="avg-orders">-</div><div class="label">Orders per User</div></div>
                 </div>
 
                 <div class="graph-container">
@@ -301,7 +301,7 @@
     </div>
 
    <script type="module">
-        import { auth, db } from './js/auth.js';
+        import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { 
             doc, 
@@ -419,10 +419,14 @@
 
             document.getElementById('total-users').textContent = users.length;
             document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('total-purchases').textContent = '173'; // Static data for now
-            document.getElementById('checkouts').textContent = '89'; // Static data for now
+            document.getElementById('total-purchases').textContent = totalOrders;
+            document.getElementById('checkouts').textContent = totalOrders;
             document.getElementById('active-carts').textContent = activeCarts;
-            document.getElementById('avg-time').textContent = '8m 42s'; // Static data for now
+            const totalOrders = document.getElementById('total-purchases').textContent; // Grab the real number we just calculated
+const totalUsers = users.length;
+const conversionRate = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
+
+document.getElementById('avg-orders').textContent = conversionRate;
         }
 
         function renderChart(view, usersData) {
