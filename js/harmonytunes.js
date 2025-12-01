@@ -50,7 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
         "My Favorites": []
     };
     let currentPlaylist = playlists["Minecraft - Volume Alpha"];
-
+    // --- LOAD FAVORITES FROM STORAGE ---
+const savedFavs = localStorage.getItem('dts_favorites');
+if (savedFavs) {
+    playlists["My Favorites"] = JSON.parse(savedFavs);
+}
     // --- FUNCTIONS ---
     function loadPlaylist(playlist) {
         songListBody.innerHTML = '';
@@ -303,13 +307,15 @@ row.innerHTML = `
 
     // --- INITIALIZE ---
     loadPlaylist(currentPlaylist);
-    window.addToFavorites = (index) => {
+ window.addToFavorites = (index) => {
     const song = currentPlaylist[index];
     const favorites = playlists["My Favorites"];
 
     // Check if already in favorites to avoid duplicates
     if (!favorites.some(f => f.title === song.title)) {
         favorites.push(song);
+        // Save to Local Storage immediately
+        localStorage.setItem('dts_favorites', JSON.stringify(favorites)); 
         alert(`Added "${song.title}" to Favorites!`);
     } else {
         alert("Song is already in your favorites.");

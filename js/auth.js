@@ -19,7 +19,8 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-const ADMIN_EMAIL = 'catalinandrian1@gmail.com';
+// Admin status is verified securely via Firebase Custom Claims or Firestore User Data
+const ADMIN_EMAIL = null;
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');

@@ -47,24 +47,10 @@ function renderCheckoutPage() {
                         </div>
                     </section>
                     <section>
-                        <h3>Payment Information</h3>
-                        <div class="form-group">
-                            <label for="card-number">Card Number</label>
-                            <input type="text" id="card-number" placeholder="XXXX XXXX XXXX XXXX" required>
-                        </div>
-                        <div class="form-group-inline">
-                            <div class="form-group">
-                                <label for="expiry">Expiry (MM/YY)</label>
-                                <input type="text" id="expiry" placeholder="MM/YY" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cvc">CVC</label>
-                                <input type="text" id="cvc" placeholder="123" required>
-                            </div>
-                        </div>
-                    </section>
-                    <button type="submit" class="cta-button place-order-button" id="place-order-btn">Place Order</button>
-                    <p id="checkout-message"></p>
+                   <div style="background: rgba(255, 255, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba;">
+    <p style="margin: 0; color: #ffca2c; font-size: 0.9rem;"><strong>BETA NOTICE:</strong> No payment is required today. This is a reservation system. We will contact you via email for payment when the item ships.</p>
+</div>
+<button type="submit" class="cta-button place-order-button" id="place-order-btn">Reserve Order (Pay Later)</button>
                 </form>
             </div>
             <div class="checkout-summary-container">
