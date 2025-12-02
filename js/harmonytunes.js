@@ -1,3 +1,7 @@
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- DOM ELEMENTS ---
     const audioPlayer = document.getElementById('audio-player');
@@ -8,150 +12,221 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('next-btn');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const repeatBtn = document.getElementById('repeat-btn');
-
     const progressBar = document.querySelector('.progress-bar');
     const progress = document.querySelector('.progress');
     const currentTimeEl = document.querySelector('.current-time');
     const totalTimeEl = document.querySelector('.total-time');
-
     const volumeSlider = document.querySelector('.volume-slider');
-
     const songListBody = document.getElementById('song-list-body');
     const playerSongTitle = document.getElementById('player-song-title');
     const playerSongArtist = document.getElementById('player-song-artist');
     const playerAlbumArt = document.getElementById('player-album-art');
-    const playlistHeaderArt = document.querySelector('.playlist-header .album-art');
+    const playlistListItems = document.querySelectorAll('#playlist-list li');
+    const headerTitle = document.getElementById('playlist-title');
 
+    // --- DATA ---
+    // Only includes songs with actual files uploaded
+    const librarySongs = [
+        { 
+            id: 'deorc-decuple',
+            title: "Deorc Decuple", 
+            artist: "FormantX", 
+            duration: "Unknown", 
+            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
+            art: "/images/harmony-tunes-card.jpg"
+        },
+        { 
+            id: 'no-pole-remix',
+            title: "No Pole x Where Have You Been", 
+            artist: "Remix", 
+            duration: "Unknown", 
+            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
+            art: "/images/dreams-lobby.jpg"
+        }
+    ];
 
-    const newPlaylistBtn = document.getElementById('new-playlist-btn');
-    const sharePlaylistBtn = document.getElementById('share-playlist-btn');
-
-
-    // --- STATE MANAGEMENT ---
+    let userFavorites = [];
+    let currentQueue = [...librarySongs]; // Default to main library
+    let currentSongIndex = 0;
     let isPlaying = false;
     let isShuffle = false;
-    let repeatMode = 0; // 0: no repeat, 1: repeat playlist, 2: repeat song
-    let currentSongIndex = 0;
-    let originalPlaylist = [];
-    let playlists = {
-        "Minecraft - Volume Alpha": [
-            // Using the provided MP3 for all songs as a placeholder
-            { title: "Key", artist: "C418", duration: "1:05", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Subwoofer Lullaby", artist: "C418", duration: "3:28", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Living Mice", artist: "C418", duration: "2:57", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Haggstrom", artist: "C418", duration: "3:24", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Minecraft", artist: "C418", duration: "4:14", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Mice on Venus", artist: "C418", duration: "4:41", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Dry Hands", artist: "C418", duration: "1:08", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Wet Hands", artist: "C418", duration: "1:30", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Clark", artist: "C418", duration: "3:11", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-            { title: "Sweden", artist: "C418", duration: "3:35", src: "No Pole x Where Have You Been (Remix).mp3", art: "dreams-lobby.jpg"},
-        ],
-        "My Favorites": []
-    };
-    let currentPlaylist = playlists["Minecraft - Volume Alpha"];
-    // --- LOAD FAVORITES FROM STORAGE ---
-const savedFavs = localStorage.getItem('dts_favorites');
-if (savedFavs) {
-    playlists["My Favorites"] = JSON.parse(savedFavs);
-}
-    // --- FUNCTIONS ---
-    function loadPlaylist(playlist) {
-        songListBody.innerHTML = '';
-        if (!playlist || playlist.length === 0) {
-            // Handle empty playlist case
-            const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="4" style="text-align:center;">This playlist is empty.</td>`;
-            songListBody.appendChild(row);
+    let repeatMode = 0; // 0: none, 1: all, 2: one
+    let currentUser = null;
+
+    // --- AUTH & FIRESTORE LOGIC ---
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        if (user) {
+            await loadUserFavorites(user.uid);
+        } else {
+            userFavorites = []; // Clear favorites if logged out
+        }
+        // Refresh the list to show/hide hearts or update state
+        renderSongList(); 
+    });
+
+    async function loadUserFavorites(uid) {
+        try {
+            const docRef = doc(db, "users", uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().musicFavorites) {
+                // We store IDs in Firestore, so we filter the library
+                const favIds = docSnap.data().musicFavorites;
+                userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+            }
+        } catch (e) {
+            console.error("Error loading favorites:", e);
+        }
+    }
+
+    async function toggleFavorite(songId) {
+        if (!currentUser) {
+            alert("Please sign in to save favorites.");
             return;
         }
-        playlist.forEach((song, index) => {
+
+        const song = librarySongs.find(s => s.id === songId);
+        const isFav = userFavorites.some(s => s.id === songId);
+        const userRef = doc(db, "users", currentUser.uid);
+
+        try {
+            if (isFav) {
+                // Remove locally
+                userFavorites = userFavorites.filter(s => s.id !== songId);
+                // Remove from Firestore
+                await updateDoc(userRef, {
+                    musicFavorites: arrayRemove(songId)
+                });
+            } else {
+                // Add locally
+                userFavorites.push(song);
+                // Add to Firestore
+                await updateDoc(userRef, {
+                    musicFavorites: arrayUnion(songId)
+                });
+            }
+            renderSongList();
+        } catch (e) {
+            console.error("Error updating favorite:", e);
+            // If the document doesn't exist yet, create it with the favorite
+            if (e.code === 'not-found') {
+                await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
+                userFavorites.push(song);
+                renderSongList();
+            }
+        }
+    }
+
+    // --- UI RENDERING ---
+    function renderSongList() {
+        songListBody.innerHTML = '';
+        
+        if (currentQueue.length === 0) {
+            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found in this playlist.</td></tr>`;
+            return;
+        }
+
+        currentQueue.forEach((song, index) => {
+            const isFav = userFavorites.some(fav => fav.id === song.id);
             const row = document.createElement('tr');
             row.dataset.index = index;
+            
+            // Check if this row is currently playing
+            const isActive = (audioPlayer.src.endsWith(encodeURI(song.src).split('/').pop()) || audioPlayer.src.includes(song.src));
+            if (isActive) row.classList.add('playing');
+
             row.innerHTML = `
-                <td><span class="song-index">${index + 1}</span><span class="playing-icon" style="display:none;">▶</span></td>
-                <td class="song-title">${song.title}</td>
+                <td>
+                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
+                    <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
+                </td>
+                <td class="song-title">
+                    ${song.title}
+                    <button class="fav-btn" style="color: ${isFav ? 'var(--accent-red)' : 'inherit'}; border:none; background:none; cursor:pointer; margin-left:10px;">
+                        ${isFav ? '❤' : '♡'}
+                    </button>
+                </td>
                 <td>${song.artist}</td>
                 <td>${song.duration}</td>
             `;
+
+            // Attach Favorite Click Event
+            row.querySelector('.fav-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent row click
+                toggleFavorite(song.id);
+            });
+
             songListBody.appendChild(row);
-            // Inside the playlist.forEach loop...
-row.innerHTML = `
-    <td><span class="song-index">${index + 1}</span><span class="playing-icon" style="display:none;">▶</span></td>
-    <td class="song-title">
-        ${song.title}
-        <button class="fav-btn" onclick="event.stopPropagation(); addToFavorites(${index})">❤</button>
-    </td>
-    <td>${song.artist}</td>
-    <td>${song.duration}</td>
-`;
         });
     }
 
-    function loadSong(index) {
-        if (index < 0 || index >= currentPlaylist.length) {
-            return; // Invalid index
+    function switchPlaylist(type) {
+        if (type === 'favorites') {
+            currentQueue = [...userFavorites];
+            headerTitle.textContent = "My Favorites";
+        } else {
+            currentQueue = [...librarySongs];
+            headerTitle.textContent = "Available Tracks";
         }
+        currentSongIndex = 0;
+        renderSongList();
+    }
+
+    // --- PLAYER LOGIC ---
+    function loadSong(index) {
+        if (index < 0 || index >= currentQueue.length) return;
+        
         currentSongIndex = index;
-        const song = currentPlaylist[index];
-        audioPlayer.src = song.src;
+        const song = currentQueue[index];
+        
+        // Only update source if it's different to prevent reloading
+        const currentSrc = audioPlayer.getAttribute('src');
+        if (currentSrc !== song.src) {
+            audioPlayer.src = song.src;
+            audioPlayer.load();
+        }
+
         playerSongTitle.textContent = song.title;
         playerSongArtist.textContent = song.artist;
-        if(song.art) {
-            playerAlbumArt.src = song.art;
-            playlistHeaderArt.src = song.art;
-        }
+        playerAlbumArt.src = song.art;
+        
+        // Update Metadata when loaded
+        audioPlayer.onloadedmetadata = () => {
+            totalTimeEl.textContent = formatTime(audioPlayer.duration);
+        };
 
-        progress.style.width = '0%';
-        currentTimeEl.textContent = '0:00';
-
-        updatePlayingUI();
+        renderSongList(); // Update UI active state
     }
-    
-    function updatePlayingUI() {
-        document.querySelectorAll('.song-table tbody tr').forEach(row => {
-            row.classList.remove('playing');
-            row.querySelector('.song-index').style.display = 'block';
-            row.querySelector('.playing-icon').style.display = 'none';
-        });
-
-        const currentRow = document.querySelector(`.song-table tbody tr[data-index="${currentSongIndex}"]`);
-        if (currentRow) {
-            currentRow.classList.add('playing');
-             currentRow.querySelector('.song-index').style.display = 'none';
-            currentRow.querySelector('.playing-icon').style.display = 'block';
-        }
-    }
-
 
     function playSong() {
-        if (currentPlaylist.length === 0) return;
-        isPlaying = true;
-        audioPlayer.play();
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'block';
+        if (!audioPlayer.src) loadSong(0);
+        audioPlayer.play().then(() => {
+            isPlaying = true;
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+        }).catch(e => console.error("Playback error:", e));
     }
 
     function pauseSong() {
-        isPlaying = false;
         audioPlayer.pause();
+        isPlaying = false;
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
     }
 
     function togglePlayPause() {
-        if (!audioPlayer.src && currentPlaylist.length > 0) {
-             loadSong(0);
-        }
-        isPlaying ? pauseSong() : playSong();
+        if (audioPlayer.paused) playSong();
+        else pauseSong();
     }
 
     function nextSong() {
-        currentSongIndex++;
-        if (currentSongIndex >= currentPlaylist.length) {
-            currentSongIndex = 0;
+        let nextIndex = currentSongIndex + 1;
+        if (isShuffle) {
+            nextIndex = Math.floor(Math.random() * currentQueue.length);
+        } else if (nextIndex >= currentQueue.length) {
+            nextIndex = 0; // Loop back
         }
-        loadSong(currentSongIndex);
+        loadSong(nextIndex);
         playSong();
     }
 
@@ -159,77 +234,26 @@ row.innerHTML = `
         if (audioPlayer.currentTime > 3) {
             audioPlayer.currentTime = 0;
         } else {
-            currentSongIndex--;
-            if (currentSongIndex < 0) {
-                currentSongIndex = currentPlaylist.length - 1;
-            }
-            loadSong(currentSongIndex);
+            let prevIndex = currentSongIndex - 1;
+            if (prevIndex < 0) prevIndex = currentQueue.length - 1;
+            loadSong(prevIndex);
             playSong();
         }
     }
 
-    function toggleShuffle() {
-        isShuffle = !isShuffle;
-        shuffleBtn.classList.toggle('active', isShuffle);
-
-        if (isShuffle) {
-            // Save the original order and currently playing song
-            const currentSong = currentPlaylist[currentSongIndex];
-            originalPlaylist = [...currentPlaylist];
-
-            // Shuffle the playlist
-            let shuffled = currentPlaylist.filter(song => song !== currentSong);
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            // Put the current song at the beginning
-            currentPlaylist = [currentSong, ...shuffled];
-            currentSongIndex = 0; // Reset index to the current song
-        } else {
-            // Restore the original order
-            const currentSong = currentPlaylist[currentSongIndex];
-            currentPlaylist = [...originalPlaylist];
-            currentSongIndex = currentPlaylist.findIndex(song => song.src === currentSong.src && song.title === currentSong.title);
-        }
-        // Reload the playlist view to reflect the new order
-        loadPlaylist(currentPlaylist);
-        updatePlayingUI(); // Re-highlight the current song
-    }
-
-
-    function toggleRepeat() {
-        repeatMode = (repeatMode + 1) % 3;
-        repeatBtn.classList.toggle('active', repeatMode !== 0);
-        
-        const repeatIcon = repeatBtn.querySelector('svg');
-        let repeatIndicator = repeatBtn.querySelector('.repeat-indicator');
-
-        if (!repeatIndicator) {
-            repeatIndicator = document.createElement('span');
-            repeatIndicator.className = 'repeat-indicator';
-            repeatBtn.appendChild(repeatIndicator);
-        }
-
-        if (repeatMode === 2) {
-            repeatIndicator.textContent = '1';
-        } else {
-            repeatIndicator.textContent = '';
-        }
-    }
-
-
+    // --- UTILS ---
     function formatTime(seconds) {
-        const minutes = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        if (isNaN(seconds)) return "0:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
     function updateProgress() {
         const { duration, currentTime } = audioPlayer;
         if (duration) {
-            const progressPercent = (currentTime / duration) * 100;
-            progress.style.width = `${progressPercent}%`;
+            const percent = (currentTime / duration) * 100;
+            progress.style.width = `${percent}%`;
             currentTimeEl.textContent = formatTime(currentTime);
         }
     }
@@ -238,87 +262,48 @@ row.innerHTML = `
         const width = this.clientWidth;
         const clickX = e.offsetX;
         const duration = audioPlayer.duration;
-        if (duration) {
-            audioPlayer.currentTime = (clickX / width) * duration;
-        }
+        audioPlayer.currentTime = (clickX / width) * duration;
     }
-
-    function handleSongEnd() {
-        if(repeatMode === 2){ // Repeat song
-            audioPlayer.currentTime = 0;
-            playSong();
-        } else if (repeatMode === 1) { // Repeat playlist
-             nextSong();
-        } else { // No repeat
-            if (currentSongIndex === currentPlaylist.length - 1) {
-                // If it's the last song, pause.
-                pauseSong();
-            } else {
-                nextSong();
-            }
-        }
-    }
-
 
     // --- EVENT LISTENERS ---
     playPauseBtn.addEventListener('click', togglePlayPause);
-    shuffleBtn.addEventListener('click', toggleShuffle);
-    repeatBtn.addEventListener('click', toggleRepeat);
-
-    audioPlayer.addEventListener('loadedmetadata', () => {
-        totalTimeEl.textContent = formatTime(audioPlayer.duration);
-    });
-    audioPlayer.addEventListener('timeupdate', updateProgress);
-    audioPlayer.addEventListener('ended', handleSongEnd);
-
-    progressBar.addEventListener('click', setProgress);
-
-    volumeSlider.addEventListener('input', (e) => audioPlayer.volume = e.target.value);
-
     nextBtn.addEventListener('click', nextSong);
     prevBtn.addEventListener('click', prevSong);
+    
+    audioPlayer.addEventListener('timeupdate', updateProgress);
+    audioPlayer.addEventListener('ended', () => {
+        if (repeatMode === 2) {
+            audioPlayer.currentTime = 0;
+            playSong();
+        } else {
+            nextSong();
+        }
+    });
+
+    progressBar.addEventListener('click', setProgress);
+    volumeSlider.addEventListener('input', (e) => audioPlayer.volume = e.target.value);
 
     songListBody.addEventListener('click', (e) => {
-        const songRow = e.target.closest('tr');
-        if (songRow && songRow.dataset.index) {
-            const index = parseInt(songRow.dataset.index);
-            loadSong(index);
+        // Handle row click (ignoring if fav button was clicked)
+        const row = e.target.closest('tr');
+        if (row && !e.target.closest('.fav-btn')) {
+            loadSong(parseInt(row.dataset.index));
             playSong();
         }
     });
 
-    sharePlaylistBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            alert('Playlist link copied to clipboard!');
+    // Playlist Sidebar Clicking
+    playlistListItems.forEach(item => {
+        item.addEventListener('click', () => {
+            // UI Update
+            playlistListItems.forEach(i => i.classList.remove('active-playlist'));
+            item.classList.add('active-playlist');
+            
+            // Logic Update
+            switchPlaylist(item.dataset.playlist);
         });
     });
 
-    newPlaylistBtn.addEventListener('click', () => {
-        const playlistName = prompt("Enter new playlist name:");
-        if (playlistName && !playlists[playlistName]) {
-            playlists[playlistName] = [];
-            alert(`Playlist "${playlistName}" created!`);
-            // You would then update the sidebar UI here to show the new playlist
-        } else if (playlistName) {
-            alert("A playlist with that name already exists.");
-        }
-    });
-
-
-    // --- INITIALIZE ---
-    loadPlaylist(currentPlaylist);
- window.addToFavorites = (index) => {
-    const song = currentPlaylist[index];
-    const favorites = playlists["My Favorites"];
-
-    // Check if already in favorites to avoid duplicates
-    if (!favorites.some(f => f.title === song.title)) {
-        favorites.push(song);
-        // Save to Local Storage immediately
-        localStorage.setItem('dts_favorites', JSON.stringify(favorites)); 
-        alert(`Added "${song.title}" to Favorites!`);
-    } else {
-        alert("Song is already in your favorites.");
-    }
-};
+    // Initial Render
+    renderSongList();
 });

@@ -1,3 +1,7 @@
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
 export function loadNavbar() {
     const headerHTML = `
     <nav class="navbar">
@@ -17,20 +21,42 @@ export function loadNavbar() {
         </button>
     </nav>`;
 
-    document.querySelector('.main-header').innerHTML = headerHTML;
-    
-    // Re-attach Auth Listener logic here so it updates the link
-    // Re-attach Hamburger logic here
-    attachNavEvents();
+    const header = document.querySelector('.main-header');
+    if (header) {
+        header.innerHTML = headerHTML;
+        attachNavEvents();
+        updateAuthLink(); // Check login status immediately after loading
+    }
 }
 
 function attachNavEvents() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
-    if(hamburger) {
+    if (hamburger && navLinks) {
         hamburger.addEventListener('click', () => {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
         });
     }
+}
+
+function updateAuthLink() {
+    const authLink = document.getElementById('auth-link');
+    if (!authLink) return;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                authLink.href = destination;
+                authLink.textContent = "My Account";
+            } catch (e) {
+                console.error("Nav Error", e);
+            }
+        } else {
+            authLink.href = 'sign in beta.html';
+            authLink.textContent = "Sign In / Sign Up";
+        }
+    });
 }

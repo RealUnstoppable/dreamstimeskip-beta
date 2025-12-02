@@ -185,25 +185,7 @@
     </div>
 
     <header class="main-header">
-        <nav class="navbar">
-            <a href="#" class="nav-logo">un<span></span></a>
-            <ul class="nav-links">
-                <li><a href="#bento">Overview</a></li>
-                <li><a href="#unstoppable">Unstoppable</a></li>
-                <li><a href="#dts">Dreams TimeSkip</a></li>
-                <li><a href="#harmony">HarmonyTunes</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="memberships.html">Memberships</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="portfolio.html">Design</a></li>
-                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
+        <div id="navbar-placeholder"></div>
     </header>
 
     <main>
@@ -359,6 +341,11 @@
     <div id="siri-orb">
         <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
     </div>
+    
+    <script type="module">
+    import { loadNavbar } from './js/navbar.js';
+    document.addEventListener('DOMContentLoaded', loadNavbar);
+</script>
     
   <script src="/js/script.js"></script>
 
