@@ -110,28 +110,15 @@
     </style>
 </head>
 <body>
-
-    <header class="main-header">
-        <nav class="navbar">
-            <a href="index.html" class="nav-logo">un<span></span></a>
-            <ul class="nav-links">
-                <li><a href="shop.html">Back to Shop</a></li>
-                <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            </button>
-        </nav>
-    </header>
-
     <main class="checkout-main" id="checkout-container">
         <h1>Loading Checkout...</h1>
     </main>
-    
     <script src="/js/script.js"></script>
     <script type="module" src="/js/checkout.js"></script>
-
+ <script src="/js/script.js"></script>
+     <script type="module">
+    import { loadNavbar } from './js/navbar.js';
+    document.addEventListener('DOMContentLoaded', loadNavbar);
+</script>
 </body>
 </html>
