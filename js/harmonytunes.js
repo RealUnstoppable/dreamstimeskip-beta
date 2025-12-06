@@ -9,21 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
             id: 'deorc-decuple',
             title: "Deorc Decuple", 
             artist: "FormantX", 
-            duration: "Unknown", 
+            duration: "3:45", 
             src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
-            category: "Electronic"
+            art: "/images/harmony-tunes-card.jpg"
         },
         { 
             id: 'no-pole-remix',
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
-            duration: "Unknown", 
+            duration: "2:30", 
             src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/dreams-lobby.jpg",
-            category: "Hip-Hop"
+            art: "/images/dreams-lobby.jpg"
         }
-        // Add more dummy data if files were available
     ];
 
     const tiktokData = [
@@ -43,10 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentUser = null;
 
     // --- DOM ELEMENTS ---
-    // Views
     const viewHome = document.getElementById('view-home');
     const viewPlaylist = document.getElementById('view-playlist');
-    const navHome = document.getElementById('nav-home');
+    const navPills = document.querySelectorAll('.nav-pill');
     const backToHomeBtn = document.getElementById('back-to-home');
     
     // Containers
@@ -87,54 +83,58 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPlayerEvents();
     }
 
-    // --- NAVIGATION & VIEWS ---
+    // --- NAVIGATION ---
     function setupNavigation() {
-        navHome.addEventListener('click', showHome);
-        backToHomeBtn.addEventListener('click', showHome);
+        navPills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                // UI Toggle
+                navPills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
 
-        // Sidebar Playlist Clicks
-        document.querySelectorAll('#playlist-list li').forEach(li => {
-            li.addEventListener('click', () => {
-                const type = li.dataset.playlist;
-                loadPlaylistView(type);
+                // Logic
+                const id = pill.id;
+                if (id === 'nav-home') {
+                    showHome();
+                } else if (id === 'nav-favorites') {
+                    loadPlaylistView('favorites');
+                } else if (id === 'nav-playlists') {
+                    // Just scroll to playlist section on home for now
+                    showHome();
+                    containerPlaylists.scrollIntoView({ behavior: 'smooth' });
+                } else if (id === 'nav-search') {
+                    alert("Search feature coming soon!");
+                }
             });
+        });
+
+        backToHomeBtn.addEventListener('click', () => {
+            showHome();
+            document.getElementById('nav-home').classList.add('active');
+            document.getElementById('nav-favorites').classList.remove('active');
         });
     }
 
     function showHome() {
         viewHome.style.display = 'block';
         viewPlaylist.style.display = 'none';
-        navHome.classList.add('active-nav');
-        document.querySelectorAll('#playlist-list li').forEach(li => li.classList.remove('active-playlist'));
     }
 
     function loadPlaylistView(type) {
         viewHome.style.display = 'none';
         viewPlaylist.style.display = 'block';
-        navHome.classList.remove('active-nav');
         
-        // Highlight sidebar
-        document.querySelectorAll('#playlist-list li').forEach(li => {
-            if (li.dataset.playlist === type) li.classList.add('active-playlist');
-            else li.classList.remove('active-playlist');
-        });
-
-        // Set Data
         if (type === 'favorites') {
             playlistTitleEl.textContent = "Liked Songs";
             playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
             renderSongTable(userFavorites);
-            
             playlistPlayBtn.onclick = () => {
-                if (userFavorites.length > 0) {
-                    playContext(userFavorites, 0);
-                }
+                if (userFavorites.length > 0) playContext(userFavorites, 0);
             };
         } else {
+            // Default Main
             playlistTitleEl.textContent = "All Available Tracks";
             playlistDescEl.textContent = "Unstoppable Media • Official Library";
             renderSongTable(librarySongs);
-
             playlistPlayBtn.onclick = () => {
                 playContext(librarySongs, 0);
             };
@@ -143,10 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- RENDERING HOME ---
     function renderHome() {
-        // 1. Jump Back In (Mock: Just take the first 2 songs)
+        // 1. Jump Back In
         containerJumpBack.innerHTML = librarySongs.slice(0, 2).map(song => createSongCard(song)).join('');
 
-        // 2. Recommended (Mock: Random sort)
+        // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
         containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
 
@@ -160,13 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
-        // 4. Playlists Cards
+        // 4. Playlists
         const playlists = [
             { id: 'main', title: "All Tracks", desc: "Complete Library" },
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card" onclick="loadPlaylistView('${pl.id}')">
+            <div class="music-card" onclick="window.loadPlaylistView('${pl.id}')">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
                     <button class="card-play-btn">▶</button>
@@ -176,16 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
-        // Attach event listeners to generated Play Buttons on Home Cards
+        // Card Play Buttons
         document.querySelectorAll('.music-card .card-play-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Don't trigger the card click (which might open playlist)
-                // Find song ID from card (Note: creating card logic needs to embed ID)
+                e.stopPropagation();
                 const card = btn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
                     const song = librarySongs.find(s => s.id === songId);
-                    if(song) playContext([song], 0); // Play just this song (or add logic for album)
+                    if(song) playContext([song], 0);
                 }
             });
         });
@@ -204,17 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
-    // Global helper for onclick in HTML string
     window.playSongById = (id) => {
         const songIndex = librarySongs.findIndex(s => s.id === id);
-        if (songIndex > -1) {
-            playContext(librarySongs, songIndex);
-        }
+        if (songIndex > -1) playContext(librarySongs, songIndex);
     };
     
-    window.loadPlaylistView = loadPlaylistView; // Expose to global
+    window.loadPlaylistView = loadPlaylistView;
 
-    // --- RENDERING TABLE ---
+    // --- RENDERING TABLE (Fixed Duration Bug) ---
     function renderSongTable(songs) {
         songListBody.innerHTML = '';
         if (songs.length === 0) {
@@ -223,39 +219,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         songs.forEach((song, index) => {
-            const isFav = userFavorites.some(fav => fav.id === song.id);
             const row = document.createElement('tr');
             
-            // Check playing state
             const isActive = (currentQueue[currentSongIndex]?.id === song.id);
             if (isActive) row.classList.add('playing');
 
+            // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
                     <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
                     <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
                 </td>
-                <td class="song-title">
-                    ${song.title}
-                </td>
+                <td class="song-title">${song.title}</td>
                 <td>${song.artist}</td>
-                <td>
-                    <button class="fav-btn" data-id="${song.id}" style="color: ${isFav ? 'var(--accent-green)' : 'inherit'};">
-                        ${isFav ? '❤' : '♡'}
-                    </button>
-                </td>
+                <td style="text-align: right;">${song.duration}</td>
             `;
 
-            row.addEventListener('click', (e) => {
-                if(!e.target.closest('.fav-btn')) {
-                    playContext(songs, index);
-                }
-            });
-
-            const favBtn = row.querySelector('.fav-btn');
-            favBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleFavorite(song.id);
+            row.addEventListener('click', () => {
+                playContext(songs, index);
             });
 
             songListBody.appendChild(row);
@@ -266,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function playContext(newQueue, startIndex) {
         currentQueue = [...newQueue];
         if (isShuffle) {
-            // Simple shuffle logic: move start index to 0, shuffle rest
             const first = currentQueue[startIndex];
             const rest = currentQueue.filter((_, i) => i !== startIndex).sort(() => Math.random() - 0.5);
             currentQueue = [first, ...rest];
@@ -287,16 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        // Update Like Button State
         const isFav = userFavorites.some(s => s.id === song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
-        // UI Updates
         updateProgress();
-        // Re-render table if visible to show playing icon
         if(viewPlaylist.style.display !== 'none') {
-            // Determine which list is showing based on header
             const showingFavs = playlistTitleEl.textContent === "Liked Songs";
             renderSongTable(showingFavs ? userFavorites : librarySongs);
         }
@@ -307,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-        }).catch(e => console.error("Playback error", e));
+        }).catch(e => console.error(e));
     }
 
     function pauseSong() {
@@ -325,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function nextSong() {
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
-            if (repeatMode === 1) nextIndex = 0; // Loop list
-            else return; // Stop
+            if (repeatMode === 1) nextIndex = 0;
+            else return;
         }
         currentSongIndex = nextIndex;
         loadSong(currentSongIndex);
@@ -364,10 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Volume
         volumeSlider.addEventListener('input', (e) => audioPlayer.volume = e.target.value);
 
-        // Progress Bar Click
         progressBar.parentElement.addEventListener('click', (e) => {
             const width = progressBar.parentElement.clientWidth;
             const clickX = e.offsetX;
@@ -375,37 +349,29 @@ document.addEventListener('DOMContentLoaded', () => {
             audioPlayer.currentTime = (clickX / width) * duration;
         });
 
-        // Shuffle
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
             shuffleBtn.style.color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
         });
 
-        // Repeat
         repeatBtn.addEventListener('click', () => {
             repeatMode = (repeatMode + 1) % 3;
-            // 0: none, 1: all, 2: one
             const indicator = repeatBtn.querySelector('.repeat-indicator');
             if (repeatMode === 0) {
                 repeatBtn.style.color = '#b3b3b3';
                 indicator.textContent = '';
             } else if (repeatMode === 1) {
                 repeatBtn.style.color = 'var(--accent-green)';
-                indicator.textContent = '.'; // Visual dot
+                indicator.textContent = '.';
             } else {
                 repeatBtn.style.color = 'var(--accent-green)';
                 indicator.textContent = '1';
             }
         });
 
-        // Player Like Button
         playerLikeBtn.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) {
                 toggleFavorite(currentQueue[currentSongIndex].id);
-                // Refresh icon immediately
-                const isFav = userFavorites.some(s => s.id === currentQueue[currentSongIndex].id);
-                playerLikeBtn.textContent = isFav ? '❤' : '♡';
-                playerLikeBtn.classList.toggle('active', isFav);
             }
         });
     }
@@ -427,7 +393,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    // --- DATA / FIRESTORE ---
     async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
@@ -446,13 +411,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 userFavorites.push(song);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
-            // Update UI if on favorites playlist or updating table hearts
-            if (viewPlaylist.style.display !== 'none') {
-                const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-                renderSongTable(showingFavs ? userFavorites : librarySongs);
+            // Update UI
+            const isPlayingFav = (currentQueue[currentSongIndex]?.id === songId);
+            if(isPlayingFav) {
+                playerLikeBtn.textContent = !isFav ? '❤' : '♡'; // Toggle logic was inverted in var check
+                playerLikeBtn.classList.toggle('active', !isFav);
+            }
+            if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
+                renderSongTable(userFavorites);
             }
         } catch (e) {
-            console.error("Error updating favorite:", e);
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
                 userFavorites.push(song);
@@ -463,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
-            // Load Favorites
             try {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
@@ -473,13 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (e) { console.error(e); }
             
-            // Set dynamic greeting with name
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
             document.getElementById('greeting').textContent = `${timeGreeting}, ${user.displayName || 'Friend'}`;
-        } else {
-            userFavorites = [];
-            document.getElementById('greeting').textContent = "Good Evening";
         }
         init();
     });

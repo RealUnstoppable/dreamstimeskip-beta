@@ -21,25 +21,17 @@
     <header class="main-header"></header>
 
     <div class="spotify-layout">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <ul class="sidebar-menu">
-                    <li id="nav-home" class="active-nav"><span class="icon">🏠</span> Home</li>
-                    <li id="nav-search"><span class="icon">🔍</span> Search</li>
-                </ul>
-            </div>
-            <div class="sidebar-section">
-                <h4>Your Library</h4>
-                <ul id="playlist-list">
-                    <li data-playlist="main"><span class="icon">🎵</span> All Tracks</li>
-                    <li data-playlist="favorites"><span class="icon">❤️</span> Liked Songs</li>
-                </ul>
-            </div>
-        </aside>
-
         <main class="harmony-main">
             
             <div id="view-home">
+                
+                <nav class="pill-nav">
+                    <button class="nav-pill active" id="nav-home">Home</button>
+                    <button class="nav-pill" id="nav-search">Search</button>
+                    <button class="nav-pill" id="nav-playlists">Playlists</button>
+                    <button class="nav-pill" id="nav-favorites">Favorites</button>
+                </nav>
+
                 <div class="greet-section">
                     <h1 id="greeting">Welcome Back</h1>
                 </div>
@@ -80,7 +72,7 @@
             </div>
 
             <div id="view-playlist" style="display: none;">
-                <button id="back-to-home" class="back-btn">← Back to Home</button>
+                <button id="back-to-home" class="back-btn">← Back</button>
                 <div class="playlist-header">
                      <img id="playlist-cover-image" src="/images/harmony-tunes-card.jpg" alt="Album Art" class="album-art">
                     <div class="playlist-details">
@@ -97,10 +89,10 @@
                     <table class="song-table">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th style="width: 40px;">#</th>
                                 <th>Title</th>
                                 <th>Artist</th>
-                                <th>Duration</th>
+                                <th style="text-align: right;">Duration</th>
                             </tr>
                         </thead>
                         <tbody id="song-list-body">
@@ -111,8 +103,7 @@
         </main>
     </div>
 
-    <div class="music-player-bar">
-        <div class="player-background"></div>
+    <div class="music-player-bar glass-panel">
         
         <div class="current-song-details">
             <img src="/images/harmony-tunes-card.jpg" alt="Current Album Art" id="player-album-art">
@@ -154,8 +145,10 @@
         </div>
 
         <div class="volume-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+            <div class="volume-slider-wrapper">
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1">
+            </div>
         </div>
     </div>
     
