@@ -4,487 +4,162 @@
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HarmonyTunes | Immersive Audio</title>
-    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <title>HarmonyTunes | un</title>
+    <meta name="description" content="Your daily dose of trending music.">
     
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            /* --- Palette (Matches Admin) --- */
-            --bg-deep: #050505;
-            --bg-surface: #0e0e0e;
-            --bg-glass: rgba(20, 20, 20, 0.7);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            
-            --accent-primary: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.3);
-            
-            /* Dynamic variable set by JS based on song cover */
-            --dynamic-bg: #1a1a1a; 
-            
-            --sidebar-width: 260px;
-            --player-height: 90px;
-            --radius-lg: 16px;
-            --transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        /* --- Reset & Base --- */
-        body {
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* --- Ambient Background Glow --- */
-        .ambient-glow {
-            position: fixed;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 50% 50%, var(--dynamic-bg), transparent 60%);
-            opacity: 0.15;
-            pointer-events: none;
-            z-index: 0;
-            transition: background 1.5s ease;
-        }
-
-        /* --- Layout Grid --- */
-        .app-layout {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - var(--player-height));
-            position: relative;
-            z-index: 1;
-        }
-
-        /* --- Sidebar --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-surface);
-            border-right: 1px solid var(--border-glass);
-            padding: 32px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            flex-shrink: 0;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            text-decoration: none;
-        }
-        
-        .brand-logo { width: 32px; height: 32px; border-radius: 8px; }
-        .brand-text { font-size: 1.1rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
-
-        .nav-section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
-            font-size: 0.95rem;
-        }
-
-        .nav-btn:hover { color: #fff; background: rgba(255,255,255,0.03); }
-        .nav-btn.active { color: #fff; background: rgba(255,255,255,0.08); font-weight: 600; }
-        .nav-btn svg { width: 20px; height: 20px; stroke-width: 2px; }
-
-        .btn-request {
-            margin-top: auto;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 1px solid var(--border-glass);
-            color: #fff;
-            justify-content: center;
-        }
-        .btn-request:hover { border-color: rgba(255,255,255,0.3); transform: translateY(-2px); }
-
-        /* --- Main Content --- */
-        .main-view {
-            flex: 1;
-            overflow-y: auto;
-            position: relative;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--bg-deep));
-        }
-        
-        /* Scrollbar Styling */
-        .main-view::-webkit-scrollbar { width: 8px; }
-        .main-view::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-
-        .content-container {
-            padding: 40px 50px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header / Search */
-        .view-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-        
-        .greeting { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; }
-
-        .search-wrapper {
-            position: relative;
-            width: 300px;
-        }
-        
-        .search-input {
-            width: 100%;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid transparent;
-            padding: 12px 16px 12px 40px;
-            border-radius: 50px;
-            color: white;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: var(--transition);
-        }
-        .search-input:focus { outline: none; background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
-        
-        .search-icon {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: var(--text-muted); pointer-events: none;
-        }
-
-        /* Song Grid (Discover) */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 24px;
-        }
-
-        .music-card {
-            background: rgba(255,255,255,0.03);
-            padding: 16px;
-            border-radius: var(--radius-lg);
-            transition: var(--transition);
-            cursor: pointer;
-            border: 1px solid transparent;
-        }
-
-        .music-card:hover {
-            background: rgba(255,255,255,0.08);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .card-img-wrapper {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .music-card:hover img { transform: scale(1.05); }
-
-        .card-play-btn {
-            position: absolute; bottom: 10px; right: 10px;
-            width: 44px; height: 44px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            border: none;
-            color: white;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; transform: translateY(10px);
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding-left: 4px; /* Optical center for play triangle */
-        }
-        
-        .music-card:hover .card-play-btn { opacity: 1; transform: translateY(0); }
-        .card-play-btn:hover { transform: scale(1.1) !important; background: #fff; color: var(--accent-primary); }
-
-        .card-title { font-weight: 600; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-desc { font-size: 0.85rem; color: var(--text-muted); }
-
-        /* Playlist View (Table) */
-        .playlist-header {
-            display: flex;
-            align-items: flex-end;
-            gap: 30px;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid var(--border-glass);
-        }
-
-        .playlist-cover-large {
-            width: 220px; height: 220px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            object-fit: cover;
-        }
-
-        .playlist-info h4 { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.1em; margin: 0 0 10px 0; }
-        .playlist-info h1 { font-size: 3.5rem; margin: 0 0 15px 0; letter-spacing: -0.03em; line-height: 1; }
-        .playlist-info p { color: var(--text-muted); margin: 0; }
-
-        .song-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .song-table th { color: var(--text-muted); font-size: 0.8rem; font-weight: 500; text-transform: uppercase; padding: 12px 16px; border-bottom: 1px solid var(--border-glass); }
-        .song-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
-        .song-table tr:hover td { background: rgba(255,255,255,0.05); color: #fff; cursor: pointer; }
-
-        /* --- Player Bar (Fixed Bottom) --- */
-        .player-bar {
-            height: var(--player-height);
-            background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-glass);
-            position: relative;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-        }
-
-        /* Track Info */
-        .track-info { display: flex; align-items: center; gap: 16px; width: 30%; }
-        .track-thumb { width: 56px; height: 56px; border-radius: 6px; background: #222; object-fit: cover; }
-        .track-text h4 { margin: 0; font-size: 0.9rem; font-weight: 600; color: #fff; }
-        .track-text p { margin: 2px 0 0 0; font-size: 0.75rem; color: var(--text-muted); }
-        .like-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-        .like-btn:hover { color: #fff; transform: scale(1.1); }
-
-        /* Controls (Center) */
-        .player-center { display: flex; flex-direction: column; align-items: center; width: 40%; gap: 6px; }
-        
-        .controls-row { display: flex; align-items: center; gap: 20px; }
-        .ctrl-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; }
-        .ctrl-btn:hover { color: #fff; }
-        .play-pause-circle {
-            width: 36px; height: 36px;
-            background: #fff; color: #000;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .play-pause-circle:hover { transform: scale(1.05); }
-
-        .progress-row { width: 100%; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: var(--text-muted); }
-        .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; position: relative; overflow: hidden; cursor: pointer; }
-        .progress-fill { width: 0%; height: 100%; background: #fff; border-radius: 2px; transition: width 0.1s linear; }
-        .progress-bar:hover .progress-fill { background: var(--accent-primary); }
-
-        /* Volume (Right) */
-        .volume-controls { width: 30%; display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-        .vol-slider { width: 100px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 2px; }
-        .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #fff; border-radius: 50%; cursor: pointer; }
-
-        /* --- Modals (Request/Status) --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
-            z-index: 200; display: none; align-items: center; justify-content: center;
-        }
-        
-        .modal-glass {
-            background: #121212; border: 1px solid var(--border-glass);
-            padding: 30px; border-radius: 16px; width: 400px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            animation: modalPop 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-        }
-        @keyframes modalPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .modal-glass h2 { margin-top: 0; }
-        .input-group { margin-bottom: 16px; }
-        .input-group input { width: 100%; padding: 12px; background: #222; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-primary { background: var(--accent-primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-ghost { background: transparent; color: #888; border: none; padding: 10px 20px; cursor: pointer; }
-        .btn-ghost:hover { color: #fff; }
-
-        /* Status List */
-        .status-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 8px; }
-        .status-badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; font-weight: 700; }
-        .st-pending { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
-        .st-approved { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-        .st-declined { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
-
-    </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/harmonytunes.css">
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
+    <header class="main-header"></header>
 
-    <div class="app-layout">
-        
-        <aside class="sidebar">
-            <a href="index.html" class="brand-header">
-                <img src="/images/dreams-favicon.png" class="brand-logo" alt="Logo">
-                <span class="brand-text">HarmonyTunes</span>
-            </a>
-
-            <div>
-                <div class="nav-section-title">Menu</div>
-                <button id="nav-home" class="nav-btn active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    Discover
-                </button>
-                <button id="nav-library" class="nav-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                    My Library
-                </button>
-                <button id="nav-check-status" class="nav-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Track Requests
-                </button>
-            </div>
-
-            <button id="nav-request-song" class="nav-btn btn-request">
-                <span>+ Request Song</span>
-            </button>
-        </aside>
-
-        <main class="main-view">
+    <div class="spotify-layout">
+        <main class="harmony-main">
             
-            <div id="view-home" class="content-container">
-                <header class="view-header">
-                    <h1 id="greeting" class="greeting">Welcome</h1>
-                    <div class="search-wrapper">
-                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" id="smart-search" class="search-input" placeholder="Search tracks...">
-                    </div>
-                </header>
+            <div id="view-home">
+                
+                <nav class="pill-nav">
+                    <button class="nav-pill active" id="nav-home">Home</button>
+                    <button class="nav-pill" id="nav-search">Search</button>
+                    <button class="nav-pill" id="nav-playlists">Playlists</button>
+                    <button class="nav-pill" id="nav-favorites">Favorites</button>
+                </nav>
 
-                <section>
-                    <h3 style="margin-bottom: 20px; font-weight: 600;">Featured & Trending</h3>
-                    <div class="grid-layout" id="container-main-library">
+                <div class="greet-section">
+                    <h1 id="greeting">Welcome Back</h1>
+                </div>
+
+                <section class="shelf">
+                    <div class="shelf-header">
+                        <h2>Jump Back In</h2>
+                        <span class="see-all">History</span>
+                    </div>
+                    <div class="card-grid" id="container-jump-back-in">
+                        </div>
+                </section>
+
+                <section class="shelf">
+                    <div class="shelf-header">
+                        <h2>Recommended for You</h2>
+                    </div>
+                    <div class="card-grid" id="container-recommended">
+                        </div>
+                </section>
+
+                <section class="shelf">
+                    <div class="shelf-header">
+                        <h2>HarmonyTunes on TikTok</h2>
+                        <a href="https://www.tiktok.com/@harmonytunesofficial" target="_blank" class="see-all">Follow Us</a>
+                    </div>
+                    <div class="tiktok-grid" id="container-tiktoks">
+                        </div>
+                </section>
+
+                <section class="shelf">
+                    <div class="shelf-header">
+                        <h2>Your Playlists</h2>
+                    </div>
+                    <div class="card-grid" id="container-playlists">
                         </div>
                 </section>
             </div>
 
-            <div id="view-playlist" class="content-container" style="display: none;">
-                <button id="back-to-home" class="btn-ghost" style="padding-left:0; margin-bottom: 20px;">← Back to Discover</button>
-                
+            <div id="view-playlist" style="display: none;">
+                <button id="back-to-home" class="back-btn">← Back</button>
                 <div class="playlist-header">
-                    <img id="playlist-cover-image" src="/images/harmony-tunes-card.jpg" class="playlist-cover-large shadow-lg">
-                    <div class="playlist-info">
-                        <h4>Playlist</h4>
-                        <h1 id="playlist-title">Liked Songs</h1>
-                        <p id="playlist-desc">Your personal collection • Updated just now</p>
+                     <img id="playlist-cover-image" src="/images/harmony-tunes-card.jpg" alt="Album Art" class="album-art">
+                    <div class="playlist-details">
+                        <h4 style="text-transform: uppercase; font-size: 0.8rem; margin-bottom: 5px;">Playlist</h4>
+                        <h1 id="playlist-title">Available Tracks</h1>
+                        <p id="playlist-desc">Unstoppable Media • 24 songs</p>
+                        <div class="playlist-actions">
+                            <button id="playlist-play-btn" class="action-btn-play">▶</button>
+                            <button id="share-playlist-btn" class="action-btn-secondary">Share</button>
+                        </div>
                     </div>
                 </div>
-
-                <table class="song-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>Title</th>
-                            <th>Artist</th>
-                            <th style="text-align: right;">Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="song-list-body">
-                        </tbody>
-                </table>
+                <div class="song-list-container">
+                    <table class="song-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th>Title</th>
+                                <th>Artist</th>
+                                <th style="text-align: right;">Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="song-list-body">
+                            </tbody>
+                    </table>
+                </div>
             </div>
-
         </main>
     </div>
 
-    <footer class="player-bar">
-        <div class="track-info">
-            <img id="player-album-art" src="/images/dreams-favicon.png" class="track-thumb">
-            <div class="track-text">
-                <h4 id="player-song-title">Not Playing</h4>
-                <p id="player-song-artist">Select a track</p>
+    <div class="music-player-bar glass-panel">
+        
+        <div class="current-song-details">
+            <img src="/images/harmony-tunes-card.jpg" alt="Current Album Art" id="player-album-art">
+            <div class="song-info-text">
+                <p id="player-song-title">Select a song</p>
+                <p id="player-song-artist">...</p>
             </div>
-            <button id="player-like-btn" class="like-btn">♡</button>
+            <button class="like-btn-player" id="player-like-btn">♡</button>
         </div>
 
-        <div class="player-center">
-            <div class="controls-row">
-                <button id="prev-btn" class="ctrl-btn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
-                <button id="play-pause-btn" class="ctrl-btn play-pause-circle">
-                    <svg class="play-icon" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    <svg class="pause-icon" width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        <div class="player-controls">
+            <div class="controls">
+                <button class="control-button" id="shuffle-btn" title="Shuffle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
                 </button>
-                <button id="next-btn" class="ctrl-btn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                <button class="control-button" id="prev-btn" title="Previous">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke-width="2" stroke="currentColor"></line></svg>
+                </button>
+                <button class="control-button play-pause-btn" id="play-pause-btn" title="Play/Pause">
+                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                </button>
+                <button class="control-button" id="next-btn" title="Next">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke-width="2" stroke="currentColor"></line></svg>
+                </button>
+                <button class="control-button" id="repeat-btn" title="Repeat">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                     <span class="repeat-indicator"></span>
+                </button>
             </div>
-            <div class="progress-row">
+            
+            <div class="progress-bar-container">
+                <span class="current-time">0:00</span>
                 <div class="progress-bar">
-                    <div class="progress-fill progress"></div>
+                    <div class="progress"></div>
                 </div>
+                <span class="total-time">0:00</span>
             </div>
         </div>
 
-        <div class="volume-controls">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
-            <input type="range" class="vol-slider">
+        <div class="volume-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+            <div class="volume-slider-wrapper">
+                <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1">
+            </div>
         </div>
-    </footer>
-
+    </div>
+    
     <audio id="audio-player"></audio>
 
-    <div id="request-modal" class="modal-overlay">
-        <div class="modal-glass">
-            <h2>Request a Vibe</h2>
-            <p style="color:#888; margin-bottom: 20px;">We'll add it to the rotation if it fits.</p>
-            <form id="request-form">
-                <div class="input-group">
-                    <input type="text" id="req-title" placeholder="Song Title" required>
-                </div>
-                <div class="input-group">
-                    <input type="text" id="req-artist" placeholder="Artist" required>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-ghost" id="close-request-modal">Cancel</button>
-                    <button type="submit" class="btn-primary btn-submit">Send Request</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="status-modal" class="modal-overlay">
-        <div class="modal-glass">
-            <h2>Your Requests</h2>
-            <div id="status-list" style="margin: 20px 0; max-height: 300px; overflow-y: auto;">
-                </div>
-            <button class="btn-ghost" id="close-status-modal" style="width:100%;">Close</button>
-        </div>
-    </div>
-
+    <script type="module">
+        import { loadNavbar } from '/js/navbar.js';
+        document.addEventListener('DOMContentLoaded', loadNavbar);
+    </script>
+    
     <script type="module" src="/js/harmonytunes.js"></script>
-
+    
 </body>
 </html>
