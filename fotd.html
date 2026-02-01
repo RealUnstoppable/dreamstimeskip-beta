@@ -40,26 +40,7 @@
         .orb-text { color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 1rem; text-decoration: none; opacity: 0; transition: opacity 0.3s ease 0.4s; white-space: nowrap; transform: translateY(20px); }
         #siri-orb.expanded .orb-text { opacity: 1; transform: translateY(0); }
 
-        /* --- Header & Nav --- */
-        .main-header { position: fixed; top: 0; left: 0; width: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 100; border-bottom: 1px solid var(--border-color); }
-        .navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; padding: 0 1rem; height: var(--header-height); }
-        .nav-logo { font-size: 1.5rem; font-weight: 800; text-decoration: none; color: #fff; }
-        .nav-logo span { color: var(--accent-color); }
-        .nav-links { list-style: none; display: flex; gap: 1.5rem; }
-        .nav-links a { text-decoration: none; color: #ccc; font-weight: 500; transition: color 0.2s; }
-        .nav-links a:hover { color: var(--accent-color); }
-        .hamburger { display: none; background: none; border: none; }
-        .bar { display: block; width: 25px; height: 3px; margin: 5px auto; transition: all 0.3s ease-in-out; background-color: white; }
-        @media (max-width: 768px) {
-            .nav-links { position: fixed; left: -100%; top: var(--header-height); gap: 0; flex-direction: column; background-color: var(--background-color); width: 100%; text-align: center; transition: 0.3s; border-top: 1px solid var(--border-color); }
-            .nav-links li { padding: 1rem 0; }
-            .nav-links.active { left: 0; }
-            .hamburger { display: block; cursor: pointer; }
-        }
-        .hamburger.active .bar:nth-child(2) { opacity: 0; }
-        .hamburger.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-        .hamburger.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-        
+      
         /* --- Main Content --- */
         .fotd-section { padding: 4rem 1rem; }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
@@ -150,16 +131,7 @@
 
     <header class="main-header">
         <nav class="navbar">
-            <a href="index.html" class="nav-logo">un<span></span></a>
-            <ul class="nav-links">
-                <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
-                <li><a href="index.html#harmony">HarmonyTunes</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
+           
             <button class="hamburger" aria-label="Open menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
         </nav>
     </header>
@@ -197,7 +169,7 @@
                 <div class="footer-column"><h5>Company</h5><ul><li><a href="#">About Us</a></li><li><a href="#">Blog</a></li><li><a href="#">Shop</a></li><li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li></ul></div>
                 <div class="footer-column footer-newsletter"><h5>Stay in the Loop</h5><p>Sign up for news, announcements, and exclusive beta access.</p><form class="signup-form"><input type="email" placeholder="your.email@example.com" required><button type="submit">Sign Up</button></form></div>
             </div>
-            <div class="footer-bottom"><p>&copy; 2025 Unstoppable LLC. All Rights Reserved.</p><p>Designed in collaboration with Unstoppable Design, LLC.</p></div>
+            <div class="footer-bottom"><p>&copy; 2026 Unstoppable LLC. All Rights Reserved.</p><p>Designed in collaboration with Unstoppable Design, LLC.</p></div>
         </div>
     </footer>
 
@@ -460,5 +432,10 @@
       });
     </script>
     <script type="module" src="/js/auth.js"></script>
+     <script src="/js/script.js"></script>
+     <script type="module">
+    import { loadNavbar } from './js/navbar.js';
+    document.addEventListener('DOMContentLoaded', loadNavbar);
+</script>
 </body>
 </html>
