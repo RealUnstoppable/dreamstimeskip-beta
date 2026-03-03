@@ -14,7 +14,7 @@ export function loadNavbar() {
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
-            <li><a href="Portfolio.html">About Me</a></li>
+            <li><a href="portfolio.html">About Me</a></li>
             <li><a href="uds.html">UDS</a></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
