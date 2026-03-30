@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Inventory Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --primary: #111111;
+            --accent: #2563eb;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
+        .header p { color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            outline: none;
+            width: 100%;
+        }
+
+        input[readonly] {
+            background-color: #f3f4f6;
+            color: var(--text-muted);
+            border-color: #d1d5db;
+        }
+
+        input:focus:not([readonly]), textarea:focus { border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Inventory Table Styles - Mobile Responsive */
+        .inventory-list { display: flex; flex-direction: column; gap: 1rem; }
+        .inventory-item {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .inv-name { flex: 1 1 100%; min-width: 150px; }
+        .inv-location { flex: 1 1 calc(33.333% - 0.5rem); min-width: 90px; }
+        .inv-controls { 
+            flex: 1 1 100%; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-top: 0.5rem;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .inventory-item { flex-wrap: nowrap; }
+            .inv-name { flex: 2 1 auto; }
+            .inv-location { flex: 1 1 auto; }
+            .inv-controls { flex: 0 1 auto; margin-top: 0; border-top: none; padding-top: 0; }
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            text-align: center;
+        }
+        .btn:hover { opacity: 0.9; }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        .btn-danger { background: #ef4444; padding: 0.5rem 1rem; }
+        
+        .generate-btn {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: var(--accent);
+        }
+
+        /* PDF Report Template (Rendered off-screen to avoid blank page issues) */
+        #pdf-wrapper {
+            position: absolute;
+            left: -10000px;
+            top: 0;
+            width: 800px;
+            background: white;
+            z-index: -1;
+        }
+
+        #pdf-template {
+            padding: 40px;
+            color: #000;
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+        }
+
+        .pdf-header { text-align: center; margin-bottom: 20px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .pdf-section { margin-bottom: 15px; }
+        .pdf-section-title { font-weight: bold; font-style: italic; margin-bottom: 5px; }
+        .pdf-divider { text-align: center; margin: 15px 0; }
+        .pdf-text { white-space: pre-wrap; margin-bottom: 5px;}
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <h1>Shift Tracker & Inventory App</h1>
+        <p>Fill out the data below to generate a formatted PDF report.</p>
+    </div>
+
+    <form id="trackerForm">
+        <div class="card">
+            <h2>Shift Details</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="shiftDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Time</label>
+                    <input type="time" id="shiftTime" value="08:00" required>
+                </div>
+                <div class="form-group">
+                    <label>Shift Manager</label>
+                    <input type="text" id="shiftManager" value="Catalin Andrian" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Prep, Beef & Labor</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Prep Notes</label>
+                    <textarea id="prepNotes" placeholder="e.g. Amber Cooked 70 Bacon Slices (had 15 slices)..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Beef Put to Cook</label>
+                    <input type="text" id="beefCook">
+                </div>
+                <div class="form-group">
+                    <label>Beef Tempered</label>
+                    <input type="text" id="beefTempered">
+                </div>
+                <div class="form-group">
+                    <label>Labor Variance</label>
+                    <input type="text" id="laborVariance">
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Cash & Registers</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Drawer 1 ($)</label>
+                    <div class="register-input-group">
+                        <input type="number" step="0.01" id="d1-val" value="100.00" oninput="calcDrawer('d1')">
+                        <input type="text" id="d1-res" readonly>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Drawer 4 ($)</label>
+                    <div class="register-input-group">
+                        <input type="number" step="0.01" id="d4-val" value="100.00" oninput="calcDrawer('d4')">
+                        <input type="text" id="d4-res" readonly>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Drawer 5 ($)</label>
+                    <div class="register-input-group">
+                        <input type="number" step="0.01" id="d5-val" value="100.00" oninput="calcDrawer('d5')">
+                        <input type="text" id="d5-res" readonly>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Safe Count ($)</label>
+                    <input type="text" id="safeCount" placeholder="$1,100.00">
+                </div>
+                <div class="form-group">
+                    <label>Deposit ($)</label>
+                    <input type="text" id="deposit" placeholder="$343.00">
+                </div>
+                <div class="form-group full-width">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="depVerified" checked> <label>Verified ✔️</label>
+                        <input type="checkbox" id="depValidated" checked style="margin-left: 1rem;"> <label>Validated ✔️</label>
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Bills/Change Needed</label>
+                    <textarea id="changeNeeded"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Inventory Count</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);">Enter "N/A" where applicable.</p>
+            <div id="inventoryContainer" class="inventory-list">
+                </div>
+            <button type="button" class="btn btn-outline" style="margin-top: 1rem;" onclick="addInventoryItem()">+ Add Item</button>
+        </div>
+
+        <div class="card">
+            <h2>Dates to be Changed</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cooler</label>
+                    <div class="checkbox-group"><input type="checkbox" id="coolerChunks" checked> All Chunks</div>
+                    <div class="checkbox-group"><input type="checkbox" id="coolerPans" checked> All Pans</div>
+                </div>
+                <div class="form-group">
+                    <label>Backline</label>
+                    <textarea id="backlineDates" placeholder="All Pans ✔️&#10;All Bottles&#10;All Cheese Bags"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Prepline</label>
+                    <textarea id="preplineDates" placeholder="All Bottles ✔️&#10;All Cheese Bags ✔️"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>End of Shift Tasks & Notes</h2>
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Pulled from Freezer</label>
+                    <textarea id="pulledFreezer"></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label>Sanitizer Check</label>
+                    <div class="checkbox-group"><input type="checkbox" id="waterSanitizer" checked> Water & Sanitizer Bottle Changed</div>
+                    <div class="checkbox-group"><input type="checkbox" id="panSanitizer" checked> Sanitizer Pans Changed</div>
+                </div>
+                <div class="form-group full-width">
+                    <label>Sauce Bottles Made</label>
+                    <textarea id="saucesMade" placeholder="Ranch&#10;Gyro&#10;Red Ranch"></textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label>Paperwork & General Notes</label>
+                    <textarea id="extraNotes" placeholder="Check Turkey, Pull Bread, Pick Up Trash Outside..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn generate-btn" onclick="generateReport()">Generate PDF Report</button>
+    </form>
+</div>
+
+<div id="pdf-wrapper">
+    <div id="pdf-template">
+        <div class="pdf-header" id="pdfHeader">Inventory Count Template - 00/00/00 - 8:00AM - Shift Manager: Name</div>
+        
+        <div class="pdf-section">
+            <div class="pdf-text">Notes:</div>
+            <div class="pdf-text"><span class="pdf-section-title">*Prep Notes*</span> <span id="pdfPrep"></span></div>
+            <div class="pdf-text"><span class="pdf-section-title">*Beef*</span> Beef Put to Cook: <span id="pdfBeefCook"></span>, Beef Tempered: <span id="pdfBeefTemp"></span></div>
+        </div>
+        <div class="pdf-divider">——</div>
+        
+        <div class="pdf-section">
+            <div class="pdf-text"><span class="pdf-section-title">*Labor*</span></div>
+            <div class="pdf-text">Labor Variance: <span id="pdfLabor"></span></div>
+        </div>
+        <div class="pdf-divider">——</div>
+        
+        <div class="pdf-section">
+            <div class="pdf-text"><span class="pdf-section-title">*Cash*</span></div><br>
+            <div class="pdf-text">Registers:</div>
+            <div class="pdf-text" id="pdfDrawers"></div><br>
+            <div class="pdf-text">Safe Count: <span id="pdfSafe"></span></div><br>
+            <div class="pdf-text">Deposit: <span id="pdfDeposit"></span> Verified <span id="pdfDepVer"></span> | Validated <span id="pdfDepVal"></span></div><br>
+            <div class="pdf-text">(Big Bills Exchanged in Registers)</div><br>
+            <div class="pdf-text">Bills/Change Needed:</div>
+            <div class="pdf-text" id="pdfChange"></div>
+        </div>
+        <div class="pdf-divider">——</div>
+
+        <div class="pdf-section">
+            <div class="pdf-text"><span class="pdf-section-title">*Inventory*</span></div><br>
+            <div class="pdf-text">Inventory Count:</div><br>
+            <div id="pdfInventoryList"></div>
+            <div class="pdf-text"><br>(items that need to be reviewed have • assigned to them)</div>
+        </div>
+        
+        <div class="html2pdf__page-break"></div>
+        <div class="pdf-divider">——<br>2nd Page:<br>——</div>
+        
+        <div class="pdf-section">
+            <div class="pdf-text"><span class="pdf-section-title">*Dates to be Changed:*</span></div><br>
+            <div class="pdf-text">Cooler:</div>
+            <div class="pdf-text" id="pdfCoolerDates"></div>
+            <div class="pdf-divider">——</div>
+            <div class="pdf-text">Backline:</div>
+            <div class="pdf-text" id="pdfBacklineDates"></div>
+            <div class="pdf-divider">——</div>
+            <div class="pdf-text">Prepline:</div>
+            <div class="pdf-text" id="pdfPreplineDates"></div>
+        </div>
+        <div class="pdf-divider">——End of Dates to be Changed——</div>
+
+        <div class="pdf-section">
+            <div class="pdf-text">Pulled from Freezer:</div>
+            <div class="pdf-text" id="pdfPulled"></div>
+        </div>
+        <div class="pdf-divider">——</div>
+        
+        <div class="pdf-section" id="pdfSanitizer"></div>
+        <div class="pdf-divider">——</div>
+        
+        <div class="pdf-section">
+            <div class="pdf-text">Sauce Bottles Made:</div>
+            <div class="pdf-text" id="pdfSauces"></div>
+        </div>
+        <div class="pdf-divider">——</div>
+
+        <div class="pdf-section">
+            <div class="pdf-text"><span class="pdf-section-title">*Paperwork*</span></div>
+            <div class="pdf-text">Heat N’ Hold Log Printed and Put in AOR ✔️</div>
+            <div class="pdf-text">Manager Void x (cannot open site due to password change needed)</div><br>
+            <div class="pdf-text" id="pdfNotes"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initial standard inventory items
+    const defaultItems = [
+        "Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Chicken Finger", 
+        "Fries - Curly", "Fries - Crinkle", "Burger", "Jalapeno Bites", 
+        "Turkey", "Beef", "Corned Beef", "Potato Cakes", "Sub Bun", "Brioche"
+    ];
+
+    window.onload = () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('shiftDate').value = today;
+        
+        defaultItems.forEach(name => addInventoryItem(name));
+
+        // Initialize Register Maths
+        ['d1', 'd4', 'd5'].forEach(id => calcDrawer(id));
+    };
+
+    // Calculate Drawer Under/Over function
+    function calcDrawer(id) {
+        let val = parseFloat(document.getElementById(id + '-val').value) || 0;
+        let diff = val - 100;
+        let resInput = document.getElementById(id + '-res');
+        
+        if (diff === 0) {
+            resInput.value = "($0.00 Short)";
+        } else if (diff < 0) {
+            resInput.value = `($${Math.abs(diff).toFixed(2)} Short)`;
+        } else {
+            resInput.value = `($${diff.toFixed(2)} Over)`;
+        }
+    }
+
+    function addInventoryItem(name = "") {
+        const container = document.getElementById('inventoryContainer');
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'inventory-item';
+        itemDiv.innerHTML = `
+            <input type="text" placeholder="Item Name" class="inv-name" value="${name}">
+            <input type="text" placeholder="Backline" class="inv-location inv-backline" value="N/A">
+            <input type="text" placeholder="Cooler" class="inv-location inv-cooler" value="N/A">
+            <input type="text" placeholder="Freezer" class="inv-location inv-freezer" value="N/A">
+            <div class="inv-controls">
+                <label style="font-size: 0.85rem;"><input type="checkbox" class="inv-review"> Review (•)</label>
+                <button type="button" class="btn btn-danger" onclick="this.closest('.inventory-item').remove()">Remove</button>
+            </div>
+        `;
+        container.appendChild(itemDiv);
+    }
+
+    function formatTextWithCheckmarks(text) {
+        return text.replace(/\n/g, '<br>');
+    }
+
+    function generateReport() {
+        // 1. Gather Data
+        const dateRaw = document.getElementById('shiftDate').value;
+        const [yyyy, mm, dd] = dateRaw.split('-');
+        const formattedDate = `${mm}/${dd}/${yyyy.slice(-2)}`;
+        const time = document.getElementById('shiftTime').value;
+        
+        // Safety check for time
+        let formattedTime = time;
+        if(time) {
+            const timeObj = new Date(`1970-01-01T${time}`);
+            formattedTime = timeObj.toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'});
+        }
+        
+        const manager = document.getElementById('shiftManager').value;
+        
+        // 2. Map to PDF Template
+        document.getElementById('pdfHeader').innerText = `Inventory Count Template - ${formattedDate} - ${formattedTime} - Shift Manager: ${manager}`;
+        document.getElementById('pdfPrep').innerText = document.getElementById('prepNotes').value || "N/A";
+        document.getElementById('pdfBeefCook').innerText = document.getElementById('beefCook').value || "0";
+        document.getElementById('pdfBeefTemp').innerText = document.getElementById('beefTempered').value || "0 Cases";
+        document.getElementById('pdfLabor').innerText = document.getElementById('laborVariance').value || "";
+
+        // Cash Logic Mapping
+        const d1Val = document.getElementById('d1-val').value;
+        const d1Res = document.getElementById('d1-res').value;
+        const d4Val = document.getElementById('d4-val').value;
+        const d4Res = document.getElementById('d4-res').value;
+        const d5Val = document.getElementById('d5-val').value;
+        const d5Res = document.getElementById('d5-res').value;
+        
+        document.getElementById('pdfDrawers').innerHTML = `Drawer 1 = $${d1Val} ${d1Res}<br>Drawer 4 = $${d4Val} ${d4Res}<br>Drawer 5 = $${d5Val} ${d5Res}`;
+        
+        document.getElementById('pdfSafe').innerText = document.getElementById('safeCount').value || "$1,100.00";
+        document.getElementById('pdfDeposit').innerText = document.getElementById('deposit').value || "$0.00";
+        document.getElementById('pdfDepVer').innerText = document.getElementById('depVerified').checked ? "✔️" : "❌";
+        document.getElementById('pdfDepVal').innerText = document.getElementById('depValidated').checked ? "✔️" : "❌";
+        document.getElementById('pdfChange').innerHTML = formatTextWithCheckmarks(document.getElementById('changeNeeded').value);
+
+        // Inventory list
+        let invHTML = "";
+        const invItems = document.querySelectorAll('.inventory-item');
+        invItems.forEach(item => {
+            const name = item.querySelector('.inv-name').value;
+            const bl = item.querySelector('.inv-backline').value;
+            const cl = item.querySelector('.inv-cooler').value;
+            const fr = item.querySelector('.inv-freezer').value;
+            const needsReview = item.querySelector('.inv-review').checked;
+            
+            if(name) {
+                const prefix = needsReview ? "•" : "";
+                invHTML += `<div class="pdf-text">${prefix}${name}: ${bl} Backline, ${cl} in Cooler , ${fr} Freezer</div>`;
+            }
+        });
+        document.getElementById('pdfInventoryList').innerHTML = invHTML;
+
+        // Checklists
+        let coolerStr = "";
+        if(document.getElementById('coolerChunks').checked) coolerStr += "All Chunks ✔️<br>";
+        if(document.getElementById('coolerPans').checked) coolerStr += "All Pans ✔️";
+        document.getElementById('pdfCoolerDates').innerHTML = coolerStr;
+        document.getElementById('pdfBacklineDates').innerHTML = formatTextWithCheckmarks(document.getElementById('backlineDates').value);
+        document.getElementById('pdfPreplineDates').innerHTML = formatTextWithCheckmarks(document.getElementById('preplineDates').value);
+        document.getElementById('pdfPulled').innerHTML = formatTextWithCheckmarks(document.getElementById('pulledFreezer').value);
+
+        // Sanitizer
+        let sanStr = "";
+        if(document.getElementById('waterSanitizer').checked) sanStr += `<div class="pdf-text">Water & Sanitizer Bottle Changed ✔️</div>`;
+        if(document.getElementById('panSanitizer').checked) sanStr += `<div class="pdf-text">Sanitizer Pans Changed on Main Backline ✔️</div>`;
+        document.getElementById('pdfSanitizer').innerHTML = sanStr;
+
+        document.getElementById('pdfSauces').innerHTML = formatTextWithCheckmarks(document.getElementById('saucesMade').value);
+        document.getElementById('pdfNotes').innerHTML = formatTextWithCheckmarks(document.getElementById('extraNotes').value);
+
+        // 3. Generate PDF
+        const element = document.getElementById('pdf-template');
+        
+        const opt = {
+            margin:       0.5,
+            filename:     `Inventory_Count_${formattedDate.replace(/\//g, '-')}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+</script>
+</body>
+</html>
