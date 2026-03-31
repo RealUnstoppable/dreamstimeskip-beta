@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Inventory Tracker</title>
+    <link rel="icon" type="image/png" href="ManagerPro.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,10 +12,12 @@
             --card-bg: #ffffff;
             --primary: #111111;
             --accent: #2563eb;
+            --accent-hover: #1d4ed8;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border: #e5e7eb;
             --radius: 12px;
+            --nav-height: 60px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -22,30 +25,90 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        /* ----- NAVBAR & SIDEBAR ----- */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary);
+            margin-right: 1rem;
+        }
+
+        .brand { font-weight: 700; font-size: 1.25rem; color: var(--primary); flex-grow: 1; }
+        
+        .user-status { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+
+        .sidebar {
+            position: fixed;
+            top: var(--nav-height);
+            left: -280px;
+            width: 280px;
+            height: calc(100vh - var(--nav-height));
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+        }
+
+        .sidebar.open { left: 0; }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: block;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .nav-item:hover { background: var(--bg-color); color: var(--accent); }
+        .nav-item.highlight { color: var(--accent); }
+        
+        .sidebar-divider { height: 1px; background: var(--border); margin: 1rem 0; }
+        
+        /* ----- APP VIEWS ----- */
+        .main-content {
+            margin-top: var(--nav-height);
+            padding: 2rem 1rem;
             display: flex;
             justify-content: center;
+            transition: margin-left 0.3s ease;
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 900px;
-        }
+        .view-section { display: none; width: 100%; max-width: 900px; }
+        .view-section.active { display: block; animation: fadeIn 0.3s; }
 
-        .header {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header h1 { font-size: 1.75rem; font-weight: 700; color: var(--primary); }
-        .header p { color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem; }
-
+        /* ----- SHARED UI COMPONENTS ----- */
         .card {
             background: var(--card-bg);
             border-radius: var(--radius);
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border);
         }
 
@@ -57,107 +120,6 @@
             color: var(--primary);
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group.full-width { grid-column: 1 / -1; }
-
-        label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
-
-        input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-            outline: none;
-            width: 100%;
-        }
-
-        input[readonly] {
-            background-color: #f3f4f6;
-            color: var(--text-muted);
-            border-color: #d1d5db;
-        }
-
-        input:focus:not([readonly]), textarea:focus { border-color: var(--accent); }
-        textarea { resize: vertical; min-height: 80px; }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.95rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .register-input-group {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        /* Inventory Table Styles */
-        .inventory-list { display: flex; flex-direction: column; gap: 1rem; }
-        
-        /* Headers for desktop */
-        .inv-headers {
-            display: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            padding: 0 1rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .inventory-item {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            align-items: center;
-            background: #f9fafb;
-            padding: 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        
-        .inv-name { flex: 1 1 100%; min-width: 150px; }
-        .inv-location { flex: 1 1 calc(33.333% - 0.5rem); min-width: 90px; }
-        .inv-controls { 
-            flex: 1 1 100%; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 0.5rem;
-            border-top: 1px solid #e5e7eb;
-            padding-top: 0.5rem;
-        }
-
-        @media (min-width: 768px) {
-            .inv-headers {
-                display: flex;
-                gap: 0.5rem;
-            }
-            .inv-headers > div:nth-child(1) { flex: 2 1 auto; min-width: 150px; }
-            .inv-headers > div:nth-child(2),
-            .inv-headers > div:nth-child(3),
-            .inv-headers > div:nth-child(4) { flex: 1 1 auto; min-width: 90px; }
-            .inv-headers > div:nth-child(5) { flex: 0 1 auto; width: 140px; } /* Spacer for buttons */
-
-            .inventory-item { flex-wrap: nowrap; }
-            .inv-name { flex: 2 1 auto; }
-            .inv-location { flex: 1 1 auto; }
-            .inv-controls { flex: 0 1 auto; width: 140px; margin-top: 0; border-top: none; padding-top: 0; }
-        }
-        
         .btn {
             background: var(--primary);
             color: #fff;
@@ -166,45 +128,79 @@
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: background 0.2s;
             text-align: center;
         }
-        .btn:hover { opacity: 0.9; }
-        .btn-outline {
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
+        .btn:hover { background: #333; }
+        .btn-accent { background: var(--accent); }
+        .btn-accent:hover { background: var(--accent-hover); }
+        .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
         .btn-danger { background: #ef4444; padding: 0.5rem 1rem; }
+
+        /* ----- FORM ELEMENTS ----- */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
         
-        .generate-btn {
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="password"], input[type="email"], textarea, select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
             width: 100%;
-            font-size: 1.1rem;
-            padding: 1rem;
-            margin-top: 1rem;
-            background: var(--accent);
+            font-family: 'Inter', sans-serif;
+        }
+        input[readonly] { background-color: #f3f4f6; color: var(--text-muted); }
+        input:focus:not([readonly]), textarea:focus, select:focus { border-color: var(--accent); }
+        textarea { resize: vertical; min-height: 80px; }
+        .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .register-input-group { display: flex; gap: 0.5rem; }
+
+        /* ----- INVENTORY TABLE ----- */
+        .inventory-list { display: flex; flex-direction: column; gap: 1rem; }
+        .inv-headers { display: none; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); padding: 0 1rem; margin-bottom: 0.5rem; }
+        .inventory-item { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; background: #f9fafb; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); }
+        .inv-name { flex: 1 1 100%; min-width: 150px; }
+        .inv-location { flex: 1 1 calc(33.333% - 0.5rem); min-width: 90px; }
+        .inv-controls { flex: 1 1 100%; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; border-top: 1px solid #e5e7eb; padding-top: 0.5rem; }
+
+        @media (min-width: 768px) {
+            .inv-headers { display: flex; gap: 0.5rem; }
+            .inv-headers > div:nth-child(1) { flex: 2 1 auto; min-width: 150px; }
+            .inv-headers > div:nth-child(2), .inv-headers > div:nth-child(3), .inv-headers > div:nth-child(4) { flex: 1 1 auto; min-width: 90px; }
+            .inv-headers > div:nth-child(5) { flex: 0 1 auto; width: 140px; } 
+            .inventory-item { flex-wrap: nowrap; }
+            .inv-name { flex: 2 1 auto; }
+            .inv-location { flex: 1 1 auto; }
+            .inv-controls { flex: 0 1 auto; width: 140px; margin-top: 0; border-top: none; padding-top: 0; }
         }
 
-        /* ----- PRINT CSS (Native Browser PDF) ----- */
-        #print-wrapper {
-            display: none; /* Completely hidden on screen */
-        }
+        .action-buttons { display: flex; gap: 1rem; margin-top: 1rem; }
+        .action-buttons .btn { flex: 1; padding: 1rem; font-size: 1.05rem; }
 
+        /* ----- PRICING TIERS ----- */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .tier-card { text-align: center; border: 2px solid var(--border); transition: transform 0.2s, border-color 0.2s; }
+        .tier-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .tier-card.pro { border-color: var(--accent); position: relative; }
+        .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .price { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin: 1rem 0; }
+        .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+        .features { list-style: none; margin: 1.5rem 0; text-align: left; }
+        .features li { margin-bottom: 0.75rem; font-size: 0.95rem; }
+        .features li::before { content: "✔️"; margin-right: 0.5rem; font-size: 0.8rem; }
+
+        /* ----- AUTH CENTER ----- */
+        .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
+
+        /* ----- PRINT CSS ----- */
+        #print-wrapper { display: none; }
         @media print {
-            /* Hide the web app UI completely */
             body { background: white; margin: 0; padding: 0; }
-            .app-container { display: none !important; }
-            
-            /* Show only the formatted text report */
-            #print-wrapper {
-                display: block !important;
-                width: 100%;
-                color: black;
-                font-family: 'Times New Roman', serif;
-                font-size: 13pt; /* Good readable size for printed documents */
-                line-height: 1.5;
-            }
-
+            .navbar, .sidebar, .main-content { display: none !important; }
+            #print-wrapper { display: block !important; width: 100%; color: black; font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5; }
             .print-header { text-align: center; margin-bottom: 20px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
             .print-section { margin-bottom: 15px; }
             .print-section-title { font-weight: bold; font-style: italic; margin-bottom: 5px; }
@@ -216,177 +212,277 @@
 </head>
 <body>
 
-<div class="app-container">
-    <div class="header">
-        <h1>Shift Tracker & Inventory App</h1>
-        <p>Fill out the data below, then print/save as a PDF.</p>
+<nav class="navbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="brand">ManagerPro App</div>
+    <div class="user-status" id="navUserStatus" onclick="navTo('auth')">Login / Sign Up</div>
+</nav>
+
+<aside class="sidebar" id="sidebar">
+    <a class="nav-item" onclick="navTo('tracker')">📝 Active Shift Tracker</a>
+    <a class="nav-item" onclick="navTo('presets')">🍔 Templates & Presets</a>
+    <div class="sidebar-divider"></div>
+    <a class="nav-item highlight" onclick="navTo('pricing')">⭐ Upgrade to Pro</a>
+    <a class="nav-item highlight" onclick="alert('Share this link: managerpro.app/ref=catalin to get 5% off your Pro Plan!')">🎁 Recommend (5% Off)</a>
+    <div class="sidebar-divider"></div>
+    <a class="nav-item" onclick="navTo('auth')">👤 Account / Login</a>
+</aside>
+
+<main class="main-content">
+    
+    <div id="view-tracker" class="view-section active">
+        <div style="text-align:center; margin-bottom: 2rem;">
+            <h1 style="color:var(--primary); font-size: 2rem;">Shift Tracker</h1>
+            <p style="color:var(--text-muted);">Your work auto-saves. Select a preset in the menu to change restaurants.</p>
+        </div>
+
+        <form id="trackerForm">
+            <div class="card">
+                <h2>Shift Details</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="shiftDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="shiftTime" value="08:00" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Manager</label>
+                        <input type="text" id="shiftManager" value="Catalin Andrian" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Prep, Beef & Labor</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Prep Notes</label>
+                        <textarea id="prepNotes" placeholder="e.g. Amber Cooked 70 Bacon Slices..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Beef Put to Cook (Or Main Prep)</label>
+                        <input type="text" id="beefCook">
+                    </div>
+                    <div class="form-group">
+                        <label>Beef Tempered (Or Thawed)</label>
+                        <input type="text" id="beefTempered">
+                    </div>
+                    <div class="form-group">
+                        <label>Labor Variance</label>
+                        <input type="text" id="laborVariance">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Cash & Registers</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Drawer 1 ($)</label>
+                        <div class="register-input-group">
+                            <input type="number" step="0.01" id="d1-val" value="100.00" oninput="calcDrawer('d1')">
+                            <input type="text" id="d1-res" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Drawer 4 ($)</label>
+                        <div class="register-input-group">
+                            <input type="number" step="0.01" id="d4-val" value="100.00" oninput="calcDrawer('d4')">
+                            <input type="text" id="d4-res" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Drawer 5 ($)</label>
+                        <div class="register-input-group">
+                            <input type="number" step="0.01" id="d5-val" value="100.00" oninput="calcDrawer('d5')">
+                            <input type="text" id="d5-res" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Safe Count ($)</label>
+                        <input type="text" id="safeCount" placeholder="$1,100.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Deposit ($)</label>
+                        <input type="text" id="deposit" placeholder="$343.00">
+                    </div>
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="depVerified" checked> <label>Verified ✔️</label>
+                            <input type="checkbox" id="depValidated" checked style="margin-left: 1rem;"> <label>Validated ✔️</label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Bills/Change Needed</label>
+                        <textarea id="changeNeeded"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Inventory Count</h2>
+                <p style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);">Enter "N/A" where applicable.</p>
+                
+                <div class="inv-headers">
+                    <div>Item Name</div>
+                    <div>Backline / FOH</div>
+                    <div>Cooler</div>
+                    <div>Freezer</div>
+                    <div></div>
+                </div>
+
+                <div id="inventoryContainer" class="inventory-list"></div>
+                <button type="button" class="btn btn-outline" style="margin-top: 1rem; width: 100%;" onclick="addInventoryItem()">+ Add Custom Item</button>
+            </div>
+
+            <div class="card">
+                <h2>Shift Checklists & Tasks</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Cooler / Storage Checks</label>
+                        <div class="checkbox-group"><input type="checkbox" id="coolerChunks" checked> All Chunks / Large Prep Good</div>
+                        <div class="checkbox-group"><input type="checkbox" id="coolerPans" checked> All Pans / Bins Good</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Backline Dates Changed</label>
+                        <textarea id="backlineDates" placeholder="All Pans ✔️&#10;All Bottles&#10;All Cheese Bags"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Prepline Dates Changed</label>
+                        <textarea id="preplineDates" placeholder="All Bottles ✔️&#10;All Cheese Bags ✔️"></textarea>
+                    </div>
+                </div>
+                
+                <div class="form-grid" style="margin-top: 1rem; border-top: 1px solid #eee; padding-top: 1rem;">
+                    <div class="form-group full-width">
+                        <label>Pulled from Freezer</label>
+                        <textarea id="pulledFreezer"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Sanitizer Check</label>
+                        <div class="checkbox-group"><input type="checkbox" id="waterSanitizer" checked> Water & Sanitizer Bottle Changed</div>
+                        <div class="checkbox-group"><input type="checkbox" id="panSanitizer" checked> Sanitizer Pans Changed</div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Sauce Bottles Made</label>
+                        <textarea id="saucesMade" placeholder="Ranch&#10;Gyro&#10;Red Ranch"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Paperwork & General Notes</label>
+                        <textarea id="extraNotes" placeholder="Check Turkey, Pull Bread, Pick Up Trash Outside..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-accent generate-btn" onclick="generateReport()">🖨️ Print / Save PDF</button>
+                <button type="button" class="btn btn-danger clear-btn" onclick="clearData()">Clear Data</button>
+            </div>
+        </form>
     </div>
 
-    <form id="trackerForm">
+    <div id="view-presets" class="view-section">
         <div class="card">
-            <h2>Shift Details</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Date</label>
-                    <input type="date" id="shiftDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Time</label>
-                    <input type="time" id="shiftTime" value="08:00" required>
-                </div>
-                <div class="form-group">
-                    <label>Shift Manager</label>
-                    <input type="text" id="shiftManager" value="Catalin Andrian" required>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Prep, Beef & Labor</h2>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label>Prep Notes</label>
-                    <textarea id="prepNotes" placeholder="e.g. Amber Cooked 70 Bacon Slices..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Beef Put to Cook</label>
-                    <input type="text" id="beefCook">
-                </div>
-                <div class="form-group">
-                    <label>Beef Tempered</label>
-                    <input type="text" id="beefTempered">
-                </div>
-                <div class="form-group">
-                    <label>Labor Variance</label>
-                    <input type="text" id="laborVariance">
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Cash & Registers</h2>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label>Drawer 1 ($)</label>
-                    <div class="register-input-group">
-                        <input type="number" step="0.01" id="d1-val" value="100.00" oninput="calcDrawer('d1')">
-                        <input type="text" id="d1-res" readonly>
-                    </div>
-                </div>
-                <div class="form-group full-width">
-                    <label>Drawer 4 ($)</label>
-                    <div class="register-input-group">
-                        <input type="number" step="0.01" id="d4-val" value="100.00" oninput="calcDrawer('d4')">
-                        <input type="text" id="d4-res" readonly>
-                    </div>
-                </div>
-                <div class="form-group full-width">
-                    <label>Drawer 5 ($)</label>
-                    <div class="register-input-group">
-                        <input type="number" step="0.01" id="d5-val" value="100.00" oninput="calcDrawer('d5')">
-                        <input type="text" id="d5-res" readonly>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Safe Count ($)</label>
-                    <input type="text" id="safeCount" placeholder="$1,100.00">
-                </div>
-                <div class="form-group">
-                    <label>Deposit ($)</label>
-                    <input type="text" id="deposit" placeholder="$343.00">
-                </div>
-                <div class="form-group full-width">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="depVerified" checked> <label>Verified ✔️</label>
-                        <input type="checkbox" id="depValidated" checked style="margin-left: 1rem;"> <label>Validated ✔️</label>
-                    </div>
-                </div>
-                <div class="form-group full-width">
-                    <label>Bills/Change Needed</label>
-                    <textarea id="changeNeeded"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Inventory Count</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);">Enter "N/A" where applicable.</p>
+            <h2>Templates & Presets</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">Load a standard inventory list to save time. <strong>Warning:</strong> Loading a preset will replace your current inventory list.</p>
             
-            <div class="inv-headers">
-                <div>Item Name</div>
-                <div>Backline</div>
-                <div>Cooler</div>
-                <div>Freezer</div>
-                <div></div>
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label>Select Restaurant Type</label>
+                <select id="presetSelector">
+                    <option value="arbys">Classic Fast Food (Arby's Style)</option>
+                    <option value="burger">Burger Joint (Generic)</option>
+                    <option value="cafe">Coffee Shop / Cafe (Starbucks Style)</option>
+                    <option value="pizza">Pizza Shop</option>
+                </select>
             </div>
-
-            <div id="inventoryContainer" class="inventory-list">
-                </div>
-            <button type="button" class="btn btn-outline" style="margin-top: 1rem;" onclick="addInventoryItem()">+ Add Item</button>
+            
+            <button class="btn btn-accent" onclick="loadPresetList()">Load Preset</button>
         </div>
 
         <div class="card">
-            <h2>Dates to be Changed</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Cooler</label>
-                    <div class="checkbox-group"><input type="checkbox" id="coolerChunks" checked> All Chunks</div>
-                    <div class="checkbox-group"><input type="checkbox" id="coolerPans" checked> All Pans</div>
-                </div>
-                <div class="form-group">
-                    <label>Backline</label>
-                    <textarea id="backlineDates" placeholder="All Pans ✔️&#10;All Bottles&#10;All Cheese Bags"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Prepline</label>
-                    <textarea id="preplineDates" placeholder="All Bottles ✔️&#10;All Cheese Bags ✔️"></textarea>
-                </div>
-            </div>
+            <h2>Custom Managing</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">(Pro Feature) Create and save your own custom lists across multiple restaurant locations.</p>
+            <button class="btn btn-outline" onclick="navTo('pricing')">Unlock Custom Managing</button>
+        </div>
+    </div>
+
+    <div id="view-pricing" class="view-section">
+        <div style="text-align:center; margin-bottom: 2rem;">
+            <h1 style="color:var(--primary); font-size: 2rem;">Choose Your Plan</h1>
+            <p style="color:var(--text-muted);">Upgrade to unlock cross-device syncing, custom templates, and multi-location management.</p>
         </div>
 
-        <div class="card">
-            <h2>End of Shift Tasks & Notes</h2>
-            <div class="form-grid">
-                <div class="form-group full-width">
-                    <label>Pulled from Freezer</label>
-                    <textarea id="pulledFreezer"></textarea>
-                </div>
-                <div class="form-group full-width">
-                    <label>Sanitizer Check</label>
-                    <div class="checkbox-group"><input type="checkbox" id="waterSanitizer" checked> Water & Sanitizer Bottle Changed</div>
-                    <div class="checkbox-group"><input type="checkbox" id="panSanitizer" checked> Sanitizer Pans Changed</div>
-                </div>
-                <div class="form-group full-width">
-                    <label>Sauce Bottles Made</label>
-                    <textarea id="saucesMade" placeholder="Ranch&#10;Gyro&#10;Red Ranch"></textarea>
-                </div>
-                <div class="form-group full-width">
-                    <label>Paperwork & General Notes</label>
-                    <textarea id="extraNotes" placeholder="Check Turkey, Pull Bread, Pick Up Trash Outside..."></textarea>
-                </div>
+        <div class="pricing-grid">
+            <div class="card tier-card">
+                <h2>Individual Annual</h2>
+                <div class="price">$59<span>/yr</span></div>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Perfect for a single shift manager.</p>
+                <ul class="features">
+                    <li>Unlimited PDF Reports</li>
+                    <li>Save 3 Custom Presets</li>
+                    <li>Basic Email Support</li>
+                </ul>
+                <button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="alert('Redirecting to Checkout...')">Select Individual</button>
+            </div>
+
+            <div class="card tier-card pro">
+                <div class="badge">Most Popular</div>
+                <h2>Business Annual</h2>
+                <div class="price">$199<span>/yr</span></div>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Built for General Managers & Owners.</p>
+                <ul class="features">
+                    <li>Multi-Location Dashboard</li>
+                    <li>Unlimited Custom Presets</li>
+                    <li>Cloud Sync & Auto-Backup</li>
+                    <li>Priority 24/7 Support</li>
+                </ul>
+                <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="alert('Redirecting to Checkout...')">Select Business</button>
             </div>
         </div>
+        
+        <div style="text-align:center; margin-top: 2rem;">
+            <p style="color:var(--text-muted); font-size: 0.9rem;">Have a friend in management? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="alert('Share managerpro.app/ref=catalin')">Recommend them for 5% off!</a></p>
+        </div>
+    </div>
 
-        <button type="button" class="btn generate-btn" onclick="generateReport()">Print / Save as PDF</button>
-    </form>
-</div>
+    <div id="view-auth" class="view-section">
+        <div class="card auth-container">
+            <h2 id="authTitle">Sign In to ManagerPro</h2>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group" style="text-align:left; margin-bottom:1rem;">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="manager@restaurant.com" required>
+                </div>
+                <div class="form-group" style="text-align:left; margin-bottom:1.5rem;">
+                    <label>Password</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width:100%;" id="authBtn">Sign In</button>
+            </form>
+            <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                Don't have an account? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode()">Create one</a>
+            </p>
+        </div>
+    </div>
+
+</main>
 
 <div id="print-wrapper">
     <div class="print-header" id="printHeader">Inventory Count Template - 00/00/00 - 8:00AM - Shift Manager: Name</div>
-    
     <div class="print-section">
         <div class="print-text">Notes:</div>
         <div class="print-text"><span class="print-section-title">*Prep Notes*</span> <span id="printPrep"></span></div>
-        <div class="print-text"><span class="print-section-title">*Beef*</span> Beef Put to Cook: <span id="printBeefCook"></span>, Beef Tempered: <span id="printBeefTemp"></span></div>
+        <div class="print-text"><span class="print-section-title">*Main Prep/Beef*</span> Put to Cook: <span id="printBeefCook"></span>, Tempered: <span id="printBeefTemp"></span></div>
     </div>
     <div class="print-divider">——</div>
-    
     <div class="print-section">
         <div class="print-text"><span class="print-section-title">*Labor*</span></div>
         <div class="print-text">Labor Variance: <span id="printLabor"></span></div>
     </div>
     <div class="print-divider">——</div>
-    
     <div class="print-section">
         <div class="print-text"><span class="print-section-title">*Cash*</span></div><br>
         <div class="print-text">Registers:</div>
@@ -398,7 +494,6 @@
         <div class="print-text" id="printChange"></div>
     </div>
     <div class="print-divider">——</div>
-
     <div class="print-section">
         <div class="print-text"><span class="print-section-title">*Inventory*</span></div><br>
         <div class="print-text">Inventory Count:</div><br>
@@ -411,7 +506,7 @@
     
     <div class="print-section">
         <div class="print-text"><span class="print-section-title">*Dates to be Changed:*</span></div><br>
-        <div class="print-text">Cooler:</div>
+        <div class="print-text">Storage/Cooler:</div>
         <div class="print-text" id="printCoolerDates"></div>
         <div class="print-divider">——</div>
         <div class="print-text">Backline:</div>
@@ -421,89 +516,245 @@
         <div class="print-text" id="printPreplineDates"></div>
     </div>
     <div class="print-divider">——End of Dates to be Changed——</div>
-
     <div class="print-section">
         <div class="print-text">Pulled from Freezer:</div>
         <div class="print-text" id="printPulled"></div>
     </div>
     <div class="print-divider">——</div>
-    
     <div class="print-section" id="printSanitizer"></div>
     <div class="print-divider">——</div>
-    
     <div class="print-section">
-        <div class="print-text">Sauce Bottles Made:</div>
+        <div class="print-text">Sauce/Prep Bottles Made:</div>
         <div class="print-text" id="printSauces"></div>
     </div>
     <div class="print-divider">——</div>
-
     <div class="print-section">
         <div class="print-text"><span class="print-section-title">*Paperwork*</span></div>
-        <div class="print-text">Heat N’ Hold Log Printed and Put in AOR ✔️</div>
+        <div class="print-text">Logs Printed and Put in AOR ✔️</div>
         <div class="print-text">Manager Void x (cannot open site due to password change needed)</div><br>
         <div class="print-text" id="printNotes"></div>
     </div>
 </div>
 
 <script>
-    const defaultItems = [
-        "Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Chicken Finger", 
-        "Fries - Curly", "Fries - Crinkle", "Burger", "Jalapeno Bites", 
-        "Turkey", "Beef", "Corned Beef", "Potato Cakes", "Sub Bun", "Brioche"
-    ];
+    // --- APP NAVIGATION ---
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function navTo(viewId) {
+        // Hide all views
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        // Show selected view
+        document.getElementById('view-' + viewId).classList.add('active');
+        // Close sidebar if open
+        document.getElementById('sidebar').classList.remove('open');
+        window.scrollTo(0, 0);
+    }
+
+    // --- AUTHENTICATION MOCK ---
+    let isRegisterMode = false;
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
+        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
+        event.target.innerText = isRegisterMode ? "Sign In instead" : "Create one";
+    }
+
+    function handleAuth(e) {
+        e.preventDefault();
+        document.getElementById('navUserStatus').innerText = "Account: Manager";
+        alert("Authentication successful!");
+        navTo('tracker');
+    }
+
+    // --- PRESETS / TEMPLATES ---
+    const presets = {
+        'arbys': [
+            "Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Chicken Finger", 
+            "Fries - Curly", "Fries - Crinkle", "Burger", "Jalapeno Bites", 
+            "Turkey", "Beef", "Corned Beef", "Potato Cakes", "Sub Bun", "Brioche"
+        ],
+        'burger': [
+            "Beef Patties", "Burger Buns", "Lettuce (Bags)", "Tomato", "Onion",
+            "Fries (Boxes)", "American Cheese", "Ketchup Bags", "Mustard Bags"
+        ],
+        'cafe': [
+            "Espresso Beans", "Pike Place Roast", "Whole Milk", "2% Milk", 
+            "Oat Milk", "Almond Milk", "Vanilla Syrup", "Caramel Syrup",
+            "Mocha Sauce", "Pastries (Assorted)"
+        ],
+        'pizza': [
+            "Dough Trays (S, M, L)", "Pizza Sauce", "Mozzarella Cheese", 
+            "Pepperoni", "Sausage", "Mushrooms", "Onions", "Green Peppers",
+            "Pizza Boxes (M)", "Pizza Boxes (L)"
+        ]
+    };
+
+    function loadPresetList() {
+        if(confirm("This will clear your current inventory list. Are you sure?")) {
+            const selected = document.getElementById('presetSelector').value;
+            const items = presets[selected] || presets['arbys'];
+            
+            document.getElementById('inventoryContainer').innerHTML = '';
+            items.forEach(name => addInventoryItem(name));
+            saveState();
+            navTo('tracker');
+            alert("Preset loaded successfully!");
+        }
+    }
+
+    // --- INVENTORY & TRACKER LOGIC ---
+    document.getElementById('trackerForm').addEventListener('input', saveState);
 
     window.onload = () => {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('shiftDate').value = today;
-        
-        defaultItems.forEach(name => addInventoryItem(name));
-
-        // Initialize Register Maths
-        ['d1', 'd4', 'd5'].forEach(id => calcDrawer(id));
+        loadState();
     };
+
+    function addInventoryItem(name = "", bl = "N/A", cl = "N/A", fr = "N/A", review = false) {
+        const container = document.getElementById('inventoryContainer');
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'inventory-item';
+        const isChecked = review ? "checked" : "";
+
+        itemDiv.innerHTML = `
+            <input type="text" placeholder="Item Name" class="inv-name" value="${name}">
+            <input type="text" placeholder="Front" class="inv-location inv-backline" value="${bl}">
+            <input type="text" placeholder="Cooler" class="inv-location inv-cooler" value="${cl}">
+            <input type="text" placeholder="Freezer" class="inv-location inv-freezer" value="${fr}">
+            <div class="inv-controls">
+                <label style="font-size: 0.85rem;"><input type="checkbox" class="inv-review" ${isChecked}> Review (•)</label>
+                <button type="button" class="btn btn-danger" onclick="removeItem(this)">X</button>
+            </div>
+        `;
+        container.appendChild(itemDiv);
+        saveState();
+    }
+
+    function removeItem(button) {
+        button.closest('.inventory-item').remove();
+        saveState();
+    }
 
     function calcDrawer(id) {
         let val = parseFloat(document.getElementById(id + '-val').value) || 0;
         let diff = val - 100;
         let resInput = document.getElementById(id + '-res');
+        if (diff === 0) resInput.value = "($0.00 Short)";
+        else if (diff < 0) resInput.value = `($${Math.abs(diff).toFixed(2)} Short)`;
+        else resInput.value = `($${diff.toFixed(2)} Over)`;
+    }
+
+    // --- AUTO-SAVE LOGIC ---
+    function saveState() {
+        const state = {
+            shiftDate: document.getElementById('shiftDate').value,
+            shiftTime: document.getElementById('shiftTime').value,
+            shiftManager: document.getElementById('shiftManager').value,
+            prepNotes: document.getElementById('prepNotes').value,
+            beefCook: document.getElementById('beefCook').value,
+            beefTempered: document.getElementById('beefTempered').value,
+            laborVariance: document.getElementById('laborVariance').value,
+            
+            d1Val: document.getElementById('d1-val').value,
+            d4Val: document.getElementById('d4-val').value,
+            d5Val: document.getElementById('d5-val').value,
+            safeCount: document.getElementById('safeCount').value,
+            deposit: document.getElementById('deposit').value,
+            depVerified: document.getElementById('depVerified').checked,
+            depValidated: document.getElementById('depValidated').checked,
+            changeNeeded: document.getElementById('changeNeeded').value,
+            
+            coolerChunks: document.getElementById('coolerChunks').checked,
+            coolerPans: document.getElementById('coolerPans').checked,
+            backlineDates: document.getElementById('backlineDates').value,
+            preplineDates: document.getElementById('preplineDates').value,
+            pulledFreezer: document.getElementById('pulledFreezer').value,
+            waterSanitizer: document.getElementById('waterSanitizer').checked,
+            panSanitizer: document.getElementById('panSanitizer').checked,
+            saucesMade: document.getElementById('saucesMade').value,
+            extraNotes: document.getElementById('extraNotes').value,
+            inventory: []
+        };
+
+        const invItems = document.querySelectorAll('.inventory-item');
+        invItems.forEach(item => {
+            state.inventory.push({
+                name: item.querySelector('.inv-name').value,
+                bl: item.querySelector('.inv-backline').value,
+                cl: item.querySelector('.inv-cooler').value,
+                fr: item.querySelector('.inv-freezer').value,
+                review: item.querySelector('.inv-review').checked
+            });
+        });
+
+        localStorage.setItem('managerProData', JSON.stringify(state));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('managerProData');
         
-        if (diff === 0) {
-            resInput.value = "($0.00 Short)";
-        } else if (diff < 0) {
-            resInput.value = `($${Math.abs(diff).toFixed(2)} Short)`;
+        if (saved) {
+            const state = JSON.parse(saved);
+            if(state.shiftDate) document.getElementById('shiftDate').value = state.shiftDate;
+            if(state.shiftTime) document.getElementById('shiftTime').value = state.shiftTime;
+            if(state.shiftManager) document.getElementById('shiftManager').value = state.shiftManager;
+            if(state.prepNotes) document.getElementById('prepNotes').value = state.prepNotes;
+            if(state.beefCook) document.getElementById('beefCook').value = state.beefCook;
+            if(state.beefTempered) document.getElementById('beefTempered').value = state.beefTempered;
+            if(state.laborVariance) document.getElementById('laborVariance').value = state.laborVariance;
+            if(state.d1Val) document.getElementById('d1-val').value = state.d1Val;
+            if(state.d4Val) document.getElementById('d4-val').value = state.d4Val;
+            if(state.d5Val) document.getElementById('d5-val').value = state.d5Val;
+            if(state.safeCount) document.getElementById('safeCount').value = state.safeCount;
+            if(state.deposit) document.getElementById('deposit').value = state.deposit;
+            
+            if(state.changeNeeded) document.getElementById('changeNeeded').value = state.changeNeeded;
+            if(state.backlineDates) document.getElementById('backlineDates').value = state.backlineDates;
+            if(state.preplineDates) document.getElementById('preplineDates').value = state.preplineDates;
+            if(state.pulledFreezer) document.getElementById('pulledFreezer').value = state.pulledFreezer;
+            if(state.saucesMade) document.getElementById('saucesMade').value = state.saucesMade;
+            if(state.extraNotes) document.getElementById('extraNotes').value = state.extraNotes;
+
+            document.getElementById('depVerified').checked = state.depVerified ?? true;
+            document.getElementById('depValidated').checked = state.depValidated ?? true;
+            document.getElementById('coolerChunks').checked = state.coolerChunks ?? true;
+            document.getElementById('coolerPans').checked = state.coolerPans ?? true;
+            document.getElementById('waterSanitizer').checked = state.waterSanitizer ?? true;
+            document.getElementById('panSanitizer').checked = state.panSanitizer ?? true;
+
+            document.getElementById('inventoryContainer').innerHTML = ''; 
+            if (state.inventory && state.inventory.length > 0) {
+                state.inventory.forEach(inv => {
+                    addInventoryItem(inv.name, inv.bl, inv.cl, inv.fr, inv.review);
+                });
+            } else {
+                presets['arbys'].forEach(name => addInventoryItem(name));
+            }
         } else {
-            resInput.value = `($${diff.toFixed(2)} Over)`;
+            document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
+            presets['arbys'].forEach(name => addInventoryItem(name));
+        }
+
+        ['d1', 'd4', 'd5'].forEach(id => calcDrawer(id));
+    }
+
+    function clearData() {
+        if(confirm("Are you sure you want to clear all data and start a new shift?")) {
+            localStorage.removeItem('managerProData');
+            location.reload(); 
         }
     }
 
-    function addInventoryItem(name = "") {
-        const container = document.getElementById('inventoryContainer');
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'inventory-item';
-        // Note: Placeholders kept for mobile users where headers stack
-        itemDiv.innerHTML = `
-            <input type="text" placeholder="Item Name" class="inv-name" value="${name}">
-            <input type="text" placeholder="Backline" class="inv-location inv-backline" value="N/A">
-            <input type="text" placeholder="Cooler" class="inv-location inv-cooler" value="N/A">
-            <input type="text" placeholder="Freezer" class="inv-location inv-freezer" value="N/A">
-            <div class="inv-controls">
-                <label style="font-size: 0.85rem;"><input type="checkbox" class="inv-review"> Review (•)</label>
-                <button type="button" class="btn btn-danger" onclick="this.closest('.inventory-item').remove()">Remove</button>
-            </div>
-        `;
-        container.appendChild(itemDiv);
-    }
-
-    function formatTextWithCheckmarks(text) {
+    function formatText(text) {
         if(!text) return "";
         return text.replace(/\n/g, '<br>');
     }
 
     function generateReport() {
-        // Gather Data
         const dateRaw = document.getElementById('shiftDate').value;
         const [yyyy, mm, dd] = dateRaw.split('-');
-        const formattedDate = `${mm}/${dd}/${yyyy.slice(-2)}`;
+        const formattedDate = dateRaw ? `${mm}/${dd}/${yyyy.slice(-2)}` : "00/00/00";
         const time = document.getElementById('shiftTime').value;
         
         let formattedTime = time;
@@ -514,7 +765,6 @@
         
         const manager = document.getElementById('shiftManager').value;
         
-        // Map to Print Template
         document.getElementById('printHeader').innerText = `Inventory Count Template - ${formattedDate} - ${formattedTime} - Shift Manager: ${manager}`;
         document.getElementById('printPrep').innerText = document.getElementById('prepNotes').value || "N/A";
         document.getElementById('printBeefCook').innerText = document.getElementById('beefCook').value || "0";
@@ -534,12 +784,10 @@
         document.getElementById('printDeposit').innerText = document.getElementById('deposit').value || "$0.00";
         document.getElementById('printDepVer').innerText = document.getElementById('depVerified').checked ? "✔️" : "❌";
         document.getElementById('printDepVal').innerText = document.getElementById('depValidated').checked ? "✔️" : "❌";
-        document.getElementById('printChange').innerHTML = formatTextWithCheckmarks(document.getElementById('changeNeeded').value);
+        document.getElementById('printChange').innerHTML = formatText(document.getElementById('changeNeeded').value);
 
-        // Inventory list
         let invHTML = "";
-        const invItems = document.querySelectorAll('.inventory-item');
-        invItems.forEach(item => {
+        document.querySelectorAll('.inventory-item').forEach(item => {
             const name = item.querySelector('.inv-name').value;
             const bl = item.querySelector('.inv-backline').value;
             const cl = item.querySelector('.inv-cooler').value;
@@ -548,31 +796,27 @@
             
             if(name) {
                 const prefix = needsReview ? "•" : "";
-                invHTML += `<div class="print-text">${prefix}${name}: ${bl} Backline, ${cl} in Cooler , ${fr} Freezer</div>`;
+                invHTML += `<div class="print-text">${prefix}${name}: ${bl} Backline, ${cl} Cooler , ${fr} Freezer</div>`;
             }
         });
         document.getElementById('printInventoryList').innerHTML = invHTML;
 
-        // Checklists
         let coolerStr = "";
-        if(document.getElementById('coolerChunks').checked) coolerStr += "All Chunks ✔️<br>";
+        if(document.getElementById('coolerChunks').checked) coolerStr += "All Chunks/Mains ✔️<br>";
         if(document.getElementById('coolerPans').checked) coolerStr += "All Pans ✔️";
         document.getElementById('printCoolerDates').innerHTML = coolerStr;
-        document.getElementById('printBacklineDates').innerHTML = formatTextWithCheckmarks(document.getElementById('backlineDates').value);
-        document.getElementById('printPreplineDates').innerHTML = formatTextWithCheckmarks(document.getElementById('preplineDates').value);
-        document.getElementById('printPulled').innerHTML = formatTextWithCheckmarks(document.getElementById('pulledFreezer').value);
+        document.getElementById('printBacklineDates').innerHTML = formatText(document.getElementById('backlineDates').value);
+        document.getElementById('printPreplineDates').innerHTML = formatText(document.getElementById('preplineDates').value);
+        document.getElementById('printPulled').innerHTML = formatText(document.getElementById('pulledFreezer').value);
 
-        // Sanitizer
         let sanStr = "";
         if(document.getElementById('waterSanitizer').checked) sanStr += `<div class="print-text">Water & Sanitizer Bottle Changed ✔️</div>`;
-        if(document.getElementById('panSanitizer').checked) sanStr += `<div class="print-text">Sanitizer Pans Changed on Main Backline ✔️</div>`;
+        if(document.getElementById('panSanitizer').checked) sanStr += `<div class="print-text">Sanitizer Pans Changed ✔️</div>`;
         document.getElementById('printSanitizer').innerHTML = sanStr;
 
-        document.getElementById('printSauces').innerHTML = formatTextWithCheckmarks(document.getElementById('saucesMade').value);
-        document.getElementById('printNotes').innerHTML = formatTextWithCheckmarks(document.getElementById('extraNotes').value);
+        document.getElementById('printSauces').innerHTML = formatText(document.getElementById('saucesMade').value);
+        document.getElementById('printNotes').innerHTML = formatText(document.getElementById('extraNotes').value);
 
-        // Trigger native browser print dialog
-        // Once opened, user can choose destination "Save as PDF"
         window.print();
     }
 </script>
