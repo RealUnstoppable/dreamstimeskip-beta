@@ -412,23 +412,23 @@
             });
         }
 
-        function calculatePerformanceMetrics(users, carts) {
-            const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
-            const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-            const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
+       function calculatePerformanceMetrics(users, carts, orders = []) {
+    const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
 
-            document.getElementById('total-users').textContent = users.length;
-            document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('total-purchases').textContent = totalOrders;
-            document.getElementById('checkouts').textContent = totalOrders;
-            document.getElementById('active-carts').textContent = activeCarts;
-            const totalOrders = document.getElementById('total-purchases').textContent; // Grab the real number we just calculated
-const totalUsers = users.length;
-const conversionRate = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
+    const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
+    const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
 
-document.getElementById('avg-orders').textContent = conversionRate;
-        }
+    const totalOrders = orders.length;
+    const totalUsers = users.length;
+    const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
 
+    document.getElementById('total-users').textContent = totalUsers;
+    document.getElementById('new-signups').textContent = newSignups;
+    document.getElementById('total-purchases').textContent = totalOrders;
+    document.getElementById('checkouts').textContent = totalOrders;
+    document.getElementById('active-carts').textContent = activeCarts;
+    document.getElementById('avg-orders').textContent = avgOrders;
+}
         function renderChart(view, usersData) {
             const ctx = document.getElementById('performance-chart').getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
