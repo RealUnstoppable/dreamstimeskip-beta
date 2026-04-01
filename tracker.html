@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Manager Inventory Tracker</title>
+    <title>ManagerPro</title>
     
-   <link rel="icon" type="image/jpeg" href="ManagerPro.jpg?v=2">
-    
+    <link rel="icon" type="image/jpeg" href="ManagerPro.jpg?v=2">
     <link rel="apple-touch-icon" href="ManagerPro.jpg?v=2">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +13,11 @@
     <meta name="apple-mobile-web-app-title" content="ManagerPro">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -76,6 +80,7 @@
         .brand { font-weight: 700; font-size: 1.25rem; color: var(--primary); flex-grow: 1; }
         
         .user-status { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+        .user-status:hover { color: var(--accent); }
 
         .sidebar {
             position: fixed;
@@ -261,15 +266,14 @@
 <nav class="navbar">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
     <div class="brand">ManagerPro</div>
-    <div class="user-status" id="navUserStatus" onclick="navTo('auth')">Login / Sign Up</div>
+    <div class="user-status" id="navUserStatus" onclick="handleNavAccountClick()">Login / Sign Up</div>
 </nav>
 
 <aside class="sidebar" id="sidebar">
     <a class="nav-item" onclick="navTo('tracker')">📝 Active Shift Tracker</a>
     <a class="nav-item" onclick="navTo('presets')">🍔 Templates & Presets</a>
     <div class="sidebar-divider"></div>
-    <a class="nav-item" onclick="navTo('profile')">👤 Manager Profile</a>
-    <a class="nav-item" onclick="navTo('auth')">🔐 Account / Login</a>
+    <a class="nav-item" onclick="handleNavAccountClick()">👤 Manager Profile</a>
     <div class="sidebar-divider"></div>
     <div class="theme-switch-wrapper">
         <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Dark Mode</span>
@@ -305,7 +309,7 @@
                     </div>
                     <div class="form-group">
                         <label>Shift Manager</label>
-                        <input type="text" id="shiftManager" value="Catalin Andrian" required>
+                        <input type="text" id="shiftManager" placeholder="Enter Name" required>
                     </div>
                 </div>
             </div>
@@ -441,9 +445,9 @@
 
     <div id="view-profile" class="view-section">
         <div class="card" style="text-align: center;">
-            <div style="width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; margin: 0 auto 1rem;">C</div>
+            <div id="profileAvatar" style="width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; margin: 0 auto 1rem;">M</div>
             <h2>Manager Profile</h2>
-            <p style="color:var(--text-muted);">Manage your personal details and location settings. Changes here will update default tracker settings.</p>
+            <p style="color:var(--text-muted);">Saved securely in the cloud via Firebase.</p>
         </div>
 
         <div class="card">
@@ -451,15 +455,15 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="profName" value="Catalin Andrian">
+                    <input type="text" id="profName" placeholder="E.g. John Doe">
                 </div>
                 <div class="form-group">
                     <label>Role / Title</label>
-                    <input type="text" id="profRole" value="Shift Manager">
+                    <input type="text" id="profRole" placeholder="Shift Manager">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="profEmail" value="catalin@managerpro.app">
+                    <label>Email (Locked)</label>
+                    <input type="email" id="profEmail" readonly>
                 </div>
                 <div class="form-group">
                     <label>Phone</label>
@@ -473,14 +477,15 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Store Name / Brand</label>
-                    <input type="text" id="profStore" value="Arby's">
+                    <input type="text" id="profStore" placeholder="Restaurant Name">
                 </div>
                 <div class="form-group">
                     <label>Store Location</label>
-                    <input type="text" id="profLocation" value="Buford, GA">
+                    <input type="text" id="profLocation" placeholder="City, State">
                 </div>
-                <div class="form-group full-width">
-                    <button class="btn btn-accent" style="width: 100%; margin-top: 1rem;" onclick="saveProfile()">Save Profile Settings</button>
+                <div class="form-group full-width" style="display:flex; gap:1rem;">
+                    <button class="btn btn-accent" style="flex:1;" onclick="saveProfileToFirebase()">Save Profile</button>
+                    <button class="btn btn-danger" style="flex:1;" onclick="signOut()">Sign Out</button>
                 </div>
             </div>
         </div>
@@ -503,18 +508,12 @@
             
             <button class="btn btn-accent" onclick="loadPresetList()">Load Preset</button>
         </div>
-
-        <div class="card">
-            <h2>Custom Managing</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1rem;">(Pro Feature) Create and save your own custom lists across multiple restaurant locations.</p>
-            <button class="btn btn-outline" onclick="navTo('pricing')">Unlock Custom Managing</button>
-        </div>
     </div>
 
     <div id="view-pricing" class="view-section">
         <div style="text-align:center; margin-bottom: 2rem;">
             <h1 style="color:var(--primary); font-size: 2rem;">Choose Your Plan</h1>
-            <p style="color:var(--text-muted);">Upgrade to unlock cross-device syncing, custom templates, and multi-location management.</p>
+            <p style="color:var(--text-muted);">Upgrade to unlock cross-device syncing and multi-location management.</p>
         </div>
 
         <div class="pricing-grid">
@@ -527,7 +526,7 @@
                     <li>Save 3 Custom Presets</li>
                     <li>Basic Email Support</li>
                 </ul>
-                <button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="alert('Redirecting to Checkout...')">Select Individual</button>
+                <button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="processCheckout('Individual Pro')">Select Individual</button>
             </div>
 
             <div class="card tier-card pro">
@@ -541,7 +540,7 @@
                     <li>Cloud Sync & Auto-Backup</li>
                     <li>Priority 24/7 Support</li>
                 </ul>
-                <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="alert('Redirecting to Checkout...')">Select Business</button>
+                <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="processCheckout('Business Pro')">Select Business</button>
             </div>
         </div>
     </div>
@@ -552,11 +551,11 @@
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="form-group" style="text-align:left; margin-bottom:1rem;">
                     <label>Email Address</label>
-                    <input type="email" placeholder="manager@restaurant.com" required>
+                    <input type="email" id="authEmail" placeholder="manager@restaurant.com" required>
                 </div>
                 <div class="form-group" style="text-align:left; margin-bottom:1.5rem;">
                     <label>Password</label>
-                    <input type="password" placeholder="••••••••" required>
+                    <input type="password" id="authPass" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn btn-accent" style="width:100%;" id="authBtn">Sign In</button>
             </form>
@@ -635,7 +634,219 @@
 </div>
 
 <script>
-    // --- THEME / DARK MODE ---
+    // ==========================================
+    // 1. FIREBASE INITIALIZATION 
+    // ==========================================
+    // REPLACE WITH YOUR ACTUAL DREAMSTIMESKIP CONFIG
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "dreamstimeskip.firebaseapp.com",
+        projectId: "dreamstimeskip",
+        storageBucket: "dreamstimeskip.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+
+    // Track Auth State
+    auth.onAuthStateChanged((user) => {
+        currentUser = user;
+        const navStatus = document.getElementById('navUserStatus');
+        
+        if (user) {
+            navStatus.innerText = "Profile: " + (user.displayName || user.email.split('@')[0]);
+            document.getElementById('profEmail').value = user.email;
+            loadProfileFromFirebase(user.uid);
+            
+            // If they just logged in and are on the auth page, redirect
+            if (document.getElementById('view-auth').classList.contains('active')) {
+                navTo('profile');
+            }
+        } else {
+            navStatus.innerText = "Login / Sign Up";
+            clearProfileForm();
+        }
+    });
+
+
+    // ==========================================
+    // 2. APP NAVIGATION & PROTECTED ROUTES
+    // ==========================================
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function navTo(viewId) {
+        // Protect the profile route
+        if (viewId === 'profile' && !currentUser) {
+            alert("Please sign in to access your Manager Profile.");
+            viewId = 'auth';
+        }
+
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        document.getElementById('sidebar').classList.remove('open');
+        window.scrollTo(0, 0);
+    }
+
+    // Smart logic for the Nav Bar / Sidebar user button
+    function handleNavAccountClick() {
+        if (currentUser) {
+            navTo('profile');
+        } else {
+            navTo('auth');
+        }
+    }
+
+
+    // ==========================================
+    // 3. AUTHENTICATION & PROFILE LOGIC
+    // ==========================================
+    let isRegisterMode = false;
+    
+    function toggleAuthMode() {
+        isRegisterMode = !isRegisterMode;
+        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
+        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
+        event.target.innerText = isRegisterMode ? "Sign In instead" : "Create one";
+    }
+
+    function handleAuth(e) {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const pass = document.getElementById('authPass').value;
+        const btn = document.getElementById('authBtn');
+        
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        if (isRegisterMode) {
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    alert("Account created successfully!");
+                    navTo('profile');
+                })
+                .catch(err => alert(err.message))
+                .finally(() => { btn.disabled = false; btn.innerText = "Sign Up"; });
+        } else {
+            auth.signInWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    navTo('profile');
+                })
+                .catch(err => alert(err.message))
+                .finally(() => { btn.disabled = false; btn.innerText = "Sign In"; });
+        }
+    }
+
+    function signOut() {
+        auth.signOut().then(() => {
+            alert("Signed out successfully.");
+            navTo('auth');
+        });
+    }
+
+    // FireStore DB Logic
+    function saveProfileToFirebase() {
+        if (!currentUser) return;
+        
+        const profileData = {
+            name: document.getElementById('profName').value,
+            role: document.getElementById('profRole').value,
+            phone: document.getElementById('profPhone').value,
+            store: document.getElementById('profStore').value,
+            location: document.getElementById('profLocation').value
+        };
+
+        db.collection('users').doc(currentUser.uid).set(profileData, { merge: true })
+            .then(() => {
+                // Also update the tracker default name
+                document.getElementById('shiftManager').value = profileData.name;
+                saveState(); // Save local shift data
+
+                // Update auth display name
+                currentUser.updateProfile({ displayName: profileData.name });
+                document.getElementById('navUserStatus').innerText = "Profile: " + profileData.name;
+                
+                // Update avatar letter
+                if(profileData.name) {
+                    document.getElementById('profileAvatar').innerText = profileData.name.charAt(0).toUpperCase();
+                }
+
+                alert("Profile saved securely to Firebase!");
+            })
+            .catch((error) => {
+                alert("Error saving profile: " + error.message);
+            });
+    }
+
+    function loadProfileFromFirebase(uid) {
+        db.collection('users').doc(uid).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                document.getElementById('profName').value = data.name || "";
+                document.getElementById('profRole').value = data.role || "";
+                document.getElementById('profPhone').value = data.phone || "";
+                document.getElementById('profStore').value = data.store || "";
+                document.getElementById('profLocation').value = data.location || "";
+                
+                if (data.name) {
+                    document.getElementById('shiftManager').value = data.name;
+                    document.getElementById('profileAvatar').innerText = data.name.charAt(0).toUpperCase();
+                }
+            }
+        }).catch(err => console.log("Error fetching profile:", err));
+    }
+
+    function clearProfileForm() {
+        document.getElementById('profName').value = "";
+        document.getElementById('profRole').value = "";
+        document.getElementById('profPhone').value = "";
+        document.getElementById('profStore').value = "";
+        document.getElementById('profLocation').value = "";
+        document.getElementById('profEmail').value = "";
+        document.getElementById('profileAvatar').innerText = "M";
+    }
+
+    // ==========================================
+    // 4. CHECKOUT SYSTEM (Firebase Synced)
+    // ==========================================
+    function processCheckout(planName) {
+        if (!currentUser) {
+            alert("Please sign in or create an account to upgrade to Pro.");
+            navTo('auth');
+            return;
+        }
+
+        // Simulating the checkout completion -> updating Firestore
+        const confirmPurchase = confirm(`Proceed to checkout for ${planName}?`);
+        
+        if (confirmPurchase) {
+            db.collection('users').doc(currentUser.uid).set({
+                subscription: {
+                    plan: planName,
+                    status: "active",
+                    dateSubscribed: firebase.firestore.FieldValue.serverTimestamp()
+                }
+            }, { merge: true })
+            .then(() => {
+                alert(`Successfully checked out! Your account is now linked to the ${planName} plan in Firebase.`);
+                navTo('tracker');
+            })
+            .catch(err => alert("Checkout error: " + err.message));
+        }
+    }
+
+    // ==========================================
+    // 5. THEME & TRACKER LOGIC
+    // ==========================================
     function toggleTheme() {
         const isDark = document.getElementById('themeToggle').checked;
         if (isDark) {
@@ -647,45 +858,6 @@
         }
     }
 
-    // --- APP NAVIGATION ---
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-    }
-
-    function navTo(viewId) {
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        document.getElementById('sidebar').classList.remove('open');
-        window.scrollTo(0, 0);
-    }
-
-    // --- MANAGER PROFILE LOGIC ---
-    function saveProfile() {
-        const newName = document.getElementById('profName').value;
-        document.getElementById('shiftManager').value = newName; // Push name to main tracker
-        saveState();
-        alert("Profile saved successfully!");
-        navTo('tracker');
-    }
-
-    // --- AUTHENTICATION MOCK ---
-    let isRegisterMode = false;
-    function toggleAuthMode() {
-        isRegisterMode = !isRegisterMode;
-        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
-        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
-        event.target.innerText = isRegisterMode ? "Sign In instead" : "Create one";
-    }
-
-    function handleAuth(e) {
-        e.preventDefault();
-        const userName = document.getElementById('profName').value || "Manager";
-        document.getElementById('navUserStatus').innerText = "Account: " + userName;
-        alert("Authentication successful!");
-        navTo('tracker');
-    }
-
-    // --- PRESETS / TEMPLATES ---
     const presets = {
         'arbys': [
             "Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Chicken Finger", 
@@ -721,18 +893,14 @@
         }
     }
 
-    // --- INVENTORY & TRACKER LOGIC ---
     document.getElementById('trackerForm').addEventListener('input', saveState);
 
     window.onload = () => {
-        // Load Theme
         const savedTheme = localStorage.getItem('managerProTheme');
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-mode');
             document.getElementById('themeToggle').checked = true;
         }
-
-        // Load Tracker State
         loadState();
     };
 
@@ -770,7 +938,6 @@
         else resInput.value = `($${diff.toFixed(2)} Over)`;
     }
 
-    // --- AUTO-SAVE LOGIC ---
     function saveState() {
         const state = {
             shiftDate: document.getElementById('shiftDate').value,
@@ -887,7 +1054,7 @@
             formattedTime = timeObj.toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'});
         }
         
-        const manager = document.getElementById('shiftManager').value;
+        const manager = document.getElementById('shiftManager').value || "Manager";
         
         document.getElementById('printHeader').innerText = `Inventory Count Template - ${formattedDate} - ${formattedTime} - Shift Manager: ${manager}`;
         document.getElementById('printPrep').innerText = document.getElementById('prepNotes').value || "N/A";
