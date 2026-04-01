@@ -560,7 +560,7 @@
                 <button type="submit" class="btn btn-accent" style="width:100%;" id="authBtn">Sign In</button>
             </form>
             <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-                Don't have an account? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode()">Create one</a>
+                Don't have an account? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode(event)">Create one</a>
             </p>
         </div>
     </div>
@@ -639,14 +639,14 @@
     // ==========================================
     // REPLACE WITH YOUR ACTUAL DREAMSTIMESKIP CONFIG
   // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 // Updated Firebase config to use the Compat SDK (correct for HTML files)
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
   authDomain: "dts-hub-website.firebaseapp.com",
@@ -657,8 +657,10 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase services using Compat mode
+// ✅ Correct initialization (compat)
 firebase.initializeApp(firebaseConfig);
+
+// Services
 const auth = firebase.auth();
 const db = firebase.firestore();
 
@@ -720,12 +722,20 @@ const db = firebase.firestore();
     // ==========================================
     let isRegisterMode = false;
     
-    function toggleAuthMode() {
-        isRegisterMode = !isRegisterMode;
-        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
-        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
-        event.target.innerText = isRegisterMode ? "Sign In instead" : "Create one";
-    }
+function toggleAuthMode(e) {
+    if (e) e.preventDefault();
+
+    isRegisterMode = !isRegisterMode;
+
+    document.getElementById('authTitle').innerText =
+        isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
+
+    document.getElementById('authBtn').innerText =
+        isRegisterMode ? "Sign Up" : "Sign In";
+
+    const link = document.querySelector('#view-auth a');
+    link.innerText = isRegisterMode ? "Sign In instead" : "Create one";
+}
 
     function handleAuth(e) {
         e.preventDefault();
@@ -1118,6 +1128,18 @@ const db = firebase.firestore();
 
         window.print();
     }
+    window.onload = () => {
+    try {
+        const savedTheme = localStorage.getItem('managerProTheme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').checked = true;
+        }
+        loadState();
+    } catch (err) {
+        console.error("Load error:", err);
+    }
+};
 </script>
 </body>
 </html>
