@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ManagerPro</title>
+    <title>ezManage</title>
     
     <link rel="icon" type="image/jpeg" href="ManagerPro.jpg?v=2">
     <link rel="apple-touch-icon" href="ManagerPro.jpg?v=2">
@@ -265,7 +265,7 @@
 
 <nav class="navbar">
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <div class="brand">ManagerPro</div>
+    <div class="brand">ezManage</div>
     <div class="user-status" id="navUserStatus" onclick="handleNavAccountClick()">Login / Sign Up</div>
 </nav>
 
@@ -547,7 +547,7 @@
 
     <div id="view-auth" class="view-section">
         <div class="card auth-container">
-            <h2 id="authTitle">Sign In to ManagerPro</h2>
+            <h2 id="authTitle">Sign In to ezManage</h2>
             <form id="authForm" onsubmit="handleAuth(event)">
                 <div class="form-group" style="text-align:left; margin-bottom:1rem;">
                     <label>Email Address</label>
@@ -728,7 +728,7 @@ function toggleAuthMode(e) {
     isRegisterMode = !isRegisterMode;
 
     document.getElementById('authTitle').innerText =
-        isRegisterMode ? "Create an Account" : "Sign In to ManagerPro";
+        isRegisterMode ? "Create an Account" : "Sign In to ezManage";
 
     document.getElementById('authBtn').innerText =
         isRegisterMode ? "Sign Up" : "Sign In";
@@ -836,31 +836,35 @@ function toggleAuthMode(e) {
     // ==========================================
     // 4. CHECKOUT SYSTEM (Firebase Synced)
     // ==========================================
-    function processCheckout(planName) {
-        if (!currentUser) {
-            alert("Please sign in or create an account to upgrade to Pro.");
-            navTo('auth');
-            return;
+  async function processCheckout(planName) {
+    if (!currentUser) {
+        alert("Please sign in or create an account to upgrade.");
+        navTo('auth');
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:3000/create-checkout-session", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ plan: planName })
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+            window.location.href = data.url; // 🔥 redirect to Stripe
+        } else {
+            alert("Error creating checkout session");
         }
 
-        // Simulating the checkout completion -> updating Firestore
-        const confirmPurchase = confirm(`Proceed to checkout for ${planName}?`);
-        
-        if (confirmPurchase) {
-            db.collection('users').doc(currentUser.uid).set({
-                subscription: {
-                    plan: planName,
-                    status: "active",
-                    dateSubscribed: firebase.firestore.FieldValue.serverTimestamp()
-                }
-            }, { merge: true })
-            .then(() => {
-                alert(`Successfully checked out! Your account is now linked to the ${planName} plan in Firebase.`);
-                navTo('tracker');
-            })
-            .catch(err => alert("Checkout error: " + err.message));
-        }
+    } catch (err) {
+        console.error(err);
+        alert("Payment error");
     }
+}
 
     // ==========================================
     // 5. THEME & TRACKER LOGIC
@@ -1139,6 +1143,20 @@ function toggleAuthMode(e) {
     } catch (err) {
         console.error("Load error:", err);
     }
+    const params = new URLSearchParams(window.location.search);
+
+if (params.get("success")) {
+    alert("Payment successful!");
+
+    // 🔥 Update Firestore
+    if (currentUser) {
+        db.collection('users').doc(currentUser.uid).set({
+            subscription: {
+                status: "active"
+            }
+        }, { merge: true });
+    }
+}
 };
 </script>
 </body>
