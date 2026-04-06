@@ -154,3 +154,6 @@ if (document.getElementById('auth-form')) {
 function showMessage(msg) { messageEl.textContent = msg; }
     updateFormView();
 }
+if (user) {
+    loadUserData(user.uid);
+}

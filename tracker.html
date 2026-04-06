@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ezManage</title>
@@ -267,6 +268,25 @@
             .print-text { white-space: pre-wrap; margin-bottom: 5px; }
             .page-break { page-break-before: always; }
         }
+        button, input, select, textarea {
+    font-size: 16px; /* prevents zoom on iPhone */
+}
+
+.menu-btn {
+    padding: 10px;
+}
+
+.sidebar {
+    width: 85%;
+    max-width: 300px;
+}
+
+.btn {
+    min-height: 48px;
+}
+.nav-item {
+    padding: 1rem 1.5rem;
+}
     </style>
 </head>
 <body>
@@ -810,23 +830,71 @@
     // ==========================================
     // 4. CHECKOUT SYSTEM (Firebase Synced)
     // ==========================================
-    async function processCheckout(planName) {
-        if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
-        try {
-            const res = await fetch("http://localhost:3000/create-checkout-session", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: planName })
-            });
-            const data = await res.json();
-            if (data.url) window.location.href = data.url; 
-            else alert("Error creating checkout session");
-        } catch (err) {
-            console.error(err);
-            alert("Payment error");
-        }
+async function processCheckout(planName) {
+    if (!currentUser) {
+        navTo('auth');
+        return;
     }
 
+    const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            plan: planName
+        })
+    });
+
+    const data = await res.json();
+    window.location.href = data.url;
+}
+
+function requireProFeature() {
+    if (!currentUser) {
+        alert("Sign in required");
+        navTo('auth');
+        return false;
+    }
+
+    if (!currentUserData?.subscription || currentUserData.subscription.status !== "active") {
+        alert("Upgrade to Pro to use this feature.");
+        navTo('pricing');
+        return false;
+    }
+
+    return true;
+    
+}
+let currentUserData = null;
+
+function loadUserData(uid) {
+    db.collection("users").doc(uid).onSnapshot(doc => {
+        currentUserData = doc.data();
+    });
+}
+<button onclick="cancelSubscription()" class="btn btn-danger">Cancel Subscription</button>
+async function cancelSubscription() {
+    if (!currentUserData?.subscription?.customerId) return;
+
+    const confirmCancel = confirm("Cancel subscription?");
+    if (!confirmCancel) return;
+
+    await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            customerId: currentUserData.subscription.customerId
+        })
+    });
+
+    alert("Subscription canceled");
+}
+function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
+}
+<button onclick="signInWithGoogle()" class="btn btn-outline">Sign in with Google</button>
     // ==========================================
     // 5. THEME, TRACKER & HISTORY LOGIC
     // ==========================================
@@ -1155,6 +1223,7 @@
             }
         }
     };
+    
 </script>
 </body>
 </html>

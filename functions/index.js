@@ -1,32 +1,103 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+const Stripe = require("stripe");
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+admin.initializeApp();
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+const stripe = Stripe("YOUR_STRIPE_SECRET_KEY");
+const endpointSecret = "YOUR_WEBHOOK_SECRET";
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+// 🔹 Create Checkout Session
+exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
+  const { uid, plan } = req.body;
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  const priceId =
+    plan === "Business Pro"
+      ? "price_business_id"
+      : "price_individual_id";
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      payment_method_types: ["card"],
+      customer_email: req.body.email,
+      line_items: [{ price: priceId, quantity: 1 }],
+
+      subscription_data: {
+        trial_period_days: 7, // ✅ FREE TRIAL
+      },
+
+      success_url: "https://yourdomain.com?success=true",
+      cancel_url: "https://yourdomain.com?canceled=true",
+
+      metadata: { uid },
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+
+// 🔐 STRIPE WEBHOOK (SECURE)
+exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error(err);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // 🎯 Handle events
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const uid = session.metadata.uid;
+
+    await admin.firestore().collection("users").doc(uid).set({
+      subscription: {
+        status: "active",
+        customerId: session.customer,
+      },
+    }, { merge: true });
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object;
+
+    const snapshot = await admin.firestore()
+      .collection("users")
+      .where("subscription.customerId", "==", sub.customer)
+      .get();
+
+    snapshot.forEach(doc => {
+      doc.ref.update({
+        "subscription.status": "canceled"
+      });
+    });
+  }
+
+  res.json({ received: true });
+});
+
+
+// 🔻 Cancel Subscription
+exports.cancelSubscription = functions.https.onRequest(async (req, res) => {
+  const { customerId } = req.body;
+
+  try {
+    const subs = await stripe.subscriptions.list({ customer: customerId });
+
+    for (let sub of subs.data) {
+      await stripe.subscriptions.del(sub.id);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});

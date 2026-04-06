@@ -339,43 +339,41 @@
             setupEventListeners();
         }
 
-        async function loadAdminData() {
-            // Users & Carts
-            const usersCollection = collection(db, "users");
-            const recentUsersQuery = query(collection(db, "users"), orderBy("signupDate", "desc"), limit(50));
-            const usersSnapshot = await getDocs(recentUsersQuery);
-            const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    async function loadAdminData() {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            const cartsCollection = collection(db, "carts");
-            const cartsSnapshot = await getDocs(query(collection(db, "carts"), limit(50)));
-            const carts = cartsSnapshot.docs.map(d => ({ userId: d.id, ...d.data() }));
+    const cartsSnapshot = await getDocs(collection(db, "carts"));
+    const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-            // Newsletter
-            const newsletterCollection = collection(db, "newsletterSubscribers");
-            const newsletterSnapshot = await getDocs(newsletterCollection);
-            const newsletterSubscribers = newsletterSnapshot.docs.map(d => d.data());
+    const ordersSnapshot = await getDocs(collection(db, "orders"));
+    const orders = ordersSnapshot.docs.map(d => d.data());
 
-            // Download Stats (Wrapped in try/catch so it doesn't break other stats if it fails)
-            try {
-                const statsRef = doc(db, "site_stats", "downloads");
-                const statsDoc = await getDoc(statsRef);
-                if (statsDoc.exists()) {
-                    const data = statsDoc.data();
-                    document.getElementById('download-count-infosheet').textContent = data.infoSheet || 0;
-                } else {
-                    document.getElementById('download-count-infosheet').textContent = 0;
-                }
-            } catch (e) {
-                console.error("Failed to load download stats:", e);
-                document.getElementById('download-count-infosheet').textContent = "N/A";
-            }
+    // 💰 Revenue
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
 
-            // Render other data regardless of download stats success
-            renderUserTable(users);
-            renderNewsletterTable(newsletterSubscribers);
-            calculatePerformanceMetrics(users, carts);
-            renderChart('summary', users);
-        }
+    document.getElementById('total-purchases').textContent = orders.length;
+
+    // 🔥 Add new metric dynamically
+    addRevenueCard(totalRevenue);
+
+    renderUserTable(users);
+    calculatePerformanceMetrics(users, carts, orders);
+    renderChart('summary', users);
+}
+function addRevenueCard(totalRevenue) {
+    let el = document.getElementById('total-revenue');
+
+    if (!el) {
+        const card = document.createElement('div');
+        card.className = "metric-card";
+        card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
+        document.querySelector('.metrics-grid').appendChild(card);
+        el = document.getElementById('total-revenue');
+    }
+
+    el.textContent = `$${totalRevenue.toFixed(2)}`;
+}
 
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
