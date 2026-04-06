@@ -1,21 +1,7 @@
 // js/auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { 
-    getAuth, 
-    onAuthStateChanged, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut,
-    GoogleAuthProvider,
-    signInWithPopup
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { 
-    getFirestore, 
-    doc, 
-    setDoc, 
-    getDoc, 
-    serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -28,68 +14,146 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase
+// Initialize Firebase and export the instances for other scripts to use
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Google Provider
-export const googleProvider = new GoogleAuthProvider();
+// Admin status is verified securely via Firebase Custom Claims or Firestore User Data
+const ADMIN_EMAIL = null;
 
-// Your deployed Firebase Function Base URL
-// 🔴 IMPORTANT: Replace this with your actual Cloud Functions URL once deployed
-const FUNCTION_BASE_URL = "https://us-central1-dts-hub-website.cloudfunctions.net";
+onAuthStateChanged(auth, async (user) => {
+    const authLink = document.getElementById('auth-link');
+    const membershipStatusContainer = document.getElementById('membership-status-container');
 
-// 🔹 STRIPE: Process Checkout
-export async function processCheckout(planName) {
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Please sign in or create an account to upgrade.");
-        window.location.href = 'sign in beta.html';
-        return;
-    }
+ if (user) {
+        // -------------------------------------
+        // User is signed in
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
 
-    try {
-        const res = await fetch(`${FUNCTION_BASE_URL}/createCheckoutSession`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                plan: planName
-            })
-        });
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const destination = userData.isAdmin ? 'admin.html' : 'account.html';
 
-        const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url; // Redirect to Stripe Checkout
-        } else {
-            console.error("Stripe Error:", data);
-            alert("Error connecting to payment provider.");
+            if (authLink) {
+                authLink.href = destination;
+                authLink.textContent = "My Account";
+            }
+
+            if (membershipStatusContainer) {
+                membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
+            }
         }
-    } catch (err) {
-        console.error(err);
-        alert("Checkout error. Please try again later.");
+    } else {
+        // User is signed out
+        if (authLink) {
+            authLink.href = 'sign in beta.html';
+            authLink.textContent = "Sign In / Sign Up";
+        }
+
+        if (membershipStatusContainer) {
+            membershipStatusContainer.innerHTML = '';
+        }
     }
+});
+
+if (document.getElementById('auth-form')) {
+    const form = document.getElementById('auth-form');
+    const formTitle = document.getElementById('form-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleLink = document.getElementById('toggle-form');
+    const usernameGroup = document.getElementById('username-group');
+    const messageEl = document.getElementById('message');
+
+    let isSignUp = false;
+
+    const updateFormView = () => {
+        formTitle.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        usernameGroup.style.display = isSignUp ? 'block' : 'none';
+        document.getElementById('username').required = isSignUp;
+        submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+        toggleLink.textContent = isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up";
+        messageEl.textContent = '';
+    };
+
+    toggleLink.addEventListener('click', e => {
+        e.preventDefault();
+        isSignUp = !isSignUp;
+        updateFormView();
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const username = document.getElementById('username').value.trim();
+
+        messageEl.textContent = '';
+        submitBtn.disabled = true;
+
+        if (isSignUp) {
+            if (!username || !email || !password) {
+                showMessage("All fields are required.");
+                submitBtn.disabled = false;
+                return;
+            }
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    username: username,
+                    email: userCredential.user.email,
+                    signupDate: serverTimestamp(),
+                    isBanned: false,
+                    isAdmin: false, // Always false on creation for security
+                    membershipLevel: 'free'
+                });
+                sessionStorage.setItem('newUser', 'true');
+                window.location.replace('account.html');
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error));
+                submitBtn.disabled = false;
+            }
+        } else {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+
+                if (userDoc.exists() && !userDoc.data().isBanned) {
+                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    window.location.replace(destination);
+                } else {
+                    await signOut(auth);
+                    showMessage("This account is suspended or does not exist.");
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                showMessage(getFirebaseErrorMessage(error));
+                submitBtn.disabled = false;
+            }
+        }
+    });
+
+    function getFirebaseErrorMessage(error) {
+        switch (error.code) {
+            case 'auth/invalid-email':
+                return 'Please enter a valid email address.';
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+                return 'Invalid email or password.';
+            case 'auth/email-already-in-use':
+                return 'An account with this email already exists.';
+            case 'auth/weak-password':
+                return 'Password should be at least 6 characters.';
+            default:
+                return 'An unexpected error occurred. Please try again.';
+        }
+    }
+
+function showMessage(msg) { messageEl.textContent = msg; }
+    updateFormView();
 }
-
-// 🔹 STRIPE: Cancel Subscription
-export async function cancelSubscription(customerId) {
-    if (!customerId) return;
-
-    const confirmCancel = confirm("Are you sure you want to cancel your subscription? You will lose access to Pro features at the end of your billing cycle.");
-    if (!confirmCancel) return;
-
-    try {
-        await fetch(`${FUNCTION_BASE_URL}/cancelSubscription`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ customerId: customerId })
-        });
-        alert("Subscription successfully canceled.");
-        window.location.reload();
-    } catch (err) {
-        console.error(err);
-        alert("Failed to cancel subscription.");
-    }
+if (user) {
+    loadUserData(user.uid);
 }
