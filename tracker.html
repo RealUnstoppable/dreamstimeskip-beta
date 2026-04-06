@@ -76,6 +76,7 @@
             cursor: pointer;
             color: var(--primary);
             margin-right: 1rem;
+            padding: 10px;
         }
 
         .brand { font-weight: 700; font-size: 1.25rem; color: var(--primary); flex-grow: 1; }
@@ -87,7 +88,8 @@
             position: fixed;
             top: var(--nav-height);
             left: -280px;
-            width: 280px;
+            width: 85%;
+            max-width: 300px;
             height: calc(100vh - var(--nav-height));
             background: var(--card-bg);
             border-right: 1px solid var(--border);
@@ -102,7 +104,7 @@
         .sidebar.open { left: 0; }
 
         .nav-item {
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 1.5rem;
             display: block;
             color: var(--text-main);
             text-decoration: none;
@@ -175,6 +177,7 @@
             color: var(--card-bg);
             border: none;
             padding: 0.75rem 1.5rem;
+            min-height: 48px;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
@@ -193,11 +196,14 @@
         .form-group.full-width { grid-column: 1 / -1; }
         label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
         
+        button, input, select, textarea {
+            font-size: 16px; /* prevents zoom on iPhone */
+        }
+
         input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="password"], input[type="email"], textarea, select {
             padding: 0.75rem;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 0.95rem;
             outline: none;
             width: 100%;
             background-color: var(--input-bg);
@@ -268,25 +274,6 @@
             .print-text { white-space: pre-wrap; margin-bottom: 5px; }
             .page-break { page-break-before: always; }
         }
-        button, input, select, textarea {
-    font-size: 16px; /* prevents zoom on iPhone */
-}
-
-.menu-btn {
-    padding: 10px;
-}
-
-.sidebar {
-    width: 85%;
-    max-width: 300px;
-}
-
-.btn {
-    min-height: 48px;
-}
-.nav-item {
-    padding: 1rem 1.5rem;
-}
     </style>
 </head>
 <body>
@@ -528,6 +515,12 @@
                 </div>
             </div>
         </div>
+
+        <div class="card">
+            <h2>Subscription Status</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">Manage your ezManage Pro subscription.</p>
+            <button onclick="cancelSubscription()" class="btn btn-danger">Cancel Subscription</button>
+        </div>
     </div>
 
     <div id="view-presets" class="view-section">
@@ -596,8 +589,11 @@
                     <label>Password</label>
                     <input type="password" id="authPass" placeholder="••••••••" required>
                 </div>
-                <button type="submit" class="btn btn-accent" style="width:100%;" id="authBtn">Sign In</button>
+                <button type="submit" class="btn btn-accent" style="width:100%; margin-bottom: 1rem;" id="authBtn">Sign In</button>
             </form>
+
+            <button onclick="signInWithGoogle()" class="btn btn-outline" style="width: 100%;">Sign in with Google</button>
+            
             <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
                 Don't have an account? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode(event)">Create one</a>
             </p>
@@ -686,10 +682,14 @@
       measurementId: "G-ZN3YJPHVGX"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const auth = firebase.auth();
     const db = firebase.firestore();
+    
     let currentUser = null;
+    let currentUserData = null;
 
     auth.onAuthStateChanged((user) => {
         currentUser = user;
@@ -698,13 +698,17 @@
         if (user) {
             navStatus.innerText = "Profile: " + (user.displayName || user.email.split('@')[0]);
             document.getElementById('profEmail').value = user.email;
+            
+            // Load custom app data
             loadProfileFromFirebase(user.uid);
+            loadUserData(user.uid); // Trigger subscription fetching
             
             if (document.getElementById('view-auth').classList.contains('active')) {
                 navTo('profile');
             }
         } else {
             navStatus.innerText = "Login / Sign Up";
+            currentUserData = null;
             clearProfileForm();
         }
     });
@@ -772,6 +776,11 @@
         }
     }
 
+    function signInWithGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => alert(err.message));
+    }
+
     function signOut() {
         auth.signOut().then(() => { alert("Signed out successfully."); navTo('auth'); });
     }
@@ -817,6 +826,12 @@
         }).catch(err => console.log("Error fetching profile:", err));
     }
 
+    function loadUserData(uid) {
+        db.collection("users").doc(uid).onSnapshot(doc => {
+            currentUserData = doc.data();
+        });
+    }
+
     function clearProfileForm() {
         document.getElementById('profName').value = "";
         document.getElementById('profRole').value = "";
@@ -828,73 +843,74 @@
     }
 
     // ==========================================
-    // 4. CHECKOUT SYSTEM (Firebase Synced)
+    // 4. CHECKOUT & SUBSCRIPTION SYSTEM 
     // ==========================================
-async function processCheckout(planName) {
-    if (!currentUser) {
-        navTo('auth');
-        return;
+    async function processCheckout(planName) {
+        if (!currentUser) {
+            navTo('auth');
+            return;
+        }
+
+        try {
+            const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    plan: planName
+                })
+            });
+
+            const data = await res.json();
+            window.location.href = data.url;
+        } catch (err) {
+            console.error("Checkout error:", err);
+            alert("Error connecting to payment provider.");
+        }
     }
 
-    const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            uid: currentUser.uid,
-            email: currentUser.email,
-            plan: planName
-        })
-    });
+    function requireProFeature() {
+        if (!currentUser) {
+            alert("Sign in required");
+            navTo('auth');
+            return false;
+        }
 
-    const data = await res.json();
-    window.location.href = data.url;
-}
+        if (!currentUserData?.subscription || currentUserData.subscription.status !== "active") {
+            alert("Upgrade to Pro to use this feature.");
+            navTo('pricing');
+            return false;
+        }
 
-function requireProFeature() {
-    if (!currentUser) {
-        alert("Sign in required");
-        navTo('auth');
-        return false;
+        return true;
     }
 
-    if (!currentUserData?.subscription || currentUserData.subscription.status !== "active") {
-        alert("Upgrade to Pro to use this feature.");
-        navTo('pricing');
-        return false;
+    async function cancelSubscription() {
+        if (!currentUserData?.subscription?.customerId) {
+            alert("No active subscription found.");
+            return;
+        }
+
+        const confirmCancel = confirm("Are you sure you want to cancel your subscription?");
+        if (!confirmCancel) return;
+
+        try {
+            await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    customerId: currentUserData.subscription.customerId
+                })
+            });
+
+            alert("Subscription canceled successfully.");
+        } catch(err) {
+            console.error("Cancelation error:", err);
+            alert("Failed to cancel subscription.");
+        }
     }
 
-    return true;
-    
-}
-let currentUserData = null;
-
-function loadUserData(uid) {
-    db.collection("users").doc(uid).onSnapshot(doc => {
-        currentUserData = doc.data();
-    });
-}
-<button onclick="cancelSubscription()" class="btn btn-danger">Cancel Subscription</button>
-async function cancelSubscription() {
-    if (!currentUserData?.subscription?.customerId) return;
-
-    const confirmCancel = confirm("Cancel subscription?");
-    if (!confirmCancel) return;
-
-    await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            customerId: currentUserData.subscription.customerId
-        })
-    });
-
-    alert("Subscription canceled");
-}
-function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
-}
-<button onclick="signInWithGoogle()" class="btn btn-outline">Sign in with Google</button>
     // ==========================================
     // 5. THEME, TRACKER & HISTORY LOGIC
     // ==========================================
