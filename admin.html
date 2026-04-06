@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script type="module" src="/js/theme-loader.js"></script>
+     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | ezManage</title>
-    
+    <title>Admin Dashboard | DTS HUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="/css/themes.css">
-    
     <style>
         :root {
             --bg-color: #0A0A0A;
@@ -35,8 +33,6 @@
             display: flex;
             justify-content: center;
             padding: 40px 20px;
-            /* Initially hidden to prevent flicker before auth check completes */
-            display: none; 
         }
         .admin-layout {
             display: flex;
@@ -114,11 +110,6 @@
         }
         .content-section.active {
             display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
         }
         .content-section > h3 {
             font-size: 1.8rem;
@@ -153,7 +144,7 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-bottom: 30px;
-            height: 400px; 
+            height: 400px; /* Set a fixed height for the container */
             display: flex;
             flex-direction: column;
         }
@@ -211,10 +202,6 @@
             background-color: rgba(220, 38, 38, 0.2);
             color: var(--accent-red);
         }
-        .status-badge.pro {
-            background-color: rgba(37, 99, 235, 0.2);
-            color: var(--accent-blue);
-        }
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -234,20 +221,20 @@
         }
     </style>
 </head>
-<body> 
-    <div class="admin-layout">
+<body style="display: none;"> <div class="admin-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Admin Panel</h2>
-                <p id="user-email-sidebar">Loading...</p>
+                <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="index.html">← Return to App</a></li>
-                    <li><a href="#performance" class="nav-link active">Performance & Revenue</a></li>
+                    <li><a href="index.html">← Return to Home</a></li>
+                    <li><a href="#performance" class="nav-link active">Performance</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
+                    <li><a href="account.html">My Account Settings</a></li>
                 </ul>
             </nav>
             <button class="sign-out-btn" id="sign-out">Sign Out</button>
@@ -256,13 +243,14 @@
         <main class="main-content">
             <section id="performance" class="content-section active">
                 <h3>Performance Overview</h3>
-                <div class="metrics-grid" id="metrics-grid-container">
+                <div class="metrics-grid">
                     <div class="metric-card"><div class="value" id="total-users">-</div><div class="label">Total Users</div></div>
                     <div class="metric-card"><div class="value" id="new-signups">-</div><div class="label">New Sign-ups (24h)</div></div>
-                    <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Subscriptions</div></div>
+                    <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Purchases</div></div>
+                    <div class="metric-card"><div class="value" id="checkouts">-</div><div class="label">Completed Checkouts</div></div>
                     <div class="metric-card"><div class="value" id="active-carts">-</div><div class="label">Users with Active Carts</div></div>
                     <div class="metric-card"><div class="value" id="avg-orders">-</div><div class="label">Orders per User</div></div>
-                    </div>
+                </div>
 
                 <div class="graph-container">
                     <div class="graph-header">
@@ -281,19 +269,8 @@
                 <h3>User Management</h3>
                 <div class="user-table-container">
                     <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Name / Username</th>
-                                <th>Email</th>
-                                <th>Sign-up Date</th>
-                                <th>Tier</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-list-body">
-                            <tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>
-                        </tbody>
+                        <thead><tr><th>Username</th><th>Email</th><th>Sign-up Date</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="user-list-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -302,7 +279,7 @@
                 <h3>Download Statistics</h3>
                 <div class="metrics-grid">
                      <div class="metric-card">
-                        <div class="value" id="download-count-infosheet">0</div>
+                        <div class="value" id="download-count-infosheet">-</div>
                         <div class="label">Realm Info Sheet</div>
                     </div>
                 </div>
@@ -315,52 +292,44 @@
                 <h3>Newsletter Subscribers</h3>
                 <div class="user-table-container">
                     <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Subscription Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="newsletter-list-body">
-                            <tr><td colspan="2" style="text-align: center;">Loading subscribers...</td></tr>
-                        </tbody>
+                        <thead><tr><th>Email</th><th>Subscription Date</th></tr></thead>
+                        <tbody id="newsletter-list-body"></tbody>
                     </table>
                 </div>
             </section>
         </main>
     </div>
 
-    <script type="module">
-        // Import your configured instances (ensure path is correct for your repo structure)
+   <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { 
             doc, 
             getDoc, 
             collection, 
             getDocs, 
             Timestamp, 
-            updateDoc
-        } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+            updateDoc, 
+            query, 
+            orderBy, 
+            limit 
+        } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         let performanceChart;
 
-        // 1. Auth Guard for Admin
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const userDoc = await getDoc(userDocRef);
 
-                // Verify user exists and is flagged as an admin
                 if (userDoc.exists() && userDoc.data().isAdmin) {
-                    document.body.style.display = 'flex'; // Un-hide the page
+                    document.body.style.display = 'flex';
                     initializeAdminPage(user);
                 } else {
-                    alert("Unauthorized. Redirecting to home.");
-                    window.location.replace('index.html');
+                    window.location.replace('account.html');
                 }
             } else {
-                window.location.replace('tracker.html');
+                window.location.replace('sign in beta.html');
             }
         });
 
@@ -370,115 +339,56 @@
             setupEventListeners();
         }
 
-        // 2. Load Core Data
-        async function loadAdminData() {
-            try {
-                // Fetch collections concurrently for speed
-                const [usersSnapshot, cartsSnapshot, ordersSnapshot, newsletterSnapshot] = await Promise.all([
-                    getDocs(collection(db, "users")),
-                    getDocs(collection(db, "carts")),
-                    getDocs(collection(db, "orders")),
-                    getDocs(collection(db, "newsletter")) // Assuming you store emails here
-                ]);
+    async function loadAdminData() {
+    const usersSnapshot = await getDocs(collection(db, "users"));
+    const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                const orders = ordersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                const subscribers = newsletterSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const cartsSnapshot = await getDocs(collection(db, "carts"));
+    const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-                // 💰 Revenue Calculation from Orders/Subscriptions
-                const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.amount) || 0), 0);
+    const ordersSnapshot = await getDocs(collection(db, "orders"));
+    const orders = ordersSnapshot.docs.map(d => d.data());
 
-                // Render UI Components
-                addRevenueCard(totalRevenue);
-                calculatePerformanceMetrics(users, carts, orders);
-                calculateStoreAnalytics(orders);
-                
-                renderUserTable(users);
-                renderNewsletterTable(subscribers);
-                renderChart('summary', users);
+    // 💰 Revenue
+    const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
 
-            } catch (err) {
-                console.error("Failed to load admin data:", err);
-            }
-        }
+    document.getElementById('total-purchases').textContent = orders.length;
 
-        function addRevenueCard(totalRevenue) {
-            let el = document.getElementById('total-revenue');
+    // 🔥 Add new metric dynamically
+    addRevenueCard(totalRevenue);
 
-            if (!el) {
-                const card = document.createElement('div');
-                card.className = "metric-card";
-                card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
-                document.getElementById('metrics-grid-container').appendChild(card);
-                el = document.getElementById('total-revenue');
-            }
+    renderUserTable(users);
+    calculatePerformanceMetrics(users, carts, orders);
+    renderChart('summary', users);
+}
+function addRevenueCard(totalRevenue) {
+    let el = document.getElementById('total-revenue');
 
-            el.textContent = `$${totalRevenue.toFixed(2)}`;
-        }
+    if (!el) {
+        const card = document.createElement('div');
+        card.className = "metric-card";
+        card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
+        document.querySelector('.metrics-grid').appendChild(card);
+        el = document.getElementById('total-revenue');
+    }
 
-        function calculatePerformanceMetrics(users, carts, orders = []) {
-            const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
+    el.textContent = `$${totalRevenue.toFixed(2)}`;
+}
 
-            const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-            const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
-
-            const totalOrders = orders.length;
-            const totalUsers = users.length;
-            const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
-
-            document.getElementById('total-users').textContent = totalUsers;
-            document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('total-purchases').textContent = totalOrders;
-            document.getElementById('active-carts').textContent = activeCarts;
-            document.getElementById('avg-orders').textContent = avgOrders;
-        }
-
-        function calculateStoreAnalytics(orders) {
-            const storeMap = {};
-            orders.forEach(order => {
-                const store = order.storeId || "unknown";
-                if (!storeMap[store]) storeMap[store] = 0;
-                storeMap[store] += (parseFloat(order.amount) || 0);
-            });
-            console.log("Store Revenue Analytics:", storeMap);
-        }
-
-        // 3. Table Renderers
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
             userListBody.innerHTML = '';
             
-            // Filter out admins so you don't accidentally ban yourself
-            const standardUsers = users.filter(user => !user.isAdmin);
-            
-            if (standardUsers.length === 0) {
-                userListBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No standard users found.</td></tr>';
-                return;
-            }
-
-            standardUsers.forEach(user => {
+            users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
-                
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
-                const actionButton = user.isBanned 
-                    ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` 
-                    : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
-                
+                const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
                 const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
                 
-                // Tier logic based on Stripe webhook updates
-                const isPro = user.subscription?.status === 'active' || user.isPro;
-                const tierBadge = isPro ? `<span class="status-badge pro">Pro</span>` : `Free`;
-                
-                // Name fallback
-                const displayName = user.name || user.username || "N/A";
-
                 row.innerHTML = `
-                    <td>${displayName}</td>
+                    <td>${user.username}</td>
                     <td>${user.email}</td>
                     <td>${signupDate}</td>
-                    <td>${tierBadge}</td>
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
                 userListBody.appendChild(row);
@@ -489,11 +399,6 @@
             const newsletterListBody = document.getElementById('newsletter-list-body');
             newsletterListBody.innerHTML = '';
             
-            if (subscribers.length === 0) {
-                newsletterListBody.innerHTML = '<tr><td colspan="2" style="text-align: center;">No subscribers yet.</td></tr>';
-                return;
-            }
-
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
                 const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
@@ -505,7 +410,23 @@
             });
         }
 
-        // 4. Chart Logic
+       function calculatePerformanceMetrics(users, carts, orders = []) {
+    const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
+
+    const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
+    const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
+
+    const totalOrders = orders.length;
+    const totalUsers = users.length;
+    const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
+
+    document.getElementById('total-users').textContent = totalUsers;
+    document.getElementById('new-signups').textContent = newSignups;
+    document.getElementById('total-purchases').textContent = totalOrders;
+    document.getElementById('checkouts').textContent = totalOrders;
+    document.getElementById('active-carts').textContent = activeCarts;
+    document.getElementById('avg-orders').textContent = avgOrders;
+}
         function renderChart(view, usersData) {
             const ctx = document.getElementById('performance-chart').getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
@@ -526,14 +447,14 @@
                             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                             datasets: [{ 
                                 label: 'New Sign-ups', 
-                                data: [5, 9, 3, 5, 2, 3, 7], // Swap with real timeline data when ready
+                                data: [5, 9, 3, 5, 2, 3, 7], 
                                 borderColor: '#2563EB', 
                                 tension: 0.4, 
                                 fill: true, 
                                 backgroundColor: 'rgba(37, 99, 235, 0.2)' 
                             }]
                         },
-                        options: getChartOptions(false)
+                        options: getChartOptions(false) // Not a pie chart
                     };
                     break;
                 case 'purchases':
@@ -550,25 +471,25 @@
                                 backgroundColor: 'rgba(22, 163, 74, 0.2)' 
                             }]
                         },
-                        options: getChartOptions(false)
+                        options: getChartOptions(false) // Not a pie chart
                     };
                     break;
                 default: // 'summary'
-                    const totalSignups = parseInt(document.getElementById('total-users').textContent) || 0;
-                    const totalPurchases = parseInt(document.getElementById('total-purchases').textContent) || 0;
+                    const totalSignups = 296; // Static data for demo
+                    const totalPurchases = 173; // Static data for demo
                     chartConfig = {
                         type: 'doughnut',
                         data: {
-                            labels: ['Free Users', 'Pro Subscribers'],
+                            labels: ['Total Sign-ups', 'Total Purchases'],
                             datasets: [{
-                                data: [Math.max(0, totalSignups - totalPurchases), totalPurchases],
+                                data: [totalSignups, totalPurchases],
                                 backgroundColor: ['rgba(37, 99, 235, 0.8)', 'rgba(22, 163, 74, 0.8)'],
                                 borderColor: ['#2563EB', '#16A34A'],
                                 borderWidth: 2,
                                 hoverOffset: 4
                             }]
                         },
-                        options: getChartOptions(true)
+                        options: getChartOptions(true) // Is a pie chart
                     };
                     break;
             }
@@ -592,7 +513,19 @@
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                         titleFont: { size: 14 },
                         bodyFont: { size: 12 },
-                        padding: 10
+                        padding: 10,
+                        callbacks: {
+                             label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed;
+                                }
+                                return label;
+                            }
+                        }
                     }
                 }
             };
@@ -614,47 +547,37 @@
             return options;
         }
     
-        // 5. Setup Listeners
+
         function setupEventListeners() {
-            // Event delegation for ban/unban buttons
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
                 if (!userId) return;
-                
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
-                    try {
-                        await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                        loadAdminData(); // Refresh table
-                    } catch (err) {
-                        alert("Error updating user status.");
-                        console.error(err);
-                    }
+                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                    loadAdminData();
                 }
             });
 
-            // Sidebar navigation
             document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
                     document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                    
                     e.currentTarget.classList.add('active');
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                 });
             });
 
-            // Graph toggle
             document.getElementById('graph-selector').addEventListener('change', (e) => {
                 renderChart(e.target.value);
             });
 
-            // Sign out
             document.getElementById('sign-out').addEventListener('click', () => {
                 signOut(auth);
             });
         }
     </script>
+
 </body>
 </html>
