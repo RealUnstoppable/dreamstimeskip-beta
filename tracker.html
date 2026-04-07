@@ -897,43 +897,35 @@
         return true;
     }
 
-    // FIX: Replaced custom backend fetch with simple, reliable Stripe Payment Links
-    function processCheckout(planName) {
+    async function processCheckout(planName) {
         if (!currentUser) {
             alert("Please sign in or create an account to upgrade.");
             navTo('auth');
             return;
         }
-        const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-        uid: currentUser.uid,
-        email: currentUser.email,
-        plan: planName
-    })
-});
 
-        // 🔴 INSTRUCTIONS: 
-        // 1. Go to your Stripe Dashboard -> "Payment Links"
-        // 2. Create a link for your $59/yr Individual Plan and your $199/yr Business Plan
-        // 3. Paste the URLs below, replacing the placeholder text.
-        
-        let stripeLink = "";
+        try {
+            const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    plan: planName
+                })
+            });
 
-        if (planName === 'Individual Pro') {
-            stripeLink = "https://buy.stripe.com/YOUR_INDIVIDUAL_PLAN_LINK_HERE";
-        } else if (planName === 'Business Pro') {
-            stripeLink = "https://buy.stripe.com/YOUR_BUSINESS_PLAN_LINK_HERE";
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url; 
+            } else {
+                console.error("Server responded with:", data);
+                alert("Error creating checkout session: " + (data.error || "Unknown error"));
+            }
+        } catch (err) {
+            console.error("Checkout fetch error:", err);
+            alert("Payment system unreachable. Please try again later.");
         }
-
-        if (stripeLink.includes("YOUR_")) {
-            alert("Developer Error: Please insert your actual Stripe Payment Link URLs in the tracker.html code.");
-            return;
-        }
-
-        // Redirects to Stripe checkout and pre-fills the user's email address
-        window.location.href = stripeLink + "?prefilled_email=" + encodeURIComponent(currentUser.email);
     }
 
     async function cancelSubscription() {
@@ -941,26 +933,26 @@
             alert("No active subscription found.");
             return;
         }
-        await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/cancelSubscription", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-        customerId: currentUserData.subscription.customerId
-    })
-});
 
         const confirmCancel = confirm("Are you sure you want to cancel your subscription?");
         if (!confirmCancel) return;
 
         try {
-            await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
+            const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/cancelSubscription", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
                     customerId: currentUserData.subscription.customerId
                 })
             });
-            alert("Subscription canceled successfully.");
+            
+            const data = await res.json();
+            if (data.success) {
+                alert("Subscription canceled successfully.");
+                document.querySelector('.subscription-text').innerText = 'Free';
+            } else {
+                alert("Failed to cancel subscription: " + data.error);
+            }
         } catch(err) {
             console.error("Cancelation error:", err);
             alert("Failed to cancel subscription.");
