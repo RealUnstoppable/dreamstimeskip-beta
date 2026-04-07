@@ -12,12 +12,6 @@
     <link rel="stylesheet" href="/css/themes.css">
     <style>
         :root {
-            --bg-color: #0A0A0A;
-            --primary-card-color: #141414;
-            --secondary-card-color: #1f1f1f;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --text-primary: #F5F5F7;
-            --text-secondary: #A3A3A3;
             --accent-blue: #2563EB;
             --accent-red: #DC2626;
             --accent-green: #16A34A;
@@ -46,7 +40,7 @@
         .btn-admin-back {
             display: none;
             background-color: var(--accent-yellow);
-            color: var(--bg-color);
+            color: #000;
             padding: 12px;
             border-radius: 8px;
             text-align: center;
@@ -56,9 +50,7 @@
             transition: opacity 0.2s;
             cursor: pointer;
         }
-        .btn-admin-back:hover {
-            opacity: 0.85;
-        }
+        .btn-admin-back:hover { opacity: 0.85; }
         .sidebar-header {
             padding: 20px;
             background-color: var(--primary-card-color);
@@ -66,126 +58,57 @@
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
         }
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-            margin: 0 0 5px 0;
-            line-height: 1.2;
-        }
-        .sidebar-header p {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin: 0;
-            word-wrap: break-word;
-        }
-        .sidebar-nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        .sidebar-header h2 { font-size: 1.2rem; margin: 0 0 5px 0; line-height: 1.2; }
+        .sidebar-header p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; word-wrap: break-word; }
+        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
         .sidebar-nav a {
-            display: block;
-            padding: 15px 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            font-weight: 500;
-            transition: background-color 0.2s, color 0.2s;
+            display: block; padding: 15px 20px; color: var(--text-secondary);
+            text-decoration: none; border-radius: 8px; margin-bottom: 5px;
+            font-weight: 500; transition: background-color 0.2s, color 0.2s;
         }
-        .sidebar-nav a:hover {
-            background-color: var(--primary-card-color);
-            color: var(--text-primary);
-        }
-        .sidebar-nav a.active {
-            background-color: var(--accent-blue);
-            color: var(--text-primary);
-        }
+        .sidebar-nav a:hover { background-color: var(--primary-card-color); color: var(--text-primary); }
+        .sidebar-nav a.active { background-color: var(--accent-blue); color: #fff; }
         .sign-out-btn {
-            width: 100%;
-            margin-top: 20px;
-            padding: 15px 20px;
-            background-color: var(--primary-card-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
+            width: 100%; margin-top: 20px; padding: 15px 20px;
+            background-color: var(--primary-card-color); border: 1px solid var(--border-color);
+            color: var(--text-secondary); font-weight: 500; border-radius: 8px;
+            cursor: pointer; transition: background-color 0.2s, color 0.2s;
         }
-        .sign-out-btn:hover {
-            background-color: var(--accent-red);
-            color: var(--text-primary);
-            border-color: var(--accent-red);
-        }
-        .main-content {
-            flex-grow: 1;
-        }
+        .sign-out-btn:hover { background-color: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        .main-content { flex-grow: 1; }
         .content-section {
-            display: none;
-            background-color: var(--primary-card-color);
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            display: none; background-color: var(--primary-card-color);
+            padding: 40px; border-radius: 12px; border: 1px solid var(--border-color);
         }
-        .content-section.active {
-            display: block;
-        }
-        .content-section h3 {
-            font-size: 1.8rem;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
+        .content-section.active { display: block; }
+        .content-section h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; }
         .card {
-            background-color: var(--secondary-card-color);
-            padding: 25px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
+            background-color: var(--secondary-card-color); padding: 25px;
+            border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);
         }
-        .card h4 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+        .card h4 { margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
         .form-group input, .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            background-color: #2c2c2c;
-            color: var(--text-primary);
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 1rem;
+            width: 100%; padding: 12px; border: 1px solid var(--border-color);
+            background-color: var(--input-bg); color: var(--text-primary);
+            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
         }
+        .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
         .btn {
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
-            border: 1px solid transparent;
-            transition: all 0.2s;
+            padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer;
+            text-decoration: none; display: inline-block; text-align: center; border: 1px solid transparent; transition: all 0.2s;
         }
         .btn-primary { background-color: var(--accent-blue); color: white; }
-        .btn-primary:hover { background-color: #1D4ED8; }
+        .btn-primary:hover { opacity: 0.9; }
         .btn-danger { background-color: var(--accent-red); color: white; }
-        .btn-danger:hover { background-color: #B91C1C; }
+        .btn-danger:hover { opacity: 0.9; }
         #delete-account-card { border-color: var(--accent-red); }
         .notification { padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 15px; display: none; }
         .notification.success { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
         .notification.error { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
-
+        .accent-options { display: flex; gap: 15px; flex-wrap: wrap; }
+        
         @media (max-width: 768px) {
             body { padding: 20px 10px; }
             .account-layout { flex-direction: column; }
@@ -198,7 +121,7 @@
 <body style="display: none;">
     <div class="account-layout">
         <aside class="sidebar">
-            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin Dashboard</a>
+            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
             <div class="sidebar-header">
                 <h2 id="welcome-header">Loading...</h2>
                 <p id="user-email-sidebar"></p>
@@ -207,20 +130,41 @@
                 <ul>
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
                     <li><a href="#support" class="nav-link">Support</a></li>
                 </ul>
             </nav>
             <button class="sign-out-btn" id="sign-out">Sign Out</button>
         </aside>
+        
         <main class="main-content">
             <section id="dashboard" class="content-section active">
                 <h3>Dashboard</h3>
                 <div class="card">
                     <h4>Quick Overview</h4>
-                    <p>Welcome to your personal hub. Here you can manage your account settings, view your order history, and customize your site experience.</p>
+                    <p>Welcome to your personal hub. Navigate the sidebar to manage your subscriptions, orders, and themes.</p>
                 </div>
             </section>
+
+            <section id="orders" class="content-section">
+                <h3>Order History</h3>
+                <div class="card">
+                    <h4>Recent Purchases</h4>
+                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                </div>
+            </section>
+
+            <section id="billing" class="content-section">
+                <h3>Billing & Plans</h3>
+                <div class="card">
+                    <h4>Current Plan</h4>
+                    <p>You are currently on the <strong>Free</strong> tier.</p>
+                    <a href="memberships.html" class="btn btn-primary" style="margin-top: 10px;">Upgrade Plan</a>
+                </div>
+            </section>
+
             <section id="settings" class="content-section">
                 <h3>Settings</h3>
                 <div class="card">
@@ -231,7 +175,7 @@
                             <input type="text" id="update-username" required>
                         </div>
                         <div class="form-group">
-                            <label for="update-email">Email (cannot be changed)</label>
+                            <label for="update-email">Email (Cannot be changed)</label>
                             <input type="email" id="update-email" disabled>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -247,19 +191,17 @@
                             <select id="theme-select">
                                 <option value="dark">Dark</option>
                                 <option value="light">Light</option>
+                                <option value="midnight">Midnight</option>
+                                <option value="forest">Forest</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Accent Color</label>
-                            <div>
-                                <input type="radio" id="accent-blue" name="accent-color" value="blue">
-                                <label for="accent-blue">Blue</label>
-                                <input type="radio" id="accent-red" name="accent-color" value="red">
-                                <label for="accent-red">Red</label>
-                                <input type="radio" id="accent-green" name="accent-color" value="green">
-                                <label for="accent-green">Green</label>
-                                <input type="radio" id="accent-purple" name="accent-color" value="purple">
-                                <label for="accent-purple">Purple</label>
+                            <div class="accent-options">
+                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
+                                <label><input type="radio" name="accent-color" value="red"> Red</label>
+                                <label><input type="radio" name="accent-color" value="green"> Green</label>
+                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Save Theme</button>
@@ -273,6 +215,7 @@
                     <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
                 </div>
             </section>
+            
             <section id="support" class="content-section">
                 <h3>Contact Support</h3>
                 <div class="card">
@@ -283,41 +226,27 @@
         </main>
     </div>
 
-  
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        // ADDED: getDoc was missing
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
-        // --- NEW: Main Entry Point (This was missing!) ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // User is logged in, fetch their data
                 try {
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        
-                        // 1. Populate the page
                         initializePage(user, userData);
-                        
-                        // 2. Activate buttons
                         setupEventListeners(user);
-                        
-                        // 3. Show the page (Fixes white screen)
                         document.body.style.display = 'flex';
-                    } else {
-                        console.error("User document does not exist.");
-                        // Optional: create a default doc or logout
                     }
                 } catch (error) {
                     console.error("Error loading profile:", error);
                 }
             } else {
-                // Not logged in -> Go to Sign In
                 window.location.replace('sign in beta.html');
             }
         });
@@ -340,7 +269,6 @@
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
 
-            // Load theme settings
             document.getElementById('theme-select').value = userData.theme || 'dark';
             const currentAccent = userData.accentColor || 'blue';
             const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
@@ -356,10 +284,8 @@
                 e.preventDefault();
                 const newUsername = document.getElementById('update-username').value;
                 const notificationEl = document.getElementById('profile-notification');
-                const userDocRef = doc(db, "users", user.uid);
-                
                 try {
-                    await updateDoc(userDocRef, { username: newUsername });
+                    await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
                 } catch (error) {
@@ -372,15 +298,12 @@
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
-                const userDocRef = doc(db, "users", user.uid);
 
                 try {
-                    await updateDoc(userDocRef, { theme, accentColor });
+                    await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
-                    // Apply theme immediately
                     document.body.dataset.theme = theme;
                     document.body.dataset.accent = accentColor;
-                    // Update localStorage for persistence if they log out
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
@@ -389,8 +312,7 @@
             });
 
             document.getElementById('delete-account-btn').addEventListener('click', async () => {
-                if (!confirm('DANGER: This will permanently delete your account and all its data. This action cannot be undone. Are you sure?')) return;
-                
+                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -398,42 +320,27 @@
                     alert('Your account has been permanently deleted.');
                     window.location.replace('index.html');
                 } catch (error) {
-                    if (error.code === 'auth/requires-recent-login') {
-                        alert('This action is sensitive and requires recent authentication. Please sign out, sign back in, and then try again.');
-                        signOut(auth);
-                    } else {
-                        alert(`An error occurred while deleting your account: ${error.message}`);
-                    }
+                    alert('Error: Please sign out, sign back in, and try again.');
                 }
             });
 
-            // Navigation Handling
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
-                    
-                    // Remove active class from all links and sections
                     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                    
-                    // Add active class to clicked link
                     e.currentTarget.classList.add('active');
-                    
-                    // Show target section
-                    const targetId = e.currentTarget.getAttribute('href');
-                    document.querySelector(targetId).classList.add('active');
+                    document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                 });
             });
 
             const showNotification = (element, message, type) => {
                 element.textContent = message;
-                element.className = 'notification';
-                element.classList.add(type);
+                element.className = `notification ${type}`;
                 element.style.display = 'block';
                 setTimeout(() => { element.style.display = 'none'; }, 5000);
             };
         }
     </script>
-
 </body>
 </html>

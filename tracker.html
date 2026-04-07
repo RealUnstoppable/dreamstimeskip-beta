@@ -1077,12 +1077,20 @@
     function saveToHistory() {
         const state = getCurrentState();
         state.id = Date.now().toString(); 
+        
+        // --- NEW: Save current live timestamp instead of input time ---
+        const now = new Date();
+        state.shiftDate = now.toLocaleDateString();
+        state.shiftTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        // --------------------------------------------------------------
+
         let history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
         history.unshift(state);
         if(history.length > 50) history.pop(); 
         localStorage.setItem('managerProHistory', JSON.stringify(history));
+        
+        renderHistoryList(); // Update the list immediately
     }
-
     function manualSaveHistory() {
         saveToHistory();
         alert("Shift saved to History!");

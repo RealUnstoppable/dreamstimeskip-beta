@@ -100,11 +100,11 @@ if (document.getElementById('auth-form')) {
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await setDoc(doc(db, "users", userCredential.user.uid), {
-                    username: username,
-                    email: userCredential.user.email,
+                    username: username || "User",
+                    email: email, // FIX: Use the local variable directly instead of the credential object
                     signupDate: serverTimestamp(),
                     isBanned: false,
-                    isAdmin: false, // Always false on creation for security
+                    isAdmin: false, 
                     membershipLevel: 'free'
                 });
                 sessionStorage.setItem('newUser', 'true');
