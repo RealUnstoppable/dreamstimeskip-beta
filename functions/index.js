@@ -1,17 +1,17 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const Stripe = require("stripe");
-const cors = require("cors")({ origin: true }); // ✅ Use the package you installed
+const cors = require("cors")({ origin: true });
 
 admin.initializeApp();
 
-// Initialize Stripe with the config key from the .env file
-const stripe = new Stripe(process.env.STRIPE_SECRET);
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// FIX: We provide a fallback "placeholder" string. 
+// This stops the Firebase Analyzer from crashing during deployment if it can't read the .env file yet.
+const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
+const stripe = require("stripe")(stripeKey);
 
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
-  // ✅ Wrap the function in CORS so your frontend can securely talk to it
   cors(req, res, async () => {
     if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
@@ -31,7 +31,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
         // 🔴 Replace these with your actual deployed app URL
         success_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?success=true", 
         cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?canceled=true",
-        metadata: { uid }
+        metadata: { uid: uid || "unknown" }
       });
 
       res.status(200).json({ url: session.url });
@@ -48,7 +48,6 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event;
 
   try {
-    // Firebase rawBody is required here for Stripe's security signature to match
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
     console.error("Webhook Error:", err);
@@ -60,7 +59,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const session = event.data.object;
     const uid = session.metadata.uid;
 
-    if (uid) {
+    if (uid && uid !== "unknown") {
         await admin.firestore().collection("users").doc(uid).set({
         subscription: {
             status: "active",
@@ -83,13 +82,11 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     });
   }
 
-  // Always respond to Stripe so they know we received it
   res.json({ received: true });
 });
 
 // 🔻 Cancel Subscription Manually 
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
-  // ✅ Wrap in CORS
   cors(req, res, async () => {
     if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
@@ -98,7 +95,6 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
     try {
       const subs = await stripe.subscriptions.list({ customer: customerId });
       for (const sub of subs.data) {
-        // ✅ FIX: 'del' is deprecated in Stripe v11+. Must use 'cancel'
         await stripe.subscriptions.cancel(sub.id); 
       }
       res.status(200).json({ success: true });
