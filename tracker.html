@@ -88,7 +88,7 @@
         .sidebar {
             position: fixed;
             top: var(--nav-height);
-            left: -280px;
+            left: -100%; /* FIX: Changed from -280px to completely hide the sidebar */
             width: 85%;
             max-width: 300px;
             height: calc(100vh - var(--nav-height));
@@ -262,11 +262,6 @@
 
         .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
         
-        /* ----- ADMIN DASHBOARD METRICS ----- */
-        .metric-card { background: var(--input-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
-        .metric-card .value { font-size: 2rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;}
-        .metric-card .label { font-size: 0.85rem; color: var(--text-muted); }
-
         /* ----- PRINT CSS ----- */
         #print-wrapper { display: none; }
         @media print {
@@ -294,7 +289,6 @@
     <a class="nav-item" onclick="navTo('tracker')">📝 Active Shift Tracker</a>
     <a class="nav-item" onclick="navTo('presets')">🍔 Templates & Presets</a>
     <a class="nav-item" onclick="navTo('history')">🕰️ Shift History</a>
-    <a class="nav-item" onclick="navTo('admin')">📊 Admin Dashboard</a>
     <div class="sidebar-divider"></div>
     <a class="nav-item" onclick="handleNavAccountClick()">👤 Manager Profile</a>
     <div class="sidebar-divider"></div>
@@ -476,40 +470,6 @@
         </div>
     </div>
     
-    <div id="view-admin" class="view-section">
-        <div style="text-align:center; margin-bottom: 2rem;">
-            <h1 style="color:var(--primary); font-size: 2rem;">Admin Dashboard</h1>
-            <p style="color:var(--text-muted);">Overview of system metrics and user data.</p>
-        </div>
-        <div class="card">
-            <h2>Platform Metrics</h2>
-            <div class="metrics-grid form-grid">
-                <div class="metric-card"><div class="value" id="total-users">0</div><div class="label">Total Users</div></div>
-                <div class="metric-card"><div class="value" id="new-signups">0</div><div class="label">New Signups (24h)</div></div>
-                <div class="metric-card"><div class="value" id="total-purchases">0</div><div class="label">Total Purchases</div></div>
-                <div class="metric-card"><div class="value" id="active-carts">0</div><div class="label">Active Carts</div></div>
-                <div class="metric-card"><div class="value" id="avg-orders">0</div><div class="label">Avg Orders/User</div></div>
-                <div class="metric-card"><div class="value" id="checkouts">0</div><div class="label">Checkouts</div></div>
-            </div>
-            <button class="btn btn-accent" style="margin-top: 1.5rem;" onclick="loadAdminData()">Refresh Data</button>
-        </div>
-        <div class="card" style="overflow-x: auto;">
-            <h2>User Database</h2>
-            <table style="width: 100%; text-align: left; border-collapse: collapse; min-width: 600px;">
-                <thead>
-                    <tr style="border-bottom: 2px solid var(--border);">
-                        <th style="padding: 10px;">Username</th>
-                        <th style="padding: 10px;">Email</th>
-                        <th style="padding: 10px;">Signup Date</th>
-                        <th style="padding: 10px;">Subscription</th>
-                        <th style="padding: 10px;">Status</th>
-                    </tr>
-                </thead>
-                <tbody id="user-list-body"></tbody>
-            </table>
-        </div>
-    </div>
-
     <div id="view-profile" class="view-section">
         <div class="card" style="text-align: center;">
             <div id="profileAvatar" style="width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; margin: 0 auto 1rem;">M</div>
@@ -768,8 +728,6 @@
                 vapidKey: "-rRUolygol9pMITWTBL8SDfuiM9d3AHhR6iuoozI5jU" // 🔴 Replace with your actual Vapid Key
             });
 
-            console.log("Push Token:", token);
-
             if (currentUser) {
                 db.collection("users").doc(currentUser.uid).set({
                     pushToken: token
@@ -792,12 +750,8 @@
             alert("Please sign in to access your Manager Profile.");
             viewId = 'auth';
         }
-        if (viewId === 'admin' && (!currentUser || !requireProFeature())) {
-             return; // Locked behind pro feature check
-        }
-
+        
         if (viewId === 'history') renderHistoryList();
-        if (viewId === 'admin') loadAdminData();
 
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById('view-' + viewId).classList.add('active');
@@ -836,7 +790,9 @@
             auth.createUserWithEmailAndPassword(email, pass)
                 .then(cred => {
                     db.collection("users").doc(cred.user.uid).set({
-                        email: email, signupDate: firebase.firestore.FieldValue.serverTimestamp()
+                        email: email, 
+                        signupDate: firebase.firestore.FieldValue.serverTimestamp(),
+                        isAdmin: false
                     }, { merge: true });
                     alert("Account created successfully!"); 
                     navTo('profile'); 
@@ -855,7 +811,9 @@
         const provider = new firebase.auth.GoogleAuthProvider();
         auth.signInWithPopup(provider).then(cred => {
             db.collection("users").doc(cred.user.uid).set({
-                email: cred.user.email, signupDate: firebase.firestore.FieldValue.serverTimestamp()
+                email: cred.user.email, 
+                signupDate: firebase.firestore.FieldValue.serverTimestamp(),
+                isAdmin: false
             }, { merge: true });
         }).catch(err => alert(err.message));
     }
@@ -939,35 +897,43 @@
         return true;
     }
 
-    async function processCheckout(planName) {
+    // FIX: Replaced custom backend fetch with simple, reliable Stripe Payment Links
+    function processCheckout(planName) {
         if (!currentUser) {
             alert("Please sign in or create an account to upgrade.");
             navTo('auth');
             return;
         }
+        const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        uid: currentUser.uid,
+        email: currentUser.email,
+        plan: planName
+    })
+});
 
-        try {
-            // 🔴 REPLACE YOUR_FUNCTION_URL with your deployed Firebase Function URL
-            const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    plan: planName
-                })
-            });
+        // 🔴 INSTRUCTIONS: 
+        // 1. Go to your Stripe Dashboard -> "Payment Links"
+        // 2. Create a link for your $59/yr Individual Plan and your $199/yr Business Plan
+        // 3. Paste the URLs below, replacing the placeholder text.
+        
+        let stripeLink = "";
 
-            const data = await res.json();
-            if (data.url) {
-                window.location.href = data.url; 
-            } else {
-                alert("Error creating checkout session");
-            }
-        } catch (err) {
-            console.error("Checkout error:", err);
-            alert("Payment error");
+        if (planName === 'Individual Pro') {
+            stripeLink = "https://buy.stripe.com/YOUR_INDIVIDUAL_PLAN_LINK_HERE";
+        } else if (planName === 'Business Pro') {
+            stripeLink = "https://buy.stripe.com/YOUR_BUSINESS_PLAN_LINK_HERE";
         }
+
+        if (stripeLink.includes("YOUR_")) {
+            alert("Developer Error: Please insert your actual Stripe Payment Link URLs in the tracker.html code.");
+            return;
+        }
+
+        // Redirects to Stripe checkout and pre-fills the user's email address
+        window.location.href = stripeLink + "?prefilled_email=" + encodeURIComponent(currentUser.email);
     }
 
     async function cancelSubscription() {
@@ -975,12 +941,18 @@
             alert("No active subscription found.");
             return;
         }
+        await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/cancelSubscription", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+        customerId: currentUserData.subscription.customerId
+    })
+});
 
         const confirmCancel = confirm("Are you sure you want to cancel your subscription?");
         if (!confirmCancel) return;
 
         try {
-            // 🔴 REPLACE YOUR_FUNCTION_URL with your deployed Firebase Function URL
             await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -996,90 +968,7 @@
     }
 
     // ==========================================
-    // 5. ADMIN & ANALYTICS TRACKING
-    // ==========================================
-    async function loadAdminData() {
-        try {
-            const usersSnapshot = await db.collection("users").get();
-            const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            const cartsSnapshot = await db.collection("carts").get();
-            const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            const ordersSnapshot = await db.collection("orders").get();
-            const orders = ordersSnapshot.docs.map(d => d.data());
-
-            const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
-
-            addRevenueCard(totalRevenue);
-            renderUserTable(users);
-            calculatePerformanceMetrics(users, carts, orders);
-            calculateStoreAnalytics(orders);
-        } catch (e) {
-            console.log("No tracking collections found or permission denied.", e);
-        }
-    }
-
-    function calculatePerformanceMetrics(users, carts, orders = []) {
-        const twentyFourHoursAgo = new Date(Date.now() - (24 * 60 * 60 * 1000));
-
-        const newSignups = users.filter(u => u.signupDate && u.signupDate.toDate() > twentyFourHoursAgo).length;
-        const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
-
-        const totalOrders = orders.length;
-        const totalUsers = users.length;
-        const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
-
-        document.getElementById('total-users').textContent = totalUsers;
-        document.getElementById('new-signups').textContent = newSignups;
-        document.getElementById('total-purchases').textContent = totalOrders;
-        document.getElementById('checkouts').textContent = totalOrders;
-        document.getElementById('active-carts').textContent = activeCarts;
-        document.getElementById('avg-orders').textContent = avgOrders;
-    }
-
-    function calculateStoreAnalytics(orders) {
-        const storeMap = {};
-        orders.forEach(order => {
-            const store = order.storeId || "unknown";
-            if (!storeMap[store]) storeMap[store] = 0;
-            storeMap[store] += order.amount || 0;
-        });
-        console.log("Store Revenue:", storeMap);
-    }
-
-    function addRevenueCard(totalRevenue) {
-        let el = document.getElementById('total-revenue');
-        if (!el) {
-            const card = document.createElement('div');
-            card.className = "metric-card";
-            card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
-            document.querySelector('.metrics-grid').appendChild(card);
-            el = document.getElementById('total-revenue');
-        }
-        el.textContent = `$${totalRevenue.toFixed(2)}`;
-    }
-
-    function renderUserTable(users) {
-        const body = document.getElementById('user-list-body');
-        body.innerHTML = '';
-        users.forEach(user => {
-            const sub = user.subscription?.status || "free";
-            const row = document.createElement('tr');
-            row.style.borderBottom = "1px solid var(--border)";
-            row.innerHTML = `
-                <td style="padding: 10px;">${user.username || user.name || "N/A"}</td>
-                <td style="padding: 10px;">${user.email || "N/A"}</td>
-                <td style="padding: 10px;">${user.signupDate ? user.signupDate.toDate().toLocaleDateString() : "N/A"}</td>
-                <td style="padding: 10px; font-weight: bold; color: ${sub === 'active' ? 'var(--accent)' : 'inherit'};">${sub}</td>
-                <td style="padding: 10px;">${user.isBanned ? "Banned" : "Active"}</td>
-            `;
-            body.appendChild(row);
-        });
-    }
-
-    // ==========================================
-    // 6. THEME, TRACKER & HISTORY LOGIC
+    // 5. THEME, TRACKER & HISTORY LOGIC
     // ==========================================
     function toggleTheme() {
         if (document.getElementById('themeToggle').checked) {
@@ -1384,7 +1273,7 @@
     }
 
     // ==========================================
-    // 7. SERVICE WORKER & ONLOAD LOGIC
+    // 6. SERVICE WORKER & ONLOAD LOGIC
     // ==========================================
     if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("service-worker.js");

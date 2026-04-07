@@ -26,8 +26,7 @@ onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
 
- if (user) {
-        // -------------------------------------
+    if (user) {
         // User is signed in
         const userDocRef = doc(db, "users", user.uid);
         const userDoc = await getDoc(userDocRef);
@@ -151,9 +150,6 @@ if (document.getElementById('auth-form')) {
         }
     }
 
-function showMessage(msg) { messageEl.textContent = msg; }
+    function showMessage(msg) { messageEl.textContent = msg; }
     updateFormView();
-}
-if (user) {
-    loadUserData(user.uid);
 }

@@ -1,6 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Stripe = require("stripe");
+const cors = require("cors")({ origin: true }); // ✅ Use the package you installed
 
 admin.initializeApp();
 
@@ -9,39 +10,36 @@ const stripe = new Stripe(process.env.STRIPE_SECRET);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 // 🔹 Create Checkout Session
-exports.createCheckoutSession = functions.https.onRequest(async (req, res) => {
-  // Setup CORS if testing locally
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "GET, POST");
+exports.createCheckoutSession = functions.https.onRequest((req, res) => {
+  // ✅ Wrap the function in CORS so your frontend can securely talk to it
+  cors(req, res, async () => {
+    if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  if (req.method === "OPTIONS") {
-    res.end();
-    return;
-  }
+    const { uid, email, plan } = req.body;
 
-  const { uid, email, plan } = req.body;
+    // 🔴 Replace these with the actual Price IDs from your Stripe Dashboard
+    const priceId = plan === "Business Pro" ? "price_business_id" : "price_individual_id";
 
-  // 🔴 Replace these with the actual Price IDs from your Stripe Dashboard
-  const priceId = plan === "Business Pro" ? "price_business_id" : "price_individual_id";
+    try {
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        payment_method_types: ["card"],
+        customer_email: email,
+        line_items: [{ price: priceId, quantity: 1 }],
+        subscription_data: { trial_period_days: 7 }, // ✅ FREE TRIAL
+        
+        // 🔴 Replace these with your actual deployed app URL
+        success_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?success=true", 
+        cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?canceled=true",
+        metadata: { uid }
+      });
 
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
-      payment_method_types: ["card"],
-      customer_email: email,
-      line_items: [{price: priceId, quantity: 1}],
-      subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
-      
-      // 🔴 Replace these with your actual deployed app URL
-      success_url: "https://dreamstimeskip-beta.pages.dev?success=true", 
-      cancel_url: "https://dreamstimeskip-beta.pages.dev?canceled=true",
-      metadata: {uid}
-    });
-
-    res.json({url: session.url});
-  } catch (err) {
-    res.status(500).send({error: err.message});
-  }
+      res.status(200).json({ url: session.url });
+    } catch (err) {
+      console.error("Checkout Error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
 });
 
 // 🔐 STRIPE WEBHOOK (SECURE)
@@ -50,9 +48,10 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event;
 
   try {
+    // Firebase rawBody is required here for Stripe's security signature to match
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error(err);
+    console.error("Webhook Error:", err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -61,12 +60,14 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const session = event.data.object;
     const uid = session.metadata.uid;
 
-    await admin.firestore().collection("users").doc(uid).set({
-      subscription: {
-        status: "active",
-        customerId: session.customer
-      }
-    }, {merge: true});
+    if (uid) {
+        await admin.firestore().collection("users").doc(uid).set({
+        subscription: {
+            status: "active",
+            customerId: session.customer
+        }
+        }, { merge: true });
+    }
   }
 
   if (event.type === "customer.subscription.deleted") {
@@ -78,32 +79,32 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       .get();
 
     snapshot.forEach(doc => {
-      doc.ref.update({"subscription.status": "canceled"});
+      doc.ref.update({ "subscription.status": "canceled" });
     });
   }
 
-  res.json({received: true});
+  // Always respond to Stripe so they know we received it
+  res.json({ received: true });
 });
 
 // 🔻 Cancel Subscription Manually 
-exports.cancelSubscription = functions.https.onRequest(async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST");
+exports.cancelSubscription = functions.https.onRequest((req, res) => {
+  // ✅ Wrap in CORS
+  cors(req, res, async () => {
+    if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-  if (req.method === "OPTIONS") {
-    res.end();
-    return;
-  }
+    const { customerId } = req.body;
 
-  const { customerId } = req.body;
-
-  try {
-    const subs = await stripe.subscriptions.list({customer: customerId});
-    for (const sub of subs.data) {
-      await stripe.subscriptions.del(sub.id);
+    try {
+      const subs = await stripe.subscriptions.list({ customer: customerId });
+      for (const sub of subs.data) {
+        // ✅ FIX: 'del' is deprecated in Stripe v11+. Must use 'cancel'
+        await stripe.subscriptions.cancel(sub.id); 
+      }
+      res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Cancel Error:", err);
+      res.status(500).json({ error: err.message });
     }
-    res.json({success: true});
-  } catch (err) {
-    res.status(500).send({error: err.message});
-  }
+  });
 });
