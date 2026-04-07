@@ -18,6 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
 
     <style>
         :root {
@@ -260,6 +261,11 @@
         .features li::before { content: "✔️"; margin-right: 0.5rem; font-size: 0.8rem; }
 
         .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
+        
+        /* ----- ADMIN DASHBOARD METRICS ----- */
+        .metric-card { background: var(--input-bg); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+        .metric-card .value { font-size: 2rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;}
+        .metric-card .label { font-size: 0.85rem; color: var(--text-muted); }
 
         /* ----- PRINT CSS ----- */
         #print-wrapper { display: none; }
@@ -288,6 +294,7 @@
     <a class="nav-item" onclick="navTo('tracker')">📝 Active Shift Tracker</a>
     <a class="nav-item" onclick="navTo('presets')">🍔 Templates & Presets</a>
     <a class="nav-item" onclick="navTo('history')">🕰️ Shift History</a>
+    <a class="nav-item" onclick="navTo('admin')">📊 Admin Dashboard</a>
     <div class="sidebar-divider"></div>
     <a class="nav-item" onclick="handleNavAccountClick()">👤 Manager Profile</a>
     <div class="sidebar-divider"></div>
@@ -466,6 +473,40 @@
             <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Select and load previously saved shifts. Generating a PDF or pressing 'Save to History' adds to this list.</p>
             <div id="historyListContainer" class="history-list">
                 </div>
+        </div>
+    </div>
+    
+    <div id="view-admin" class="view-section">
+        <div style="text-align:center; margin-bottom: 2rem;">
+            <h1 style="color:var(--primary); font-size: 2rem;">Admin Dashboard</h1>
+            <p style="color:var(--text-muted);">Overview of system metrics and user data.</p>
+        </div>
+        <div class="card">
+            <h2>Platform Metrics</h2>
+            <div class="metrics-grid form-grid">
+                <div class="metric-card"><div class="value" id="total-users">0</div><div class="label">Total Users</div></div>
+                <div class="metric-card"><div class="value" id="new-signups">0</div><div class="label">New Signups (24h)</div></div>
+                <div class="metric-card"><div class="value" id="total-purchases">0</div><div class="label">Total Purchases</div></div>
+                <div class="metric-card"><div class="value" id="active-carts">0</div><div class="label">Active Carts</div></div>
+                <div class="metric-card"><div class="value" id="avg-orders">0</div><div class="label">Avg Orders/User</div></div>
+                <div class="metric-card"><div class="value" id="checkouts">0</div><div class="label">Checkouts</div></div>
+            </div>
+            <button class="btn btn-accent" style="margin-top: 1.5rem;" onclick="loadAdminData()">Refresh Data</button>
+        </div>
+        <div class="card" style="overflow-x: auto;">
+            <h2>User Database</h2>
+            <table style="width: 100%; text-align: left; border-collapse: collapse; min-width: 600px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <th style="padding: 10px;">Username</th>
+                        <th style="padding: 10px;">Email</th>
+                        <th style="padding: 10px;">Signup Date</th>
+                        <th style="padding: 10px;">Subscription</th>
+                        <th style="padding: 10px;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="user-list-body"></tbody>
+            </table>
         </div>
     </div>
 
@@ -670,7 +711,7 @@
 
 <script>
     // ==========================================
-    // 1. FIREBASE INITIALIZATION 
+    // 1. FIREBASE & PUSH INITIALIZATION 
     // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
@@ -687,7 +728,11 @@
     }
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const messaging = firebase.messaging();
     
+    // Offline Persistence
+    db.enablePersistence().catch(err => console.log("Offline failed:", err));
+
     let currentUser = null;
     let currentUserData = null;
 
@@ -702,6 +747,7 @@
             // Load custom app data
             loadProfileFromFirebase(user.uid);
             loadUserData(user.uid); // Trigger subscription fetching
+            initPush(); // Init Push Tokens
             
             if (document.getElementById('view-auth').classList.contains('active')) {
                 navTo('profile');
@@ -712,6 +758,27 @@
             clearProfileForm();
         }
     });
+
+    async function initPush() {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") return;
+
+            const token = await messaging.getToken({
+                vapidKey: "-rRUolygol9pMITWTBL8SDfuiM9d3AHhR6iuoozI5jU" // 🔴 Replace with your actual Vapid Key
+            });
+
+            console.log("Push Token:", token);
+
+            if (currentUser) {
+                db.collection("users").doc(currentUser.uid).set({
+                    pushToken: token
+                }, { merge: true });
+            }
+        } catch (err) {
+            console.error("Push Notification Error:", err);
+        }
+    }
 
     // ==========================================
     // 2. APP NAVIGATION & PROTECTED ROUTES
@@ -725,10 +792,12 @@
             alert("Please sign in to access your Manager Profile.");
             viewId = 'auth';
         }
-
-        if (viewId === 'history') {
-            renderHistoryList();
+        if (viewId === 'admin' && (!currentUser || !requireProFeature())) {
+             return; // Locked behind pro feature check
         }
+
+        if (viewId === 'history') renderHistoryList();
+        if (viewId === 'admin') loadAdminData();
 
         document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
         document.getElementById('view-' + viewId).classList.add('active');
@@ -765,7 +834,13 @@
 
         if (isRegisterMode) {
             auth.createUserWithEmailAndPassword(email, pass)
-                .then(() => { alert("Account created successfully!"); navTo('profile'); })
+                .then(cred => {
+                    db.collection("users").doc(cred.user.uid).set({
+                        email: email, signupDate: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    alert("Account created successfully!"); 
+                    navTo('profile'); 
+                })
                 .catch(err => alert(err.message))
                 .finally(() => { btn.disabled = false; btn.innerText = "Sign Up"; });
         } else {
@@ -778,7 +853,11 @@
 
     function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(err => alert(err.message));
+        auth.signInWithPopup(provider).then(cred => {
+            db.collection("users").doc(cred.user.uid).set({
+                email: cred.user.email, signupDate: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        }).catch(err => alert(err.message));
     }
 
     function signOut() {
@@ -845,31 +924,6 @@
     // ==========================================
     // 4. CHECKOUT & SUBSCRIPTION SYSTEM 
     // ==========================================
-    async function processCheckout(planName) {
-        if (!currentUser) {
-            navTo('auth');
-            return;
-        }
-
-        try {
-            const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    plan: planName
-                })
-            });
-
-            const data = await res.json();
-            window.location.href = data.url;
-        } catch (err) {
-            console.error("Checkout error:", err);
-            alert("Error connecting to payment provider.");
-        }
-    }
-
     function requireProFeature() {
         if (!currentUser) {
             alert("Sign in required");
@@ -882,8 +936,38 @@
             navTo('pricing');
             return false;
         }
-
         return true;
+    }
+
+    async function processCheckout(planName) {
+        if (!currentUser) {
+            alert("Please sign in or create an account to upgrade.");
+            navTo('auth');
+            return;
+        }
+
+        try {
+            // 🔴 REPLACE YOUR_FUNCTION_URL with your deployed Firebase Function URL
+            const res = await fetch("YOUR_FUNCTION_URL/createCheckoutSession", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    plan: planName
+                })
+            });
+
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url; 
+            } else {
+                alert("Error creating checkout session");
+            }
+        } catch (err) {
+            console.error("Checkout error:", err);
+            alert("Payment error");
+        }
     }
 
     async function cancelSubscription() {
@@ -896,6 +980,7 @@
         if (!confirmCancel) return;
 
         try {
+            // 🔴 REPLACE YOUR_FUNCTION_URL with your deployed Firebase Function URL
             await fetch("YOUR_FUNCTION_URL/cancelSubscription", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -903,7 +988,6 @@
                     customerId: currentUserData.subscription.customerId
                 })
             });
-
             alert("Subscription canceled successfully.");
         } catch(err) {
             console.error("Cancelation error:", err);
@@ -912,7 +996,90 @@
     }
 
     // ==========================================
-    // 5. THEME, TRACKER & HISTORY LOGIC
+    // 5. ADMIN & ANALYTICS TRACKING
+    // ==========================================
+    async function loadAdminData() {
+        try {
+            const usersSnapshot = await db.collection("users").get();
+            const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const cartsSnapshot = await db.collection("carts").get();
+            const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            const ordersSnapshot = await db.collection("orders").get();
+            const orders = ordersSnapshot.docs.map(d => d.data());
+
+            const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
+
+            addRevenueCard(totalRevenue);
+            renderUserTable(users);
+            calculatePerformanceMetrics(users, carts, orders);
+            calculateStoreAnalytics(orders);
+        } catch (e) {
+            console.log("No tracking collections found or permission denied.", e);
+        }
+    }
+
+    function calculatePerformanceMetrics(users, carts, orders = []) {
+        const twentyFourHoursAgo = new Date(Date.now() - (24 * 60 * 60 * 1000));
+
+        const newSignups = users.filter(u => u.signupDate && u.signupDate.toDate() > twentyFourHoursAgo).length;
+        const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
+
+        const totalOrders = orders.length;
+        const totalUsers = users.length;
+        const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
+
+        document.getElementById('total-users').textContent = totalUsers;
+        document.getElementById('new-signups').textContent = newSignups;
+        document.getElementById('total-purchases').textContent = totalOrders;
+        document.getElementById('checkouts').textContent = totalOrders;
+        document.getElementById('active-carts').textContent = activeCarts;
+        document.getElementById('avg-orders').textContent = avgOrders;
+    }
+
+    function calculateStoreAnalytics(orders) {
+        const storeMap = {};
+        orders.forEach(order => {
+            const store = order.storeId || "unknown";
+            if (!storeMap[store]) storeMap[store] = 0;
+            storeMap[store] += order.amount || 0;
+        });
+        console.log("Store Revenue:", storeMap);
+    }
+
+    function addRevenueCard(totalRevenue) {
+        let el = document.getElementById('total-revenue');
+        if (!el) {
+            const card = document.createElement('div');
+            card.className = "metric-card";
+            card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
+            document.querySelector('.metrics-grid').appendChild(card);
+            el = document.getElementById('total-revenue');
+        }
+        el.textContent = `$${totalRevenue.toFixed(2)}`;
+    }
+
+    function renderUserTable(users) {
+        const body = document.getElementById('user-list-body');
+        body.innerHTML = '';
+        users.forEach(user => {
+            const sub = user.subscription?.status || "free";
+            const row = document.createElement('tr');
+            row.style.borderBottom = "1px solid var(--border)";
+            row.innerHTML = `
+                <td style="padding: 10px;">${user.username || user.name || "N/A"}</td>
+                <td style="padding: 10px;">${user.email || "N/A"}</td>
+                <td style="padding: 10px;">${user.signupDate ? user.signupDate.toDate().toLocaleDateString() : "N/A"}</td>
+                <td style="padding: 10px; font-weight: bold; color: ${sub === 'active' ? 'var(--accent)' : 'inherit'};">${sub}</td>
+                <td style="padding: 10px;">${user.isBanned ? "Banned" : "Active"}</td>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    // ==========================================
+    // 6. THEME, TRACKER & HISTORY LOGIC
     // ==========================================
     function toggleTheme() {
         if (document.getElementById('themeToggle').checked) {
@@ -976,7 +1143,6 @@
         else resInput.value = `($${diff.toFixed(2)} Over)`;
     }
 
-    // Creates the data object for the current form state
     function getCurrentState() {
         const state = {
             shiftDate: document.getElementById('shiftDate').value,
@@ -1029,13 +1195,10 @@
     // --- HISTORY FUNCTIONS ---
     function saveToHistory() {
         const state = getCurrentState();
-        state.id = Date.now().toString(); // Generate unique ID for the history item
-        
+        state.id = Date.now().toString(); 
         let history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
-        history.unshift(state); // Add to beginning of the array
-        
-        if(history.length > 50) history.pop(); // Keep maximum 50 records
-        
+        history.unshift(state);
+        if(history.length > 50) history.pop(); 
         localStorage.setItem('managerProHistory', JSON.stringify(history));
     }
 
@@ -1074,7 +1237,6 @@
     function loadHistoryItem(id) {
         const history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
         const item = history.find(h => h.id === id);
-        
         if(item) {
             if(confirm("Loading this history will overwrite your current active shift form. Continue?")) {
                 localStorage.setItem('managerProData', JSON.stringify(item));
@@ -1092,11 +1254,9 @@
             renderHistoryList();
         }
     }
-    // -------------------------
 
     function loadState() {
         const saved = localStorage.getItem('managerProData');
-        
         if (saved) {
             const state = JSON.parse(saved);
             if(state.shiftDate) document.getElementById('shiftDate').value = state.shiftDate;
@@ -1150,7 +1310,9 @@
     function formatText(text) { return text ? text.replace(/\n/g, '<br>') : ""; }
 
     function generateReport() {
-        // Automatically save to history before printing
+        // Enforce PRO feature constraint
+        if (!requireProFeature()) return;
+
         saveToHistory();
 
         const dateRaw = document.getElementById('shiftDate').value;
@@ -1221,6 +1383,13 @@
         window.print();
     }
 
+    // ==========================================
+    // 7. SERVICE WORKER & ONLOAD LOGIC
+    // ==========================================
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js");
+    }
+
     window.onload = () => {
         try {
             const savedTheme = localStorage.getItem('managerProTheme');
@@ -1231,11 +1400,14 @@
             loadState();
         } catch (err) { console.error("Load error:", err); }
         
+        // Listen for Stripe Redirect params
         const params = new URLSearchParams(window.location.search);
         if (params.get("success")) {
-            alert("Payment successful!");
+            alert("Payment successful! Your account is now PRO.");
             if (currentUser) {
-                db.collection('users').doc(currentUser.uid).set({ subscription: { status: "active" } }, { merge: true });
+                db.collection('users').doc(currentUser.uid).set({
+                    subscription: { status: "active" }
+                }, { merge: true });
             }
         }
     };

@@ -144,7 +144,7 @@
             border-radius: 12px;
             border: 1px solid var(--border-color);
             margin-bottom: 30px;
-            height: 400px; /* Set a fixed height for the container */
+            height: 400px;
             display: flex;
             flex-direction: column;
         }
@@ -202,6 +202,10 @@
             background-color: rgba(220, 38, 38, 0.2);
             color: var(--accent-red);
         }
+        .subscription-text {
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
         .btn-sm {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -221,7 +225,8 @@
         }
     </style>
 </head>
-<body style="display: none;"> <div class="admin-layout">
+<body style="display: none;"> 
+    <div class="admin-layout">
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2>Admin Panel</h2>
@@ -244,9 +249,10 @@
             <section id="performance" class="content-section active">
                 <h3>Performance Overview</h3>
                 <div class="metrics-grid">
+                    <div class="metric-card"><div class="value" id="total-revenue">$-</div><div class="label">Total Revenue</div></div>
+                    <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Purchases</div></div>
                     <div class="metric-card"><div class="value" id="total-users">-</div><div class="label">Total Users</div></div>
                     <div class="metric-card"><div class="value" id="new-signups">-</div><div class="label">New Sign-ups (24h)</div></div>
-                    <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Purchases</div></div>
                     <div class="metric-card"><div class="value" id="checkouts">-</div><div class="label">Completed Checkouts</div></div>
                     <div class="metric-card"><div class="value" id="active-carts">-</div><div class="label">Users with Active Carts</div></div>
                     <div class="metric-card"><div class="value" id="avg-orders">-</div><div class="label">Orders per User</div></div>
@@ -269,7 +275,16 @@
                 <h3>User Management</h3>
                 <div class="user-table-container">
                     <table class="user-table">
-                        <thead><tr><th>Username</th><th>Email</th><th>Sign-up Date</th><th>Status</th><th>Action</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Sign-up Date</th>
+                                <th>Subscription</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
                         <tbody id="user-list-body"></tbody>
                     </table>
                 </div>
@@ -339,41 +354,29 @@
             setupEventListeners();
         }
 
-    async function loadAdminData() {
-    const usersSnapshot = await getDocs(collection(db, "users"));
-    const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        async function loadAdminData() {
+            try {
+                const usersSnapshot = await getDocs(collection(db, "users"));
+                const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    const cartsSnapshot = await getDocs(collection(db, "carts"));
-    const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                const cartsSnapshot = await getDocs(collection(db, "carts"));
+                const carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    const ordersSnapshot = await getDocs(collection(db, "orders"));
-    const orders = ordersSnapshot.docs.map(d => d.data());
+                const ordersSnapshot = await getDocs(collection(db, "orders"));
+                const orders = ordersSnapshot.docs.map(d => d.data());
 
-    // 💰 Revenue
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
+                // Revenue calculation
+                const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
+                document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+                document.getElementById('total-purchases').textContent = orders.length;
 
-    document.getElementById('total-purchases').textContent = orders.length;
-
-    // 🔥 Add new metric dynamically
-    addRevenueCard(totalRevenue);
-
-    renderUserTable(users);
-    calculatePerformanceMetrics(users, carts, orders);
-    renderChart('summary', users);
-}
-function addRevenueCard(totalRevenue) {
-    let el = document.getElementById('total-revenue');
-
-    if (!el) {
-        const card = document.createElement('div');
-        card.className = "metric-card";
-        card.innerHTML = `<div class="value" id="total-revenue"></div><div class="label">Total Revenue ($)</div>`;
-        document.querySelector('.metrics-grid').appendChild(card);
-        el = document.getElementById('total-revenue');
-    }
-
-    el.textContent = `$${totalRevenue.toFixed(2)}`;
-}
+                renderUserTable(users);
+                calculatePerformanceMetrics(users, carts, orders);
+                renderChart('summary', users);
+            } catch (error) {
+                console.error("Error loading admin data:", error);
+            }
+        }
 
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
@@ -385,10 +388,16 @@ function addRevenueCard(totalRevenue) {
                 const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
                 const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
                 
+                // Subscription tracking
+                const subStatus = user.subscription?.status === 'active' 
+                    ? `<span class="subscription-text">Active Pro</span>` 
+                    : `<span style="color: var(--text-secondary);">Free</span>`;
+                
                 row.innerHTML = `
-                    <td>${user.username}</td>
+                    <td>${user.username || user.name || "N/A"}</td>
                     <td>${user.email}</td>
                     <td>${signupDate}</td>
+                    <td>${subStatus}</td>
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
                 userListBody.appendChild(row);
@@ -410,23 +419,23 @@ function addRevenueCard(totalRevenue) {
             });
         }
 
-       function calculatePerformanceMetrics(users, carts, orders = []) {
-    const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
+        function calculatePerformanceMetrics(users, carts, orders = []) {
+            const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
 
-    const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-    const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
+            const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
+            const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
 
-    const totalOrders = orders.length;
-    const totalUsers = users.length;
-    const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
+            const totalOrders = orders.length;
+            const totalUsers = users.length;
+            const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
 
-    document.getElementById('total-users').textContent = totalUsers;
-    document.getElementById('new-signups').textContent = newSignups;
-    document.getElementById('total-purchases').textContent = totalOrders;
-    document.getElementById('checkouts').textContent = totalOrders;
-    document.getElementById('active-carts').textContent = activeCarts;
-    document.getElementById('avg-orders').textContent = avgOrders;
-}
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('new-signups').textContent = newSignups;
+            document.getElementById('checkouts').textContent = totalOrders;
+            document.getElementById('active-carts').textContent = activeCarts;
+            document.getElementById('avg-orders').textContent = avgOrders;
+        }
+
         function renderChart(view, usersData) {
             const ctx = document.getElementById('performance-chart').getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
@@ -454,7 +463,7 @@ function addRevenueCard(totalRevenue) {
                                 backgroundColor: 'rgba(37, 99, 235, 0.2)' 
                             }]
                         },
-                        options: getChartOptions(false) // Not a pie chart
+                        options: getChartOptions(false)
                     };
                     break;
                 case 'purchases':
@@ -471,12 +480,12 @@ function addRevenueCard(totalRevenue) {
                                 backgroundColor: 'rgba(22, 163, 74, 0.2)' 
                             }]
                         },
-                        options: getChartOptions(false) // Not a pie chart
+                        options: getChartOptions(false)
                     };
                     break;
-                default: // 'summary'
-                    const totalSignups = 296; // Static data for demo
-                    const totalPurchases = 173; // Static data for demo
+                default: 
+                    const totalSignups = 296; 
+                    const totalPurchases = 173; 
                     chartConfig = {
                         type: 'doughnut',
                         data: {
@@ -489,7 +498,7 @@ function addRevenueCard(totalRevenue) {
                                 hoverOffset: 4
                             }]
                         },
-                        options: getChartOptions(true) // Is a pie chart
+                        options: getChartOptions(true)
                     };
                     break;
             }
@@ -547,7 +556,6 @@ function addRevenueCard(totalRevenue) {
             return options;
         }
     
-
         function setupEventListeners() {
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
@@ -578,6 +586,5 @@ function addRevenueCard(totalRevenue) {
             });
         }
     </script>
-
 </body>
 </html>
