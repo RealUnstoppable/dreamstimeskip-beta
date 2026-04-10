@@ -8,9 +8,9 @@ export function loadFooter() {
                     <h5>Navigate</h5>
                     <ul>
                         <li><a href="index.html#bento">Overview</a></li>
-                        <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                        <li><a href="index.html#dts">Dreams TimeSkip</a></li>
-                        <li><a href="index.html#harmony">HarmonyTunes</a></li>
+                        <li><a href="unstoppable.html">Unstoppable</a></li>
+                        <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+                        <li><a href="harmonytunes.html">HarmonyTunes</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">

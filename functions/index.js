@@ -17,8 +17,8 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
     const { uid, email, plan } = req.body;
 
-    // 🔴 Replace these with the actual Price IDs from your Stripe Dashboard
-    const priceId = plan === "Business Pro" ? "price_business_id" : "price_individual_id";
+    // 🔴 Updated with the actual Price IDs from your Stripe Dashboard
+    const priceId = plan === "Business Pro" ? "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
 
     try {
       const session = await stripe.checkout.sessions.create({

@@ -8,8 +8,8 @@ export function loadNavbar() {
         <a href="index.html" class="nav-logo">un<span></span></a>
         <ul class="nav-links">
             
-            <li><a href="index.html#unstoppable">Unstoppable</a></li>
-            <li><a href="index.html#dts">Dreams TimeSkip</a></li>
+            <li><a href="unstoppable.html">Unstoppable</a></li>
+            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
             <li><a href="harmonytunes.html">HarmonyTunes</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
