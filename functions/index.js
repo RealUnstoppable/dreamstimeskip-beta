@@ -4,8 +4,7 @@ const cors = require("cors")({ origin: true });
 
 admin.initializeApp();
 
-// FIX: We provide a fallback "placeholder" string. 
-// This stops the Firebase Analyzer from crashing during deployment if it can't read the .env file yet.
+// Fallback "placeholder" string to stop Firebase Analyzer from crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
@@ -15,9 +14,9 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-    const { uid, email, plan } = req.body;
+    const { uid, email, plan, successUrl, cancelUrl } = req.body;
 
-    // 🔴 Updated with the actual Price IDs from your Stripe Dashboard
+    // 🔴 Actual Price IDs from your Stripe Dashboard
     const priceId = plan === "Business Pro" ? "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
 
     try {
@@ -28,10 +27,13 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
         line_items: [{ price: priceId, quantity: 1 }],
         subscription_data: { trial_period_days: 7 }, // ✅ FREE TRIAL
         
-        // 🔴 Replace these with your actual deployed app URL
-        success_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?success=true", 
-        cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker.html?canceled=true",
-        metadata: { uid: uid || "unknown" }
+        // Use the URLs passed from the frontend, fallback to hardcoded if missing
+        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true", 
+        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
+        metadata: { 
+            uid: uid || "unknown",
+            planName: plan || "Pro"
+        }
       });
 
       res.status(200).json({ url: session.url });
@@ -58,13 +60,15 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const uid = session.metadata.uid;
+    const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
         await admin.firestore().collection("users").doc(uid).set({
-        subscription: {
-            status: "active",
-            customerId: session.customer
-        }
+          plan: planName, // Updates the frontend to unlock pro features
+          subscription: {
+              status: "active",
+              customerId: session.customer
+          }
         }, { merge: true });
     }
   }
@@ -78,7 +82,11 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       .get();
 
     snapshot.forEach(doc => {
-      doc.ref.update({ "subscription.status": "canceled" });
+      // Revert the user back to the free plan
+      doc.ref.update({ 
+          plan: "free",
+          "subscription.status": "canceled" 
+      });
     });
   }
 
