@@ -35,7 +35,6 @@
             --input-bg: #ffffff;
         }
 
-        /* --- DARK MODE VARIABLES --- */
         body.dark-mode {
             --bg-color: #111827;
             --card-bg: #1f2937;
@@ -48,226 +47,109 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
-        }
+        body { background-color: var(--bg-color); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
 
-        /* ----- NAVBAR & SIDEBAR ----- */
-        .navbar {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            height: var(--nav-height);
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            padding: 0 1.5rem;
-            z-index: 1000;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--primary);
-            margin-right: 1rem;
-            padding: 10px;
-        }
-
+        .navbar { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-height); background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 1.5rem; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .menu-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--primary); margin-right: 1rem; padding: 10px; }
         .brand { font-weight: 700; font-size: 1.25rem; color: var(--primary); flex-grow: 1; }
-        
         .user-status { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; }
         .user-status:hover { color: var(--accent); }
 
-        .sidebar {
-            position: fixed;
-            top: var(--nav-height);
-            left: -100%; /* FIX: Changed from -280px to completely hide the sidebar */
-            width: 85%;
-            max-width: 300px;
-            height: calc(100vh - var(--nav-height));
-            background: var(--card-bg);
-            border-right: 1px solid var(--border);
-            transition: left 0.3s ease, background-color 0.3s, border-color 0.3s;
-            z-index: 999;
-            padding: 1.5rem 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-        }
-
+        .sidebar { position: fixed; top: var(--nav-height); left: -100%; width: 85%; max-width: 300px; height: calc(100vh - var(--nav-height)); background: var(--card-bg); border-right: 1px solid var(--border); transition: left 0.3s ease; z-index: 999; padding: 1.5rem 0; display: flex; flex-direction: column; overflow-y: auto; }
         .sidebar.open { left: 0; }
-
-        .nav-item {
-            padding: 1rem 1.5rem;
-            display: block;
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
+        .nav-item { padding: 1rem 1.5rem; display: block; color: var(--text-main); text-decoration: none; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .nav-item:hover { background: var(--bg-color); color: var(--accent); }
         .nav-item.highlight { color: var(--accent); }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 1rem 0; }
         
-        .sidebar-divider { height: 1px; background: var(--border); margin: 1rem 0; transition: background-color 0.3s; }
-        
-        /* --- TOGGLE SWITCH (DARK MODE) --- */
-        .theme-switch-wrapper {
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .theme-switch-wrapper { padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
         .theme-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .theme-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .4s; border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px;
-            left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;
-        }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(20px); }
 
-        /* ----- APP VIEWS ----- */
-        .main-content {
-            margin-top: var(--nav-height);
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: center;
-            transition: margin-left 0.3s ease;
-        }
-
+        .main-content { margin-top: var(--nav-height); padding: 2rem 1rem; display: flex; justify-content: center; }
         .view-section { display: none; width: 100%; max-width: 900px; }
         .view-section.active { display: block; animation: fadeIn 0.3s; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ----- SHARED UI COMPONENTS ----- */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.15rem; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); color: var(--primary); }
 
-        .card h2 {
-            font-size: 1.15rem;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--primary);
-            transition: border-color 0.3s, color 0.3s;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: var(--card-bg);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            min-height: 48px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s, background-color 0.3s;
-            text-align: center;
-        }
+        .btn { background: var(--primary); color: var(--card-bg); border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; text-align: center; font-size: 1rem; }
         .btn:hover { opacity: 0.8; }
         .btn-accent { background: var(--accent); color: white; }
-        .btn-accent:hover { background: var(--accent-hover); opacity: 1; }
+        .btn-accent:hover { background: var(--accent-hover); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
-        .btn-danger { background: #ef4444; padding: 0.5rem 1rem; color: white; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
 
-        /* ----- FORM ELEMENTS ----- */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
         .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
         .form-group.full-width { grid-column: 1 / -1; }
         label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
         
-        button, input, select, textarea {
-            font-size: 16px; /* prevents zoom on iPhone */
-        }
-
-        input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="password"], input[type="email"], textarea, select {
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            outline: none;
-            width: 100%;
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-        }
-        body.dark-mode input[readonly] { background-color: #1f2937; color: #9ca3af; }
+        button, input, select, textarea { font-size: 16px; }
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="password"], input[type="email"], textarea, select { padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; outline: none; width: 100%; background-color: var(--input-bg); color: var(--text-main); }
         input[readonly] { background-color: #f3f4f6; color: var(--text-muted); }
+        body.dark-mode input[readonly] { background-color: #1f2937; color: #9ca3af; }
         input:focus:not([readonly]), textarea:focus, select:focus { border-color: var(--accent); }
         textarea { resize: vertical; min-height: 80px; }
         .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .register-input-group { display: flex; gap: 0.5rem; }
-
-        /* ----- INVENTORY TABLE ----- */
-        .inventory-list { display: flex; flex-direction: column; gap: 1rem; }
-        .inv-headers { display: none; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); padding: 0 1rem; margin-bottom: 0.5rem; }
-        .inventory-item { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; background: var(--input-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); transition: background-color 0.3s, border-color 0.3s; }
+        
+        /* Lists & Dynamic items */
+        .dynamic-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
+        .dynamic-item { display: flex; gap: 0.5rem; align-items: center; }
+        .dynamic-item input { flex: 1; }
+        
+        .inventory-item { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; background: var(--input-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); }
         .inv-name { flex: 1 1 100%; min-width: 150px; }
         .inv-location { flex: 1 1 calc(33.333% - 0.5rem); min-width: 90px; }
         .inv-controls { flex: 1 1 100%; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.5rem; }
 
         @media (min-width: 768px) {
-            .inv-headers { display: flex; gap: 0.5rem; }
-            .inv-headers > div:nth-child(1) { flex: 2 1 auto; min-width: 150px; }
-            .inv-headers > div:nth-child(2), .inv-headers > div:nth-child(3), .inv-headers > div:nth-child(4) { flex: 1 1 auto; min-width: 90px; }
-            .inv-headers > div:nth-child(5) { flex: 0 1 auto; width: 140px; } 
             .inventory-item { flex-wrap: nowrap; }
             .inv-name { flex: 2 1 auto; }
             .inv-location { flex: 1 1 auto; }
             .inv-controls { flex: 0 1 auto; width: 140px; margin-top: 0; border-top: none; padding-top: 0; }
+            .form-grid.three-col { grid-template-columns: repeat(3, 1fr); }
         }
 
         .action-buttons { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
         .action-buttons .btn { flex: 1; min-width: 150px; padding: 1rem; font-size: 1.05rem; }
 
-        /* ----- HISTORY LIST ----- */
-        .history-item { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); transition: border-color 0.3s; }
-        .history-item:hover { border-color: var(--accent); }
-        .history-details { display: flex; flex-direction: column; gap: 0.25rem; }
+        /* History & Performance */
+        .history-item { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); }
         .history-date { font-weight: 600; color: var(--primary); font-size: 1.05rem; }
-        .history-actions { display: flex; gap: 0.5rem; }
-        .history-actions .btn { padding: 0.5rem 1rem; font-size: 0.9rem; min-width: auto; }
+        .stat-box { background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
 
-        /* ----- PRICING TIERS ----- */
+        /* Pricing */
         .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .tier-card { text-align: center; border: 2px solid var(--border); transition: transform 0.2s, border-color 0.2s; }
-        .tier-card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .tier-card.pro { border-color: var(--accent); position: relative; }
+        .tier-card { text-align: center; border: 2px solid var(--border); position: relative; }
+        .tier-card.pro { border-color: var(--accent); }
         .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 0.25rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-        .price { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin: 1rem 0; }
+        .price-strike { text-decoration: line-through; color: var(--text-muted); font-size: 1.2rem; margin-right: 0.5rem; }
+        .price { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin: 0.5rem 0; }
         .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
         .features { list-style: none; margin: 1.5rem 0; text-align: left; }
         .features li { margin-bottom: 0.75rem; font-size: 0.95rem; }
         .features li::before { content: "✔️"; margin-right: 0.5rem; font-size: 0.8rem; }
 
+        /* Welcome & Auth */
+        .welcome-container { text-align: center; padding: 4rem 1rem; }
+        .welcome-title { font-size: 3rem; color: var(--primary); margin-bottom: 1rem; font-weight: 800; }
         .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
-        
-        /* ----- PRINT CSS ----- */
+
+        /* Print */
         #print-wrapper { display: none; }
         @media print {
             body { background: white !important; color: black !important; margin: 0; padding: 0; }
             .navbar, .sidebar, .main-content { display: none !important; }
-            #print-wrapper { display: block !important; width: 100%; color: black; font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5; }
+            #print-wrapper { display: block !important; width: 100%; color: black; font-family: 'Times New Roman', serif; font-size: 12pt; }
             .print-header { text-align: center; margin-bottom: 20px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 10px; }
             .print-section { margin-bottom: 15px; }
             .print-section-title { font-weight: bold; font-style: italic; margin-bottom: 5px; }
@@ -289,11 +171,13 @@
     <a class="nav-item" onclick="navTo('tracker')">📝 Active Shift Tracker</a>
     <a class="nav-item" onclick="navTo('presets')">🍔 Templates & Presets</a>
     <a class="nav-item" onclick="navTo('history')">🕰️ Shift History</a>
+    <a class="nav-item" onclick="navTo('performance')">📊 Manager Performance</a>
     <div class="sidebar-divider"></div>
     <a class="nav-item" onclick="handleNavAccountClick()">👤 Manager Profile</a>
+    <a class="nav-item" onclick="navTo('request')">💡 Feature Request</a>
     <div class="sidebar-divider"></div>
     <div class="theme-switch-wrapper">
-        <span style="font-weight: 600; font-size: 0.9rem; color: var(--text-main);">Dark Mode</span>
+        <span style="font-weight: 600; font-size: 0.9rem;">Dark Mode</span>
         <label class="theme-switch">
             <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
             <span class="slider"></span>
@@ -301,33 +185,116 @@
     </div>
     <div class="sidebar-divider"></div>
     <a class="nav-item highlight" onclick="navTo('pricing')">⭐ Upgrade to Pro</a>
-    <a class="nav-item highlight" onclick="alert('Share this link: dreamstimeskip-beta.pages.dev/tracker/ref=67 to get 5% off your Pro Plan!')">🎁 Recommend (5% Off)</a>
 </aside>
 
 <main class="main-content">
     
-    <div id="view-tracker" class="view-section active">
+    <div id="view-welcome" class="view-section">
+        <div class="welcome-container">
+            <h1 class="welcome-title">Manage Shifts,<br>Made <span style="color:var(--accent);">ez</span>.</h1>
+            <p style="color:var(--text-muted); font-size: 1.2rem; margin-bottom: 2.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                The ultimate tool for restaurant and retail shift managers. Track cash, inventory, routines, and performance in one place.
+            </p>
+            <div style="display:flex; gap:1rem; justify-content: center; flex-wrap: wrap;">
+                <button class="btn btn-accent" onclick="navTo('auth'); isRegisterMode = true; toggleAuthModeUI();">Get Started Free</button>
+                <button class="btn btn-outline" onclick="navTo('auth'); isRegisterMode = false; toggleAuthModeUI();">Log In</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-auth" class="view-section">
+        <div class="card auth-container">
+            <h2 id="authTitle">Sign In to ezManage</h2>
+            <form id="authForm" onsubmit="handleAuth(event)">
+                <div class="form-group" style="text-align:left; margin-bottom:1rem;">
+                    <label>Email Address</label>
+                    <input type="email" id="authEmail" placeholder="manager@restaurant.com" required>
+                </div>
+                <div class="form-group" style="text-align:left; margin-bottom:1.5rem;">
+                    <label>Password</label>
+                    <input type="password" id="authPass" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn btn-accent" style="width:100%; margin-bottom: 1rem;" id="authBtn">Sign In</button>
+            </form>
+            <button onclick="signInWithGoogle()" class="btn btn-outline" style="width: 100%;">Sign in with Google</button>
+            <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                <span id="authToggleText">Don't have an account?</span> <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode(event)" id="authToggleLink">Create one</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="view-setup" class="view-section">
+        <div class="card auth-container" style="max-width: 600px;">
+            <h2>Complete Your Profile</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Let's customize your ezManage experience.</p>
+            
+            <div class="form-grid">
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Full Name</label>
+                    <input type="text" id="setupName" placeholder="John Doe" required>
+                </div>
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Phone Number</label>
+                    <input type="text" id="setupPhone" placeholder="(555) 000-0000" required>
+                </div>
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Occupation / Role</label>
+                    <input type="text" id="setupRole" placeholder="Shift Manager" required>
+                </div>
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Store / Brand</label>
+                    <select id="setupStore">
+                        <option value="arbys">Arby's / Classic Fast Food</option>
+                        <option value="mcdonalds">McDonald's</option>
+                        <option value="tacobell">Taco Bell</option>
+                        <option value="whataburger">Whataburger</option>
+                        <option value="chickfila">Chick-fil-A</option>
+                        <option value="dunkin">Dunkin' / Coffee</option>
+                        <option value="pizza">Pizza Shop</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Store Location</label>
+                    <input type="text" id="setupLocation" placeholder="City, State" required>
+                </div>
+            </div>
+            <button class="btn btn-accent" style="width:100%; margin-top: 1.5rem;" onclick="completeSetup()">Finish Setup</button>
+        </div>
+    </div>
+
+    <div id="view-tracker" class="view-section">
         <div style="text-align:center; margin-bottom: 2rem;">
             <h1 style="color:var(--primary); font-size: 2rem;">Shift Tracker</h1>
-            <p style="color:var(--text-muted);">Your work auto-saves. Select a preset in the menu to change restaurants.</p>
+            <p style="color:var(--text-muted);">Your work auto-saves locally. Select a preset in the menu to change layouts.</p>
         </div>
 
         <form id="trackerForm">
             <div class="card">
                 <h2>Shift Details</h2>
-                <div class="form-grid">
+                <div class="form-grid three-col">
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="shiftDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Time</label>
-                        <input type="time" id="shiftTime" value="08:00" required>
+                        <label>Time (Auto-syncs)</label>
+                        <input type="time" id="shiftTime" required>
                     </div>
                     <div class="form-group">
                         <label>Shift Manager</label>
                         <input type="text" id="shiftManager" placeholder="Enter Name" required>
                     </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Manager Daily Routine & ServSafe</h2>
+                <div id="routineContainer" class="dynamic-list">
+                    </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <input type="text" id="newRoutineTask" placeholder="Add custom task..." style="flex:1;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addRoutineTask()">Add</button>
                 </div>
             </div>
 
@@ -355,42 +322,25 @@
 
             <div class="card">
                 <h2>Cash & Registers</h2>
+                
+                <div class="form-group full-width" style="margin-bottom: 1rem;">
+                    <label>Registers / Drawers ($)</label>
+                    <div id="drawersContainer" class="dynamic-list"></div>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addDrawerItem()">+ Add Drawer</button>
+                </div>
+
                 <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Drawer 1 ($)</label>
-                        <div class="register-input-group">
-                            <input type="number" step="0.01" id="d1-val" value="100.00" oninput="calcDrawer('d1')">
-                            <input type="text" id="d1-res" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Drawer 4 ($)</label>
-                        <div class="register-input-group">
-                            <input type="number" step="0.01" id="d4-val" value="100.00" oninput="calcDrawer('d4')">
-                            <input type="text" id="d4-res" readonly>
-                        </div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Drawer 5 ($)</label>
-                        <div class="register-input-group">
-                            <input type="number" step="0.01" id="d5-val" value="100.00" oninput="calcDrawer('d5')">
-                            <input type="text" id="d5-res" readonly>
-                        </div>
-                    </div>
                     <div class="form-group">
                         <label>Safe Count ($)</label>
                         <input type="text" id="safeCount" placeholder="$1,100.00">
                     </div>
-                    <div class="form-group">
-                        <label>Deposit ($)</label>
-                        <input type="text" id="deposit" placeholder="$343.00">
+                    
+                    <div class="form-group full-width" style="margin-top:1rem;">
+                        <label>Deposits ($)</label>
+                        <div id="depositsContainer" class="dynamic-list"></div>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="addDepositItem()">+ Add Deposit</button>
                     </div>
-                    <div class="form-group full-width">
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="depVerified" checked> <label>Verified ✔️</label>
-                            <input type="checkbox" id="depValidated" checked style="margin-left: 1rem;"> <label>Validated ✔️</label>
-                        </div>
-                    </div>
+
                     <div class="form-group full-width">
                         <label>Bills/Change Needed</label>
                         <textarea id="changeNeeded"></textarea>
@@ -400,73 +350,41 @@
 
             <div class="card">
                 <h2>Inventory Count</h2>
-                <p style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted);">Enter "N/A" where applicable.</p>
-                
-                <div class="inv-headers">
-                    <div>Item Name</div>
-                    <div>Backline / FOH</div>
-                    <div>Cooler</div>
-                    <div>Freezer</div>
-                    <div></div>
-                </div>
-
-                <div id="inventoryContainer" class="inventory-list"></div>
-                <button type="button" class="btn btn-outline" style="margin-top: 1rem; width: 100%;" onclick="addInventoryItem()">+ Add Custom Item</button>
-            </div>
-
-            <div class="card">
-                <h2>Shift Checklists & Tasks</h2>
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Cooler / Storage Checks</label>
-                        <div class="checkbox-group"><input type="checkbox" id="coolerChunks" checked> All Chunks / Large Prep Good</div>
-                        <div class="checkbox-group"><input type="checkbox" id="coolerPans" checked> All Pans / Bins Good</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Backline Dates Changed</label>
-                        <textarea id="backlineDates" placeholder="All Pans ✔️&#10;All Bottles&#10;All Cheese Bags"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Prepline Dates Changed</label>
-                        <textarea id="preplineDates" placeholder="All Bottles ✔️&#10;All Cheese Bags ✔️"></textarea>
-                    </div>
-                </div>
-                
-                <div class="form-grid" style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
-                    <div class="form-group full-width">
-                        <label>Pulled from Freezer</label>
-                        <textarea id="pulledFreezer"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Sanitizer Check</label>
-                        <div class="checkbox-group"><input type="checkbox" id="waterSanitizer" checked> Water & Sanitizer Bottle Changed</div>
-                        <div class="checkbox-group"><input type="checkbox" id="panSanitizer" checked> Sanitizer Pans Changed</div>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Sauce Bottles Made</label>
-                        <textarea id="saucesMade" placeholder="Ranch&#10;Gyro&#10;Red Ranch"></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Paperwork & General Notes</label>
-                        <textarea id="extraNotes" placeholder="Check Turkey, Pull Bread, Pick Up Trash Outside..."></textarea>
-                    </div>
-                </div>
+                <div id="inventoryContainer" class="dynamic-list"></div>
+                <button type="button" class="btn btn-outline" style="width: 100%;" onclick="addInventoryItem()">+ Add Inventory Item</button>
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn btn-accent generate-btn" onclick="generateReport()">🖨️ Print / Save PDF</button>
-                <button type="button" class="btn btn-outline" onclick="manualSaveHistory()">💾 Save to History</button>
-                <button type="button" class="btn btn-danger clear-btn" onclick="clearData()">Clear Data</button>
+                <button type="button" class="btn btn-accent" onclick="generateReport()">🖨️ Print / Save PDF</button>
+                <button type="button" class="btn btn-outline" onclick="manualSaveHistory()">☁️ Save to Cloud History</button>
+                <button type="button" class="btn btn-danger" onclick="clearData()">Clear Data</button>
             </div>
         </form>
     </div>
 
     <div id="view-history" class="view-section">
         <div class="card">
-            <h2>Shift History</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Select and load previously saved shifts. Generating a PDF or pressing 'Save to History' adds to this list.</p>
-            <div id="historyListContainer" class="history-list">
+            <h2>Cloud Shift History</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Your history syncs across all devices linked to your account.</p>
+            <div id="historyListContainer"></div>
+        </div>
+    </div>
+
+    <div id="view-performance" class="view-section">
+        <div class="card">
+            <h2>Manager Performance</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Analytics based on your saved cloud history.</p>
+            
+            <div class="form-grid">
+                <div class="stat-box">
+                    <div class="stat-value" id="statShifts">0</div>
+                    <div class="stat-label">Total Shifts Logged</div>
                 </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRoutines">0%</div>
+                    <div class="stat-label">Routine Completion Avg</div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -474,7 +392,8 @@
         <div class="card" style="text-align: center;">
             <div id="profileAvatar" style="width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: bold; margin: 0 auto 1rem;">M</div>
             <h2>Manager Profile</h2>
-            <p style="color:var(--text-muted);">Saved securely in the cloud via Firebase.</p>
+            <p id="profSubStatus" style="color:var(--accent); font-weight: bold; margin-bottom: 0.5rem;">Free Plan</p>
+            <p id="profDaysLeft" style="color:var(--text-muted); font-size: 0.85rem; display: none;"></p>
         </div>
 
         <div class="card">
@@ -482,82 +401,93 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="profName" placeholder="E.g. John Doe">
+                    <input type="text" id="profName">
                 </div>
                 <div class="form-group">
                     <label>Role / Title</label>
-                    <input type="text" id="profRole" placeholder="Shift Manager">
+                    <input type="text" id="profRole">
                 </div>
                 <div class="form-group">
-                    <label>Email (Locked)</label>
+                    <label>Email</label>
                     <input type="email" id="profEmail" readonly>
                 </div>
                 <div class="form-group">
                     <label>Phone</label>
-                    <input type="text" id="profPhone" placeholder="(555) 000-0000">
+                    <input type="text" id="profPhone">
+                </div>
+                <div class="form-group">
+                    <label>Store Brand</label>
+                    <input type="text" id="profStore">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="profLocation">
                 </div>
             </div>
+            <button class="btn btn-accent" style="width: 100%; margin-top: 1rem;" onclick="saveProfileToFirebase()">Save Profile</button>
         </div>
 
         <div class="card">
-            <h2>Location & Store</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Store Name / Brand</label>
-                    <input type="text" id="profStore" placeholder="Restaurant Name">
-                </div>
-                <div class="form-group">
-                    <label>Store Location</label>
-                    <input type="text" id="profLocation" placeholder="City, State">
-                </div>
-                <div class="form-group full-width" style="display:flex; gap:1rem;">
-                    <button class="btn btn-accent" style="flex:1;" onclick="saveProfileToFirebase()">Save Profile</button>
-                    <button class="btn btn-danger" style="flex:1;" onclick="signOut()">Sign Out</button>
-                </div>
-            </div>
+            <h2>Refer & Earn</h2>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Share your special link for unstoppable.store. You receive your discount once the person signs up and activates their account (pays $1).</p>
+            <input type="text" id="referralLink" readonly style="font-family: monospace; margin-bottom: 1rem;">
+            <button class="btn btn-outline" onclick="copyReferral()">Copy Link</button>
         </div>
 
         <div class="card">
-            <h2>Subscription Status</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1rem;">Manage your ezManage Pro subscription.</p>
-            <button onclick="cancelSubscription()" class="btn btn-danger">Cancel Subscription</button>
+            <button class="btn btn-danger" style="width:100%;" onclick="signOut()">Sign Out</button>
         </div>
     </div>
 
     <div id="view-presets" class="view-section">
         <div class="card">
             <h2>Templates & Presets</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1rem;">Load a standard inventory list to save time. <strong>Warning:</strong> Loading a preset will replace your current inventory list.</p>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">Load standard layouts. Loading a preset replaces your current inventory list.</p>
             
             <div class="form-group" style="margin-bottom: 1.5rem;">
-                <label>Select Restaurant Type</label>
+                <label>System Presets</label>
                 <select id="presetSelector">
-                    <option value="arbys">Classic Fast Food (Arby's Style)</option>
-                    <option value="burger">Burger Joint (Generic)</option>
-                    <option value="cafe">Coffee Shop / Cafe (Starbucks Style)</option>
+                    <option value="arbys">Arby's</option>
+                    <option value="mcdonalds">McDonald's</option>
+                    <option value="tacobell">Taco Bell</option>
+                    <option value="whataburger">Whataburger</option>
+                    <option value="chickfila">Chick-fil-A</option>
+                    <option value="dunkin">Dunkin' / Krispy Kreme</option>
                     <option value="pizza">Pizza Shop</option>
                 </select>
+                <button class="btn btn-accent" style="margin-top: 0.5rem;" onclick="loadPresetList()">Load System Preset</button>
             </div>
-            
-            <button class="btn btn-accent" onclick="loadPresetList()">Load Preset</button>
+
+            <hr style="border: 0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+
+            <h3>My Custom Presets</h3>
+            <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Save your current Tracker layout as a reusable preset. (Free: 1, Pro: 10, Business: Unlimited).</p>
+            <div style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
+                <input type="text" id="customPresetName" placeholder="Preset Name (e.g., Morning Shift)" style="flex:1;">
+                <button class="btn btn-outline" onclick="saveCustomPreset()">Save Current</button>
+            </div>
+            <div id="customPresetsContainer" class="dynamic-list"></div>
         </div>
     </div>
 
     <div id="view-pricing" class="view-section">
         <div style="text-align:center; margin-bottom: 2rem;">
-            <h1 style="color:var(--primary); font-size: 2rem;">Choose Your Plan</h1>
-            <p style="color:var(--text-muted);">Upgrade to unlock cross-device syncing and multi-location management.</p>
+            <h1 style="color:var(--primary); font-size: 2rem;">Unlock ezManage Pro</h1>
+            <p style="color:var(--text-muted);">Includes a 7-Day Free Trial. Special 20% Off Launch Pricing!</p>
         </div>
 
         <div class="pricing-grid">
             <div class="card tier-card">
                 <h2>Individual Annual</h2>
-                <div class="price">$59<span>/yr</span></div>
+                <div class="price">
+                    <span class="price-strike">$77</span>$61<span>/yr</span>
+                </div>
                 <p style="color:var(--text-muted); font-size:0.9rem;">Perfect for a single shift manager.</p>
                 <ul class="features">
-                    <li>Unlimited PDF Reports</li>
-                    <li>Save 3 Custom Presets</li>
-                    <li>Basic Email Support</li>
+                    <li>Unlimited Cloud History Sync</li>
+                    <li>10 Custom Presets</li>
+                    <li>Performance Analytics</li>
+                    <li>7-Day Free Trial</li>
                 </ul>
                 <button class="btn btn-outline" style="width:100%; margin-top:1rem;" onclick="processCheckout('Individual Pro')">Select Individual</button>
             </div>
@@ -565,113 +495,58 @@
             <div class="card tier-card pro">
                 <div class="badge">Most Popular</div>
                 <h2>Business Annual</h2>
-                <div class="price">$199<span>/yr</span></div>
-                <p style="color:var(--text-muted); font-size:0.9rem;">Built for General Managers & Owners.</p>
+                <div class="price">
+                    <span class="price-strike">$259</span>$207<span>/yr</span>
+                </div>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Built for GMs & Owners.</p>
                 <ul class="features">
-                    <li>Multi-Location Dashboard</li>
+                    <li>Multi-Location Dashboards</li>
                     <li>Unlimited Custom Presets</li>
-                    <li>Cloud Sync & Auto-Backup</li>
-                    <li>Priority 24/7 Support</li>
+                    <li>Priority Feature Requests</li>
+                    <li>7-Day Free Trial</li>
                 </ul>
                 <button class="btn btn-accent" style="width:100%; margin-top:1rem;" onclick="processCheckout('Business Pro')">Select Business</button>
             </div>
         </div>
     </div>
 
-    <div id="view-auth" class="view-section">
-        <div class="card auth-container">
-            <h2 id="authTitle">Sign In to ezManage</h2>
-            <form id="authForm" onsubmit="handleAuth(event)">
-                <div class="form-group" style="text-align:left; margin-bottom:1rem;">
-                    <label>Email Address</label>
-                    <input type="email" id="authEmail" placeholder="manager@restaurant.com" required>
-                </div>
-                <div class="form-group" style="text-align:left; margin-bottom:1.5rem;">
-                    <label>Password</label>
-                    <input type="password" id="authPass" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-accent" style="width:100%; margin-bottom: 1rem;" id="authBtn">Sign In</button>
-            </form>
-
-            <button onclick="signInWithGoogle()" class="btn btn-outline" style="width: 100%;">Sign in with Google</button>
-            
-            <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
-                Don't have an account? <a href="#" style="color:var(--accent); text-decoration:none;" onclick="toggleAuthMode(event)">Create one</a>
-            </p>
+    <div id="view-request" class="view-section">
+        <div class="card">
+            <h2>Feature Request</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">Send requests directly to the admin. Pro users get priority processing.</p>
+            <div class="form-group">
+                <label>Describe the feature or issue</label>
+                <textarea id="featureReqText" placeholder="I would love it if the app could..."></textarea>
+            </div>
+            <button class="btn btn-accent" style="margin-top: 1rem;" onclick="submitFeatureRequest()">Submit Request</button>
         </div>
     </div>
 
 </main>
 
 <div id="print-wrapper">
-    <div class="print-header" id="printHeader">Inventory Count Template - 00/00/00 - 8:00AM - Shift Manager: Name</div>
+    <div class="print-header" id="printHeader"></div>
     <div class="print-section">
-        <div class="print-text">Notes:</div>
-        <div class="print-text"><span class="print-section-title">*Prep Notes*</span> <span id="printPrep"></span></div>
-        <div class="print-text"><span class="print-section-title">*Main Prep/Beef*</span> Put to Cook: <span id="printBeefCook"></span>, Tempered: <span id="printBeefTemp"></span></div>
+        <div class="print-text"><span class="print-section-title">*Shift Routine & Checks*</span></div>
+        <div id="printRoutines"></div>
     </div>
     <div class="print-divider">——</div>
     <div class="print-section">
-        <div class="print-text"><span class="print-section-title">*Labor*</span></div>
-        <div class="print-text">Labor Variance: <span id="printLabor"></span></div>
+        <div class="print-text"><span class="print-section-title">*Cash & Drawers*</span></div>
+        <div id="printDrawers"></div>
+        <div class="print-text" style="margin-top:10px;">Safe Count: <span id="printSafe"></span></div>
+        <div id="printDeposits" style="margin-top:10px;"></div>
     </div>
     <div class="print-divider">——</div>
     <div class="print-section">
-        <div class="print-text"><span class="print-section-title">*Cash*</span></div><br>
-        <div class="print-text">Registers:</div>
-        <div class="print-text" id="printDrawers"></div><br>
-        <div class="print-text">Safe Count: <span id="printSafe"></span></div><br>
-        <div class="print-text">Deposit: <span id="printDeposit"></span> Verified <span id="printDepVer"></span> | Validated <span id="printDepVal"></span></div><br>
-        <div class="print-text">(Big Bills Exchanged in Registers)</div><br>
-        <div class="print-text">Bills/Change Needed:</div>
-        <div class="print-text" id="printChange"></div>
-    </div>
-    <div class="print-divider">——</div>
-    <div class="print-section">
-        <div class="print-text"><span class="print-section-title">*Inventory*</span></div><br>
-        <div class="print-text">Inventory Count:</div><br>
+        <div class="print-text"><span class="print-section-title">*Inventory*</span></div>
         <div id="printInventoryList"></div>
-        <div class="print-text"><br>(items that need to be reviewed have • assigned to them)</div>
-    </div>
-    
-    <div class="page-break"></div>
-    <div class="print-divider">——<br>2nd Page:<br>——</div>
-    
-    <div class="print-section">
-        <div class="print-text"><span class="print-section-title">*Dates to be Changed:*</span></div><br>
-        <div class="print-text">Storage/Cooler:</div>
-        <div class="print-text" id="printCoolerDates"></div>
-        <div class="print-divider">——</div>
-        <div class="print-text">Backline:</div>
-        <div class="print-text" id="printBacklineDates"></div>
-        <div class="print-divider">——</div>
-        <div class="print-text">Prepline:</div>
-        <div class="print-text" id="printPreplineDates"></div>
-    </div>
-    <div class="print-divider">——End of Dates to be Changed——</div>
-    <div class="print-section">
-        <div class="print-text">Pulled from Freezer:</div>
-        <div class="print-text" id="printPulled"></div>
-    </div>
-    <div class="print-divider">——</div>
-    <div class="print-section" id="printSanitizer"></div>
-    <div class="print-divider">——</div>
-    <div class="print-section">
-        <div class="print-text">Sauce/Prep Bottles Made:</div>
-        <div class="print-text" id="printSauces"></div>
-    </div>
-    <div class="print-divider">——</div>
-    <div class="print-section">
-        <div class="print-text"><span class="print-section-title">*Paperwork*</span></div>
-        <div class="print-text">Logs Printed and Put in AOR ✔️</div>
-        <div class="print-text">Manager Void (cannot open site due to password change needed)</div><br>
-        <div class="print-text" id="printNotes"></div>
     </div>
 </div>
 
 <script>
     // ==========================================
-    // 1. FIREBASE & PUSH INITIALIZATION 
+    // 1. FIREBASE CONFIG
     // ==========================================
     const firebaseConfig = {
       apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
@@ -683,98 +558,58 @@
       measurementId: "G-ZN3YJPHVGX"
     };
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const messaging = firebase.messaging();
     
     // Offline Persistence
     db.enablePersistence().catch(err => console.log("Offline failed:", err));
 
     let currentUser = null;
     let currentUserData = null;
+    let isRegisterMode = false;
 
+    // ==========================================
+    // 2. AUTHENTICATION & ONBOARDING
+    // ==========================================
     auth.onAuthStateChanged((user) => {
         currentUser = user;
         const navStatus = document.getElementById('navUserStatus');
         
         if (user) {
-            navStatus.innerText = "Profile: " + (user.displayName || user.email.split('@')[0]);
+            navStatus.innerText = "Profile: " + (user.displayName || "Manager");
             document.getElementById('profEmail').value = user.email;
+            document.getElementById('referralLink').value = `https://unstoppable.store/ref=${user.uid}`;
             
-            // Load custom app data
-            loadProfileFromFirebase(user.uid);
-            loadUserData(user.uid); // Trigger subscription fetching
-            initPush(); // Init Push Tokens
-            
-            if (document.getElementById('view-auth').classList.contains('active')) {
-                navTo('profile');
-            }
+            db.collection("users").doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    currentUserData = doc.data();
+                    loadProfileUI(currentUserData);
+                    loadCustomPresets();
+                    calculatePerformance();
+                    navTo('tracker');
+                } else {
+                    navTo('setup'); // Force onboarding if no user document
+                }
+            });
         } else {
             navStatus.innerText = "Login / Sign Up";
             currentUserData = null;
-            clearProfileForm();
+            navTo('welcome');
         }
     });
 
-    async function initPush() {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") return;
-
-            const token = await messaging.getToken({
-                vapidKey: "-rRUolygol9pMITWTBL8SDfuiM9d3AHhR6iuoozI5jU" // 🔴 Replace with your actual Vapid Key
-            });
-
-            if (currentUser) {
-                db.collection("users").doc(currentUser.uid).set({
-                    pushToken: token
-                }, { merge: true });
-            }
-        } catch (err) {
-            console.error("Push Notification Error:", err);
-        }
+    function toggleAuthModeUI() {
+        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ezManage";
+        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
+        document.getElementById('authToggleText').innerText = isRegisterMode ? "Already have an account?" : "Don't have an account?";
+        document.getElementById('authToggleLink').innerText = isRegisterMode ? "Sign In" : "Create one";
     }
 
-    // ==========================================
-    // 2. APP NAVIGATION & PROTECTED ROUTES
-    // ==========================================
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-    }
-
-    function navTo(viewId) {
-        if (viewId === 'profile' && !currentUser) {
-            alert("Please sign in to access your Manager Profile.");
-            viewId = 'auth';
-        }
-        
-        if (viewId === 'history') renderHistoryList();
-
-        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-        document.getElementById('view-' + viewId).classList.add('active');
-        document.getElementById('sidebar').classList.remove('open');
-        window.scrollTo(0, 0);
-    }
-
-    function handleNavAccountClick() {
-        if (currentUser) navTo('profile');
-        else navTo('auth');
-    }
-
-    // ==========================================
-    // 3. AUTHENTICATION & PROFILE LOGIC
-    // ==========================================
-    let isRegisterMode = false;
-    
     function toggleAuthMode(e) {
         if (e) e.preventDefault();
         isRegisterMode = !isRegisterMode;
-        document.getElementById('authTitle').innerText = isRegisterMode ? "Create an Account" : "Sign In to ezManage";
-        document.getElementById('authBtn').innerText = isRegisterMode ? "Sign Up" : "Sign In";
-        document.querySelector('#view-auth a').innerText = isRegisterMode ? "Sign In instead" : "Create one";
+        toggleAuthModeUI();
     }
 
     function handleAuth(e) {
@@ -782,186 +617,117 @@
         const email = document.getElementById('authEmail').value;
         const pass = document.getElementById('authPass').value;
         const btn = document.getElementById('authBtn');
-        
         btn.disabled = true;
-        btn.innerText = "Processing...";
 
         if (isRegisterMode) {
             auth.createUserWithEmailAndPassword(email, pass)
-                .then(cred => {
-                    db.collection("users").doc(cred.user.uid).set({
-                        email: email, 
-                        signupDate: firebase.firestore.FieldValue.serverTimestamp(),
-                        isAdmin: false
-                    }, { merge: true });
-                    alert("Account created successfully!"); 
-                    navTo('profile'); 
-                })
+                .then(cred => navTo('setup'))
                 .catch(err => alert(err.message))
-                .finally(() => { btn.disabled = false; btn.innerText = "Sign Up"; });
+                .finally(() => btn.disabled = false);
         } else {
             auth.signInWithEmailAndPassword(email, pass)
-                .then(() => navTo('profile'))
                 .catch(err => alert(err.message))
-                .finally(() => { btn.disabled = false; btn.innerText = "Sign In"; });
+                .finally(() => btn.disabled = false);
         }
     }
 
     function signInWithGoogle() {
         const provider = new firebase.auth.GoogleAuthProvider();
         auth.signInWithPopup(provider).then(cred => {
-            db.collection("users").doc(cred.user.uid).set({
-                email: cred.user.email, 
-                signupDate: firebase.firestore.FieldValue.serverTimestamp(),
-                isAdmin: false
-            }, { merge: true });
+            db.collection("users").doc(cred.user.uid).get().then(doc => {
+                if(!doc.exists) navTo('setup');
+            });
         }).catch(err => alert(err.message));
     }
 
-    function signOut() {
-        auth.signOut().then(() => { alert("Signed out successfully."); navTo('auth'); });
+    function signOut() { auth.signOut(); }
+
+    function completeSetup() {
+        if (!currentUser) return;
+        const data = {
+            name: document.getElementById('setupName').value,
+            phone: document.getElementById('setupPhone').value,
+            role: document.getElementById('setupRole').value,
+            store: document.getElementById('setupStore').value,
+            location: document.getElementById('setupLocation').value,
+            email: currentUser.email,
+            plan: 'free',
+            signupDate: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        if(!data.name || !data.store) return alert("Please fill required fields.");
+
+        db.collection('users').doc(currentUser.uid).set(data).then(() => {
+            currentUser.updateProfile({ displayName: data.name });
+            document.getElementById('shiftManager').value = data.name;
+            
+            // Auto-load preset based on store choice
+            const storeKey = data.store === 'other' ? 'arbys' : data.store;
+            loadPresetByName(storeKey);
+            
+            alert("Setup Complete!");
+            navTo('tracker');
+        });
     }
 
     function saveProfileToFirebase() {
-        if (!currentUser) return;
-        
-        const profileData = {
+        if(!currentUser) return;
+        const data = {
             name: document.getElementById('profName').value,
             role: document.getElementById('profRole').value,
             phone: document.getElementById('profPhone').value,
             store: document.getElementById('profStore').value,
             location: document.getElementById('profLocation').value
         };
-
-        db.collection('users').doc(currentUser.uid).set(profileData, { merge: true })
-            .then(() => {
-                document.getElementById('shiftManager').value = profileData.name;
-                saveState(); 
-                currentUser.updateProfile({ displayName: profileData.name });
-                document.getElementById('navUserStatus').innerText = "Profile: " + profileData.name;
-                if(profileData.name) document.getElementById('profileAvatar').innerText = profileData.name.charAt(0).toUpperCase();
-                alert("Profile saved securely to Firebase!");
-            })
-            .catch(error => alert("Error saving profile: " + error.message));
-    }
-
-    function loadProfileFromFirebase(uid) {
-        db.collection('users').doc(uid).get().then((doc) => {
-            if (doc.exists) {
-                const data = doc.data();
-                document.getElementById('profName').value = data.name || "";
-                document.getElementById('profRole').value = data.role || "";
-                document.getElementById('profPhone').value = data.phone || "";
-                document.getElementById('profStore').value = data.store || "";
-                document.getElementById('profLocation').value = data.location || "";
-                
-                if (data.name) {
-                    document.getElementById('shiftManager').value = data.name;
-                    document.getElementById('profileAvatar').innerText = data.name.charAt(0).toUpperCase();
-                }
-            }
-        }).catch(err => console.log("Error fetching profile:", err));
-    }
-
-    function loadUserData(uid) {
-        db.collection("users").doc(uid).onSnapshot(doc => {
-            currentUserData = doc.data();
+        db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => {
+            alert("Profile updated!");
+            document.getElementById('shiftManager').value = data.name;
         });
     }
 
-    function clearProfileForm() {
-        document.getElementById('profName').value = "";
-        document.getElementById('profRole').value = "";
-        document.getElementById('profPhone').value = "";
-        document.getElementById('profStore').value = "";
-        document.getElementById('profLocation').value = "";
-        document.getElementById('profEmail').value = "";
-        document.getElementById('profileAvatar').innerText = "M";
-    }
+    function loadProfileUI(data) {
+        document.getElementById('profName').value = data.name || "";
+        document.getElementById('profRole').value = data.role || "";
+        document.getElementById('profPhone').value = data.phone || "";
+        document.getElementById('profStore').value = data.store || "";
+        document.getElementById('profLocation').value = data.location || "";
+        if(data.name) document.getElementById('profileAvatar').innerText = data.name.charAt(0).toUpperCase();
 
-    // ==========================================
-    // 4. CHECKOUT & SUBSCRIPTION SYSTEM 
-    // ==========================================
-    function requireProFeature() {
-        if (!currentUser) {
-            alert("Sign in required");
-            navTo('auth');
-            return false;
-        }
-
-        if (!currentUserData?.subscription || currentUserData.subscription.status !== "active") {
-            alert("Upgrade to Pro to use this feature.");
-            navTo('pricing');
-            return false;
-        }
-        return true;
-    }
-
-    async function processCheckout(planName) {
-        if (!currentUser) {
-            alert("Please sign in or create an account to upgrade.");
-            navTo('auth');
-            return;
-        }
-
-        try {
-            const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    uid: currentUser.uid,
-                    email: currentUser.email,
-                    plan: planName
-                })
-            });
-
-            const data = await res.json();
-            if (data.url) {
-                window.location.href = data.url; 
-            } else {
-                console.error("Server responded with:", data);
-                alert("Error creating checkout session: " + (data.error || "Unknown error"));
-            }
-        } catch (err) {
-            console.error("Checkout fetch error:", err);
-            alert("Payment system unreachable. Please try again later.");
+        const planName = data.plan || "Free Plan";
+        document.getElementById('profSubStatus').innerText = planName.toUpperCase();
+        if(data.trialEndsAt && data.trialEndsAt.toDate() > new Date()) {
+            const days = Math.ceil((data.trialEndsAt.toDate() - new Date()) / (1000 * 60 * 60 * 24));
+            document.getElementById('profDaysLeft').style.display = "block";
+            document.getElementById('profDaysLeft').innerText = `${days} Days left in Free Trial`;
         }
     }
 
-    async function cancelSubscription() {
-        if (!currentUserData?.subscription?.customerId) {
-            alert("No active subscription found.");
-            return;
-        }
-
-        const confirmCancel = confirm("Are you sure you want to cancel your subscription?");
-        if (!confirmCancel) return;
-
-        try {
-            const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/cancelSubscription", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    customerId: currentUserData.subscription.customerId
-                })
-            });
-            
-            const data = await res.json();
-            if (data.success) {
-                alert("Subscription canceled successfully.");
-                document.querySelector('.subscription-text').innerText = 'Free';
-            } else {
-                alert("Failed to cancel subscription: " + data.error);
-            }
-        } catch(err) {
-            console.error("Cancelation error:", err);
-            alert("Failed to cancel subscription.");
-        }
+    function copyReferral() {
+        const link = document.getElementById('referralLink');
+        link.select();
+        document.execCommand("copy");
+        alert("Referral link copied!");
     }
 
     // ==========================================
-    // 5. THEME, TRACKER & HISTORY LOGIC
+    // 3. NAVIGATION & UI
     // ==========================================
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+
+    function navTo(viewId) {
+        if (!currentUser && viewId !== 'welcome' && viewId !== 'auth') {
+            viewId = 'welcome';
+        }
+        if (viewId === 'history') fetchCloudHistory();
+
+        document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+        document.getElementById('sidebar').classList.remove('open');
+        window.scrollTo(0, 0);
+    }
+
+    function handleNavAccountClick() { navTo(currentUser ? 'profile' : 'welcome'); }
+
     function toggleTheme() {
         if (document.getElementById('themeToggle').checked) {
             document.body.classList.add('dark-mode');
@@ -972,335 +738,354 @@
         }
     }
 
-    const presets = {
-        'arbys': ["Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Chicken Finger", "Fries - Curly", "Fries - Crinkle", "Burger", "Jalapeno Bites", "Turkey", "Beef", "Corned Beef", "Potato Cakes", "Sub Bun", "Brioche"],
-        'burger': ["Beef Patties", "Burger Buns", "Lettuce (Bags)", "Tomato", "Onion", "Fries (Boxes)", "American Cheese", "Ketchup Bags", "Mustard Bags"],
-        'cafe': ["Espresso Beans", "Pike Place Roast", "Whole Milk", "2% Milk", "Oat Milk", "Almond Milk", "Vanilla Syrup", "Caramel Syrup", "Mocha Sauce", "Pastries (Assorted)"],
-        'pizza': ["Dough Trays (S, M, L)", "Pizza Sauce", "Mozzarella Cheese", "Pepperoni", "Sausage", "Mushrooms", "Onions", "Green Peppers", "Pizza Boxes (M)", "Pizza Boxes (L)"]
-    };
-
-    function loadPresetList() {
-        if(confirm("This will clear your current inventory list. Are you sure?")) {
-            const items = presets[document.getElementById('presetSelector').value] || presets['arbys'];
-            document.getElementById('inventoryContainer').innerHTML = '';
-            items.forEach(name => addInventoryItem(name));
-            saveState();
-            navTo('tracker');
-            alert("Preset loaded successfully!");
+    // ==========================================
+    // 4. DYNAMIC TRACKER FORMS
+    // ==========================================
+    
+    // Time auto-sync
+    let timeEdited = false;
+    document.getElementById('shiftTime').addEventListener('change', () => timeEdited = true);
+    setInterval(() => {
+        if(!timeEdited && document.getElementById('view-tracker').classList.contains('active')) {
+            document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
         }
+    }, 60000);
+
+    // --- Drawers ---
+    function addDrawerItem(val = "100.00", label = "") {
+        const id = Date.now() + Math.floor(Math.random()*1000);
+        const div = document.createElement('div');
+        div.className = "dynamic-item";
+        div.innerHTML = `
+            <input type="text" placeholder="Drawer Name (e.g. Front 1)" style="flex: 1;" class="drawer-name" value="${label}">
+            <input type="number" step="0.01" value="${val}" style="flex: 0.5;" class="drawer-val" oninput="calcDynamicDrawer(this)">
+            <input type="text" readonly style="flex: 1;" class="drawer-res">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+        `;
+        document.getElementById('drawersContainer').appendChild(div);
+        calcDynamicDrawer(div.querySelector('.drawer-val'));
     }
 
-    document.getElementById('trackerForm').addEventListener('input', saveState);
+    function calcDynamicDrawer(inputElem) {
+        let val = parseFloat(inputElem.value) || 0;
+        let diff = val - 100;
+        let resInput = inputElem.parentElement.querySelector('.drawer-res');
+        if (diff === 0) resInput.value = "$0.00 Short";
+        else if (diff < 0) resInput.value = `($${Math.abs(diff).toFixed(2)} Short)`;
+        else resInput.value = `($${diff.toFixed(2)} Over)`;
+    }
 
-    function addInventoryItem(name = "", bl = "N/A", cl = "N/A", fr = "N/A", review = false) {
-        const container = document.getElementById('inventoryContainer');
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'inventory-item';
-        itemDiv.innerHTML = `
+    // --- Deposits ---
+    function addDepositItem(val = "") {
+        const div = document.createElement('div');
+        div.className = "dynamic-item";
+        div.innerHTML = `
+            <input type="text" placeholder="Deposit Amount (e.g. $450.00)" class="dep-val" value="${val}">
+            <label><input type="checkbox" class="dep-ver" checked> Ver. ✔️</label>
+            <label><input type="checkbox" class="dep-val-chk" checked> Val. ✔️</label>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+        `;
+        document.getElementById('depositsContainer').appendChild(div);
+    }
+
+    // --- Daily Routines & ServSafe ---
+    const defaultRoutines = ["Parking Lot Walk / Trash", "Lobby Cleanliness", "Restrooms Checked", "Drive-Thru Clear", "Fryer Filtered", "Temps Logged (ServSafe)", "Sanitizer Buckets Changed"];
+    
+    function addRoutineTask(name = "", isChecked = false) {
+        let taskName = name || document.getElementById('newRoutineTask').value;
+        if(!taskName) return;
+        
+        const div = document.createElement('div');
+        div.className = "checkbox-group";
+        div.innerHTML = `
+            <input type="checkbox" class="routine-chk" ${isChecked ? 'checked' : ''}> 
+            <span class="routine-name" style="flex:1;">${taskName}</span>
+            <button type="button" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px;" onclick="this.parentElement.remove()">X</button>
+        `;
+        document.getElementById('routineContainer').appendChild(div);
+        document.getElementById('newRoutineTask').value = "";
+    }
+
+    // --- Inventory ---
+    function addInventoryItem(name = "", bl = "N/A", cl = "N/A", fr = "N/A") {
+        const div = document.createElement('div');
+        div.className = 'inventory-item';
+        div.innerHTML = `
             <input type="text" placeholder="Item Name" class="inv-name" value="${name}">
             <input type="text" placeholder="Front" class="inv-location inv-backline" value="${bl}">
             <input type="text" placeholder="Cooler" class="inv-location inv-cooler" value="${cl}">
             <input type="text" placeholder="Freezer" class="inv-location inv-freezer" value="${fr}">
             <div class="inv-controls">
-                <label style="font-size: 0.85rem;"><input type="checkbox" class="inv-review" ${review ? "checked" : ""}> Review (•)</label>
-                <button type="button" class="btn btn-danger" onclick="removeItem(this)">X</button>
+                <button type="button" class="btn btn-danger" onclick="this.closest('.inventory-item').remove()">X</button>
             </div>
         `;
-        container.appendChild(itemDiv);
-        saveState();
+        document.getElementById('inventoryContainer').appendChild(div);
     }
 
-    function removeItem(button) {
-        button.closest('.inventory-item').remove();
-        saveState();
+    // ==========================================
+    // 5. PRESETS (SYSTEM & CUSTOM)
+    // ==========================================
+    const presets = {
+        'arbys': ["Shake Mix", "Mozzarella Stick", "Chicken Chunk", "Curly Fries", "Beef", "Sub Bun"],
+        'mcdonalds': ["10:1 Beef Patties", "4:1 Beef Patties", "Nuggets", "Fries", "Reg Buns", "Qtr Buns", "Mac Sauce"],
+        'tacobell': ["Ground Beef", "Nacho Cheese", "Tortillas (10in)", "Tortillas (12in)", "Lettuce", "Crunchy Shells"],
+        'whataburger': ["Large Patties", "Small Patties", "Large Buns", "Small Buns", "Spicy Ketchup", "Onion Rings"],
+        'chickfila': ["Chicken Filets", "Spicy Filets", "Nuggets", "Waffle Fries", "CFA Sauce", "Lemonade"],
+        'dunkin': ["Original Blend Beans", "Decaf Beans", "Glazed Donuts", "Munchkins", "Whole Milk", "Caramel Swirl"],
+        'pizza': ["Dough (L)", "Dough (M)", "Pizza Sauce", "Mozzarella", "Pepperoni", "Sausage", "Boxes (L)"]
+    };
+
+    function loadPresetByName(key) {
+        document.getElementById('inventoryContainer').innerHTML = '';
+        const items = presets[key] || presets['arbys'];
+        items.forEach(name => addInventoryItem(name));
     }
 
-    function calcDrawer(id) {
-        let val = parseFloat(document.getElementById(id + '-val').value) || 0;
-        let diff = val - 100;
-        let resInput = document.getElementById(id + '-res');
-        if (diff === 0) resInput.value = "($0.00 Short)";
-        else if (diff < 0) resInput.value = `($${Math.abs(diff).toFixed(2)} Short)`;
-        else resInput.value = `($${diff.toFixed(2)} Over)`;
+    function loadPresetList() {
+        if(confirm("Replace current inventory with System Preset?")) {
+            loadPresetByName(document.getElementById('presetSelector').value);
+            navTo('tracker');
+        }
     }
 
-    function getCurrentState() {
+    function saveCustomPreset() {
+        if (!currentUser) return alert("Must be signed in.");
+        const plan = currentUserData?.plan || 'free';
+        const name = document.getElementById('customPresetName').value || "My Preset";
+        
+        let items = [];
+        document.querySelectorAll('.inventory-item').forEach(el => {
+            items.push(el.querySelector('.inv-name').value);
+        });
+
+        db.collection('users').doc(currentUser.uid).collection('presets').get().then(snap => {
+            if (plan === 'free' && snap.size >= 1) return alert("Free plan limited to 1 Custom Preset. Upgrade to Pro for more.");
+            if (plan.includes('Individual') && snap.size >= 10) return alert("Individual Pro limited to 10 Presets. Upgrade to Business.");
+
+            db.collection('users').doc(currentUser.uid).collection('presets').add({
+                name: name,
+                items: items,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert("Custom Preset Saved!");
+                document.getElementById('customPresetName').value = "";
+                loadCustomPresets();
+            });
+        });
+    }
+
+    function loadCustomPresets() {
+        if(!currentUser) return;
+        const container = document.getElementById('customPresetsContainer');
+        db.collection('users').doc(currentUser.uid).collection('presets').onSnapshot(snap => {
+            container.innerHTML = "";
+            snap.forEach(doc => {
+                const data = doc.data();
+                const div = document.createElement('div');
+                div.className = "history-item";
+                div.innerHTML = `
+                    <div style="font-weight:600;">${data.name}</div>
+                    <button class="btn btn-outline btn-sm" onclick="applyCustomPreset('${doc.id}')">Load</button>
+                `;
+                container.appendChild(div);
+            });
+        });
+    }
+
+    function applyCustomPreset(docId) {
+        if(confirm("Replace current inventory?")) {
+            db.collection('users').doc(currentUser.uid).collection('presets').doc(docId).get().then(doc => {
+                document.getElementById('inventoryContainer').innerHTML = '';
+                doc.data().items.forEach(name => addInventoryItem(name));
+                navTo('tracker');
+            });
+        }
+    }
+
+    // ==========================================
+    // 6. CLOUD HISTORY & PERFORMANCE
+    // ==========================================
+    function getTrackerState() {
+        const now = new Date();
         const state = {
-            shiftDate: document.getElementById('shiftDate').value,
-            shiftTime: document.getElementById('shiftTime').value,
-            shiftManager: document.getElementById('shiftManager').value,
-            prepNotes: document.getElementById('prepNotes').value,
-            beefCook: document.getElementById('beefCook').value,
-            beefTempered: document.getElementById('beefTempered').value,
-            laborVariance: document.getElementById('laborVariance').value,
-            
-            d1Val: document.getElementById('d1-val').value,
-            d4Val: document.getElementById('d4-val').value,
-            d5Val: document.getElementById('d5-val').value,
-            safeCount: document.getElementById('safeCount').value,
-            deposit: document.getElementById('deposit').value,
-            depVerified: document.getElementById('depVerified').checked,
-            depValidated: document.getElementById('depValidated').checked,
-            changeNeeded: document.getElementById('changeNeeded').value,
-            
-            coolerChunks: document.getElementById('coolerChunks').checked,
-            coolerPans: document.getElementById('coolerPans').checked,
-            backlineDates: document.getElementById('backlineDates').value,
-            preplineDates: document.getElementById('preplineDates').value,
-            pulledFreezer: document.getElementById('pulledFreezer').value,
-            waterSanitizer: document.getElementById('waterSanitizer').checked,
-            panSanitizer: document.getElementById('panSanitizer').checked,
-            saucesMade: document.getElementById('saucesMade').value,
-            extraNotes: document.getElementById('extraNotes').value,
+            dateSaved: now.toLocaleDateString(),
+            timeSaved: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            manager: document.getElementById('shiftManager').value,
+            routines: [],
+            drawers: [],
+            deposits: [],
             inventory: []
         };
 
-        document.querySelectorAll('.inventory-item').forEach(item => {
-            state.inventory.push({
-                name: item.querySelector('.inv-name').value,
-                bl: item.querySelector('.inv-backline').value,
-                cl: item.querySelector('.inv-cooler').value,
-                fr: item.querySelector('.inv-freezer').value,
-                review: item.querySelector('.inv-review').checked
-            });
+        document.querySelectorAll('#routineContainer .checkbox-group').forEach(el => {
+            state.routines.push({ name: el.querySelector('.routine-name').innerText, checked: el.querySelector('.routine-chk').checked });
+        });
+
+        document.querySelectorAll('#drawersContainer .dynamic-item').forEach(el => {
+            state.drawers.push({ name: el.querySelector('.drawer-name').value, val: el.querySelector('.drawer-val').value, res: el.querySelector('.drawer-res').value });
+        });
+
+        document.querySelectorAll('#depositsContainer .dynamic-item').forEach(el => {
+            state.deposits.push({ val: el.querySelector('.dep-val').value, ver: el.querySelector('.dep-ver').checked, valCheck: el.querySelector('.dep-val-chk').checked });
+        });
+
+        document.querySelectorAll('.inventory-item').forEach(el => {
+            state.inventory.push({ name: el.querySelector('.inv-name').value, bl: el.querySelector('.inv-backline').value, cl: el.querySelector('.inv-cooler').value, fr: el.querySelector('.inv-freezer').value });
         });
 
         return state;
     }
 
-    function saveState() {
-        const state = getCurrentState();
-        localStorage.setItem('managerProData', JSON.stringify(state));
-    }
-
-    // --- HISTORY FUNCTIONS ---
-    function saveToHistory() {
-        const state = getCurrentState();
-        state.id = Date.now().toString(); 
-        
-        // --- NEW: Save current live timestamp instead of input time ---
-        const now = new Date();
-        state.shiftDate = now.toLocaleDateString();
-        state.shiftTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        // --------------------------------------------------------------
-
-        let history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
-        history.unshift(state);
-        if(history.length > 50) history.pop(); 
-        localStorage.setItem('managerProHistory', JSON.stringify(history));
-        
-        renderHistoryList(); // Update the list immediately
-    }
     function manualSaveHistory() {
-        saveToHistory();
-        alert("Shift saved to History!");
-    }
-
-    function renderHistoryList() {
-        const history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
-        const container = document.getElementById('historyListContainer');
-        container.innerHTML = '';
-
-        if(history.length === 0) {
-            container.innerHTML = '<p style="color:var(--text-muted);">No saved history yet. Generate a PDF or save a shift to see it here.</p>';
+        if(!currentUser) {
+            alert("Sign in to save history to the cloud.");
+            navTo('auth');
             return;
         }
-
-        history.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            div.innerHTML = `
-                <div class="history-details">
-                    <div class="history-date">${item.shiftDate || 'No Date'} @ ${item.shiftTime || 'No Time'}</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Manager: ${item.shiftManager || 'N/A'}</div>
-                </div>
-                <div class="history-actions">
-                    <button class="btn btn-outline" onclick="loadHistoryItem('${item.id}')">Load</button>
-                    <button class="btn btn-danger" onclick="deleteHistoryItem('${item.id}')">X</button>
-                </div>
-            `;
-            container.appendChild(div);
+        db.collection('users').doc(currentUser.uid).collection('history').add(getTrackerState()).then(() => {
+            alert("Shift saved to Cloud History!");
+            calculatePerformance();
         });
     }
 
-    function loadHistoryItem(id) {
-        const history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
-        const item = history.find(h => h.id === id);
-        if(item) {
-            if(confirm("Loading this history will overwrite your current active shift form. Continue?")) {
-                localStorage.setItem('managerProData', JSON.stringify(item));
-                loadState();
-                navTo('tracker');
-            }
-        }
+    function fetchCloudHistory() {
+        if(!currentUser) return;
+        const container = document.getElementById('historyListContainer');
+        db.collection('users').doc(currentUser.uid).collection('history')
+          .orderBy('dateSaved', 'desc')
+          .limit(20)
+          .get().then(snap => {
+            container.innerHTML = "";
+            if(snap.empty) { container.innerHTML = "<p>No cloud history found.</p>"; return; }
+            snap.forEach(doc => {
+                const data = doc.data();
+                const div = document.createElement('div');
+                div.className = "history-item";
+                div.innerHTML = `
+                    <div>
+                        <div class="history-date">${data.dateSaved} @ ${data.timeSaved}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">Manager: ${data.manager}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        });
     }
 
-    function deleteHistoryItem(id) {
-        if(confirm("Are you sure you want to delete this saved shift?")) {
-            let history = JSON.parse(localStorage.getItem('managerProHistory') || '[]');
-            history = history.filter(h => h.id !== id);
-            localStorage.setItem('managerProHistory', JSON.stringify(history));
-            renderHistoryList();
-        }
-    }
-
-    function loadState() {
-        const saved = localStorage.getItem('managerProData');
-        if (saved) {
-            const state = JSON.parse(saved);
-            if(state.shiftDate) document.getElementById('shiftDate').value = state.shiftDate;
-            if(state.shiftTime) document.getElementById('shiftTime').value = state.shiftTime;
-            if(state.shiftManager) document.getElementById('shiftManager').value = state.shiftManager;
-            if(state.prepNotes) document.getElementById('prepNotes').value = state.prepNotes;
-            if(state.beefCook) document.getElementById('beefCook').value = state.beefCook;
-            if(state.beefTempered) document.getElementById('beefTempered').value = state.beefTempered;
-            if(state.laborVariance) document.getElementById('laborVariance').value = state.laborVariance;
-            if(state.d1Val) document.getElementById('d1-val').value = state.d1Val;
-            if(state.d4Val) document.getElementById('d4-val').value = state.d4Val;
-            if(state.d5Val) document.getElementById('d5-val').value = state.d5Val;
-            if(state.safeCount) document.getElementById('safeCount').value = state.safeCount;
-            if(state.deposit) document.getElementById('deposit').value = state.deposit;
+    function calculatePerformance() {
+        if(!currentUser) return;
+        db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
+            document.getElementById('statShifts').innerText = snap.size;
             
-            if(state.changeNeeded) document.getElementById('changeNeeded').value = state.changeNeeded;
-            if(state.backlineDates) document.getElementById('backlineDates').value = state.backlineDates;
-            if(state.preplineDates) document.getElementById('preplineDates').value = state.preplineDates;
-            if(state.pulledFreezer) document.getElementById('pulledFreezer').value = state.pulledFreezer;
-            if(state.saucesMade) document.getElementById('saucesMade').value = state.saucesMade;
-            if(state.extraNotes) document.getElementById('extraNotes').value = state.extraNotes;
+            let totalRoutines = 0;
+            let checkedRoutines = 0;
+            
+            snap.forEach(doc => {
+                const routines = doc.data().routines || [];
+                routines.forEach(r => {
+                    totalRoutines++;
+                    if(r.checked) checkedRoutines++;
+                });
+            });
 
-            document.getElementById('depVerified').checked = state.depVerified ?? true;
-            document.getElementById('depValidated').checked = state.depValidated ?? true;
-            document.getElementById('coolerChunks').checked = state.coolerChunks ?? true;
-            document.getElementById('coolerPans').checked = state.coolerPans ?? true;
-            document.getElementById('waterSanitizer').checked = state.waterSanitizer ?? true;
-            document.getElementById('panSanitizer').checked = state.panSanitizer ?? true;
-
-            document.getElementById('inventoryContainer').innerHTML = ''; 
-            if (state.inventory && state.inventory.length > 0) {
-                state.inventory.forEach(inv => addInventoryItem(inv.name, inv.bl, inv.cl, inv.fr, inv.review));
-            } else {
-                presets['arbys'].forEach(name => addInventoryItem(name));
-            }
-        } else {
-            document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
-            presets['arbys'].forEach(name => addInventoryItem(name));
-        }
-
-        ['d1', 'd4', 'd5'].forEach(id => calcDrawer(id));
+            const percent = totalRoutines === 0 ? 0 : Math.round((checkedRoutines / totalRoutines) * 100);
+            document.getElementById('statRoutines').innerText = percent + "%";
+        });
     }
 
-    function clearData() {
-        if(confirm("Are you sure you want to clear all data and start a new shift?")) {
-            localStorage.removeItem('managerProData');
-            location.reload(); 
-        }
-    }
-
-    function formatText(text) { return text ? text.replace(/\n/g, '<br>') : ""; }
-
+    // ==========================================
+    // 7. PRINTING & REPORT GENERATION
+    // ==========================================
     function generateReport() {
-        // Enforce PRO feature constraint
-        if (!requireProFeature()) return;
+        if(!currentUser) { alert("Sign in to generate reports."); return navTo('welcome'); }
 
-        saveToHistory();
-
-        const dateRaw = document.getElementById('shiftDate').value;
-        const [yyyy, mm, dd] = dateRaw.split('-');
-        const formattedDate = dateRaw ? `${mm}/${dd}/${yyyy.slice(-2)}` : "00/00/00";
-        const time = document.getElementById('shiftTime').value;
+        const state = getTrackerState();
         
-        let formattedTime = time;
-        if(time) {
-            const timeObj = new Date(`1970-01-01T${time}`);
-            formattedTime = timeObj.toLocaleTimeString([], {hour: 'numeric', minute:'2-digit'});
-        }
+        document.getElementById('printHeader').innerText = `ezManage Shift Report - ${state.dateSaved} - ${state.timeSaved} - Manager: ${state.manager}`;
         
-        const manager = document.getElementById('shiftManager').value || "Manager";
-        
-        document.getElementById('printHeader').innerText = `Inventory Count Template - ${formattedDate} - ${formattedTime} - Shift Manager: ${manager}`;
-        document.getElementById('printPrep').innerText = document.getElementById('prepNotes').value || "N/A";
-        document.getElementById('printBeefCook').innerText = document.getElementById('beefCook').value || "0";
-        document.getElementById('printBeefTemp').innerText = document.getElementById('beefTempered').value || "0 Cases";
-        document.getElementById('printLabor').innerText = document.getElementById('laborVariance').value || "";
+        let routineHtml = "";
+        state.routines.forEach(r => routineHtml += `<div class="print-text">${r.checked ? '✔️' : '❌'} ${r.name}</div>`);
+        document.getElementById('printRoutines').innerHTML = routineHtml;
 
-        const d1Val = document.getElementById('d1-val').value;
-        const d1Res = document.getElementById('d1-res').value;
-        const d4Val = document.getElementById('d4-val').value;
-        const d4Res = document.getElementById('d4-res').value;
-        const d5Val = document.getElementById('d5-val').value;
-        const d5Res = document.getElementById('d5-res').value;
-        
-        document.getElementById('printDrawers').innerHTML = `Drawer 1 = $${d1Val} ${d1Res}<br>Drawer 4 = $${d4Val} ${d4Res}<br>Drawer 5 = $${d5Val} ${d5Res}`;
-        
-        document.getElementById('printSafe').innerText = document.getElementById('safeCount').value || "$1,100.00";
-        document.getElementById('printDeposit').innerText = document.getElementById('deposit').value || "$0.00";
-        document.getElementById('printDepVer').innerText = document.getElementById('depVerified').checked ? "✔️" : "❌";
-        document.getElementById('printDepVal').innerText = document.getElementById('depValidated').checked ? "✔️" : "❌";
-        document.getElementById('printChange').innerHTML = formatText(document.getElementById('changeNeeded').value);
+        let drawHtml = "";
+        state.drawers.forEach(d => drawHtml += `<div class="print-text">${d.name || 'Drawer'}: $${d.val} ${d.res}</div>`);
+        document.getElementById('printDrawers').innerHTML = drawHtml;
 
-        let invHTML = "";
-        document.querySelectorAll('.inventory-item').forEach(item => {
-            const name = item.querySelector('.inv-name').value;
-            const bl = item.querySelector('.inv-backline').value;
-            const cl = item.querySelector('.inv-cooler').value;
-            const fr = item.querySelector('.inv-freezer').value;
-            const needsReview = item.querySelector('.inv-review').checked;
-            
-            if(name) {
-                const prefix = needsReview ? "•" : "";
-                invHTML += `<div class="print-text">${prefix}${name}: ${bl} Backline, ${cl} Cooler , ${fr} Freezer</div>`;
-            }
-        });
-        document.getElementById('printInventoryList').innerHTML = invHTML;
+        document.getElementById('printSafe').innerText = document.getElementById('safeCount').value || "$0.00";
 
-        let coolerStr = "";
-        if(document.getElementById('coolerChunks').checked) coolerStr += "All Chunks/Mains ✔️<br>";
-        if(document.getElementById('coolerPans').checked) coolerStr += "All Pans ✔️";
-        document.getElementById('printCoolerDates').innerHTML = coolerStr;
-        document.getElementById('printBacklineDates').innerHTML = formatText(document.getElementById('backlineDates').value);
-        document.getElementById('printPreplineDates').innerHTML = formatText(document.getElementById('preplineDates').value);
-        document.getElementById('printPulled').innerHTML = formatText(document.getElementById('pulledFreezer').value);
+        let depHtml = "";
+        state.deposits.forEach(d => depHtml += `<div class="print-text">Deposit: ${d.val} (Ver: ${d.ver?'Y':'N'}, Val: ${d.valCheck?'Y':'N'})</div>`);
+        document.getElementById('printDeposits').innerHTML = depHtml;
 
-        let sanStr = "";
-        if(document.getElementById('waterSanitizer').checked) sanStr += `<div class="print-text">Water & Sanitizer Bottle Changed ✔️</div>`;
-        if(document.getElementById('panSanitizer').checked) sanStr += `<div class="print-text">Sanitizer Pans Changed ✔️</div>`;
-        document.getElementById('printSanitizer').innerHTML = sanStr;
+        let invHtml = "";
+        state.inventory.forEach(i => invHtml += `<div class="print-text">${i.name}: ${i.bl} Front | ${i.cl} Cooler | ${i.fr} Freezer</div>`);
+        document.getElementById('printInventoryList').innerHTML = invHtml;
 
-        document.getElementById('printSauces').innerHTML = formatText(document.getElementById('saucesMade').value);
-        document.getElementById('printNotes').innerHTML = formatText(document.getElementById('extraNotes').value);
-
+        manualSaveHistory();
         window.print();
     }
 
+    function clearData() {
+        if(confirm("Clear current form data?")) {
+            document.getElementById('trackerForm').reset();
+            document.getElementById('drawersContainer').innerHTML = "";
+            document.getElementById('depositsContainer').innerHTML = "";
+            document.getElementById('inventoryContainer').innerHTML = "";
+            document.getElementById('routineContainer').innerHTML = "";
+            initDefaults();
+        }
+    }
+
     // ==========================================
-    // 6. SERVICE WORKER & ONLOAD LOGIC
+    // 8. MISC (Init, Checkout, Requests)
     // ==========================================
-    if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("service-worker.js");
+    function initDefaults() {
+        document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
+        addDrawerItem("100.00", "Drawer 1");
+        addDepositItem("$0.00");
+        defaultRoutines.forEach(r => addRoutineTask(r, false));
+        loadPresetByName('arbys');
+    }
+
+    function processCheckout(plan) {
+        if(!currentUser) { alert("Sign in first."); return navTo('auth'); }
+        // Simulated checkout process for the code snippet
+        alert(`Initiating checkout for ${plan}. In production, this connects to Stripe.`);
+        db.collection('users').doc(currentUser.uid).set({ 
+            plan: plan, 
+            trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
+        }, { merge: true }).then(() => {
+            alert("Success! 7-Day Free Trial activated.");
+            location.reload();
+        });
+    }
+
+    function submitFeatureRequest() {
+        if(!currentUser) return alert("Please sign in.");
+        const text = document.getElementById('featureReqText').value;
+        if(!text) return;
+        
+        db.collection('feature_requests').add({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            text: text,
+            isPro: currentUserData?.plan !== 'free',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            alert("Request sent successfully!");
+            document.getElementById('featureReqText').value = "";
+        });
     }
 
     window.onload = () => {
-        try {
-            const savedTheme = localStorage.getItem('managerProTheme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('themeToggle').checked = true;
-            }
-            loadState();
-        } catch (err) { console.error("Load error:", err); }
-        
-        // Listen for Stripe Redirect params
-        const params = new URLSearchParams(window.location.search);
-        if (params.get("success")) {
-            alert("Payment successful! Your account is now PRO.");
-            if (currentUser) {
-                db.collection('users').doc(currentUser.uid).set({
-                    subscription: { status: "active" }
-                }, { merge: true });
-            }
+        if(localStorage.getItem('managerProTheme') === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('themeToggle').checked = true;
         }
+        initDefaults();
     };
-    
+
 </script>
 </body>
 </html>
