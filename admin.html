@@ -69,6 +69,7 @@
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
         .status-badge.active { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
         .status-badge.banned { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
+        .status-badge.pro { background-color: rgba(251, 191, 36, 0.2); color: var(--accent-yellow); }
         .subscription-text { font-weight: bold; color: var(--accent-blue); }
         .btn-sm { padding: 6px 12px; border-radius: 5px; font-weight: 500; cursor: pointer; border: none; color: white; }
         .btn-ban { background-color: var(--accent-red); }
@@ -107,6 +108,7 @@
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
+                    <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
                     <li><a href="account.html">My Account Settings</a></li>
@@ -156,6 +158,25 @@
                             </tr>
                         </thead>
                         <tbody id="user-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="featurerequests" class="content-section">
+                <h3>App Feature Requests (ezManage)</h3>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                                <th>Tier</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feature-request-list-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -225,7 +246,6 @@
                 const ordersSnapshot = await getDocs(collection(db, "orders"));
                 const orders = ordersSnapshot.docs.map(d => d.data());
 
-                // Fetch Newsletter Subscribers
                 const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
                 const subscribers = newsletterSnapshot.docs.map(d => d.data());
 
@@ -234,9 +254,20 @@
                 document.getElementById('total-purchases').textContent = orders.length;
 
                 renderUserTable(users);
-                renderNewsletterTable(subscribers); // Populate Newsletter UI
+                renderNewsletterTable(subscribers); 
                 calculatePerformanceMetrics(users, carts, orders);
                 renderChart('summary', users);
+                
+                // Fetch Feature Requests
+                try {
+                    const featureRequestsSnapshot = await getDocs(collection(db, "feature_requests"));
+                    const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderFeatureRequestsTable(requests);
+                } catch (frError) {
+                    console.log("Could not load feature requests. Missing Firestore rules?", frError);
+                    document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                }
+                
             } catch (error) {
                 console.error("Error loading admin data:", error);
             }
@@ -264,6 +295,42 @@
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
                 userListBody.appendChild(row);
+            });
+        }
+
+        // NEW RENDERER FOR FEATURE REQUESTS
+        function renderFeatureRequestsTable(requests) {
+            const listBody = document.getElementById('feature-request-list-body');
+            listBody.innerHTML = '';
+            
+            if(requests.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`;
+                return;
+            }
+            
+            // Sort to place newest items at the top
+            requests.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+            requests.forEach(req => {
+                const row = document.createElement('tr');
+                const dateRaw = req.timestamp ? new Date(req.timestamp) : new Date();
+                const reqDate = dateRaw.toLocaleDateString();
+                
+                const tierBadge = req.isPro ? `<span class="status-badge pro">Priority (Pro)</span>` : `<span class="status-badge">Free Tier</span>`;
+                const isComplete = req.status === 'completed';
+                const statusStr = isComplete ? `<span style="color:var(--accent-green);">Completed</span>` : `<span style="color:var(--accent-yellow);">Pending</span>`;
+                const actionButton = isComplete 
+                     ? `<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>`
+                     : `<button class="btn-sm btn-unban mark-complete-btn" data-id="${req.id}">Mark Complete</button>`;
+                
+                row.innerHTML = `
+                    <td>${reqDate}</td>
+                    <td>${req.email || "Unknown User"}</td>
+                    <td style="max-width:300px; word-wrap:break-word;">${req.message}</td>
+                    <td>${tierBadge}</td>
+                    <td>${statusStr}</td>
+                    <td>${actionButton}</td>`;
+                listBody.appendChild(row);
             });
         }
 
@@ -340,6 +407,15 @@
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                    loadAdminData();
+                }
+            });
+            
+            document.getElementById('feature-request-list-body').addEventListener('click', async (e) => {
+                const reqId = e.target.dataset.id;
+                if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
+                if (confirm(`Mark this feature request as complete?`)) {
+                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
                     loadAdminData();
                 }
             });

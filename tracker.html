@@ -620,8 +620,12 @@
                 if (doc.exists) {
                     currentUserData = doc.data();
                     loadProfileUI(currentUserData);
+                    
+                    // The old method tried reading subcollections which was blocked by rules
+                    // The new method uses the array fields stored directly inside the user doc
                     loadCustomPresets();
                     calculatePerformance();
+                    
                     syncDraftFromServer(); 
                     navTo('tracker');
                 } else {
@@ -891,28 +895,32 @@
 
     function saveCustomPreset() {
         if (!currentUser) return alert("Must be signed in.");
-        const plan = currentUserData?.plan || 'free';
-        const name = document.getElementById('customPresetName').value || "My Custom Preset";
         
-        let items = [];
-        document.querySelectorAll('.inventory-item').forEach(el => {
-            items.push({
-                name: el.querySelector('.inv-name').value,
-                bl: el.querySelector('.inv-backline').value,
-                cl: el.querySelector('.inv-cooler').value,
-                fr: el.querySelector('.inv-freezer').value
+        // FIX: Saved directly inside user document array to bypass missing subcollection rules
+        db.collection('users').doc(currentUser.uid).get().then(docSnap => {
+            const plan = docSnap.data().plan || 'free';
+            let existingPresets = docSnap.data().customPresets || [];
+            
+            if (plan === 'free' && existingPresets.length >= 1) return alert("Free plan limited to 1 Custom Preset. Upgrade to Pro for more.");
+            if (plan.includes('Individual') && existingPresets.length >= 10) return alert("Individual Pro limited to 10 Presets. Upgrade to Business.");
+
+            const name = document.getElementById('customPresetName').value || "My Custom Preset";
+            let items = [];
+            
+            document.querySelectorAll('.inventory-item').forEach(el => {
+                items.push({
+                    name: el.querySelector('.inv-name').value,
+                    bl: el.querySelector('.inv-backline').value,
+                    cl: el.querySelector('.inv-cooler').value,
+                    fr: el.querySelector('.inv-freezer').value
+                });
             });
-        });
 
-        db.collection('users').doc(currentUser.uid).collection('presets').get().then(snap => {
-            if (plan === 'free' && snap.size >= 1) return alert("Free plan limited to 1 Custom Preset. Upgrade to Pro for more.");
-            if (plan.includes('Individual') && snap.size >= 10) return alert("Individual Pro limited to 10 Presets. Upgrade to Business.");
-
-            db.collection('users').doc(currentUser.uid).collection('presets').add({
-                name: name,
-                items: items,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
+            const newPreset = { id: Date.now().toString(), name: name, items: items, createdAt: new Date().toISOString() };
+            
+            db.collection('users').doc(currentUser.uid).set({
+                customPresets: firebase.firestore.FieldValue.arrayUnion(newPreset)
+            }, { merge: true }).then(() => {
                 alert("Custom Preset Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
                 loadCustomPresets();
@@ -923,31 +931,37 @@
     function loadCustomPresets() {
         if(!currentUser) return;
         const container = document.getElementById('customPresetsContainer');
-        db.collection('users').doc(currentUser.uid).collection('presets').onSnapshot(snap => {
+        db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
             container.innerHTML = "";
-            snap.forEach(doc => {
-                const data = doc.data();
-                const div = document.createElement('div');
-                div.className = "history-item";
-                div.innerHTML = `
-                    <div style="font-weight:600;">${data.name}</div>
-                    <button class="btn btn-outline btn-sm" onclick="applyCustomPreset('${doc.id}')">Load</button>
-                `;
-                container.appendChild(div);
-            });
+            if (doc.exists && doc.data().customPresets) {
+                const presets = doc.data().customPresets;
+                presets.forEach(data => {
+                    const div = document.createElement('div');
+                    div.className = "history-item";
+                    div.innerHTML = `
+                        <div style="font-weight:600;">${data.name}</div>
+                        <button class="btn btn-outline btn-sm" onclick="applyCustomPreset('${data.id}')">Load</button>
+                    `;
+                    container.appendChild(div);
+                });
+            }
         });
     }
 
-    function applyCustomPreset(docId) {
+    function applyCustomPreset(presetId) {
         if(confirm("Replace current inventory with this custom preset?")) {
-            db.collection('users').doc(currentUser.uid).collection('presets').doc(docId).get().then(doc => {
-                document.getElementById('inventoryContainer').innerHTML = '';
-                doc.data().items.forEach(item => {
-                    if (typeof item === 'string') addInventoryItem(item); 
-                    else addInventoryItem(item.name, item.bl, item.cl, item.fr);
-                });
-                navTo('tracker');
-                triggerDraftSync();
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                const presets = doc.data().customPresets || [];
+                const targetPreset = presets.find(p => p.id === presetId);
+                if (targetPreset) {
+                    document.getElementById('inventoryContainer').innerHTML = '';
+                    targetPreset.items.forEach(item => {
+                        if (typeof item === 'string') addInventoryItem(item); 
+                        else addInventoryItem(item.name, item.bl, item.cl, item.fr);
+                    });
+                    navTo('tracker');
+                    triggerDraftSync();
+                }
             });
         }
     }
@@ -961,6 +975,7 @@
         const duration = shiftStartTime ? Math.round((Date.now() - shiftStartTime) / 60000) : 0;
 
         const state = {
+            id: Date.now().toString(), // Used for rendering history lists
             dateSaved: document.getElementById('shiftDate').value || now.toLocaleDateString(),
             timeSaved: document.getElementById('shiftTime').value || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             manager: document.getElementById('shiftManager').value,
@@ -990,7 +1005,6 @@
         return state;
     }
 
-    // Auto-sync Draft Logic
     document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
     
     function triggerDraftSync() {
@@ -1028,29 +1042,37 @@
 
     function manualSaveHistory() {
         if(!currentUser) return alert("Sign in to save history to the cloud.");
-        
         const state = getTrackerState();
-        db.collection('users').doc(currentUser.uid).collection('history').add(state).then(() => {
+        
+        // FIX: Saved directly inside user document array to bypass missing subcollection rules
+        db.collection('users').doc(currentUser.uid).set({
+            shiftHistory: firebase.firestore.FieldValue.arrayUnion(state)
+        }, { merge: true }).then(() => {
             alert("Shift saved & completed in Cloud History!");
             shiftStartTime = null; 
             document.getElementById('timerDisplay').innerText = "Not Started";
             document.getElementById('timerBtn').innerText = "Start Shift Timer";
             document.getElementById('timerBtn').classList.replace('btn-danger', 'btn-success');
             calculatePerformance();
+            fetchCloudHistory();
         });
     }
 
     function fetchCloudHistory() {
         if(!currentUser) return;
         const container = document.getElementById('historyListContainer');
-        db.collection('users').doc(currentUser.uid).collection('history')
-          .orderBy('dateSaved', 'desc')
-          .limit(20)
-          .get().then(snap => {
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
             container.innerHTML = "";
-            if(snap.empty) { container.innerHTML = "<p>No cloud history found.</p>"; return; }
-            snap.forEach(doc => {
-                const data = doc.data();
+            const historyData = (doc.exists ? doc.data().shiftHistory || [] : []);
+            
+            if(historyData.length === 0) { 
+                container.innerHTML = "<p>No cloud history found.</p>"; return; 
+            }
+            
+            // Sort to show newest first
+            historyData.sort((a,b) => b.id - a.id);
+
+            historyData.slice(0, 20).forEach(data => {
                 const div = document.createElement('div');
                 div.className = "history-item";
                 div.innerHTML = `
@@ -1066,15 +1088,15 @@
 
     function calculatePerformance() {
         if(!currentUser) return;
-        db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
-            const shiftCount = snap.size;
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
+            const shiftHistory = doc.exists ? doc.data().shiftHistory || [] : [];
+            const shiftCount = shiftHistory.length;
             document.getElementById('statShifts').innerText = shiftCount;
             
             let totalRoutines = 0; let checkedRoutines = 0;
             let totalDuration = 0;
             
-            snap.forEach(doc => {
-                const data = doc.data();
+            shiftHistory.forEach(data => {
                 if(data.durationMins) totalDuration += data.durationMins;
                 const routines = data.routines || [];
                 routines.forEach(r => {
@@ -1102,12 +1124,12 @@
 
     function exportPerformanceCSV() {
         if(!currentUser) return alert("Please sign in.");
-        db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
-            if(snap.empty) return alert("No data to export.");
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
+            const shiftHistory = doc.exists ? doc.data().shiftHistory || [] : [];
+            if(shiftHistory.length === 0) return alert("No data to export.");
             
             let csv = "Date,Time,Manager,Duration(mins),Safe Count,Labor Variance\n";
-            snap.forEach(doc => {
-                const d = doc.data();
+            shiftHistory.forEach(d => {
                 csv += `"${d.dateSaved}","${d.timeSaved}","${d.manager}","${d.durationMins||0}","${d.safeCount||0}","${d.laborVariance||0}"\n`;
             });
 
@@ -1194,7 +1216,9 @@
                 body: JSON.stringify({
                     uid: currentUser.uid,
                     email: currentUser.email,
-                    plan: planName
+                    plan: planName,
+                    successUrl: "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+                    cancelUrl: window.location.href
                 })
             });
 
@@ -1220,18 +1244,18 @@
             uid: currentUser.uid,
             email: currentUser.email,
             message: text,
-            type: 'feature_request',
+            type: 'ezManage_feature',
             status: 'new',
             isPro: currentUserData?.plan !== 'free',
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            timestamp: new Date().toISOString()
         };
 
         db.collection('feature_requests').add(payload).then(() => {
-            // Also push to generic admin notifications collection for the admin dashboard
-            db.collection('admin_notifications').add(payload).then(() => {
-                alert("Request sent directly to Admin Notifications!");
-                document.getElementById('featureReqText').value = "";
-            });
+            alert("Request sent directly to Admin Panel!");
+            document.getElementById('featureReqText').value = "";
+        }).catch((err) => {
+             console.error(err);
+             alert("Failed to send request. Admin needs to add database rules for 'feature_requests'.");
         });
     }
 
@@ -1240,7 +1264,6 @@
             document.body.classList.add('dark-mode');
             document.getElementById('themeToggle').checked = true;
         }
-        // Listener for Stripe Redirects params
         const params = new URLSearchParams(window.location.search);
         if (params.get("success")) {
             alert("Payment successful! Your account is now PRO.");
