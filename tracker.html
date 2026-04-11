@@ -83,6 +83,7 @@
         .btn-accent { background: var(--accent); color: white; }
         .btn-accent:hover { background: var(--accent-hover); }
         .btn-outline { background: transparent; color: var(--primary); border: 1px solid var(--primary); }
+        .btn-success { background: #10b981; color: white; }
         .btn-danger { background: #ef4444; color: white; }
         .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
 
@@ -99,7 +100,6 @@
         textarea { resize: vertical; min-height: 80px; }
         .checkbox-group { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
         
-        /* Lists & Dynamic items */
         .dynamic-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
         .dynamic-item { display: flex; gap: 0.5rem; align-items: center; }
         .dynamic-item input { flex: 1; }
@@ -120,14 +120,12 @@
         .action-buttons { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
         .action-buttons .btn { flex: 1; min-width: 150px; padding: 1rem; font-size: 1.05rem; }
 
-        /* History & Performance */
         .history-item { padding: 1.25rem; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); }
         .history-date { font-weight: 600; color: var(--primary); font-size: 1.05rem; }
         .stat-box { background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
         .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
 
-        /* Pricing */
         .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
         .tier-card { text-align: center; border: 2px solid var(--border); position: relative; }
         .tier-card.pro { border-color: var(--accent); }
@@ -139,10 +137,13 @@
         .features li { margin-bottom: 0.75rem; font-size: 0.95rem; }
         .features li::before { content: "✔️"; margin-right: 0.5rem; font-size: 0.8rem; }
 
-        /* Welcome & Auth */
         .welcome-container { text-align: center; padding: 4rem 1rem; }
         .welcome-title { font-size: 3rem; color: var(--primary); margin-bottom: 1rem; font-weight: 800; }
         .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
+        
+        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 3rem; text-align: left; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .benefit-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
+        .benefit-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
 
         /* Print */
         #print-wrapper { display: none; }
@@ -198,6 +199,21 @@
             <div style="display:flex; gap:1rem; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-accent" onclick="navTo('auth'); isRegisterMode = true; toggleAuthModeUI();">Get Started Free</button>
                 <button class="btn btn-outline" onclick="navTo('auth'); isRegisterMode = false; toggleAuthModeUI();">Log In</button>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3>⏱️ Save Time</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Stop doing tedious math. Automate your drawer variance calculations and inventory tracking instantly.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>☁️ Cross-Device Sync</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Start a shift on your phone, finish it on the office tablet. Your data syncs securely across all devices.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>📈 Track Performance</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Analyze average task completion times, track your shift metrics, and discover actionable tips to improve.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -258,6 +274,10 @@
                     <label>Store Location</label>
                     <input type="text" id="setupLocation" placeholder="City, State" required>
                 </div>
+                <div class="form-group full-width" style="text-align:left;">
+                    <label>Referral Code (Optional)</label>
+                    <input type="text" id="setupReferral" placeholder="If someone referred you">
+                </div>
             </div>
             <button class="btn btn-accent" style="width:100%; margin-top: 1.5rem;" onclick="completeSetup()">Finish Setup</button>
         </div>
@@ -266,32 +286,35 @@
     <div id="view-tracker" class="view-section">
         <div style="text-align:center; margin-bottom: 2rem;">
             <h1 style="color:var(--primary); font-size: 2rem;">Shift Tracker</h1>
-            <p style="color:var(--text-muted);">Your work auto-saves locally. Select a preset in the menu to change layouts.</p>
+            <p style="color:var(--text-muted);">Drafts sync automatically to the cloud across your devices.</p>
         </div>
 
         <form id="trackerForm">
             <div class="card">
-                <h2>Shift Details</h2>
+                <h2>Shift Details & Timer</h2>
                 <div class="form-grid three-col">
                     <div class="form-group">
                         <label>Date</label>
                         <input type="date" id="shiftDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Time (Auto-syncs)</label>
+                        <label>Time</label>
                         <input type="time" id="shiftTime" required>
                     </div>
                     <div class="form-group">
                         <label>Shift Manager</label>
                         <input type="text" id="shiftManager" placeholder="Enter Name" required>
                     </div>
+                    <div class="form-group full-width" style="display:flex; flex-direction:row; align-items:center; gap: 1rem;">
+                        <button type="button" class="btn btn-success btn-sm" id="timerBtn" onclick="toggleShiftTimer()">Start Shift Timer</button>
+                        <span id="timerDisplay" style="font-weight:bold; color:var(--text-muted);">Not Started</span>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
                 <h2>Manager Daily Routine & ServSafe</h2>
-                <div id="routineContainer" class="dynamic-list">
-                    </div>
+                <div id="routineContainer" class="dynamic-list"></div>
                 <div style="display:flex; gap:0.5rem;">
                     <input type="text" id="newRoutineTask" placeholder="Add custom task..." style="flex:1;">
                     <button type="button" class="btn btn-outline btn-sm" onclick="addRoutineTask()">Add</button>
@@ -322,7 +345,6 @@
 
             <div class="card">
                 <h2>Cash & Registers</h2>
-                
                 <div class="form-group full-width" style="margin-bottom: 1rem;">
                     <label>Registers / Drawers ($)</label>
                     <div id="drawersContainer" class="dynamic-list"></div>
@@ -355,8 +377,8 @@
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn btn-accent" onclick="generateReport()">🖨️ Print / Save PDF</button>
-                <button type="button" class="btn btn-outline" onclick="manualSaveHistory()">☁️ Save to Cloud History</button>
+                <button type="button" class="btn btn-accent" onclick="generateReport()">🖨️ End Shift & Save PDF</button>
+                <button type="button" class="btn btn-outline" onclick="manualSaveHistory()">☁️ Complete & Save to Cloud</button>
                 <button type="button" class="btn btn-danger" onclick="clearData()">Clear Data</button>
             </div>
         </form>
@@ -365,14 +387,17 @@
     <div id="view-history" class="view-section">
         <div class="card">
             <h2>Cloud Shift History</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Your history syncs across all devices linked to your account.</p>
+            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Your completed shifts are synced securely across all devices.</p>
             <div id="historyListContainer"></div>
         </div>
     </div>
 
     <div id="view-performance" class="view-section">
         <div class="card">
-            <h2>Manager Performance</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                <h2 style="margin:0; border:none; padding:0;">Manager Performance</h2>
+                <button class="btn btn-outline btn-sm" onclick="exportPerformanceCSV()">Export CSV</button>
+            </div>
             <p style="color:var(--text-muted); margin-bottom: 1.5rem;">Analytics based on your saved cloud history.</p>
             
             <div class="form-grid">
@@ -381,9 +406,18 @@
                     <div class="stat-label">Total Shifts Logged</div>
                 </div>
                 <div class="stat-box">
-                    <div class="stat-value" id="statRoutines">0%</div>
-                    <div class="stat-label">Routine Completion Avg</div>
+                    <div class="stat-value" id="statAvgTime">0m</div>
+                    <div class="stat-label">Avg Shift Log Time</div>
                 </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="statRoutines">0%</div>
+                    <div class="stat-label">Routine Completion</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2rem; color:var(--primary);">💡 Tips for Improvement</h3>
+            <div id="performanceTips" style="margin-top: 1rem; color: var(--text-muted); background: var(--bg-color); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                Log more shifts to see personalized performance tips!
             </div>
         </div>
     </div>
@@ -429,7 +463,7 @@
 
         <div class="card">
             <h2>Refer & Earn</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Share your special link for unstoppable.store. You receive your discount once the person signs up and activates their account (pays $1).</p>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1rem;">Share your special link for unstoppable.store. You receive your discount once the person signs up and activates their account!</p>
             <input type="text" id="referralLink" readonly style="font-family: monospace; margin-bottom: 1rem;">
             <button class="btn btn-outline" onclick="copyReferral()">Copy Link</button>
         </div>
@@ -464,7 +498,7 @@
             <p style="color:var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Save your current Tracker layout as a reusable preset. (Free: 1, Pro: 10, Business: Unlimited).</p>
             <div style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
                 <input type="text" id="customPresetName" placeholder="Preset Name (e.g., Morning Shift)" style="flex:1;">
-                <button class="btn btn-outline" onclick="saveCustomPreset()">Save Current</button>
+                <button class="btn btn-outline" onclick="saveCustomPreset()">Save Current Layout</button>
             </div>
             <div id="customPresetsContainer" class="dynamic-list"></div>
         </div>
@@ -513,7 +547,7 @@
     <div id="view-request" class="view-section">
         <div class="card">
             <h2>Feature Request</h2>
-            <p style="color:var(--text-muted); margin-bottom: 1rem;">Send requests directly to the admin. Pro users get priority processing.</p>
+            <p style="color:var(--text-muted); margin-bottom: 1rem;">Send requests directly to the admin panel. Pro users get priority processing.</p>
             <div class="form-group">
                 <label>Describe the feature or issue</label>
                 <textarea id="featureReqText" placeholder="I would love it if the app could..."></textarea>
@@ -562,12 +596,13 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
     
-    // Offline Persistence
     db.enablePersistence().catch(err => console.log("Offline failed:", err));
 
     let currentUser = null;
     let currentUserData = null;
     let isRegisterMode = false;
+    let shiftStartTime = null;
+    let cloudSyncTimeout = null;
 
     // ==========================================
     // 2. AUTHENTICATION & ONBOARDING
@@ -587,9 +622,10 @@
                     loadProfileUI(currentUserData);
                     loadCustomPresets();
                     calculatePerformance();
+                    syncDraftFromServer(); 
                     navTo('tracker');
                 } else {
-                    navTo('setup'); // Force onboarding if no user document
+                    navTo('setup'); 
                 }
             });
         } else {
@@ -650,6 +686,7 @@
             role: document.getElementById('setupRole').value,
             store: document.getElementById('setupStore').value,
             location: document.getElementById('setupLocation').value,
+            referralCode: document.getElementById('setupReferral').value || null,
             email: currentUser.email,
             plan: 'free',
             signupDate: firebase.firestore.FieldValue.serverTimestamp()
@@ -661,7 +698,6 @@
             currentUser.updateProfile({ displayName: data.name });
             document.getElementById('shiftManager').value = data.name;
             
-            // Auto-load preset based on store choice
             const storeKey = data.store === 'other' ? 'arbys' : data.store;
             loadPresetByName(storeKey);
             
@@ -695,11 +731,6 @@
 
         const planName = data.plan || "Free Plan";
         document.getElementById('profSubStatus').innerText = planName.toUpperCase();
-        if(data.trialEndsAt && data.trialEndsAt.toDate() > new Date()) {
-            const days = Math.ceil((data.trialEndsAt.toDate() - new Date()) / (1000 * 60 * 60 * 24));
-            document.getElementById('profDaysLeft').style.display = "block";
-            document.getElementById('profDaysLeft').innerText = `${days} Days left in Free Trial`;
-        }
     }
 
     function copyReferral() {
@@ -739,19 +770,28 @@
     }
 
     // ==========================================
-    // 4. DYNAMIC TRACKER FORMS
+    // 4. DYNAMIC TRACKER FORMS & TIMERS
     // ==========================================
     
-    // Time auto-sync
-    let timeEdited = false;
-    document.getElementById('shiftTime').addEventListener('change', () => timeEdited = true);
-    setInterval(() => {
-        if(!timeEdited && document.getElementById('view-tracker').classList.contains('active')) {
-            document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
+    function toggleShiftTimer() {
+        const btn = document.getElementById('timerBtn');
+        const disp = document.getElementById('timerDisplay');
+        if (!shiftStartTime) {
+            shiftStartTime = Date.now();
+            btn.innerText = "Stop Timer";
+            btn.classList.replace('btn-success', 'btn-danger');
+            disp.innerText = "Running...";
+            disp.style.color = "var(--accent)";
+        } else {
+            const mins = Math.round((Date.now() - shiftStartTime) / 60000);
+            disp.innerText = `Paused (${mins} min)`;
+            disp.style.color = "var(--text-muted)";
+            shiftStartTime = null; 
+            btn.innerText = "Resume Timer";
+            btn.classList.replace('btn-danger', 'btn-success');
         }
-    }, 60000);
+    }
 
-    // --- Drawers ---
     function addDrawerItem(val = "100.00", label = "") {
         const id = Date.now() + Math.floor(Math.random()*1000);
         const div = document.createElement('div');
@@ -760,10 +800,11 @@
             <input type="text" placeholder="Drawer Name (e.g. Front 1)" style="flex: 1;" class="drawer-name" value="${label}">
             <input type="number" step="0.01" value="${val}" style="flex: 0.5;" class="drawer-val" oninput="calcDynamicDrawer(this)">
             <input type="text" readonly style="flex: 1;" class="drawer-res">
-            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove(); triggerDraftSync();">X</button>
         `;
         document.getElementById('drawersContainer').appendChild(div);
         calcDynamicDrawer(div.querySelector('.drawer-val'));
+        triggerDraftSync();
     }
 
     function calcDynamicDrawer(inputElem) {
@@ -775,38 +816,36 @@
         else resInput.value = `($${diff.toFixed(2)} Over)`;
     }
 
-    // --- Deposits ---
     function addDepositItem(val = "") {
         const div = document.createElement('div');
         div.className = "dynamic-item";
         div.innerHTML = `
-            <input type="text" placeholder="Deposit Amount (e.g. $450.00)" class="dep-val" value="${val}">
+            <input type="text" placeholder="Deposit Amount" class="dep-val" value="${val}">
             <label><input type="checkbox" class="dep-ver" checked> Ver. ✔️</label>
             <label><input type="checkbox" class="dep-val-chk" checked> Val. ✔️</label>
-            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">X</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove(); triggerDraftSync();">X</button>
         `;
         document.getElementById('depositsContainer').appendChild(div);
+        triggerDraftSync();
     }
 
-    // --- Daily Routines & ServSafe ---
     const defaultRoutines = ["Parking Lot Walk / Trash", "Lobby Cleanliness", "Restrooms Checked", "Drive-Thru Clear", "Fryer Filtered", "Temps Logged (ServSafe)", "Sanitizer Buckets Changed"];
     
     function addRoutineTask(name = "", isChecked = false) {
         let taskName = name || document.getElementById('newRoutineTask').value;
         if(!taskName) return;
-        
         const div = document.createElement('div');
         div.className = "checkbox-group";
         div.innerHTML = `
             <input type="checkbox" class="routine-chk" ${isChecked ? 'checked' : ''}> 
             <span class="routine-name" style="flex:1;">${taskName}</span>
-            <button type="button" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px;" onclick="this.parentElement.remove()">X</button>
+            <button type="button" class="btn btn-danger btn-sm" style="padding: 2px 6px; font-size: 10px;" onclick="this.parentElement.remove(); triggerDraftSync();">X</button>
         `;
         document.getElementById('routineContainer').appendChild(div);
         document.getElementById('newRoutineTask').value = "";
+        triggerDraftSync();
     }
 
-    // --- Inventory ---
     function addInventoryItem(name = "", bl = "N/A", cl = "N/A", fr = "N/A") {
         const div = document.createElement('div');
         div.className = 'inventory-item';
@@ -816,10 +855,11 @@
             <input type="text" placeholder="Cooler" class="inv-location inv-cooler" value="${cl}">
             <input type="text" placeholder="Freezer" class="inv-location inv-freezer" value="${fr}">
             <div class="inv-controls">
-                <button type="button" class="btn btn-danger" onclick="this.closest('.inventory-item').remove()">X</button>
+                <button type="button" class="btn btn-danger" onclick="this.closest('.inventory-item').remove(); triggerDraftSync();">X</button>
             </div>
         `;
         document.getElementById('inventoryContainer').appendChild(div);
+        triggerDraftSync();
     }
 
     // ==========================================
@@ -839,6 +879,7 @@
         document.getElementById('inventoryContainer').innerHTML = '';
         const items = presets[key] || presets['arbys'];
         items.forEach(name => addInventoryItem(name));
+        triggerDraftSync();
     }
 
     function loadPresetList() {
@@ -851,11 +892,16 @@
     function saveCustomPreset() {
         if (!currentUser) return alert("Must be signed in.");
         const plan = currentUserData?.plan || 'free';
-        const name = document.getElementById('customPresetName').value || "My Preset";
+        const name = document.getElementById('customPresetName').value || "My Custom Preset";
         
         let items = [];
         document.querySelectorAll('.inventory-item').forEach(el => {
-            items.push(el.querySelector('.inv-name').value);
+            items.push({
+                name: el.querySelector('.inv-name').value,
+                bl: el.querySelector('.inv-backline').value,
+                cl: el.querySelector('.inv-cooler').value,
+                fr: el.querySelector('.inv-freezer').value
+            });
         });
 
         db.collection('users').doc(currentUser.uid).collection('presets').get().then(snap => {
@@ -867,7 +913,7 @@
                 items: items,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
-                alert("Custom Preset Saved!");
+                alert("Custom Preset Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
                 loadCustomPresets();
             });
@@ -893,42 +939,50 @@
     }
 
     function applyCustomPreset(docId) {
-        if(confirm("Replace current inventory?")) {
+        if(confirm("Replace current inventory with this custom preset?")) {
             db.collection('users').doc(currentUser.uid).collection('presets').doc(docId).get().then(doc => {
                 document.getElementById('inventoryContainer').innerHTML = '';
-                doc.data().items.forEach(name => addInventoryItem(name));
+                doc.data().items.forEach(item => {
+                    if (typeof item === 'string') addInventoryItem(item); 
+                    else addInventoryItem(item.name, item.bl, item.cl, item.fr);
+                });
                 navTo('tracker');
+                triggerDraftSync();
             });
         }
     }
 
     // ==========================================
-    // 6. CLOUD HISTORY & PERFORMANCE
+    // 6. CLOUD SYNC, HISTORY & PERFORMANCE
     // ==========================================
+    
     function getTrackerState() {
         const now = new Date();
+        const duration = shiftStartTime ? Math.round((Date.now() - shiftStartTime) / 60000) : 0;
+
         const state = {
-            dateSaved: now.toLocaleDateString(),
-            timeSaved: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            dateSaved: document.getElementById('shiftDate').value || now.toLocaleDateString(),
+            timeSaved: document.getElementById('shiftTime').value || now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             manager: document.getElementById('shiftManager').value,
-            routines: [],
-            drawers: [],
-            deposits: [],
-            inventory: []
+            durationMins: duration,
+            routines: [], drawers: [], deposits: [], inventory: [],
+            prepNotes: document.getElementById('prepNotes').value,
+            beefCook: document.getElementById('beefCook').value,
+            beefTempered: document.getElementById('beefTempered').value,
+            laborVariance: document.getElementById('laborVariance').value,
+            safeCount: document.getElementById('safeCount').value,
+            changeNeeded: document.getElementById('changeNeeded').value
         };
 
         document.querySelectorAll('#routineContainer .checkbox-group').forEach(el => {
             state.routines.push({ name: el.querySelector('.routine-name').innerText, checked: el.querySelector('.routine-chk').checked });
         });
-
         document.querySelectorAll('#drawersContainer .dynamic-item').forEach(el => {
             state.drawers.push({ name: el.querySelector('.drawer-name').value, val: el.querySelector('.drawer-val').value, res: el.querySelector('.drawer-res').value });
         });
-
         document.querySelectorAll('#depositsContainer .dynamic-item').forEach(el => {
             state.deposits.push({ val: el.querySelector('.dep-val').value, ver: el.querySelector('.dep-ver').checked, valCheck: el.querySelector('.dep-val-chk').checked });
         });
-
         document.querySelectorAll('.inventory-item').forEach(el => {
             state.inventory.push({ name: el.querySelector('.inv-name').value, bl: el.querySelector('.inv-backline').value, cl: el.querySelector('.inv-cooler').value, fr: el.querySelector('.inv-freezer').value });
         });
@@ -936,14 +990,52 @@
         return state;
     }
 
+    // Auto-sync Draft Logic
+    document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
+    
+    function triggerDraftSync() {
+        if (!currentUser) return;
+        clearTimeout(cloudSyncTimeout);
+        cloudSyncTimeout = setTimeout(() => {
+            const state = getTrackerState();
+            db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
+        }, 2000); 
+    }
+
+    function syncDraftFromServer() {
+        if (!currentUser) return;
+        db.collection('users').doc(currentUser.uid).get().then(doc => {
+            if (doc.exists && doc.data().trackerDraft) {
+                const draft = doc.data().trackerDraft;
+                // Repopulate UI
+                if(draft.manager) document.getElementById('shiftManager').value = draft.manager;
+                if(draft.prepNotes) document.getElementById('prepNotes').value = draft.prepNotes;
+                if(draft.safeCount) document.getElementById('safeCount').value = draft.safeCount;
+                
+                document.getElementById('routineContainer').innerHTML = '';
+                if(draft.routines) draft.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                
+                document.getElementById('inventoryContainer').innerHTML = '';
+                if(draft.inventory) draft.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
+                
+                document.getElementById('drawersContainer').innerHTML = '';
+                if(draft.drawers) draft.drawers.forEach(d => addDrawerItem(d.val, d.name));
+            } else {
+                initDefaults();
+            }
+        });
+    }
+
     function manualSaveHistory() {
-        if(!currentUser) {
-            alert("Sign in to save history to the cloud.");
-            navTo('auth');
-            return;
-        }
-        db.collection('users').doc(currentUser.uid).collection('history').add(getTrackerState()).then(() => {
-            alert("Shift saved to Cloud History!");
+        if(!currentUser) return alert("Sign in to save history to the cloud.");
+        
+        const state = getTrackerState();
+        db.collection('users').doc(currentUser.uid).collection('history').add(state).then(() => {
+            alert("Shift saved & completed in Cloud History!");
+            shiftStartTime = null; 
+            document.getElementById('timerDisplay').innerText = "Not Started";
+            document.getElementById('timerBtn').innerText = "Start Shift Timer";
+            document.getElementById('timerBtn').classList.replace('btn-danger', 'btn-success');
             calculatePerformance();
         });
     }
@@ -964,7 +1056,7 @@
                 div.innerHTML = `
                     <div>
                         <div class="history-date">${data.dateSaved} @ ${data.timeSaved}</div>
-                        <div style="font-size:0.85rem; color:var(--text-muted);">Manager: ${data.manager}</div>
+                        <div style="font-size:0.85rem; color:var(--text-muted);">Manager: ${data.manager} | Duration: ${data.durationMins || 0}m</div>
                     </div>
                 `;
                 container.appendChild(div);
@@ -975,21 +1067,59 @@
     function calculatePerformance() {
         if(!currentUser) return;
         db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
-            document.getElementById('statShifts').innerText = snap.size;
+            const shiftCount = snap.size;
+            document.getElementById('statShifts').innerText = shiftCount;
             
-            let totalRoutines = 0;
-            let checkedRoutines = 0;
+            let totalRoutines = 0; let checkedRoutines = 0;
+            let totalDuration = 0;
             
             snap.forEach(doc => {
-                const routines = doc.data().routines || [];
+                const data = doc.data();
+                if(data.durationMins) totalDuration += data.durationMins;
+                const routines = data.routines || [];
                 routines.forEach(r => {
                     totalRoutines++;
                     if(r.checked) checkedRoutines++;
                 });
             });
 
+            const avgTime = shiftCount > 0 ? Math.round(totalDuration / shiftCount) : 0;
+            document.getElementById('statAvgTime').innerText = avgTime + "m";
+
             const percent = totalRoutines === 0 ? 0 : Math.round((checkedRoutines / totalRoutines) * 100);
             document.getElementById('statRoutines').innerText = percent + "%";
+
+            // Dynamic Tips
+            let tipText = "Keep logging shifts to see targeted tips!";
+            if (shiftCount > 0) {
+                if (percent < 80) tipText = "Your routine completion is below 80%. Try setting a dedicated 10-minute block for your ServSafe & Lobby checks mid-shift.";
+                else if (avgTime > 120) tipText = "You're taking quite a while to complete your digital logs. Try updating the tracker periodically rather than doing it all at the end of the shift.";
+                else tipText = "Great job! Your routine completion is solid and you're logging efficiently. Consider saving your layout as a Custom Preset to save even more time.";
+            }
+            document.getElementById('performanceTips').innerText = tipText;
+        });
+    }
+
+    function exportPerformanceCSV() {
+        if(!currentUser) return alert("Please sign in.");
+        db.collection('users').doc(currentUser.uid).collection('history').get().then(snap => {
+            if(snap.empty) return alert("No data to export.");
+            
+            let csv = "Date,Time,Manager,Duration(mins),Safe Count,Labor Variance\n";
+            snap.forEach(doc => {
+                const d = doc.data();
+                csv += `"${d.dateSaved}","${d.timeSaved}","${d.manager}","${d.durationMins||0}","${d.safeCount||0}","${d.laborVariance||0}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'manager_performance.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         });
     }
 
@@ -1032,6 +1162,10 @@
             document.getElementById('depositsContainer').innerHTML = "";
             document.getElementById('inventoryContainer').innerHTML = "";
             document.getElementById('routineContainer').innerHTML = "";
+            shiftStartTime = null;
+            document.getElementById('timerDisplay').innerText = "Not Started";
+            document.getElementById('timerBtn').innerText = "Start Shift Timer";
+            document.getElementById('timerBtn').classList.replace('btn-danger', 'btn-success');
             initDefaults();
         }
     }
@@ -1040,25 +1174,41 @@
     // 8. MISC (Init, Checkout, Requests)
     // ==========================================
     function initDefaults() {
-        document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
-        addDrawerItem("100.00", "Drawer 1");
-        addDepositItem("$0.00");
-        defaultRoutines.forEach(r => addRoutineTask(r, false));
-        loadPresetByName('arbys');
+        if (document.getElementById('inventoryContainer').innerHTML.trim() === "") {
+            document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
+            addDrawerItem("100.00", "Drawer 1");
+            addDepositItem("$0.00");
+            defaultRoutines.forEach(r => addRoutineTask(r, false));
+            loadPresetByName('arbys');
+        }
     }
 
-    function processCheckout(plan) {
-        if(!currentUser) { alert("Sign in first."); return navTo('auth'); }
-        // Simulated checkout process for the code snippet
-        alert(`Initiating checkout for ${plan}. In production, this connects to Stripe.`);
-        db.collection('users').doc(currentUser.uid).set({ 
-            plan: plan, 
-            trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) 
-        }, { merge: true }).then(() => {
-            alert("Success! 7-Day Free Trial activated.");
-            location.reload();
-        });
+    async function processCheckout(planName) {
+        if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
+
+        try {
+            const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    plan: planName
+                })
+            });
+
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url; 
+            } else {
+                console.error("Server responded with:", data);
+                alert("Error creating checkout session: " + (data.error || "Unknown error"));
+            }
+        } catch (err) {
+            console.error("Checkout fetch error:", err);
+            alert("Payment system unreachable. Please try again later.");
+        }
     }
 
     function submitFeatureRequest() {
@@ -1066,15 +1216,22 @@
         const text = document.getElementById('featureReqText').value;
         if(!text) return;
         
-        db.collection('feature_requests').add({
+        const payload = {
             uid: currentUser.uid,
             email: currentUser.email,
-            text: text,
+            message: text,
+            type: 'feature_request',
+            status: 'new',
             isPro: currentUserData?.plan !== 'free',
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-            alert("Request sent successfully!");
-            document.getElementById('featureReqText').value = "";
+        };
+
+        db.collection('feature_requests').add(payload).then(() => {
+            // Also push to generic admin notifications collection for the admin dashboard
+            db.collection('admin_notifications').add(payload).then(() => {
+                alert("Request sent directly to Admin Notifications!");
+                document.getElementById('featureReqText').value = "";
+            });
         });
     }
 
@@ -1083,7 +1240,14 @@
             document.body.classList.add('dark-mode');
             document.getElementById('themeToggle').checked = true;
         }
-        initDefaults();
+        // Listener for Stripe Redirects params
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("success")) {
+            alert("Payment successful! Your account is now PRO.");
+            if (currentUser) {
+                db.collection('users').doc(currentUser.uid).set({ plan: "Pro" }, { merge: true });
+            }
+        }
     };
 
 </script>
