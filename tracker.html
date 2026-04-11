@@ -235,7 +235,7 @@
     <main class="pt-[var(--nav-height)] min-h-screen">
 
         <div id="view-welcome" class="view-section active">
-            <section class="pt-24 pb-32 px-6 relative overflow-hidden bg-white dark:bg-slate-950">
+            <section class="pt-24 pb-32 px-6 relative overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300">
                 <div class="absolute inset-0 -z-10">
                     <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-sky-50/50 dark:from-sky-900/10 to-transparent"></div>
                 </div>
@@ -269,7 +269,7 @@
                 </div>
             </section>
 
-            <section class="py-32 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200/60 dark:border-slate-800">
+            <section class="py-32 bg-slate-50 dark:bg-slate-900/50 border-y border-slate-200/60 dark:border-slate-800 transition-colors duration-300">
                 <div class="max-w-7xl mx-auto px-6">
                     <div class="grid lg:grid-cols-3 gap-12">
                         <div class="bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800">
@@ -550,6 +550,7 @@
                     <div class="space-y-8">
                         <div class="card">
                             <h3 class="text-xl font-black mb-6">Custom Presets</h3>
+                            <p class="text-sm text-slate-500 mb-4">Saves your exact current inventory layout (including item quantities) so you can recall it instantly.</p>
                             <div class="flex gap-2 mb-8">
                                 <input type="text" id="customPresetName" placeholder="e.g. Closing Shift Layout" class="flex-1">
                                 <button onclick="saveCustomPreset()" class="btn btn-outline">Save Current</button>
@@ -564,7 +565,7 @@
         <div id="view-profile" class="view-section px-6 py-12">
             <div class="max-w-4xl mx-auto">
                 <div class="card text-center mb-12 py-16">
-                    <div id="profileAvatar" class="w-24 h-24 bg-sky-500 text-white rounded-full flex items-center justify-center text-4xl font-black mx-auto mb-6 shadow-xl shadow-sky-200">?</div>
+                    <div id="profileAvatar" class="w-24 h-24 bg-sky-500 text-white rounded-full flex items-center justify-center text-4xl font-black mx-auto mb-6 shadow-xl shadow-sky-200 dark:shadow-none">?</div>
                     <h2 class="text-3xl font-black mb-2" id="profNameDisplay">User Name</h2>
                     <span class="inline-flex items-center px-4 py-1.5 text-[10px] font-black tracking-[0.2em] text-sky-700 uppercase bg-sky-50 rounded-full" id="profSubStatus">Free Plan</span>
                 </div>
@@ -583,45 +584,45 @@
                     <div class="card">
                         <h3 class="text-xl font-black mb-6">Affiliate Program</h3>
                         <p class="text-slate-500 mb-6 text-sm">Earn premium credits by referring other managers.</p>
-                        <input type="text" id="referralLink" readonly class="font-mono text-xs mb-4">
+                        <input type="text" id="referralLink" readonly class="font-mono text-xs mb-4 bg-slate-50 opacity-60 dark:bg-slate-800">
                         <button onclick="copyReferral()" class="btn btn-outline w-full">Copy My Link</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="view-pricing" class="view-section px-6 py-20 bg-slate-950">
+        <div id="view-pricing" class="view-section px-6 py-20 bg-white dark:bg-slate-950 transition-colors duration-300">
             <div class="max-w-5xl mx-auto text-center">
-                <h2 class="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">Transparent Scaling</h2>
-                <p class="text-slate-400 text-xl mb-16 font-medium">Simple plans for serious growth.</p>
+                <h2 class="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">Transparent Scaling</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-xl mb-16 font-medium">Simple plans for serious growth.</p>
 
                 <div class="grid md:grid-cols-2 gap-8 text-left max-w-4xl mx-auto">
-                    <div class="card bg-slate-900 border-slate-800 p-12">
+                    <div class="card bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 p-12">
                         <h3 class="text-xs font-black text-sky-500 uppercase tracking-[0.3em] mb-4">Individual Pro</h3>
                         <div class="flex items-baseline mb-8">
-                            <span class="text-7xl font-black tracking-tighter text-white">$61</span>
+                            <span class="text-7xl font-black tracking-tighter text-slate-900 dark:text-white">$61</span>
                             <span class="text-slate-500 text-xl font-bold ml-2">/year</span>
                         </div>
-                        <ul class="space-y-4 mb-10 text-slate-300 font-medium">
+                        <ul class="space-y-4 mb-10 text-slate-700 dark:text-slate-300 font-medium">
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> Cloud Sync</li>
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> 10 Custom Presets</li>
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> Performance History</li>
                         </ul>
-                        <button onclick="processCheckout('Individual Pro')" class="btn btn-outline w-full border-slate-700 text-white hover:bg-sky-500 hover:border-sky-500">Choose Pro</button>
+                        <button onclick="processCheckout('Individual Pro')" class="btn btn-outline w-full border-slate-300 dark:border-slate-700 hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors">Choose Pro</button>
                     </div>
-                    <div class="card bg-white p-12 relative overflow-hidden">
+                    <div class="card bg-white dark:bg-slate-800 p-12 relative overflow-hidden border-slate-200 dark:border-slate-700 shadow-xl">
                         <div class="absolute top-0 right-0 bg-sky-500 text-white text-[10px] font-black px-6 py-2 rounded-bl-3xl uppercase tracking-widest">Most Selected</div>
                         <h3 class="text-xs font-black text-sky-600 uppercase tracking-[0.3em] mb-4">Business Pro</h3>
                         <div class="flex items-baseline mb-8">
-                            <span class="text-7xl font-black tracking-tighter text-slate-900">$207</span>
-                            <span class="text-slate-400 text-xl font-bold ml-2">/year</span>
+                            <span class="text-7xl font-black tracking-tighter text-slate-900 dark:text-white">$207</span>
+                            <span class="text-slate-500 dark:text-slate-400 text-xl font-bold ml-2">/year</span>
                         </div>
-                        <ul class="space-y-4 mb-10 text-slate-600 font-medium">
+                        <ul class="space-y-4 mb-10 text-slate-700 dark:text-slate-300 font-medium">
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> Multi-Unit Support</li>
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> AI Trend Analysis</li>
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> Priority Feature Request</li>
                         </ul>
-                        <button onclick="processCheckout('Business Pro')" class="btn btn-accent w-full shadow-2xl shadow-sky-200">Choose Business</button>
+                        <button onclick="processCheckout('Business Pro')" class="btn btn-accent w-full shadow-2xl shadow-sky-200 dark:shadow-none">Choose Business</button>
                     </div>
                 </div>
             </div>
@@ -793,7 +794,6 @@
         }
 
         function navTo(viewId) {
-            // Guard
             if (!currentUser && (['history', 'presets', 'performance', 'request', 'profile'].includes(viewId))) {
                 viewId = 'auth';
             }
@@ -904,7 +904,7 @@
             triggerDraftSync();
         }
 
-        function addInventoryItem(name = "", bl = "N/A", cl = "N/A", fr = "N/A") {
+        function addInventoryItem(name = "", bl = "", cl = "", fr = "") {
             const div = document.createElement('div');
             div.className = 'inventory-item animate-fadeIn';
             div.innerHTML = `
@@ -962,7 +962,6 @@
             cloudSyncTimeout = setTimeout(() => {
                 const state = getTrackerState();
                 db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
-                console.log("Cloud draft updated.");
             }, 3000); 
         }
 
@@ -1018,17 +1017,58 @@
                 
                 history.slice(0, 20).forEach(data => {
                     const div = document.createElement('div');
-                    div.className = "card flex justify-between items-center hover:border-sky-200 transition-colors cursor-pointer group";
+                    div.className = "card flex justify-between items-center hover:border-sky-200 dark:hover:border-sky-800 transition-colors group";
                     div.innerHTML = `
                         <div>
                             <div class="font-black text-lg">${data.dateSaved}</div>
                             <div class="text-xs font-bold uppercase tracking-widest text-slate-400">Manager: ${data.manager || 'N/A'} • Duration: ${data.durationMins || 0}m</div>
                         </div>
-                        <i data-lucide="chevron-right" class="text-slate-200 group-hover:text-sky-500"></i>
+                        <button onclick="loadHistoryShift('${data.id}')" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i data-lucide="download"></i> Load Shift
+                        </button>
                     `;
                     container.appendChild(div);
                 });
                 lucide.createIcons();
+            });
+        }
+
+        // New Feature: Load a complete past shift back into the tracker
+        function loadHistoryShift(id) {
+            if(!currentUser) return;
+            if(!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
+
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                const history = doc.data().shiftHistory || [];
+                const shift = history.find(s => s.id === id);
+                
+                if(shift) {
+                    document.getElementById('shiftDate').value = shift.dateSaved || "";
+                    document.getElementById('shiftTime').value = shift.timeSaved || "";
+                    document.getElementById('shiftManager').value = shift.manager || "";
+                    document.getElementById('prepNotes').value = shift.prepNotes || "";
+                    document.getElementById('safeCount').value = shift.safeCount || "";
+                    document.getElementById('beefCook').value = shift.beefCook || "";
+                    document.getElementById('beefTempered').value = shift.beefTempered || "";
+                    document.getElementById('laborVariance').value = shift.laborVariance || "";
+                    document.getElementById('changeNeeded').value = shift.changeNeeded || "";
+                    
+                    document.getElementById('routineContainer').innerHTML = '';
+                    if(shift.routines) shift.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                    
+                    document.getElementById('inventoryContainer').innerHTML = '';
+                    if(shift.inventory) shift.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
+                    
+                    document.getElementById('drawersContainer').innerHTML = '';
+                    if(shift.drawers) shift.drawers.forEach(d => addDrawerItem(d.val, d.name));
+
+                    document.getElementById('depositsContainer').innerHTML = '';
+                    if(shift.deposits) shift.deposits.forEach(d => addDepositItem(d.val));
+
+                    navTo('tracker');
+                    triggerDraftSync();
+                    alert("Shift loaded into Active Tracker successfully.");
+                }
             });
         }
 
@@ -1069,7 +1109,7 @@
         };
 
         function loadPresetList() {
-            if(confirm("Apply this template? Current list will be cleared.")) {
+            if(confirm("Apply this template? Current inventory list will be cleared.")) {
                 const key = document.getElementById('presetSelector').value;
                 document.getElementById('inventoryContainer').innerHTML = '';
                 (presets[key] || []).forEach(name => addInventoryItem(name));
@@ -1078,16 +1118,25 @@
             }
         }
 
+        // Updated Feature: Save full state (names and counts) of current layout
         function saveCustomPreset() {
             if(!currentUser) return;
             const name = document.getElementById('customPresetName').value || "Unnamed Preset";
             const items = [];
-            document.querySelectorAll('.inventory-item').forEach(el => items.push({ name: el.querySelector('.inv-name').value }));
+            
+            document.querySelectorAll('.inventory-item').forEach(el => {
+                items.push({ 
+                    name: el.querySelector('.inv-name').value,
+                    bl: el.querySelector('.inv-backline').value,
+                    cl: el.querySelector('.inv-cooler').value,
+                    fr: el.querySelector('.inv-freezer').value
+                });
+            });
             
             db.collection('users').doc(currentUser.uid).set({
-                customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now(), name, items })
+                customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
             }, { merge: true }).then(() => {
-                alert("Layout Saved!");
+                alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
                 loadCustomPresets();
             });
@@ -1101,10 +1150,10 @@
                 if(doc.exists && doc.data().customPresets) {
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
-                        div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group";
+                        div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
                             <span class="font-bold">${p.name}</span>
-                            <button onclick="applyCustomPreset('${p.id}')" class="btn btn-sm btn-outline opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
+                            <button onclick="applyCustomPreset('${p.id}')" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
                         container.appendChild(div);
                     });
@@ -1113,11 +1162,18 @@
         }
 
         function applyCustomPreset(id) {
+            if(!confirm("Replace current inventory layout with this custom preset?")) return;
             db.collection('users').doc(currentUser.uid).get().then(doc => {
                 const preset = (doc.data().customPresets || []).find(p => p.id == id);
                 if(preset) {
                     document.getElementById('inventoryContainer').innerHTML = '';
-                    preset.items.forEach(i => addInventoryItem(i.name));
+                    preset.items.forEach(i => {
+                        if (typeof i === 'string') {
+                            addInventoryItem(i); // Backwards compatibility for older saved presets
+                        } else {
+                            addInventoryItem(i.name, i.bl, i.cl, i.fr); // New format with counts
+                        }
+                    });
                     navTo('tracker');
                     triggerDraftSync();
                 }
@@ -1186,6 +1242,7 @@
                 document.getElementById('inventoryContainer').innerHTML = '';
                 document.getElementById('routineContainer').innerHTML = '';
                 initDefaults();
+                triggerDraftSync();
             }
         }
 
