@@ -14,6 +14,12 @@
     <meta name="apple-mobile-web-app-title" content="ezManage">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use your custom dark-mode class
+        tailwind.config = {
+            darkMode: ['class', '.dark-mode'],
+        }
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     
@@ -569,7 +575,7 @@
                         <div class="space-y-4">
                             <input type="text" id="profName" placeholder="Name">
                             <input type="text" id="profRole" placeholder="Role">
-                            <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60">
+                            <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60 dark:bg-slate-800">
                             <input type="text" id="profPhone" placeholder="Phone">
                             <button onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save Changes</button>
                         </div>
@@ -1184,18 +1190,45 @@
         }
 
         function initDefaults() {
-            document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
-            addDrawerItem("100.00", "Register 1");
-            addDrawerItem("100.00", "Register 2");
-            addDepositItem();
-            ["Parking Lot", "Lobby/Restrooms", "ServSafe Temps", "Filtered Fryers", "Trash Run"].forEach(t => addRoutineTask(t));
+            // Check if inventory container is empty to avoid double-loading on page refresh
+            if (document.getElementById('inventoryContainer').innerHTML.trim() === "") {
+                document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('shiftTime').value = new Date().toTimeString().slice(0,5);
+                addDrawerItem("100.00", "Register 1");
+                addDrawerItem("100.00", "Register 2");
+                addDepositItem();
+                ["Parking Lot", "Lobby/Restrooms", "ServSafe Temps", "Filtered Fryers", "Trash Run"].forEach(t => addRoutineTask(t));
+                loadPresetByName('arbys');
+            }
         }
 
-        async function processCheckout(plan) {
-            if(!currentUser) return navTo('auth');
-            alert("Redirecting to Stripe checkout for " + plan);
-            // Integration code here...
+        async function processCheckout(planName) {
+            if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
+
+            try {
+                const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        uid: currentUser.uid,
+                        email: currentUser.email,
+                        plan: planName,
+                        successUrl: "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+                        cancelUrl: window.location.href
+                    })
+                });
+
+                const data = await res.json();
+                if (data.url) {
+                    window.location.href = data.url; 
+                } else {
+                    console.error("Server responded with:", data);
+                    alert("Error creating checkout session: " + (data.error || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Checkout fetch error:", err);
+                alert("Payment system unreachable. Please try again later.");
+            }
         }
 
         function submitFeatureRequest() {
