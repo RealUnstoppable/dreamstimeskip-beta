@@ -4,7 +4,7 @@
      <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | DTS HUB & Unstoppable</title>
+    <title>Admin Dashboard | DTS HUB</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,23 +62,18 @@
         .graph-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .graph-dropdown { background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; }
         
-        .user-table-container { background-color: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 12px; overflow-x: auto; margin-bottom: 30px;}
+        .user-table-container { background-color: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 12px; overflow-x: auto; }
         .user-table { width: 100%; border-collapse: collapse; text-align: left; }
         .user-table th, .user-table td { padding: 15px 20px; border-bottom: 1px solid var(--border-color); }
         .user-table th { font-weight: 600; color: var(--text-secondary); }
         .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
         .status-badge.active { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
-        .status-badge.banned, .status-badge.cancelled { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
+        .status-badge.banned { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
         .status-badge.pro { background-color: rgba(251, 191, 36, 0.2); color: var(--accent-yellow); }
-        .status-badge.pending { background-color: rgba(251, 191, 36, 0.2); color: var(--accent-yellow); }
         .subscription-text { font-weight: bold; color: var(--accent-blue); }
-        
-        .btn-sm { padding: 6px 12px; border-radius: 5px; font-weight: 500; cursor: pointer; border: none; color: white; margin-right: 5px; margin-bottom: 5px;}
+        .btn-sm { padding: 6px 12px; border-radius: 5px; font-weight: 500; cursor: pointer; border: none; color: white; }
         .btn-ban { background-color: var(--accent-red); }
         .btn-unban { background-color: var(--accent-green); }
-        .btn-action { background-color: var(--secondary-card-color, #333); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .btn-action:hover { background-color: var(--text-primary); color: var(--bg-color); }
-        .btn-danger { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
 
         @media (max-width: 768px) {
             body { padding: 10px; flex-direction: column; }
@@ -112,8 +107,6 @@
                 <ul>
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
-                    <li><a href="#bookings" class="nav-link">Bookings</a></li>
-                    <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
@@ -135,8 +128,6 @@
                     <div class="metric-card"><div class="value" id="checkouts">-</div><div class="label">Completed Checkouts</div></div>
                     <div class="metric-card"><div class="value" id="active-carts">-</div><div class="label">Users with Active Carts</div></div>
                     <div class="metric-card"><div class="value" id="avg-orders">-</div><div class="label">Orders per User</div></div>
-                    <div class="metric-card"><div class="value" id="upcoming-bookings">-</div><div class="label">Upcoming Appts</div></div>
-                    <div class="metric-card"><div class="value" id="pending-quotes">-</div><div class="label">Pending Quotes</div></div>
                 </div>
 
                 <div class="graph-container">
@@ -152,46 +143,6 @@
                 </div>
             </section>
             
-            <section id="bookings" class="content-section">
-                <h3>All Bookings</h3>
-                <div class="user-table-container">
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Client Name</th>
-                                <th>Contact Info</th>
-                                <th>Vehicle</th>
-                                <th>Date & Time</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bookings-list-body">
-                            <tr><td colspan="6" style="text-align: center;">Loading bookings...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="quotes" class="content-section">
-                <h3>Quote Requests</h3>
-                <div class="user-table-container">
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Vehicle Details & Condition</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="quotes-list-body">
-                            <tr><td colspan="4" style="text-align: center;">Loading quotes...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
             <section id="users" class="content-section">
                 <h3>User Management</h3>
                 <div class="user-table-container">
@@ -258,7 +209,7 @@
    <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         let performanceChart;
 
@@ -286,7 +237,6 @@
 
         async function loadAdminData() {
             try {
-                // Fetch Core Data
                 const usersSnapshot = await getDocs(collection(db, "users"));
                 const users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
@@ -299,26 +249,14 @@
                 const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
                 const subscribers = newsletterSnapshot.docs.map(d => d.data());
 
-                // Fetch Detailing Bookings & Quotes
-                const bookingsSnap = await getDocs(collection(db, "bookings"));
-                const bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-
-                const quotesSnap = await getDocs(collection(db, "quotes"));
-                const quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-                // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
                 document.getElementById('total-purchases').textContent = orders.length;
 
-                // Renderers
                 renderUserTable(users);
                 renderNewsletterTable(subscribers); 
-                calculatePerformanceMetrics(users, carts, orders, bookings, quotes);
+                calculatePerformanceMetrics(users, carts, orders);
                 renderChart('summary', users);
-                renderBookingsTable(bookings);
-                renderQuotesTable(quotes);
                 
                 // Fetch Feature Requests
                 try {
@@ -330,84 +268,24 @@
                     document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                 }
                 
-                // Download Stats
-                try {
-                    const statsRef = doc(db, "site_stats", "downloads");
-                    const statsDoc = await getDoc(statsRef);
-                    if (statsDoc.exists()) {
-                        document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
-                    }
-                } catch (e) {
-                    document.getElementById('download-count-infosheet').textContent = "N/A";
-                }
-
             } catch (error) {
                 console.error("Error loading admin data:", error);
             }
         }
 
-        function renderBookingsTable(bookings) {
-            const tbody = document.getElementById('bookings-list-body');
-            tbody.innerHTML = '';
-            if(bookings.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No bookings found.</td></tr>'; return;
-            }
-            bookings.forEach(b => {
-                const row = document.createElement('tr');
-                const name = b.customerName || 'N/A';
-                const phone = b.customerPhone || 'N/A';
-                const email = b.customerEmail || 'N/A';
-                const formattedDate = new Date(b.appointmentDate).toLocaleString([], {weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
-                let badgeClass = 'active';
-                if(b.status === 'cancelled') badgeClass = 'cancelled';
-                if(b.status === 'completed') badgeClass = 'active'; 
-                
-                row.innerHTML = `
-                    <td><strong>${name}</strong></td>
-                    <td>${phone}<br><span style="font-size:0.8rem; color:var(--text-secondary);">${email}</span></td>
-                    <td style="text-transform: capitalize;">${b.vehicle}</td>
-                    <td>${formattedDate}</td>
-                    <td><span class="status-badge ${badgeClass}">${(b.status || 'unknown').replace('_', ' ')}</span></td>
-                    <td>
-                        ${b.status !== 'cancelled' ? `<button class="btn-sm btn-danger action-btn" data-type="booking" data-action="cancel" data-id="${b.id}">Cancel</button>` : ''}
-                        ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${b.id}">Mark Done</button>` : ''}
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function renderQuotesTable(quotes) {
-            const tbody = document.getElementById('quotes-list-body');
-            tbody.innerHTML = '';
-            if(quotes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No quotes pending.</td></tr>'; return;
-            }
-            quotes.forEach(q => {
-                const row = document.createElement('tr');
-                const badgeClass = q.status === 'responded' ? 'active' : 'pending';
-                row.innerHTML = `
-                    <td>${q.email}</td>
-                    <td>${q.details}</td>
-                    <td><span class="status-badge ${badgeClass}">${q.status || 'pending'}</span></td>
-                    <td>
-                        ${q.status !== 'responded' ? `<button class="btn-sm btn-action action-btn" data-type="quote" data-action="responded" data-id="${q.id}">Responded</button>` : ''}
-                        <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${q.id}">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
             userListBody.innerHTML = '';
+            
             users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
                 const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
                 const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
-                const subStatus = user.subscription?.status === 'active' ? `<span class="subscription-text">Active Pro</span>` : `<span style="color: var(--text-secondary);">Free</span>`;
+                
+                const subStatus = user.subscription?.status === 'active' 
+                    ? `<span class="subscription-text">Active Pro</span>` 
+                    : `<span style="color: var(--text-secondary);">Free</span>`;
                 
                 row.innerHTML = `
                     <td>${user.username || user.name || "N/A"}</td>
@@ -420,16 +298,24 @@
             });
         }
 
+        // NEW RENDERER FOR FEATURE REQUESTS
         function renderFeatureRequestsTable(requests) {
             const listBody = document.getElementById('feature-request-list-body');
             listBody.innerHTML = '';
+            
             if(requests.length === 0) {
-                listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`; return;
+                listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`;
+                return;
             }
+            
+            // Sort to place newest items at the top
             requests.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
             requests.forEach(req => {
                 const row = document.createElement('tr');
-                const reqDate = req.timestamp ? new Date(req.timestamp).toLocaleDateString() : new Date().toLocaleDateString();
+                const dateRaw = req.timestamp ? new Date(req.timestamp) : new Date();
+                const reqDate = dateRaw.toLocaleDateString();
+                
                 const tierBadge = req.isPro ? `<span class="status-badge pro">Priority (Pro)</span>` : `<span class="status-badge">Free Tier</span>`;
                 const isComplete = req.status === 'completed';
                 const statusStr = isComplete ? `<span style="color:var(--accent-green);">Completed</span>` : `<span style="color:var(--accent-yellow);">Pending</span>`;
@@ -451,18 +337,24 @@
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
             newsletterListBody.innerHTML = '';
+            
             if(subscribers.length === 0) {
-                newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">No subscribers yet.</td></tr>`; return;
+                newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">No subscribers yet.</td></tr>`;
+                return;
             }
+
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
                 const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
-                row.innerHTML = `<td>${subscriber.email}</td><td>${subscriptionDate}</td>`;
+                
+                row.innerHTML = `
+                    <td>${subscriber.email}</td>
+                    <td>${subscriptionDate}</td>`;
                 newsletterListBody.appendChild(row);
             });
         }
 
-        function calculatePerformanceMetrics(users, carts, orders = [], bookings = [], quotes = []) {
+        function calculatePerformanceMetrics(users, carts, orders = []) {
             const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
             const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
             const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
@@ -471,17 +363,11 @@
             const totalUsers = users.length;
             const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
 
-            const now = new Date();
-            const upcoming = bookings.filter(b => b.status !== 'cancelled' && new Date(b.appointmentDate) >= now);
-            const pendingQuotes = quotes.filter(q => q.status === 'pending');
-
             document.getElementById('total-users').textContent = totalUsers;
             document.getElementById('new-signups').textContent = newSignups;
             document.getElementById('checkouts').textContent = totalOrders;
             document.getElementById('active-carts').textContent = activeCarts;
             document.getElementById('avg-orders').textContent = avgOrders;
-            document.getElementById('upcoming-bookings').textContent = upcoming.length;
-            document.getElementById('pending-quotes').textContent = pendingQuotes.length;
         }
 
         function renderChart(view, usersData) {
@@ -515,7 +401,6 @@
         }
     
         function setupEventListeners() {
-            // User Ban Toggle
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
                 if (!userId) return;
@@ -526,7 +411,6 @@
                 }
             });
             
-            // Feature Request Complete Toggle
             document.getElementById('feature-request-list-body').addEventListener('click', async (e) => {
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
@@ -536,35 +420,6 @@
                 }
             });
 
-            // Bookings Action Buttons
-            document.getElementById('bookings-list-body').addEventListener('click', async (e) => {
-                const btn = e.target.closest('.action-btn');
-                if(!btn) return;
-                const action = btn.dataset.action;
-                const id = btn.dataset.id;
-                if (action === 'cancel' && confirm("Cancel this booking?")) {
-                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
-                } else if (action === 'complete') {
-                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
-                }
-                loadAdminData();
-            });
-
-            // Quotes Action Buttons
-            document.getElementById('quotes-list-body').addEventListener('click', async (e) => {
-                const btn = e.target.closest('.action-btn');
-                if(!btn) return;
-                const action = btn.dataset.action;
-                const id = btn.dataset.id;
-                if (action === 'responded') {
-                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
-                } else if (action === 'delete' && confirm("Delete this quote request?")) {
-                    await deleteDoc(doc(db, "quotes", id));
-                }
-                loadAdminData();
-            });
-
-            // Navigation
             document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(link => {
                 link.addEventListener('click', e => {
                     e.preventDefault();
