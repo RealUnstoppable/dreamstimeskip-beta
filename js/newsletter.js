@@ -1,9 +1,13 @@
 import { db } from './auth.js';
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-document.querySelectorAll('.signup-form').forEach(form => {
-    form.addEventListener('submit', async (e) => {
+// Use event delegation to catch submissions from dynamically loaded footers
+document.addEventListener('submit', async (e) => {
+    // Check if the submitted element has the .signup-form class
+    if (e.target && e.target.matches('.signup-form')) {
         e.preventDefault();
+        
+        const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
         const email = emailInput.value.trim();
 
@@ -22,5 +26,5 @@ document.querySelectorAll('.signup-form').forEach(form => {
                 alert("There was an error subscribing. Please try again later.");
             }
         }
-    });
+    }
 });

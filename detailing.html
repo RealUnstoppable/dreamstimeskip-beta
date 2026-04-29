@@ -325,18 +325,25 @@
 
     <script type="module">
         import { loadNavbar } from '/js/navbar.js';
+        import { loadFooter } from '/js/footer.js';
         
-        // Load Navbar
+        // Load Navbar and Footer
         document.addEventListener('DOMContentLoaded', () => {
             // Inject navbar logic manually since the placeholder might differ
             const header = document.querySelector('.main-header');
             if(header) {
-                // We use the exported function from your existing codebase
                 loadNavbar(); 
+            }
+
+            // Inject footer logic so the newsletter form appears
+            const footer = document.querySelector('.main-footer');
+            if(footer) {
+                loadFooter();
             }
         });
     </script>
 
+    <script type="module" src="/js/newsletter.js"></script>
     <script src="/js/script.js"></script>
 
     <script type="module">
