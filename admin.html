@@ -278,6 +278,16 @@
             }
         });
 
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
@@ -363,14 +373,14 @@
                 if(b.status === 'completed') badgeClass = 'active'; 
                 
                 row.innerHTML = `
-                    <td><strong>${name}</strong></td>
-                    <td>${phone}<br><span style="font-size:0.8rem; color:var(--text-secondary);">${email}</span></td>
-                    <td style="text-transform: capitalize;">${b.vehicle}</td>
+                    <td><strong>${escapeHTML(name)}</strong></td>
+                    <td>${escapeHTML(phone)}<br><span style="font-size:0.8rem; color:var(--text-secondary);">${escapeHTML(email)}</span></td>
+                    <td style="text-transform: capitalize;">${escapeHTML(b.vehicle)}</td>
                     <td>${formattedDate}</td>
-                    <td><span class="status-badge ${badgeClass}">${(b.status || 'unknown').replace('_', ' ')}</span></td>
+                    <td><span class="status-badge ${badgeClass}">${(escapeHTML(b.status) || 'unknown').replace('_', ' ')}</span></td>
                     <td>
-                        ${b.status !== 'cancelled' ? `<button class="btn-sm btn-danger action-btn" data-type="booking" data-action="cancel" data-id="${b.id}">Cancel</button>` : ''}
-                        ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${b.id}">Mark Done</button>` : ''}
+                        ${b.status !== 'cancelled' ? `<button class="btn-sm btn-danger action-btn" data-type="booking" data-action="cancel" data-id="${escapeHTML(b.id)}">Cancel</button>` : ''}
+                        ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${escapeHTML(b.id)}">Mark Done</button>` : ''}
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -387,12 +397,12 @@
                 const row = document.createElement('tr');
                 const badgeClass = q.status === 'responded' ? 'active' : 'pending';
                 row.innerHTML = `
-                    <td>${q.email}</td>
-                    <td>${q.details}</td>
-                    <td><span class="status-badge ${badgeClass}">${q.status || 'pending'}</span></td>
+                    <td>${escapeHTML(q.email)}</td>
+                    <td>${escapeHTML(q.details)}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeHTML(q.status) || 'pending'}</span></td>
                     <td>
-                        ${q.status !== 'responded' ? `<button class="btn-sm btn-action action-btn" data-type="quote" data-action="responded" data-id="${q.id}">Responded</button>` : ''}
-                        <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${q.id}">Delete</button>
+                        ${q.status !== 'responded' ? `<button class="btn-sm btn-action action-btn" data-type="quote" data-action="responded" data-id="${escapeHTML(q.id)}">Responded</button>` : ''}
+                        <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${escapeHTML(q.id)}">Delete</button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -405,13 +415,13 @@
             users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
-                const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${user.id}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${user.id}">Ban</button>`;
+                const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${escapeHTML(user.id)}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${escapeHTML(user.id)}">Ban</button>`;
                 const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
                 const subStatus = user.subscription?.status === 'active' ? `<span class="subscription-text">Active Pro</span>` : `<span style="color: var(--text-secondary);">Free</span>`;
                 
                 row.innerHTML = `
-                    <td>${user.username || user.name || "N/A"}</td>
-                    <td>${user.email}</td>
+                    <td>${escapeHTML(user.username) || escapeHTML(user.name) || "N/A"}</td>
+                    <td>${escapeHTML(user.email)}</td>
                     <td>${signupDate}</td>
                     <td>${subStatus}</td>
                     <td>${statusBadge}</td>
@@ -435,12 +445,12 @@
                 const statusStr = isComplete ? `<span style="color:var(--accent-green);">Completed</span>` : `<span style="color:var(--accent-yellow);">Pending</span>`;
                 const actionButton = isComplete 
                      ? `<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>`
-                     : `<button class="btn-sm btn-unban mark-complete-btn" data-id="${req.id}">Mark Complete</button>`;
+                     : `<button class="btn-sm btn-unban mark-complete-btn" data-id="${escapeHTML(req.id)}">Mark Complete</button>`;
                 
                 row.innerHTML = `
                     <td>${reqDate}</td>
-                    <td>${req.email || "Unknown User"}</td>
-                    <td style="max-width:300px; word-wrap:break-word;">${req.message}</td>
+                    <td>${escapeHTML(req.email) || "Unknown User"}</td>
+                    <td style="max-width:300px; word-wrap:break-word;">${escapeHTML(req.message)}</td>
                     <td>${tierBadge}</td>
                     <td>${statusStr}</td>
                     <td>${actionButton}</td>`;

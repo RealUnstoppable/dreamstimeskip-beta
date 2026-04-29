@@ -1,6 +1,6 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const cors = require("cors")({ origin: true });
+const cors = require("cors")({origin: true});
 
 admin.initializeApp();
 
@@ -14,7 +14,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-    const { uid, email, plan, successUrl, cancelUrl } = req.body;
+    const {uid, email, plan, successUrl, cancelUrl} = req.body;
 
     // 🔴 Actual Price IDs from your Stripe Dashboard
     const priceId = plan === "Business Pro" ? "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
@@ -24,22 +24,22 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
         mode: "subscription",
         payment_method_types: ["card"],
         customer_email: email,
-        line_items: [{ price: priceId, quantity: 1 }],
-        subscription_data: { trial_period_days: 7 }, // ✅ FREE TRIAL
-        
+        line_items: [{price: priceId, quantity: 1}],
+        subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
+
         // Use the URLs passed from the frontend, fallback to hardcoded if missing
-        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true", 
+        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
         cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
-        metadata: { 
-            uid: uid || "unknown",
-            planName: plan || "Pro"
-        }
+        metadata: {
+          uid: uid || "unknown",
+          planName: plan || "Pro",
+        },
       });
 
-      res.status(200).json({ url: session.url });
+      res.status(200).json({url: session.url});
     } catch (err) {
       console.error("Checkout Error:", err);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({error: err.message});
     }
   });
 });
@@ -63,13 +63,13 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-        await admin.firestore().collection("users").doc(uid).set({
-          plan: planName, // Updates the frontend to unlock pro features
-          subscription: {
-              status: "active",
-              customerId: session.customer
-          }
-        }, { merge: true });
+      await admin.firestore().collection("users").doc(uid).set({
+        plan: planName, // Updates the frontend to unlock pro features
+        subscription: {
+          status: "active",
+          customerId: session.customer,
+        },
+      }, {merge: true});
     }
   }
 
@@ -77,38 +77,38 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const sub = event.data.object;
 
     const snapshot = await admin.firestore()
-      .collection("users")
-      .where("subscription.customerId", "==", sub.customer)
-      .get();
+        .collection("users")
+        .where("subscription.customerId", "==", sub.customer)
+        .get();
 
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       // Revert the user back to the free plan
-      doc.ref.update({ 
-          plan: "free",
-          "subscription.status": "canceled" 
+      doc.ref.update({
+        "plan": "free",
+        "subscription.status": "canceled",
       });
     });
   }
 
-  res.json({ received: true });
+  res.json({received: true});
 });
 
-// 🔻 Cancel Subscription Manually 
+// 🔻 Cancel Subscription Manually
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
 
-    const { customerId } = req.body;
+    const {customerId} = req.body;
 
     try {
-      const subs = await stripe.subscriptions.list({ customer: customerId });
+      const subs = await stripe.subscriptions.list({customer: customerId});
       for (const sub of subs.data) {
-        await stripe.subscriptions.cancel(sub.id); 
+        await stripe.subscriptions.cancel(sub.id);
       }
-      res.status(200).json({ success: true });
+      res.status(200).json({success: true});
     } catch (err) {
       console.error("Cancel Error:", err);
-      res.status(500).json({ error: err.message });
+      res.status(500).json({error: err.message});
     }
   });
 });
