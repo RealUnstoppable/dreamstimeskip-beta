@@ -199,7 +199,7 @@
     <aside id="sidebar" class="fixed inset-y-0 left-0 w-80 bg-white dark:bg-slate-900 z-[60] shadow-2xl border-r border-slate-100 dark:border-slate-800 p-8 no-print">
         <div class="flex justify-between items-center mb-12">
             <span class="font-black uppercase tracking-widest text-xs">Menu</span>
-            <button onclick="toggleSidebar()" class="p-2"><i data-lucide="x"></i></button>
+            <button onclick="toggleSidebar()" class="p-2" aria-label="Close menu"><i data-lucide="x"></i></button>
         </div>
 
         <nav class="space-y-6">
@@ -959,7 +959,7 @@
                 <input type="text" placeholder="Drawer Label" class="drawer-name" value="${label}" style="flex: 2;">
                 <input type="number" step="0.01" value="${val}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)">
                 <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;">
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2"><i data-lucide="x" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('drawersContainer').appendChild(div);
             calcDrawer(div.querySelector('.drawer-val'));
@@ -982,7 +982,7 @@
                 <input type="text" placeholder="Amount" class="dep-val" value="${val}" style="flex:1;">
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400"><i data-lucide="x" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('depositsContainer').appendChild(div);
             lucide.createIcons();
@@ -997,7 +997,7 @@
             div.innerHTML = `
                 <input type="checkbox" class="routine-chk w-5 h-5 accent-sky-500" ${isChecked ? 'checked' : ''} onchange="triggerDraftSync()"> 
                 <span class="routine-name flex-1 font-semibold text-sm">${taskName}</span>
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400"><i data-lucide="trash-2" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
             `;
             document.getElementById('routineContainer').appendChild(div);
             document.getElementById('newRoutineTask').value = "";
@@ -1013,7 +1013,7 @@
                 <input type="text" placeholder="Backline" class="inv-backline" value="${bl}" oninput="triggerDraftSync()">
                 <input type="text" placeholder="Cooler" class="inv-cooler" value="${cl}" oninput="triggerDraftSync()">
                 <input type="text" placeholder="Freezer" class="inv-freezer" value="${fr}" oninput="triggerDraftSync()">
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right"><i data-lucide="minus-circle" class="w-5"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
             lucide.createIcons();
