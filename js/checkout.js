@@ -7,6 +7,14 @@ import { products } from './shop.js';
 let currentUser = null;
 let userCart = {};
 
+export function setCurrentUser(user) {
+    currentUser = user;
+}
+
+export function setUserCart(cart) {
+    userCart = cart;
+}
+
 const checkoutContainer = document.getElementById('checkout-container');
 
 function renderCheckoutPage() {
@@ -73,7 +81,7 @@ function renderCheckoutPage() {
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
-async function handlePlaceOrder(e) {
+export async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
     const messageEl = document.getElementById('checkout-message');
