@@ -73,6 +73,29 @@ function renderCheckoutPage() {
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
+async function processOrderTransaction(userId, cartItems, orderDetails) {
+    await runTransaction(db, async (transaction) => {
+        // 1. Create a new order document
+        const newOrderRef = doc(db, "orders", `${userId}-${Date.now()}`);
+        transaction.set(newOrderRef, orderDetails);
+
+        // 2. Update product order counts
+        for (const [productId, quantity] of Object.entries(cartItems)) {
+            const productStatRef = doc(db, "product_stats", productId);
+            const statDoc = await transaction.get(productStatRef);
+            if (!statDoc.exists()) {
+                transaction.set(productStatRef, { orderedCount: quantity });
+            } else {
+                const newCount = statDoc.data().orderedCount + quantity;
+                transaction.update(productStatRef, { orderedCount: newCount });
+            }
+        }
+        // 3. Clear the user's cart
+        const userCartRef = doc(db, 'carts', userId);
+        transaction.set(userCartRef, { items: {} });
+    });
+}
+
 async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
@@ -95,26 +118,7 @@ async function handlePlaceOrder(e) {
 
     try {
         // New Feature: Use a transaction to ensure atomicity
-        await runTransaction(db, async (transaction) => {
-            // 1. Create a new order document
-            const newOrderRef = doc(db, "orders", `${currentUser.uid}-${Date.now()}`);
-            transaction.set(newOrderRef, orderDetails);
-
-            // 2. Update product order counts
-            for (const [productId, quantity] of Object.entries(userCart)) {
-                const productStatRef = doc(db, "product_stats", productId);
-                const statDoc = await transaction.get(productStatRef);
-                if (!statDoc.exists()) {
-    transaction.set(productStatRef, { orderedCount: quantity });
-} else {
-    const newCount = statDoc.data().orderedCount + quantity;
-    transaction.update(productStatRef, { orderedCount: newCount });
-}
-            }
-            // 3. Clear the user's cart
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            transaction.set(userCartRef, { items: {} });
-        });
+        await processOrderTransaction(currentUser.uid, userCart, orderDetails);
 
         messageEl.textContent = 'Order placed successfully! Redirecting...';
         messageEl.style.color = 'var(--accent-green)';
