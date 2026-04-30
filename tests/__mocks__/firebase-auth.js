@@ -1,5 +1,6 @@
-export const getAuth = jest.fn();
+import { jest } from '@jest/globals';
 export const onAuthStateChanged = jest.fn();
-export const signInWithPopup = jest.fn();
-export const GoogleAuthProvider = class {};
+export const signInWithEmailAndPassword = jest.fn();
+export const createUserWithEmailAndPassword = jest.fn();
 export const signOut = jest.fn();
+export const getAuth = jest.fn();
