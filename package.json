@@ -1,0 +1,8 @@
+{
+  "name": "dreamstimeskip-hub",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_ENV=test node js/footer.test.js"
+  }
+}
