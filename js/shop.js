@@ -36,7 +36,7 @@ export const products = [
 ];
 
 // --- STATE MANAGEMENT ---
-let cart = {}; // { productId: quantity, ... }
+export let cart = {}; // { productId: quantity, ... }
 let currentUser = null;
 
 // --- DOM ELEMENTS ---
@@ -109,10 +109,14 @@ function updateCartSummary() {
 }
 
 // --- CART LOGIC ---
-async function handleAddToCart(productId) {
+export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
-    await saveCart();
-    renderCart();
+    try {
+        await saveCart();
+        renderCart();
+    } catch (error) {
+        console.error('Failed to add to cart:', error);
+    }
 }
 
 async function handleUpdateQuantity(productId, quantity) {
