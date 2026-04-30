@@ -2,6 +2,6 @@
 **Learning:** When throttling events like `mousemove` with `requestAnimationFrame` using an `isTicking` flag and `latestEvent` state, ensure that the early return (e.g. `if (!latestEvent) return;`) also resets the `isTicking` flag (`isTicking = false;`). Otherwise, if the event state is cleared (like in a `mouseleave` handler) before the animation frame executes, the ticking state gets permanently locked, disabling the handler. It is also good practice to reset the ticking state in the `mouseleave` handler directly.
 **Action:** Always verify that early returns inside throttled or debounced callbacks properly clean up or reset tracking flags to avoid permanently locking the event listener state.
 
-## Firestore Transaction Performance and Integrity
-**Learning:** When using Firestore transactions, all read operations (`transaction.get()`) must occur before any write operations (`transaction.set()`, `transaction.update()`). To optimize multiple reads within a transaction (e.g., in a loop), use `Promise.all` to fetch all required documents concurrently before applying any writes. This not only avoids N+1 query performance penalties but also adheres strictly to Firestore's read-before-write transaction requirement.
-**Action:** Always batch reads concurrently using `Promise.all` inside Firestore transactions when dealing with loops or multiple documents, and sequence all writes after all reads.
+## 2024-05-01 - Concurrent API Calls
+**Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
+**Action:** Always prefer batching or Promise.all() for iterative async operations to minimize function execution time and avoid premature termination.
