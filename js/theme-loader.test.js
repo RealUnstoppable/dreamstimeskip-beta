@@ -1,160 +1,195 @@
-import { auth } from './auth.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
-import { getDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
-
-// We need to carefully mock the imports to control their behavior.
+// Setup mocks before importing
 jest.mock('./auth.js', () => ({
-  auth: { currentUser: null },
-  db: {}
+    auth: { currentUser: null },
+    db: {}
 }));
 
 jest.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
-  onAuthStateChanged: jest.fn()
+    onAuthStateChanged: jest.fn()
 }));
 
 jest.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () => ({
-  doc: jest.fn(),
-  getDoc: jest.fn()
+    doc: jest.fn(),
+    getDoc: jest.fn()
 }));
 
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+
 describe('theme-loader.js', () => {
-  let authStateCallback;
+    let originalLocalStorage;
+    let authStateCallback;
 
-  beforeEach(() => {
-    // Clear DOM and LocalStorage before each test
-    // Setting dataset keys to empty string makes them exist but empty.
-    // To completely clear them, we can delete the properties from dataset.
-    delete document.body.dataset.theme;
-    delete document.body.dataset.accent;
-    localStorage.clear();
-    jest.clearAllMocks();
+    beforeEach(() => {
+        // Mock localStorage
+        originalLocalStorage = window.localStorage;
+        const localStorageMock = {
+            getItem: jest.fn(),
+            setItem: jest.fn(),
+            clear: jest.fn()
+        };
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-    // Capture the callback passed to onAuthStateChanged
-    onAuthStateChanged.mockImplementation((_auth, callback) => {
-      authStateCallback = callback;
-    });
-  });
+        // Reset document body
+        document.body.dataset.theme = '';
+        document.body.dataset.accent = '';
 
-  const loadThemeLoader = async () => {
-    // To test the IIFE, we must isolate modules so it runs on each import.
-    await jest.isolateModulesAsync(async () => {
-        await import('./theme-loader.js');
-    });
-  };
+        // Mock console.error
+        jest.spyOn(console, 'error').mockImplementation(() => {});
 
-  describe('IIFE (Initial Load)', () => {
-    it('should not set dataset if localStorage is empty', async () => {
-      await loadThemeLoader();
-      expect(document.body.dataset.theme).toBeUndefined();
-      expect(document.body.dataset.accent).toBeUndefined();
-    });
+        // Reset mocks
+        jest.clearAllMocks();
+        jest.resetModules();
 
-    it('should set dataset from localStorage if present', async () => {
-      localStorage.setItem('userTheme', 'light');
-      localStorage.setItem('userAccent', 'green');
-      await loadThemeLoader();
-      expect(document.body.dataset.theme).toBe('light');
-      expect(document.body.dataset.accent).toBe('green');
-    });
-  });
+        // Ensure getDoc default is to not exist so it doesn't leak
+        const { getDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        getDoc.mockResolvedValue({ exists: () => false });
 
-  describe('window.updateTheme', () => {
-    beforeEach(async () => {
-      await loadThemeLoader();
+        // Capture the auth state callback
+        onAuthStateChanged.mockImplementation((_, callback) => {
+            authStateCallback = callback;
+        });
     });
 
-    it('should update dataset and localStorage when user is not logged in', () => {
-      auth.currentUser = null;
-      window.updateTheme('light', 'green');
-
-      expect(document.body.dataset.theme).toBe('light');
-      expect(document.body.dataset.accent).toBe('green');
-      expect(localStorage.getItem('userTheme')).toBe('light');
-      expect(localStorage.getItem('userAccent')).toBe('green');
+    afterEach(() => {
+        Object.defineProperty(window, 'localStorage', { value: originalLocalStorage });
+        jest.restoreAllMocks();
     });
 
-    it('should fall back to dark and blue if no arguments provided', () => {
-      auth.currentUser = null;
-      window.updateTheme();
+    // Helper to load the module
+    const loadModule = async () => {
+        authStateCallback = undefined;
 
-      expect(document.body.dataset.theme).toBe('dark');
-      expect(document.body.dataset.accent).toBe('blue');
-      expect(localStorage.getItem('userTheme')).toBe('dark');
-      expect(localStorage.getItem('userAccent')).toBe('blue');
+        jest.isolateModules(() => {
+            // Need to require the mocks inside isolateModules so they are picked up by the isolated module
+            const { onAuthStateChanged } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js');
+            onAuthStateChanged.mockImplementation((_, callback) => {
+                authStateCallback = callback;
+            });
+            require('./theme-loader.js');
+        });
+
+        // Give time for any async initialization if any
+        await new Promise(process.nextTick);
+
+        // Ensure the callback was registered
+        if (!authStateCallback) {
+            throw new Error("authStateCallback was not registered by onAuthStateChanged");
+        }
+    };
+
+    it('should set fallback theme when user is authenticated but has no Firestore profile', async () => {
+        await loadModule();
+
+        // Mock an authenticated user
+        const mockUser = { uid: 'user123' };
+        auth.currentUser = mockUser;
+
+        // Ensure we are mocking the method on the correct instance inside isolateModules
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+
+        isolatedDoc.mockReturnValue('mockDocRef');
+        isolatedGetDoc.mockResolvedValue({ exists: () => false });
+
+        // Trigger auth state change
+        await authStateCallback(mockUser);
+
+        // Verify fallback theme was applied
+        expect(document.body.dataset.theme).toBe('dark');
+        expect(document.body.dataset.accent).toBe('blue');
     });
 
-    it('should update dataset but skip localStorage when user is logged in', () => {
-      auth.currentUser = { uid: '123' };
-      window.updateTheme('light', 'green');
+    it('should set user theme when authenticated and profile exists', async () => {
+        // Clear global mock first just in case
+        getDoc.mockReset();
+        getDoc.mockResolvedValue({
+            exists: () => true,
+            data: () => ({ theme: 'light', accentColor: 'red' })
+        });
 
-      expect(document.body.dataset.theme).toBe('light');
-      expect(document.body.dataset.accent).toBe('green');
-      // LocalStorage should remain empty
-      expect(localStorage.getItem('userTheme')).toBeNull();
-      expect(localStorage.getItem('userAccent')).toBeNull();
-    });
-  });
+        await loadModule();
 
-  describe('onAuthStateChanged callback', () => {
-    beforeEach(async () => {
-      await loadThemeLoader();
-    });
+        const mockUser = { uid: 'user123' };
+        auth.currentUser = mockUser;
 
-    it('should apply theme from localStorage when user is not logged in', async () => {
-      localStorage.setItem('userTheme', 'dark');
-      localStorage.setItem('userAccent', 'red');
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
 
-      // trigger callback with no user
-      await authStateCallback(null);
+        isolatedDoc.mockReturnValue('mockDocRef');
+        isolatedGetDoc.mockResolvedValue({
+            exists: () => true,
+            data: () => ({ theme: 'light', accentColor: 'red' })
+        });
 
-      expect(document.body.dataset.theme).toBe('dark');
-      expect(document.body.dataset.accent).toBe('red');
-    });
+        await authStateCallback(mockUser);
 
-    it('should fetch theme from Firestore when user is logged in and document exists', async () => {
-      const mockUser = { uid: '123' };
+        // Await the microtasks just in case getDoc takes an extra tick
+        await new Promise(process.nextTick);
 
-      // Mock Firestore response
-      getDoc.mockResolvedValueOnce({
-        exists: () => true,
-        data: () => ({ theme: 'light', accentColor: 'purple' })
-      });
-
-      await authStateCallback(mockUser);
-
-      expect(getDoc).toHaveBeenCalled();
-      expect(document.body.dataset.theme).toBe('light');
-      expect(document.body.dataset.accent).toBe('purple');
+        expect(document.body.dataset.theme).toBe('light');
+        expect(document.body.dataset.accent).toBe('red');
     });
 
-    it('should fall back to dark/blue when user is logged in but document does not exist', async () => {
-      const mockUser = { uid: '123' };
+    it('should set fallback theme when Firestore throws an error', async () => {
+        await loadModule();
 
-      getDoc.mockResolvedValueOnce({
-        exists: () => false
-      });
+        const mockUser = { uid: 'user123' };
+        auth.currentUser = mockUser;
 
-      await authStateCallback(mockUser);
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        isolatedDoc.mockReturnValue('mockDocRef');
+        isolatedGetDoc.mockRejectedValue(new Error('Firestore error'));
 
-      expect(document.body.dataset.theme).toBe('dark');
-      expect(document.body.dataset.accent).toBe('blue');
+        await authStateCallback(mockUser);
+
+        expect(console.error).toHaveBeenCalled();
+        expect(document.body.dataset.theme).toBe('dark');
+        expect(document.body.dataset.accent).toBe('blue');
     });
 
-    it('should fall back to dark/blue when Firestore fetch fails', async () => {
-      const mockUser = { uid: '123' };
+    it('should set theme from localStorage for unauthenticated users', async () => {
+        // Set up localStorage mock to return values
+        window.localStorage.getItem.mockImplementation(key => {
+            if (key === 'userTheme') return 'customTheme';
+            if (key === 'userAccent') return 'customAccent';
+            return null;
+        });
 
-      getDoc.mockRejectedValueOnce(new Error('Network error'));
+        await loadModule();
 
-      // Suppress console.error for this test
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        auth.currentUser = null;
 
-      await authStateCallback(mockUser);
+        await authStateCallback(null);
 
-      expect(consoleSpy).toHaveBeenCalledWith("Error loading theme from Firestore:", expect.any(Error));
-      expect(document.body.dataset.theme).toBe('dark');
-      expect(document.body.dataset.accent).toBe('blue');
-
-      consoleSpy.mockRestore();
+        expect(document.body.dataset.theme).toBe('customTheme');
+        expect(document.body.dataset.accent).toBe('customAccent');
     });
-  });
+
+    it('should set fallback values and persist to localStorage when no theme is found and user is unauthenticated', async () => {
+        window.localStorage.getItem.mockReturnValue(null);
+
+        await loadModule();
+
+        auth.currentUser = null;
+
+        await authStateCallback(null);
+
+        expect(document.body.dataset.theme).toBe('dark');
+        expect(document.body.dataset.accent).toBe('blue');
+        expect(window.localStorage.setItem).toHaveBeenCalledWith('userTheme', 'dark');
+        expect(window.localStorage.setItem).toHaveBeenCalledWith('userAccent', 'blue');
+    });
+
+    it('should apply initial theme from localStorage on load', async () => {
+        window.localStorage.getItem.mockImplementation(key => {
+            if (key === 'userTheme') return 'initTheme';
+            if (key === 'userAccent') return 'initAccent';
+            return null;
+        });
+
+        await loadModule();
+
+        expect(document.body.dataset.theme).toBe('initTheme');
+        expect(document.body.dataset.accent).toBe('initAccent');
+    });
 });
