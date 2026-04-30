@@ -1,143 +1,160 @@
-const test = require("firebase-functions-test")();
+const testEnv = require("firebase-functions-test")();
+
+// Mock Stripe BEFORE importing index.js
+const mockCreateSession = jest.fn();
+jest.mock("stripe", () => {
+  return jest.fn().mockImplementation(() => ({
+    checkout: {
+      sessions: {
+        create: mockCreateSession,
+      },
+    },
+    webhooks: {
+      constructEvent: jest.fn(),
+    },
+    subscriptions: {
+      list: jest.fn(),
+      cancel: jest.fn(),
+    },
+  }));
+});
+
+// Mock request and response objects
+const mockReq = (options = {}) => ({
+  method: "POST",
+  body: {},
+  headers: {},
+  ...options,
+});
+
+const mockRes = () => {
+  const res = {};
+  res.setHeader = jest.fn();
+  res.getHeader = jest.fn();
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
+  res.send = jest.fn().mockReturnValue(res);
+  return res;
+};
+
+// Import functions after mocks
+const {createCheckoutSession} = require("./index.js");
 
 describe("createCheckoutSession", () => {
-  let myFunctions;
-  let mockStripe;
-
-  beforeAll(() => {
-    // We mock stripe so we can observe calls and control returns
-    mockStripe = {
-      checkout: {
-        sessions: {
-          create: jest.fn(),
-        },
-      },
-    };
-
-    // Override require('stripe') to return a function that returns our mockStripe
-    jest.mock("stripe", () => {
-      return jest.fn(() => mockStripe);
-    });
-
-    // We can just require the index.js file now that stripe is mocked
-    myFunctions = require("./index.js");
-  });
-
-  afterAll(() => {
-    test.cleanup();
-  });
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("should return 405 if method is not POST", (done) => {
-    const req = { method: "GET", headers: { origin: "http://localhost" } };
-    const res = {
-      setHeader: () => {},
-      getHeader: () => {},
-      status: (code) => {
-        expect(code).toBe(405);
-        return {
-          send: (msg) => {
-            expect(msg).toBe("Method Not Allowed");
-            done();
-          },
-        };
-      },
-    };
-
-    myFunctions.createCheckoutSession(req, res);
+  afterAll(() => {
+    testEnv.cleanup();
   });
 
-  it("should successfully create a checkout session and return 200", async () => {
-    // Setup the mock to resolve with a fake session
-    mockStripe.checkout.sessions.create.mockResolvedValue({
-      url: "https://checkout.stripe.com/test",
+  it("should return 405 Method Not Allowed for non-POST requests", async () => {
+    const req = mockReq({method: "GET"});
+    const res = mockRes();
+
+    // The function might return before internal promise is resolved,
+    // wrapping it to ensure it completes before asserting
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
     });
 
-    const req = {
-      method: "POST",
-      headers: { origin: "http://localhost" },
-      body: {
-        uid: "test-uid",
-        email: "test@example.com",
-        plan: "Business Pro",
-      },
-    };
-
-    // We can use a Promise to wait for the response since the function handles it asynchronously
-    const responsePromise = new Promise((resolve) => {
-      const res = {
-        setHeader: () => {},
-        getHeader: () => {},
-        status: (code) => {
-          return {
-            json: (data) => {
-              resolve({ code, data });
-            },
-            send: (msg) => {
-              resolve({ code, data: msg });
-            }
-          };
-        },
-      };
-      myFunctions.createCheckoutSession(req, res);
-    });
-
-    const { code, data } = await responsePromise;
-
-    expect(code).toBe(200);
-    expect(data).toEqual({ url: "https://checkout.stripe.com/test" });
-
-    // Verify that stripe.checkout.sessions.create was called with the correct parameters
-    expect(mockStripe.checkout.sessions.create).toHaveBeenCalledTimes(1);
-    expect(mockStripe.checkout.sessions.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        mode: "subscription",
-        payment_method_types: ["card"],
-        customer_email: "test@example.com",
-        line_items: [{ price: "price_1THHbVBp2C5GdKaKvCVoMf1X", quantity: 1 }],
-      })
-    );
+    expect(res.status).toHaveBeenCalledWith(405);
+    expect(res.send).toHaveBeenCalledWith("Method Not Allowed");
   });
 
-  it("should return 500 if stripe throws an error", async () => {
-    // Setup the mock to reject with an error
-    mockStripe.checkout.sessions.create.mockRejectedValue(new Error("Stripe API error"));
-
-    const req = {
-      method: "POST",
-      headers: { origin: "http://localhost" },
-      body: {
-        uid: "test-uid",
-        email: "test@example.com",
-        plan: "Business Pro",
-      },
-    };
-
-    const responsePromise = new Promise((resolve) => {
-      const res = {
-        setHeader: () => {},
-        getHeader: () => {},
-        status: (code) => {
-          return {
-            json: (data) => {
-              resolve({ code, data });
-            },
-            send: (msg) => {
-              resolve({ code, data: msg });
-            }
-          };
-        },
-      };
-      myFunctions.createCheckoutSession(req, res);
+  it("should create session with Pro plan & fallback URLs", async () => {
+    mockCreateSession.mockResolvedValueOnce({
+      url: "https://checkout.stripe.com/test-url",
     });
 
-    const { code, data } = await responsePromise;
+    const req = mockReq({
+      method: "POST",
+      body: {
+        uid: "user123",
+        email: "test@example.com",
+      },
+    });
+    const res = mockRes();
 
-    expect(code).toBe(500);
-    expect(data).toEqual({ error: "Stripe API error" });
-    expect(mockStripe.checkout.sessions.create).toHaveBeenCalledTimes(1);
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
+      customer_email: "test@example.com",
+      line_items: [{price: "price_1THHYPBp2C5GdKaKxNpqndNE", quantity: 1}],
+      success_url: "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+      cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
+      metadata: {
+        uid: "user123",
+        planName: "Pro", // default if not provided
+      },
+    }));
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({url: "https://checkout.stripe.com/test-url"});
+  });
+
+  it("should create session with Business Pro & custom URLs", async () => {
+    mockCreateSession.mockResolvedValueOnce({
+      url: "https://checkout.stripe.com/biz-url",
+    });
+
+    const req = mockReq({
+      method: "POST",
+      body: {
+        uid: "bizuser",
+        email: "biz@example.com",
+        plan: "Business Pro",
+        successUrl: "https://mycustomurl.com/success",
+        cancelUrl: "https://mycustomurl.com/cancel",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
+      customer_email: "biz@example.com",
+      line_items: [{price: "price_1THHbVBp2C5GdKaKvCVoMf1X", quantity: 1}],
+      success_url: "https://mycustomurl.com/success",
+      cancel_url: "https://mycustomurl.com/cancel",
+      metadata: {
+        uid: "bizuser",
+        planName: "Business Pro",
+      },
+    }));
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({url: "https://checkout.stripe.com/biz-url"});
+  });
+
+  it("should handle stripe session errors and return 500", async () => {
+    // Suppress console.error in tests for expected errors
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    mockCreateSession.mockRejectedValueOnce(new Error("Stripe API Error"));
+
+    const req = mockReq({
+      method: "POST",
+      body: {email: "test@example.com"},
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({error: "Stripe API Error"});
+
+    console.error.mockRestore();
   });
 });
