@@ -36,7 +36,7 @@ export const products = [
 ];
 
 // --- STATE MANAGEMENT ---
-let cart = {}; // { productId: quantity, ... }
+export let cart = {}; // { productId: quantity, ... }
 let currentUser = null;
 
 // --- DOM ELEMENTS ---
@@ -87,7 +87,7 @@ function renderCart() {
                     </div>
                     <div class="cart-item-actions">
                         <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
-                        <button class="remove-item-btn" data-id="${productId}">&#128465;</button>
+                        <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
                     </div>
                 </div>
             `;
@@ -115,7 +115,7 @@ async function handleAddToCart(productId) {
     renderCart();
 }
 
-async function handleUpdateQuantity(productId, quantity) {
+export async function handleUpdateQuantity(productId, quantity) {
     if (quantity <= 0) {
         await handleRemoveFromCart(productId);
     } else {

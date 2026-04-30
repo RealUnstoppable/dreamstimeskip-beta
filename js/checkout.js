@@ -7,6 +7,14 @@ import { products } from './shop.js';
 let currentUser = null;
 let userCart = {};
 
+export function setCurrentUser(user) {
+    currentUser = user;
+}
+
+export function setUserCart(cart) {
+    userCart = cart;
+}
+
 const checkoutContainer = document.getElementById('checkout-container');
 
 function renderCheckoutPage() {
@@ -73,30 +81,7 @@ function renderCheckoutPage() {
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
-async function processOrderTransaction(userId, cartItems, orderDetails) {
-    await runTransaction(db, async (transaction) => {
-        // 1. Create a new order document
-        const newOrderRef = doc(db, "orders", `${userId}-${Date.now()}`);
-        transaction.set(newOrderRef, orderDetails);
-
-        // 2. Update product order counts
-        for (const [productId, quantity] of Object.entries(cartItems)) {
-            const productStatRef = doc(db, "product_stats", productId);
-            const statDoc = await transaction.get(productStatRef);
-            if (!statDoc.exists()) {
-                transaction.set(productStatRef, { orderedCount: quantity });
-            } else {
-                const newCount = statDoc.data().orderedCount + quantity;
-                transaction.update(productStatRef, { orderedCount: newCount });
-            }
-        }
-        // 3. Clear the user's cart
-        const userCartRef = doc(db, 'carts', userId);
-        transaction.set(userCartRef, { items: {} });
-    });
-}
-
-async function handlePlaceOrder(e) {
+export async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
     const messageEl = document.getElementById('checkout-message');
