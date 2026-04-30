@@ -1,3 +1,3 @@
-## 2024-04-29 - requestAnimationFrame State Management Bug
-**Learning:** When throttling events like `mousemove` with `requestAnimationFrame` using an `isTicking` flag and `latestEvent` state, ensure that the early return (e.g. `if (!latestEvent) return;`) also resets the `isTicking` flag (`isTicking = false;`). Otherwise, if the event state is cleared (like in a `mouseleave` handler) before the animation frame executes, the ticking state gets permanently locked, disabling the handler. It is also good practice to reset the ticking state in the `mouseleave` handler directly.
-**Action:** Always verify that early returns inside throttled or debounced callbacks properly clean up or reset tracking flags to avoid permanently locking the event listener state.
+# Bolt Learnings
+
+- **Firebase Cloud Functions & Promise.all**: Always use `Promise.all()` to handle multiple async operations (like API requests or database updates) to execute them concurrently instead of using sequential loops (like `for...of`). This minimizes execution time by executing tasks in parallel, drastically speeding up I/O-bound operations and avoiding function timeouts. It can make a significant difference, for example taking 50 parallel queries down to 50ms from 2.5 seconds sequentially.

@@ -102,9 +102,10 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 
     try {
       const subs = await stripe.subscriptions.list({customer: customerId});
-      for (const sub of subs.data) {
-        await stripe.subscriptions.cancel(sub.id);
-      }
+      // ⚡ Bolt: Execute cancellation API requests concurrently for performance
+      await Promise.all(subs.data.map((sub) =>
+        stripe.subscriptions.cancel(sub.id),
+      ));
       res.status(200).json({success: true});
     } catch (err) {
       console.error("Cancel Error:", err);
