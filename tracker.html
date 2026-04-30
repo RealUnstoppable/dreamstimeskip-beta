@@ -787,6 +787,18 @@
         let currentUser = null;
         let currentUserData = null;
         let isRegisterMode = false;
+
+        function escapeHTML(str) {
+            if (str == null) return "";
+            if (typeof str !== 'string') str = str.toString();
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         let shiftStartTime = null;
         let timerInterval = null;
         let cloudSyncTimeout = null;
@@ -956,8 +968,8 @@
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center animate-fadeIn";
             div.innerHTML = `
-                <input type="text" placeholder="Drawer Label" class="drawer-name" value="${label}" style="flex: 2;">
-                <input type="number" step="0.01" value="${val}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)">
+                <input type="text" placeholder="Drawer Label" class="drawer-name" value="${escapeHTML(label)}" style="flex: 2;">
+                <input type="number" step="0.01" value="${escapeHTML(val)}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)">
                 <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
             `;
@@ -979,7 +991,7 @@
             const div = document.createElement('div');
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
             div.innerHTML = `
-                <input type="text" placeholder="Amount" class="dep-val" value="${val}" style="flex:1;">
+                <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;">
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
@@ -996,7 +1008,7 @@
             div.className = "flex items-center gap-3 p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm";
             div.innerHTML = `
                 <input type="checkbox" class="routine-chk w-5 h-5 accent-sky-500" ${isChecked ? 'checked' : ''} onchange="triggerDraftSync()"> 
-                <span class="routine-name flex-1 font-semibold text-sm">${taskName}</span>
+                <span class="routine-name flex-1 font-semibold text-sm">${escapeHTML(taskName)}</span>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
             `;
             document.getElementById('routineContainer').appendChild(div);
@@ -1009,10 +1021,10 @@
             const div = document.createElement('div');
             div.className = 'inventory-item animate-fadeIn';
             div.innerHTML = `
-                <input type="text" placeholder="Item Name" class="inv-name" value="${name}">
-                <input type="text" placeholder="Backline" class="inv-backline" value="${bl}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Cooler" class="inv-cooler" value="${cl}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Freezer" class="inv-freezer" value="${fr}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Item Name" class="inv-name" value="${escapeHTML(name)}">
+                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" oninput="triggerDraftSync()">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
@@ -1117,10 +1129,10 @@
                     div.className = "card flex justify-between items-center hover:border-sky-200 dark:hover:border-sky-800 transition-colors group";
                     div.innerHTML = `
                         <div>
-                            <div class="font-black text-lg">${data.dateSaved}</div>
-                            <div class="text-xs font-bold uppercase tracking-widest text-slate-400">Manager: ${data.manager || 'N/A'} • Duration: ${data.durationMins || 0}m</div>
+                            <div class="font-black text-lg">${escapeHTML(data.dateSaved)}</div>
+                            <div class="text-xs font-bold uppercase tracking-widest text-slate-400">Manager: ${escapeHTML(data.manager || 'N/A')} • Duration: ${escapeHTML(data.durationMins)}m</div>
                         </div>
-                        <button onclick="loadHistoryShift('${data.id}')" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="loadHistoryShift('${escapeHTML(data.id)}')" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <i data-lucide="download"></i> Load Shift
                         </button>
                     `;
@@ -1243,8 +1255,8 @@
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
-                            <span class="font-bold">${p.name}</span>
-                            <button onclick="applyCustomPreset('${p.id}')" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
+                            <span class="font-bold">${escapeHTML(p.name)}</span>
+                            <button onclick="applyCustomPreset('${escapeHTML(p.id)}')" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
                         container.appendChild(div);
                     });

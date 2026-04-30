@@ -467,7 +467,7 @@
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
                 const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
-                row.innerHTML = `<td>${subscriber.email}</td><td>${subscriptionDate}</td>`;
+                row.innerHTML = `<td>${escapeHTML(subscriber.email)}</td><td>${subscriptionDate}</td>`;
                 newsletterListBody.appendChild(row);
             });
         }
