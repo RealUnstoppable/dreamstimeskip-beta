@@ -1,7 +1,14 @@
 export default {
   testEnvironment: 'jsdom',
-  transform: {},
+  testMatch: ['<rootDir>/tests/**/*.test.js'],
+  modulePathIgnorePatterns: ["<rootDir>/dts-hub-website/", "<rootDir>/functions/"],
+  transform: {
+    "^.+\\.jsx?$": "babel-jest"
+  },
   moduleNameMapper: {
-    '^https://www.gstatic.com/firebasejs/9.15.0/(.*)$': '<rootDir>/tests/mocks/$1'
+    "^https://.*/firebase-auth\\.js$": "<rootDir>/tests/__mocks__/firebase-auth.js",
+    "^https://.*/firebase-firestore\\.js$": "<rootDir>/tests/__mocks__/firebase-firestore.js",
+    "^https://.*$": "jest-transform-stub",
+    "^./auth.js$": "<rootDir>/tests/__mocks__/auth.js"
   }
 };
