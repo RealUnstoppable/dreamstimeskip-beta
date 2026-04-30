@@ -81,13 +81,15 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       .where("subscription.customerId", "==", sub.customer)
       .get();
 
-    snapshot.forEach(doc => {
+    const batch = admin.firestore().batch();
+    snapshot.forEach((doc) => {
       // Revert the user back to the free plan
-      doc.ref.update({ 
-          plan: "free",
-          "subscription.status": "canceled" 
+      batch.update(doc.ref, {
+        plan: "free",
+        "subscription.status": "canceled",
       });
     });
+    await batch.commit();
   }
 
   res.json({ received: true });
