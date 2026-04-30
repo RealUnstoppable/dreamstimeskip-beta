@@ -1,0 +1,14 @@
+{
+  "name": "project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0"
+  }
+}
