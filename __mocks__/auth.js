@@ -1,2 +1,5 @@
-export const auth = {};
+export const auth = {
+    currentUser: null
+};
+
 export const db = {};
