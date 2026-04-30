@@ -1,8 +1,36 @@
 {
-  "name": "dreamstimeskip-hub",
+  "name": "app",
   "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "directories": {
+    "test": "tests"
+  },
   "type": "module",
   "scripts": {
-    "test": "NODE_ENV=test node js/footer.test.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RealUnstoppable/dreamstimeskip-beta.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RealUnstoppable/dreamstimeskip-beta/issues"
+  },
+  "homepage": "https://github.com/RealUnstoppable/dreamstimeskip-beta#readme",
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/user-event": "^14.6.1",
+    "babel-jest": "^30.3.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jest-transform-stub": "^2.0.0",
+    "jsdom": "^29.1.0"
   }
 }
