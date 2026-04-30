@@ -1,7 +1,9 @@
 // js/footer.js
 
 // Automatically initialize the newsletter logic on any page that loads this footer
-import './newsletter.js';
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+    import('./newsletter.js');
+}
 
 export function loadFooter() {
     const footerHTML = `
