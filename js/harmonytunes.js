@@ -2,6 +2,13 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
+export function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
     const librarySongs = [
@@ -38,6 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
+    window.__setCurrentUser = (u) => currentUser = u;
+    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setCurrentQueue = (q) => currentQueue = q;
+    window.__setCurrentSongIndex = (i) => currentSongIndex = i;
+    window.__getUserFavorites = () => userFavorites;
 
     // --- DOM ELEMENTS ---
     const viewHome = document.getElementById('view-home');
@@ -123,21 +135,29 @@ document.addEventListener('DOMContentLoaded', () => {
         viewHome.style.display = 'none';
         viewPlaylist.style.display = 'block';
         
-        if (type === 'favorites') {
-            playlistTitleEl.textContent = "Liked Songs";
-            playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
-            renderSongTable(userFavorites);
-            playlistPlayBtn.onclick = () => {
-                if (userFavorites.length > 0) playContext(userFavorites, 0);
-            };
-        } else {
-            // Default Main
-            playlistTitleEl.textContent = "All Available Tracks";
-            playlistDescEl.textContent = "Unstoppable Media • Official Library";
-            renderSongTable(librarySongs);
-            playlistPlayBtn.onclick = () => {
-                playContext(librarySongs, 0);
-            };
+        try {
+            if (type === 'favorites') {
+                playlistTitleEl.textContent = "Liked Songs";
+                playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
+                renderSongTable(userFavorites);
+                playlistPlayBtn.onclick = () => {
+                    if (userFavorites.length > 0) playContext(userFavorites, 0);
+                };
+            } else {
+                // Default Main
+                playlistTitleEl.textContent = "All Available Tracks";
+                playlistDescEl.textContent = "Unstoppable Media • Official Library";
+                renderSongTable(librarySongs);
+                playlistPlayBtn.onclick = () => {
+                    playContext(librarySongs, 0);
+                };
+            }
+        } catch (error) {
+            console.error("Error loading playlist:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
+            try { playlistPlayBtn.onclick = null; } catch (e) {}
         }
     }
 
@@ -373,7 +393,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function toggleFavorite(songId) {
+    function formatTime(seconds) {
+        if (isNaN(seconds)) return "0:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
             return;
