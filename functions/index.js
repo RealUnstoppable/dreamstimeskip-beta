@@ -4,7 +4,8 @@ const cors = require("cors")({origin: true});
 
 admin.initializeApp();
 
-// Fallback "placeholder" string to stop Firebase Analyzer from crashing during deployment
+// Fallback "placeholder" string to stop Firebase Analyzer from
+// crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
@@ -12,12 +13,15 @@ const stripe = require("stripe")(stripeKey);
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
 
     const {uid, email, plan, successUrl, cancelUrl} = req.body;
 
     // 🔴 Actual Price IDs from your Stripe Dashboard
-    const priceId = plan === "Business Pro" ? "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
+    const priceId = plan === "Business Pro" ?
+      "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
 
     try {
       const session = await stripe.checkout.sessions.create({
@@ -27,8 +31,9 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
         line_items: [{price: priceId, quantity: 1}],
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
 
-        // Use the URLs passed from the frontend, fallback to hardcoded if missing
-        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+        // Use URLs passed from frontend, fallback to hardcoded if missing
+        success_url: successUrl ||
+          "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
         cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
         metadata: {
           uid: uid || "unknown",
@@ -81,13 +86,13 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
         .where("subscription.customerId", "==", sub.customer)
         .get();
 
-    snapshot.forEach((doc) => {
-      // Revert the user back to the free plan
+    const updates = snapshot.docs.map((doc) =>
       doc.ref.update({
         "plan": "free",
         "subscription.status": "canceled",
-      });
-    });
+      }),
+    );
+    await Promise.all(updates);
   }
 
   res.json({received: true});
@@ -96,16 +101,18 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 // 🔻 Cancel Subscription Manually
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
 
     const {customerId} = req.body;
 
     try {
       const subs = await stripe.subscriptions.list({customer: customerId});
-      // ⚡ Bolt: Execute cancellation API requests concurrently for performance
-      await Promise.all(subs.data.map((sub) =>
+      const cancelPromises = subs.data.map((sub) =>
         stripe.subscriptions.cancel(sub.id),
-      ));
+      );
+      await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
       console.error("Cancel Error:", err);
