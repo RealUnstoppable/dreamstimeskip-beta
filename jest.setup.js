@@ -1,27 +1,13 @@
-import { jest } from '@jest/globals';
-
-// Set up globals
-global.document = {
-    getElementById: jest.fn().mockReturnValue({
-        innerHTML: '',
-        textContent: '',
-        addEventListener: jest.fn(),
-        style: {}
-    }),
-    querySelector: jest.fn().mockReturnValue({
-        innerHTML: '',
-        textContent: '',
-        addEventListener: jest.fn(),
-        style: {}
-    }),
-    addEventListener: jest.fn()
-};
-
-global.window = {
-    addEventListener: jest.fn()
-};
-
-global.localStorage = {
-    getItem: jest.fn(),
-    setItem: jest.fn()
-};
+document.body.innerHTML = `
+    <div id="cart-items-container"></div>
+    <button id="checkout-btn"></button>
+    <span id="cart-item-count"></span>
+    <span id="cart-total-price"></span>
+    <div id="product-grid"></div>
+    <button id="cart-button"></button>
+    <div id="cart-modal"></div>
+    <button id="close-cart-btn"></button>
+    <div id="nav-cta-container"></div>
+    <button class="hamburger"></button>
+    <div class="nav-links"></div>
+`;
