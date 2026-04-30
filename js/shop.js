@@ -2,6 +2,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { calculateCartSummary } from './cart-utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
@@ -98,11 +99,7 @@ function renderCart() {
 }
 
 function updateCartSummary() {
-    const itemCount = Object.values(cart).reduce((sum, quantity) => sum + quantity, 0);
-    const totalPrice = Object.entries(cart).reduce((sum, [productId, quantity]) => {
-        const product = products.find(p => p.id === productId);
-        return sum + (product.price * quantity);
-    }, 0);
+    const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
     cartItemCountEl.textContent = itemCount;
     cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
