@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
+    window.__setCurrentUser = (u) => currentUser = u;
+    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setCurrentQueue = (q) => currentQueue = q;
+    window.__setCurrentSongIndex = (i) => currentSongIndex = i;
+    window.__getUserFavorites = () => userFavorites;
 
     // --- DOM ELEMENTS ---
     const viewHome = document.getElementById('view-home');
@@ -393,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${min}:${sec < 10 ? '0' : ''}${sec}`;
     }
 
-    async function toggleFavorite(songId) {
+    window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
             return;
