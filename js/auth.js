@@ -133,7 +133,13 @@ if (document.getElementById('auth-form')) {
         }
     });
 
-    function getFirebaseErrorMessage(error) {
+
+
+    function showMessage(msg) { messageEl.textContent = msg; }
+    updateFormView();
+}
+
+export function getFirebaseErrorMessage(error) {
         switch (error.code) {
             case 'auth/invalid-email':
                 return 'Please enter a valid email address.';
@@ -149,7 +155,3 @@ if (document.getElementById('auth-form')) {
                 return 'An unexpected error occurred. Please try again.';
         }
     }
-
-    function showMessage(msg) { messageEl.textContent = msg; }
-    updateFormView();
-}

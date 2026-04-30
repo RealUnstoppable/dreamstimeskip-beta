@@ -1,0 +1,1 @@
+export const getAuth = () => {}; export const onAuthStateChanged = () => {}; export const createUserWithEmailAndPassword = () => {}; export const signInWithEmailAndPassword = () => {}; export const signOut = () => {}; export const sendEmailVerification = () => {};
