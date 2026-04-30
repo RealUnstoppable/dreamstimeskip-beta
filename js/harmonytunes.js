@@ -190,19 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function createSongCard(song) {
-        return `
-            <div class="music-card" data-song-id="${song.id}" onclick="playSongById('${song.id}')">
-                <div class="card-img-wrapper">
-                    <img src="${song.art}" alt="${song.title}">
-                    <button class="card-play-btn">▶</button>
-                </div>
-                <div class="card-title">${song.title}</div>
-                <div class="card-desc">${song.artist}</div>
-            </div>
-        `;
-    }
-
     window.playSongById = (id) => {
         const songIndex = librarySongs.findIndex(s => s.id === id);
         if (songIndex > -1) playContext(librarySongs, songIndex);
@@ -386,13 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
-
     async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
@@ -447,3 +427,23 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     });
 });
+
+export function createSongCard(song) {
+    return `
+        <div class="music-card" data-song-id="${song.id}" onclick="playSongById('${song.id}')">
+            <div class="card-img-wrapper">
+                <img src="${song.art}" alt="${song.title}">
+                <button class="card-play-btn">▶</button>
+            </div>
+            <div class="card-title">${song.title}</div>
+            <div class="card-desc">${song.artist}</div>
+        </div>
+    `;
+}
+
+export function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+}
