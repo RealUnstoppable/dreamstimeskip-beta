@@ -6,8 +6,9 @@
   "directories": {
     "test": "tests"
   },
+  "type": "module",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules npx jest",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start": "node server.js"
   },
   "repository": {
@@ -17,14 +18,19 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "bugs": {
     "url": "https://github.com/RealUnstoppable/dreamstimeskip-beta/issues"
   },
   "homepage": "https://github.com/RealUnstoppable/dreamstimeskip-beta#readme",
   "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/user-event": "^14.6.1",
+    "babel-jest": "^30.3.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "jest-transform-stub": "^2.0.0",
     "jsdom": "^29.1.0"
   }
 }
