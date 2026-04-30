@@ -96,22 +96,30 @@ async function handlePlaceOrder(e) {
     try {
         // New Feature: Use a transaction to ensure atomicity
         await runTransaction(db, async (transaction) => {
-            // 1. Create a new order document
+            const productEntries = Object.entries(userCart);
+
+            // 1. Fetch all product stats concurrently (Reads must happen before writes)
+            const statDocs = await Promise.all(
+                productEntries.map(([productId]) => transaction.get(doc(db, "product_stats", productId)))
+            );
+
+            // 2. Create a new order document
             const newOrderRef = doc(db, "orders", `${currentUser.uid}-${Date.now()}`);
             transaction.set(newOrderRef, orderDetails);
 
-            // 2. Update product order counts
-            for (const [productId, quantity] of Object.entries(userCart)) {
+            // 3. Update product order counts
+            productEntries.forEach(([productId, quantity], i) => {
                 const productStatRef = doc(db, "product_stats", productId);
-                const statDoc = await transaction.get(productStatRef);
+                const statDoc = statDocs[i];
                 if (!statDoc.exists()) {
-    transaction.set(productStatRef, { orderedCount: quantity });
-} else {
-    const newCount = statDoc.data().orderedCount + quantity;
-    transaction.update(productStatRef, { orderedCount: newCount });
-}
-            }
-            // 3. Clear the user's cart
+                    transaction.set(productStatRef, { orderedCount: quantity });
+                } else {
+                    const newCount = statDoc.data().orderedCount + quantity;
+                    transaction.update(productStatRef, { orderedCount: newCount });
+                }
+            });
+
+            // 4. Clear the user's cart
             const userCartRef = doc(db, 'carts', currentUser.uid);
             transaction.set(userCartRef, { items: {} });
         });
