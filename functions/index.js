@@ -105,9 +105,31 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const {customerId} = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split("Bearer ")[1];
 
     try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      const uid = decodedToken.uid;
+
+      const userDoc = await admin.firestore().collection("users")
+          .doc(uid).get();
+      if (!userDoc.exists) {
+        return res.status(404).send("User not found");
+      }
+
+      const userData = userDoc.data();
+      const customerId = userData.subscription ?
+          userData.subscription.customerId : null;
+
+      if (!customerId) {
+        return res.status(400).send("No active subscription found");
+      }
+
       const subs = await stripe.subscriptions.list({customer: customerId});
       const cancelPromises = subs.data.map((sub) =>
         stripe.subscriptions.cancel(sub.id),

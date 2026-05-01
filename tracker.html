@@ -1132,7 +1132,7 @@
                             <div class="font-black text-lg">${escapeHTML(data.dateSaved)}</div>
                             <div class="text-xs font-bold uppercase tracking-widest text-slate-400">Manager: ${escapeHTML(data.manager || 'N/A')} • Duration: ${escapeHTML(data.durationMins)}m</div>
                         </div>
-                        <button onclick="loadHistoryShift('${escapeHTML(data.id)}')" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button data-id="${escapeHTML(data.id)}" onclick="loadHistoryShift(this.getAttribute('data-id'))" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <i data-lucide="download"></i> Load Shift
                         </button>
                     `;
@@ -1256,7 +1256,7 @@
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
                             <span class="font-bold">${escapeHTML(p.name)}</span>
-                            <button onclick="applyCustomPreset('${escapeHTML(p.id)}')" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
+                            <button data-id="${escapeHTML(p.id)}" onclick="applyCustomPreset(this.getAttribute('data-id'))" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
                         container.appendChild(div);
                     });
