@@ -6,6 +6,7 @@ export default {
     "^.+\\.jsx?$": "babel-jest"
   },
   moduleNameMapper: {
+    "^https://.*/firebase-app\\.js$": "<rootDir>/tests/__mocks__/firebase-app.js",
     "^https://.*/firebase-auth\\.js$": "<rootDir>/tests/__mocks__/firebase-auth.js",
     "^https://.*/firebase-firestore\\.js$": "<rootDir>/tests/__mocks__/firebase-firestore.js",
     "^https://.*$": "jest-transform-stub",
