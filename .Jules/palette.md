@@ -1,0 +1,3 @@
+## 2026-04-29 - Add ARIA labels to dynamically generated icon-only buttons
+**Learning:** Found an accessibility issue pattern specific to this app's components: dynamically generated elements (like drawers, deposits, tasks, and inventory items) often contained icon-only delete/remove buttons that were missing `aria-label`s. This renders these buttons inaccessible to screen readers since they have no textual content.
+**Action:** When adding or reviewing dynamically generated HTML elements containing icon-only buttons, always ensure an `aria-label` attribute is included to describe the button's action (e.g., 'Remove item').

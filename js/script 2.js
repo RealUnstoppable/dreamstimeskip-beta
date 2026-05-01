@@ -107,21 +107,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Bento Card 3D Tilt Effect ---
     const bentoCards = document.querySelectorAll('.bento-card');
     bentoCards.forEach(card => {
+        // ⚡ Bolt: Throttle mousemove events with requestAnimationFrame
+        // to prevent main-thread blocking from high-frequency polling.
+        let isTicking = false;
+        let latestEvent = null;
+
         card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+            latestEvent = { clientX: e.clientX, clientY: e.clientY };
 
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+            if (!isTicking) {
+                window.requestAnimationFrame(() => {
+                    if (!latestEvent) {
+                        isTicking = false;
+                        return;
+                    }
 
-            const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg rotation
-            const rotateY = ((x - centerX) / centerX) * 5;  // Max 5deg rotation
+                    const rect = card.getBoundingClientRect();
+                    const x = latestEvent.clientX - rect.left;
+                    const y = latestEvent.clientY - rect.top;
 
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = ((y - centerY) / centerY) * -5; // Max 5deg rotation
+                    const rotateY = ((x - centerX) / centerX) * 5;  // Max 5deg rotation
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+                    isTicking = false;
+                });
+                isTicking = true;
+            }
         });
 
         card.addEventListener('mouseleave', () => {
+            latestEvent = null; // Clear pending updates
+            isTicking = false; // Reset ticking state if leave occurs before frame
             card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
         });
     });

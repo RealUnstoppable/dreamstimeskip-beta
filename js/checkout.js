@@ -7,6 +7,14 @@ import { products } from './shop.js';
 let currentUser = null;
 let userCart = {};
 
+export function setCurrentUser(user) {
+    currentUser = user;
+}
+
+export function setUserCart(cart) {
+    userCart = cart;
+}
+
 const checkoutContainer = document.getElementById('checkout-container');
 
 function renderCheckoutPage() {
@@ -73,7 +81,45 @@ function renderCheckoutPage() {
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
-async function handlePlaceOrder(e) {
+export async function processOrderTransaction(uid, cart, orderDetails) {
+    await runTransaction(db, async (transaction) => {
+        // 1. Concurrent Reads: Fetch all product stats to avoid N+1 sequential queries
+        const productIds = Object.keys(cart);
+        const statRefs = productIds.map(id => doc(db, 'product_stats', id));
+        const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
+
+        // Prepare a map of current stats for the writes phase
+        const currentStats = {};
+        statDocs.forEach((statDoc, index) => {
+            const productId = productIds[index];
+            currentStats[productId] = statDoc;
+        });
+
+        // 2. Writes
+        // 2a. Create the order document
+        const newOrderRef = doc(db, 'orders', `${uid}_${Date.now()}`);
+        transaction.set(newOrderRef, orderDetails);
+
+        // 2b. Update product order counts based on the concurrently fetched reads
+        for (const [productId, quantity] of Object.entries(cart)) {
+            const productStatRef = doc(db, 'product_stats', productId);
+            const statDoc = currentStats[productId];
+
+            if (!statDoc.exists()) {
+                transaction.set(productStatRef, { orderedCount: quantity });
+            } else {
+                const newCount = statDoc.data().orderedCount + quantity;
+                transaction.update(productStatRef, { orderedCount: newCount });
+            }
+        }
+
+        // 2c. Clear the user's cart
+        const userCartRef = doc(db, 'carts', uid);
+        transaction.update(userCartRef, { items: {} });
+    });
+}
+
+export async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
     const messageEl = document.getElementById('checkout-message');
@@ -95,26 +141,7 @@ async function handlePlaceOrder(e) {
 
     try {
         // New Feature: Use a transaction to ensure atomicity
-        await runTransaction(db, async (transaction) => {
-            // 1. Create a new order document
-            const newOrderRef = doc(db, "orders", `${currentUser.uid}-${Date.now()}`);
-            transaction.set(newOrderRef, orderDetails);
-
-            // 2. Update product order counts
-            for (const [productId, quantity] of Object.entries(userCart)) {
-                const productStatRef = doc(db, "product_stats", productId);
-                const statDoc = await transaction.get(productStatRef);
-                if (!statDoc.exists()) {
-    transaction.set(productStatRef, { orderedCount: quantity });
-} else {
-    const newCount = statDoc.data().orderedCount + quantity;
-    transaction.update(productStatRef, { orderedCount: newCount });
-}
-            }
-            // 3. Clear the user's cart
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            transaction.set(userCartRef, { items: {} });
-        });
+        await processOrderTransaction(currentUser.uid, userCart, orderDetails);
 
         messageEl.textContent = 'Order placed successfully! Redirecting...';
         messageEl.style.color = 'var(--accent-green)';
