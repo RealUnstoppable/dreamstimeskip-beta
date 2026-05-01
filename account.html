@@ -176,7 +176,7 @@
                         </div>
                         <div class="form-group">
                             <label for="update-email">Email (Cannot be changed)</label>
-                            <input type="email" id="update-email" disabled>
+                            <input type="email" id="update-email" disabled title="Your email address cannot be changed">
                         </div>
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                         <div id="profile-notification" class="notification"></div>
@@ -284,12 +284,21 @@
                 e.preventDefault();
                 const newUsername = document.getElementById('update-username').value;
                 const notificationEl = document.getElementById('profile-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
+
                 try {
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
