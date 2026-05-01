@@ -6,3 +6,4 @@ export const updateDoc = jest.fn();
 export const arrayUnion = jest.fn();
 export const arrayRemove = jest.fn();
 export const getFirestore = jest.fn();
+export const serverTimestamp = jest.fn();
