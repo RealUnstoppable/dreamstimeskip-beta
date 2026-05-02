@@ -649,3 +649,12 @@ p.section-subtitle {
     pointer-events: none; /* Ensures clicking text still works */
     opacity: 0.8; /* Slight transparency to blend with background color */
 }
+/* --- ACCESSIBILITY: KEYBOARD NAVIGATION --- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
