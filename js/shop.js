@@ -36,6 +36,12 @@ export const products = [
     }
 ];
 
+// ⚡ Bolt: Precompute product lookups (O(1)) instead of O(N) array finds in loops.
+export const productsById = products.reduce((acc, product) => {
+    acc[product.id] = product;
+    return acc;
+}, {});
+
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
 let currentUser = null;
@@ -77,7 +83,7 @@ function renderCart() {
         checkoutBtn.disabled = true;
     } else {
         cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            const product = products.find(p => p.id === productId);
+            const product = productsById[productId];
             if (!product) return ''; // Should not happen
             return `
                 <div class="cart-item">
