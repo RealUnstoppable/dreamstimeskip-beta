@@ -19,6 +19,18 @@ jest.mock("stripe", () => {
   }));
 });
 
+// Mock admin before index.js import
+const mockVerifyIdToken = jest.fn();
+jest.mock("firebase-admin", () => {
+  return {
+    initializeApp: jest.fn(),
+    auth: () => ({
+      verifyIdToken: mockVerifyIdToken,
+    }),
+    firestore: jest.fn(),
+  };
+});
+
 // Mock request and response objects
 const mockReq = (options = {}) => ({
   method: "POST",
@@ -64,17 +76,32 @@ describe("createCheckoutSession", () => {
     expect(res.send).toHaveBeenCalledWith("Method Not Allowed");
   });
 
+  it("should return 401 if missing Authorization header", async () => {
+    const req = mockReq({method: "POST"});
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith("Unauthorized");
+  });
+
   it("should create session with Pro plan & fallback URLs", async () => {
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "user123",
+      email: "test@example.com",
+    });
     mockCreateSession.mockResolvedValueOnce({
       url: "https://checkout.stripe.com/test-url",
     });
 
     const req = mockReq({
       method: "POST",
-      body: {
-        uid: "user123",
-        email: "test@example.com",
-      },
+      headers: { authorization: "Bearer valid-token" },
+      body: {}, // Plan defaults to Pro
     });
     const res = mockRes();
 
@@ -99,15 +126,18 @@ describe("createCheckoutSession", () => {
   });
 
   it("should create session with Business Pro & custom URLs", async () => {
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "bizuser",
+      email: "biz@example.com",
+    });
     mockCreateSession.mockResolvedValueOnce({
       url: "https://checkout.stripe.com/biz-url",
     });
 
     const req = mockReq({
       method: "POST",
+      headers: { authorization: "Bearer biz-token" },
       body: {
-        uid: "bizuser",
-        email: "biz@example.com",
         plan: "Business Pro",
         successUrl: "https://mycustomurl.com/success",
         cancelUrl: "https://mycustomurl.com/cancel",
@@ -139,11 +169,16 @@ describe("createCheckoutSession", () => {
     // Suppress console.error in tests for expected errors
     jest.spyOn(console, "error").mockImplementation(() => {});
 
+    mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "user123",
+      email: "test@example.com",
+    });
     mockCreateSession.mockRejectedValueOnce(new Error("Stripe API Error"));
 
     const req = mockReq({
       method: "POST",
-      body: {email: "test@example.com"},
+      headers: { authorization: "Bearer valid-token" },
+      body: {},
     });
     const res = mockRes();
 

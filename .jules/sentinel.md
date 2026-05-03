@@ -22,3 +22,13 @@
 **Vulnerability:** `tracker.html` was injecting `escapeHTML`-sanitized data directly into `onclick` attribute strings: `onclick="fn('${escapeHTML(id)}')"` (e.g., in `loadHistoryShift` and `applyCustomPreset`). Since HTML entities inside HTML attributes are decoded by the browser *before* evaluating the JavaScript, this allowed for DOM-based XSS. For example, the `&#039;` is decoded back to `'`, allowing a malicious payload to break out of the string context in the JavaScript handler.
 **Learning:** `escapeHTML` is not sufficient to sanitize strings interpolated directly into inline JavaScript within HTML attributes.
 **Prevention:** Use `data-` attributes and retrieve the value safely inside the handler using `this.getAttribute('data-id')`, or use standard event delegation.
+
+## 2024-05-18 - [Fix Client-Side Pricing Vulnerability & Checkout IDOR]
+**Vulnerability:** The frontend `tracker.html` passed a calculated `amount` parameter to the backend, which is a classic security anti-pattern. Simultaneously, `createCheckoutSession` lacked `Authorization` verification, creating an IDOR vulnerability where an attacker could create sessions for other users.
+**Learning:** Never trust client-computed prices for checkout generation. Furthermore, HTTP Cloud Functions must securely identify the user.
+**Prevention:** Hardcode Stripe `priceId` logic strictly on the backend. Use `admin.auth().verifyIdToken()` mapped from an `Authorization` header to ascertain the true `uid` securely, discarding any spoofable client-supplied IDs.
+
+## 2024-05-18 - [Fix DOM-based XSS in HarmonyTunes Event Delegation]
+**Vulnerability:** `js/harmonytunes.js` contained inline `onclick` handlers on dynamic content like `onclick="window.playSongById('${song.id}')"`. An unescaped quote in `song.id` (or similar variables) could lead to DOM-based XSS when assigning the template literal to `innerHTML`.
+**Learning:** `innerHTML` is inherently dangerous when interpolating unescaped variables directly into event handlers.
+**Prevention:** Store data in `data-*` attributes (e.g., `data-song-id="${song.id}"`) and use event delegation on a persistent container or `document`. Safely extract the value using `e.target.closest('.selector').getAttribute('data-song-id')` inside the JavaScript listener.

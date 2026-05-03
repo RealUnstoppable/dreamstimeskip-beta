@@ -17,7 +17,25 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const {uid, email, plan, successUrl, cancelUrl} = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+
+    let uid;
+    let customer_email;
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      uid = decodedToken.uid;
+      customer_email = decodedToken.email;
+    } catch (err) {
+      console.error("Auth Error:", err);
+      return res.status(401).send("Unauthorized");
+    }
+
+    const {plan, successUrl, cancelUrl} = req.body;
 
     // 🔴 Actual Price IDs from your Stripe Dashboard
     const priceId = plan === "Business Pro" ?
@@ -27,7 +45,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
-        customer_email: email,
+        customer_email: customer_email,
         line_items: [{price: priceId, quantity: 1}],
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
 
