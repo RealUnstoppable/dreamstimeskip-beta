@@ -17,7 +17,25 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const {uid, email, plan, successUrl, cancelUrl} = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+    let uid;
+    let email;
+
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      uid = decodedToken.uid;
+      email = decodedToken.email;
+    } catch (err) {
+      console.error("Auth Error:", err);
+      return res.status(401).send("Unauthorized");
+    }
+
+    const {plan, successUrl, cancelUrl} = req.body;
 
     // 🔴 Actual Price IDs from your Stripe Dashboard
     const priceId = plan === "Business Pro" ?
