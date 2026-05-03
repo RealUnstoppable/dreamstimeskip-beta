@@ -22,3 +22,8 @@
 **Vulnerability:** `tracker.html` was injecting `escapeHTML`-sanitized data directly into `onclick` attribute strings: `onclick="fn('${escapeHTML(id)}')"` (e.g., in `loadHistoryShift` and `applyCustomPreset`). Since HTML entities inside HTML attributes are decoded by the browser *before* evaluating the JavaScript, this allowed for DOM-based XSS. For example, the `&#039;` is decoded back to `'`, allowing a malicious payload to break out of the string context in the JavaScript handler.
 **Learning:** `escapeHTML` is not sufficient to sanitize strings interpolated directly into inline JavaScript within HTML attributes.
 **Prevention:** Use `data-` attributes and retrieve the value safely inside the handler using `this.getAttribute('data-id')`, or use standard event delegation.
+
+## 2024-05-18 - [Fix Critical IDOR in Stripe Checkout Session Creation]
+**Vulnerability:** The `createCheckoutSession` cloud function (`functions/index.js`) blindly trusted the `uid` and `email` properties provided in the POST request body. This allowed an attacker to create a Stripe checkout session with their own parameters but assigned to another user's `uid`. When the payment succeeded, the `stripeWebhook` would incorrectly upgrade the victim's account (or an attacker could manipulate the `uid` to upgrade their own account on someone else's dime).
+**Learning:** Never trust client-provided IDs for sensitive operations. Always extract the user identity securely on the backend from an authenticated session or JWT.
+**Prevention:** Implement `admin.auth().verifyIdToken(token)` inside the Cloud Function and extract the `uid` and `email` directly from the decoded token rather than trusting the `req.body`.

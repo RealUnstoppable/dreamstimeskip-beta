@@ -37,12 +37,40 @@ const mockRes = () => {
   return res;
 };
 
+// Mock firebase-admin since we now use it in createCheckoutSession
+jest.mock("firebase-admin", () => {
+  const mockVerifyIdToken = jest.fn();
+  return {
+    initializeApp: jest.fn(),
+    auth: jest.fn().mockReturnValue({
+      verifyIdToken: mockVerifyIdToken,
+    }),
+    _mockVerifyIdToken: mockVerifyIdToken, // Export for tests to access
+    firestore: jest.fn().mockReturnValue({
+      collection: jest.fn().mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          get: jest.fn(),
+          set: jest.fn(),
+          update: jest.fn(),
+        }),
+        where: jest.fn().mockReturnValue({
+          get: jest.fn(),
+        }),
+      }),
+    }),
+  };
+});
+
 // Import functions after mocks
 const {createCheckoutSession} = require("./index.js");
 
 describe("createCheckoutSession", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValue({
+      uid: "user123",
+      email: "test@example.com",
+    });
   });
 
   afterAll(() => {
@@ -71,9 +99,11 @@ describe("createCheckoutSession", () => {
 
     const req = mockReq({
       method: "POST",
+      headers: {
+        authorization: "Bearer valid-token",
+      },
       body: {
-        uid: "user123",
-        email: "test@example.com",
+        plan: "Pro",
       },
     });
     const res = mockRes();
@@ -99,15 +129,21 @@ describe("createCheckoutSession", () => {
   });
 
   it("should create session with Business Pro & custom URLs", async () => {
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValue({
+      uid: "bizuser",
+      email: "biz@example.com",
+    });
+
     mockCreateSession.mockResolvedValueOnce({
       url: "https://checkout.stripe.com/biz-url",
     });
 
     const req = mockReq({
       method: "POST",
+      headers: {
+        authorization: "Bearer valid-token",
+      },
       body: {
-        uid: "bizuser",
-        email: "biz@example.com",
         plan: "Business Pro",
         successUrl: "https://mycustomurl.com/success",
         cancelUrl: "https://mycustomurl.com/cancel",
@@ -143,7 +179,10 @@ describe("createCheckoutSession", () => {
 
     const req = mockReq({
       method: "POST",
-      body: {email: "test@example.com"},
+      headers: {
+        authorization: "Bearer valid-token",
+      },
+      body: {},
     });
     const res = mockRes();
 
@@ -154,6 +193,51 @@ describe("createCheckoutSession", () => {
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({error: "Stripe API Error"});
+
+    console.error.mockRestore();
+  });
+
+  it("should return 401 if missing Authorization header", async () => {
+    const req = mockReq({
+      method: "POST",
+      body: {
+        plan: "Pro",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith("Unauthorized");
+  });
+
+  it("should return 401 if verification fails", async () => {
+    const error = new Error("Token Expired");
+    require("firebase-admin")._mockVerifyIdToken.mockRejectedValueOnce(error);
+    jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const req = mockReq({
+      method: "POST",
+      headers: {
+        authorization: "Bearer invalid-token",
+      },
+      body: {
+        plan: "Pro",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith("Unauthorized");
 
     console.error.mockRestore();
   });
