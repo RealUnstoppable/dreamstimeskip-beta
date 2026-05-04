@@ -5,3 +5,6 @@
 ## 2026-05-03 - Audio Player Accessibility
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
+## 2026-05-04 - Added ARIA labels to mobile hamburger menu icon-only toggles
+**Learning:** Icon-only buttons used for navigation toggling (like hamburger menus) are completely inaccessible to screen reader users without proper labeling.
+**Action:** Always add explicit `aria-label` attributes to icon-only buttons like hamburger menus that do not have visible text labels associated with them via `for` attributes.
