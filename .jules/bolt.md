@@ -6,6 +6,6 @@
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
 **Action:** Always prefer batching or Promise.all() for iterative async operations to minimize function execution time and avoid premature termination.
 
-## 2024-05-02 - O(N) Array Looks in Loops
-**Learning:** Found O(N) `Array.prototype.find()` calls inside rendering and calculation loops (e.g., `.map()` and `.reduce()`) for the cart and checkout logic. This can cause O(N*M) performance bottlenecks where N is the cart size and M is the product catalog size.
-**Action:** Pre-compute a `Map` or dictionary (O(1) lookup) of the target array objects before the loop to reduce time complexity to O(N+M).
+## 2024-05-15 - Optimizing Array.find in Loops
+**Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
+**Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.

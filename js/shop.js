@@ -36,11 +36,8 @@ export const products = [
     }
 ];
 
-// ⚡ Bolt: Precompute product lookups (O(1)) instead of O(N) array finds in loops.
-export const productsById = products.reduce((acc, product) => {
-    acc[product.id] = product;
-    return acc;
-}, {});
+// ⚡ Bolt: Pre-computed Map for O(1) product lookups, avoiding O(N^2) nested loops when rendering carts
+export const productMap = new Map(products.map(p => [p.id, p]));
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -83,7 +80,8 @@ function renderCart() {
         checkoutBtn.disabled = true;
     } else {
         cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            const product = productsById[productId];
+            // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
+            const product = productMap.get(productId);
             if (!product) return ''; // Should not happen
             return `
                 <div class="cart-item">
