@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. TikToks
         containerTikToks.innerHTML = tiktokData.map(tk => `
-            <div class="tiktok-card" onclick="window.open('${tk.url}', '_blank')">
+            <div class="tiktok-card" data-url="${tk.url}">
                 <img src="${tk.img}" alt="${tk.title}">
                 <div class="tiktok-overlay">
                     <div class="tiktok-title">${tk.title}</div>
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card" onclick="window.loadPlaylistView('${pl.id}')">
+            <div class="music-card playlist-card" data-playlist-id="${pl.id}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
                     <button class="card-play-btn">▶</button>
@@ -196,17 +196,40 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `).join('');
 
-        // Card Play Buttons
-        document.querySelectorAll('.music-card .card-play-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // Event delegation for dynamically created cards
+        document.addEventListener('click', (e) => {
+            const tiktokCard = e.target.closest('.tiktok-card');
+            if (tiktokCard) {
+                const url = tiktokCard.getAttribute('data-url');
+                if (url) window.open(url, '_blank');
+                return;
+            }
+
+            const playlistCard = e.target.closest('.playlist-card');
+            if (playlistCard) {
+                const id = playlistCard.getAttribute('data-playlist-id');
+                if (id) window.loadPlaylistView(id);
+                return;
+            }
+
+            const playBtn = e.target.closest('.card-play-btn');
+            if (playBtn) {
                 e.stopPropagation();
-                const card = btn.closest('.music-card');
+                const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
                     const song = librarySongs.find(s => s.id === songId);
-                    if(song) playContext([song], 0);
+                    if (song) playContext([song], 0);
                 }
-            });
+                return;
+            }
+
+            const musicCard = e.target.closest('.music-card[data-song-id]');
+            if (musicCard) {
+                const id = musicCard.getAttribute('data-song-id');
+                if (id) window.playSongById(id);
+                return;
+            }
         });
     }
 
@@ -457,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 export function createSongCard(song) {
     return `
-        <div class="music-card" data-song-id="${song.id}" onclick="playSongById('${song.id}')">
+        <div class="music-card" data-song-id="${song.id}">
             <div class="card-img-wrapper">
                 <img src="${song.art}" alt="${song.title}">
                 <button class="card-play-btn">▶</button>

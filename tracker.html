@@ -1368,10 +1368,7 @@
         async function processCheckout(planName) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
 
-            // Sale + Referral Logic
-            let basePrice = (planName === 'Business Pro') ? 165 : 48;
-            let finalPrice = hasReferralDiscount ? Math.floor(basePrice * 0.9) : basePrice;
-
+            // Pricing logic is handled securely on the server
             try {
                 const token = await currentUser.getIdToken();
                 const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
@@ -1382,7 +1379,6 @@
                     },
                     body: JSON.stringify({
                         plan: planName,
-                        amount: finalPrice, // Send adjusted price to backend
                         successUrl: window.location.origin + window.location.pathname + "?success=true",
                         cancelUrl: window.location.href
                     })
