@@ -23,13 +23,13 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
     }
 
     const token = authHeader.split("Bearer ")[1];
-
     let uid;
-    let customer_email;
+    let email;
+
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       uid = decodedToken.uid;
-      customer_email = decodedToken.email;
+      email = decodedToken.email;
     } catch (err) {
       console.error("Auth Error:", err);
       return res.status(401).send("Unauthorized");

@@ -1370,12 +1370,12 @@
 
             // Pricing logic is handled securely on the server
             try {
-                const idToken = await currentUser.getIdToken();
+                const token = await currentUser.getIdToken();
                 const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${idToken}`
+                        "Authorization": `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         plan: planName,
