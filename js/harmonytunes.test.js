@@ -61,7 +61,7 @@ test('createSongCard generates correct HTML based on song properties', () => {
     };
 
     const expectedHTML = `
-        <div class="music-card" data-song-id="test-id" onclick="playSongById('test-id')">
+        <div class="music-card" data-song-id="test-id">
             <div class="card-img-wrapper">
                 <img src="/images/test.jpg" alt="Test Title">
                 <button class="card-play-btn">▶</button>
