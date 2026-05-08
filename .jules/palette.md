@@ -5,3 +5,7 @@
 ## 2026-05-03 - Audio Player Accessibility
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
+
+## 2024-05-19 - Informative Titles for Disabled Buttons
+**Learning:** Disabled action buttons (like checkout or subscribe) without clear reasons leave users confused about how to proceed and create accessibility barriers.
+**Action:** Always add an informative `title` attribute (e.g., `title="Your cart is empty"`) to disabled buttons to explain *why* they are disabled and dynamically update or remove the title when the button becomes enabled.
