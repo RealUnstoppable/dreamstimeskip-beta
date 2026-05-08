@@ -9,3 +9,7 @@
 ## 2024-05-15 - Optimizing Array.find in Loops
 **Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
 **Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.
+
+## 2024-05-16 - Optimizing Array.includes in Loops
+**Learning:** Using `Array.includes()` inside an array iteration (like `Array.filter()`) creates an O(N * M) time complexity where N is the length of the array being filtered and M is the length of the array being searched against. This causes noticeable bottlenecks for large lists.
+**Action:** Always convert the target array to a `Set` before the loop (e.g., `new Set(items)`), and use `.has()` for O(1) lookups inside the loop, achieving an O(N + M) time complexity instead.

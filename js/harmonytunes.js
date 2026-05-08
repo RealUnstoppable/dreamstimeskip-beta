@@ -466,7 +466,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
-                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    // ⚡ Bolt: Use a Set for O(1) lookups instead of O(M) Array.includes()
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                 }
             } catch (e) { console.error(e); }
             
@@ -491,9 +493,3 @@ export function createSongCard(song) {
     `;
 }
 
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-}
