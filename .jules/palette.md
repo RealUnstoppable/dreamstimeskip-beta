@@ -5,3 +5,7 @@
 ## 2026-05-03 - Audio Player Accessibility
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
+
+## 2024-05-24 - Tracker App Personal Details Accessibility
+**Learning:** Found missing `<label>`s on profile editing fields in tracker.html and lack of explicit loading feedback during save operation in `saveProfileToFirebase()`.
+**Action:** Always provide explicit `<label for="...">` tags and modify profile update operations to show clear "Saving..." feedback and disable the save button temporarily.

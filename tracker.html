@@ -668,11 +668,23 @@
                     <div class="card">
                         <h3 class="text-xl font-black mb-6">Personal Details</h3>
                         <div class="space-y-4">
-                            <input type="text" id="profName" placeholder="Name">
-                            <input type="text" id="profRole" placeholder="Role">
-                            <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60 dark:bg-slate-800">
-                            <input type="text" id="profPhone" placeholder="Phone">
-                            <button onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save Changes</button>
+                            <div>
+                                <label for="profName" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Name</label>
+                                <input type="text" id="profName" placeholder="Name">
+                            </div>
+                            <div>
+                                <label for="profRole" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Role</label>
+                                <input type="text" id="profRole" placeholder="Role">
+                            </div>
+                            <div>
+                                <label for="profEmail" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Email</label>
+                                <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60 dark:bg-slate-800" title="Email address cannot be changed">
+                            </div>
+                            <div>
+                                <label for="profPhone" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Phone</label>
+                                <input type="text" id="profPhone" placeholder="Phone">
+                            </div>
+                            <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save Changes</button>
                         </div>
                     </div>
                     <div class="card">
@@ -1326,12 +1338,23 @@
 
         function saveProfileToFirebase() {
             if(!currentUser) return;
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
-            db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => alert("Profile Updated!"));
+            db.collection('users').doc(currentUser.uid).set(data, { merge: true })
+                .then(() => alert("Profile Updated!"))
+                .catch(err => alert(err.message))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                });
         }
 
         function copyReferral() {
