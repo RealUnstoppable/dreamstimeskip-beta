@@ -91,11 +91,14 @@ if (document.getElementById('auth-form')) {
 
         messageEl.textContent = '';
         submitBtn.disabled = true;
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
 
         if (isSignUp) {
             if (!username || !email || !password) {
                 showMessage("All fields are required.");
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
                 return;
             }
             try {
@@ -113,6 +116,7 @@ if (document.getElementById('auth-form')) {
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         } else {
             try {
@@ -126,10 +130,12 @@ if (document.getElementById('auth-form')) {
                     await signOut(auth);
                     showMessage("This account is suspended or does not exist.");
                     submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
                 }
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         }
     });
