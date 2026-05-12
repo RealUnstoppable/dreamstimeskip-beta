@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+        function escapeHTML(str) {
+            if (str == null) return "";
+            if (typeof str !== 'string') str = str.toString();
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function test() {
+            try {
+                const s = "test <script" + ">alert(1)</script" + ">";
+                document.getElementById('result').textContent = "Success: " + escapeHTML(s);
+            } catch(e) {
+                document.getElementById('result').textContent = "Error: " + e.message;
+            }
+        }
+</script>
+</head>
+<body onload="test()">
+<div id="result"></div>
+</body>
+</html>
