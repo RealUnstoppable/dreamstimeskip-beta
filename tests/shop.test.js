@@ -36,4 +36,28 @@ describe('handleUpdateQuantity', () => {
         await handleUpdateQuantity('unstoppable-hoodie', '4');
         expect(cart['unstoppable-hoodie']).toBe(4);
     });
+
+    test('logs error when product is not found', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        await handleUpdateQuantity('non-existent-product', 5);
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Product not found: non-existent-product');
+        consoleErrorSpy.mockRestore();
+    });
+
+    test('logs error when saveCart fails', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const originalSetItem = localStorage.setItem;
+        const testError = new Error('Storage full');
+
+        localStorage.setItem = jest.fn(() => {
+            throw testError;
+        });
+
+        await handleUpdateQuantity('unstoppable-hoodie', 5);
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to update quantity:', testError);
+
+        localStorage.setItem = originalSetItem;
+        consoleErrorSpy.mockRestore();
+    });
 });

@@ -123,12 +123,21 @@ export async function handleAddToCart(productId) {
 }
 
 export async function handleUpdateQuantity(productId, quantity) {
-    if (quantity <= 0) {
-        await handleRemoveFromCart(productId);
-    } else {
-        cart[productId] = parseInt(quantity, 10);
-        await saveCart();
-        renderCart();
+    if (!productMap.has(productId)) {
+        console.error(`Product not found: ${productId}`);
+        return;
+    }
+
+    try {
+        if (quantity <= 0) {
+            await handleRemoveFromCart(productId);
+        } else {
+            cart[productId] = parseInt(quantity, 10);
+            await saveCart();
+            renderCart();
+        }
+    } catch (error) {
+        console.error('Failed to update quantity:', error);
     }
 }
 
