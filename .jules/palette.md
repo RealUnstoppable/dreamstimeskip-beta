@@ -6,6 +6,6 @@
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
 
-## 2024-05-19 - Informative Titles for Disabled Buttons
-**Learning:** Disabled action buttons (like checkout or subscribe) without clear reasons leave users confused about how to proceed and create accessibility barriers.
-**Action:** Always add an informative `title` attribute (e.g., `title="Your cart is empty"`) to disabled buttons to explain *why* they are disabled and dynamically update or remove the title when the button becomes enabled.
+## 2024-06-25 - Form Labels and Hidden Accessibility Patterns
+**Learning:** Found multiple form `<label>` elements missing the `for` attribute required to associate them with inputs. Additionally, some inputs completely lacked labels, relying entirely on placeholders. Placeholders are not an accessible alternative to labels for screen readers.
+**Action:** When adding missing labels to UI components that were designed without visible text labels, use visually hidden labels (styled with `clip: rect(0 0 0 0)` etc.) to ensure screen reader support without breaking the existing visual design system or layout. Always verify `for` attributes exist on all `<label>` tags.
