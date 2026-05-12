@@ -7,3 +7,4 @@ export const arrayUnion = jest.fn();
 export const arrayRemove = jest.fn();
 export const getFirestore = jest.fn();
 export const serverTimestamp = jest.fn();
+export const runTransaction = jest.fn();
