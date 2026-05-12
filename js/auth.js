@@ -38,7 +38,11 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if (membershipStatusContainer) {
-                membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
+                membershipStatusContainer.textContent = ''; // clear previous content
+                const statusSpan = document.createElement('span');
+                statusSpan.className = `membership-status ${userData.membershipLevel}`;
+                statusSpan.textContent = userData.membershipLevel;
+                membershipStatusContainer.appendChild(statusSpan);
             }
         }
     } else {
@@ -49,7 +53,7 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         if (membershipStatusContainer) {
-            membershipStatusContainer.innerHTML = '';
+            membershipStatusContainer.textContent = '';
         }
     }
 });
