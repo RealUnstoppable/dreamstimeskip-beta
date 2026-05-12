@@ -28,7 +28,7 @@
 **Learning:** Never trust client-provided IDs for sensitive operations. Always extract the user identity securely on the backend from an authenticated session or JWT.
 **Prevention:** Implement `admin.auth().verifyIdToken(token)` inside the Cloud Function and extract the `uid` and `email` directly from the decoded token rather than trusting the `req.body`.
 
-## 2024-05-18 - [Fix DOM-based XSS in tracker report generation]
-**Vulnerability:** The `generateReport` function in `tracker.html` was susceptible to DOM-based XSS. It read user-provided form state (e.g., drawer names, item values, routine tasks) and interpolated them directly into HTML string templates (`routineHtml`, `drawerHtml`, `invHtml`) without sanitization before passing those strings to `.innerHTML` assignments.
-**Learning:** Even when generating features like printable reports where input appears internal to the user's session, rendering user-controlled data directly into the DOM via `.innerHTML` poses an XSS risk.
-**Prevention:** Apply an `escapeHTML` utility to every user-generated variable interpolated into HTML string templates before inserting those templates into the DOM via `.innerHTML`.
+## 2024-05-18 - [Fix DOM-based XSS in Tracker Report Generation]
+**Vulnerability:** The tracker page (`tracker.html`) was directly injecting user-provided data (routines, drawers, and inventory items) into the DOM using `innerHTML` without sanitization within the `generateReport` function. This allowed for DOM-based XSS if malicious payload was entered into the tracker fields before generating the report.
+**Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
+**Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
