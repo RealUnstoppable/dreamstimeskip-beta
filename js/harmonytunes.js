@@ -465,11 +465,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
-                    const favIds = docSnap.data().musicFavorites;
-                    // ⚡ Bolt: Convert favIds to a Set to replace O(M) Array.includes lookups with O(1) Set.has,
-                    // reducing the filter complexity from O(N*M) to O(N+M)
-                    const favIdsSet = new Set(favIds);
-                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
+                    // ⚡ Bolt: Convert array to Set for O(1) lookups inside the filter loop,
+                    // replacing O(N*M) complexity with O(N+M)
+                    const favIds = new Set(docSnap.data().musicFavorites);
+                    userFavorites = librarySongs.filter(song => favIds.has(song.id));
                 }
             } catch (e) { console.error(e); }
             
