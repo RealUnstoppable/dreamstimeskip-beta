@@ -78,6 +78,7 @@ function renderCart() {
     if (Object.keys(cart).length === 0) {
         cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
         checkoutBtn.disabled = true;
+        checkoutBtn.title = "Your cart is empty";
     } else {
         cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
             // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
@@ -98,6 +99,7 @@ function renderCart() {
             `;
         }).join('');
         checkoutBtn.disabled = false;
+        checkoutBtn.title = "";
     }
     updateCartSummary();
 }
