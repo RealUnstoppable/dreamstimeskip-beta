@@ -465,8 +465,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
-                    const favIds = docSnap.data().musicFavorites;
-                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    // ⚡ Bolt: Convert array to Set for O(1) lookups inside the filter loop,
+                    // replacing O(N*M) complexity with O(N+M)
+                    const favIds = new Set(docSnap.data().musicFavorites);
+                    userFavorites = librarySongs.filter(song => favIds.has(song.id));
                 }
             } catch (e) { console.error(e); }
             
