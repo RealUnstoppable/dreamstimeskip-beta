@@ -466,7 +466,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
-                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                 }
             } catch (e) { console.error(e); }
             

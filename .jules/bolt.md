@@ -9,3 +9,8 @@
 ## 2024-05-15 - Optimizing Array.find in Loops
 **Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
 **Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.
+## 2026-05-06 - Optimize Array Filtering in harmonytunes.js
+
+**Learning:** Replacing O(M) `Array.includes()` with O(1) `Set.has()` inside an O(N) filter loop reduces overall complexity from O(N*M) to O(N+M). This is particularly impactful when both the source array and the filter list are large.
+
+**Action:** Optimized the favorite songs filtering in `js/harmonytunes.js` by converting the list of favorite IDs to a `Set`.
