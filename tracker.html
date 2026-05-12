@@ -456,7 +456,7 @@
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
-                <button onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
+                <button id="complete-setup-btn" onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
             </div>
         </div>
 
@@ -908,10 +908,23 @@
 
             if(!data.name) return alert("Name is required.");
 
+            const btn = document.getElementById('complete-setup-btn');
+            let originalText = 'Finish Setup';
+            if (btn) {
+                originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Processing...';
+            }
+
             db.collection('users').doc(currentUser.uid).set(data).then(() => {
                 currentUser.updateProfile({ displayName: data.name });
                 document.getElementById('shiftManager').value = data.name;
                 navTo('tracker');
+            }).finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
             });
         }
 

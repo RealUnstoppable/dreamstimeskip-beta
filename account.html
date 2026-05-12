@@ -204,7 +204,7 @@
                                 <label><input type="radio" name="accent-color" value="purple"> Purple</label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <button type="submit" id="save-theme-btn" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
@@ -308,6 +308,14 @@
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
 
+                const submitBtn = e.submitter || document.getElementById('save-theme-btn');
+                const originalText = submitBtn ? submitBtn.innerText : 'Save Theme';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Saving...';
+                }
+
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
@@ -317,11 +325,22 @@
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerText = originalText;
+                    }
                 }
             });
 
-            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Deleting...';
+
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -330,6 +349,9 @@
                     window.location.replace('index.html');
                 } catch (error) {
                     alert('Error: Please sign out, sign back in, and try again.');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
 
