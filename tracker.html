@@ -430,19 +430,19 @@
                 
                 <div class="grid md:grid-cols-2 gap-6 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <label for="setupName" class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                         <input type="text" id="setupName" placeholder="Catalin Andrian">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
+                        <label for="setupPhone" class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
                         <input type="text" id="setupPhone" placeholder="(555) 000-0000">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
+                        <label for="setupRole" class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
                         <input type="text" id="setupRole" placeholder="Shift Manager">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
+                        <label for="setupStore" class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
                         <select id="setupStore">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
@@ -452,7 +452,7 @@
                         </select>
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
+                        <label for="setupLocation" class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
@@ -476,11 +476,11 @@
                 <form id="trackerForm" class="space-y-8">
                     <div class="card grid md:grid-cols-3 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift Manager</label>
+                            <label for="shiftManager" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift Manager</label>
                             <input type="text" id="shiftManager" placeholder="Enter Name">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date & Time</label>
+                            <label for="shiftDate" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date & Time</label>
                             <div class="flex gap-2">
                                 <input type="date" id="shiftDate">
                                 <input type="time" id="shiftTime">
@@ -668,22 +668,17 @@
                     <div class="card">
                         <h3 class="text-xl font-black mb-6">Personal Details</h3>
                         <div class="space-y-4">
-                            <div>
-                                <label for="profName" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Name</label>
-                                <input type="text" id="profName" placeholder="Name">
-                            </div>
-                            <div>
-                                <label for="profRole" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Role</label>
-                                <input type="text" id="profRole" placeholder="Role">
-                            </div>
-                            <div>
-                                <label for="profEmail" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Email</label>
-                                <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60 dark:bg-slate-800" title="Email address cannot be changed">
-                            </div>
-                            <div>
-                                <label for="profPhone" class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">Phone</label>
-                                <input type="text" id="profPhone" placeholder="Phone">
-                            </div>
+                            <label for="profName" style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Name</label>
+                            <input type="text" id="profName" placeholder="Name">
+
+                            <label for="profRole" style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Role</label>
+                            <input type="text" id="profRole" placeholder="Role">
+
+                            <label for="profEmail" style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Email</label>
+                            <input type="email" id="profEmail" readonly class="bg-slate-50 opacity-60 dark:bg-slate-800">
+
+                            <label for="profPhone" style="border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px;">Phone</label>
+                            <input type="text" id="profPhone" placeholder="Phone">
                             <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save Changes</button>
                         </div>
                     </div>
@@ -1310,17 +1305,17 @@
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
             
             let routineHtml = "";
-            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${r.name}</div>`);
+            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${escapeHTML(r.name)}</div>`);
             document.getElementById('printRoutines').innerHTML = routineHtml;
 
             let drawerHtml = "";
-            state.drawers.forEach(d => drawerHtml += `<div>${d.name}: $${d.val} (${d.res})</div>`);
+            state.drawers.forEach(d => drawerHtml += `<div>${escapeHTML(d.name)}: $${escapeHTML(d.val)} (${escapeHTML(d.res)})</div>`);
             document.getElementById('printDrawers').innerHTML = drawerHtml;
 
             document.getElementById('printSafe').innerText = state.safeCount;
 
             let invHtml = "";
-            state.inventory.forEach(i => invHtml += `<div>${i.name}: ${i.bl} BL | ${i.cl} CL | ${i.fr} FR</div>`);
+            state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
             manualSaveHistory();
@@ -1339,22 +1334,24 @@
         function saveProfileToFirebase() {
             if(!currentUser) return;
             const btn = document.getElementById('saveProfileBtn');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
-
+            const originalText = btn ? btn.innerText : 'Save Changes';
+            if(btn) {
+                btn.disabled = true;
+                btn.innerText = "Saving...";
+            }
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
-            db.collection('users').doc(currentUser.uid).set(data, { merge: true })
-                .then(() => alert("Profile Updated!"))
-                .catch(err => alert(err.message))
-                .finally(() => {
+            db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => {
+                alert("Profile Updated!");
+            }).finally(() => {
+                if(btn) {
                     btn.disabled = false;
                     btn.innerText = originalText;
-                });
+                }
+            });
         }
 
         function copyReferral() {
