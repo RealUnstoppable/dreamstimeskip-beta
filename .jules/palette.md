@@ -6,6 +6,6 @@
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
 
-## 2024-05-24 - Missing ARIA labels on Icon-Only Buttons
-**Learning:** Some older mobile menus and dashboard elements (like the admin layout hamburger and close buttons) in this app use purely icon-based text nodes (e.g., `☰` and `✕`) without an associated `aria-label`. This makes navigation completely inaccessible to screen reader users as they have no context for what the button does.
-**Action:** When implementing new mobile layout toggles or reviewing existing ones, always ensure `aria-label` is present on purely icon-based or symbol-based interactive elements, such as `hamburger-btn`.
+## 2024-06-25 - Form Labels and Hidden Accessibility Patterns
+**Learning:** Found multiple form `<label>` elements missing the `for` attribute required to associate them with inputs. Additionally, some inputs completely lacked labels, relying entirely on placeholders. Placeholders are not an accessible alternative to labels for screen readers.
+**Action:** When adding missing labels to UI components that were designed without visible text labels, use visually hidden labels (styled with `clip: rect(0 0 0 0)` etc.) to ensure screen reader support without breaking the existing visual design system or layout. Always verify `for` attributes exist on all `<label>` tags.
