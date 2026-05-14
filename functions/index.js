@@ -116,6 +116,77 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   res.json({received: true});
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+// 🛠️ Create Maintenance Ticket
+exports.createMaintenanceTicket = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      const uid = decodedToken.uid;
+      const email = decodedToken.email;
+
+      const { equipmentName, issueDescription, priority } = req.body;
+
+      if (!equipmentName || !issueDescription || !priority) {
+        return res.status(400).send("Missing required fields");
+      }
+
+      const validPriorities = ["Low", "Medium", "High"];
+      let actualPriority = priority;
+
+      if (!validPriorities.includes(priority)) {
+        actualPriority = "Medium";
+      }
+
+      // Auto-flag high priority if keywords detected
+      const descLower = issueDescription.toLowerCase();
+      if (descLower.includes("leak") || descLower.includes("fire") || descLower.includes("offline")) {
+        actualPriority = "High";
+      }
+
+      const ticketData = {
+        uid,
+        email,
+        equipmentName,
+        issueDescription,
+        priority: actualPriority,
+        status: "Open",
+        reportedAt: admin.firestore.FieldValue.serverTimestamp(),
+        resolvedAt: null
+      };
+
+      const docRef = await admin.firestore().collection("maintenance_tickets").add(ticketData);
+
+      res.status(200).json({ success: true, id: docRef.id });
+    } catch (err) {
+      console.error("Maintenance Ticket Error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+});
+
 // 🔻 Cancel Subscription Manually
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
