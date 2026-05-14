@@ -231,3 +231,105 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+
+// --- PRODUCTS ---
+const products = [
+    { id: 'unstoppable-hoodie', price: 59.99, name: 'Unstoppable Hoodie' },
+    { id: 'dts-model-tee', price: 24.99, name: 'DTS Model Tee' },
+    { id: 'harmonytunes-shirt', price: 24.99, name: 'HarmonyTunes Cap' },
+    { id: 'unstoppable-mousepad', price: 19.99, name: 'Unstoppable Mousepad' }
+];
+const productMap = new Map(products.map(p => [p.id, p]));
+
+// 🛒 Place Order
+exports.placeOrder = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+    let uid, email;
+    try {
+      const decoded = await admin.auth().verifyIdToken(token);
+      uid = decoded.uid;
+      email = decoded.email;
+    } catch (err) {
+      return res.status(401).send("Unauthorized");
+    }
+
+    const { cart, shippingInfo } = req.body;
+    if (!cart || Object.keys(cart).length === 0) {
+      return res.status(400).send("Cart is empty");
+    }
+
+    let subtotal = 0;
+    const orderItems = {};
+    for (const [productId, quantity] of Object.entries(cart)) {
+      const product = productMap.get(productId);
+      if (!product) return res.status(400).send(`Invalid product: ${productId}`);
+      subtotal += product.price * quantity;
+      orderItems[productId] = {
+        name: product.name,
+        price: product.price,
+        quantity: quantity
+      };
+    }
+
+    const tax = subtotal * 0.07;
+    const total = subtotal + tax;
+
+    const orderDetails = {
+      userId: uid,
+      email: email,
+      items: orderItems,
+      subtotal,
+      tax,
+      total,
+      status: 'Processing',
+      shippingInfo,
+      orderDate: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+      await admin.firestore().runTransaction(async (transaction) => {
+        // Reads
+        const productIds = Object.keys(cart);
+        const statRefs = productIds.map(id => admin.firestore().collection('product_stats').doc(id));
+        const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
+
+        const currentStats = {};
+        statDocs.forEach((doc, i) => {
+          currentStats[productIds[i]] = doc;
+        });
+
+        // Writes
+        const orderId = `${uid}_${Date.now()}`;
+        const orderRef = admin.firestore().collection('orders').doc(orderId);
+        transaction.set(orderRef, orderDetails);
+
+        const cartRef = admin.firestore().collection('carts').doc(uid);
+        transaction.set(cartRef, { items: {} }, { merge: true });
+
+        for (const [productId, quantity] of Object.entries(cart)) {
+          const statRef = admin.firestore().collection('product_stats').doc(productId);
+          const statDoc = currentStats[productId];
+          if (!statDoc.exists) {
+            transaction.set(statRef, { orderedCount: quantity });
+          } else {
+            transaction.update(statRef, { orderedCount: statDoc.data().orderedCount + quantity });
+          }
+        }
+      });
+
+      res.status(200).json({ success: true, orderDetails });
+    } catch (err) {
+      console.error("Order Transaction Error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+});

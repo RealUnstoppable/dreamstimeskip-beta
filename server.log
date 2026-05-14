@@ -1,0 +1,16 @@
+127.0.0.1 - - [14/May/2026 16:42:18] "GET /account.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:42:19] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:42:19] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:42:19] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:42:20] "GET /sign%20in%20beta.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /checkout.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/script.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/checkout.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/shop.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /js/cart-utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/May/2026 16:49:04] "GET /sign%20in%20beta.html HTTP/1.1" 200 -
