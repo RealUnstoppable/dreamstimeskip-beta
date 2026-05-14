@@ -80,35 +80,35 @@
             <form id="booking-form">
                 
                 <div class="form-group">
-                    <label>Full Name *</label>
+                    <label for="b-name">Full Name *</label>
                     <input type="text" id="b-name" required placeholder="John Doe">
                 </div>
                 
                 <div class="form-group">
-                    <label>Phone Number *</label>
+                    <label for="b-phone">Phone Number *</label>
                     <input type="tel" id="b-phone" required placeholder="(555) 123-4567">
                 </div>
 
                 <div class="form-group">
-                    <label>Email Address *</label>
+                    <label for="b-email">Email Address *</label>
                     <input type="email" id="b-email" required placeholder="john@example.com">
                 </div>
 
                 <div id="account-creation-block" class="account-prompt">
-                    <label class="checkbox-label">
+                    <label for="create-account-cb" class="checkbox-label">
                         <input type="checkbox" id="create-account-cb"> 
                         Create an account for faster checkout?
                     </label>
                     <p>Manage appointments and unlock Unstoppable Club discounts.</p>
                     
                     <div id="password-group" style="display: none; margin-top: 15px;">
-                        <label>Choose a Password *</label>
+                        <label for="b-password">Choose a Password *</label>
                         <input type="password" id="b-password" placeholder="Minimum 6 characters">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Vehicle Type *</label>
+                    <label for="b-vehicle">Vehicle Type *</label>
                     <select id="b-vehicle" required>
                         <option value="sedan">Luxury Sedan ($150+)</option>
                         <option value="suv">Luxury SUV ($250+)</option>
@@ -118,7 +118,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Select Date & Time *</label>
+                    <label for="b-datetime">Select Date & Time *</label>
                     <p style="font-size: 0.8rem; color: var(--text-muted); margin: -5px 0 10px 0;">Note: Tuesdays & Thursdays 7AM-3PM are unavailable.</p>
                     <input type="datetime-local" id="b-datetime" required>
                 </div>
@@ -130,11 +130,11 @@
         <div id="quote-tab" class="tab-content">
             <form id="quote-form">
                 <div class="form-group">
-                    <label>Email *</label>
+                    <label for="q-email">Email *</label>
                     <input type="email" id="q-email" required>
                 </div>
                 <div class="form-group">
-                    <label>Vehicle Make, Model & Condition *</label>
+                    <label for="q-details">Vehicle Make, Model & Condition *</label>
                     <input type="text" id="q-details" required placeholder="e.g. 2022 Porsche 911 - heavy swirl marks">
                 </div>
                 <button type="submit">Request Custom Quote</button>

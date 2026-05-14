@@ -5,3 +5,7 @@
 ## 2026-05-03 - Audio Player Accessibility
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
+
+## 2026-05-14 - Newsletter Form State
+**Learning:** Standalone, dynamically generated forms (like the newsletter signup form) often get overlooked for UI loading states compared to primary auth forms. Even standard `alert()`-driven submission flows benefit from button disables to prevent double-submission.
+**Action:** When auditing forms, explicitly check non-primary/footer components for `disabled` states and localized "Subscribing..."/"Loading..." text during async submissions.

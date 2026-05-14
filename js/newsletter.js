@@ -19,18 +19,32 @@ if (typeof document !== 'undefined') {
             const email = emailInput.value.trim();
 
             if (email) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                let originalText = "Sign Up";
+                if (submitBtn) {
+                    originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Subscribing...";
+                }
+
                 try {
                     await setDoc(doc(db, "newsletterSubscribers", email), {
                         email: email,
                         subscribedAt: serverTimestamp()
                     });
 
-                // Show a success message
-                alert("You've successfully subscribed to the newsletter!");
-                emailInput.value = ''; // Clear the input
-            } catch (error) {
-                console.error("Error submitting email:", error);
-                alert("There was an error subscribing. Please try again later.");
+                    // Show a success message
+                    alert("You've successfully subscribed to the newsletter!");
+                    emailInput.value = ''; // Clear the input
+                } catch (error) {
+                    console.error("Error submitting email:", error);
+                    alert("There was an error subscribing. Please try again later.");
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                }
             }
         }
     });
