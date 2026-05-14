@@ -127,15 +127,23 @@ export async function handleUpdateQuantity(productId, quantity) {
         await handleRemoveFromCart(productId);
     } else {
         cart[productId] = parseInt(quantity, 10);
-        await saveCart();
-        renderCart();
+        renderCart(); // Optimistic UI update
+        try {
+            await saveCart();
+        } catch (error) {
+            console.error('Failed to update quantity:', error);
+        }
     }
 }
 
 async function handleRemoveFromCart(productId) {
     delete cart[productId];
-    await saveCart();
-    renderCart();
+    renderCart(); // Optimistic UI update
+    try {
+        await saveCart();
+    } catch (error) {
+        console.error('Failed to remove from cart:', error);
+    }
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---

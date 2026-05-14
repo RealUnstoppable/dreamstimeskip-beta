@@ -1331,7 +1331,7 @@
             if(data.name) document.getElementById('profileAvatar').innerText = data.name.charAt(0).toUpperCase();
         }
 
-        function saveProfileToFirebase() {
+        async function saveProfileToFirebase() {
             if(!currentUser) return;
             const btn = document.getElementById('saveProfileBtn');
             const originalText = btn ? btn.innerText : 'Save Changes';
@@ -1344,14 +1344,18 @@
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
-            db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => {
+            try {
+                await db.collection('users').doc(currentUser.uid).set(data, { merge: true });
                 alert("Profile Updated!");
-            }).finally(() => {
+            } catch (err) {
+                console.error("Error saving profile to Firebase:", err);
+                alert("Failed to update profile. Please try again.");
+            } finally {
                 if(btn) {
                     btn.disabled = false;
                     btn.innerText = originalText;
                 }
-            });
+            }
         }
 
         function copyReferral() {
@@ -1415,15 +1419,22 @@
             }
         }
 
-        function submitFeatureRequest() {
+        async function submitFeatureRequest() {
             const msg = document.getElementById('featureReqText').value;
             if(!msg) return;
-            db.collection('feature_requests').add({
-                uid: currentUser.uid,
-                email: currentUser.email,
-                message: msg,
-                timestamp: new Date().toISOString()
-            }).then(() => { alert("Sent!"); document.getElementById('featureReqText').value = ""; });
+            try {
+                await db.collection('feature_requests').add({
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    message: msg,
+                    timestamp: new Date().toISOString()
+                });
+                alert("Sent!");
+                document.getElementById('featureReqText').value = "";
+            } catch (err) {
+                console.error("Error submitting feature request:", err);
+                alert("Failed to submit feature request. Please try again.");
+            }
         }
 
         window.onload = () => {
