@@ -150,9 +150,10 @@
 
             <section id="orders" class="content-section">
                 <h3>Order History</h3>
-                <div class="card">
+                <div class="card" id="orders-container">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <p style="color: var(--text-secondary);" id="no-orders-msg">Loading orders...</p>
+                    <div id="orders-list"></div>
                 </div>
             </section>
 
@@ -229,7 +230,7 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -273,6 +274,66 @@
             const currentAccent = userData.accentColor || 'blue';
             const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
             if (accentRadio) accentRadio.checked = true;
+
+            fetchOrders(user.uid);
+        }
+
+        async function fetchOrders(uid) {
+            try {
+                const q = query(collection(db, "orders"), where("userId", "==", uid));
+                const querySnapshot = await getDocs(q);
+                const ordersList = document.getElementById('orders-list');
+                const noOrdersMsg = document.getElementById('no-orders-msg');
+
+                if (querySnapshot.empty) {
+                    noOrdersMsg.textContent = "You have no recent orders.";
+                    noOrdersMsg.style.display = 'block';
+                    ordersList.innerHTML = '';
+                    return;
+                }
+
+                noOrdersMsg.style.display = 'none';
+
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    orders.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort client-side by date descending
+                orders.sort((a, b) => b.orderDate?.toMillis() - a.orderDate?.toMillis());
+
+                ordersList.innerHTML = orders.map(order => {
+                    const date = order.orderDate ? new Date(order.orderDate.toDate()).toLocaleDateString() : 'N/A';
+
+                    let itemsHtml = '';
+                    if (order.items) {
+                        for (const [id, item] of Object.entries(order.items)) {
+                            // If order.items is cart quantities, we just show quantity
+                            itemsHtml += `<div style="font-size:0.9rem; color:var(--text-secondary)">- ${id}: ${item}</div>`;
+                        }
+                    }
+
+                    // The cart is just { productId: quantity } in the order
+                    // Since we don't have product details saved in the order (just ID and quantity),
+                    // we'll display the product ID and quantity.
+
+                    return `
+                        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: var(--bg-color);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <strong>Order #${order.id.slice(-6)}</strong>
+                                <span style="background: var(--accent-blue); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem;">${order.status || 'Completed'}</span>
+                            </div>
+                            <div style="margin-bottom: 10px;">Date: ${date}</div>
+                            <div><strong>Items:</strong></div>
+                            ${itemsHtml}
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                document.getElementById('no-orders-msg').textContent = "Error loading orders.";
+            }
         }
 
         function setupEventListeners(user) {
