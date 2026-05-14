@@ -120,7 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
                     
-                    greetingElement.textContent = `New Years Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    // Updates the text to the countdown
+                    greetingElement.textContent = `New Year in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
                 manageVideoBackground(false);
             }

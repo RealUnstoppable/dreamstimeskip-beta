@@ -140,13 +140,12 @@ async function handleRemoveFromCart(productId) {
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 async function saveCart() {
-    updateCartSummary(); // Update UI immediately for responsiveness
     if (currentUser) {
         try {
             const userCartRef = doc(db, 'carts', currentUser.uid);
             await setDoc(userCartRef, { items: cart });
         } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
+            console.error("Error saving cart to Firestore in saveCart:", error);
         }
     } else {
         // **MODIFIED**: Save cart to localStorage for logged-out users
