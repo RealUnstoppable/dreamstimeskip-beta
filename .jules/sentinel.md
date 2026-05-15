@@ -32,3 +32,8 @@
 **Vulnerability:** The tracker page (`tracker.html`) was directly injecting user-provided data (routines, drawers, and inventory items) into the DOM using `innerHTML` without sanitization within the `generateReport` function. This allowed for DOM-based XSS if malicious payload was entered into the tracker fields before generating the report.
 **Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
+
+## 2024-05-18 - [Fix DOM-based XSS Bypass in admin.html escapeHTML]
+**Vulnerability:** The `escapeHTML` function in `admin.html` returned non-string inputs unmodified `if (typeof str !== 'string') return str;`. This allowed DOM-based XSS bypasses when arrays (e.g., `["<img src=x onerror=alert(1)>"]`) were passed to it and subsequently interpolated into template literals, as arrays are implicitly coerced to strings without escaping.
+**Learning:** Custom sanitization utilities must account for implicit string coercion in JavaScript template literals. Failing to explicitly cast inputs to strings before sanitizing can lead to bypasses.
+**Prevention:** Ensure `escapeHTML` functions explicitly cast inputs to strings (`str = str.toString()`) before applying replacements to prevent type coercion bypasses.
