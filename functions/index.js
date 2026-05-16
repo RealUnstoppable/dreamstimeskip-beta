@@ -10,30 +10,36 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+// Shared Authentication Utility
+async function authenticateRequest(req, res) {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return null;
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    return { uid: decodedToken.uid, email: decodedToken.email };
+  } catch (err) {
+    console.error("Auth Error:", err);
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+}
+
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
-    let uid;
-    let email;
-
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      uid = decodedToken.uid;
-      email = decodedToken.email;
-    } catch (err) {
-      console.error("Auth Error:", err);
-      return res.status(401).send("Unauthorized");
-    }
+    const auth = await authenticateRequest(req, res);
+    if (!auth) return;
+    const { uid, email } = auth;
 
     const {plan, successUrl, cancelUrl} = req.body;
 
@@ -131,22 +137,11 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 // 🛠️ Create Maintenance Ticket
 exports.createMaintenanceTicket = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
+    const auth = await authenticateRequest(req, res);
+    if (!auth) return;
+    const { uid, email } = auth;
 
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
-      const email = decodedToken.email;
-
       const { equipmentName, issueDescription, priority } = req.body;
 
       if (!equipmentName || !issueDescription || !priority) {
@@ -190,21 +185,11 @@ exports.createMaintenanceTicket = functions.https.onRequest((req, res) => {
 // 🔻 Cancel Subscription Manually
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
+    const auth = await authenticateRequest(req, res);
+    if (!auth) return;
+    const { uid } = auth;
 
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
-
       const userDoc = await admin.firestore().collection("users")
           .doc(uid).get();
       if (!userDoc.exists) {
