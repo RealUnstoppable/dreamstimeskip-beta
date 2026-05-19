@@ -115,6 +115,7 @@
                     <li><a href="#bookings" class="nav-link">Bookings</a></li>
                     <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
+                    <li><a href="#maintenance" class="nav-link">Maintenance</a></li>
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
@@ -207,6 +208,26 @@
                             </tr>
                         </thead>
                         <tbody id="user-list-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="maintenance" class="content-section">
+                <h3>Maintenance Tickets</h3>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date Reported</th>
+                                <th>Email</th>
+                                <th>Equipment</th>
+                                <th>Description</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="maintenance-list-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -336,6 +357,17 @@
                     quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 } catch (e) { console.error("Error fetching quotes:", e); }
 
+                let maintenanceTickets = [];
+                try {
+                    const ticketsSnap = await getDocs(collection(db, "maintenance_tickets"));
+                    maintenanceTickets = ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    maintenanceTickets.sort((a, b) => {
+                        const dateA = a.reportedAt ? a.reportedAt.toDate() : new Date(0);
+                        const dateB = b.reportedAt ? b.reportedAt.toDate() : new Date(0);
+                        return dateB - dateA; // Newest first
+                    });
+                } catch (e) { console.error("Error fetching maintenance tickets:", e); }
+
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
@@ -348,6 +380,7 @@
                 renderChart('summary', users);
                 renderBookingsTable(bookings);
                 renderQuotesTable(quotes);
+                renderMaintenanceTable(maintenanceTickets);
                 
                 // Fetch Feature Requests
                 try {
@@ -400,6 +433,44 @@
                     <td>
                         ${b.status !== 'cancelled' ? `<button class="btn-sm btn-danger action-btn" data-type="booking" data-action="cancel" data-id="${escapeHTML(b.id)}">Cancel</button>` : ''}
                         ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${escapeHTML(b.id)}">Mark Done</button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderMaintenanceTable(tickets) {
+            const tbody = document.getElementById('maintenance-list-body');
+            tbody.innerHTML = '';
+            if(tickets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No maintenance tickets found.</td></tr>'; return;
+            }
+            tickets.forEach(t => {
+                const row = document.createElement('tr');
+                const date = t.reportedAt ? t.reportedAt.toDate().toLocaleDateString() : 'N/A';
+
+                let badgeClass = 'pending';
+                if (t.status === 'In Progress') badgeClass = 'pro';
+                if (t.status === 'Resolved') badgeClass = 'active';
+
+                let priorityStyle = '';
+                if (t.priority === 'High') priorityStyle = 'color: var(--accent-red); font-weight: bold;';
+                if (t.priority === 'Medium') priorityStyle = 'color: var(--accent-yellow); font-weight: bold;';
+
+                row.innerHTML = `
+                    <td>${date}</td>
+                    <td>${escapeHTML(t.email || t.uid || 'Unknown')}</td>
+                    <td>${escapeHTML(t.equipmentName)}</td>
+                    <td>${escapeHTML(t.issueDescription)}</td>
+                    <td style="${priorityStyle}">${escapeHTML(t.priority)}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeHTML(t.status || 'Open')}</span></td>
+                    <td>
+                        <select class="action-dropdown" data-id="${escapeHTML(t.id)}">
+                            <option value="" disabled selected>Update Status</option>
+                            <option value="Open" ${t.status === 'Open' ? 'disabled' : ''}>Open</option>
+                            <option value="In Progress" ${t.status === 'In Progress' ? 'disabled' : ''}>In Progress</option>
+                            <option value="Resolved" ${t.status === 'Resolved' ? 'disabled' : ''}>Resolved</option>
+                        </select>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -591,6 +662,28 @@
                     await deleteDoc(doc(db, "quotes", id));
                 }
                 loadAdminData();
+            });
+
+            // Maintenance Action Dropdown
+            document.getElementById('maintenance-list-body').addEventListener('change', async (e) => {
+                if (e.target.classList.contains('action-dropdown')) {
+                    const id = e.target.dataset.id;
+                    const newStatus = e.target.value;
+                    if (id && newStatus) {
+                        try {
+                            const updateData = { status: newStatus };
+                            if (newStatus === "Resolved") {
+                                updateData.resolvedAt = Timestamp.now();
+                            }
+                            await updateDoc(doc(db, "maintenance_tickets", id), updateData);
+                            loadAdminData();
+                        } catch (err) {
+                            console.error("Error updating ticket:", err);
+                            alert("Failed to update ticket status. Ensure you have the correct permissions.");
+                            loadAdminData(); // Reset the dropdown if failed
+                        }
+                    }
+                }
             });
 
             // Navigation
