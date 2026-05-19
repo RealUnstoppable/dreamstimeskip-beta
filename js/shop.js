@@ -75,31 +75,37 @@ function renderProducts() {
 }
 
 function renderCart() {
-    if (Object.keys(cart).length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        checkoutBtn.disabled = true;
-        checkoutBtn.title = "Your cart is empty";
-    } else {
-        cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
-            const product = productMap.get(productId);
-            if (!product) return ''; // Should not happen
-            return `
-                <div class="cart-item">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                    <div class="cart-item-info">
-                        <h4>${product.name}</h4>
-                        <p>$${product.price.toFixed(2)}</p>
+    if (cartItemsContainer) {
+        if (Object.keys(cart).length === 0) {
+            cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+            if (checkoutBtn) {
+                checkoutBtn.disabled = true;
+                checkoutBtn.title = "Your cart is empty";
+            }
+        } else {
+            cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
+                // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
+                const product = productMap.get(productId);
+                if (!product) return ''; // Should not happen
+                return `
+                    <div class="cart-item">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
+                        <div class="cart-item-info">
+                            <h4>${product.name}</h4>
+                            <p>$${product.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
+                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                        </div>
                     </div>
-                    <div class="cart-item-actions">
-                        <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
-                        <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        checkoutBtn.disabled = false;
-        checkoutBtn.title = "";
+                `;
+            }).join('');
+            if (checkoutBtn) {
+                checkoutBtn.disabled = false;
+                checkoutBtn.title = "";
+            }
+        }
     }
     updateCartSummary();
 }
@@ -107,8 +113,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
