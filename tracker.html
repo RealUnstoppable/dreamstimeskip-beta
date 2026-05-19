@@ -217,7 +217,7 @@
         <div class="absolute bottom-8 left-8 right-8">
             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <span class="text-xs font-bold uppercase tracking-widest">Dark Mode</span>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label for="themeToggle" class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()">
                     <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                 </label>
@@ -488,7 +488,7 @@
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer Control</label>
+                            <label for="timerBtn" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer Control</label>
                             <div class="flex gap-2 items-center">
                                 <button type="button" id="timerBtn" onclick="toggleShiftTimer()" class="btn btn-success flex-1 py-3"><i data-lucide="play" class="w-4"></i> Start</button>
                                 <span id="timerDisplay" class="font-mono font-bold bg-slate-50 dark:bg-slate-800 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700">00:00</span>
@@ -535,7 +535,7 @@
                         <h3 class="text-xl font-black mb-6 flex items-center gap-3"><i data-lucide="banknote" class="text-emerald-500"></i> Cash & Registers</h3>
                         <div class="grid lg:grid-cols-2 gap-12">
                             <div>
-                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Register Variance Tracker</label>
+                                <label for="drawersContainer" class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Register Variance Tracker</label>
                                 <div id="drawersContainer" class="space-y-3 mb-4"></div>
                                 <button type="button" onclick="addDrawerItem()" class="text-sky-600 font-black text-xs uppercase tracking-widest hover:text-sky-700">+ Add Drawer</button>
                             </div>
@@ -545,7 +545,7 @@
                                     <input type="text" id="safeCount" placeholder="$1,100.00">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Verified Deposits</label>
+                                    <label for="depositsContainer" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Verified Deposits</label>
                                     <div id="depositsContainer" class="space-y-3 mb-2"></div>
                                     <button type="button" onclick="addDepositItem()" class="text-sky-600 font-black text-xs uppercase tracking-widest">+ Add Deposit</button>
                                 </div>
@@ -1053,11 +1053,12 @@
 
         function addDepositItem(val = "") {
             const div = document.createElement('div');
+            const uniqueId = Date.now() + Math.random().toString(36).substr(2, 9);
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
             div.innerHTML = `
                 <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;">
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
+                <label for="dep-ver-${uniqueId}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="dep-ver-${uniqueId}" class="dep-ver" checked> VER</label>
+                <label for="dep-val-chk-${uniqueId}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="dep-val-chk-${uniqueId}" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('depositsContainer').appendChild(div);

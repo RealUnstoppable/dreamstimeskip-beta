@@ -13,6 +13,14 @@ if (typeof document !== 'undefined') {
             const email = emailInput.value.trim();
 
             if (email) {
+                const submitBtn = form.querySelector('button[type="submit"]');
+                let originalText = "Sign Up";
+                if (submitBtn) {
+                    originalText = submitBtn.textContent;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Subscribing...";
+                }
+
                 try {
                     await setDoc(doc(db, "newsletterSubscribers", email), {
                         email: email,
