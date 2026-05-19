@@ -59,8 +59,6 @@ describe('toggleFavorite unit tests', () => {
         window.__setUserFavorites([]);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);
         window.__setCurrentSongIndex(0);
-        window.__setCurrentQueue([{id: 'deorc-decuple'}]);
-        window.__setCurrentSongIndex(0);
 
         doc.mockReturnValue('mockDocRef');
 
@@ -79,8 +77,6 @@ describe('toggleFavorite unit tests', () => {
         window.__setUserFavorites([{ id: 'deorc-decuple', title: 'Deorc Decuple' }]);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);
         window.__setCurrentSongIndex(0);
-        window.__setCurrentQueue([{id: 'deorc-decuple'}]);
-        window.__setCurrentSongIndex(0);
 
         doc.mockReturnValue('mockDocRef');
 
@@ -93,8 +89,6 @@ describe('toggleFavorite unit tests', () => {
     it('creates a user document if it does not exist (not-found error)', async () => {
         window.__setCurrentUser({ uid: 'user123' });
         window.__setUserFavorites([]);
-        window.__setCurrentQueue([{id: 'deorc-decuple'}]);
-        window.__setCurrentSongIndex(0);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);
         window.__setCurrentSongIndex(0);
 
