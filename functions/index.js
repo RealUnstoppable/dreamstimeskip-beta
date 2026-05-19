@@ -35,6 +35,30 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+// Shared auth utility
+async function authenticateRequest(req, res) {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return null;
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    return decodedToken;
+  } catch (err) {
+    console.error("Auth Error:", err);
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+}
+
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
