@@ -29,6 +29,11 @@
 **Prevention:** Implement `admin.auth().verifyIdToken(token)` inside the Cloud Function and extract the `uid` and `email` directly from the decoded token rather than trusting the `req.body`.
 
 ## 2024-05-18 - [Fix DOM-based XSS in Tracker Report Generation]
-**Vulnerability:** The `generateReport` function in `tracker.html` was directly injecting user-provided state data (such as item names, values, and quantities from routines, drawers, and inventory) into the DOM via `innerHTML` string concatenation without sanitization. This allowed for DOM-based XSS if a user's malicious payload was rendered during report generation.
-**Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
-**Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
+**Vulnerability:** The tracker page (`tracker.html`) was directly injecting user-provided data (routines, drawers, and inventory items) into the DOM using `innerHTML` without sanitization within the `generateReport` function. This allowed for DOM-based XSS if malicious payload was entered into the tracker fields before generating the report.
+**Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
+**Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
+
+## 2024-05-18 - [Fix DOM-based XSS bypass in escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` did not explicitly convert non-string inputs to strings before escaping, returning them as-is if `typeof str !== 'string'`. This could allow XSS bypasses if arrays or objects containing malicious payloads are implicitly coerced to strings during template literal interpolation in `innerHTML`.
+**Learning:** When writing string escaping functions, always explicitly cast the input to a string, or explicitly reject non-string types, before applying the sanitization logic.
+**Prevention:** Use `str = str.toString()` or `String(str)` before running `.replace()` chains in `escapeHTML` utilities.

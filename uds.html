@@ -303,12 +303,19 @@
         window.subscribeNewsletter = async () => {
             const email = document.getElementById('news-email').value;
             const msg = document.getElementById('news-msg');
+            const btn = document.querySelector('#newsletter-form button');
+
             if(!email) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Please enter an email address.";
                 return;
             }
             
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "Subscribing...";
+            }
+
             try {
                 await setDoc(doc(db, "newsletterSubscribers", email), {
                     email: email,
@@ -320,6 +327,11 @@
             } catch(e) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error subscribing. Please try again.";
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "Subscribe";
+                }
             }
         };
     </script>

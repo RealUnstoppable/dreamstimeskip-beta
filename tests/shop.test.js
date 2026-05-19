@@ -1,8 +1,21 @@
 import { jest } from '@jest/globals';
+
+document.body.innerHTML = `
+    <div id="cart-items-container"></div>
+    <button id="checkout-btn"></button>
+`;
+
 import { handleUpdateQuantity, cart } from '../js/shop.js';
 
 describe('handleUpdateQuantity', () => {
     beforeEach(() => {
+        // Mock DOM elements required by renderCart
+        document.body.innerHTML = `
+            <div id="cart-items-container"></div>
+            <button id="checkout-btn"></button>
+            <div id="cart-item-count"></div>
+            <div id="cart-total-price"></div>
+        `;
         // Reset cart to a known state
         for (let key in cart) delete cart[key];
     });
