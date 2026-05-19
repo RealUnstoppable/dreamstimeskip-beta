@@ -32,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { title: "Top 10 This Week", img: "/images/un-logo-1.png", url: "https://tiktok.com" }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) song lookups, avoiding O(N) array searches
+    const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
     let userFavorites = [];
     let favoriteIds = new Set();
     let currentQueue = [];
@@ -227,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    const song = librarySongs.find(s => s.id === songId);
+                    const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
@@ -471,8 +474,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const song = librarySongs.find(s => s.id === songId);
-        const isFav = favoriteIds.has(songId);
+        const song = librarySongsMap.get(songId);
+        const isFav = userFavorites.some(s => s.id === songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
