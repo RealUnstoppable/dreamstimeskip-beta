@@ -95,7 +95,6 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       console.error("Checkout Error: Manager info: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
-  });
 });
 
 // 🔐 STRIPE WEBHOOK (SECURE)
@@ -198,7 +197,8 @@ exports.createMaintenanceTicket = functions.https.onRequest((req, res) => {
         resolvedAt: null
       };
 
-      const docRef = await admin.firestore().collection("maintenance_tickets").add(ticketData);
+      try {
+        const docRef = await admin.firestore().collection("maintenance_tickets").add(ticketData);
 
       res.status(200).json({ success: true, id: docRef.id });
     } catch (err) {
@@ -217,7 +217,8 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 
     try {
 
-      const userDoc = await admin.firestore().collection("users")
+      try {
+        const userDoc = await admin.firestore().collection("users")
           .doc(uid).get();
       if (!userDoc.exists) {
         return res.status(404).send("User not found");
