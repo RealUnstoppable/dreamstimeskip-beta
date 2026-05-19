@@ -1,5 +1,3 @@
-import { jest } from '@jest/globals';
-
 // Set up minimal DOM before requiring the script
 document.body.innerHTML = `
     <div id="view-home"></div>
@@ -30,8 +28,8 @@ document.body.innerHTML = `
     <div id="greeting"></div>
 `;
 
-// Try importing the script
-await import('../js/harmonytunes.js');
+// Try requiring the script
+require('../js/harmonytunes.js');
 
 // Dispatch DOMContentLoaded so the script actually runs its init block
 const event = new Event('DOMContentLoaded');
@@ -42,7 +40,7 @@ describe('loadPlaylistView error handling', () => {
     // Reset the UI before each test
     document.getElementById('playlist-title').textContent = '';
     document.getElementById('playlist-desc').textContent = '';
-    document.getElementById('song-list-body').textContent = '';
+    document.getElementById('song-list-body').innerHTML = '';
   });
 
   it('should handle null/undefined type by defaulting to Main Library', () => {
@@ -53,7 +51,7 @@ describe('loadPlaylistView error handling', () => {
   it('should gracefully handle empty or missing favorites', () => {
     window.loadPlaylistView('favorites');
     expect(document.getElementById('playlist-title').textContent).toBe('Liked Songs');
-    expect(document.getElementById('song-list-body').textContent).toContain('No songs found.');
+    expect(document.getElementById('song-list-body').innerHTML).toContain('No songs found.');
   });
 
   it('should display error state if data fetching throws an error', () => {
@@ -72,7 +70,7 @@ describe('loadPlaylistView error handling', () => {
     window.loadPlaylistView('main');
 
     expect(document.getElementById('playlist-title').textContent).toBe('Error');
-    expect(document.getElementById('song-list-body').textContent).toContain('Failed to load playlist.');
+    expect(document.getElementById('song-list-body').innerHTML).toContain('Failed to load playlist.');
     expect(consoleSpy).toHaveBeenCalled();
 
     consoleSpy.mockRestore();
