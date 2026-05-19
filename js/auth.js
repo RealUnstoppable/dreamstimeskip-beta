@@ -1,6 +1,7 @@
 // js/auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
@@ -16,8 +17,30 @@ const firebaseConfig = {
 
 // Initialize Firebase and export the instances for other scripts to use
 export const app = initializeApp(firebaseConfig);
+initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6Lc_YOUR_RECAPTCHA_SITE_KEY'),
+    isTokenAutoRefreshEnabled: true
+});
 export const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch(error => {
+    console.error("Auth persistence setup failed:", error);
+});
 export const db = getFirestore(app);
+
+async function verifyConnectionHealth() {
+    try {
+        await getDoc(doc(db, "users", "health_check_dummy"));
+    } catch (error) {
+        if (error.code !== 'permission-denied') {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background: red; color: white; padding: 10px; text-align: center; position: fixed; top: 0; width: 100%; z-index: 9999;';
+            banner.textContent = 'Firebase Connection Error. Please try again later.';
+            document.body.prepend(banner);
+            console.error("Firebase connection health check failed:", error);
+        }
+    }
+}
+verifyConnectionHealth();
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
