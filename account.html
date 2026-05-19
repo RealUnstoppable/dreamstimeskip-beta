@@ -240,8 +240,8 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { products } from '/js/shop.js';
+        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { productMap } from '/js/shop.js';
         
         const productMap = new Map(products.map(p => [p.id, p]));
 
@@ -288,51 +288,74 @@
             const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
             if (accentRadio) accentRadio.checked = true;
 
-            renderWishlist(userData.wishlist || [], user.uid);
+            loadUserOrders(user.uid);
         }
 
-        function renderWishlist(wishlistArray, userId) {
-            const container = document.getElementById('wishlist-container');
-            if (!wishlistArray || wishlistArray.length === 0) {
-                container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is currently empty.</p>';
-                return;
-            }
+        async function loadUserOrders(uid) {
+            const ordersContainer = document.querySelector('#orders .card');
+            ordersContainer.innerHTML = '<h4>Recent Purchases</h4><p style="color: var(--text-secondary);">Loading orders...</p>';
 
-            container.innerHTML = wishlistArray.map(productId => {
-                const product = productMap.get(productId);
-                if (!product) return '';
-                return `
-                    <div class="product-card" style="position: relative; background-color: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;">
-                        <img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 200px; object-fit: cover; background-color: #000;">
-                        <div style="padding: 15px; flex-grow: 1; display: flex; flex-direction: column;">
-                            <h4 style="margin: 0 0 10px;">${product.name}</h4>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
-                                <span style="font-weight: 700;">$${product.price.toFixed(2)}</span>
-                                <button class="btn btn-primary btn-remove-wishlist" data-id="${product.id}" style="padding: 8px 12px; font-size: 0.9rem; background: var(--accent-red); border: none; border-radius: 6px; color: white; cursor: pointer;">Remove</button>
+            try {
+                const q = query(
+                    collection(db, 'orders'),
+                    where('userId', '==', uid),
+                    orderBy('orderDate', 'desc')
+                );
+
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    ordersContainer.innerHTML = '<h4>Recent Purchases</h4><p style="color: var(--text-secondary);">You have no recent orders.</p>';
+                    return;
+                }
+
+                let ordersHtml = '<h4>Recent Purchases</h4><div style="display: flex; flex-direction: column; gap: 15px;">';
+
+                querySnapshot.forEach((docSnap) => {
+                    const order = docSnap.data();
+                    const orderDate = order.orderDate ? new Date(order.orderDate.seconds * 1000).toLocaleDateString() : 'N/A';
+
+                    let itemsHtml = '';
+                    let totalCost = 0;
+
+                    if (order.items) {
+                        for (const [productId, quantity] of Object.entries(order.items)) {
+                            const product = productMap.get(productId);
+                            if (product) {
+                                itemsHtml += `<div>${quantity}x ${product.name}</div>`;
+                                totalCost += product.price * quantity;
+                            } else {
+                                itemsHtml += `<div>${quantity}x Unknown Item (${productId})</div>`;
+                            }
+                        }
+                    }
+
+                    const tax = totalCost * 0.07;
+                    const finalTotal = totalCost + tax;
+
+                    ordersHtml += `
+                        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; background-color: var(--primary-card-color);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 500;">
+                                <span>Order Date: ${orderDate}</span>
+                                <span>Status: ${order.status || 'Processing'}</span>
+                            </div>
+                            <div style="color: var(--text-secondary); margin-bottom: 10px; font-size: 0.95rem;">
+                                ${itemsHtml}
+                            </div>
+                            <div style="text-align: right; font-weight: bold; font-size: 1.1rem; color: var(--text-primary);">
+                                Total: $${finalTotal.toFixed(2)}
                             </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
-
-            container.querySelectorAll('.btn-remove-wishlist').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const productId = e.target.dataset.id;
-                    try {
-                        e.target.disabled = true;
-                        e.target.textContent = 'Removing...';
-                        const userRef = doc(db, 'users', userId);
-                        await updateDoc(userRef, { wishlist: arrayRemove(productId) });
-                        // Optimistic UI update
-                        const newWishlist = wishlistArray.filter(id => id !== productId);
-                        renderWishlist(newWishlist, userId);
-                    } catch (error) {
-                        console.error('Error removing item from wishlist:', error);
-                        e.target.disabled = false;
-                        e.target.textContent = 'Remove';
-                    }
+                    `;
                 });
-            });
+
+                ordersHtml += '</div>';
+                ordersContainer.innerHTML = ordersHtml;
+
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                ordersContainer.innerHTML = '<h4>Recent Purchases</h4><p style="color: var(--accent-red);">Error loading orders. Please try again later.</p>';
+            }
         }
 
         function setupEventListeners(user) {
@@ -367,6 +390,11 @@
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -377,11 +405,18 @@
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
-            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                const btn = e.target;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Deleting...';
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -390,6 +425,8 @@
                     window.location.replace('index.html');
                 } catch (error) {
                     alert('Error: Please sign out, sign back in, and try again.');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
 
