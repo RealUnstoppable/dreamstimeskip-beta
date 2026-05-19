@@ -13,3 +13,7 @@
 ## 2024-05-18 - Optimizing Array.includes in Loops
 **Learning:** Using `Array.includes()` inside a `.filter()` or `.map()` loop creates an O(N*M) time complexity, which can be a bottleneck when filtering large arrays against a list of identifiers.
 **Action:** Convert the identifier list to a `Set` before the loop and replace O(M) `Array.includes()` with O(1) `Set.has()` to achieve O(N+M) complexity, which is significantly faster.
+
+## 2024-05-20 - Throttling High-Frequency Audio Events
+**Learning:** The \`timeupdate\` event on HTML5 audio/video elements can fire multiple times per second (typically 4-250ms intervals). Updating the DOM directly in this event handler blocks the main thread unnecessarily.
+**Action:** Always throttle \`timeupdate\` (or similar high-frequency events like \`scroll\`) using \`requestAnimationFrame\` with a ticking flag to align DOM updates with the browser's render cycle, reducing layout thrashing and CPU usage.
