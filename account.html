@@ -307,6 +307,11 @@
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -317,11 +322,18 @@
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
-            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                const btn = e.target;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Deleting...';
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -330,6 +342,8 @@
                     window.location.replace('index.html');
                 } catch (error) {
                     alert('Error: Please sign out, sign back in, and try again.');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
 
