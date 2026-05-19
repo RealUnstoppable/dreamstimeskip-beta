@@ -33,7 +33,7 @@
 **Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
 
-## 2024-05-18 - [Fix Stored XSS bypass in escapeHTML array coercion]
-**Vulnerability:** The `escapeHTML` function in `admin.html` bypassed escaping for inputs that were explicitly arrays (e.g. from flawed data parsing) due to implicit coercion in template literals, making it vulnerable to XSS.
-**Learning:** `typeof array` is 'object', so `if (typeof str !== 'string') return str;` incorrectly passed arrays through unescaped. When the array was later interpolated in an HTML template literal, it was implicitly coerced to a string, rendering the unescaped payload into the DOM.
-**Prevention:** In vanilla HTML/JS applications, always cast inputs explicitly to strings (e.g. `str = str.toString()`) in sanitization functions before replacing characters, instead of returning early for non-strings.
+## 2024-05-18 - [Fix DOM-based XSS bypass in escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` did not explicitly convert non-string inputs to strings before escaping, returning them as-is if `typeof str !== 'string'`. This could allow XSS bypasses if arrays or objects containing malicious payloads are implicitly coerced to strings during template literal interpolation in `innerHTML`.
+**Learning:** When writing string escaping functions, always explicitly cast the input to a string, or explicitly reject non-string types, before applying the sanitization logic.
+**Prevention:** Use `str = str.toString()` or `String(str)` before running `.replace()` chains in `escapeHTML` utilities.
