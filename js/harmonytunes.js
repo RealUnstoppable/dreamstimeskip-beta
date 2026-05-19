@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { title: "Top 10 This Week", img: "/images/un-logo-1.png", url: "https://tiktok.com" }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) song lookups, avoiding O(N) array searches
+    const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
     let userFavorites = [];
     let favoriteIds = new Set();
     let currentQueue = [];
@@ -230,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    const song = librarySongMap.get(songId);
+                    const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
@@ -340,7 +343,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        // ⚡ Bolt: O(1) membership check replaces O(N) array traversal
         const isFav = favoriteIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
@@ -450,13 +452,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ⚡ Bolt: Throttled updateProgress to prevent excessive main-thread blocking during timeupdate
+    let isProgressTicking = false;
     function updateProgress() {
-        const { duration, currentTime } = audioPlayer;
-        if (duration) {
-            const percent = (currentTime / duration) * 100;
-            progress.style.width = `${percent}%`;
-            currentTimeEl.textContent = formatTime(currentTime);
-            totalTimeEl.textContent = formatTime(duration);
+        if (!isProgressTicking) {
+            window.requestAnimationFrame(() => {
+                const { duration, currentTime } = audioPlayer;
+                if (duration) {
+                    const percent = (currentTime / duration) * 100;
+                    progress.style.width = `${percent}%`;
+                    currentTimeEl.textContent = formatTime(currentTime);
+                    totalTimeEl.textContent = formatTime(duration);
+                }
+                isProgressTicking = false;
+            });
+            isProgressTicking = true;
         }
     }
 
@@ -467,9 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const song = librarySongs.find(s => s.id === songId);
-        // ⚡ Bolt: O(1) membership check replaces O(N) array traversal
-        const isFav = favoriteIds.has(songId);
+        const song = librarySongsMap.get(songId);
+        const isFav = userFavorites.some(s => s.id === songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
@@ -495,6 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
                 userFavorites.push(song);
+                favoriteIds.add(songId);
             }
         }
     }
