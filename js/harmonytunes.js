@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    let favoriteIds = new Set();
     let currentQueue = [];
     let currentSongIndex = 0;
     let isPlaying = false;
@@ -40,7 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
-    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setUserFavorites = (f) => {
+        userFavorites = f;
+        favoriteIds = new Set(f.map(s => s.id));
+    };
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
@@ -333,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = userFavorites.some(s => s.id === song.id);
+        const isFav = favoriteIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
@@ -442,13 +446,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ⚡ Bolt: Throttled updateProgress to prevent excessive main-thread blocking during timeupdate
+    let isProgressTicking = false;
     function updateProgress() {
-        const { duration, currentTime } = audioPlayer;
-        if (duration) {
-            const percent = (currentTime / duration) * 100;
-            progress.style.width = `${percent}%`;
-            currentTimeEl.textContent = formatTime(currentTime);
-            totalTimeEl.textContent = formatTime(duration);
+        if (!isProgressTicking) {
+            window.requestAnimationFrame(() => {
+                const { duration, currentTime } = audioPlayer;
+                if (duration) {
+                    const percent = (currentTime / duration) * 100;
+                    progress.style.width = `${percent}%`;
+                    currentTimeEl.textContent = formatTime(currentTime);
+                    totalTimeEl.textContent = formatTime(duration);
+                }
+                isProgressTicking = false;
+            });
+            isProgressTicking = true;
         }
     }
 
@@ -460,15 +472,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const song = librarySongs.find(s => s.id === songId);
-        const isFav = userFavorites.some(s => s.id === songId);
+        const isFav = favoriteIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
                 userFavorites = userFavorites.filter(s => s.id !== songId);
+                favoriteIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
                 userFavorites.push(song);
+                favoriteIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
             // Update UI
@@ -484,6 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
                 userFavorites.push(song);
+                favoriteIds.add(songId);
             }
         }
     }
@@ -499,6 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // replacing O(N*M) complexity with O(N+M)
                     const favIds = new Set(docSnap.data().musicFavorites);
                     userFavorites = librarySongs.filter(song => favIds.has(song.id));
+                    favoriteIds = new Set(userFavorites.map(s => s.id));
                 }
             } catch (e) { console.error(e); }
             
