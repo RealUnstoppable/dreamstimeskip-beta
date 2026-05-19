@@ -33,7 +33,7 @@
 **Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
 
-## 2024-05-18 - [Improve Data Consistency in User Signup]
-**Vulnerability:** Potential data inconsistency between Firebase Auth and Firestore if the `userCredential` object was relied upon instead of the local validated `email` variable during user document creation.
-**Learning:** Always use locally scoped, validated variables when populating secondary data stores (like Firestore) to ensure consistency across the system and avoid trusting properties from transient objects when the source of truth is already available.
-**Prevention:** Use local variables directly when creating user documents in Firestore after a successful Firebase Authentication `createUserWithEmailAndPassword` call.
+## 2024-05-18 - [Fix DOM-based XSS bypass in escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` did not explicitly convert non-string inputs to strings before escaping, returning them as-is if `typeof str !== 'string'`. This could allow XSS bypasses if arrays or objects containing malicious payloads are implicitly coerced to strings during template literal interpolation in `innerHTML`.
+**Learning:** When writing string escaping functions, always explicitly cast the input to a string, or explicitly reject non-string types, before applying the sanitization logic.
+**Prevention:** Use `str = str.toString()` or `String(str)` before running `.replace()` chains in `escapeHTML` utilities.
