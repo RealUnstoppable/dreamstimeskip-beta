@@ -51,43 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionObserver.observe(section);
     });
 
-    // --- Dynamic Greeting & New Year Video Background ---
+    // --- Dynamic Greeting & New Year Countdown ---
     const greetingElement = document.getElementById('dynamic-greeting');
     const heroSection = document.querySelector('.hero');
 
-    if (greetingElement && heroSection) {
-        
-        // Helper function to manage the video element
-        const manageVideoBackground = (shouldPlay) => {
-            let videoBg = document.getElementById('new-year-video');
-            
-            if (shouldPlay) {
-                if (!videoBg) {
-                    videoBg = document.createElement('video');
-                    videoBg.id = 'new-year-video';
-                    videoBg.src = '/fireworks-bg.mp4'; // Points to root based on your path
-                    videoBg.autoplay = true;
-                    videoBg.loop = true;
-                    videoBg.muted = true; // Required for autoplay
-                    videoBg.playsInline = true;
-                    videoBg.classList.add('new-year-video');
-                    
-                    // Prepend to ensure it sits behind content but follows z-index rules
-                    heroSection.appendChild(videoBg);
-                }
-                // Ensure it's playing
-                if (videoBg.paused) videoBg.play().catch(e => console.log("Autoplay blocked:", e));
-                
-            } else {
-                if (videoBg) {
-                    videoBg.remove();
-                }
-            }
-        };
-
+    if (greetingElement) {
         const updateGreeting = () => {
             const now = new Date();
-            
+
             // Define key dates for the event
             const newYear2026 = new Date('January 1, 2026 00:00:00');
             const endOfCelebration = new Date('January 1, 2026 23:59:59');
@@ -103,26 +74,28 @@ document.addEventListener('DOMContentLoaded', () => {
                  } else {
                      greetingElement.textContent = "Good Evening.";
                  }
-                 manageVideoBackground(false);
-            } 
+                 if (heroSection) heroSection.classList.remove('fireworks-bg');
+            }
             // STATE 2: New Year's Day Celebration (Jan 1st, 2026)
             else if (now >= newYear2026 && now <= endOfCelebration) {
                 greetingElement.textContent = "Happy New Year!";
-                manageVideoBackground(true);
-            } 
+                if (heroSection) heroSection.classList.add('fireworks-bg');
+            }
             // STATE 3: Countdown to 2026 (Right Now)
             else {
                 const diff = newYear2026 - now;
-                
+
                 if (diff > 0) {
                     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    
-                    greetingElement.textContent = `New Years Countdown: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+                    // Updates the text to the countdown
+                    greetingElement.textContent = `New Year in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
-                manageVideoBackground(false);
+                // Ensure background is normal during countdown
+                if (heroSection) heroSection.classList.remove('fireworks-bg');
             }
         };
 
