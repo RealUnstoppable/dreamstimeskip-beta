@@ -1,10 +1,4 @@
 import { jest } from '@jest/globals';
-
-document.body.innerHTML = `
-    <div id="cart-items-container"></div>
-    <button id="checkout-btn"></button>
-`;
-
 import { handleUpdateQuantity, cart } from '../js/shop.js';
 
 describe('handleUpdateQuantity', () => {
