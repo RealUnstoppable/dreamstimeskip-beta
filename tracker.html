@@ -1460,6 +1460,7 @@
                     alert("Error creating checkout session: " + (data.error || "Unknown error"));
                 }
             } catch (err) {
+                console.error("Manager info: [" + err.message + "]");
                 alert("Payment system unreachable. Please try again later.");
             }
         }
@@ -1527,11 +1528,11 @@
                     document.getElementById('mntEquipment').value = "";
                     document.getElementById('mntDescription').value = "";
                     document.getElementById('mntPriority').value = "Medium";
-                    loadMaintenanceTickets();
                 } else {
                     alert("Error: " + (data.error || "Unknown error"));
                 }
             } catch (err) {
+                console.error("Manager info: [" + err.message + "]");
                 alert("Failed to submit ticket. Please check your connection.");
             } finally {
                 btn.disabled = false;
@@ -1607,7 +1608,10 @@
                 updateData.resolvedAt = firebase.firestore.FieldValue.serverTimestamp();
             }
             db.collection("maintenance_tickets").doc(ticketId).update(updateData)
-              .catch(err => alert("Error updating ticket: " + err.message));
+              .catch(err => {
+                  console.error("Manager info: " + err.message);
+                  alert("Error updating ticket: " + err.message);
+              });
         }
 
         window.onload = () => {
