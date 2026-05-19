@@ -32,3 +32,8 @@
 **Vulnerability:** The tracker page (`tracker.html`) was directly injecting user-provided data (routines, drawers, and inventory items) into the DOM using `innerHTML` without sanitization within the `generateReport` function. This allowed for DOM-based XSS if malicious payload was entered into the tracker fields before generating the report.
 **Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
+
+## 2024-05-18 - [Improve Data Consistency in User Signup]
+**Vulnerability:** Potential data inconsistency between Firebase Auth and Firestore if the `userCredential` object was relied upon instead of the local validated `email` variable during user document creation.
+**Learning:** Always use locally scoped, validated variables when populating secondary data stores (like Firestore) to ensure consistency across the system and avoid trusting properties from transient objects when the source of truth is already available.
+**Prevention:** Use local variables directly when creating user documents in Firestore after a successful Firebase Authentication `createUserWithEmailAndPassword` call.
