@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
@@ -41,6 +41,7 @@ export const productMap = new Map(products.map(p => [p.id, p]));
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
+export let wishlist = []; // array of productIds
 let currentUser = null;
 
 // --- DOM ELEMENTS ---
@@ -58,9 +59,17 @@ const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile
 
 
 // --- RENDER FUNCTIONS ---
-function renderProducts() {
-    productGrid.innerHTML = products.map(product => `
+export function renderProducts() {
+    if (!productGrid) return;
+
+    productGrid.innerHTML = products.map(product => {
+        const isWishlisted = wishlist.includes(product.id);
+        const heartIcon = isWishlisted ? '&#9829;' : '&#9825;';
+        const activeClass = isWishlisted ? 'active' : '';
+
+        return `
         <div class="product-card">
+            <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle wishlist">${heartIcon}</button>
             <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
             <div class="product-info">
                 <h3>${product.name}</h3>
@@ -71,7 +80,7 @@ function renderProducts() {
                 </div>
             </div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function renderCart() {
@@ -138,6 +147,31 @@ async function handleRemoveFromCart(productId) {
     renderCart();
 }
 
+export async function toggleWishlist(productId) {
+    if (!currentUser) {
+        alert("Please sign in to add items to your wishlist.");
+        window.location.href = "sign in beta.html";
+        return;
+    }
+
+    const isWishlisted = wishlist.includes(productId);
+    const userRef = doc(db, 'users', currentUser.uid);
+
+    try {
+        if (isWishlisted) {
+            await updateDoc(userRef, { wishlist: arrayRemove(productId) });
+            wishlist = wishlist.filter(id => id !== productId);
+        } else {
+            await updateDoc(userRef, { wishlist: arrayUnion(productId) });
+            wishlist.push(productId);
+        }
+        renderProducts(); // Re-render to update heart icons
+    } catch (error) {
+        console.error("Error updating wishlist:", error);
+        alert("Failed to update wishlist. Please try again.");
+    }
+}
+
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
@@ -176,6 +210,10 @@ function setupEventListeners() {
         if (e.target.classList.contains('add-to-cart-btn')) {
             const productId = e.target.dataset.id;
             handleAddToCart(productId);
+        }
+        if (e.target.classList.contains('wishlist-btn')) {
+            const productId = e.target.dataset.id;
+            toggleWishlist(productId);
         }
     });
 
@@ -223,6 +261,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (user) {
             // User is signed in
+
+            // Fetch wishlist
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                wishlist = userData.wishlist || [];
+                renderProducts(); // Re-render once we have wishlist state
+            }
+
             const userCartRef = doc(db, 'carts', user.uid);
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
@@ -239,6 +287,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // User is signed out, load from localStorage
             cart = localCart;
+            wishlist = [];
+            renderProducts();
         }
 
         updateUserNav(user);

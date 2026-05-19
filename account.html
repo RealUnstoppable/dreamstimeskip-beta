@@ -131,6 +131,7 @@
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#wishlist" class="nav-link">Wishlist</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
                     <li><a href="#support" class="nav-link">Support</a></li>
@@ -153,6 +154,16 @@
                 <div class="card">
                     <h4>Recent Purchases</h4>
                     <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                </div>
+            </section>
+
+            <section id="wishlist" class="content-section">
+                <h3>Wishlist</h3>
+                <div class="card">
+                    <h4>Saved Items</h4>
+                    <div id="wishlist-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+                        <p style="color: var(--text-secondary);">Your wishlist is currently empty.</p>
+                    </div>
                 </div>
             </section>
 
@@ -232,6 +243,8 @@
         import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { productMap } from '/js/shop.js';
         
+        const productMap = new Map(products.map(p => [p.id, p]));
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
