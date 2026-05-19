@@ -38,7 +38,11 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if (membershipStatusContainer) {
-                membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
+                membershipStatusContainer.textContent = ''; // clear previous content
+                const statusSpan = document.createElement('span');
+                statusSpan.className = `membership-status ${userData.membershipLevel}`;
+                statusSpan.textContent = userData.membershipLevel;
+                membershipStatusContainer.appendChild(statusSpan);
             }
         }
     } else {
@@ -49,7 +53,7 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         if (membershipStatusContainer) {
-            membershipStatusContainer.innerHTML = '';
+            membershipStatusContainer.textContent = '';
         }
     }
 });
@@ -87,18 +91,21 @@ if (document.getElementById('auth-form')) {
 
         messageEl.textContent = '';
         submitBtn.disabled = true;
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
 
         if (isSignUp) {
             if (!username || !email || !password) {
                 showMessage("All fields are required.");
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
                 return;
             }
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await setDoc(doc(db, "users", userCredential.user.uid), {
                     username: username || "User",
-                    email: email, // FIX: Use the local variable directly instead of the credential object
+                    email,
                     signupDate: serverTimestamp(),
                     isBanned: false,
                     isAdmin: false, 
@@ -109,6 +116,7 @@ if (document.getElementById('auth-form')) {
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         } else {
             try {
@@ -122,10 +130,12 @@ if (document.getElementById('auth-form')) {
                     await signOut(auth);
                     showMessage("This account is suspended or does not exist.");
                     submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
                 }
             } catch (error) {
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         }
     });

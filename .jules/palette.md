@@ -6,6 +6,10 @@
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
 
-## 2026-05-14 - Newsletter Form State
-**Learning:** Standalone, dynamically generated forms (like the newsletter signup form) often get overlooked for UI loading states compared to primary auth forms. Even standard `alert()`-driven submission flows benefit from button disables to prevent double-submission.
-**Action:** When auditing forms, explicitly check non-primary/footer components for `disabled` states and localized "Subscribing..."/"Loading..." text during async submissions.
+## 2024-06-25 - Form Labels and Hidden Accessibility Patterns
+**Learning:** Found multiple form `<label>` elements missing the `for` attribute required to associate them with inputs. Additionally, some inputs completely lacked labels, relying entirely on placeholders. Placeholders are not an accessible alternative to labels for screen readers.
+**Action:** When adding missing labels to UI components that were designed without visible text labels, use visually hidden labels (styled with `clip: rect(0 0 0 0)` etc.) to ensure screen reader support without breaking the existing visual design system or layout. Always verify `for` attributes exist on all `<label>` tags.
+
+## 2024-06-26 - Form Label Accessibility
+**Learning:** Found multiple `<label>` elements missing the `for` attribute in booking form. Even when visually near the input, explicit `for` bindings are essential for screen readers to correctly associate the label with the input field, and to allow users to click the label to focus the input.
+**Action:** Always add explicit `for` attributes tying labels to their corresponding input `id`s across all forms.
