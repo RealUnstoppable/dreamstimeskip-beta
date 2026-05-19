@@ -33,7 +33,7 @@
 **Learning:** All user-provided data read from the DOM inputs and rendered as a report via `innerHTML` must be properly sanitized, even if the data was just read from inputs on the same page.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before appending it to HTML strings that will be inserted using `innerHTML`.
 
-## 2024-05-18 - [Fix XSS bypass in escapeHTML function]
-**Vulnerability:** The `escapeHTML` function in `admin.html` was silently returning non-string inputs (like Arrays) unmodified (`if (typeof str !== 'string') return str;`). This meant that if a template literal passed an Array containing malicious payload to `escapeHTML`, the Array would be returned unmodified, coerced into a string by the template literal, and directly injected into `innerHTML`, leading to a DOM-based XSS vulnerability.
-**Learning:** Returning non-string objects unmodified from an HTML escaping function is a critical security risk because JavaScript template literals implicitly coerce objects (like Arrays) into strings, bypassing sanitization logic.
-**Prevention:** Always convert inputs to strings explicitly (e.g. `str = str.toString()`) before attempting to sanitize them using `.replace()` chains inside custom `escapeHTML` utilities.
+## 2024-05-18 - [Fix DOM-based XSS bypass in escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` did not explicitly convert non-string inputs to strings before escaping, returning them as-is if `typeof str !== 'string'`. This could allow XSS bypasses if arrays or objects containing malicious payloads are implicitly coerced to strings during template literal interpolation in `innerHTML`.
+**Learning:** When writing string escaping functions, always explicitly cast the input to a string, or explicitly reject non-string types, before applying the sanitization logic.
+**Prevention:** Use `str = str.toString()` or `String(str)` before running `.replace()` chains in `escapeHTML` utilities.
