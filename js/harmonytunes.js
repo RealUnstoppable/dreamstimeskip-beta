@@ -5,6 +5,8 @@ import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https:/
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
+    // ⚡ Bolt: Pre-computed Map for O(1) library song lookups
+    let librarySongMap = new Map();
     const librarySongs = [
         { 
             id: 'deorc-decuple',
@@ -23,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             art: "/images/dreams-lobby.jpg"
         }
     ];
+    librarySongMap = new Map(librarySongs.map(s => [s.id, s]));
 
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
