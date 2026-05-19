@@ -10,6 +10,6 @@
 **Learning:** Found multiple form `<label>` elements missing the `for` attribute required to associate them with inputs. Additionally, some inputs completely lacked labels, relying entirely on placeholders. Placeholders are not an accessible alternative to labels for screen readers.
 **Action:** When adding missing labels to UI components that were designed without visible text labels, use visually hidden labels (styled with `clip: rect(0 0 0 0)` etc.) to ensure screen reader support without breaking the existing visual design system or layout. Always verify `for` attributes exist on all `<label>` tags.
 
-## 2026-05-19 - Adding Loading States to Critical Form Actions
-**Learning:** Missed adding a loading state to account deletion because I failed to review the exact un-truncated event listener implementation. Account actions (like deletion or updates) shouldn't leave the user hanging without feedback while async operations occur.
-**Action:** Always verify the full, un-truncated block of code before implementing changes. For async user operations like form submissions or destructive actions, ensure buttons are disabled and display loading feedback (e.g., "Saving..." or "Deleting...").
+## 2024-06-26 - Form Label Accessibility
+**Learning:** Found multiple `<label>` elements missing the `for` attribute in booking form. Even when visually near the input, explicit `for` bindings are essential for screen readers to correctly associate the label with the input field, and to allow users to click the label to focus the input.
+**Action:** Always add explicit `for` attributes tying labels to their corresponding input `id`s across all forms.
