@@ -116,7 +116,7 @@ export async function handleAddToCart(productId) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error);
+        console.error("Manager info: [Add to Cart Failed] - " + error.message);
     }
 }
 
@@ -144,7 +144,7 @@ async function saveCart() {
             const userCartRef = doc(db, 'carts', currentUser.uid);
             await setDoc(userCartRef, { items: cart });
         } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
+            console.error("Manager info: [Save Cart Failed] - " + error.message);
         }
     } else {
         // **MODIFIED**: Save cart to localStorage for logged-out users
