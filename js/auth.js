@@ -1,7 +1,8 @@
 // js/auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,10 +15,42 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase and export the instances for other scripts to use
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+let appInstance, authInstance, dbInstance;
+
+try {
+  // Initialize Firebase and export the instances for other scripts to use
+  appInstance = initializeApp(firebaseConfig);
+
+  // Initialize App Check
+  initializeAppCheck(appInstance, {
+    provider: new ReCaptchaV3Provider('YOUR_RECAPTCHA_V3_SITE_KEY'),
+    isTokenAutoRefreshEnabled: true
+  });
+
+  authInstance = getAuth(appInstance);
+  dbInstance = getFirestore(appInstance);
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
+export const app = appInstance;
+export const auth = authInstance;
+export const db = dbInstance;
+
+export async function verifyFirebaseConnection() {
+  try {
+    if (!db) throw new Error("Firestore not initialized");
+    await getDoc(doc(db, "_health", "check"));
+  } catch (error) {
+    if (error.code !== "permission-denied") {
+      console.error("Firebase connection failed:", error);
+      alert("Error: Unable to connect to backend services. Please check your network connection or try again later.");
+    }
+  }
+}
+
+// Run health check on load
+verifyFirebaseConnection();
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
