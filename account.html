@@ -231,18 +231,44 @@
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
+        let listenersSetup = false;
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
+                    const cachedData = sessionStorage.getItem('userDataCache');
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        initializePage(user, userData);
+                        if (!listenersSetup) {
+                            setupEventListeners(user);
+                            listenersSetup = true;
+                        }
+                        document.body.style.display = 'flex';
+                    }
+
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
+                        sessionStorage.setItem('userDataCache', JSON.stringify(userData));
                         initializePage(user, userData);
-                        setupEventListeners(user);
-                        document.body.style.display = 'flex';
+                    } else {
+                        // Fallback default user structure if missing
+                        const defaultUserData = {
+                            username: user.email ? user.email.split('@')[0] : "User",
+                            isAdmin: false,
+                            theme: 'dark',
+                            accentColor: 'blue'
+                        };
+                        initializePage(user, defaultUserData);
                     }
+
+                    if (!listenersSetup) {
+                        setupEventListeners(user);
+                        listenersSetup = true;
+                    }
+                    document.body.style.display = 'flex';
                 } catch (error) {
                     console.error("Error loading profile:", error);
                 }
@@ -277,6 +303,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
+                sessionStorage.removeItem('userDataCache');
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
@@ -294,6 +321,12 @@
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+                    const cachedData = sessionStorage.getItem('userDataCache');
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.username = newUsername;
+                        sessionStorage.setItem('userDataCache', JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -315,6 +348,14 @@
                     document.body.dataset.accent = accentColor;
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
+
+                    const cachedData = sessionStorage.getItem('userDataCache');
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.theme = theme;
+                        userData.accentColor = accentColor;
+                        sessionStorage.setItem('userDataCache', JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 }

@@ -40,6 +40,12 @@ onAuthStateChanged(auth, async (user) => {
             if (membershipStatusContainer) {
                 membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
             }
+
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('sign%20in%20beta.html') || currentPath.includes('sign in beta.html')) {
+                window.location.replace(destination);
+                return;
+            }
         }
     } else {
         // User is signed out
@@ -50,6 +56,12 @@ onAuthStateChanged(auth, async (user) => {
 
         if (membershipStatusContainer) {
             membershipStatusContainer.innerHTML = '';
+        }
+
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('account.html') || currentPath.includes('admin.html')) {
+            window.location.replace('sign in beta.html');
+            return;
         }
     }
 });
