@@ -1,23 +1,10 @@
 // js/auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { app, auth, db } from "./firebase.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-  authDomain: "dts-hub-website.firebaseapp.com",
-  projectId: "dts-hub-website",
-  storageBucket: "dts-hub-website.firebasestorage.app",
-  messagingSenderId: "48345990988",
-  appId: "1:48345990988:web:e3662c9b508168546471e9",
-  measurementId: "G-ZN3YJPHVGX"
-};
-
-// Initialize Firebase and export the instances for other scripts to use
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Re-export instances for scripts that import from auth.js
+export { app, auth, db };
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
