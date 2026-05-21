@@ -107,6 +107,7 @@ if (document.getElementById('auth-form')) {
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
             } catch (error) {
+                console.error("Signup Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }
@@ -124,6 +125,7 @@ if (document.getElementById('auth-form')) {
                     submitBtn.disabled = false;
                 }
             } catch (error) {
+                console.error("Signin Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }

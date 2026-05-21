@@ -1259,6 +1259,7 @@
             db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
                 container.innerHTML = "";
                 if(doc.exists && doc.data().customPresets) {
+                    const fragment = document.createDocumentFragment();
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
@@ -1266,8 +1267,9 @@
                             <span class="font-bold">${escapeHTML(p.name)}</span>
                             <button data-id="${escapeHTML(p.id)}" onclick="applyCustomPreset(this.getAttribute('data-id'))" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
-                        container.appendChild(div);
+                        fragment.appendChild(div);
                     });
+                    container.appendChild(fragment);
                 }
             });
         }
