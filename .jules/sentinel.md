@@ -32,3 +32,8 @@
 **Vulnerability:** The `generateReport` function in `tracker.html` was directly injecting user-provided state data (such as item names, values, and quantities from routines, drawers, and inventory) into the DOM via `innerHTML` string concatenation without sanitization. This allowed for DOM-based XSS if a user's malicious payload was rendered during report generation.
 **Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
+
+## 2024-05-20 - [Fix DOM-based XSS in HarmonyTunes Song Table]
+**Vulnerability:** The `renderSongTable` function in `js/harmonytunes.js` directly injected user-provided or external data (`song.title`, `song.artist`) into the DOM using `innerHTML` without sanitization. This allowed for DOM-based XSS.
+**Learning:** Even when reading from a seemingly safe internal array or object, any data that originates from user input or external sources must be sanitized before insertion via `innerHTML`.
+**Prevention:** Always apply an `escapeHTML` utility to untrusted data before concatenating it into `innerHTML` strings.
