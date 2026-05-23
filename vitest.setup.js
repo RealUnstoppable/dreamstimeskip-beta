@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js', () => ({
   onAuthStateChanged: vi.fn(),
   getAuth: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
@@ -9,7 +9,7 @@ vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
   sendEmailVerification: vi.fn(),
 }));
 
-vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () => ({
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js', () => ({
   doc: vi.fn(),
   getDoc: vi.fn(),
   setDoc: vi.fn(),
@@ -18,10 +18,13 @@ vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () =>
   getFirestore: vi.fn(),
 }));
 
-vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js', () => ({
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js', () => ({
   initializeApp: vi.fn(),
 }));
 
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js', () => ({
+  initializeAppCheck: vi.fn(),
+  ReCaptchaV3Provider: class { constructor(key) { this.key = key; } }
 vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js', () => ({
   initializeAppCheck: vi.fn(),
   ReCaptchaEnterpriseProvider: vi.fn()
