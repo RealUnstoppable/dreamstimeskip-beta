@@ -105,8 +105,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
@@ -137,8 +137,14 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+let saveCartTimeout = null;
+let pendingResolves = [];
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
+
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
     if (currentUser) {
         try {
             const userCartRef = doc(db, 'carts', currentUser.uid);
@@ -150,6 +156,27 @@ async function saveCart() {
         // **MODIFIED**: Save cart to localStorage for logged-out users
         localStorage.setItem('localCart', JSON.stringify(cart));
     }
+
+    return new Promise((resolve) => {
+        pendingResolves.push(resolve);
+        saveCartTimeout = setTimeout(async () => {
+            if (currentUser) {
+                try {
+                    const userCartRef = doc(db, 'carts', currentUser.uid);
+                    await setDoc(userCartRef, { items: cart });
+                } catch (error) {
+                    console.error("Error saving cart to Firestore:", error);
+                }
+            } else {
+                // **MODIFIED**: Save cart to localStorage for logged-out users
+                localStorage.setItem('localCart', JSON.stringify(cart));
+            }
+            // Resolve all promises that were waiting for this debounce cycle
+            const resolves = pendingResolves;
+            pendingResolves = [];
+            resolves.forEach(r => r());
+        }, 500); // 500ms debounce
+    });
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
