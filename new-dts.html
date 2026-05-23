@@ -264,7 +264,7 @@
                 <button class="read-more-btn" onclick="toggleSection('gilded-details')">Read More</button>
                 
                 <div id="gilded-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/2563EB?text=Gilded+Armor+Preview" alt="Gilded Armor Preview" class="update-image">
+                    <img src="https://placehold.co/800x400/141414/2563EB?text=Gilded+Armor+Preview" alt="Gilded Armor Preview" class="update-image" loading="lazy">
                     
                     <h3>How to Craft</h3>
                     <ol>
@@ -303,7 +303,7 @@
                 <button class="read-more-btn" onclick="toggleSection('biomes-details')">Read More</button>
                 
                 <div id="biomes-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/16A34A?text=Cherry+Blossom+Grove" alt="Cherry Blossom Grove" class="update-image">
+                    <img src="https://placehold.co/800x400/141414/16A34A?text=Cherry+Blossom+Grove" alt="Cherry Blossom Grove" class="update-image" loading="lazy">
                     
                     <h3>New Biomes</h3>
                     <ul>
@@ -329,7 +329,7 @@
                 <button class="read-more-btn" onclick="toggleSection('magic-details')">Read More</button>
                 
                 <div id="magic-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/9333EA?text=Magic+Wands" alt="Magic Wands" class="update-image">
+                    <img src="https://placehold.co/800x400/141414/9333EA?text=Magic+Wands" alt="Magic Wands" class="update-image" loading="lazy">
                     
                     <p>There is a leveling system to unlock new magic to prevent players from becoming too OP immediately. You will need to craft the <strong>Magic Book</strong> to get started.</p>
                     
@@ -363,7 +363,7 @@
                 <button class="read-more-btn" onclick="toggleSection('decor-details')">Read More</button>
                 
                 <div id="decor-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/FBBF24?text=Furniture+Showcase" alt="Furniture Showcase" class="update-image">
+                    <img src="https://placehold.co/800x400/141414/FBBF24?text=Furniture+Showcase" alt="Furniture Showcase" class="update-image" loading="lazy">
                     
                     <p>This addon adds many new blocks with all types of wood compatibility. Admin command to generate a showcase house: <span class="code-block">/function medieval_blocks</span></p>
                     
@@ -505,8 +505,8 @@
     
     <script type="module">
       import { auth, db } from '/js/auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
       
       const authLink = document.getElementById('auth-link');
       

@@ -1,12 +1,25 @@
 // js/auth.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
+import { app, auth, db } from "./firebase.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+// Re-export instances for scripts that import from auth.js
+export { app, auth, db };
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-  authDomain: "dts-hub-website.firebaseapp.com",
+  authDomain: "realunstoppable.store",
   projectId: "dts-hub-website",
   storageBucket: "dts-hub-website.firebasestorage.app",
   messagingSenderId: "48345990988",
@@ -14,10 +27,83 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
+let appInstance, authInstance, dbInstance;
+
+try {
+  // Initialize Firebase and export the instances for other scripts to use
+  appInstance = initializeApp(firebaseConfig);
+
+  // Initialize App Check
+  initializeAppCheck(appInstance, {
+    provider: new ReCaptchaV3Provider('YOUR_RECAPTCHA_V3_SITE_KEY'),
+    isTokenAutoRefreshEnabled: true
+  });
+
+  authInstance = getAuth(appInstance);
+  dbInstance = getFirestore(appInstance);
+} catch (error) {
+  console.error("Firebase initialization error:", error);
+}
+
+export const app = appInstance;
+export const auth = authInstance;
+export const db = dbInstance;
+
+export async function verifyFirebaseConnection() {
+  try {
+    if (!db) throw new Error("Firestore not initialized");
+    await getDoc(doc(db, "_health", "check"));
+  } catch (error) {
+    if (error.code !== "permission-denied") {
+      console.error("Firebase connection failed:", error);
+      alert("Error: Unable to connect to backend services. Please check your network connection or try again later.");
+    }
+  }
+}
+
+// Run health check on load
+verifyFirebaseConnection();
 // Initialize Firebase and export the instances for other scripts to use
 export const app = initializeApp(firebaseConfig);
+initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6Lc_YOUR_RECAPTCHA_SITE_KEY'),
+    isTokenAutoRefreshEnabled: true
+export const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaEnterpriseProvider('PLACEHOLDER_KEY'),
+  isTokenAutoRefreshEnabled: true
+});
 export const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch(error => {
+    console.error("Auth persistence setup failed:", error);
+});
 export const db = getFirestore(app);
+
+async function verifyConnectionHealth() {
+    try {
+        await getDoc(doc(db, "users", "health_check_dummy"));
+    } catch (error) {
+        if (error.code !== 'permission-denied') {
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background: red; color: white; padding: 10px; text-align: center; position: fixed; top: 0; width: 100%; z-index: 9999;';
+            banner.textContent = 'Firebase Connection Error. Please try again later.';
+            document.body.prepend(banner);
+            console.error("Firebase connection health check failed:", error);
+        }
+    }
+}
+verifyConnectionHealth();
+(async () => {
+    try {
+        await getDoc(doc(db, "health_check", "ping"));
+    } catch(error) {
+        if (error.code === "unavailable" || error.message.includes("offline")) {
+            const banner = document.createElement("div");
+            banner.style.cssText = "position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:9999;padding:10px;";
+            banner.textContent = "Error: Firebase connection is unreachable.";
+            document.body.appendChild(banner);
+        }
+    }
+})();
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
@@ -40,6 +126,12 @@ onAuthStateChanged(auth, async (user) => {
             if (membershipStatusContainer) {
                 membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
             }
+
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('sign%20in%20beta.html') || currentPath.includes('sign in beta.html')) {
+                window.location.replace(destination);
+                return;
+            }
         }
     } else {
         // User is signed out
@@ -50,6 +142,12 @@ onAuthStateChanged(auth, async (user) => {
 
         if (membershipStatusContainer) {
             membershipStatusContainer.innerHTML = '';
+        }
+
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('account.html') || currentPath.includes('admin.html')) {
+            window.location.replace('sign in beta.html');
+            return;
         }
     }
 });
@@ -107,6 +205,7 @@ if (document.getElementById('auth-form')) {
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
             } catch (error) {
+                console.error("Signup Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }
@@ -124,6 +223,7 @@ if (document.getElementById('auth-form')) {
                     submitBtn.disabled = false;
                 }
             } catch (error) {
+                console.error("Signin Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }

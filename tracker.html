@@ -171,7 +171,7 @@
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3 cursor-pointer" onclick="navTo('welcome')">
                 <div class="relative group">
-                    <img src="ManagerPro.jpg" 
+                    <img src="ManagerPro.jpg" loading="lazy"
                          onerror="this.src='https://ui-avatars.com/api/?name=ez+M&background=87ceeb&color=fff'" 
                          alt="ezManage Logo" 
                          class="w-10 h-10 rounded-xl shadow-sm border border-white transform transition-transform group-hover:rotate-6">
@@ -236,7 +236,7 @@
                 <div class="max-w-6xl mx-auto flex flex-col items-center text-center">
                     <div class="relative mb-12">
                         <div class="absolute inset-0 bg-sky-200 blur-2xl opacity-40 rounded-full scale-110"></div>
-                        <img src="ManagerPro.jpg" class="relative w-28 h-28 rounded-[2.5rem] shadow-2xl ring-1 ring-slate-200">
+                        <img src="ManagerPro.jpg" class="relative w-28 h-28 rounded-[2.5rem] shadow-2xl ring-1 ring-slate-200" loading="lazy">
                     </div>
 
                     <span class="inline-flex items-center px-4 py-1.5 mb-8 text-[10px] font-black tracking-[0.2em] text-sky-700 uppercase bg-sky-50 rounded-full">
@@ -397,11 +397,11 @@
                 <h2 id="authTitle" class="text-3xl font-black mb-8">Sign In</h2>
                 <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Email Address</label>
+                        <label for="authEmail" class="text-xs font-black uppercase tracking-widest text-slate-400">Email Address</label>
                         <input type="email" id="authEmail" placeholder="manager@ezmanage.com" required>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Password</label>
+                        <label for="authPass" class="text-xs font-black uppercase tracking-widest text-slate-400">Password</label>
                         <input type="password" id="authPass" placeholder="••••••••" required>
                     </div>
                     <button type="submit" id="authBtn" class="btn btn-accent w-full py-4 mt-4">Sign In</button>
@@ -412,8 +412,8 @@
                     <div class="relative flex justify-center text-xs uppercase"><span class="bg-white dark:bg-slate-900 px-2 text-slate-400">Or continue with</span></div>
                 </div>
 
-                <button onclick="signInWithGoogle()" class="btn btn-outline w-full py-4 font-bold flex items-center justify-center gap-3">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5"> Google
+                <button onclick="signInWithGoogle()" class="btn btn-outline w-full py-4 font-bold flex items-center justify-center gap-3" aria-label="Sign in with Google">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5" alt="Google logo"> Google
                 </button>
 
                 <p class="mt-8 text-sm text-slate-500">
@@ -860,17 +860,25 @@
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPass').value;
             const btn = document.getElementById('authBtn');
+            const originalText = btn.innerText;
             btn.disabled = true;
+            btn.innerText = 'Processing...';
 
             if (isRegisterMode) {
                 auth.createUserWithEmailAndPassword(email, pass)
                     .then(() => navTo('setup'))
                     .catch(err => alert(err.message))
-                    .finally(() => btn.disabled = false);
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    });
             } else {
                 auth.signInWithEmailAndPassword(email, pass)
                     .catch(err => alert(err.message))
-                    .finally(() => btn.disabled = false);
+                    .finally(() => {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    });
             }
         }
 
@@ -1132,7 +1140,7 @@
                             <div class="font-black text-lg">${escapeHTML(data.dateSaved)}</div>
                             <div class="text-xs font-bold uppercase tracking-widest text-slate-400">Manager: ${escapeHTML(data.manager || 'N/A')} • Duration: ${escapeHTML(data.durationMins)}m</div>
                         </div>
-                        <button onclick="loadHistoryShift('${escapeHTML(data.id)}')" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button data-id="${escapeHTML(data.id)}" onclick="loadHistoryShift(this.getAttribute('data-id'))" class="btn btn-outline btn-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                             <i data-lucide="download"></i> Load Shift
                         </button>
                     `;
@@ -1251,15 +1259,17 @@
             db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
                 container.innerHTML = "";
                 if(doc.exists && doc.data().customPresets) {
+                    const fragment = document.createDocumentFragment();
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
                             <span class="font-bold">${escapeHTML(p.name)}</span>
-                            <button onclick="applyCustomPreset('${escapeHTML(p.id)}')" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
+                            <button data-id="${escapeHTML(p.id)}" onclick="applyCustomPreset(this.getAttribute('data-id'))" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
-                        container.appendChild(div);
+                        fragment.appendChild(div);
                     });
+                    container.appendChild(fragment);
                 }
             });
         }
@@ -1290,17 +1300,17 @@
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
             
             let routineHtml = "";
-            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${r.name}</div>`);
+            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${escapeHTML(r.name)}</div>`);
             document.getElementById('printRoutines').innerHTML = routineHtml;
 
             let drawerHtml = "";
-            state.drawers.forEach(d => drawerHtml += `<div>${d.name}: $${d.val} (${d.res})</div>`);
+            state.drawers.forEach(d => drawerHtml += `<div>${escapeHTML(d.name)}: $${escapeHTML(d.val)} (${escapeHTML(d.res)})</div>`);
             document.getElementById('printDrawers').innerHTML = drawerHtml;
 
             document.getElementById('printSafe').innerText = state.safeCount;
 
             let invHtml = "";
-            state.inventory.forEach(i => invHtml += `<div>${i.name}: ${i.bl} BL | ${i.cl} CL | ${i.fr} FR</div>`);
+            state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
             manualSaveHistory();
@@ -1360,19 +1370,17 @@
         async function processCheckout(planName) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
 
-            // Sale + Referral Logic
-            let basePrice = (planName === 'Business Pro') ? 165 : 48;
-            let finalPrice = hasReferralDiscount ? Math.floor(basePrice * 0.9) : basePrice;
-
+            // Pricing logic is handled securely on the server
             try {
+                const token = await currentUser.getIdToken();
                 const res = await fetch("https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession", {
                     method: "POST",
-                    headers: {"Content-Type": "application/json"},
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
                     body: JSON.stringify({
-                        uid: currentUser.uid,
-                        email: currentUser.email,
                         plan: planName,
-                        amount: finalPrice, // Send adjusted price to backend
                         successUrl: window.location.origin + window.location.pathname + "?success=true",
                         cancelUrl: window.location.href
                     })

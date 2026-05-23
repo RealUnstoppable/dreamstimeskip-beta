@@ -1,8 +1,8 @@
 // js/checkout.js
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-import { products } from './shop.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { products, productMap } from './shop.js';
 
 let currentUser = null;
 let userCart = {};
@@ -24,7 +24,8 @@ function renderCheckoutPage() {
     }
 
     const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
-        const product = products.find(p => p.id === productId);
+        // ⚡ Bolt: O(1) lookup replaces O(N) products.find() to speed up subtotal calculation
+        const product = productMap.get(productId);
         return sum + (product.price * quantity);
     }, 0);
     const tax = subtotal * 0.07; // 7% tax
@@ -65,7 +66,8 @@ function renderCheckoutPage() {
                 <h3>Order Summary</h3>
                 <div id="summary-items">
                     ${Object.entries(userCart).map(([productId, quantity]) => {
-        const product = products.find(p => p.id === productId);
+        // ⚡ Bolt: O(1) lookup replaces O(N) products.find() to speed up rendering
+        const product = productMap.get(productId);
         return `<div class="summary-item"><span>${quantity}x ${product.name}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
     }).join('')}
                 </div>
@@ -148,7 +150,7 @@ export async function handlePlaceOrder(e) {
         setTimeout(() => window.location.href = './account.html', 3000);
 
     } catch (error) {
-        console.error("Error placing order:", error);
+        console.error("Error placing order - Manager info:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;
