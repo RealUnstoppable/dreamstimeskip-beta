@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    let favoriteIds = new Set();
     let currentQueue = [];
     let currentSongIndex = 0;
     let isPlaying = false;
@@ -297,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = userFavorites.some(s => s.id === song.id);
+        const isFav = favoriteIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
@@ -416,13 +417,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
-
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
@@ -430,14 +424,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const song = librarySongs.find(s => s.id === songId);
-        const isFav = userFavorites.some(s => s.id === songId);
+        const isFav = favoriteIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
+                favoriteIds.delete(songId);
                 userFavorites = userFavorites.filter(s => s.id !== songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
+                favoriteIds.add(songId);
                 userFavorites.push(song);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
@@ -453,6 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
+                favoriteIds.add(songId);
                 userFavorites.push(song);
             }
         }
@@ -467,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    favoriteIds = new Set(favIds);
                 }
             } catch (e) { console.error(e); }
             
@@ -489,11 +487,4 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
-}
-
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }
