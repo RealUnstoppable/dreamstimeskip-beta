@@ -145,16 +145,6 @@ async function saveCart() {
 
     if (saveCartTimeout) {
         clearTimeout(saveCartTimeout);
-    if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore - Manager info:", error.message);
-        }
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
-        localStorage.setItem('localCart', JSON.stringify(cart));
     }
 
     return new Promise((resolve) => {

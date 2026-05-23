@@ -228,13 +228,10 @@
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { productMap } from '/js/shop.js';
 
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-        
         let listenersSetup = false;
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -261,10 +258,14 @@
                         // Fallback default user structure if missing
                         const defaultUserData = {
                             username: user.email ? user.email.split('@')[0] : "User",
+                            email: user.email,
                             isAdmin: false,
                             theme: 'dark',
-                            accentColor: 'blue'
+                            accentColor: 'blue',
+                            membershipLevel: 'free'
                         };
+                        await setDoc(userDocRef, defaultUserData, { merge: true });
+                        sessionStorage.setItem('userDataCache', JSON.stringify(defaultUserData));
                         initializePage(user, defaultUserData);
                     }
 
