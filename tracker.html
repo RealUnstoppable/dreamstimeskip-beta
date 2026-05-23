@@ -1132,6 +1132,8 @@
                 const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
                 if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
                 
+                // ⚡ Bolt: Batch DOM insertions using a DocumentFragment to reduce reflows to a single operation (O(1) instead of O(N))
+                const fragment = document.createDocumentFragment();
                 history.slice(0, 20).forEach(data => {
                     const div = document.createElement('div');
                     div.className = "card flex justify-between items-center hover:border-sky-200 dark:hover:border-sky-800 transition-colors group";
@@ -1144,8 +1146,9 @@
                             <i data-lucide="download"></i> Load Shift
                         </button>
                     `;
-                    container.appendChild(div);
+                    fragment.appendChild(div);
                 });
+                container.appendChild(fragment);
                 lucide.createIcons();
             });
         }
@@ -1259,6 +1262,8 @@
             db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
                 container.innerHTML = "";
                 if(doc.exists && doc.data().customPresets) {
+                    // ⚡ Bolt: Batch DOM insertions using a DocumentFragment to reduce reflows to a single operation (O(1) instead of O(N))
+                    const fragment = document.createDocumentFragment();
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
@@ -1266,8 +1271,9 @@
                             <span class="font-bold">${escapeHTML(p.name)}</span>
                             <button data-id="${escapeHTML(p.id)}" onclick="applyCustomPreset(this.getAttribute('data-id'))" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
-                        container.appendChild(div);
+                        fragment.appendChild(div);
                     });
+                    container.appendChild(fragment);
                 }
             });
         }
@@ -1298,17 +1304,17 @@
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
             
             let routineHtml = "";
-            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${r.name}</div>`);
+            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${escapeHTML(r.name)}</div>`);
             document.getElementById('printRoutines').innerHTML = routineHtml;
 
             let drawerHtml = "";
-            state.drawers.forEach(d => drawerHtml += `<div>${d.name}: $${d.val} (${d.res})</div>`);
+            state.drawers.forEach(d => drawerHtml += `<div>${escapeHTML(d.name)}: $${escapeHTML(d.val)} (${escapeHTML(d.res)})</div>`);
             document.getElementById('printDrawers').innerHTML = drawerHtml;
 
             document.getElementById('printSafe').innerText = state.safeCount;
 
             let invHtml = "";
-            state.inventory.forEach(i => invHtml += `<div>${i.name}: ${i.bl} BL | ${i.cl} CL | ${i.fr} FR</div>`);
+            state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
             manualSaveHistory();
