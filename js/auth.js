@@ -5,6 +5,43 @@ import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/fi
 
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+  authDomain: "realunstoppable.store",
+  projectId: "dts-hub-website",
+  storageBucket: "dts-hub-website.firebasestorage.app",
+  messagingSenderId: "48345990988",
+  appId: "1:48345990988:web:e3662c9b508168546471e9",
+  measurementId: "G-ZN3YJPHVGX"
+};
+
+// Initialize Firebase and export the instances for other scripts to use
+export const app = initializeApp(firebaseConfig);
+export const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaEnterpriseProvider('PLACEHOLDER_KEY'),
+  isTokenAutoRefreshEnabled: true
+});
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+(async () => {
+    try {
+        await getDoc(doc(db, "health_check", "ping"));
+    } catch(error) {
+        if (error.code === "unavailable" || error.message.includes("offline")) {
+            const banner = document.createElement("div");
+            banner.style.cssText = "position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:9999;padding:10px;";
+            banner.textContent = "Error: Firebase connection is unreachable.";
+            document.body.appendChild(banner);
+        }
+    }
+})();
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
@@ -94,6 +131,7 @@ if (document.getElementById('auth-form')) {
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
             } catch (error) {
+                console.error("Signup Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }
@@ -111,6 +149,7 @@ if (document.getElementById('auth-form')) {
                     submitBtn.disabled = false;
                 }
             } catch (error) {
+                console.error("Signin Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
             }

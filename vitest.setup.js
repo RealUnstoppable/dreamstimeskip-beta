@@ -22,6 +22,11 @@ vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js', () => ({
   initializeApp: vi.fn(),
 }));
 
+vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js', () => ({
+  initializeAppCheck: vi.fn(),
+  ReCaptchaEnterpriseProvider: vi.fn()
+}));
+
 vi.mock('./auth.js', () => ({
   auth: {},
   db: {}
