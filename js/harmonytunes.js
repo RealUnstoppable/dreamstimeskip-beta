@@ -478,6 +478,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
+                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
                     favoriteIds = new Set(favIds);
                     userFavoritesIds = new Set(favIds);
