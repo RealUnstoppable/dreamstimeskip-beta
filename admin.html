@@ -256,7 +256,7 @@
     </div>
 
    <script type="module">
-        import { auth, db } from '/js/auth.js';
+        import { auth, db, safeRedirect } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
@@ -271,10 +271,10 @@
                     document.body.style.display = 'flex';
                     initializeAdminPage(user);
                 } else {
-                    window.location.replace('account.html');
+                    safeRedirect('account.html');
                 }
             } else {
-                window.location.replace('sign in beta.html');
+                safeRedirect('sign in beta.html');
             }
         });
 

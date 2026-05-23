@@ -76,28 +76,30 @@ function renderProducts() {
 
 function renderCart() {
     if (Object.keys(cart).length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        checkoutBtn.disabled = true;
+        if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+        if (checkoutBtn) checkoutBtn.disabled = true;
     } else {
-        cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
-            const product = productMap.get(productId);
-            if (!product) return ''; // Should not happen
-            return `
-                <div class="cart-item">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                    <div class="cart-item-info">
-                        <h4>${product.name}</h4>
-                        <p>$${product.price.toFixed(2)}</p>
+        if (cartItemsContainer) {
+            cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
+                // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
+                const product = productMap.get(productId);
+                if (!product) return ''; // Should not happen
+                return `
+                    <div class="cart-item">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
+                        <div class="cart-item-info">
+                            <h4>${product.name}</h4>
+                            <p>$${product.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
+                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                        </div>
                     </div>
-                    <div class="cart-item-actions">
-                        <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
-                        <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        checkoutBtn.disabled = false;
+                `;
+            }).join('');
+        }
+        if (checkoutBtn) checkoutBtn.disabled = false;
     }
     updateCartSummary();
 }
@@ -105,8 +107,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
@@ -137,19 +139,29 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+let saveCartTimeout = null;
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
-    if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
-        }
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
-        localStorage.setItem('localCart', JSON.stringify(cart));
+
+    // Debounce the Firestore write
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
     }
+
+    saveCartTimeout = setTimeout(async () => {
+        if (currentUser) {
+            try {
+                const userCartRef = doc(db, 'carts', currentUser.uid);
+                await setDoc(userCartRef, { items: cart });
+            } catch (error) {
+                console.error("Error saving cart to Firestore:", error);
+            }
+        } else {
+            // Save cart to localStorage for logged-out users
+            localStorage.setItem('localCart', JSON.stringify(cart));
+        }
+    }, 500); // Wait 500ms before committing to backend
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
@@ -227,13 +239,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Merge local and firestore carts
             const mergedCart = { ...firestoreCart };
+            let hasLocalItems = false;
             for (const [productId, quantity] of Object.entries(localCart)) {
                 mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
+                hasLocalItems = true;
             }
             
             cart = mergedCart;
-            await saveCart(); // Save merged cart to Firestore
-            localStorage.removeItem('localCart'); // Clear local cart after merging
+            // Only trigger backend write if we actually merged local items into it
+            if (hasLocalItems) {
+                await saveCart();
+                localStorage.removeItem('localCart'); // Clear local cart after merging
+            }
         } else {
             // User is signed out, load from localStorage
             cart = localCart;
