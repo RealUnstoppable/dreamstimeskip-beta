@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
@@ -105,8 +105,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
@@ -116,7 +116,7 @@ export async function handleAddToCart(productId) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error);
+        console.error('Failed to add to cart - Manager info:', error.message);
     }
 }
 
@@ -137,19 +137,46 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+let saveCartTimeout = null;
+let pendingResolves = [];
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
+
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
     if (currentUser) {
         try {
             const userCartRef = doc(db, 'carts', currentUser.uid);
             await setDoc(userCartRef, { items: cart });
         } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
+            console.error("Error saving cart to Firestore - Manager info:", error.message);
         }
     } else {
         // **MODIFIED**: Save cart to localStorage for logged-out users
         localStorage.setItem('localCart', JSON.stringify(cart));
     }
+
+    return new Promise((resolve) => {
+        pendingResolves.push(resolve);
+        saveCartTimeout = setTimeout(async () => {
+            if (currentUser) {
+                try {
+                    const userCartRef = doc(db, 'carts', currentUser.uid);
+                    await setDoc(userCartRef, { items: cart });
+                } catch (error) {
+                    console.error("Error saving cart to Firestore:", error);
+                }
+            } else {
+                // **MODIFIED**: Save cart to localStorage for logged-out users
+                localStorage.setItem('localCart', JSON.stringify(cart));
+            }
+            // Resolve all promises that were waiting for this debounce cycle
+            const resolves = pendingResolves;
+            pendingResolves = [];
+            resolves.forEach(r => r());
+        }, 500); // 500ms debounce
+    });
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
