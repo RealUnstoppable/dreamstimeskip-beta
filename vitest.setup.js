@@ -25,6 +25,9 @@ vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js', () => ({
 vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js', () => ({
   initializeAppCheck: vi.fn(),
   ReCaptchaV3Provider: class { constructor(key) { this.key = key; } }
+vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js', () => ({
+  initializeAppCheck: vi.fn(),
+  ReCaptchaEnterpriseProvider: vi.fn()
 }));
 
 vi.mock('./auth.js', () => ({
