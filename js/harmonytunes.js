@@ -250,6 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         songs.forEach((song, index) => {
             const row = document.createElement('tr');
             
@@ -271,8 +273,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 playContext(songs, index);
             });
 
-            songListBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        // ⚡ Bolt: Used DocumentFragment to batch DOM inserts, reducing reflows from O(N) to O(1)
+        songListBody.appendChild(fragment);
     }
 
     // --- PLAYER LOGIC ---
