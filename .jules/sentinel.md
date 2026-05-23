@@ -32,3 +32,8 @@
 **Vulnerability:** The `generateReport` function in `tracker.html` was directly injecting user-provided state data (such as item names, values, and quantities from routines, drawers, and inventory) into the DOM via `innerHTML` string concatenation without sanitization. This allowed for DOM-based XSS if a user's malicious payload was rendered during report generation.
 **Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
+
+## 2024-05-18 - [Fix XSS Bypass in Admin Dashboard Escape Utility]
+**Vulnerability:** The `escapeHTML` function in `admin.html` returned non-string inputs unmodified instead of casting them to strings. This allowed for an XSS bypass if an attacker provided an array of malicious strings, which bypasses the `typeof str !== 'string'` check but still implicitly coerces into an unescaped string when interpolated into `innerHTML`.
+**Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
+**Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.

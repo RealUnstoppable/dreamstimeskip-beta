@@ -1,0 +1,89 @@
+// js/firebase.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app-check.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
+  authDomain: "dts-hub-website.firebaseapp.com",
+  projectId: "dts-hub-website",
+  storageBucket: "dts-hub-website.firebasestorage.app",
+  messagingSenderId: "48345990988",
+  appId: "1:48345990988:web:e3662c9b508168546471e9",
+  measurementId: "G-ZN3YJPHVGX"
+};
+
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+
+// Initialize App Check
+export const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
+  isTokenAutoRefreshEnabled: true
+});
+
+// Initialize Auth
+export const auth = getAuth(app);
+// Explicitly set persistence to cleanly isolate domains/subdomains.
+// Firebase Auth natively uses domain-specific local storage (IndexedDB/BrowserLocalPersistence).
+// Sharing auth state between subdomains cannot be done automatically without centralized login logic
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Auth persistence setup failed:", error);
+});
+
+// Initialize Firestore
+export const db = getFirestore(app);
+
+/**
+ * Verify Connection Health
+ * Attempts to read a restricted document. A 'permission-denied' error
+ * proves backend reachability. Other errors indicate true failure.
+ */
+export async function verifyFirebaseConnection() {
+  try {
+    const healthDoc = doc(db, "_health", "check");
+    await getDoc(healthDoc);
+    return true; // Document read successfully
+  } catch (error) {
+    if (error.code === 'permission-denied') {
+        // Permission denied means we reached the server but security rules blocked it.
+        // This is a SUCCESSFUL backend connection health check.
+        console.log("Firebase connection healthy (backend reached, request blocked by rules).");
+        return true;
+    }
+
+    // Any other error means the connection failed
+    console.error("Firebase connection dead:", error);
+
+    // Display error banner
+    const banner = document.createElement('div');
+    banner.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ef4444;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        z-index: 9999;
+        font-family: sans-serif;
+        font-weight: bold;
+    `;
+    banner.textContent = "Unable to reach Firebase backend services. Some features may not work.";
+
+    // Only append once body exists
+    if(document.body) {
+        document.body.prepend(banner);
+    } else {
+        document.addEventListener('DOMContentLoaded', () => document.body.prepend(banner));
+    }
+
+    return false;
+  }
+}
+
+// Auto-run verification on load
+verifyFirebaseConnection();
