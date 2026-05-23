@@ -2,13 +2,6 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
     const librarySongs = [
@@ -30,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
+    const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
         { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
@@ -39,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    // ⚡ Bolt: Maintain a Set of favorite IDs for O(1) lookups instead of O(N) Array.some() checks
+    let userFavoritesIds = new Set();
     let currentQueue = [];
     let currentSongIndex = 0;
     let isPlaying = false;
@@ -46,7 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
-    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setUserFavorites = (f) => {
+        userFavorites = f;
+        userFavoritesIds = new Set(f.map(s => s.id));
+    };
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
@@ -218,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    const song = librarySongs.find(s => s.id === songId);
+                    // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+                    const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
@@ -297,7 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = userFavorites.some(s => s.id === song.id);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
@@ -416,29 +419,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
-
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
             return;
         }
 
-        const song = librarySongs.find(s => s.id === songId);
-        const isFav = userFavorites.some(s => s.id === songId);
+        // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+        const song = librarySongsMap.get(songId);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
                 userFavorites = userFavorites.filter(s => s.id !== songId);
+                userFavoritesIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
                 userFavorites.push(song);
+                userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
             // Update UI
@@ -467,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    userFavoritesIds = new Set(favIds);
                 }
             } catch (e) { console.error(e); }
             
