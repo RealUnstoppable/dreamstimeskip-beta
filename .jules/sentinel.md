@@ -37,3 +37,7 @@
 **Vulnerability:** The `escapeHTML` utility in `admin.html` was incorrectly returning non-string inputs (like arrays) as-is. If an array containing a malicious payload was passed to it, the array would bypass escaping, and when subsequently interpolated into an HTML string, JavaScript's implicit `.toString()` would render the unescaped payload into the DOM, resulting in XSS.
 **Learning:** `typeof str !== 'string'` is insufficient as an early return in escape utilities because arrays are coerced to strings implicitly during template literal interpolation.
 **Prevention:** Always explicitly coerce variables to strings (e.g., `str.toString()` or `String(str)`) before escaping, and handle null/undefined explicitly.
+## 2024-05-18 - [Fix XSS Bypass in Admin Dashboard Escape Utility]
+**Vulnerability:** The `escapeHTML` function in `admin.html` returned non-string inputs unmodified instead of casting them to strings. This allowed for an XSS bypass if an attacker provided an array of malicious strings, which bypasses the `typeof str !== 'string'` check but still implicitly coerces into an unescaped string when interpolated into `innerHTML`.
+**Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
+**Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.
