@@ -360,7 +360,16 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
         
-        audioPlayer.addEventListener('timeupdate', updateProgress);
+        let isUpdatingProgress = false;
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (!isUpdatingProgress) {
+                requestAnimationFrame(() => {
+                    updateProgress();
+                    isUpdatingProgress = false;
+                });
+                isUpdatingProgress = true;
+            }
+        });
         audioPlayer.addEventListener('ended', () => {
             if (repeatMode === 2) {
                 audioPlayer.currentTime = 0;
@@ -491,9 +500,3 @@ export function createSongCard(song) {
     `;
 }
 
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-}
