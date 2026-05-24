@@ -4,18 +4,18 @@ jest.mock('./auth.js', () => ({
     db: {}
 }));
 
-jest.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
+jest.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js', () => ({
     onAuthStateChanged: jest.fn()
 }));
 
-jest.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () => ({
+jest.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js', () => ({
     doc: jest.fn(),
     getDoc: jest.fn()
 }));
 
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
 describe('theme-loader.js', () => {
     let originalLocalStorage;
@@ -43,7 +43,7 @@ describe('theme-loader.js', () => {
         jest.resetModules();
 
         // Ensure getDoc default is to not exist so it doesn't leak
-        const { getDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        const { getDoc } = require('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
         getDoc.mockResolvedValue({ exists: () => false });
 
         // Capture the auth state callback
@@ -63,7 +63,7 @@ describe('theme-loader.js', () => {
 
         jest.isolateModules(() => {
             // Need to require the mocks inside isolateModules so they are picked up by the isolated module
-            const { onAuthStateChanged } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js');
+            const { onAuthStateChanged } = require('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
             onAuthStateChanged.mockImplementation((_, callback) => {
                 authStateCallback = callback;
             });
@@ -87,7 +87,7 @@ describe('theme-loader.js', () => {
         auth.currentUser = mockUser;
 
         // Ensure we are mocking the method on the correct instance inside isolateModules
-        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
 
         isolatedDoc.mockReturnValue('mockDocRef');
         isolatedGetDoc.mockResolvedValue({ exists: () => false });
@@ -113,7 +113,7 @@ describe('theme-loader.js', () => {
         const mockUser = { uid: 'user123' };
         auth.currentUser = mockUser;
 
-        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
 
         isolatedDoc.mockReturnValue('mockDocRef');
         isolatedGetDoc.mockResolvedValue({
@@ -136,7 +136,7 @@ describe('theme-loader.js', () => {
         const mockUser = { uid: 'user123' };
         auth.currentUser = mockUser;
 
-        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js');
+        const { doc: isolatedDoc, getDoc: isolatedGetDoc } = require('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js');
         isolatedDoc.mockReturnValue('mockDocRef');
         isolatedGetDoc.mockRejectedValue(new Error('Firestore error'));
 

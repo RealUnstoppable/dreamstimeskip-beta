@@ -1,4 +1,4 @@
-/* css/shop.css */
+
 
 :root {
     --bg-color: #0A0A0A;
@@ -9,7 +9,7 @@
     --accent-blue: #2563EB;
 }
 
-/* --- ADDED: Header & Navbar Base Styles --- */
+
 .main-header {
     position: fixed;
     top: 0;
@@ -18,7 +18,7 @@
     background: var(--bg-color);
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
-    /* Ensure header is above the slide-out menu */
+
 }
 
 .navbar {
@@ -30,7 +30,7 @@
     padding: 1.25rem 40px;
 }
 
-/* Base Styles (No changes) */
+
 .shop-main {
     max-width: 1400px;
     margin: 0 auto;
@@ -326,7 +326,7 @@
     padding: 40px 0;
 }
 
-/* --- Mobile Navigation & Hamburger Menu --- */
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -338,7 +338,7 @@
     cursor: pointer;
     padding: 0;
     z-index: 1001;
-    /* Must be above header to be clickable */
+
 }
 
 .hamburger .bar {
@@ -351,45 +351,45 @@
     transform-origin: 1px;
 }
 
-/* Using 992px as a breakpoint for this nav bar */
+
 @media (max-width: 992px) {
 
-    /* **MODIFIED**: Styles for the full-screen mobile menu */
+
     .nav-links {
         position: fixed;
         top: 0;
         left: -100%;
-        /* MODIFIED: Start off-screen to the left */
+
         width: 100%;
         height: 100vh;
         background-color: var(--bg-color);
-        /* MODIFIED: Darker background */
+
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 2rem;
         transition: left 0.3s ease-in-out;
-        /* MODIFIED: Animate 'left' property */
+
         z-index: -1;
-        /* MODIFIED: Sit underneath the main header */
+
     }
 
     .nav-links.active {
         left: 0;
-        /* MODIFIED: Slide in from the left */
+
     }
 
-    /* Hide the Sign In button that's outside the list */
+
     #nav-cta-container {
         display: none;
     }
 
-    /* Show the hamburger menu icon */
+
     .hamburger {
         display: flex;
     }
 
-    /* Animate hamburger to an 'X' shape when active */
+
     .hamburger.active .bar:nth-child(1) {
         transform: rotate(45deg);
     }
