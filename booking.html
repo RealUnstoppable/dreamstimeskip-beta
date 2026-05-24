@@ -66,6 +66,8 @@
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
+
 
     <div class="booking-card">
         <a href="index.html" style="color: var(--accent); text-decoration: none; font-size: 0.95rem; font-weight: 600;">&larr; Back to Home</a>
@@ -299,6 +301,15 @@
                 msg.textContent = "Error submitting quote.";
             }
         });
+    </script>
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>

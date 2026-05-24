@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
@@ -92,7 +93,8 @@
 
         /* Hidden Content Styles */
         .full-details {
-            display: none; /* Hidden by default */
+            display: none;
+            /* Hidden by default */
             margin-top: 30px;
             padding-top: 30px;
             border-top: 1px solid var(--border-color);
@@ -104,8 +106,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Content Formatting */
@@ -116,13 +125,15 @@
             margin-bottom: 15px;
         }
 
-        .full-details p, .full-details li {
+        .full-details p,
+        .full-details li {
             color: #d1d5db;
             line-height: 1.7;
             margin-bottom: 15px;
         }
 
-        .full-details ul, .full-details ol {
+        .full-details ul,
+        .full-details ol {
             margin-left: 20px;
             margin-bottom: 20px;
         }
@@ -154,18 +165,19 @@
             border-collapse: collapse;
             margin: 20px 0;
         }
-        
-        .data-table th, .data-table td {
+
+        .data-table th,
+        .data-table td {
             border: 1px solid var(--border-color);
             padding: 12px;
             text-align: left;
         }
 
         .data-table th {
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255, 255, 255, 0.05);
             color: var(--accent-blue);
         }
-        
+
         .btn-download-large {
             background-color: var(--accent-green);
             color: white;
@@ -181,16 +193,17 @@
             border: none;
             cursor: pointer;
         }
+
         .btn-download-large:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
         }
-
     </style>
 </head>
+
 <body>
     <header class="main-header">
- 
+
     </header>
     <main class="update-main">
         <h1 class="page-title">What's New in Dreams TimeSkip</h1>
@@ -200,22 +213,33 @@
             <div class="section-content">
                 <h2 class="section-title">The Legends of Time: Rise of the Exiles</h2>
                 <p class="section-summary">
-                    Welcome to Season 1. Centuries have passed since the Exiles forged the NeoCube. Now, three kingdoms—Wealth, Power, and Wisdom—defy the oppressive rule of an enigmatic figure. Will you rise as a conqueror?
+                    Welcome to Season 1. Centuries have passed since the Exiles forged the NeoCube. Now, three
+                    kingdoms—Wealth, Power, and Wisdom—defy the oppressive rule of an enigmatic figure. Will you rise as
+                    a conqueror?
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('lore-details')">Read More</button>
-                
+
                 <div id="lore-details" class="full-details">
                     <p><strong>Introduction:</strong></p>
-                    <p>Centuries have passed since the first exiles set foot in the mysterious lands of time. They, the pioneers who forged the NeoCube, a sacred artifact capable of bending reality itself, unknowingly unleashed a force that would shape the fate of kingdoms.</p>
-                    <p>With its discovery, an enigmatic figure emerged, wielding the NeoCube's power to control these lands and dictate the rise and fall of mighty realms. Yet, amidst this dominion, a glimmer of resistance remains. Three kingdoms, resolute in their defiance, defy the oppressive rule.</p>
+                    <p>Centuries have passed since the first exiles set foot in the mysterious lands of time. They, the
+                        pioneers who forged the NeoCube, a sacred artifact capable of bending reality itself,
+                        unknowingly unleashed a force that would shape the fate of kingdoms.</p>
+                    <p>With its discovery, an enigmatic figure emerged, wielding the NeoCube's power to control these
+                        lands and dictate the rise and fall of mighty realms. Yet, amidst this dominion, a glimmer of
+                        resistance remains. Three kingdoms, resolute in their defiance, defy the oppressive rule.</p>
                     <ul>
                         <li><strong>The Kingdom of Wealth:</strong> Where opulence and fortune thrive.</li>
                         <li><strong>The Kingdom of Power:</strong> A bastion of strength and unyielding might.</li>
-                        <li><strong>The Kingdom of Wisdom:</strong> Where knowledge and intellect illuminate the path ahead.</li>
+                        <li><strong>The Kingdom of Wisdom:</strong> Where knowledge and intellect illuminate the path
+                            ahead.</li>
                     </ul>
-                    <p>But their dominion is fragile, their thrones vacant, their rulers lost to the annals of history. Now, the remnants of noble bloodlines have splintered, each vying to forge their own kingdoms, their own legacies.</p>
-                    <p>As chaos consumes the realm, the lone Minister, unwavering in loyalty to the fallen King, watches from the Throne Room. Yet, a shadow looms from the underworld—an Overlord ascends.</p>
-                    <p>It falls to you, brave Exile, to gather your loyal subjects and claim your birthright as the Supreme King of the Land. Will you rise as a conqueror or succumb to the tempest?</p>
+                    <p>But their dominion is fragile, their thrones vacant, their rulers lost to the annals of history.
+                        Now, the remnants of noble bloodlines have splintered, each vying to forge their own kingdoms,
+                        their own legacies.</p>
+                    <p>As chaos consumes the realm, the lone Minister, unwavering in loyalty to the fallen King, watches
+                        from the Throne Room. Yet, a shadow looms from the underworld—an Overlord ascends.</p>
+                    <p>It falls to you, brave Exile, to gather your loyal subjects and claim your birthright as the
+                        Supreme King of the Land. Will you rise as a conqueror or succumb to the tempest?</p>
                 </div>
             </div>
         </section>
@@ -224,10 +248,11 @@
             <div class="section-content">
                 <h2 class="section-title">Patch Notes & Known Bugs</h2>
                 <p class="section-summary">
-                    We've squashed major bugs including the "missing legs" glitch and "deadly laser sun," though some issues with moon size and entity textures persist.
+                    We've squashed major bugs including the "missing legs" glitch and "deadly laser sun," though some
+                    issues with moon size and entity textures persist.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('bugs-details')">Read More</button>
-                
+
                 <div id="bugs-details" class="full-details">
                     <h3>Resolved Issues</h3>
                     <ul>
@@ -259,16 +284,19 @@
             <div class="section-content">
                 <h2 class="section-title">New Gear: Gilded Items</h2>
                 <p class="section-summary">
-                    A new tier of equipment has arrived. Craft Gilded Netherite for superior durability and protection. Includes the all-new Mace weapon class!
+                    A new tier of equipment has arrived. Craft Gilded Netherite for superior durability and protection.
+                    Includes the all-new Mace weapon class!
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('gilded-details')">Read More</button>
-                
+
                 <div id="gilded-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/2563EB?text=Gilded+Armor+Preview" alt="Gilded Armor Preview" class="update-image" loading="lazy">
-                    
+                    <img src="https://placehold.co/800x400/141414/2563EB?text=Gilded+Armor+Preview"
+                        alt="Gilded Armor Preview" class="update-image" loading="lazy">
+
                     <h3>How to Craft</h3>
                     <ol>
-                        <li><strong>Smelt:</strong> Burn Gilded Blackstone in a furnace or blast furnace to get Melted Gilded Blackstone.</li>
+                        <li><strong>Smelt:</strong> Burn Gilded Blackstone in a furnace or blast furnace to get Melted
+                            Gilded Blackstone.</li>
                         <li><strong>Combine:</strong> Craft Gilded Netherite Ingots.</li>
                         <li><strong>Apply:</strong> Combine directly with Netherite equipment in a crafting table.</li>
                     </ol>
@@ -276,15 +304,36 @@
 
                     <h3>Armor Stats</h3>
                     <table class="data-table">
-                        <tr><th>Item</th><th>Protection</th><th>Durability</th></tr>
-                        <tr><td>Gilded Helmet</td><td>3 Bars</td><td>543 (vs 407)</td></tr>
-                        <tr><td>Gilded Chestplate</td><td>8 Bars</td><td>789 (vs 592)</td></tr>
-                        <tr><td>Gilded Leggings</td><td>6 Bars</td><td>740 (vs 555)</td></tr>
-                        <tr><td>Gilded Boots</td><td>3 Bars</td><td>641 (vs 481)</td></tr>
+                        <tr>
+                            <th>Item</th>
+                            <th>Protection</th>
+                            <th>Durability</th>
+                        </tr>
+                        <tr>
+                            <td>Gilded Helmet</td>
+                            <td>3 Bars</td>
+                            <td>543 (vs 407)</td>
+                        </tr>
+                        <tr>
+                            <td>Gilded Chestplate</td>
+                            <td>8 Bars</td>
+                            <td>789 (vs 592)</td>
+                        </tr>
+                        <tr>
+                            <td>Gilded Leggings</td>
+                            <td>6 Bars</td>
+                            <td>740 (vs 555)</td>
+                        </tr>
+                        <tr>
+                            <td>Gilded Boots</td>
+                            <td>3 Bars</td>
+                            <td>641 (vs 481)</td>
+                        </tr>
                     </table>
 
                     <h3>New Weapon: The Mace</h3>
-                    <p>Breaks cobwebs and bamboo instantly. Features a "Bash" attack (Right Click/Hold) that deals heavy durability damage to opponent armor.</p>
+                    <p>Breaks cobwebs and bamboo instantly. Features a "Bash" attack (Right Click/Hold) that deals heavy
+                        durability damage to opponent armor.</p>
                     <ul>
                         <li><strong>Gilded Mace:</strong> 50 durability damage per bash.</li>
                         <li><strong>Netherite Mace:</strong> 42 durability damage per bash.</li>
@@ -298,16 +347,19 @@
             <div class="section-content">
                 <h2 class="section-title">World Update: Biomania</h2>
                 <p class="section-summary">
-                    Explore the landscape with brand new biomes including the Cherry Blossom Grove and Shattered Taiga. New trees, plants, and blocks await.
+                    Explore the landscape with brand new biomes including the Cherry Blossom Grove and Shattered Taiga.
+                    New trees, plants, and blocks await.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('biomes-details')">Read More</button>
-                
+
                 <div id="biomes-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/16A34A?text=Cherry+Blossom+Grove" alt="Cherry Blossom Grove" class="update-image" loading="lazy">
-                    
+                    <img src="https://placehold.co/800x400/141414/16A34A?text=Cherry+Blossom+Grove"
+                        alt="Cherry Blossom Grove" class="update-image" loading="lazy">
+
                     <h3>New Biomes</h3>
                     <ul>
-                        <li><strong>Cherry Blossom Grove:</strong> Full of pink petals, Cherry trees, and atmosphere fog.</li>
+                        <li><strong>Cherry Blossom Grove:</strong> Full of pink petals, Cherry trees, and atmosphere
+                            fog.</li>
                         <li><strong>Shattered Taiga:</strong> A chaotic, rugged landscape with massive cliffs.</li>
                         <li><strong>Dunes:</strong> Vast sandy expanses with new "Dune Grass" vegetation.</li>
                         <li><strong>Rainforest:</strong> Dense, lush, and dark forests.</li>
@@ -315,7 +367,8 @@
                     </ul>
 
                     <h3>New Blocks & Particles</h3>
-                    <p>Added Cherry Sapling, Cherry Stairs, Dune Grass, Fluffy Cattail, and Sand Dust Particles for atmosphere.</p>
+                    <p>Added Cherry Sapling, Cherry Stairs, Dune Grass, Fluffy Cattail, and Sand Dust Particles for
+                        atmosphere.</p>
                 </div>
             </div>
         </section>
@@ -324,15 +377,18 @@
             <div class="section-content">
                 <h2 class="section-title">Magic System</h2>
                 <p class="section-summary">
-                    We've added 30 new wands and 10 magic classes. Master the elements, but choose wisely—you can only hold 2 magic classes at a time.
+                    We've added 30 new wands and 10 magic classes. Master the elements, but choose wisely—you can only
+                    hold 2 magic classes at a time.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('magic-details')">Read More</button>
-                
+
                 <div id="magic-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/9333EA?text=Magic+Wands" alt="Magic Wands" class="update-image" loading="lazy">
-                    
-                    <p>There is a leveling system to unlock new magic to prevent players from becoming too OP immediately. You will need to craft the <strong>Magic Book</strong> to get started.</p>
-                    
+                    <img src="https://placehold.co/800x400/141414/9333EA?text=Magic+Wands" alt="Magic Wands"
+                        class="update-image" loading="lazy">
+
+                    <p>There is a leveling system to unlock new magic to prevent players from becoming too OP
+                        immediately. You will need to craft the <strong>Magic Book</strong> to get started.</p>
+
                     <h3>Magic Classes</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr;">
                         <ul>
@@ -358,20 +414,24 @@
             <div class="section-content">
                 <h2 class="section-title">Furniture & Decor Mod</h2>
                 <p class="section-summary">
-                    Decorate your home with fully 3D modeled furniture. Includes functional chairs, tables, storage barrels, and more.
+                    Decorate your home with fully 3D modeled furniture. Includes functional chairs, tables, storage
+                    barrels, and more.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('decor-details')">Read More</button>
-                
+
                 <div id="decor-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/FBBF24?text=Furniture+Showcase" alt="Furniture Showcase" class="update-image" loading="lazy">
-                    
-                    <p>This addon adds many new blocks with all types of wood compatibility. Admin command to generate a showcase house: <span class="code-block">/function medieval_blocks</span></p>
-                    
+                    <img src="https://placehold.co/800x400/141414/FBBF24?text=Furniture+Showcase"
+                        alt="Furniture Showcase" class="update-image" loading="lazy">
+
+                    <p>This addon adds many new blocks with all types of wood compatibility. Admin command to generate a
+                        showcase house: <span class="code-block">/function medieval_blocks</span></p>
+
                     <h3>New Items</h3>
                     <ul>
                         <li><strong>Decorative Sticks & Beams:</strong> For adding detail to walls and roofs.</li>
                         <li><strong>Bookshelves:</strong> 16 variants with different book patterns.</li>
-                        <li><strong>Storage:</strong> Crates, Barrels, and Baskets (display items like apples, fish, etc.).</li>
+                        <li><strong>Storage:</strong> Crates, Barrels, and Baskets (display items like apples, fish,
+                            etc.).</li>
                         <li><strong>Furniture:</strong> Tables, Stools, Cupboards, Desks.</li>
                         <li><strong>Chairs:</strong> Fully functional! Sit down and relax.</li>
                     </ul>
@@ -383,14 +443,16 @@
             <div class="section-content">
                 <h2 class="section-title">New Foods & Farming</h2>
                 <p class="section-summary">
-                    A massive culinary update with 70+ new foods, 40+ new crops, and new kitchen machinery like blenders and ovens.
+                    A massive culinary update with 70+ new foods, 40+ new crops, and new kitchen machinery like blenders
+                    and ovens.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('food-details')">Read More</button>
-                
+
                 <div id="food-details" class="full-details">
                     <h3>Crops & Trees</h3>
-                    <p>Trade with the <strong>Wandering Farmer</strong> to get seeds. Grow Maple (syrup!), Cherry, Palm (coconuts), Cinnamon, Orange, Lemon, Mango, and Peach trees.</p>
-                    
+                    <p>Trade with the <strong>Wandering Farmer</strong> to get seeds. Grow Maple (syrup!), Cherry, Palm
+                        (coconuts), Cinnamon, Orange, Lemon, Mango, and Peach trees.</p>
+
                     <h3>New Machinery</h3>
                     <ul>
                         <li><strong>Ovens:</strong> Cook food using cooking oil instead of coal.</li>
@@ -398,9 +460,10 @@
                         <li><strong>Presser:</strong> Make juice without fuel.</li>
                         <li><strong>Brewer & Blender:</strong> Create sodas and smoothies.</li>
                     </ul>
-                    
+
                     <h3>New Dishes</h3>
-                    <p>Craft Kabobs (roast on campfire), Pies, Cakes, and various fruit dishes. Find the <strong>Aimless Baker</strong> roaming the world to buy supplies!</p>
+                    <p>Craft Kabobs (roast on campfire), Pies, Cakes, and various fruit dishes. Find the <strong>Aimless
+                            Baker</strong> roaming the world to buy supplies!</p>
                 </div>
             </div>
         </section>
@@ -409,19 +472,38 @@
             <div class="section-content">
                 <h2 class="section-title">Economy & Tax System</h2>
                 <p class="section-summary">
-                    We have revised the currency system and introduced a progressive tax bracket for shop owners based on monthly income.
+                    We have revised the currency system and introduced a progressive tax bracket for shop owners based
+                    on monthly income.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('eco-details')">Read More</button>
-                
+
                 <div id="eco-details" class="full-details">
                     <h3>Currency Exchange Rates</h3>
                     <table class="data-table">
-                        <tr><td>1 Iron Ingot</td><td>0.2 Gold</td></tr>
-                        <tr><td>1 Gold Nugget</td><td>2 Gold</td></tr>
-                        <tr><td>1 Gold Bar</td><td>20 Gold</td></tr>
-                        <tr><td>1 Diamond</td><td>50 Gold</td></tr>
-                        <tr><td>1 Netherite Ingot</td><td>100 Gold</td></tr>
-                        <tr><td>1 Netherite Block</td><td>1000 Gold</td></tr>
+                        <tr>
+                            <td>1 Iron Ingot</td>
+                            <td>0.2 Gold</td>
+                        </tr>
+                        <tr>
+                            <td>1 Gold Nugget</td>
+                            <td>2 Gold</td>
+                        </tr>
+                        <tr>
+                            <td>1 Gold Bar</td>
+                            <td>20 Gold</td>
+                        </tr>
+                        <tr>
+                            <td>1 Diamond</td>
+                            <td>50 Gold</td>
+                        </tr>
+                        <tr>
+                            <td>1 Netherite Ingot</td>
+                            <td>100 Gold</td>
+                        </tr>
+                        <tr>
+                            <td>1 Netherite Block</td>
+                            <td>1000 Gold</td>
+                        </tr>
                     </table>
 
                     <h3>New Tax Brackets (Monthly)</h3>
@@ -439,10 +521,11 @@
             <div class="section-content">
                 <h2 class="section-title">Membership Plans</h2>
                 <p class="section-summary">
-                    Support the realm with the "Poor Man's Plan" or upgrade to "Enhanced" for monthly shulker box gifts and special armor.
+                    Support the realm with the "Poor Man's Plan" or upgrade to "Enhanced" for monthly shulker box gifts
+                    and special armor.
                 </p>
                 <button class="read-more-btn" onclick="toggleSection('member-details')">Read More</button>
-                
+
                 <div id="member-details" class="full-details">
                     <h3>Poor Man's Plan (1 Diamond/Month)</h3>
                     <ul>
@@ -469,13 +552,19 @@
                 Want to read this offline? Download the full original document below.
             </p>
             <a href="DreamsTimeSkipRealmInfoSheet.docx" class="btn-download-large" download>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
                 Download Official Info Sheet
             </a>
         </div>
 
         <div class="center-content" style="text-align: center; margin-bottom: 60px;">
-            <a href="dreamstimeskip.html" class="cta-button" style="background-color: transparent; border: 1px solid var(--text-secondary);">Back to Launch Page</a>
+            <a href="dreamstimeskip.html" class="cta-button"
+                style="background-color: transparent; border: 1px solid var(--text-secondary);">Back to Launch Page</a>
         </div>
 
     </main>
@@ -492,7 +581,7 @@
         function toggleSection(id) {
             const element = document.getElementById(id);
             const btn = element.parentElement.querySelector('.read-more-btn');
-            
+
             if (element.classList.contains('open')) {
                 element.classList.remove('open');
                 btn.textContent = "Read More";
@@ -502,48 +591,54 @@
             }
         }
     </script>
-    
-    <script type="module">
-      import { auth, db } from '/js/auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-      import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-      
-      const authLink = document.getElementById('auth-link');
-      
-      // Auth state listener
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-            authLink.href = 'account.html';
-            authLink.textContent = "My Account";
-        } else {
-            authLink.href = 'sign in beta.html';
-            authLink.textContent = "Sign In / Sign Up";
-        }
-      });
 
-      // Download Tracker Logic
-      const downloadBtn = document.querySelector('.btn-download-large');
-      if (downloadBtn) {
-          downloadBtn.addEventListener('click', async () => {
-              const statsRef = doc(db, "site_stats", "downloads");
-              try {
-                  await updateDoc(statsRef, {
-                      infoSheet: increment(1)
-                  });
-                  console.log("Download counted.");
-              } catch (e) {
-                  // If the document doesn't exist yet, create it
-                  await setDoc(statsRef, { infoSheet: 1 }, { merge: true });
-                  console.log("Download counter initialized.");
-              }
-          });
-      }
+    <script type="module">
+        import { auth, db } from '/js/auth.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        const authLink = document.getElementById('auth-link');
+
+        // Auth state listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authLink.href = 'account.html';
+                authLink.textContent = "My Account";
+            } else {
+                authLink.href = 'sign in beta.html';
+                authLink.textContent = "Sign In / Sign Up";
+            }
+        });
+
+        // Download Tracker Logic
+        const downloadBtn = document.querySelector('.btn-download-large');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                const statsRef = doc(db, "site_stats", "downloads");
+                try {
+                    await updateDoc(statsRef, {
+                        infoSheet: increment(1)
+                    });
+                    console.log("Download counted.");
+                } catch (e) {
+                    // If the document doesn't exist yet, create it
+                    await setDoc(statsRef, { infoSheet: 1 }, { merge: true });
+                    console.log("Download counter initialized.");
+                }
+            });
+        }
     </script>
-     <script src="/js/script.js"></script>
-     <script type="module">
-    import { loadNavbar } from './js/navbar.js';
-    document.addEventListener('DOMContentLoaded', loadNavbar);
-</script>
-   
+    <script src="/js/script.js"></script>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+
+
 </body>
+
 </html>

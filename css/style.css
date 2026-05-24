@@ -130,6 +130,25 @@ body {
 
 .hamburger {
     display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 2rem;
+    height: 2rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+}
+
+.hamburger .bar {
+    width: 2rem;
+    height: 0.25rem;
+    background-color: var(--text-primary);
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    transform-origin: 1px;
 }
 
 
@@ -542,7 +561,7 @@ p.section-subtitle {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .navbar {
         padding: 0 20px;
     }
@@ -550,15 +569,16 @@ p.section-subtitle {
     .nav-links {
         position: fixed;
         left: -100%;
-        top: 64px;
+        top: 0;
         flex-direction: column;
-        background-color: #000;
+        background-color: var(--bg-color);
         width: 100%;
-        height: calc(100vh - 64px);
-        text-align: center;
-        transition: 0.3s;
-        gap: 0;
-        padding-top: 20px;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+        transition: left 0.3s ease-in-out;
+        gap: 2rem;
+        z-index: -1;
     }
 
     .nav-links.active {
@@ -566,11 +586,11 @@ p.section-subtitle {
     }
 
     .nav-links li {
-        padding: 20px 0;
+        padding: 0;
     }
 
     .nav-links a {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
     }
 
     .nav-cta {
@@ -578,31 +598,20 @@ p.section-subtitle {
     }
 
     .hamburger {
-        display: block;
-        cursor: pointer;
-        background: none;
-        border: none;
+        display: flex;
     }
 
-    .hamburger .bar {
-        display: block;
-        width: 25px;
-        height: 2px;
-        margin: 5px auto;
-        background-color: var(--text-primary);
-        transition: all 0.3s ease-in-out;
+    .hamburger.active .bar:nth-child(1) {
+        transform: rotate(45deg);
     }
 
     .hamburger.active .bar:nth-child(2) {
         opacity: 0;
-    }
-
-    .hamburger.active .bar:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
+        transform: translateX(20px);
     }
 
     .hamburger.active .bar:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
+        transform: rotate(-45deg);
     }
 
     .bento-section {

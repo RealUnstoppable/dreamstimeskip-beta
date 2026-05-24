@@ -1,6 +1,7 @@
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
@@ -251,6 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
         const fragment = document.createDocumentFragment();
 
         songs.forEach((song, index) => {
@@ -277,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
             fragment.appendChild(row);
         });
 
-        // ⚡ Bolt: Used DocumentFragment to batch DOM inserts, reducing reflows from O(N) to O(1)
         songListBody.appendChild(fragment);
     }
 
@@ -425,6 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
+
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
@@ -502,11 +505,4 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
-}
-
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }

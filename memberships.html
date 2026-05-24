@@ -342,7 +342,7 @@
                     <li>Exclusive profile badge</li>
                     <li>Early access to new merch drops</li>
                 </ul>
-                <a href="#" class="view-more-link" data-plan="premium">view more</a>
+                <a href="javascript:void(0)" class="view-more-link" data-plan="premium">view more</a>
                 <a href="checkout-premium.html" class="btn-subscribe btn-premium" data-plan="premium">Choose Premium</a>
             </div>
 
@@ -356,7 +356,7 @@
                     <li>Custom theme creator</li>
                     <li>"Supporter" status & badge</li>
                 </ul>
-                <a href="#" class="view-more-link" data-plan="ultimate">view more</a>
+                <a href="javascript:void(0)" class="view-more-link" data-plan="ultimate">view more</a>
                 <a href="checkout-ultimate.html" class="btn-subscribe btn-ultimate" data-plan="ultimate">Go Ultimate</a>
             </div>
         </section>
@@ -376,10 +376,8 @@
         import { loadNavbar } from './js/navbar.js';
         import { loadFooter } from './js/footer.js'; // Add this line
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadNavbar();
-            loadFooter(); // Add this line
-        });
+        loadNavbar();
+        loadFooter();
     </script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
