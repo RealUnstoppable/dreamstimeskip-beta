@@ -33,6 +33,10 @@
 **Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
 
+## 2024-05-20 - [Fix DOM-based XSS in HarmonyTunes Song Table]
+**Vulnerability:** The `renderSongTable` function in `js/harmonytunes.js` directly injected user-provided or external data (`song.title`, `song.artist`) into the DOM using `innerHTML` without sanitization. This allowed for DOM-based XSS.
+**Learning:** Even when reading from a seemingly safe internal array or object, any data that originates from user input or external sources must be sanitized before insertion via `innerHTML`.
+**Prevention:** Always apply an `escapeHTML` utility to untrusted data before concatenating it into `innerHTML` strings.
 ## 2024-05-18 - [Fix DOM-based XSS Bypass in Admin Dashboard escapeHTML]
 **Vulnerability:** The `escapeHTML` utility in `admin.html` was incorrectly returning non-string inputs (like arrays) as-is. If an array containing a malicious payload was passed to it, the array would bypass escaping, and when subsequently interpolated into an HTML string, JavaScript's implicit `.toString()` would render the unescaped payload into the DOM, resulting in XSS.
 **Learning:** `typeof str !== 'string'` is insufficient as an early return in escape utilities because arrays are coerced to strings implicitly during template literal interpolation.
