@@ -94,6 +94,7 @@ if (document.getElementById('auth-form')) {
         messageEl.textContent = '';
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
+        const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = 'Processing...';
 
         if (isSignUp) {
