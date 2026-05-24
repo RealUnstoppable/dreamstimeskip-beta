@@ -5,3 +5,7 @@
 ## 2026-05-03 - Audio Player Accessibility
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
+
+## 2024-05-24 - Async UI Feedback and ARIA Alerts
+**Learning:** The authentication form lacked visual textual feedback during submission and screen readers weren't alerted to error messages.
+**Action:** Always add textual loading state updates (e.g. "Processing...") during async operations, and apply `role="alert"` to dynamic error message containers so screen readers announce them immediately.
