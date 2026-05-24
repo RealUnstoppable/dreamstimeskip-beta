@@ -27,6 +27,9 @@ jest.unstable_mockModule('./shop.js', () => ({
     products: [
         { id: 'prod1', name: 'Product 1', price: 10 }
     ],
+    productMap: new Map([
+        ['prod1', { id: 'prod1', name: 'Product 1', price: 10 }]
+    ]),
 }));
 
 describe('handlePlaceOrder', () => {

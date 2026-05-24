@@ -118,8 +118,9 @@
         }
     </style>
 </head>
-<body style="display: none;">
-    <div class="account-layout">
+<body>
+    <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--text-primary);">Loading Profile...</div>
+    <div class="account-layout" style="display: none;" id="account-layout">
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
             <div class="sidebar-header">
@@ -232,6 +233,8 @@
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { auth, db, safeRedirect } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { productMap } from '/js/shop.js';
@@ -255,6 +258,7 @@
                     let userDoc = await getDoc(userDocRef);
 
                     if (!userDoc.exists()) {
+                        const defaultData = {
                         // Missing document fallback
                         console.log("Missing user document. Creating fallback document...");
                         const newUserData = {
@@ -263,6 +267,12 @@
                             signupDate: serverTimestamp(),
                             isBanned: false,
                             isAdmin: false,
+                            membershipLevel: 'free',
+                            theme: 'dark',
+                            accentColor: 'blue'
+                        };
+                        await setDoc(userDocRef, defaultData);
+                        userDoc = await getDoc(userDocRef);
                             membershipLevel: 'free'
                         };
                         await setDoc(userDocRef, newUserData);
@@ -293,6 +303,8 @@
 
                     if (!listenersSetup) {
                         setupEventListeners(user);
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        document.getElementById('account-layout').style.display = 'flex';
                         listenersSetup = true;
                     }
                     document.body.style.display = 'flex';
@@ -300,6 +312,9 @@
                     console.error("Error loading profile:", error);
                 }
             } else {
+                if (!window.location.pathname.endsWith('sign in beta.html')) {
+                    window.location.replace('sign in beta.html');
+                }
                 safeRedirect('sign in beta.html');
             }
         });
