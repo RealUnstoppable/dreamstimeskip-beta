@@ -150,9 +150,9 @@
 
             <section id="orders" class="content-section">
                 <h3>Order History</h3>
-                <div class="card">
+                <div class="card" id="order-history-list">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <p style="color: var(--text-secondary);">Loading your orders...</p>
                 </div>
             </section>
 
@@ -229,7 +229,8 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { productMap } from '/js/shop.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -273,6 +274,82 @@
             const currentAccent = userData.accentColor || 'blue';
             const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
             if (accentRadio) accentRadio.checked = true;
+
+            loadUserOrders(user.uid);
+        }
+
+        async function loadUserOrders(uid) {
+            const orderListContainer = document.getElementById('order-history-list');
+            try {
+                const ordersRef = collection(db, "orders");
+                const q = query(ordersRef, where("userId", "==", uid), orderBy("orderDate", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    orderListContainer.innerHTML = `
+                        <h4>Recent Purchases</h4>
+                        <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    `;
+                    return;
+                }
+
+                let html = '<h4>Recent Purchases</h4>';
+                querySnapshot.forEach((docSnap) => {
+                    const order = docSnap.data();
+                    const orderId = docSnap.id;
+                    const date = order.orderDate ? order.orderDate.toDate().toLocaleDateString() : 'Unknown Date';
+
+                    let subtotal = 0;
+                    let itemsHtml = '';
+
+                    if (order.items) {
+                        for (const [productId, quantity] of Object.entries(order.items)) {
+                            const product = productMap.get(productId);
+                            if (product) {
+                                subtotal += product.price * quantity;
+                                itemsHtml += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                                    <span>${quantity}x ${product.name}</span>
+                                    <span>$${(product.price * quantity).toFixed(2)}</span>
+                                </div>`;
+                            } else {
+                                itemsHtml += `<div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem;">
+                                    <span>${quantity}x Unknown Item (${productId})</span>
+                                </div>`;
+                            }
+                        }
+                    }
+
+                    const tax = subtotal * 0.07;
+                    const total = subtotal + tax;
+
+                    html += `
+                        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.2);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                <strong>Order: ${orderId.split('_')[1] || orderId}</strong>
+                                <span style="color: var(--text-secondary);">${date}</span>
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                ${itemsHtml}
+                            </div>
+                            <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 10px; font-weight: bold;">
+                                <span>Total (incl. tax)</span>
+                                <span>$${total.toFixed(2)}</span>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 0.85rem;">
+                                Status: <span style="color: var(--accent-blue);">${order.status || 'Processing'}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                orderListContainer.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                orderListContainer.innerHTML = `
+                    <h4>Recent Purchases</h4>
+                    <p style="color: var(--accent-red);">Failed to load orders. Please try again later.</p>
+                `;
+            }
         }
 
         function setupEventListeners(user) {
