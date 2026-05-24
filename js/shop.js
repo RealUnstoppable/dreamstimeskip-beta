@@ -220,6 +220,7 @@ async function saveCart() {
 
 // --- AUTHENTICATION & UI UPDATES ---
 function updateUserNav(user) {
+    if (!navCtaContainer) return;
     if (user) {
         navCtaContainer.innerHTML = `<a href="account.html" class="cta-button nav-cta">My Account</a>`;
     } else {
@@ -242,33 +243,39 @@ function setupEventListeners() {
     });
 
     // Cart modal listeners
-    cartButton.addEventListener('click', () => cartModal.style.display = 'block');
-    closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
-    window.addEventListener('click', (e) => {
-        if (e.target === cartModal) {
-            cartModal.style.display = 'none';
-        }
-    });
+    if (cartButton && cartModal && closeCartBtn) {
+        cartButton.addEventListener('click', () => cartModal.style.display = 'block');
+        closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.style.display = 'none';
+            }
+        });
+    }
 
     // Cart item action listeners
-    cartItemsContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-item-btn')) {
-            const productId = e.target.dataset.id;
-            handleRemoveFromCart(productId);
-        }
-    });
-    cartItemsContainer.addEventListener('change', (e) => {
-        if (e.target.classList.contains('item-quantity-input')) {
-            const productId = e.target.dataset.id;
-            const quantity = parseInt(e.target.value, 10);
-            handleUpdateQuantity(productId, quantity);
-        }
-    });
+    if (cartItemsContainer) {
+        cartItemsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-item-btn')) {
+                const productId = e.target.dataset.id;
+                handleRemoveFromCart(productId);
+            }
+        });
+        cartItemsContainer.addEventListener('change', (e) => {
+            if (e.target.classList.contains('item-quantity-input')) {
+                const productId = e.target.dataset.id;
+                const quantity = parseInt(e.target.value, 10);
+                handleUpdateQuantity(productId, quantity);
+            }
+        });
+    }
     
-    checkoutBtn.addEventListener('click', () => {
-        // Updated to point to the new checkout.html page
-        window.location.href = 'checkout.html';
-    });
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            // Updated to point to the new checkout.html page
+            window.location.href = 'checkout.html';
+        });
+    }
 }
 
 
