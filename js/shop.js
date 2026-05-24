@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
@@ -41,6 +41,7 @@ export const productMap = new Map(products.map(p => [p.id, p]));
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
+export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
 
 // --- DOM ELEMENTS ---
@@ -57,46 +58,57 @@ const navCtaContainer = document.getElementById('nav-cta-container');
 
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-footer">
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+    productGrid.innerHTML = products.map(product => {
+        const isWishlisted = wishlist.has(product.id);
+        const heartIcon = isWishlisted ? '❤️' : '🤍';
+        const activeClass = isWishlisted ? 'active' : '';
+
+        return `
+            <div class="product-card">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
+                    ${heartIcon}
+                </button>
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <div class="product-footer">
+                        <span class="product-price">${product.price.toFixed(2)}</span>
+                        <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderCart() {
     if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        checkoutBtn.disabled = true;
+        if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+        if (checkoutBtn) checkoutBtn.disabled = true;
     } else {
-        cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
-            const product = productMap.get(productId);
-            if (!product) return ''; // Should not happen
-            return `
-                <div class="cart-item">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                    <div class="cart-item-info">
-                        <h4>${product.name}</h4>
-                        <p>$${product.price.toFixed(2)}</p>
+        if (cartItemsContainer) {
+            cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
+                // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
+                const product = productMap.get(productId);
+                if (!product) return ''; // Should not happen
+                return `
+                    <div class="cart-item">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
+                        <div class="cart-item-info">
+                            <h4>${product.name}</h4>
+                            <p>$${product.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
+                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                        </div>
                     </div>
-                    <div class="cart-item-actions">
-                        <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
-                        <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        checkoutBtn.disabled = false;
+                `;
+            }).join('');
+        }
+        if (checkoutBtn) checkoutBtn.disabled = false;
     }
     updateCartSummary();
 }
@@ -115,7 +127,7 @@ export async function handleAddToCart(productId) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error);
+        console.error('Failed to add to cart - Manager info:', error.message);
     }
 }
 
@@ -136,19 +148,74 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+let saveCartTimeout = null;
+let saveWishlistTimeout = null;
+let pendingResolves = [];
+
+async function saveWishlist() {
+    if (!currentUser) return;
+
+    return new Promise((resolve, reject) => {
+        if (saveWishlistTimeout) clearTimeout(saveWishlistTimeout);
+
+        saveWishlistTimeout = setTimeout(async () => {
+            try {
+                const userWishlistRef = doc(db, 'wishlists', currentUser.uid);
+                await setDoc(userWishlistRef, { items: Array.from(wishlist) });
+                resolve();
+            } catch (error) {
+                console.error("Error saving wishlist to Firestore:", error);
+                reject(error);
+            }
+        }, 500);
+    });
+}
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
-    if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
-        }
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
-        localStorage.setItem('localCart', JSON.stringify(cart));
+
+    // Debounce the Firestore write
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
     }
+
+    saveCartTimeout = setTimeout(async () => {
+        if (currentUser) {
+            try {
+                const userCartRef = doc(db, 'carts', currentUser.uid);
+                await setDoc(userCartRef, { items: cart });
+            } catch (error) {
+                console.error("Error saving cart to Firestore:", error);
+            }
+        } else {
+            // Save cart to localStorage for logged-out users
+            localStorage.setItem('localCart', JSON.stringify(cart));
+        }
+    }, 500); // Wait 500ms before committing to backend
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
+    }
+
+    return new Promise((resolve) => {
+        pendingResolves.push(resolve);
+        saveCartTimeout = setTimeout(async () => {
+            if (currentUser) {
+                try {
+                    const userCartRef = doc(db, 'carts', currentUser.uid);
+                    await setDoc(userCartRef, { items: cart });
+                } catch (error) {
+                    console.error("Error saving cart to Firestore:", error);
+                }
+            } else {
+                // **MODIFIED**: Save cart to localStorage for logged-out users
+                localStorage.setItem('localCart', JSON.stringify(cart));
+            }
+            // Resolve all promises that were waiting for this debounce cycle
+            const resolves = pendingResolves;
+            pendingResolves = [];
+            resolves.forEach(r => r());
+        }, 500); // 500ms debounce
+    });
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
@@ -167,6 +234,10 @@ function setupEventListeners() {
         if (e.target.classList.contains('add-to-cart-btn')) {
             const productId = e.target.dataset.id;
             handleAddToCart(productId);
+        } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
+            const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
+            const productId = btn.dataset.id;
+            toggleWishlist(productId);
         }
     });
 
@@ -213,19 +284,38 @@ onAuthStateChanged(auth, async (user) => {
 
         if (user) {
             // User is signed in
+
+            // Load Wishlist
+            try {
+                const userWishlistRef = doc(db, 'wishlists', user.uid);
+                const wishlistSnap = await getDoc(userWishlistRef);
+                if (wishlistSnap.exists() && wishlistSnap.data().items) {
+                    wishlist = new Set(wishlistSnap.data().items);
+                } else {
+                    wishlist = new Set();
+                }
+            } catch (error) {
+                console.error("Error loading wishlist:", error);
+            }
+
             const userCartRef = doc(db, 'carts', user.uid);
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
 
             // Merge local and firestore carts
             const mergedCart = { ...firestoreCart };
+            let hasLocalItems = false;
             for (const [productId, quantity] of Object.entries(localCart)) {
                 mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
+                hasLocalItems = true;
             }
             
             cart = mergedCart;
-            await saveCart(); // Save merged cart to Firestore
-            localStorage.removeItem('localCart'); // Clear local cart after merging
+            // Only trigger backend write if we actually merged local items into it
+            if (hasLocalItems) {
+                await saveCart();
+                localStorage.removeItem('localCart'); // Clear local cart after merging
+            }
         } else {
             // User is signed out, load from localStorage
             cart = localCart;
