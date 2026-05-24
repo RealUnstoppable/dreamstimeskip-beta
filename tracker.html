@@ -1567,17 +1567,17 @@
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
 
             let routineHtml = "";
-            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${r.name}</div>`);
+            state.routines.forEach(r => routineHtml += `<div>${r.checked ? '☑' : '☐'} ${escapeHTML(r.name)}</div>`);
             document.getElementById('printRoutines').innerHTML = routineHtml;
 
             let drawerHtml = "";
-            state.drawers.forEach(d => drawerHtml += `<div>${d.name}: $${d.val} (${d.res})</div>`);
+            state.drawers.forEach(d => drawerHtml += `<div>${escapeHTML(d.name)}: $${escapeHTML(d.val)} (${escapeHTML(d.res)})</div>`);
             document.getElementById('printDrawers').innerHTML = drawerHtml;
 
             document.getElementById('printSafe').innerText = state.safeCount;
 
             let invHtml = "";
-            state.inventory.forEach(i => invHtml += `<div>${i.name}: ${i.bl} BL | ${i.cl} CL | ${i.fr} FR</div>`);
+            state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
             manualSaveHistory();
