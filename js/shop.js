@@ -53,8 +53,6 @@ const cartItemCountEl = document.getElementById('cart-item-count');
 const cartTotalPriceEl = document.getElementById('cart-total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
 const navCtaContainer = document.getElementById('nav-cta-container');
-const hamburger = document.querySelector('.hamburger'); // <-- ADDED for mobile nav
-const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile nav
 
 
 // --- RENDER FUNCTIONS ---
@@ -164,12 +162,6 @@ function updateUserNav(user) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-    // **ADDED**: Hamburger menu toggle
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-    });
-
     // Product grid listeners
     productGrid.addEventListener('click', (e) => {
         if (e.target.classList.contains('add-to-cart-btn')) {
@@ -210,12 +202,11 @@ function setupEventListeners() {
 
 
 // --- INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
-    renderProducts();
-    setupEventListeners();
+renderProducts();
+setupEventListeners();
 
-    // **MODIFIED**: Reworked auth state change to handle local cart
-    onAuthStateChanged(auth, async (user) => {
+// **MODIFIED**: Reworked auth state change to handle local cart
+onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         const localCartData = localStorage.getItem('localCart');
         const localCart = localCartData ? JSON.parse(localCartData) : {};
@@ -243,4 +234,3 @@ document.addEventListener('DOMContentLoaded', () => {
         updateUserNav(user);
         renderCart(); // Render the final cart state
     });
-});
