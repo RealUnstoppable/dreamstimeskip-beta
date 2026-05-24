@@ -1,4 +1,7 @@
 import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
@@ -23,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) library song lookups
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
 
@@ -35,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    // ⚡ Bolt: Maintain O(1) Set alongside array to prevent O(N) membership checks
+    let favoriteIds = new Set();
     let favoriteIds = new Set();
     // ⚡ Bolt: Maintain a Set of favorite IDs for O(1) lookups instead of O(N) Array.some() checks
     let userFavoritesIds = new Set();
@@ -45,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
+    window.__setUserFavorites = (f) => { userFavorites = f; favoriteIds = new Set(f.map(s => s.id)); };
     window.__setUserFavorites = (f) => {
         userFavorites = f;
         userFavoritesIds = new Set(f.map(s => s.id));
@@ -452,6 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const song = librarySongsMap.get(songId);
+        const isFav = favoriteIds.has(songId);
         const song = librarySongs.find(s => s.id === songId);
         const isFav = favoriteIds.has(songId);
         // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
@@ -502,6 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const favIdsSet = new Set(favIds);
                     userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    favoriteIds = new Set(userFavorites.map(s => s.id));
                     favoriteIds = new Set(favIds);
                     userFavoritesIds = new Set(favIds);
                 }
@@ -528,6 +538,7 @@ export function createSongCard(song) {
     `;
 }
 }
+
 
 export function formatTime(seconds) {
     if (isNaN(seconds)) return "0:00";
