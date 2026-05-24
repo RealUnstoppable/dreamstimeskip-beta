@@ -26,11 +26,12 @@ if (typeof document !== 'undefined') {
                     });
 
                 // Show a success message
-                alert("You've successfully subscribed to the newsletter!");
-                emailInput.value = ''; // Clear the input
-            } catch (error) {
-                console.error("Error submitting email:", error);
-                alert("There was an error subscribing. Please try again later.");
+                    alert("You've successfully subscribed to the newsletter!");
+                    emailInput.value = ''; // Clear the input
+                } catch (error) {
+                    console.error("Error submitting email:", error);
+                    alert("There was an error subscribing. Please try again later.");
+                }
             }
         }
     });

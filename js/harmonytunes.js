@@ -305,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = favoriteIds.has(song.id);
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
@@ -432,8 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const song = librarySongs.find(s => s.id === songId);
-        const isFav = favoriteIds.has(songId);
         // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
         const song = librarySongsMap.get(songId);
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
@@ -481,7 +478,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
                     const favIdsSet = new Set(favIds);
                     userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
-                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
                     favoriteIds = new Set(favIds);
                     userFavoritesIds = new Set(favIds);
                 }
@@ -506,7 +502,6 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
-}
 }
 
 export function formatTime(seconds) {

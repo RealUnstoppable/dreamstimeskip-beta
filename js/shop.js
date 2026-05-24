@@ -41,6 +41,7 @@ export const productMap = new Map(products.map(p => [p.id, p]));
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
+export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
 
 // --- DOM ELEMENTS ---
@@ -59,19 +60,28 @@ const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile
 
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-footer">
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+    productGrid.innerHTML = products.map(product => {
+        const isWishlisted = wishlist.has(product.id);
+        const heartIcon = isWishlisted ? '❤️' : '🤍';
+        const activeClass = isWishlisted ? 'active' : '';
+
+        return `
+            <div class="product-card">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
+                    ${heartIcon}
+                </button>
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p>${product.description}</p>
+                    <div class="product-footer">
+                        <span class="product-price">${product.price.toFixed(2)}</span>
+                        <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderCart() {
@@ -112,6 +122,31 @@ function updateCartSummary() {
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `${totalPrice.toFixed(2)}`;
 }
 
+// --- WISHLIST LOGIC ---
+export async function toggleWishlist(productId) {
+    if (!currentUser) {
+        window.location.href = 'sign in beta.html';
+        return;
+    }
+
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    renderProducts();
+
+    try {
+        await saveWishlist();
+    } catch (error) {
+        console.error('Failed to update wishlist:', error);
+        if (wishlist.has(productId)) wishlist.delete(productId);
+        else wishlist.add(productId);
+        renderProducts();
+    }
+}
+
 // --- CART LOGIC ---
 export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
@@ -141,7 +176,27 @@ async function handleRemoveFromCart(productId) {
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 let saveCartTimeout = null;
+let saveWishlistTimeout = null;
 let pendingResolves = [];
+
+async function saveWishlist() {
+    if (!currentUser) return;
+
+    return new Promise((resolve, reject) => {
+        if (saveWishlistTimeout) clearTimeout(saveWishlistTimeout);
+
+        saveWishlistTimeout = setTimeout(async () => {
+            try {
+                const userWishlistRef = doc(db, 'wishlists', currentUser.uid);
+                await setDoc(userWishlistRef, { items: Array.from(wishlist) });
+                resolve();
+            } catch (error) {
+                console.error("Error saving wishlist to Firestore:", error);
+                reject(error);
+            }
+        }, 500);
+    });
+}
 
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
@@ -166,16 +221,6 @@ async function saveCart() {
     }, 500); // Wait 500ms before committing to backend
     if (saveCartTimeout) {
         clearTimeout(saveCartTimeout);
-    if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore - Manager info:", error.message);
-        }
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
-        localStorage.setItem('localCart', JSON.stringify(cart));
     }
 
     return new Promise((resolve) => {
@@ -222,6 +267,10 @@ function setupEventListeners() {
         if (e.target.classList.contains('add-to-cart-btn')) {
             const productId = e.target.dataset.id;
             handleAddToCart(productId);
+        } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
+            const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
+            const productId = btn.dataset.id;
+            toggleWishlist(productId);
         }
     });
 
@@ -269,6 +318,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (user) {
             // User is signed in
+
+            // Load Wishlist
+            try {
+                const userWishlistRef = doc(db, 'wishlists', user.uid);
+                const wishlistSnap = await getDoc(userWishlistRef);
+                if (wishlistSnap.exists() && wishlistSnap.data().items) {
+                    wishlist = new Set(wishlistSnap.data().items);
+                } else {
+                    wishlist = new Set();
+                }
+            } catch (error) {
+                console.error("Error loading wishlist:", error);
+            }
+
             const userCartRef = doc(db, 'carts', user.uid);
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};

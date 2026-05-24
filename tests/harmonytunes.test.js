@@ -29,7 +29,6 @@ document.body.innerHTML = `
     <div id="greeting"></div>
 `;
 
-import { jest } from '@jest/globals';
 
 // For ES Modules with Jest, we cannot simply use require() for the module.
 // And dynamic import() with DOM content loaded inside it works better.

@@ -130,6 +130,7 @@
                 <ul>
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#wishlist" class="nav-link">Wishlist</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
@@ -145,6 +146,16 @@
                 <div class="card">
                     <h4>Quick Overview</h4>
                     <p>Welcome to your personal hub. Navigate the sidebar to manage your subscriptions, orders, and themes.</p>
+                </div>
+            </section>
+
+            <section id="wishlist" class="content-section">
+                <h3>Wishlist</h3>
+                <div class="card">
+                    <h4>Saved Items</h4>
+                    <div id="wishlist-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <p style="color: var(--text-secondary);">Loading wishlist...</p>
+                    </div>
                 </div>
             </section>
 
@@ -231,7 +242,7 @@
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { productMap } from '/js/shop.js';
+        import { productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
 
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
@@ -324,6 +335,57 @@
             if (accentRadio) accentRadio.checked = true;
 
             fetchAndRenderOrders(user.uid);
+            fetchAndRenderWishlist(user.uid);
+        }
+
+        async function fetchAndRenderWishlist(uid) {
+            const wishlistContainer = document.getElementById('wishlist-list');
+            try {
+                const userWishlistRef = doc(db, 'wishlists', uid);
+                const wishlistSnap = await getDoc(userWishlistRef);
+
+                if (!wishlistSnap.exists() || !wishlistSnap.data().items || wishlistSnap.data().items.length === 0) {
+                    wishlistContainer.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Go browse the <a href="shop.html" style="color: var(--accent-blue);">Shop</a>!</p>';
+                    return;
+                }
+
+                const items = wishlistSnap.data().items;
+                wishlistContainer.innerHTML = items.map(productId => {
+                    const product = productMap.get(productId);
+                    if (!product) return '';
+                    return `
+                        <div class="wishlist-item" style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                            <img src="${product.imageUrl}" alt="${product.name}" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                            <h5 style="margin: 0 0 5px;">${product.name}</h5>
+                            <p style="margin: 0 0 10px; color: var(--accent-blue);">${product.price.toFixed(2)}</p>
+                            <div style="display: flex; gap: 10px; width: 100%;">
+                                <button class="btn btn-primary wl-add-to-cart" data-id="${product.id}" style="flex: 1; padding: 5px; font-size: 0.8rem;">Add to Cart</button>
+                                <button class="btn btn-danger wl-remove" data-id="${product.id}" style="padding: 5px 10px;">&times;</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.wl-add-to-cart').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        handleAddToCart(id);
+                        alert('Added to cart!');
+                    });
+                });
+
+                document.querySelectorAll('.wl-remove').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        await toggleWishlist(id);
+                        fetchAndRenderWishlist(uid);
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error fetching wishlist:", error);
+                wishlistContainer.innerHTML = '<p style="color: var(--accent-red);">Error loading wishlist.</p>';
+            }
         }
 
         async function fetchAndRenderOrders(uid) {
