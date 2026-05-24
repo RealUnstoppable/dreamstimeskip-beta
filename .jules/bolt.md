@@ -10,6 +10,9 @@
 **Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
 **Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.
 
+## 2024-05-21 - Throttling High-Frequency Media Events
+**Learning:** Media element events like `timeupdate` fire very rapidly (often multiple times per second). Binding unthrottled DOM updates (like progress bar width and text content) directly to these events can cause main-thread jank and excessive reflows, especially on lower-end devices.
+**Action:** Always throttle high-frequency media events (like `timeupdate` or `scroll`) using `requestAnimationFrame` to decouple event firing from DOM updates and ensure smooth 60fps rendering.
 ## 2024-05-16 - Optimizing Array.includes in Filters
 **Learning:** Using `Array.includes` inside a `.filter()` loop results in O(N^2) time complexity. For user favorites intersecting with a library, this becomes slow as either the library or the favorites list grows. Converting the filter target array into a `Set` before the loop improves the check to O(1), making the entire operation O(N).
 **Action:** Always convert an array of primitives to a `Set` before checking membership in a loop.

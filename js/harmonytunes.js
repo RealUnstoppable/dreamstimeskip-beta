@@ -370,7 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
         
-        audioPlayer.addEventListener('timeupdate', updateProgress);
+        let isUpdatingProgress = false;
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (!isUpdatingProgress) {
+                requestAnimationFrame(() => {
+                    updateProgress();
+                    isUpdatingProgress = false;
+                });
+                isUpdatingProgress = true;
+            }
+        });
         audioPlayer.addEventListener('ended', () => {
             if (repeatMode === 2) {
                 audioPlayer.currentTime = 0;
