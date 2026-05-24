@@ -7,7 +7,7 @@
 body {
     background-color: #000;
     overflow-x: hidden;
-    padding-bottom: 120px; /* Space for floating player */
+    padding-bottom: 120px;
 }
 
 .spotify-layout {
@@ -17,7 +17,7 @@ body {
     min-height: 100vh;
 }
 
-/* --- Main Content --- */
+
 .harmony-main {
     flex-grow: 1;
     background: linear-gradient(to bottom, #1e1e1e 0%, #121212 100%);
@@ -29,14 +29,14 @@ body {
     .harmony-main { padding: 40px; }
 }
 
-/* --- Pill Navigation --- */
+
 .pill-nav {
     display: flex;
     gap: 10px;
     margin-bottom: 30px;
     overflow-x: auto;
-    padding-bottom: 5px; /* For scrollbar breathing room */
-    scrollbar-width: none; /* Firefox */
+    padding-bottom: 5px;
+    scrollbar-width: none;
 }
 .pill-nav::-webkit-scrollbar { display: none; }
 
@@ -58,12 +58,12 @@ body {
 }
 
 .nav-pill.active {
-    background-color: var(--accent-green); /* Or white */
+    background-color: var(--accent-green);
     color: black;
     border-color: var(--accent-green);
 }
 
-/* --- Home Dashboard Styles --- */
+
 .greet-section h1 {
     font-size: clamp(1.8rem, 4vw, 2.5rem);
     font-weight: 800;
@@ -99,10 +99,10 @@ body {
 }
 .see-all:hover { text-decoration: underline; color: white; }
 
-/* Cards Grid */
+
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Mobile: 2 cols */
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
 }
 
@@ -190,7 +190,7 @@ body {
     overflow: hidden;
 }
 
-/* TikTok Grid */
+
 .tiktok-grid {
     display: flex;
     gap: 16px;
@@ -207,7 +207,7 @@ body {
     cursor: pointer;
     transition: transform 0.2s;
     width: 120px;
-    height: 213px; /* 9:16 aspect ratio roughly */
+    height: 213px;
     flex-shrink: 0;
     position: relative;
 }
@@ -235,7 +235,7 @@ body {
     font-weight: 600;
 }
 
-/* --- View Switching --- */
+
 .back-btn {
     background: none;
     border: none;
@@ -247,7 +247,7 @@ body {
 }
 .back-btn:hover { color: white; }
 
-/* --- Playlist View --- */
+
 .playlist-header {
     display: flex;
     flex-direction: column;
@@ -308,7 +308,7 @@ body {
 }
 .action-btn-secondary:hover { border-color: white; }
 
-/* Table Styles */
+
 .song-table {
     width: 100%;
     border-collapse: collapse;
@@ -350,7 +350,7 @@ body {
 }
 .song-table .playing .song-title { color: var(--accent-green); }
 
-/* --- Floating Glass Player --- */
+
 .music-player-bar {
     position: fixed;
     bottom: 20px;
@@ -368,7 +368,7 @@ body {
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     
-    /* Liquid Glass Effect */
+
     background: rgba(20, 20, 20, 0.7);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -380,7 +380,7 @@ body {
     align-items: center;
     gap: 12px;
     flex: 1;
-    overflow: hidden; /* Prevent text overflow */
+    overflow: hidden;
 }
 
 .current-song-details img {
@@ -427,7 +427,7 @@ body {
 }
 .control-button:hover { color: white; }
 
-/* Hide shuffle/repeat on small screens to save space */
+
 #shuffle-btn, #repeat-btn { display: none; }
 @media (min-width: 600px) {
     #shuffle-btn, #repeat-btn { display: flex; }
@@ -455,7 +455,7 @@ body {
     color: #b3b3b3;
 }
 
-/* Hide detailed progress on very small screens */
+
 .current-time, .total-time { display: none; }
 @media (min-width: 400px) {
     .current-time, .total-time { display: block; }
@@ -481,7 +481,7 @@ body {
 .progress-bar:hover .progress { background-color: var(--accent-green); }
 
 .volume-container {
-    display: none; /* Hide on mobile by default */
+    display: none;
     align-items: center;
     gap: 8px;
     flex: 0.5;
@@ -498,7 +498,7 @@ body {
     align-items: center;
 }
 
-/* Styled Volume Slider */
+
 .volume-slider {
     -webkit-appearance: none;
     width: 100%;

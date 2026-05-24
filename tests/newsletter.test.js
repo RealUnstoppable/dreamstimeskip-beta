@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { setDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+import { setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
 // Load script once globally (as event listener binds to document)
 document.body.innerHTML = `
