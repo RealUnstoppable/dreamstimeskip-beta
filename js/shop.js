@@ -59,6 +59,7 @@ const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile
 
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
+    if (!productGrid) return;
     productGrid.innerHTML = products.map(product => `
         <div class="product-card">
             <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
@@ -75,6 +76,7 @@ function renderProducts() {
 }
 
 function renderCart() {
+    if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
         cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
         checkoutBtn.disabled = true;
@@ -105,8 +107,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
@@ -117,6 +119,7 @@ export async function handleAddToCart(productId) {
         renderCart();
     } catch (error) {
         console.error('Failed to add to cart:', error);
+        throw error;
     }
 }
 
@@ -137,23 +140,47 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+// Debounce helper to prevent excessive Firestore writes
+function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+        return new Promise((resolve) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                resolve(func.apply(this, args));
+            }, wait);
+        });
+    };
+}
+
+const saveCartToFirestore = debounce(async (uid, cartData) => {
+    try {
+        const userCartRef = doc(db, 'carts', uid);
+        await setDoc(userCartRef, { items: cartData });
+    } catch (error) {
+        console.error("Error saving cart to Firestore:", error);
+    }
+}, 1000);
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
     if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
-        }
+        // Use debounced write for logged-in users
+        await saveCartToFirestore(currentUser.uid, { ...cart });
     } else {
         // **MODIFIED**: Save cart to localStorage for logged-out users
-        localStorage.setItem('localCart', JSON.stringify(cart));
+        // Let handleAddToCart or calling function catch and log the error.
+        try {
+            localStorage.setItem('localCart', JSON.stringify(cart));
+        } catch(error) {
+            throw error;
+        }
     }
 }
 
 // --- AUTHENTICATION & UI UPDATES ---
 function updateUserNav(user) {
+    if (!navCtaContainer) return;
     if (user) {
         navCtaContainer.innerHTML = `<a href="account.html" class="cta-button nav-cta">My Account</a>`;
     } else {
@@ -164,13 +191,13 @@ function updateUserNav(user) {
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
     // **ADDED**: Hamburger menu toggle
-    hamburger.addEventListener('click', () => {
+    if (hamburger) hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
         navLinks.classList.toggle('active');
     });
 
     // Product grid listeners
-    productGrid.addEventListener('click', (e) => {
+    if (productGrid) productGrid.addEventListener('click', (e) => {
         if (e.target.classList.contains('add-to-cart-btn')) {
             const productId = e.target.dataset.id;
             handleAddToCart(productId);
@@ -178,8 +205,8 @@ function setupEventListeners() {
     });
 
     // Cart modal listeners
-    cartButton.addEventListener('click', () => cartModal.style.display = 'block');
-    closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
+    if (cartButton) cartButton.addEventListener('click', () => cartModal.style.display = 'block');
+    if (closeCartBtn) closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
     window.addEventListener('click', (e) => {
         if (e.target === cartModal) {
             cartModal.style.display = 'none';
@@ -187,13 +214,13 @@ function setupEventListeners() {
     });
 
     // Cart item action listeners
-    cartItemsContainer.addEventListener('click', (e) => {
+    if (cartItemsContainer) cartItemsContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove-item-btn')) {
             const productId = e.target.dataset.id;
             handleRemoveFromCart(productId);
         }
     });
-    cartItemsContainer.addEventListener('change', (e) => {
+    if (cartItemsContainer) cartItemsContainer.addEventListener('change', (e) => {
         if (e.target.classList.contains('item-quantity-input')) {
             const productId = e.target.dataset.id;
             const quantity = parseInt(e.target.value, 10);
@@ -201,7 +228,7 @@ function setupEventListeners() {
         }
     });
     
-    checkoutBtn.addEventListener('click', () => {
+    if (checkoutBtn) checkoutBtn.addEventListener('click', () => {
         // Updated to point to the new checkout.html page
         window.location.href = 'checkout.html';
     });
@@ -222,8 +249,33 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             // User is signed in
             const userCartRef = doc(db, 'carts', user.uid);
-            const docSnap = await getDoc(userCartRef);
-            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
+
+            let cartSnap;
+            let profileData = null;
+
+            // Check cache first
+            const cachedProfile = sessionStorage.getItem('userProfileCache');
+
+            if (cachedProfile) {
+                // If profile is cached, we only need to fetch the cart
+                profileData = JSON.parse(cachedProfile);
+                cartSnap = await getDoc(userCartRef);
+            } else {
+                // If no cache, fetch both concurrently using Promise.all
+                const userProfileRef = doc(db, 'users', user.uid);
+                const [fetchedCartSnap, profileSnap] = await Promise.all([
+                    getDoc(userCartRef),
+                    getDoc(userProfileRef)
+                ]);
+
+                cartSnap = fetchedCartSnap;
+                if (profileSnap.exists()) {
+                    profileData = profileSnap.data();
+                    sessionStorage.setItem('userProfileCache', JSON.stringify(profileData));
+                }
+            }
+
+            const firestoreCart = cartSnap.exists() ? cartSnap.data().items : {};
 
             // Merge local and firestore carts
             const mergedCart = { ...firestoreCart };
@@ -232,8 +284,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             cart = mergedCart;
-            await saveCart(); // Save merged cart to Firestore
+
+            // We use standard saveCart call which is now debounced
+            await saveCart();
             localStorage.removeItem('localCart'); // Clear local cart after merging
+
+            // Apply admin status or other user profile logic if necessary later
+            // const userProfile = profileSnap.exists() ? profileSnap.data() : null;
+
         } else {
             // User is signed out, load from localStorage
             cart = localCart;

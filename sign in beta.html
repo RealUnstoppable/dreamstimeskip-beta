@@ -174,7 +174,17 @@ animation: fadeIn 300ms;
   
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (!window.location.pathname.endsWith('account.html') && !window.location.pathname.endsWith('admin.html')) {
+                    // Let auth.js handle the admin redirect after fetching user doc
+                    window.location.replace('account.html');
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>
