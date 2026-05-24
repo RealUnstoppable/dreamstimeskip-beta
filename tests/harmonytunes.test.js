@@ -34,6 +34,13 @@ describe('loadPlaylistView error handling', () => {
   beforeAll(async () => {
     // Import the script as an ES module
     await import('../js/harmonytunes.js');
+import { jest } from '@jest/globals';
+
+// For ES Modules with Jest, we cannot simply use require() for the module.
+// And dynamic import() with DOM content loaded inside it works better.
+await import('../js/harmonytunes.js');
+// Try requiring the script
+import '../js/harmonytunes.js';
 
     // Dispatch DOMContentLoaded so the script actually runs its init block
     const event = new Event('DOMContentLoaded');
