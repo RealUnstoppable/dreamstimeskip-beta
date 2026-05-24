@@ -13,3 +13,7 @@
 ## 2024-05-18 - Optimizing Array.includes in Loops
 **Learning:** Using `Array.includes()` inside a `.filter()` or `.map()` loop creates an O(N*M) time complexity, which can be a bottleneck when filtering large arrays against a list of identifiers.
 **Action:** Convert the identifier list to a `Set` before the loop and replace O(M) `Array.includes()` with O(1) `Set.has()` to achieve O(N+M) complexity, which is significantly faster.
+
+## 2024-05-19 - Optimizing DOM List Rendering
+**Learning:** Repetitive use of `document.createElement()` and `appendChild()` inside loops causes significant layout thrashing and slows down DOM updates for large datasets.
+**Action:** Replace `forEach` with `map` to build HTML strings, then inject them all at once using a single `innerHTML` assignment. This prevents multiple reflows and speeds up rendering significantly.
