@@ -96,12 +96,14 @@
 <body style="display: none;"> 
     <div class="mobile-header">
         <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
+        <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('open')" aria-label="Open sidebar">☰</button>
         <button class="hamburger-btn" aria-label="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
     </div>
 
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="mobile-header" style="justify-content: flex-end;">
+                <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.remove('open')" aria-label="Close sidebar">✕</button>
                 <button class="hamburger-btn" aria-label="Close sidebar" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
             </div>
             <div class="sidebar-header">

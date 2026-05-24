@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${pl.id}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play">▶</button>
                 </div>
                 <div class="card-title">${pl.title}</div>
                 <div class="card-desc">${pl.desc}</div>
@@ -509,7 +509,7 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${song.id}">
             <div class="card-img-wrapper">
                 <img src="${song.art}" alt="${song.title}">
-                <button class="card-play-btn">▶</button>
+                <button class="card-play-btn" aria-label="Play">▶</button>
             </div>
             <div class="card-title">${song.title}</div>
             <div class="card-desc">${song.artist}</div>
