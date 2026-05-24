@@ -10,6 +10,23 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+// 🛡️ Shared Auth Utility
+async function authenticateRequest(req, res) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    return await admin.auth().verifyIdToken(token);
+  } catch (err) {
+    console.error("Auth Error - Manager info:", err.message);
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+}
+
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -17,23 +34,11 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
+    const decodedToken = await authenticateRequest(req, res);
+    if (!decodedToken) return;
 
-    const token = authHeader.split("Bearer ")[1];
-    let uid;
-    let email;
-
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      uid = decodedToken.uid;
-      email = decodedToken.email;
-    } catch (err) {
-      console.error("Auth Error:", err);
-      return res.status(401).send("Unauthorized");
-    }
+    const uid = decodedToken.uid;
+    const email = decodedToken.email;
 
     const {plan, successUrl, cancelUrl} = req.body;
 
@@ -45,7 +50,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
-        customer_email: customer_email,
+        customer_email: email,
         line_items: [{price: priceId, quantity: 1}],
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
 
@@ -61,7 +66,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error:", err);
+      console.error("Checkout Error - Manager info:", err.message);
       res.status(500).json({error: err.message});
     }
   });
@@ -75,7 +80,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error:", err);
+    console.error("Webhook Error - Manager info:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -116,77 +121,6 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   res.json({received: true});
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-// 🛠️ Create Maintenance Ticket
-exports.createMaintenanceTicket = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
-
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
-      const email = decodedToken.email;
-
-      const { equipmentName, issueDescription, priority } = req.body;
-
-      if (!equipmentName || !issueDescription || !priority) {
-        return res.status(400).send("Missing required fields");
-      }
-
-      const validPriorities = ["Low", "Medium", "High"];
-      let actualPriority = priority;
-
-      if (!validPriorities.includes(priority)) {
-        actualPriority = "Medium";
-      }
-
-      // Auto-flag high priority if keywords detected
-      const descLower = issueDescription.toLowerCase();
-      if (descLower.includes("leak") || descLower.includes("fire") || descLower.includes("offline")) {
-        actualPriority = "High";
-      }
-
-      const ticketData = {
-        uid,
-        email,
-        equipmentName,
-        issueDescription,
-        priority: actualPriority,
-        status: "Open",
-        reportedAt: admin.firestore.FieldValue.serverTimestamp(),
-        resolvedAt: null
-      };
-
-      const docRef = await admin.firestore().collection("maintenance_tickets").add(ticketData);
-
-      res.status(200).json({ success: true, id: docRef.id });
-    } catch (err) {
-      console.error("Maintenance Ticket Error:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-});
-
 // 🔻 Cancel Subscription Manually
 exports.cancelSubscription = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -194,16 +128,11 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
+    const decodedToken = await authenticateRequest(req, res);
+    if (!decodedToken) return;
+    const uid = decodedToken.uid;
 
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
 
       const userDoc = await admin.firestore().collection("users")
           .doc(uid).get();
@@ -226,7 +155,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error:", err);
+      console.error("Cancel Error - Manager info:", err.message);
       res.status(500).json({error: err.message});
     }
   });

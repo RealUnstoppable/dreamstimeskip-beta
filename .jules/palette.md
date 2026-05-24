@@ -6,6 +6,9 @@
 **Learning:** Icon-only controls for music players (like volume sliders, play/pause, shuffle, and repeat buttons) often lack text equivalents, rendering them invisible or confusing to screen readers.
 **Action:** Always add explicit `aria-label` attributes to icon-only buttons and input sliders that do not have visible text labels associated with them via `for` attributes.
 
-## 2024-06-25 - Form Labels and Hidden Accessibility Patterns
-**Learning:** Found multiple form `<label>` elements missing the `for` attribute required to associate them with inputs. Additionally, some inputs completely lacked labels, relying entirely on placeholders. Placeholders are not an accessible alternative to labels for screen readers.
-**Action:** When adding missing labels to UI components that were designed without visible text labels, use visually hidden labels (styled with `clip: rect(0 0 0 0)` etc.) to ensure screen reader support without breaking the existing visual design system or layout. Always verify `for` attributes exist on all `<label>` tags.
+## 2024-05-24 - Async UI Feedback and ARIA Alerts
+**Learning:** The authentication form lacked visual textual feedback during submission and screen readers weren't alerted to error messages.
+**Action:** Always add textual loading state updates (e.g. "Processing...") during async operations, and apply `role="alert"` to dynamic error message containers so screen readers announce them immediately.
+## 2026-05-23 - Async Form Submission Loading States
+**Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
+**Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.

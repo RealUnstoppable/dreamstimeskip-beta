@@ -2,6 +2,8 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
@@ -24,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) library song lookups
+    // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
+    const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
         { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
@@ -33,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    // ⚡ Bolt: Maintain O(1) Set alongside array to prevent O(N) membership checks
+    let favoriteIds = new Set();
+    let favoriteIds = new Set();
+    // ⚡ Bolt: Maintain a Set of favorite IDs for O(1) lookups instead of O(N) Array.some() checks
+    let userFavoritesIds = new Set();
     let currentQueue = [];
     let currentSongIndex = 0;
     let isPlaying = false;
@@ -40,7 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
-    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setUserFavorites = (f) => { userFavorites = f; favoriteIds = new Set(f.map(s => s.id)); };
+    window.__setUserFavorites = (f) => {
+        userFavorites = f;
+        userFavoritesIds = new Set(f.map(s => s.id));
+    };
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
@@ -149,19 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
-            try { playlistDescEl.textContent = "Could not load playlist data."; } catch (e) {}
-            try {
-                songListBody.textContent = '';
-                const errorRow = document.createElement('tr');
-                const errorTd = document.createElement('td');
-                errorTd.colSpan = 4;
-                errorTd.style.textAlign = 'center';
-                errorTd.style.padding = '20px';
-                errorTd.style.color = 'red';
-                errorTd.textContent = 'Failed to load playlist. Please try again later.';
-                errorRow.appendChild(errorTd);
-                songListBody.appendChild(errorRow);
-            } catch (e) {}
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
             try { playlistPlayBtn.onclick = null; } catch (e) {}
         }
     }
@@ -194,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${pl.id}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play">▶</button>
                 </div>
                 <div class="card-title">${pl.title}</div>
                 <div class="card-desc">${pl.desc}</div>
@@ -223,7 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    const song = librarySongs.find(s => s.id === songId);
+                    // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+                    const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
@@ -245,20 +250,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.loadPlaylistView = loadPlaylistView;
 
+    // --- SECURITY ---
+    function escapeHTML(str) {
+        if (!str) return '';
+        str = str.toString();
+        return str.replace(/&/g, "&amp;")
+                  .replace(/</g, "&lt;")
+                  .replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;")
+                  .replace(/'/g, "&#039;");
+    }
+
     // --- RENDERING TABLE (Fixed Duration Bug) ---
     function renderSongTable(songs) {
-        songListBody.textContent = '';
+        songListBody.innerHTML = '';
         if (songs.length === 0) {
-            const emptyRow = document.createElement('tr');
-            const emptyTd = document.createElement('td');
-            emptyTd.colSpan = 4;
-            emptyTd.style.textAlign = 'center';
-            emptyTd.style.padding = '20px';
-            emptyTd.textContent = 'No songs found.';
-            emptyRow.appendChild(emptyTd);
-            songListBody.appendChild(emptyRow);
+            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
             return;
         }
+
+        const fragment = document.createDocumentFragment();
 
         songs.forEach((song, index) => {
             const row = document.createElement('tr');
@@ -266,47 +277,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const isActive = (currentQueue[currentSongIndex]?.id === song.id);
             if (isActive) row.classList.add('playing');
 
-            // Cell 1: Index/Icon
-            const cell1 = document.createElement('td');
-
-            const indexSpan = document.createElement('span');
-            indexSpan.className = 'song-index';
-            indexSpan.style.display = isActive ? 'none' : '';
-            indexSpan.textContent = index + 1;
-
-            const iconSpan = document.createElement('span');
-            iconSpan.className = 'playing-icon';
-            iconSpan.style.display = isActive ? 'inline' : 'none';
-            iconSpan.textContent = '▶';
-
-            cell1.appendChild(indexSpan);
-            cell1.appendChild(iconSpan);
-
-            // Cell 2: Title
-            const cell2 = document.createElement('td');
-            cell2.className = 'song-title';
-            cell2.textContent = song.title;
-
-            // Cell 3: Artist
-            const cell3 = document.createElement('td');
-            cell3.textContent = song.artist;
-
-            // Cell 4: Duration
-            const cell4 = document.createElement('td');
-            cell4.style.textAlign = 'right';
-            cell4.textContent = song.duration;
-
-            row.appendChild(cell1);
-            row.appendChild(cell2);
-            row.appendChild(cell3);
-            row.appendChild(cell4);
+            // REMOVED HEART COLUMN, ADDED DURATION
+            row.innerHTML = `
+                <td>
+                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
+                    <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
+                </td>
+                <td class="song-title">${escapeHTML(song.title)}</td>
+                <td>${escapeHTML(song.artist)}</td>
+                <td style="text-align: right;">${song.duration}</td>
+            `;
 
             row.addEventListener('click', () => {
                 playContext(songs, index);
             });
 
-            songListBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        // ⚡ Bolt: Used DocumentFragment to batch DOM inserts, reducing reflows from O(N) to O(1)
+        songListBody.appendChild(fragment);
     }
 
     // --- PLAYER LOGIC ---
@@ -333,7 +323,9 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = userFavorites.some(s => s.id === song.id);
+        const isFav = favoriteIds.has(song.id);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
@@ -396,7 +388,16 @@ document.addEventListener('DOMContentLoaded', () => {
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
         
-        audioPlayer.addEventListener('timeupdate', updateProgress);
+        let isUpdatingProgress = false;
+        audioPlayer.addEventListener('timeupdate', () => {
+            if (!isUpdatingProgress) {
+                requestAnimationFrame(() => {
+                    updateProgress();
+                    isUpdatingProgress = false;
+                });
+                isUpdatingProgress = true;
+            }
+        });
         audioPlayer.addEventListener('ended', () => {
             if (repeatMode === 2) {
                 audioPlayer.currentTime = 0;
@@ -459,16 +460,26 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const song = librarySongsMap.get(songId);
+        const isFav = favoriteIds.has(songId);
         const song = librarySongs.find(s => s.id === songId);
-        const isFav = userFavorites.some(s => s.id === songId);
+        const isFav = favoriteIds.has(songId);
+        // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+        const song = librarySongsMap.get(songId);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
+                favoriteIds.delete(songId);
                 userFavorites = userFavorites.filter(s => s.id !== songId);
+                userFavoritesIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
+                favoriteIds.add(songId);
                 userFavorites.push(song);
+                userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
             // Update UI
@@ -483,6 +494,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
+                favoriteIds.add(songId);
                 userFavorites.push(song);
             }
         }
@@ -495,10 +507,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
-                    // ⚡ Bolt: Convert array to Set for O(1) lookups inside the filter loop,
-                    // replacing O(N*M) complexity with O(N+M)
-                    const favIds = new Set(docSnap.data().musicFavorites);
-                    userFavorites = librarySongs.filter(song => favIds.has(song.id));
+                    const favIds = docSnap.data().musicFavorites;
+                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
+                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    favoriteIds = new Set(userFavorites.map(s => s.id));
+                    favoriteIds = new Set(favIds);
+                    userFavoritesIds = new Set(favIds);
                 }
             } catch (e) { console.error(e); }
             
@@ -515,11 +531,19 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${song.id}">
             <div class="card-img-wrapper">
                 <img src="${song.art}" alt="${song.title}">
-                <button class="card-play-btn">▶</button>
+                <button class="card-play-btn" aria-label="Play">▶</button>
             </div>
             <div class="card-title">${song.title}</div>
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
 }
+}
 
+
+export function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+}

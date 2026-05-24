@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals';
+
 // Set up minimal DOM before requiring the script
 document.body.innerHTML = `
     <div id="view-home"></div>
@@ -28,19 +30,28 @@ document.body.innerHTML = `
     <div id="greeting"></div>
 `;
 
-// Try requiring the script
-require('../js/harmonytunes.js');
-
-// Dispatch DOMContentLoaded so the script actually runs its init block
-const event = new Event('DOMContentLoaded');
-document.dispatchEvent(event);
-
 describe('loadPlaylistView error handling', () => {
+  beforeAll(async () => {
+    // Import the script as an ES module
+    await import('../js/harmonytunes.js');
+import { jest } from '@jest/globals';
+
+// For ES Modules with Jest, we cannot simply use require() for the module.
+// And dynamic import() with DOM content loaded inside it works better.
+await import('../js/harmonytunes.js');
+// Try requiring the script
+import '../js/harmonytunes.js';
+
+    // Dispatch DOMContentLoaded so the script actually runs its init block
+    const event = new Event('DOMContentLoaded');
+    document.dispatchEvent(event);
+  });
+
   beforeEach(() => {
     // Reset the UI before each test
     document.getElementById('playlist-title').textContent = '';
     document.getElementById('playlist-desc').textContent = '';
-    document.getElementById('song-list-body').textContent = '';
+    document.getElementById('song-list-body').innerHTML = '';
   });
 
   it('should handle null/undefined type by defaulting to Main Library', () => {
@@ -51,7 +62,7 @@ describe('loadPlaylistView error handling', () => {
   it('should gracefully handle empty or missing favorites', () => {
     window.loadPlaylistView('favorites');
     expect(document.getElementById('playlist-title').textContent).toBe('Liked Songs');
-    expect(document.getElementById('song-list-body').textContent).toContain('No songs found.');
+    expect(document.getElementById('song-list-body').innerHTML).toContain('No songs found.');
   });
 
   it('should display error state if data fetching throws an error', () => {
@@ -70,7 +81,7 @@ describe('loadPlaylistView error handling', () => {
     window.loadPlaylistView('main');
 
     expect(document.getElementById('playlist-title').textContent).toBe('Error');
-    expect(document.getElementById('song-list-body').textContent).toContain('Failed to load playlist.');
+    expect(document.getElementById('song-list-body').innerHTML).toContain('Failed to load playlist.');
     expect(consoleSpy).toHaveBeenCalled();
 
     consoleSpy.mockRestore();
