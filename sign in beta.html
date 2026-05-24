@@ -148,6 +148,8 @@ animation: fadeIn 300ms;
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
+
     <div class="container">
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
@@ -176,5 +178,16 @@ animation: fadeIn 300ms;
         import { auth, db } from '/js/auth.js';
         import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
 
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadNavbar === 'function') loadNavbar();
+            if (typeof loadFooter === 'function') loadFooter();
+        });
+    </script>
 </body>
 </html>

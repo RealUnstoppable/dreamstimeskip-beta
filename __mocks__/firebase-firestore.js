@@ -7,3 +7,5 @@ export const serverTimestamp = jest.fn();
 export const updateDoc = jest.fn();
 export const addDoc = jest.fn();
 export const collection = jest.fn();
+export const arrayUnion = jest.fn((val) => val);
+export const arrayRemove = jest.fn((val) => val);

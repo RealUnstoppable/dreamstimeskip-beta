@@ -93,7 +93,9 @@
         }
     </style>
 </head>
-<body style="display: none;"> 
+<body style="display: none;">
+    <header class="main-header"></header>
+ 
     <div class="mobile-header">
         <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
         <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
@@ -607,6 +609,17 @@
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
         }
+    </script>
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadNavbar === 'function') loadNavbar();
+            if (typeof loadFooter === 'function') loadFooter();
+        });
     </script>
 </body>
 </html>

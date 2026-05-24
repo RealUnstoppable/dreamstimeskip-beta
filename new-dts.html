@@ -540,10 +540,17 @@
       }
     </script>
      <script src="/js/script.js"></script>
-     <script type="module">
-    import { loadNavbar } from './js/navbar.js';
-    document.addEventListener('DOMContentLoaded', loadNavbar);
-</script>
+     
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof loadNavbar === 'function') loadNavbar();
+            if (typeof loadFooter === 'function') loadFooter();
+        });
+    </script>
+
    
 </body>
 </html>
