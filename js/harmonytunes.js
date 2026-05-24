@@ -2,12 +2,6 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-}
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
@@ -248,6 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+        const fragment = document.createDocumentFragment();
+
         songs.forEach((song, index) => {
             const row = document.createElement('tr');
             
@@ -269,8 +266,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 playContext(songs, index);
             });
 
-            songListBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        songListBody.appendChild(fragment);
     }
 
     // --- PLAYER LOGIC ---
