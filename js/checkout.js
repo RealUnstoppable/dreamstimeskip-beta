@@ -1,7 +1,10 @@
 // js/checkout.js
-import { auth, db } from './auth.js';
+import { auth, db, safeRedirect } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './shop.js';
 
 let currentUser = null;
@@ -147,10 +150,10 @@ export async function handlePlaceOrder(e) {
 
         messageEl.textContent = 'Order placed successfully! Redirecting...';
         messageEl.style.color = 'var(--accent-green)';
-        setTimeout(() => window.location.href = './account.html', 3000);
+        setTimeout(() => safeRedirect('./account.html'), 3000);
 
     } catch (error) {
-        console.error("Error placing order:", error);
+        console.error("Error placing order - Manager info:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;
@@ -166,6 +169,6 @@ onAuthStateChanged(auth, async (user) => {
         userCart = docSnap.exists() ? docSnap.data().items : {};
         renderCheckoutPage();
     } else {
-        window.location.replace('/sign in beta.html');
+        safeRedirect('/sign in beta.html');
     }
 });
