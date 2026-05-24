@@ -16,25 +16,7 @@
 </head>
 <body>
 
-   <header class="main-header">
-        <nav class="navbar">
-            <a href="index.html" class="nav-logo">DTS <span>HUB</span></a>
-            <ul class="nav-links">
-                <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="index.html#dts">Dreams TimeSkip</a></li>
-                <li><a href="index.html#harmony">HarmonyTunes</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                 <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
-    </header>
+    <header class="main-header"></header>
 
     <main class="blog-main">
         <section class="blog-header">
@@ -47,56 +29,17 @@
         </section>
     </main>
     
-    <footer class="main-footer">
-        <div class="footer-container">
-            <div class="footer-grid">
-                 <div class="footer-column">
-                    <h5>Navigate</h5>
-                    <ul>
-                        <li><a href="#bento">Overview</a></li>
-                        <li><a href="#unstoppable">Unstoppable</a></li>
-                        <li><a href="#dts">Dreams TimeSkip</a></li>
-                        <li><a href="#harmony">HarmonyTunes</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h5>Connect</h5>
-                    <ul>
-                        <li><a href="#">YouTube</a></li>
-                        <li><a href="#">TikTok</a></li>
-                        <li><a href="#">Twitter / X</a></li>
-                        <li><a href="#">Discord</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h5>Company</h5>
-                    <ul>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Shop</a></li>
-                        <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column footer-newsletter">
-                    <h5>Stay in the Loop</h5>
-                    <p>Sign up for news, announcements, and exclusive beta access.</p>
-                    <form class="signup-form">
-                        <input type="email" placeholder="your.email@example.com" required>
-                        <button type="submit">Sign Up</button>
-                    </form>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2026 Unstoppable LLC. All Rights Reserved.</p>
-                <p>Designed in collaboration with Unstoppable Design, LLC.</p>
-            </div>
-        </div>
-    </footer>
- <script type="module">
-        import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";</script>
+    <footer class="main-footer"></footer>
+
     <script src="/js/script.js"></script>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
 </body>
 </html>
 

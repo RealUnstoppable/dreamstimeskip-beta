@@ -110,15 +110,23 @@
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
+
     <main class="checkout-main" id="checkout-container">
         <h1>Loading Checkout...</h1>
     </main>
     <script src="/js/script.js"></script>
     <script type="module" src="/js/checkout.js"></script>
  <script src="/js/script.js"></script>
-     <script type="module">
-    import { loadNavbar } from './js/navbar.js';
-    document.addEventListener('DOMContentLoaded', loadNavbar);
-</script>
+     
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+
+    <footer class="main-footer"></footer>
 </body>
 </html>
