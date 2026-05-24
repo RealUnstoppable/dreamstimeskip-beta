@@ -10,6 +10,13 @@
 **Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
 **Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.
 
+## 2024-05-18 - Optimizing Array.includes in Loops
+**Learning:** Using `Array.includes()` inside a `.filter()` or `.map()` loop creates an O(N*M) time complexity, which can be a bottleneck when filtering large arrays against a list of identifiers.
+**Action:** Convert the identifier list to a `Set` before the loop and replace O(M) `Array.includes()` with O(1) `Set.has()` to achieve O(N+M) complexity, which is significantly faster.
+
+## 2024-05-19 - Optimizing DOM List Rendering
+**Learning:** Repetitive use of `document.createElement()` and `appendChild()` inside loops causes significant layout thrashing and slows down DOM updates for large datasets.
+**Action:** Replace `forEach` with `map` to build HTML strings, then inject them all at once using a single `innerHTML` assignment. This prevents multiple reflows and speeds up rendering significantly.
 ## 2024-05-21 - Throttling High-Frequency Media Events
 **Learning:** Media element events like `timeupdate` fire very rapidly (often multiple times per second). Binding unthrottled DOM updates (like progress bar width and text content) directly to these events can cause main-thread jank and excessive reflows, especially on lower-end devices.
 **Action:** Always throttle high-frequency media events (like `timeupdate` or `scroll`) using `requestAnimationFrame` to decouple event firing from DOM updates and ensure smooth 60fps rendering.
