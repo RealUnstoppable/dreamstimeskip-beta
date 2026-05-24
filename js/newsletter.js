@@ -3,7 +3,7 @@ import { db } from './auth.js';
 const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
 const firestore = isTest
     ? { doc: () => {}, setDoc: () => {}, serverTimestamp: () => {} }
-    : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
+    : await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js");
 
 const { doc, setDoc, serverTimestamp } = firestore;
 

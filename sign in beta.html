@@ -166,7 +166,7 @@ animation: fadeIn 300ms;
                 </div>
                 <button type="submit" id="submit-btn">Sign In</button>
             </form>
-            <p id="message"></p>
+            <p id="message" role="alert"></p>
             <a href="#" class="toggle-link" id="toggle-form">Don't have an account? Sign Up</a>
              <button class="back-button" onclick="window.history.back();"> &larr; Back</button>
         </div>
@@ -174,7 +174,18 @@ animation: fadeIn 300ms;
   
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (!window.location.pathname.endsWith('account.html') && !window.location.pathname.endsWith('admin.html')) {
+                    // Let auth.js handle the admin redirect after fetching user doc
+                    window.location.replace('account.html');
+                }
+            }
+        });
+    </script>
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"; </script>
 
 </body>
 </html>

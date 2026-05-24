@@ -1,6 +1,6 @@
 import { jest } from '@jest/globals';
 
-jest.unstable_mockModule('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
+jest.unstable_mockModule('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js', () => ({
     onAuthStateChanged: jest.fn(),
 }));
 
@@ -10,7 +10,7 @@ const mockSetDoc = jest.fn();
 const mockServerTimestamp = jest.fn(() => 'mock-timestamp');
 const mockRunTransaction = jest.fn();
 
-jest.unstable_mockModule('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () => ({
+jest.unstable_mockModule('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js', () => ({
     doc: mockDoc,
     getDoc: mockGetDoc,
     setDoc: mockSetDoc,
@@ -27,6 +27,9 @@ jest.unstable_mockModule('./shop.js', () => ({
     products: [
         { id: 'prod1', name: 'Product 1', price: 10 }
     ],
+    productMap: new Map([
+        ['prod1', { id: 'prod1', name: 'Product 1', price: 10 }]
+    ]),
 }));
 
 describe('handlePlaceOrder', () => {

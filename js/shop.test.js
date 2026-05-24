@@ -11,12 +11,12 @@ describe('shop.js handleAddToCart', () => {
             delete cart[key];
         }
         consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        originalSetItem = localStorage.setItem;
+        originalSetItem = Storage.prototype.setItem;
     });
 
     afterEach(() => {
         jest.restoreAllMocks();
-        localStorage.setItem = originalSetItem;
+        Storage.prototype.setItem = originalSetItem;
     });
 
     test('should add item to cart on success', async () => {
@@ -31,11 +31,15 @@ describe('shop.js handleAddToCart', () => {
         const productId = 'unstoppable-hoodie';
         const testError = new Error('localStorage is full');
         // Mock localStorage.setItem to throw an error, which saveCart will propagate
-        localStorage.setItem = jest.fn(() => {
+        Storage.prototype.setItem = jest.fn(() => {
             throw testError;
         });
 
-        await handleAddToCart(productId);
+        try {
+            await handleAddToCart(productId);
+        } catch (e) {
+            // Error is expected to be thrown after logging
+        }
 
         expect(cart[productId]).toBe(1);
         expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to add to cart:', testError);

@@ -236,7 +236,7 @@
                 <div class="max-w-6xl mx-auto flex flex-col items-center text-center">
                     <div class="relative mb-12">
                         <div class="absolute inset-0 bg-sky-200 blur-2xl opacity-40 rounded-full scale-110"></div>
-                        <img src="ManagerPro.jpg" class="relative w-28 h-28 rounded-[2.5rem] shadow-2xl ring-1 ring-slate-200" loading="lazy">
+                        <img src="ManagerPro.jpg" class="relative w-28 h-28 rounded-[2.5rem] shadow-2xl ring-1 ring-slate-200" alt="ezManage Logo" loading="lazy">
                     </div>
 
                     <span class="inline-flex items-center px-4 py-1.5 mb-8 text-[10px] font-black tracking-[0.2em] text-sky-700 uppercase bg-sky-50 rounded-full">
@@ -1136,6 +1136,8 @@
                 const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
                 if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
                 
+                // ⚡ Bolt: Batch DOM insertions using a DocumentFragment to reduce reflows to a single operation (O(1) instead of O(N))
+                const fragment = document.createDocumentFragment();
                 history.slice(0, 20).forEach(data => {
                     const div = document.createElement('div');
                     div.className = "card flex justify-between items-center hover:border-sky-200 dark:hover:border-sky-800 transition-colors group";
@@ -1148,8 +1150,9 @@
                             <i data-lucide="download"></i> Load Shift
                         </button>
                     `;
-                    container.appendChild(div);
+                    fragment.appendChild(div);
                 });
+                container.appendChild(fragment);
                 lucide.createIcons();
             });
         }
@@ -1263,6 +1266,8 @@
             getUserDocRef().onSnapshot(doc => {
                 container.innerHTML = "";
                 if(doc.exists && doc.data().customPresets) {
+                    // ⚡ Bolt: Batch DOM insertions using a DocumentFragment to reduce reflows to a single operation (O(1) instead of O(N))
+                    const fragment = document.createDocumentFragment();
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
@@ -1270,8 +1275,9 @@
                             <span class="font-bold">${escapeHTML(p.name)}</span>
                             <button data-id="${escapeHTML(p.id)}" onclick="applyCustomPreset(this.getAttribute('data-id'))" class="btn btn-sm btn-outline opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">Load</button>
                         `;
-                        container.appendChild(div);
+                        fragment.appendChild(div);
                     });
+                    container.appendChild(fragment);
                 }
             });
         }
