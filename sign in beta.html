@@ -174,7 +174,21 @@ animation: fadeIn 300ms;
   
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !sessionStorage.getItem('newUser')) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && !userDoc.data().isBanned) {
+                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    if (!window.location.pathname.includes(destination)) {
+                        window.location.replace(destination);
+                    }
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

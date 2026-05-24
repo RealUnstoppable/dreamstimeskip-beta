@@ -137,18 +137,29 @@ async function handleRemoveFromCart(productId) {
 }
 
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
+let saveCartTimeout = null;
+
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
-    if (currentUser) {
-        try {
-            const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart });
-        } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
-        }
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
+
+    // Clear existing timeout if there is one
+    if (saveCartTimeout) {
+        clearTimeout(saveCartTimeout);
+    }
+
+    // Always update local cache immediately
+    if (!currentUser) {
         localStorage.setItem('localCart', JSON.stringify(cart));
+    } else {
+        // Debounce Firestore writes for authenticated users
+        saveCartTimeout = setTimeout(async () => {
+            try {
+                const userCartRef = doc(db, 'carts', currentUser.uid);
+                await setDoc(userCartRef, { items: cart });
+            } catch (error) {
+                console.error("Error saving cart to Firestore:", error);
+            }
+        }, 500); // 500ms debounce
     }
 }
 

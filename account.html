@@ -118,8 +118,9 @@
         }
     </style>
 </head>
-<body style="display: none;">
-    <div class="account-layout">
+<body>
+    <div id="loading-spinner" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);">Loading...</div>
+    <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
             <div class="sidebar-header">
@@ -229,29 +230,59 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
+                    // Check sessionStorage first to optimize reads
+                    const cachedData = sessionStorage.getItem('userData');
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        initializePage(user, userData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                        return; // Exit early if we have cached data
+                    }
+
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
+                        sessionStorage.setItem('userData', JSON.stringify(userData)); // Cache data
                         initializePage(user, userData);
                         setupEventListeners(user);
-                        document.body.style.display = 'flex';
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                    } else {
+                        const fallbackData = {
+                            username: user.displayName || "User",
+                            email: user.email,
+                            membershipLevel: 'free',
+                            isAdmin: false
+                        };
+                        try {
+                            await setDoc(userDocRef, fallbackData);
+                            sessionStorage.setItem('userData', JSON.stringify(fallbackData)); // Cache data
+                        } catch(e) {
+                            console.error("Failed to set default profile", e);
+                        }
+                        initializePage(user, fallbackData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
                     }
                 } catch (error) {
                     console.error("Error loading profile:", error);
                 }
             } else {
-                window.location.replace('sign in beta.html');
+                if (!window.location.pathname.includes('sign in beta.html')) {
+                    window.location.replace('sign in beta.html');
+                }
             }
         });
 
         function initializePage(user, userData) {
+            document.getElementById('loading-spinner').style.display = 'none';
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
@@ -277,6 +308,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
+                sessionStorage.removeItem('userData');
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
