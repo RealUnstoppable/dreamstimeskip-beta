@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist:", error);
+            console.error("Manager info: Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-        }).catch(e => console.error(e));
+        }).catch(e => console.error("Manager info: Playback Error: ", e));
     }
 
     function pauseSong() {
@@ -416,12 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
 
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
@@ -468,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const favIds = docSnap.data().musicFavorites;
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Manager info: ", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -489,11 +483,4 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
-}
-
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }

@@ -804,6 +804,10 @@
         let cloudSyncTimeout = null;
         let hasReferralDiscount = false;
 
+        function getUserDocRef() { return db.collection('users').doc(currentUser.uid); }
+        function getUserDoc() { return getUserDocRef().get(); }
+        function updateUserDoc(data) { return getUserDocRef().set(data, { merge: true }); }
+
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             const navStatus = document.getElementById('navUserStatus');
@@ -1071,20 +1075,20 @@
             return state;
         }
 
-        document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
+        document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
         
         function triggerDraftSync() {
             if (!currentUser) return;
             clearTimeout(cloudSyncTimeout);
             cloudSyncTimeout = setTimeout(() => {
                 const state = getTrackerState();
-                db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
+                updateUserDoc({ trackerDraft: state });
             }, 3000); 
         }
 
         function syncDraftFromServer() {
             if (!currentUser) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            getUserDoc().then(doc => {
                 if (doc.exists && doc.data().trackerDraft) {
                     const draft = doc.data().trackerDraft;
                     document.getElementById('shiftManager').value = draft.manager || "";
@@ -1115,9 +1119,9 @@
         function manualSaveHistory() {
             if(!currentUser) return alert("Please Sign In first.");
             const state = getTrackerState();
-            db.collection('users').doc(currentUser.uid).set({
+            updateUserDoc({
                 shiftHistory: firebase.firestore.FieldValue.arrayUnion(state)
-            }, { merge: true }).then(() => {
+            }).then(() => {
                 alert("Shift saved to Cloud History!");
                 calculatePerformance();
                 fetchCloudHistory();
@@ -1127,7 +1131,7 @@
         function fetchCloudHistory() {
             if(!currentUser) return;
             const container = document.getElementById('historyListContainer');
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            getUserDoc().then(doc => {
                 container.innerHTML = "";
                 const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
                 if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
@@ -1154,7 +1158,7 @@
             if(!currentUser) return;
             if(!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
 
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            getUserDoc().then(doc => {
                 const history = doc.data().shiftHistory || [];
                 const shift = history.find(s => s.id === id);
                 
@@ -1190,7 +1194,7 @@
 
         function calculatePerformance() {
             if(!currentUser) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            getUserDoc().then(doc => {
                 const history = doc.exists ? doc.data().shiftHistory || [] : [];
                 document.getElementById('statShifts').innerText = history.length;
                 
@@ -1244,9 +1248,9 @@
                 });
             });
             
-            db.collection('users').doc(currentUser.uid).set({
+            updateUserDoc({
                 customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
-            }, { merge: true }).then(() => {
+            }).then(() => {
                 alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
                 loadCustomPresets();
@@ -1256,7 +1260,7 @@
         function loadCustomPresets() {
             if(!currentUser) return;
             const container = document.getElementById('customPresetsContainer');
-            db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
+            getUserDocRef().onSnapshot(doc => {
                 container.innerHTML = "";
                 if(doc.exists && doc.data().customPresets) {
                     doc.data().customPresets.forEach(p => {
@@ -1274,7 +1278,7 @@
 
         function applyCustomPreset(id) {
             if(!confirm("Replace current inventory layout with this custom preset?")) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            getUserDoc().then(doc => {
                 const preset = (doc.data().customPresets || []).find(p => p.id == id);
                 if(preset) {
                     document.getElementById('inventoryContainer').innerHTML = '';
@@ -1331,7 +1335,7 @@
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
-            db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => alert("Profile Updated!"));
+            updateUserDoc(data).then(() => alert("Profile Updated!"));
         }
 
         function copyReferral() {

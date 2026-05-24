@@ -59,7 +59,7 @@ describe('Newsletter Submission', () => {
     await new Promise(process.nextTick);
     await new Promise(process.nextTick);
 
-    expect(console.error).toHaveBeenCalledWith("Error submitting email:", error);
+    expect(console.error).toHaveBeenCalledWith("Manager info: Error submitting email:", error);
     expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
   });
 

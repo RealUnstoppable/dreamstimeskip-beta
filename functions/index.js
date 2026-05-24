@@ -31,7 +31,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       uid = decodedToken.uid;
       email = decodedToken.email;
     } catch (err) {
-      console.error("Auth Error:", err);
+      console.error("Manager info: Auth Error:", err);
       return res.status(401).send("Unauthorized");
     }
 
@@ -61,7 +61,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error:", err);
+      console.error("Manager info: Checkout Error:", err);
       res.status(500).json({error: err.message});
     }
   });
@@ -75,7 +75,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error:", err);
+    console.error("Manager info: Webhook Error:", err);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -155,7 +155,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error:", err);
+      console.error("Manager info: Cancel Error:", err);
       res.status(500).json({error: err.message});
     }
   });

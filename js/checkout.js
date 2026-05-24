@@ -150,7 +150,7 @@ export async function handlePlaceOrder(e) {
         setTimeout(() => window.location.href = './account.html', 3000);
 
     } catch (error) {
-        console.error("Error placing order:", error);
+        console.error("Manager info: Error placing order:", error);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;

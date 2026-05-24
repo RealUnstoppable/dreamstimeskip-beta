@@ -76,10 +76,10 @@ function renderProducts() {
 
 function renderCart() {
     if (Object.keys(cart).length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        checkoutBtn.disabled = true;
+        if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+        if (checkoutBtn) checkoutBtn.disabled = true;
     } else {
-        cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
+        if (cartItemsContainer) cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
             // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
             const product = productMap.get(productId);
             if (!product) return ''; // Should not happen
@@ -97,7 +97,7 @@ function renderCart() {
                 </div>
             `;
         }).join('');
-        checkoutBtn.disabled = false;
+        if (checkoutBtn) checkoutBtn.disabled = false;
     }
     updateCartSummary();
 }
@@ -105,8 +105,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
@@ -116,7 +116,7 @@ export async function handleAddToCart(productId) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error);
+        console.error('Manager info: Failed to add to cart:', error);
     }
 }
 
@@ -144,7 +144,7 @@ async function saveCart() {
             const userCartRef = doc(db, 'carts', currentUser.uid);
             await setDoc(userCartRef, { items: cart });
         } catch (error) {
-            console.error("Error saving cart to Firestore:", error);
+            console.error("Manager info: Error saving cart to Firestore:", error);
         }
     } else {
         // **MODIFIED**: Save cart to localStorage for logged-out users
