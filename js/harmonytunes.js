@@ -453,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
