@@ -10,6 +10,23 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+async function authenticateRequest(req, res) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    return await admin.auth().verifyIdToken(token);
+  } catch (err) {
+    console.error("Auth Error:", err);
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+}
+
 // 🔹 Create Checkout Session
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -17,23 +34,11 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
+    const decodedToken = await authenticateRequest(req, res);
+    if (!decodedToken) return;
 
-    const token = authHeader.split("Bearer ")[1];
-    let uid;
-    let email;
-
-    try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      uid = decodedToken.uid;
-      email = decodedToken.email;
-    } catch (err) {
-      console.error("Auth Error:", err);
-      return res.status(401).send("Unauthorized");
-    }
+    const uid = decodedToken.uid;
+    const email = decodedToken.email;
 
     const {plan, successUrl, cancelUrl} = req.body;
 
@@ -45,7 +50,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
-        customer_email: customer_email,
+        customer_email: email,
         line_items: [{price: priceId, quantity: 1}],
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
 
@@ -123,15 +128,10 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).send("Unauthorized");
-    }
-
-    const token = authHeader.split("Bearer ")[1];
+    const decodedToken = await authenticateRequest(req, res);
+    if (!decodedToken) return;
 
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
       const uid = decodedToken.uid;
 
       const userDoc = await admin.firestore().collection("users")

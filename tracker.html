@@ -1073,7 +1073,7 @@
             return state;
         }
 
-        document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
+        document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
         
         function triggerDraftSync() {
             if (!currentUser) return;
