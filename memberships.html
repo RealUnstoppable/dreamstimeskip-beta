@@ -276,8 +276,8 @@
     </header>
 <script type="module">
       import { auth, db } from '/js/auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+      import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
       // Select the single authentication link by its ID
       const authLink = document.getElementById('auth-link');
@@ -342,7 +342,7 @@
                     <li>Exclusive profile badge</li>
                     <li>Early access to new merch drops</li>
                 </ul>
-                <a href="#" class="view-more-link" data-plan="premium">view more</a>
+                <a href="javascript:void(0)" class="view-more-link" data-plan="premium">view more</a>
                 <a href="checkout-premium.html" class="btn-subscribe btn-premium" data-plan="premium">Choose Premium</a>
             </div>
 
@@ -356,7 +356,7 @@
                     <li>Custom theme creator</li>
                     <li>"Supporter" status & badge</li>
                 </ul>
-                <a href="#" class="view-more-link" data-plan="ultimate">view more</a>
+                <a href="javascript:void(0)" class="view-more-link" data-plan="ultimate">view more</a>
                 <a href="checkout-ultimate.html" class="btn-subscribe btn-ultimate" data-plan="ultimate">Go Ultimate</a>
             </div>
         </section>
