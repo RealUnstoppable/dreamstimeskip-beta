@@ -1,6 +1,6 @@
-const express = require("express");
-const cors = require("cors");
-const Stripe = require("stripe");
+import express from "express";
+import cors from "cors";
+import Stripe from "stripe";
 
 const app = express();
 app.use(cors());

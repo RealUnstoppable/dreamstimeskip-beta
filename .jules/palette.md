@@ -9,3 +9,6 @@
 ## 2024-05-24 - Async UI Feedback and ARIA Alerts
 **Learning:** The authentication form lacked visual textual feedback during submission and screen readers weren't alerted to error messages.
 **Action:** Always add textual loading state updates (e.g. "Processing...") during async operations, and apply `role="alert"` to dynamic error message containers so screen readers announce them immediately.
+## 2026-05-23 - Async Form Submission Loading States
+**Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
+**Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.

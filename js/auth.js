@@ -1,23 +1,13 @@
 // js/auth.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { app, auth, db } from "./firebase.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { app, auth, db } from "./firebase.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-  authDomain: "dts-hub-website.firebaseapp.com",
-  projectId: "dts-hub-website",
-  storageBucket: "dts-hub-website.firebasestorage.app",
-  messagingSenderId: "48345990988",
-  appId: "1:48345990988:web:e3662c9b508168546471e9",
-  measurementId: "G-ZN3YJPHVGX"
-};
-
-// Initialize Firebase and export the instances for other scripts to use
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Re-export instances for scripts that import from auth.js
+export { app, auth, db };
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
@@ -40,6 +30,14 @@ onAuthStateChanged(auth, async (user) => {
             if (membershipStatusContainer) {
                 membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
             }
+
+            const currentPath = window.location.pathname;
+            if (currentPath.endsWith('sign%20in%20beta.html') || currentPath.endsWith('sign in beta.html')) {
+                if (!currentPath.endsWith(destination)) {
+                    window.location.replace(destination);
+                    return;
+                }
+            }
         }
     } else {
         // User is signed out
@@ -50,6 +48,14 @@ onAuthStateChanged(auth, async (user) => {
 
         if (membershipStatusContainer) {
             membershipStatusContainer.innerHTML = '';
+        }
+
+        const currentPath = window.location.pathname;
+        if (currentPath.endsWith('account.html') || currentPath.endsWith('admin.html')) {
+            if (!currentPath.endsWith('sign in beta.html') && !currentPath.endsWith('sign%20in%20beta.html')) {
+                window.location.replace('sign in beta.html');
+                return;
+            }
         }
     }
 });
@@ -86,7 +92,9 @@ if (document.getElementById('auth-form')) {
         const username = document.getElementById('username').value.trim();
 
         messageEl.textContent = '';
+        const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
+        const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = 'Processing...';
 
         if (isSignUp) {
@@ -94,6 +102,7 @@ if (document.getElementById('auth-form')) {
                 showMessage("All fields are required.");
                 submitBtn.disabled = false;
                 submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                submitBtn.textContent = originalBtnText;
                 return;
             }
             try {
@@ -109,9 +118,11 @@ if (document.getElementById('auth-form')) {
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
             } catch (error) {
+                console.error("Signup Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
                 submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                submitBtn.textContent = originalBtnText;
             }
         } else {
             try {
@@ -126,11 +137,14 @@ if (document.getElementById('auth-form')) {
                     showMessage("This account is suspended or does not exist.");
                     submitBtn.disabled = false;
                     submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                    submitBtn.textContent = originalBtnText;
                 }
             } catch (error) {
+                console.error("Signin Error - Manager info:", error.message);
                 showMessage(getFirebaseErrorMessage(error));
                 submitBtn.disabled = false;
                 submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
+                submitBtn.textContent = originalBtnText;
             }
         }
     });
