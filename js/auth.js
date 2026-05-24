@@ -1,4 +1,7 @@
 // js/auth.js
+import { app, auth, db } from "./firebase.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
@@ -29,9 +32,11 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             const currentPath = window.location.pathname;
-            if (currentPath.includes('sign%20in%20beta.html') || currentPath.includes('sign in beta.html')) {
-                window.location.replace(destination);
-                return;
+            if (currentPath.endsWith('sign%20in%20beta.html') || currentPath.endsWith('sign in beta.html')) {
+                if (!currentPath.endsWith(destination)) {
+                    window.location.replace(destination);
+                    return;
+                }
             }
         }
     } else {
@@ -46,9 +51,11 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         const currentPath = window.location.pathname;
-        if (currentPath.includes('account.html') || currentPath.includes('admin.html')) {
-            window.location.replace('sign in beta.html');
-            return;
+        if (currentPath.endsWith('account.html') || currentPath.endsWith('admin.html')) {
+            if (!currentPath.endsWith('sign in beta.html') && !currentPath.endsWith('sign%20in%20beta.html')) {
+                window.location.replace('sign in beta.html');
+                return;
+            }
         }
     }
 });
