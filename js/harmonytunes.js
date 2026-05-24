@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    let favoriteIds = new Set();
     // ⚡ Bolt: Maintain a Set of favorite IDs for O(1) lookups instead of O(N) Array.some() checks
     let userFavoritesIds = new Set();
     let currentQueue = [];
@@ -250,6 +251,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         songs.forEach((song, index) => {
             const row = document.createElement('tr');
             
@@ -271,8 +274,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 playContext(songs, index);
             });
 
-            songListBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        // ⚡ Bolt: Used DocumentFragment to batch DOM inserts, reducing reflows from O(N) to O(1)
+        songListBody.appendChild(fragment);
     }
 
     // --- PLAYER LOGIC ---
@@ -299,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
+        const isFav = favoriteIds.has(song.id);
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
@@ -425,6 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const song = librarySongs.find(s => s.id === songId);
+        const isFav = favoriteIds.has(songId);
         // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
         const song = librarySongsMap.get(songId);
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
@@ -433,10 +442,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             if (isFav) {
+                favoriteIds.delete(songId);
                 userFavorites = userFavorites.filter(s => s.id !== songId);
                 userFavoritesIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
+                favoriteIds.add(songId);
                 userFavorites.push(song);
                 userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
@@ -453,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
+                favoriteIds.add(songId);
                 userFavorites.push(song);
             }
         }
@@ -466,7 +478,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
+                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                     userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    favoriteIds = new Set(favIds);
                     userFavoritesIds = new Set(favIds);
                 }
             } catch (e) { console.error(e); }
@@ -490,6 +506,7 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
+}
 }
 
 export function formatTime(seconds) {

@@ -230,6 +230,10 @@
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { auth, db, safeRedirect } from '/js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { productMap } from '/js/shop.js';
 
         let listenersSetup = false;
@@ -248,8 +252,26 @@
                     }
 
                     const userDocRef = doc(db, "users", user.uid);
-                    const userDoc = await getDoc(userDocRef);
+                    let userDoc = await getDoc(userDocRef);
 
+                    if (!userDoc.exists()) {
+                        // Missing document fallback
+                        console.log("Missing user document. Creating fallback document...");
+                        const newUserData = {
+                            username: user.displayName || "User",
+                            email: user.email,
+                            signupDate: serverTimestamp(),
+                            isBanned: false,
+                            isAdmin: false,
+                            membershipLevel: 'free'
+                        };
+                        await setDoc(userDocRef, newUserData);
+                        userDoc = await getDoc(userDocRef); // Re-fetch
+                    }
+
+                    const userData = userDoc.data();
+                    initializePage(user, userData);
+                    setupEventListeners(user);
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
                         sessionStorage.setItem('userDataCache', JSON.stringify(userData));
@@ -278,7 +300,7 @@
                     console.error("Error loading profile:", error);
                 }
             } else {
-                window.location.replace('sign in beta.html');
+                safeRedirect('sign in beta.html');
             }
         });
 
@@ -366,6 +388,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
+                signOut(auth).then(() => safeRedirect('index.html'));
                 sessionStorage.removeItem('userDataCache');
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
@@ -431,7 +454,7 @@
                     await deleteUser(user);
                     await deleteDoc(doc(db, "users", userId));
                     alert('Your account has been permanently deleted.');
-                    window.location.replace('index.html');
+                    safeRedirect('index.html');
                 } catch (error) {
                     alert('Error: Please sign out, sign back in, and try again.');
                 }
