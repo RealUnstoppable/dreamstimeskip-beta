@@ -17,10 +17,12 @@ async function authenticateRequest(req, res) {
     res.status(401).send("Unauthorized");
     return null;
   }
+
   const token = authHeader.split("Bearer ")[1];
   try {
     return await admin.auth().verifyIdToken(token);
   } catch (err) {
+    console.error("Auth Error:", err);
     console.error("Auth Error - Manager info:", err.message);
     res.status(401).send("Unauthorized");
     return null;
@@ -130,6 +132,9 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 
     const decodedToken = await authenticateRequest(req, res);
     if (!decodedToken) return;
+
+    try {
+      const uid = decodedToken.uid;
     const uid = decodedToken.uid;
 
     try {

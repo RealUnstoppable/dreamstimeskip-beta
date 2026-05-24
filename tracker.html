@@ -1340,6 +1340,8 @@
             return state;
         }
 
+        document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
+        
         document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
 
         function triggerDraftSync() {
