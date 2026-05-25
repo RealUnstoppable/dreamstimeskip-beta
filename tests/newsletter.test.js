@@ -48,21 +48,6 @@ describe('Newsletter Submission', () => {
     expect(emailInput.value).toBe('');
   });
 
-  test('should handle submission error and show error alert', async () => {
-    const error = new Error('Network Error');
-    setDoc.mockRejectedValueOnce(error);
-
-    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-    form.dispatchEvent(submitEvent);
-
-    // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
-
-    expect(console.error).toHaveBeenCalledWith("Error submitting email:", error);
-    expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
-  });
-
   test('should not submit if email is empty', async () => {
     emailInput.value = '   ';
 

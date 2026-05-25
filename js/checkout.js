@@ -151,7 +151,7 @@ export async function handlePlaceOrder(e) {
 
     } catch (error) {
         console.error("Error placing order:", error);
-        messageEl.textContent = 'There was an error placing your order. Please try again.';
+        messageEl.textContent = 'There was an error placing your order. Please try again. Manager info: [' + error.message + ']';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;
         placeOrderBtn.textContent = 'Place Order';
