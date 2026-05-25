@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
     <style>
         :root {
@@ -93,16 +94,18 @@
         }
     </style>
 </head>
-<body style="display: none;"> 
+<body style="display: none;">
+    <header class="main-header"></header>
+ 
     <div class="mobile-header">
         <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
-        <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <button class="hamburger-btn" aria-label="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
     </div>
 
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="mobile-header" style="justify-content: flex-end;">
-                <button class="hamburger-btn" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
+                <button class="hamburger-btn" aria-label="Close sidebar" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
             </div>
             <div class="sidebar-header">
                 <h2>Admin Panel</h2>
@@ -256,9 +259,12 @@
     </div>
 
    <script type="module">
-        import { auth, db } from '/js/auth.js';
+        import { auth, db, safeRedirect } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { auth, db } from '/js/auth.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         let performanceChart;
 
@@ -279,11 +285,17 @@
                 if (!window.location.pathname.includes('sign in beta.html')) {
                     window.location.replace('sign in beta.html');
                 }
+                    safeRedirect('account.html');
+                }
+            } else {
+                safeRedirect('sign in beta.html');
             }
         });
 
         function escapeHTML(str) {
-            if (typeof str !== 'string') return str;
+            if (str == null) return "";
+            if (typeof str !== 'string') str = str.toString();
+            if (typeof str !== 'string') str = String(str);
             return str
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
@@ -611,6 +623,15 @@
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
         }
+    </script>
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>

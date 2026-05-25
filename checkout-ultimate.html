@@ -184,7 +184,7 @@
 </header>
 <script type="module">
       import { auth, db } from '/js/auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"; </script>
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"; </script>
     <main class="checkout-main">
         <div class="checkout-layout">
 
@@ -249,8 +249,13 @@
     </script>
 
     <script src="/js/script.js"></script>
-     <script type="module">
-    import { loadNavbar } from './js/navbar.js';
-    document.addEventListener('DOMContentLoaded', loadNavbar);
-</script>
+    <footer class="main-footer"></footer> 
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+
    
