@@ -1,12 +1,12 @@
-const express = require("express");
-const cors = require("cors");
-const Stripe = require("stripe");
+import express from "express";
+import cors from "cors";
+import Stripe from "stripe";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const stripe = Stripe(""); // 🔴 replace
+const stripe = new Stripe("sk_test_placeholder"); // 🔴 replace
 
 app.post("/create-checkout-session", async (req, res) => {
   const { plan } = req.body;
