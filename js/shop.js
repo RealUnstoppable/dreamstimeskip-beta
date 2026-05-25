@@ -184,11 +184,18 @@ async function saveWishlist() {
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
 
+    // Clear existing timeout if there is one
     // Debounce the Firestore write
     if (saveCartTimeout) {
         clearTimeout(saveCartTimeout);
     }
 
+    // Always update local cache immediately
+    if (!currentUser) {
+        localStorage.setItem('localCart', JSON.stringify(cart));
+    } else {
+        // Debounce Firestore writes for authenticated users
+        saveCartTimeout = setTimeout(async () => {
     saveCartTimeout = setTimeout(async () => {
         if (currentUser) {
             try {
@@ -197,6 +204,7 @@ async function saveCart() {
             } catch (error) {
                 console.error("Error saving cart to Firestore:", error);
             }
+        }, 500); // 500ms debounce
         } else {
             // Save cart to localStorage for logged-out users
             localStorage.setItem('localCart', JSON.stringify(cart));

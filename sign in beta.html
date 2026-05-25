@@ -45,6 +45,22 @@
     <footer class="main-footer"></footer>
     <script type="module">
         import { auth, db } from '/js/auth.js';
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !sessionStorage.getItem('newUser')) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && !userDoc.data().isBanned) {
+                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    if (!window.location.pathname.includes(destination)) {
+                        window.location.replace(destination);
+                    }
+                }
+            }
+        });
+    </script>
+
         import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         // Authentication handling logic (add as needed)
     </script>

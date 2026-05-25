@@ -25,6 +25,8 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
@@ -1073,7 +1075,7 @@
         let cloudSyncTimeout = null;
         let hasReferralDiscount = false;
 
-        auth.onAuthStateChanged((user) => {
+        onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             const navStatus = document.getElementById('navUserStatus');
 
@@ -1081,6 +1083,18 @@
                 navStatus.innerText = "Manager: " + (user.displayName || "Online");
                 document.getElementById('profEmail').value = user.email;
                 document.getElementById('referralLink').value = `${window.location.origin}${window.location.pathname}?ref=${user.uid}`;
+                
+                const userDocRef = doc(db, "users", user.uid);
+                getDoc(userDocRef).then(docSnap => {
+                    if (docSnap.exists()) {
+                        currentUserData = docSnap.data();
+                        loadProfileUI(currentUserData);
+                        loadCustomPresets();
+                        calculatePerformance();
+                        syncDraftFromServer(); 
+                        if (document.querySelector('.view-section.active').id === 'view-auth') window.navTo('tracker');
+                    } else {
+                        window.navTo('setup');
 
                 db.collection("users").doc(user.uid).get().then(doc => {
                     if (doc.exists) {
@@ -1118,13 +1132,13 @@
             document.getElementById('authToggleLink').innerText = isRegisterMode ? "Sign In" : "Create one";
         }
 
-        function toggleAuthMode(e) {
+        window.toggleAuthMode = function(e) {
             if (e) e.preventDefault();
             isRegisterMode = !isRegisterMode;
             toggleAuthModeUI();
         }
 
-        function handleAuth(e) {
+        window.handleAuth = function(e) {
             e.preventDefault();
             const email = document.getElementById('authEmail').value;
             const pass = document.getElementById('authPass').value;
@@ -1134,15 +1148,15 @@
             btn.innerText = 'Processing...';
 
             if (isRegisterMode) {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .then(() => navTo('setup'))
+                createUserWithEmailAndPassword(auth, email, pass)
+                    .then(() => window.navTo('setup'))
                     .catch(err => alert(err.message))
                     .finally(() => {
                         btn.disabled = false;
                         btn.innerText = originalText;
                     });
             } else {
-                auth.signInWithEmailAndPassword(email, pass)
+                signInWithEmailAndPassword(auth, email, pass)
                     .catch(err => alert(err.message))
                     .finally(() => {
                         btn.disabled = false;
@@ -1151,6 +1165,12 @@
             }
         }
 
+        window.signInWithGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).then(cred => {
+                const userDocRef = doc(db, "users", cred.user.uid);
+                getDoc(userDocRef).then(docSnap => {
+                    if(!docSnap.exists()) window.navTo('setup');
         function signInWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then(cred => {
@@ -1160,9 +1180,9 @@
             }).catch(err => alert(err.message));
         }
 
-        function signOut() { auth.signOut().then(() => window.location.reload()); }
+        window.signOut = function() { firebaseSignOut(auth).then(() => window.location.reload()); }
 
-        function completeSetup() {
+        window.completeSetup = function() {
             if (!currentUser) return;
             const data = {
                 name: document.getElementById('setupName').value,
@@ -1172,15 +1192,15 @@
                 location: document.getElementById('setupLocation').value,
                 email: currentUser.email,
                 plan: 'free',
-                signupDate: firebase.firestore.FieldValue.serverTimestamp()
+                signupDate: serverTimestamp()
             };
 
             if (!data.name) return alert("Name is required.");
 
-            db.collection('users').doc(currentUser.uid).set(data).then(() => {
-                currentUser.updateProfile({ displayName: data.name });
+            const userDocRef = doc(db, "users", currentUser.uid);
+            setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
-                navTo('tracker');
+                window.navTo('tracker');
             });
         }
 
@@ -1342,6 +1362,7 @@
 
         document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
         
+        window.triggerDraftSync = function() {
         document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
 
         function triggerDraftSync() {
@@ -1349,15 +1370,19 @@
             clearTimeout(cloudSyncTimeout);
             cloudSyncTimeout = setTimeout(() => {
                 const state = getTrackerState();
+                const userDocRef = doc(db, 'users', currentUser.uid);
+                setDoc(userDocRef, { trackerDraft: state }, { merge: true });
+            }, 3000); 
                 db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
             }, 3000);
         }
 
         function syncDraftFromServer() {
             if (!currentUser) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                if (doc.exists && doc.data().trackerDraft) {
-                    const draft = doc.data().trackerDraft;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            getDoc(userDocRef).then(docSnap => {
+                if (docSnap.exists() && docSnap.data().trackerDraft) {
+                    const draft = docSnap.data().trackerDraft;
                     document.getElementById('shiftManager').value = draft.manager || "";
                     document.getElementById('prepNotes').value = draft.prepNotes || "";
                     document.getElementById('safeCount').value = draft.safeCount || "";
@@ -1365,6 +1390,23 @@
                     document.getElementById('beefTempered').value = draft.beefTempered || "";
                     document.getElementById('laborVariance').value = draft.laborVariance || "";
                     document.getElementById('changeNeeded').value = draft.changeNeeded || "";
+                    
+                    const addRoutine = window.addRoutineTask || addRoutineTask;
+                    const addInv = window.addInventoryItem || addInventoryItem;
+                    const addDrawer = window.addDrawerItem || addDrawerItem;
+                    const addDeposit = window.addDepositItem || addDepositItem;
+
+                    document.getElementById('routineContainer').innerHTML = '';
+                    if(draft.routines) draft.routines.forEach(r => addRoutine(r.name, r.checked));
+                    
+                    document.getElementById('inventoryContainer').innerHTML = '';
+                    if(draft.inventory) draft.inventory.forEach(i => addInv(i.name, i.bl, i.cl, i.fr));
+                    
+                    document.getElementById('drawersContainer').innerHTML = '';
+                    if(draft.drawers) draft.drawers.forEach(d => addDrawer(d.val, d.name));
+
+                    document.getElementById('depositsContainer').innerHTML = '';
+                    if(draft.deposits) draft.deposits.forEach(d => addDeposit(d.val));
 
                     document.getElementById('routineContainer').innerHTML = '';
                     if (draft.routines) draft.routines.forEach(r => addRoutineTask(r.name, r.checked));
@@ -1378,16 +1420,23 @@
                     document.getElementById('depositsContainer').innerHTML = '';
                     if (draft.deposits) draft.deposits.forEach(d => addDepositItem(d.val));
                 } else {
-                    initDefaults();
+                    if (typeof window.initDefaults === 'function') {
+                        window.initDefaults();
+                    } else if (typeof initDefaults === 'function') {
+                        initDefaults();
+                    }
                 }
             });
         }
 
+        window.manualSaveHistory = function() {
+            if(!currentUser) return alert("Please Sign In first.");
         function manualSaveHistory() {
             if (!currentUser) return alert("Please Sign In first.");
             const state = getTrackerState();
-            db.collection('users').doc(currentUser.uid).set({
-                shiftHistory: firebase.firestore.FieldValue.arrayUnion(state)
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            setDoc(userDocRef, {
+                shiftHistory: arrayUnion(state)
             }, { merge: true }).then(() => {
                 alert("Shift saved to Cloud History!");
                 calculatePerformance();
@@ -1398,8 +1447,12 @@
         function fetchCloudHistory() {
             if (!currentUser) return;
             const container = document.getElementById('historyListContainer');
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            getDoc(userDocRef).then(docSnap => {
                 container.innerHTML = "";
+                const history = (docSnap.exists() ? docSnap.data().shiftHistory || [] : []).reverse();
+                if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
+                
                 const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
                 if (history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
 
@@ -1422,12 +1475,16 @@
             });
         }
 
+        window.loadHistoryShift = function(id) {
+            if(!currentUser) return;
+            if(!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
         function loadHistoryShift(id) {
             if (!currentUser) return;
             if (!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
 
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const history = doc.data().shiftHistory || [];
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            getDoc(userDocRef).then(docSnap => {
+                const history = docSnap.data().shiftHistory || [];
                 const shift = history.find(s => s.id === id);
 
                 if (shift) {
@@ -1440,6 +1497,23 @@
                     document.getElementById('beefTempered').value = shift.beefTempered || "";
                     document.getElementById('laborVariance').value = shift.laborVariance || "";
                     document.getElementById('changeNeeded').value = shift.changeNeeded || "";
+                    
+                    const addRoutine = window.addRoutineTask || addRoutineTask;
+                    const addInv = window.addInventoryItem || addInventoryItem;
+                    const addDrawer = window.addDrawerItem || addDrawerItem;
+                    const addDeposit = window.addDepositItem || addDepositItem;
+
+                    document.getElementById('routineContainer').innerHTML = '';
+                    if(shift.routines) shift.routines.forEach(r => addRoutine(r.name, r.checked));
+                    
+                    document.getElementById('inventoryContainer').innerHTML = '';
+                    if(shift.inventory) shift.inventory.forEach(i => addInv(i.name, i.bl, i.cl, i.fr));
+                    
+                    document.getElementById('drawersContainer').innerHTML = '';
+                    if(shift.drawers) shift.drawers.forEach(d => addDrawer(d.val, d.name));
+
+                    document.getElementById('depositsContainer').innerHTML = '';
+                    if(shift.deposits) shift.deposits.forEach(d => addDeposit(d.val));
 
                     document.getElementById('routineContainer').innerHTML = '';
                     if (shift.routines) shift.routines.forEach(r => addRoutineTask(r.name, r.checked));
@@ -1453,14 +1527,18 @@
                     document.getElementById('depositsContainer').innerHTML = '';
                     if (shift.deposits) shift.deposits.forEach(d => addDepositItem(d.val));
 
-                    navTo('tracker');
-                    triggerDraftSync();
+                    window.navTo('tracker');
+                    window.triggerDraftSync();
                     alert("Shift loaded into Active Tracker successfully.");
                 }
             });
         }
 
         function calculatePerformance() {
+            if(!currentUser) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            getDoc(userDocRef).then(docSnap => {
+                const history = docSnap.exists() ? docSnap.data().shiftHistory || [] : [];
             if (!currentUser) return;
             db.collection('users').doc(currentUser.uid).get().then(doc => {
                 const history = doc.exists ? doc.data().shiftHistory || [] : [];
@@ -1502,6 +1580,8 @@
             }
         }
 
+        window.saveCustomPreset = function() {
+            if(!currentUser) return;
         function saveCustomPreset() {
             if (!currentUser) return;
             const name = document.getElementById('customPresetName').value || "Unnamed Preset";
@@ -1515,6 +1595,10 @@
                     fr: el.querySelector('.inv-freezer').value
                 });
             });
+            
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            setDoc(userDocRef, {
+                customPresets: arrayUnion({ id: Date.now().toString(), name, items })
 
             db.collection('users').doc(currentUser.uid).set({
                 customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
@@ -1528,8 +1612,11 @@
         function loadCustomPresets() {
             if (!currentUser) return;
             const container = document.getElementById('customPresetsContainer');
-            db.collection('users').doc(currentUser.uid).onSnapshot(doc => {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            onSnapshot(userDocRef, docSnap => {
                 container.innerHTML = "";
+                if(docSnap.exists() && docSnap.data().customPresets) {
+                    docSnap.data().customPresets.forEach(p => {
                 if (doc.exists && doc.data().customPresets) {
                     doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
@@ -1545,6 +1632,13 @@
             });
         }
 
+        window.applyCustomPreset = function(id) {
+            if(!confirm("Replace current inventory layout with this custom preset?")) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            getDoc(userDocRef).then(docSnap => {
+                const preset = (docSnap.data().customPresets || []).find(p => p.id == id);
+                if(preset) {
+                    const addInv = window.addInventoryItem || addInventoryItem;
         function applyCustomPreset(id) {
             if (!confirm("Replace current inventory layout with this custom preset?")) return;
             db.collection('users').doc(currentUser.uid).get().then(doc => {
@@ -1553,17 +1647,19 @@
                     document.getElementById('inventoryContainer').innerHTML = '';
                     preset.items.forEach(i => {
                         if (typeof i === 'string') {
-                            addInventoryItem(i);
+                            addInv(i);
                         } else {
-                            addInventoryItem(i.name, i.bl, i.cl, i.fr);
+                            addInv(i.name, i.bl, i.cl, i.fr);
                         }
                     });
-                    navTo('tracker');
-                    triggerDraftSync();
+                    window.navTo('tracker');
+                    window.triggerDraftSync();
                 }
             });
         }
 
+        window.generateReport = function() {
+            if(!currentUser) return alert("Sign in required.");
         function generateReport() {
             if (!currentUser) return alert("Sign in required.");
             const state = getTrackerState();
@@ -1584,7 +1680,11 @@
             state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
-            manualSaveHistory();
+            if (typeof window.manualSaveHistory === 'function') {
+                window.manualSaveHistory();
+            } else if (typeof manualSaveHistory === 'function') {
+                manualSaveHistory();
+            }
             window.print();
         }
 
@@ -1597,6 +1697,8 @@
             if (data.name) document.getElementById('profileAvatar').innerText = data.name.charAt(0).toUpperCase();
         }
 
+        window.saveProfileToFirebase = function() {
+            if(!currentUser) return;
         function saveProfileToFirebase() {
             if (!currentUser) return;
             const data = {
@@ -1604,16 +1706,19 @@
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
-            db.collection('users').doc(currentUser.uid).set(data, { merge: true }).then(() => alert("Profile Updated!"));
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            setDoc(userDocRef, data, { merge: true }).then(() => alert("Profile Updated!"));
         }
 
-        function copyReferral() {
+        window.copyReferral = function() {
             const el = document.getElementById('referralLink');
             el.select();
             document.execCommand('copy');
             alert("Link copied! Share to earn credits.");
         }
 
+        window.clearData = function() {
+            if(confirm("Are you sure? This will wipe the current tracker form.")) {
         function clearData() {
             if (confirm("Are you sure? This will wipe the current tracker form.")) {
                 document.getElementById('trackerForm').reset();
@@ -1621,12 +1726,20 @@
                 document.getElementById('depositsContainer').innerHTML = '';
                 document.getElementById('inventoryContainer').innerHTML = '';
                 document.getElementById('routineContainer').innerHTML = '';
-                initDefaults();
-                triggerDraftSync();
+                if (typeof window.initDefaults === 'function') {
+                    window.initDefaults();
+                } else if (typeof initDefaults === 'function') {
+                    initDefaults();
+                }
+                if (typeof window.triggerDraftSync === 'function') {
+                    window.triggerDraftSync();
+                } else if (typeof triggerDraftSync === 'function') {
+                    triggerDraftSync();
+                }
             }
         }
 
-        function initDefaults() {
+        window.initDefaults = function() {
             if (document.getElementById('inventoryContainer').innerHTML.trim() === "") {
                 document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('shiftTime').value = new Date().toTimeString().slice(0, 5);
@@ -1668,8 +1781,11 @@
             }
         }
 
-        function submitFeatureRequest() {
+        window.submitFeatureRequest = function() {
             const msg = document.getElementById('featureReqText').value;
+            if(!msg) return;
+            const featureRequestsRef = collection(db, 'feature_requests');
+            addDoc(featureRequestsRef, {
             if (!msg) return;
             db.collection('feature_requests').add({
                 uid: currentUser.uid,

@@ -10,6 +10,269 @@
     <link rel="stylesheet" href="/css/themes.css">
 </head>
 <body>
+    <div id="loading-spinner" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);">Loading...</div>
+    <div class="account-layout" id="account-layout-container" style="display: none;">
+        <aside class="sidebar">
+            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
+            <div class="sidebar-header">
+                <h2 id="welcome-header">Loading...</h2>
+                <p id="user-email-sidebar"></p>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="index.html">← Return to Home</a></li>
+                    <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
+                    <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
+                    <li><a href="#settings" class="nav-link">Settings</a></li>
+                    <li><a href="#support" class="nav-link">Support</a></li>
+                </ul>
+            </nav>
+            <button class="sign-out-btn" id="sign-out">Sign Out</button>
+        </aside>
+        
+        <main class="main-content">
+            <section id="dashboard" class="content-section active">
+                <h3>Dashboard</h3>
+                <div class="card">
+                    <h4>Quick Overview</h4>
+                    <p>Welcome to your personal hub. Navigate the sidebar to manage your subscriptions, orders, and themes.</p>
+                </div>
+            </section>
+
+            <section id="orders" class="content-section">
+                <h3>Order History</h3>
+                <div class="card">
+                    <h4>Recent Purchases</h4>
+                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                </div>
+            </section>
+
+            <section id="billing" class="content-section">
+                <h3>Billing & Plans</h3>
+                <div class="card">
+                    <h4>Current Plan</h4>
+                    <p>You are currently on the <strong>Free</strong> tier.</p>
+                    <a href="memberships.html" class="btn btn-primary" style="margin-top: 10px;">Upgrade Plan</a>
+                </div>
+            </section>
+
+            <section id="settings" class="content-section">
+                <h3>Settings</h3>
+                <div class="card">
+                    <h4>Update Profile</h4>
+                    <form id="update-profile-form">
+                        <div class="form-group">
+                            <label for="update-username">Username</label>
+                            <input type="text" id="update-username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update-email">Email (Cannot be changed)</label>
+                            <input type="email" id="update-email" disabled title="Your email address cannot be changed">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <div id="profile-notification" class="notification"></div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h4>Display Settings</h4>
+                    <form id="theme-settings-form">
+                        <div class="form-group">
+                            <label for="theme-select">Theme</label>
+                            <select id="theme-select">
+                                <option value="dark">Dark</option>
+                                <option value="light">Light</option>
+                                <option value="midnight">Midnight</option>
+                                <option value="forest">Forest</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Accent Color</label>
+                            <div class="accent-options">
+                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
+                                <label><input type="radio" name="accent-color" value="red"> Red</label>
+                                <label><input type="radio" name="accent-color" value="green"> Green</label>
+                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <div id="theme-notification" class="notification"></div>
+                    </form>
+                </div>
+
+                <div class="card" id="delete-account-card">
+                    <h4>Delete Account</h4>
+                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                </div>
+            </section>
+            
+            <section id="support" class="content-section">
+                <h3>Contact Support</h3>
+                <div class="card">
+                    <p>If you need help, please reach out. We're happy to assist!</p>
+                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from '/js/auth.js';
+        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Check sessionStorage first to optimize reads
+                    const cachedData = sessionStorage.getItem('userData');
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        initializePage(user, userData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                        return; // Exit early if we have cached data
+                    }
+
+                    const userDocRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        sessionStorage.setItem('userData', JSON.stringify(userData)); // Cache data
+                        initializePage(user, userData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                    } else {
+                        const fallbackData = {
+                            username: user.displayName || "User",
+                            email: user.email,
+                            membershipLevel: 'free',
+                            isAdmin: false
+                        };
+                        try {
+                            await setDoc(userDocRef, fallbackData);
+                            sessionStorage.setItem('userData', JSON.stringify(fallbackData)); // Cache data
+                        } catch(e) {
+                            console.error("Failed to set default profile", e);
+                        }
+                        initializePage(user, fallbackData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                    }
+                } catch (error) {
+                    console.error("Error loading profile:", error);
+                }
+            } else {
+                if (!window.location.pathname.includes('sign in beta.html')) {
+                    window.location.replace('sign in beta.html');
+                }
+            }
+        });
+
+        function initializePage(user, userData) {
+            document.getElementById('loading-spinner').style.display = 'none';
+            if (userData.isAdmin) {
+                const adminBtn = document.getElementById('admin-back-button');
+                if (adminBtn) adminBtn.style.display = 'block';
+            }
+
+            const welcomeHeader = document.getElementById('welcome-header');
+            if (sessionStorage.getItem('newUser')) {
+                welcomeHeader.textContent = `Welcome, ${userData.username}!`;
+                sessionStorage.removeItem('newUser');
+            } else {
+                welcomeHeader.textContent = `Welcome back, ${userData.username}!`;
+            }
+
+            document.getElementById('user-email-sidebar').textContent = user.email;
+            document.getElementById('update-username').value = userData.username;
+            document.getElementById('update-email').value = user.email;
+
+            document.getElementById('theme-select').value = userData.theme || 'dark';
+            const currentAccent = userData.accentColor || 'blue';
+            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
+            if (accentRadio) accentRadio.checked = true;
+        }
+
+        function setupEventListeners(user) {
+            document.getElementById('sign-out').addEventListener('click', () => {
+                sessionStorage.removeItem('userData');
+                signOut(auth).then(() => window.location.replace('index.html'));
+            });
+
+            document.getElementById('update-profile-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newUsername = document.getElementById('update-username').value;
+                const notificationEl = document.getElementById('profile-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
+
+                try {
+                    await updateDoc(doc(db, "users", user.uid), { username: newUsername });
+                    showNotification(notificationEl, 'Username updated successfully!', 'success');
+                    document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                }
+            });
+
+            document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const theme = document.getElementById('theme-select').value;
+                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const notificationEl = document.getElementById('theme-notification');
+
+                try {
+                    await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
+                    showNotification(notificationEl, 'Theme updated successfully!', 'success');
+                    document.body.dataset.theme = theme;
+                    document.body.dataset.accent = accentColor;
+                    localStorage.setItem('userTheme', theme);
+                    localStorage.setItem('userAccent', accentColor);
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                }
+            });
+
+            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                try {
+                    const userId = user.uid;
+                    await deleteUser(user);
+                    await deleteDoc(doc(db, "users", userId));
+                    alert('Your account has been permanently deleted.');
+                    window.location.replace('index.html');
+                } catch (error) {
+                    alert('Error: Please sign out, sign back in, and try again.');
+                }
+            });
+
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', e => {
+                    e.preventDefault();
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                    e.currentTarget.classList.add('active');
+                    document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
+                });
+            });
+
+            const showNotification = (element, message, type) => {
+                element.textContent = message;
+                element.className = `notification ${type}`;
+                element.style.display = 'block';
+                setTimeout(() => { element.style.display = 'none'; }, 5000);
+            };
+        }
     <header class="main-header"></header>
     <main style="padding: 120px 20px; text-align: center; min-height: 60vh;">
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">User Account</h1>
