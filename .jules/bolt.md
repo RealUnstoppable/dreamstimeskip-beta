@@ -16,3 +16,6 @@
 ## 2024-05-23 - Batching DOM Inserts with DocumentFragment
 **Learning:** Appending elements directly to the DOM inside a loop (e.g., `container.appendChild(el)`) causes O(N) reflows and repaints, which is a significant performance anti-pattern during list rendering.
 **Action:** Always construct elements and append them to a `DocumentFragment` first, then append the entire fragment to the container outside the loop to minimize reflows to O(1).
+## 2024-05-24 - Throttling High-Frequency Media Events
+**Learning:** High-frequency media events like `timeupdate` on HTMLAudioElement fire several times a second and trigger expensive DOM updates and string formatting synchronously. This causes main-thread blocking and frame drops.
+**Action:** Always throttle high-frequency media events using `requestAnimationFrame` coupled with a state tracking flag (e.g., `isUpdatingProgress`) to decouple rapid event firing from expensive DOM updates.

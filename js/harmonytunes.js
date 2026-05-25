@@ -416,13 +416,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
+    // to decouple rapid event firing from expensive DOM updates.
+    let isUpdatingProgress = false;
     function updateProgress() {
-        const { duration, currentTime } = audioPlayer;
-        if (duration) {
-            const percent = (currentTime / duration) * 100;
-            progress.style.width = `${percent}%`;
-            currentTimeEl.textContent = formatTime(currentTime);
-            totalTimeEl.textContent = formatTime(duration);
+        if (!isUpdatingProgress) {
+            window.requestAnimationFrame(() => {
+                const { duration, currentTime } = audioPlayer;
+                if (duration) {
+                    const percent = (currentTime / duration) * 100;
+                    progress.style.width = `${percent}%`;
+                    currentTimeEl.textContent = formatTime(currentTime);
+                    totalTimeEl.textContent = formatTime(duration);
+                }
+                isUpdatingProgress = false;
+            });
+            isUpdatingProgress = true;
         }
     }
 
@@ -505,4 +514,10 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
+}
+
+export function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
 }

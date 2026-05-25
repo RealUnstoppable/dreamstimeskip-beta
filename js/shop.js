@@ -59,15 +59,6 @@ const navCtaContainer = document.getElementById('nav-cta-container');
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
     if (!productGrid) return;
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-footer">
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
@@ -83,7 +74,7 @@ function renderProducts() {
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
                     <div class="product-footer">
-                        <span class="product-price">${product.price.toFixed(2)}</span>
+                        <span class="product-price">$${product.price.toFixed(2)}</span>
                         <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                     </div>
                 </div>
