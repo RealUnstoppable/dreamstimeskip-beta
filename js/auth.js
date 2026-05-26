@@ -2,9 +2,6 @@
 import { app, auth, db } from "./firebase.js";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { app, auth, db } from "./firebase.js";
 
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
@@ -94,7 +91,6 @@ if (document.getElementById('auth-form')) {
         messageEl.textContent = '';
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
-        const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = 'Processing...';
 
         if (isSignUp) {

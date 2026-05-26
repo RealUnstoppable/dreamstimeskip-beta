@@ -60,8 +60,14 @@ const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
     if (!productGrid) return;
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
+
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions, reducing O(N) reflows to O(1)
+    const fragment = document.createDocumentFragment();
+
+    products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
             <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
             <div class="product-info">
                 <h3>${product.name}</h3>
@@ -71,8 +77,12 @@ function renderProducts() {
                     <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+        fragment.appendChild(card);
+    });
+
+    productGrid.innerHTML = '';
+    productGrid.appendChild(fragment);
 }
 
 function renderCart() {
@@ -174,19 +184,6 @@ const saveCartToFirestore = debounce(async (uid, cartData) => {
     }
 }, 1000);
 
-async function saveCart() {
-    updateCartSummary(); // Update UI immediately for responsiveness
-    if (currentUser) {
-        // Use debounced write for logged-in users
-        await saveCartToFirestore(currentUser.uid, { ...cart });
-    } else {
-        // **MODIFIED**: Save cart to localStorage for logged-out users
-        // Let handleAddToCart or calling function catch and log the error.
-        try {
-            localStorage.setItem('localCart', JSON.stringify(cart));
-        } catch(error) {
-            throw error;
-        }
 let saveCartTimeout = null;
 let pendingResolves = [];
 
@@ -194,23 +191,6 @@ async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
 
     // Debounce the Firestore write
-    if (saveCartTimeout) {
-        clearTimeout(saveCartTimeout);
-    }
-
-    saveCartTimeout = setTimeout(async () => {
-        if (currentUser) {
-            try {
-                const userCartRef = doc(db, 'carts', currentUser.uid);
-                await setDoc(userCartRef, { items: cart });
-            } catch (error) {
-                console.error("Error saving cart to Firestore:", error);
-            }
-        } else {
-            // Save cart to localStorage for logged-out users
-            localStorage.setItem('localCart', JSON.stringify(cart));
-        }
-    }, 500); // Wait 500ms before committing to backend
     if (saveCartTimeout) {
         clearTimeout(saveCartTimeout);
     }
