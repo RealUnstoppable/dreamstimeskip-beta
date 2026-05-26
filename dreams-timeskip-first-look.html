@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog | DTS HUB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/blog.css">
+    <link rel="stylesheet" href="/css/the-philosophy-behind-unstoppable-more-than-a-brand.css">
+    <link rel="stylesheet" href="/css/themes.css">
+</head>
+<body>
+
+    <header class="main-header"></header>
+
+    <main class="blog-main">
+        <section class="blog-header">
+            <h1>A First Look at Dreams TimeSkip: The Road to 2027</h1>
+            <h3>The question we get most often is: what exactly is Dreams TimeSkip? It’s an epic Minecraft saga, but it’s also an interactive world with a rich story, unique NPCs, and live events that will shape its future. The 2027 release may seem far away, but we're building something truly special...</h3>
+        </section>
+<button class="back-button" onclick="window.history.back();"> &larr; Back to Blog</button>
+ 
+            </article>
+        </section>
+    </main>
+    
+    <footer class="main-footer"></footer>
+
+    <script src="/js/script.js"></script>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+</body>
+</html>
+

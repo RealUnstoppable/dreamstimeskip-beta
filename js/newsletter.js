@@ -1,11 +1,5 @@
 import { db } from './auth.js';
-// Check if we are in a testing environment that doesn't support https imports
-const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
-const firestore = isTest
-    ? { doc: () => {}, setDoc: () => {}, serverTimestamp: () => {} }
-    : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
-
-const { doc, setDoc, serverTimestamp } = firestore;
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Use event delegation to catch submissions from dynamically loaded footers
 if (typeof document !== 'undefined') {
@@ -33,6 +27,7 @@ if (typeof document !== 'undefined') {
                     alert("There was an error subscribing. Please try again later. Manager info: [" + error.message + "]");
                 }
             }
+        }
         }
     });
 }

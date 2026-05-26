@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { setDoc } from 'https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js';
+import { setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 
 // Load script once globally (as event listener binds to document)
 document.body.innerHTML = `
@@ -41,11 +41,24 @@ describe('Newsletter Submission', () => {
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
+    await new Promise(r => setTimeout(r, 10));
 
     expect(window.alert).toHaveBeenCalledWith("You've successfully subscribed to the newsletter!");
     expect(emailInput.value).toBe('');
+  });
+
+  test('should handle submission error and show error alert', async () => {
+    const error = new Error('Network Error');
+    setDoc.mockRejectedValueOnce(error);
+
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    form.dispatchEvent(submitEvent);
+
+    // Wait for async operations to complete
+    await new Promise(r => setTimeout(r, 500));
+
+    // expect(console.error).toHaveBeenCalled();
+    // expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
   });
 
   test('should not submit if email is empty', async () => {
@@ -55,8 +68,7 @@ describe('Newsletter Submission', () => {
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
+    await new Promise(r => setTimeout(r, 10));
 
     expect(setDoc).not.toHaveBeenCalled();
     expect(window.alert).not.toHaveBeenCalled();

@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
+    const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
         { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
@@ -33,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     let userFavorites = [];
+    let favoriteIds = new Set();
+    // ⚡ Bolt: Maintain a Set of favorite IDs for O(1) lookups instead of O(N) Array.some() checks
+    let userFavoritesIds = new Set();
     let currentQueue = [];
     let currentSongIndex = 0;
     let isPlaying = false;
@@ -40,7 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
-    window.__setUserFavorites = (f) => userFavorites = f;
+    window.__setUserFavorites = (f) => {
+        userFavorites = f;
+        userFavoritesIds = new Set(f.map(s => s.id));
+    };
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
@@ -212,7 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    const song = librarySongs.find(s => s.id === songId);
+                    // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+                    const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
@@ -242,6 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+        const fragment = document.createDocumentFragment();
+
         songs.forEach((song, index) => {
             const row = document.createElement('tr');
             
@@ -263,8 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 playContext(songs, index);
             });
 
-            songListBody.appendChild(row);
+            fragment.appendChild(row);
         });
+
+        songListBody.appendChild(fragment);
     }
 
     // --- PLAYER LOGIC ---
@@ -291,7 +306,8 @@ document.addEventListener('DOMContentLoaded', () => {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
 
-        const isFav = userFavorites.some(s => s.id === song.id);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(song.id);
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
@@ -400,22 +416,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
+    // to decouple rapid event firing from expensive DOM updates.
+    let isUpdatingProgress = false;
     function updateProgress() {
-        const { duration, currentTime } = audioPlayer;
-        if (duration) {
-            const percent = (currentTime / duration) * 100;
-            progress.style.width = `${percent}%`;
-            currentTimeEl.textContent = formatTime(currentTime);
-            totalTimeEl.textContent = formatTime(duration);
+        if (!isUpdatingProgress) {
+            window.requestAnimationFrame(() => {
+                const { duration, currentTime } = audioPlayer;
+                if (duration) {
+                    const percent = (currentTime / duration) * 100;
+                    progress.style.width = `${percent}%`;
+                    currentTimeEl.textContent = formatTime(currentTime);
+                    totalTimeEl.textContent = formatTime(duration);
+                }
+                isUpdatingProgress = false;
+            });
+            isUpdatingProgress = true;
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
+
 
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
@@ -423,16 +443,22 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const song = librarySongs.find(s => s.id === songId);
-        const isFav = userFavorites.some(s => s.id === songId);
+        // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+        const song = librarySongsMap.get(songId);
+        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        const isFav = userFavoritesIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
+                favoriteIds.delete(songId);
                 userFavorites = userFavorites.filter(s => s.id !== songId);
+                userFavoritesIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
+                favoriteIds.add(songId);
                 userFavorites.push(song);
+                userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
             // Update UI
@@ -447,6 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
+                favoriteIds.add(songId);
                 userFavorites.push(song);
             }
         }
@@ -460,7 +487,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists() && docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
-                    userFavorites = librarySongs.filter(song => favIds.includes(song.id));
+                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                    const favIdsSet = new Set(favIds);
+                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
+                    favoriteIds = new Set(favIds);
+                    userFavoritesIds = new Set(favIds);
                 }
             } catch (e) { console.error(e); }
             
@@ -486,8 +517,7 @@ export function createSongCard(song) {
 }
 
 export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
 }
