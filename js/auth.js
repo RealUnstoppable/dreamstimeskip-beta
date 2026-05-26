@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendEmailVerification } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { escapeHTML } from './utils.js';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -38,7 +39,7 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if (membershipStatusContainer) {
-                membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
+                membershipStatusContainer.innerHTML = `<span class="membership-status ${escapeHTML(userData.membershipLevel)}">${escapeHTML(userData.membershipLevel)}</span>`;
             }
         }
     } else {

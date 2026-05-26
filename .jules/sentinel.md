@@ -32,3 +32,8 @@
 **Vulnerability:** The `generateReport` function in `tracker.html` was directly injecting user-provided state data (such as item names, values, and quantities from routines, drawers, and inventory) into the DOM via `innerHTML` string concatenation without sanitization. This allowed for DOM-based XSS if a user's malicious payload was rendered during report generation.
 **Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
+
+## 2024-05-18 - [Fix DOM-based XSS in JS Components]
+**Vulnerability:** Several vanilla JS components (`js/auth.js`, `js/shop.js`, `js/harmonytunes.js`) were directly injecting user data and static arrays into the DOM using `.innerHTML` without sanitization. For example, `userData.membershipLevel` loaded from Firebase was placed directly into a template literal in `js/auth.js`.
+**Learning:** Always sanitize data retrieved from databases or provided by variables before injecting it into the DOM using `.innerHTML` in pure JavaScript code.
+**Prevention:** Use a shared utility like `escapeHTML` and consistently wrap all interpolations within template literals that are assigned to `.innerHTML`.

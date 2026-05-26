@@ -1,4 +1,17 @@
 import { jest } from '@jest/globals';
+
+// MOCK REQUIRED DOM ELEMENTS BEFORE IMPORTING SHOP.JS
+document.body.innerHTML = `
+    <div id="cart-item-count"></div>
+    <div id="cart-total-price"></div>
+    <button id="checkout-btn"></button>
+    <div id="nav-cta-container"></div>
+    <div class="hamburger"></div>
+    <div class="nav-links"></div>
+    <div id="product-grid"></div>
+    <div id="cart-items-container"></div>
+`;
+
 import { handleUpdateQuantity, cart } from '../js/shop.js';
 
 describe('handleUpdateQuantity', () => {

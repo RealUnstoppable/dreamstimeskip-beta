@@ -28,8 +28,10 @@ document.body.innerHTML = `
     <div id="greeting"></div>
 `;
 
+import { jest } from '@jest/globals';
+
 // Try requiring the script
-require('../js/harmonytunes.js');
+await import('../js/harmonytunes.js');
 
 // Dispatch DOMContentLoaded so the script actually runs its init block
 const event = new Event('DOMContentLoaded');

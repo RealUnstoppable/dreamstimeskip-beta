@@ -35,14 +35,15 @@ describe('Newsletter Submission', () => {
   });
 
   test('should handle successful submission', async () => {
-    setDoc.mockResolvedValueOnce();
+    // Override global setDoc for tests
+    window.setDoc = jest.fn().mockResolvedValueOnce();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(window.alert).toHaveBeenCalledWith("You've successfully subscribed to the newsletter!");
     expect(emailInput.value).toBe('');
@@ -50,14 +51,14 @@ describe('Newsletter Submission', () => {
 
   test('should handle submission error and show error alert', async () => {
     const error = new Error('Network Error');
-    setDoc.mockRejectedValueOnce(error);
+    window.setDoc = jest.fn().mockRejectedValueOnce(error);
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(console.error).toHaveBeenCalledWith("Error submitting email:", error);
     expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
@@ -65,15 +66,16 @@ describe('Newsletter Submission', () => {
 
   test('should not submit if email is empty', async () => {
     emailInput.value = '   ';
+    window.setDoc = jest.fn();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(process.nextTick);
-    await new Promise(process.nextTick);
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
 
-    expect(setDoc).not.toHaveBeenCalled();
+    expect(window.setDoc).not.toHaveBeenCalled();
     expect(window.alert).not.toHaveBeenCalled();
   });
 });

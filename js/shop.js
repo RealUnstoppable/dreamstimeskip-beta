@@ -3,6 +3,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
+import { escapeHTML } from './utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
@@ -61,13 +62,13 @@ const navLinks = document.querySelector('.nav-links');   // <-- ADDED for mobile
 function renderProducts() {
     productGrid.innerHTML = products.map(product => `
         <div class="product-card">
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+            <img src="${escapeHTML(product.imageUrl)}" alt="${escapeHTML(product.name)}" class="product-image" loading="lazy">
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
+                <h3>${escapeHTML(product.name)}</h3>
+                <p>${escapeHTML(product.description)}</p>
                 <div class="product-footer">
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                    <span class="product-price">$${escapeHTML(product.price.toFixed(2))}</span>
+                    <button class="add-to-cart-btn" data-id="${escapeHTML(product.id)}">Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -76,28 +77,30 @@ function renderProducts() {
 
 function renderCart() {
     if (Object.keys(cart).length === 0) {
-        cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        checkoutBtn.disabled = true;
+        if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
+        if (checkoutBtn) checkoutBtn.disabled = true;
     } else {
-        cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-            // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
-            const product = productMap.get(productId);
-            if (!product) return ''; // Should not happen
-            return `
-                <div class="cart-item">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                    <div class="cart-item-info">
-                        <h4>${product.name}</h4>
-                        <p>$${product.price.toFixed(2)}</p>
+        if (cartItemsContainer) {
+            cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
+                // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
+                const product = productMap.get(productId);
+                if (!product) return ''; // Should not happen
+                return `
+                    <div class="cart-item">
+                        <img src="${escapeHTML(product.imageUrl)}" alt="${escapeHTML(product.name)}" class="cart-item-img" loading="lazy">
+                        <div class="cart-item-info">
+                            <h4>${escapeHTML(product.name)}</h4>
+                            <p>$${escapeHTML(product.price.toFixed(2))}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <input type="number" value="${escapeHTML(quantity)}" min="1" data-id="${escapeHTML(productId)}" class="item-quantity-input">
+                            <button class="remove-item-btn" data-id="${escapeHTML(productId)}" aria-label="Remove item">&#128465;</button>
+                        </div>
                     </div>
-                    <div class="cart-item-actions">
-                        <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
-                        <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        checkoutBtn.disabled = false;
+                `;
+            }).join('');
+        }
+        if (checkoutBtn) checkoutBtn.disabled = false;
     }
     updateCartSummary();
 }
@@ -105,8 +108,8 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    cartItemCountEl.textContent = itemCount;
-    cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
 // --- CART LOGIC ---
