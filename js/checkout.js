@@ -18,6 +18,8 @@ export function setUserCart(cart) {
 const checkoutContainer = document.getElementById('checkout-container');
 
 function renderCheckoutPage() {
+    if (!checkoutContainer) return;
+
     if (Object.keys(userCart).length === 0) {
         checkoutContainer.innerHTML = '<h1>Your cart is empty.</h1><a href="/shop.html" class="cta-button">Continue Shopping</a>';
         return;

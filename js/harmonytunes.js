@@ -416,13 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function formatTime(seconds) {
-        if (isNaN(seconds)) return "0:00";
-        const min = Math.floor(seconds / 60);
-        const sec = Math.floor(seconds % 60);
-        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
-    }
-
     window.toggleFavorite = async function toggleFavorite(songId) {
         if (!currentUser) {
             alert("Please sign in to save favorites.");
@@ -489,11 +482,4 @@ export function createSongCard(song) {
             <div class="card-desc">${song.artist}</div>
         </div>
     `;
-}
-
-export function formatTime(seconds) {
-    if (isNaN(seconds)) return "0:00";
-    const min = Math.floor(seconds / 60);
-    const sec = Math.floor(seconds % 60);
-    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
 }
