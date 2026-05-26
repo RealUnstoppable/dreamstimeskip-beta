@@ -225,7 +225,7 @@ describe("createCheckoutSession", () => {
     });
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({error: "Stripe API Error"});
+    expect(res.json).toHaveBeenCalledWith({error: "Checkout Error. Manager info: [Stripe API Error]"});
 
     console.error.mockRestore();
   });
