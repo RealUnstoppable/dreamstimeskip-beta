@@ -6,7 +6,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const stripe = Stripe(""); // 🔴 replace
+// 🛡️ Sentinel: NEVER hardcode secrets. Always use environment variables for sensitive data.
+// Initialize Stripe securely using process.env.STRIPE_SECRET_KEY
+// Example execution: STRIPE_SECRET_KEY=sk_live_... node server.js
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY || ""); // 🔴 Ensure STRIPE_SECRET_KEY is set in your environment
 
 app.post("/create-checkout-session", async (req, res) => {
   const { plan } = req.body;
