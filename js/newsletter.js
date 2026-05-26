@@ -1,23 +1,19 @@
 import { db } from './auth.js';
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Use event delegation to catch submissions from dynamically loaded footers
-if (typeof document !== 'undefined') {
-    document.addEventListener('submit', async (e) => {
-        // Check if the submitted element has the .signup-form class
-        if (e.target && e.target.matches('.signup-form')) {
-            e.preventDefault();
+function initNewsletter(firestoreModule) {
+    const { doc, setDoc, serverTimestamp } = firestoreModule;
 
-            const form = e.target;
-            const emailInput = form.querySelector('input[type="email"]');
-            const email = emailInput.value.trim();
+    // Use event delegation to catch submissions from dynamically loaded footers
+    if (typeof document !== 'undefined') {
+        document.addEventListener('submit', async (e) => {
+            // Check if the submitted element has the .signup-form class
+            if (e.target && e.target.matches('.signup-form')) {
+                e.preventDefault();
 
-            if (email) {
-                try {
-                    await setDoc(doc(db, "newsletterSubscribers", email), {
-                        email: email,
-                        subscribedAt: serverTimestamp()
-                    });
+                const form = e.target;
+                const emailInput = form.querySelector('input[type="email"]');
+                const email = emailInput.value.trim();
 
                     // Show a success message
                     alert("You've successfully subscribed to the newsletter!");
