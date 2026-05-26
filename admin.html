@@ -396,6 +396,8 @@
             if(bookings.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No bookings found.</td></tr>'; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) reflows
+            const fragment = document.createDocumentFragment();
             bookings.forEach(b => {
                 const row = document.createElement('tr');
                 const name = b.customerName || 'N/A';
@@ -417,8 +419,9 @@
                         ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${escapeHTML(b.id)}">Mark Done</button>` : ''}
                     </td>
                 `;
-                tbody.appendChild(row);
+                fragment.appendChild(row);
             });
+            tbody.appendChild(fragment);
         }
 
         function renderQuotesTable(quotes) {
@@ -427,6 +430,8 @@
             if(quotes.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No quotes pending.</td></tr>'; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) reflows
+            const fragment = document.createDocumentFragment();
             quotes.forEach(q => {
                 const row = document.createElement('tr');
                 const badgeClass = q.status === 'responded' ? 'active' : 'pending';
@@ -439,13 +444,16 @@
                         <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${escapeHTML(q.id)}">Delete</button>
                     </td>
                 `;
-                tbody.appendChild(row);
+                fragment.appendChild(row);
             });
+            tbody.appendChild(fragment);
         }
 
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
             userListBody.innerHTML = '';
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) reflows
+            const fragment = document.createDocumentFragment();
             users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
@@ -460,8 +468,9 @@
                     <td>${subStatus}</td>
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
-                userListBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            userListBody.appendChild(fragment);
         }
 
         function renderFeatureRequestsTable(requests) {
@@ -470,6 +479,8 @@
             if(requests.length === 0) {
                 listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) reflows
+            const fragment = document.createDocumentFragment();
             requests.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
             requests.forEach(req => {
                 const row = document.createElement('tr');
@@ -488,8 +499,9 @@
                     <td>${tierBadge}</td>
                     <td>${statusStr}</td>
                     <td>${actionButton}</td>`;
-                listBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            listBody.appendChild(fragment);
         }
 
         function renderNewsletterTable(subscribers) {
@@ -498,12 +510,15 @@
             if(subscribers.length === 0) {
                 newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">No subscribers yet.</td></tr>`; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) reflows
+            const fragment = document.createDocumentFragment();
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
                 const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
                 row.innerHTML = `<td>${escapeHTML(subscriber.email)}</td><td>${subscriptionDate}</td>`;
-                newsletterListBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            newsletterListBody.appendChild(fragment);
         }
 
         function calculatePerformanceMetrics(users, carts, orders = [], bookings = [], quotes = []) {
