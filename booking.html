@@ -139,7 +139,7 @@
                     <label>Vehicle Make, Model & Condition *</label>
                     <input type="text" id="q-details" required placeholder="e.g. 2022 Porsche 911 - heavy swirl marks">
                 </div>
-                <button type="submit">Request Custom Quote</button>
+                <button type="submit" id="quote-submit-btn">Request Custom Quote</button>
             </form>
         </div>
 
@@ -283,9 +283,13 @@
 
         // Quote Logic
         document.getElementById('quote-form').addEventListener('submit', async (e) => {
-            // ... (Keep existing quote logic here) ...
-             e.preventDefault();
+            e.preventDefault();
             const msg = document.getElementById('msg');
+            const submitBtn = document.getElementById('quote-submit-btn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Processing...";
+
             try {
                 await addDoc(collection(db, "quotes"), {
                     email: document.getElementById('q-email').value,
@@ -299,6 +303,9 @@
             } catch (error) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error submitting quote.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Request Custom Quote";
             }
         });
     </script>
