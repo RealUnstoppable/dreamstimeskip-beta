@@ -230,6 +230,11 @@
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Processing...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -240,6 +245,9 @@
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
