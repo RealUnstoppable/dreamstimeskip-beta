@@ -12,11 +12,22 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
+        const cacheKey = `profile_${user.uid}`;
+        const cachedProfile = sessionStorage.getItem(cacheKey);
+        let userData = null;
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
+        if (cachedProfile) {
+            userData = JSON.parse(cachedProfile);
+        } else {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                userData = userDoc.data();
+                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            }
+        }
+
+        if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
 
             if (authLink) {

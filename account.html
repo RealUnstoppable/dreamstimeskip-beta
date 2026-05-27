@@ -127,7 +127,8 @@
             if (user) {
                 try {
                     // Check sessionStorage first to optimize reads
-                    const cachedData = sessionStorage.getItem('userData');
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
                     if (cachedData) {
                         const userData = JSON.parse(cachedData);
                         initializePage(user, userData);
@@ -141,7 +142,7 @@
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        sessionStorage.setItem('userData', JSON.stringify(userData)); // Cache data
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData)); // Cache data
                         initializePage(user, userData);
                         setupEventListeners(user);
                         document.getElementById('account-layout-container').style.display = 'flex';
@@ -154,7 +155,7 @@
                         };
                         try {
                             await setDoc(userDocRef, fallbackData);
-                            sessionStorage.setItem('userData', JSON.stringify(fallbackData)); // Cache data
+                            sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
                         } catch(e) {
                             console.error("Failed to set default profile", e);
                         }
@@ -199,7 +200,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
-                sessionStorage.removeItem('userData');
+                sessionStorage.removeItem(`profile_${user.uid}`);
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
@@ -217,6 +218,14 @@
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.username = newUsername;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -238,6 +247,15 @@
                     document.body.dataset.accent = accentColor;
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.theme = theme;
+                        userData.accentColor = accentColor;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 }
