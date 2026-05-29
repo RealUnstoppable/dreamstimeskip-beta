@@ -85,7 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistPlayBtn = document.getElementById('playlist-play-btn');
     
     // Player Elements
-    const audioPlayer = document.getElementById('audio-player');
+    const audioPlayer1 = document.getElementById('audio-player');
+    const audioPlayer2 = document.getElementById('audio-player-2');
+    let activeAudio = audioPlayer1;
+    let nextAudio = audioPlayer2;
+    let isMixerMode = false;
+    let isCrossfading = false;
+    let crossfadeDuration = 7;
+    const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
     const playIcon = playPauseBtn.querySelector('.play-icon');
     const pauseIcon = playPauseBtn.querySelector('.pause-icon');
@@ -320,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (index < 0 || index >= currentQueue.length) return;
         const song = currentQueue[index];
         
-        audioPlayer.src = song.src;
+        activeAudio.src = song.src;
         playerTitle.textContent = song.title;
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
@@ -340,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playSong() {
-        audioPlayer.play().then(() => {
+        activeAudio.play().then(() => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
@@ -348,14 +355,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function pauseSong() {
-        audioPlayer.pause();
+        activeAudio.pause();
         isPlaying = false;
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
     }
 
     function togglePlayPause() {
-        if (audioPlayer.paused) playSong();
+        if (activeAudio.paused) playSong();
         else pauseSong();
     }
 
@@ -371,8 +378,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function prevSong() {
-        if (audioPlayer.currentTime > 3) {
-            audioPlayer.currentTime = 0;
+        if (activeAudio.currentTime > 3) {
+            activeAudio.currentTime = 0;
         } else {
             let prevIndex = currentSongIndex - 1;
             if (prevIndex < 0) {
@@ -390,24 +397,38 @@ document.addEventListener('DOMContentLoaded', () => {
         playPauseBtn.addEventListener('click', togglePlayPause);
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
-        
-        audioPlayer.addEventListener('timeupdate', updateProgress);
-        audioPlayer.addEventListener('ended', () => {
-            if (repeatMode === 2) {
-                audioPlayer.currentTime = 0;
-                playSong();
-            } else {
-                nextSong();
-            }
+        [audioPlayer1, audioPlayer2].forEach(player => {
+            player.addEventListener('timeupdate', (e) => {
+                if (e.target === activeAudio) {
+                    updateProgress();
+                    checkCrossfade();
+                }
+            });
+            player.addEventListener('ended', (e) => {
+                if (e.target === activeAudio) {
+                    if (isMixerMode && isCrossfading) return;
+                    if (repeatMode === 2) {
+                        activeAudio.currentTime = 0;
+                        playSong();
+                    } else {
+                        nextSong();
+                    }
+                }
+            });
         });
 
-        volumeSlider.addEventListener('input', (e) => audioPlayer.volume = e.target.value);
+        mixerBtn.addEventListener('click', () => {
+            isMixerMode = !isMixerMode;
+            mixerBtn.style.color = isMixerMode ? 'var(--accent-green)' : '#b3b3b3';
+        });
+
+        volumeSlider.addEventListener('input', (e) => activeAudio.volume = e.target.value);
 
         progressBar.parentElement.addEventListener('click', (e) => {
             const width = progressBar.parentElement.clientWidth;
             const clickX = e.offsetX;
-            const duration = audioPlayer.duration;
-            audioPlayer.currentTime = (clickX / width) * duration;
+            const duration = activeAudio.duration;
+            activeAudio.currentTime = (clickX / width) * duration;
         });
 
         shuffleBtn.addEventListener('click', () => {
@@ -477,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             line.addEventListener('click', () => {
                 const start = parseFloat(line.getAttribute('data-start'));
                 if (!isNaN(start)) {
-                    audioPlayer.currentTime = start;
+                    activeAudio.currentTime = start;
                     playSong();
                 }
             });
@@ -509,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncLyrics() {
         if (viewLyrics.style.display === 'none') return;
-        const currentTime = audioPlayer.currentTime;
+        const currentTime = activeAudio.currentTime;
         const lines = lyricsContent.querySelectorAll('.lyric-line');
         
         let newActiveLineIndex = -1;
@@ -560,13 +581,78 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function checkCrossfade() {
+        if (!isMixerMode || isCrossfading) return;
+        
+        const remaining = activeAudio.duration - activeAudio.currentTime;
+        if (remaining > 0 && remaining <= crossfadeDuration) {
+            isCrossfading = true;
+            
+            const prevAudio = activeAudio;
+            activeAudio = nextAudio;
+            nextAudio = prevAudio;
+
+            let nextIndex = currentSongIndex + 1;
+            if (nextIndex >= currentQueue.length) {
+                if (repeatMode === 1) nextIndex = 0;
+                else if (repeatMode === 2) nextIndex = currentSongIndex;
+                else {
+                    isCrossfading = false;
+                    nextAudio = activeAudio;
+                    activeAudio = prevAudio;
+                    return; 
+                }
+            }
+            currentSongIndex = nextIndex;
+            
+            const song = currentQueue[currentSongIndex];
+            activeAudio.src = song.src;
+            playerTitle.textContent = song.title;
+            playerArtist.textContent = song.artist;
+            playerArt.src = song.art;
+            
+            const isFav = userFavoritesIds.has(song.id);
+            playerLikeBtn.textContent = isFav ? '❤' : '♡';
+            playerLikeBtn.classList.toggle('active', isFav);
+
+            renderLyrics(song.id);
+            if(viewPlaylist.style.display !== 'none') {
+                const showingFavs = playlistTitleEl.textContent === "Liked Songs";
+                renderSongTable(showingFavs ? userFavorites : librarySongs);
+            }
+
+            activeAudio.volume = 0;
+            activeAudio.play().catch(e => console.error(e));
+
+            const fadeStep = 50;
+            const steps = (crossfadeDuration * 1000) / fadeStep;
+            let currentStep = 0;
+            const baseVolume = volumeSlider.value || 1;
+            
+            const fadeInterval = setInterval(() => {
+                currentStep++;
+                const ratio = currentStep / steps;
+                
+                prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
+                activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
+
+                if (currentStep >= steps) {
+                    clearInterval(fadeInterval);
+                    prevAudio.pause();
+                    prevAudio.currentTime = 0;
+                    isCrossfading = false;
+                }
+            }, fadeStep);
+        }
+    }
+
     // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
     // to decouple rapid event firing from expensive DOM updates.
     let isUpdatingProgress = false;
     function updateProgress() {
         if (!isUpdatingProgress) {
             window.requestAnimationFrame(() => {
-                const { duration, currentTime } = audioPlayer;
+                const { duration, currentTime } = activeAudio;
                 if (duration) {
                     const percent = (currentTime / duration) * 100;
                     progress.style.width = `${percent}%`;

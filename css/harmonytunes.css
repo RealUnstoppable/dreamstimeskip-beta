@@ -428,10 +428,11 @@ body {
 .control-button:hover { color: white; }
 
 
-#shuffle-btn, #repeat-btn { display: none; }
+#shuffle-btn, #repeat-btn, #mixer-btn { display: none; }
 @media (min-width: 600px) {
-    #shuffle-btn, #repeat-btn { display: flex; }
+    #shuffle-btn, #repeat-btn, #mixer-btn { display: flex; }
 }
+#mixer-btn.active { color: var(--accent-green); }
 
 .play-pause-btn {
     background-color: white;
