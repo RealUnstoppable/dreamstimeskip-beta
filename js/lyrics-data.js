@@ -33,7 +33,6 @@ export const lyricsData = {
         {
             start: 18.0,
             end: 19.5,
-            trending: true,
             words: [
                 { text: "I", start: 18.0, duration: 0.2 },
                 { text: "was", start: 18.2, duration: 0.2 },
@@ -46,7 +45,6 @@ export const lyricsData = {
         {
             start: 19.5,
             end: 21.0,
-            trending: true,
             words: [
                 { text: "hate", start: 19.5, duration: 0.5 },
                 { text: "on", start: 20.0, duration: 0.5 },
@@ -141,6 +139,7 @@ export const lyricsData = {
         {
             start: 39.0,
             end: 41.0,
+            trending: true,
             words: [
                 { text: "I", start: 39.0, duration: 0.2 },
                 { text: "don't", start: 39.2, duration: 0.2 },
@@ -155,6 +154,7 @@ export const lyricsData = {
         {
             start: 41.5,
             end: 44.0,
+            trending: true,
             words: [
                 { text: "They", start: 41.5, duration: 0.2 },
                 { text: "can", start: 41.7, duration: 0.2 },
@@ -167,6 +167,7 @@ export const lyricsData = {
         {
             start: 44.5,
             end: 46.5,
+            trending: true,
             words: [
                 { text: "I'm", start: 44.5, duration: 0.2 },
                 { text: "standing", start: 44.7, duration: 0.5 },
@@ -177,6 +178,7 @@ export const lyricsData = {
         {
             start: 47.0,
             end: 49.0,
+            trending: true,
             words: [
                 { text: "Got", start: 47.0, duration: 0.2 },
                 { text: "bitches", start: 47.2, duration: 0.5 },
