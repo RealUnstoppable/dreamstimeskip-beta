@@ -612,8 +612,8 @@ body {
     background-color: white;
     color: black;
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -972,4 +972,28 @@ body {
 .total-time, .fs-total-time {
     cursor: pointer;
     user-select: none;
+}
+
+.song-info-text {
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+#player-song-title, #fs-song-title, #lyrics-title {
+    display: inline-block;
+    white-space: nowrap;
+}
+.marquee {
+    padding-right: 50px;
+    animation: marquee-scroll 10s linear infinite;
+}
+.marquee:hover {
+    animation-play-state: paused;
+}
+@keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    15% { transform: translateX(0); }
+    85% { transform: translateX(calc(-100% + 150px)); }
+    100% { transform: translateX(calc(-100% + 150px)); }
 }
