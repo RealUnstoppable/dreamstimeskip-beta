@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mixerBtn.addEventListener('click', () => {
             isMixerMode = !isMixerMode;
-            mixerBtn.style.color = isMixerMode ? 'var(--accent-green)' : '#b3b3b3';
+            mixerBtn.style.color = isMixerMode ? 'var(--accent-green)' : '#ffffff';
         });
 
         volumeSlider.addEventListener('input', (e) => activeAudio.volume = e.target.value);
