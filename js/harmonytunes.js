@@ -123,8 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Lyrics Elements
     const lyricsBtn = document.getElementById('lyrics-btn');
-    const lyricsContainer = document.getElementById('lyrics-container');
+    const viewLyrics = document.getElementById('view-lyrics');
     const closeLyricsBtn = document.getElementById('close-lyrics-btn');
+    const lyricsContent = document.getElementById('lyrics-content');
+    const lyricsContainer = document.getElementById('lyrics-container');
 
     // New Features
     const viralSkipBtn = document.getElementById('viral-skip-btn');
