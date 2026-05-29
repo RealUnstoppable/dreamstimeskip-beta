@@ -27,6 +27,11 @@ document.body.innerHTML = `
     <img id="player-album-art">
     <button id="player-like-btn"></button>
     <div id="greeting"></div>
+    <button id="lyrics-btn"></button>
+    <div id="view-lyrics" style="display: none;"></div>
+    <button id="close-lyrics-btn"></button>
+    <div id="lyrics-content"></div>
+    <div id="lyrics-container"></div>
 `;
 
 // Import the script
