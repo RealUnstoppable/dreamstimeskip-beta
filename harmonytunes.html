@@ -263,8 +263,13 @@
                 <button class="control-button" id="lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </button>
-                <button class="control-button" id="viral-skip-btn" title="Viral Skip" aria-label="Skip to trending part">
+                <button class="control-button viral-skip-wrapper" id="viral-skip-btn" title="Viral Skip" aria-label="Skip to trending part">
                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                     <span class="viral-repeat-badge" style="display:none;">&#x21BA;</span>
+                </button>
+                <!-- Mobile overflow button -->
+                <button class="control-button mobile-overflow-btn" id="mobile-overflow-btn" title="More" aria-label="More controls">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                 </button>
             </div>
             
@@ -284,7 +289,31 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- Mobile Controls Overlay (shown when ... is tapped on mobile) -->
+    <div class="mobile-controls-overlay hidden" id="mobile-controls-overlay">
+        <button class="control-button" id="mob-shuffle-btn" aria-label="Shuffle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            <span style="font-size:10px;margin-top:3px;">Shuffle</span>
+        </button>
+        <button class="control-button" id="mob-mixer-btn" aria-label="Mixer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"></circle><path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path><rect x="3" y="12" width="2" height="6" rx="1"></rect><rect x="19" y="12" width="2" height="6" rx="1"></rect></svg>
+            <span style="font-size:10px;margin-top:3px;">Mixer</span>
+        </button>
+        <button class="control-button" id="mob-repeat-btn" aria-label="Repeat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            <span style="font-size:10px;margin-top:3px;">Repeat</span>
+        </button>
+        <button class="control-button" id="mob-lyrics-btn" aria-label="Lyrics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span style="font-size:10px;margin-top:3px;">Lyrics</span>
+        </button>
+        <button class="control-button" id="mob-viral-btn" aria-label="Viral Skip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span style="font-size:10px;margin-top:3px;">Viral</span>
+        </button>
+    </div>
+
     <audio id="audio-player"></audio>
     <audio id="audio-player-2"></audio>
 
