@@ -3,82 +3,82 @@ export const lyricsData = {
     'pixy-legacy': [
         {
             start: 0.0,
-            end: 4.5,
-            words: [
-                { text: "(Instrumental)", start: 0.0, duration: 3.0 },
-                { text: "Why", start: 3.0, duration: 0.3 },
-                { text: "you", start: 3.3, duration: 0.2 },
-                { text: "so", start: 3.5, duration: 0.3 },
-                { text: "mad?", start: 3.8, duration: 0.7 }
-            ]
-        },
-        {
-            start: 5.5,
             end: 7.5,
             words: [
-                { text: "Snakes", start: 5.5, duration: 0.5 },
-                { text: "everywhere,", start: 6.0, duration: 0.8 },
-                { text: "bro", start: 6.8, duration: 0.7 }
+                { text: "(Instrumental)", start: 0.0, duration: 5.0 },
+                { text: "Why", start: 5.0, duration: 0.5 },
+                { text: "you", start: 5.5, duration: 0.5 },
+                { text: "so", start: 6.0, duration: 0.5 },
+                { text: "mad?", start: 6.5, duration: 1.0 }
             ]
         },
         {
             start: 8.0,
-            end: 10.0,
+            end: 11.0,
             words: [
-                { text: "Back", start: 8.0, duration: 0.3 },
-                { text: "from", start: 8.3, duration: 0.3 },
-                { text: "paradise.", start: 8.6, duration: 1.0 }
+                { text: "Snakes", start: 8.0, duration: 0.5 },
+                { text: "everywhere,", start: 8.5, duration: 1.0 },
+                { text: "bro", start: 9.5, duration: 1.5 }
             ]
         },
         {
-            start: 14.0,
-            end: 15.5,
+            start: 12.0,
+            end: 15.0,
             words: [
-                { text: "I", start: 14.0, duration: 0.2 },
-                { text: "was", start: 14.2, duration: 0.2 },
-                { text: "floating", start: 14.4, duration: 0.4 },
-                { text: "high", start: 14.8, duration: 0.5 }
+                { text: "Back", start: 12.0, duration: 0.4 },
+                { text: "from", start: 12.4, duration: 0.4 },
+                { text: "paradise.", start: 12.8, duration: 2.2 }
             ]
         },
         {
-            start: 15.5,
-            end: 17.0,
+            start: 18.0,
+            end: 19.5,
             words: [
-                { text: "jealous", start: 15.5, duration: 0.4 },
-                { text: "bitches", start: 15.9, duration: 0.4 },
-                { text: "hate", start: 16.3, duration: 0.2 },
-                { text: "on", start: 16.5, duration: 0.2 },
-                { text: "me", start: 16.7, duration: 0.3 }
+                { text: "I", start: 18.0, duration: 0.2 },
+                { text: "was", start: 18.2, duration: 0.2 },
+                { text: "floating", start: 18.4, duration: 0.4 },
+                { text: "high", start: 18.8, duration: 0.5 }
             ]
         },
         {
-            start: 17.0,
-            end: 19.0,
+            start: 19.5,
+            end: 21.0,
             words: [
-                { text: "On", start: 17.0, duration: 0.2 },
-                { text: "another", start: 17.2, duration: 0.4 },
-                { text: "field,", start: 17.6, duration: 0.4 },
-                { text: "think", start: 18.0, duration: 0.2 },
-                { text: "I", start: 18.2, duration: 0.2 },
-                { text: "need", start: 18.4, duration: 0.2 },
-                { text: "a", start: 18.6, duration: 0.1 },
-                { text: "pedigree", start: 18.7, duration: 0.3 }
+                { text: "jealous", start: 19.5, duration: 0.4 },
+                { text: "bitches", start: 19.9, duration: 0.4 },
+                { text: "hate", start: 20.3, duration: 0.2 },
+                { text: "on", start: 20.5, duration: 0.2 },
+                { text: "me", start: 20.7, duration: 0.3 }
             ]
         },
         {
-            start: 19.0,
-            end: 22.0,
+            start: 21.0,
+            end: 23.0,
             words: [
-                { text: "Rotten", start: 19.0, duration: 0.4 },
-                { text: "in", start: 19.4, duration: 0.2 },
-                { text: "they", start: 19.6, duration: 0.2 },
-                { text: "eyes,", start: 19.8, duration: 0.5 },
-                { text: "wishing", start: 20.3, duration: 0.4 },
-                { text: "they", start: 20.7, duration: 0.2 },
-                { text: "could", start: 20.9, duration: 0.2 },
-                { text: "silence", start: 21.1, duration: 0.5 },
-                { text: "me", start: 21.6, duration: 0.4 }
+                { text: "On", start: 21.0, duration: 0.2 },
+                { text: "another", start: 21.2, duration: 0.4 },
+                { text: "field,", start: 21.6, duration: 0.4 },
+                { text: "think", start: 22.0, duration: 0.2 },
+                { text: "I", start: 22.2, duration: 0.2 },
+                { text: "need", start: 22.4, duration: 0.2 },
+                { text: "a", start: 22.6, duration: 0.1 },
+                { text: "pedigree", start: 22.7, duration: 0.3 }
+            ]
+        },
+        {
+            start: 23.0,
+            end: 26.0,
+            words: [
+                { text: "Rotten", start: 23.0, duration: 0.4 },
+                { text: "in", start: 23.4, duration: 0.2 },
+                { text: "they", start: 23.6, duration: 0.2 },
+                { text: "eyes,", start: 23.8, duration: 0.5 },
+                { text: "wishing", start: 24.3, duration: 0.4 },
+                { text: "they", start: 24.7, duration: 0.2 },
+                { text: "could", start: 24.9, duration: 0.2 },
+                { text: "silence", start: 25.1, duration: 0.5 },
+                { text: "me", start: 25.6, duration: 0.4 }
             ]
         }
     ]
-}
+};
