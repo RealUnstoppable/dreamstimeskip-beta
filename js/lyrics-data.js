@@ -499,5 +499,14 @@ export const lyricsData = {
                 { text: "bro", start: 127.3, duration: 1.7 }
             ]
         }
+    ],
+    'deorc-decuple': [
+        {
+            start: 0.0,
+            end: 225.0,
+            words: [
+                { text: "(Instrumental)", start: 0.0, duration: 225.0 }
+            ]
+        }
     ]
 }
