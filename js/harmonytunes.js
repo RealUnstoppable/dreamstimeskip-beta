@@ -651,8 +651,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
-    
-
     const fsLyricsBtn = document.getElementById('fs-lyrics-btn');
     const fsViralSkipBtn = document.getElementById('fs-viral-skip-btn');
     const fsLikeBtn = document.getElementById('fs-like-btn');
@@ -660,6 +658,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fsRepeatBtn = document.getElementById('fs-repeat-btn');
     const fsProgressBar = document.getElementById('fs-progress-bar');
     const fsProgress = document.getElementById('fs-progress');
+
     const fsCurrentTime = document.querySelector('.fs-current-time');
     const fsTotalTime = document.querySelector('.fs-total-time');
 
@@ -1157,8 +1156,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         bindEvent(fsMixerBtn, () => triggerClick(mixerBtn));
-        bindEvent(typeof fsLyricsBtn !== 'undefined' ? fsLyricsBtn : null, () => { triggerClick(lyricsBtn); closeFullscreen(); });
-        bindEvent(typeof fsViralSkipBtn !== 'undefined' ? fsViralSkipBtn : null, () => { triggerClick(viralSkipBtn); closeFullscreen(); });
+        bindEvent(fsLyricsBtn, () => { triggerClick(lyricsBtn); closeFullscreen(); });
+        bindEvent(fsViralSkipBtn, () => { triggerClick(viralSkipBtn); closeFullscreen(); });
         bindEvent(fsLikeBtn, () => triggerClick(playerLikeBtn));
         bindEvent(fsShuffleBtn, () => triggerClick(shuffleBtn));
         bindEvent(fsRepeatBtn, () => triggerClick(repeatBtn));
@@ -1317,7 +1316,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const songInfoText = document.querySelector('.current-song-details .song-info-text');
         if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
         if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
-        // removed duplicates
         
         // Artist Profile
         const openArtistProfile = (artistName) => {
