@@ -653,6 +653,7 @@ body {
     height: 100%;
     border-radius: 2px;
     width: 0%;
+    transition: width 0.2s ease;
 }
 
 .progress-bar:hover .progress { background-color: var(--accent-green); }
@@ -952,6 +953,7 @@ body {
     height: 100%;
     background: var(--accent-green);
     width: 0%;
+    transition: width 0.2s ease;
 }
 .fs-heart {
     font-size: 1.8rem;
@@ -977,8 +979,8 @@ body {
 .song-info-text {
     overflow: hidden;
     white-space: nowrap;
-    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
 }
 #player-song-title, #fs-song-title, #lyrics-title {
     display: inline-block;

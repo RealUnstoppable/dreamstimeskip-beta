@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
         { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
-        { title: "New Release Teaser", img: "/images/DreamsTimeSkipModel300x300.jpg", url: "https://tiktok.com" },
+        { title: "New Release Teaser", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
         { title: "Behind the Scenes", img: "/images/dreams-lobby.jpg", url: "https://tiktok.com" },
         { title: "Top 10 This Week", img: "/images/un-logo-1.png", url: "https://tiktok.com" }
     ];
@@ -646,8 +646,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fsPlayPauseBtn = document.getElementById('fs-play-pause-btn');
     const fsNextBtn = document.getElementById('fs-next-btn');
     const fsPrevBtn = document.getElementById('fs-prev-btn');
-    const fsPlayIcon = fsPlayPauseBtn.querySelector('.play-icon');
-    const fsPauseIcon = fsPlayPauseBtn.querySelector('.pause-icon');
+    const fsPlayIcon = fsPlayPauseBtn ? fsPlayPauseBtn.querySelector('.play-icon') : null;
+    const fsPauseIcon = fsPlayPauseBtn ? fsPlayPauseBtn.querySelector('.pause-icon') : null;
+    const fsMixerBtn = document.getElementById('fs-mixer-btn');
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
@@ -726,39 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
-
-    function openFullscreen() {
-        const song = currentQueue[currentSongIndex];
-        if(!song) return;
-        if(typeof fsArt !== 'undefined' && fsArt) fsArt.src = song.art;
-        if(typeof fsBg !== 'undefined' && fsBg) fsBg.style.backgroundImage = `url(${song.art})`;
-        if(typeof fsTitle !== 'undefined' && fsTitle) fsTitle.textContent = song.title;
-        if(typeof fsArtist !== 'undefined' && fsArtist) fsArtist.textContent = song.artist;
-        if(typeof fsPlayer !== 'undefined' && fsPlayer) fsPlayer.style.display = 'flex';
-
-        const myFsPlayPauseBtn = document.getElementById('fs-play-pause-btn');
-        let myFsPlayIcon = null, myFsPauseIcon = null;
-        if(myFsPlayPauseBtn) {
-            myFsPlayIcon = myFsPlayPauseBtn.querySelector('.play-icon');
-            myFsPauseIcon = myFsPlayPauseBtn.querySelector('.pause-icon');
-        }
-        if (typeof isPlaying !== 'undefined' && isPlaying) {
-            if(myFsPlayIcon) myFsPlayIcon.style.display = 'none';
-            if(myFsPauseIcon) myFsPauseIcon.style.display = 'block';
-        } else {
-            if(myFsPlayIcon) myFsPlayIcon.style.display = 'block';
-            if(myFsPauseIcon) myFsPauseIcon.style.display = 'none';
-        }
-    }
-
-    window.openFullscreen = openFullscreen;
-
-    function closeFullscreen() {
-        if(typeof fsPlayer !== 'undefined' && fsPlayer) fsPlayer.style.display = 'none';
-    }
-
-    window.closeFullscreen = closeFullscreen;
 
     function init() {
         renderHome();
@@ -1026,8 +994,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-            if(typeof fsPlayIcon !== 'undefined' && fsPlayIcon) fsPlayIcon.style.display = 'none';
-            if(typeof fsPauseIcon !== 'undefined' && fsPauseIcon) fsPauseIcon.style.display = 'block';
+            if(fsPlayIcon) fsPlayIcon.style.display = 'none';
+            if(fsPauseIcon) fsPauseIcon.style.display = 'block';
             return;
         }
 
@@ -1036,8 +1004,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
-            if(typeof fsPlayIcon !== 'undefined' && fsPlayIcon) fsPlayIcon.style.display = 'none';
-            if(typeof fsPauseIcon !== 'undefined' && fsPauseIcon) fsPauseIcon.style.display = 'block';
+            if(fsPlayIcon) fsPlayIcon.style.display = 'none';
+            if(fsPauseIcon) fsPauseIcon.style.display = 'block';
             
             const fadeStep = 50;
             const durationMs = 500;
@@ -1061,8 +1029,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isPlaying = false;
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
-        if(typeof fsPlayIcon !== 'undefined' && fsPlayIcon) fsPlayIcon.style.display = 'block';
-        if(typeof fsPauseIcon !== 'undefined' && fsPauseIcon) fsPauseIcon.style.display = 'none';
+        if(fsPlayIcon) fsPlayIcon.style.display = 'block';
+        if(fsPauseIcon) fsPauseIcon.style.display = 'none';
 
         if (isCrossfading) {
             activeAudio.pause();
@@ -1217,30 +1185,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const duration = activeAudio.duration;
             activeAudio.currentTime = (clickX / width) * duration;
         });
+
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
-            const color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
-            shuffleBtn.style.color = color;
-            if(typeof fsShuffleBtn !== 'undefined' && fsShuffleBtn) fsShuffleBtn.style.color = color;
+            shuffleBtn.style.color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
         });
+
         repeatBtn.addEventListener('click', () => {
             repeatMode = (repeatMode + 1) % 3;
             const indicator = repeatBtn.querySelector('.repeat-indicator'); const fsIndicator = document.getElementById('fs-repeat-indicator');
             if (repeatMode === 0) {
                 repeatBtn.style.color = '#b3b3b3';
                 indicator.textContent = '';
-                if(typeof fsRepeatBtn !== 'undefined' && fsRepeatBtn) fsRepeatBtn.style.color = '#b3b3b3';
-                if(typeof fsIndicator !== 'undefined' && fsIndicator) fsIndicator.textContent = '';
             } else if (repeatMode === 1) {
                 repeatBtn.style.color = 'var(--accent-green)';
                 indicator.textContent = '.';
-                if(typeof fsRepeatBtn !== 'undefined' && fsRepeatBtn) fsRepeatBtn.style.color = 'var(--accent-green)';
-                if(typeof fsIndicator !== 'undefined' && fsIndicator) fsIndicator.textContent = '.';
             } else {
                 repeatBtn.style.color = 'var(--accent-green)';
                 indicator.textContent = '1';
-                if(typeof fsRepeatBtn !== 'undefined' && fsRepeatBtn) fsRepeatBtn.style.color = 'var(--accent-green)';
-                if(typeof fsIndicator !== 'undefined' && fsIndicator) fsIndicator.textContent = '1';
             }
         });
 
@@ -1299,12 +1261,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 viewLyrics.classList.remove('slide-down-active');
             }, 400);
         });
+
         // Fullscreen Player
-        playerArt.addEventListener('click', openFullscreen);
-        if(playerTitle) playerTitle.addEventListener('click', openFullscreen);
-        const songInfoText = document.querySelector('.current-song-details .song-info-text');
-        if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
-        if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
+        playerArt.addEventListener('click', () => {
+            const song = currentQueue[currentSongIndex];
+            if(!song) return;
+            fsArt.src = song.art;
+            fsBg.style.backgroundImage = `url(${song.art})`;
+            fsTitle.textContent = song.title;
+            fsArtist.textContent = song.artist;
+            fsPlayer.style.display = 'flex';
+            if (isPlaying) {
+                if(fsPlayIcon) fsPlayIcon.style.display = 'none';
+                if(fsPauseIcon) fsPauseIcon.style.display = 'block';
+            } else {
+                if(fsPlayIcon) fsPlayIcon.style.display = 'block';
+                if(fsPauseIcon) fsPauseIcon.style.display = 'none';
+            }
+        });
+        closeFsBtn.addEventListener('click', () => {
+            fsPlayer.style.display = 'none';
+        });
         fsPlayPauseBtn.addEventListener('click', togglePlayPause);
         fsNextBtn.addEventListener('click', nextSong);
         fsPrevBtn.addEventListener('click', prevSong);
@@ -1606,15 +1583,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 userFavorites.push(song);
                 userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
-            }
-            if(currentQueue[currentSongIndex] && currentQueue[currentSongIndex].id === songId) {
-                const nowFav = !isFav;
-                playerLikeBtn.textContent = nowFav ? '♥' : '♡';
-                playerLikeBtn.classList.toggle('active', nowFav);
-                if(typeof fsLikeBtn !== 'undefined' && fsLikeBtn) {
-                    fsLikeBtn.innerHTML = nowFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;';
-                    fsLikeBtn.classList.toggle('active', nowFav);
-                }
             }
         } catch (e) {
             if (e.code === 'not-found') {
