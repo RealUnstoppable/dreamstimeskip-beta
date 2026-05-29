@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
 
         activeAudio.src = song.src;
-        playerTitle.textContent = song.title; checkMarquee();
+        playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
         document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
@@ -966,6 +966,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const showingFavs = playlistTitleEl.textContent === "Liked Songs";
             renderSongTable(showingFavs ? userFavorites : librarySongs);
         }
+    }
+
+    
+    function checkMarquee() {
+        const playerTitle = document.getElementById('player-song-title');
+        const titles = [playerTitle, document.getElementById('fs-song-title'), document.getElementById('lyrics-title')];
+        titles.forEach(el => {
+            if(!el) return;
+            el.classList.remove('marquee');
+            setTimeout(() => {
+                if (el.scrollWidth > el.clientWidth) {
+                    el.classList.add('marquee');
+                }
+            }, 50);
+        });
     }
 
     function playSong() {
@@ -1479,7 +1494,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const inmixPoint = songMetadata?.inmixPoint || 15;
             activeAudio.currentTime = inmixPoint;
             
-            playerTitle.textContent = song.title; checkMarquee();
+            playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
             playerArtist.textContent = song.artist;
             playerArt.src = song.art;
             document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
