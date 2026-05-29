@@ -207,305 +207,297 @@ export const lyricsData = {
                 { text: "vow", start: 53.8, duration: 0.7 }
             ]
         },
+        // --- Added 2.0s delay starting here ---
         {
-            start: 55.0,
-            end: 58.5,
+            start: 57.0,
+            end: 60.5,
             words: [
-                { text: "Emeralds", start: 55.0, duration: 0.5 },
-                { text: "in", start: 55.5, duration: 0.2 },
-                { text: "my", start: 55.7, duration: 0.2 },
-                { text: "cortex,", start: 55.9, duration: 0.6 },
-                { text: "I", start: 56.5, duration: 0.2 },
-                { text: "don't", start: 56.7, duration: 0.2 },
-                { text: "hold", start: 56.9, duration: 0.3 },
-                { text: "no", start: 57.2, duration: 0.3 },
-                { text: "grudge,", start: 57.5, duration: 0.5 },
-                { text: "no", start: 58.0, duration: 0.5 }
+                { text: "Emeralds", start: 57.0, duration: 0.5 },
+                { text: "in", start: 57.5, duration: 0.2 },
+                { text: "my", start: 57.7, duration: 0.2 },
+                { text: "cortex,", start: 57.9, duration: 0.6 },
+                { text: "I", start: 58.5, duration: 0.2 },
+                { text: "don't", start: 58.7, duration: 0.2 },
+                { text: "hold", start: 58.9, duration: 0.3 },
+                { text: "no", start: 59.2, duration: 0.3 },
+                { text: "grudge,", start: 59.5, duration: 0.5 },
+                { text: "no", start: 60.0, duration: 0.5 }
             ]
         },
         {
-            start: 59.0,
-            end: 62.0,
+            start: 61.0,
+            end: 64.0,
             words: [
-                { text: "Just", start: 59.0, duration: 0.3 },
-                { text: "dance", start: 59.3, duration: 0.4 },
-                { text: "on", start: 59.7, duration: 0.2 },
-                { text: "me,", start: 59.9, duration: 0.4 },
-                { text: "right,", start: 60.3, duration: 0.5 },
-                { text: "right,", start: 60.8, duration: 0.5 },
-                { text: "right", start: 61.3, duration: 0.7 }
+                { text: "Just", start: 61.0, duration: 0.3 },
+                { text: "dance", start: 61.3, duration: 0.4 },
+                { text: "on", start: 61.7, duration: 0.2 },
+                { text: "me,", start: 61.9, duration: 0.4 },
+                { text: "right,", start: 62.3, duration: 0.5 },
+                { text: "right,", start: 62.8, duration: 0.5 },
+                { text: "right", start: 63.3, duration: 0.7 }
             ]
         },
         {
-            start: 62.5,
-            end: 65.5,
+            start: 64.5,
+            end: 67.5,
             words: [
-                { text: "Got", start: 62.5, duration: 0.3 },
-                { text: "guns", start: 62.8, duration: 0.4 },
-                { text: "on", start: 63.2, duration: 0.2 },
-                { text: "me,", start: 63.4, duration: 0.4 },
-                { text: "right,", start: 63.8, duration: 0.5 },
-                { text: "right,", start: 64.3, duration: 0.5 },
-                { text: "right", start: 64.8, duration: 0.7 }
+                { text: "Got", start: 64.5, duration: 0.3 },
+                { text: "guns", start: 64.8, duration: 0.4 },
+                { text: "on", start: 65.2, duration: 0.2 },
+                { text: "me,", start: 65.4, duration: 0.4 },
+                { text: "right,", start: 65.8, duration: 0.5 },
+                { text: "right,", start: 66.3, duration: 0.5 },
+                { text: "right", start: 66.8, duration: 0.7 }
             ]
         },
         {
-            start: 66.0,
-            end: 68.0,
+            start: 68.0,
+            end: 70.0,
             words: [
-                { text: "I", start: 66.0, duration: 0.2 },
-                { text: "don't", start: 66.2, duration: 0.2 },
-                { text: "know", start: 66.4, duration: 0.2 },
-                { text: "why", start: 66.6, duration: 0.2 },
-                { text: "they", start: 66.8, duration: 0.2 },
-                { text: "hate", start: 67.0, duration: 0.4 },
-                { text: "on", start: 67.4, duration: 0.2 },
-                { text: "me", start: 67.6, duration: 0.4 }
+                { text: "I", start: 68.0, duration: 0.2 },
+                { text: "don't", start: 68.2, duration: 0.2 },
+                { text: "know", start: 68.4, duration: 0.2 },
+                { text: "why", start: 68.6, duration: 0.2 },
+                { text: "they", start: 68.8, duration: 0.2 },
+                { text: "hate", start: 69.0, duration: 0.4 },
+                { text: "on", start: 69.4, duration: 0.2 },
+                { text: "me", start: 69.6, duration: 0.4 }
             ]
         },
         {
-            start: 68.5,
-            end: 70.5,
+            start: 70.5,
+            end: 72.5,
             words: [
-                { text: "They", start: 68.5, duration: 0.2 },
-                { text: "can", start: 68.7, duration: 0.2 },
-                { text: "smell", start: 68.9, duration: 0.4 },
-                { text: "the", start: 69.3, duration: 0.2 },
-                { text: "legacy", start: 69.5, duration: 1.0 }
+                { text: "They", start: 70.5, duration: 0.2 },
+                { text: "can", start: 70.7, duration: 0.2 },
+                { text: "smell", start: 70.9, duration: 0.4 },
+                { text: "the", start: 71.3, duration: 0.2 },
+                { text: "legacy", start: 71.5, duration: 1.0 }
             ]
         },
         {
-            start: 71.0,
-            end: 73.0,
+            start: 73.0,
+            end: 75.0,
             words: [
-                { text: "I'm", start: 71.0, duration: 0.2 },
-                { text: "standing", start: 71.2, duration: 0.5 },
-                { text: "on", start: 71.7, duration: 0.3 },
-                { text: "supremacy", start: 72.0, duration: 1.0 }
+                { text: "I'm", start: 73.0, duration: 0.2 },
+                { text: "standing", start: 73.2, duration: 0.5 },
+                { text: "on", start: 73.7, duration: 0.3 },
+                { text: "supremacy", start: 74.0, duration: 1.0 }
             ]
         },
         {
-            start: 73.5,
-            end: 75.5,
+            start: 75.5,
+            end: 77.5,
             words: [
-                { text: "Got", start: 73.5, duration: 0.2 },
-                { text: "bitches", start: 73.7, duration: 0.5 },
-                { text: "tryna", start: 74.2, duration: 0.4 },
-                { text: "come", start: 74.6, duration: 0.3 },
-                { text: "for", start: 74.9, duration: 0.2 },
-                { text: "me", start: 75.1, duration: 0.4 }
+                { text: "Got", start: 75.5, duration: 0.2 },
+                { text: "bitches", start: 75.7, duration: 0.5 },
+                { text: "tryna", start: 76.2, duration: 0.4 },
+                { text: "come", start: 76.6, duration: 0.3 },
+                { text: "for", start: 76.9, duration: 0.2 },
+                { text: "me", start: 77.1, duration: 0.4 }
             ]
         },
         {
-            start: 76.0,
-            end: 78.5,
+            start: 78.0,
+            end: 80.5,
             words: [
-                { text: "I", start: 76.0, duration: 0.2 },
-                { text: "was", start: 76.2, duration: 0.2 },
-                { text: "floating", start: 76.4, duration: 0.4 },
-                { text: "high,", start: 76.8, duration: 0.3 },
-                { text: "jealous", start: 77.1, duration: 0.3 },
-                { text: "bitches", start: 77.4, duration: 0.4 },
-                { text: "hate", start: 77.8, duration: 0.3 },
-                { text: "on", start: 78.1, duration: 0.2 },
-                { text: "me", start: 78.3, duration: 0.2 }
+                { text: "I", start: 78.0, duration: 0.2 },
+                { text: "was", start: 78.2, duration: 0.2 },
+                { text: "floating", start: 78.4, duration: 0.4 },
+                { text: "high,", start: 78.8, duration: 0.3 },
+                { text: "jealous", start: 79.1, duration: 0.3 },
+                { text: "bitches", start: 79.4, duration: 0.4 },
+                { text: "hate", start: 79.8, duration: 0.3 },
+                { text: "on", start: 80.1, duration: 0.2 },
+                { text: "me", start: 80.3, duration: 0.2 }
             ]
         },
         {
-            start: 79.0,
-            end: 81.5,
+            start: 81.0,
+            end: 83.5,
             words: [
-                { text: "On", start: 79.0, duration: 0.2 },
-                { text: "another", start: 79.2, duration: 0.4 },
-                { text: "field,", start: 79.6, duration: 0.4 },
-                { text: "think", start: 80.0, duration: 0.2 },
-                { text: "I", start: 80.2, duration: 0.2 },
-                { text: "need", start: 80.4, duration: 0.2 },
-                { text: "a", start: 80.6, duration: 0.1 },
-                { text: "Pedigree", start: 80.7, duration: 0.8 }
+                { text: "On", start: 81.0, duration: 0.2 },
+                { text: "another", start: 81.2, duration: 0.4 },
+                { text: "field,", start: 81.6, duration: 0.4 },
+                { text: "think", start: 82.0, duration: 0.2 },
+                { text: "I", start: 82.2, duration: 0.2 },
+                { text: "need", start: 82.4, duration: 0.2 },
+                { text: "a", start: 82.6, duration: 0.1 },
+                { text: "Pedigree", start: 82.7, duration: 0.8 }
             ]
         },
         {
-            start: 82.0,
-            end: 87.0,
+            start: 84.0,
+            end: 89.0,
             words: [
-                { text: "Rotten", start: 82.0, duration: 0.4 },
-                { text: "in", start: 82.4, duration: 0.2 },
-                { text: "they", start: 82.6, duration: 0.2 },
-                { text: "eyes,", start: 82.8, duration: 0.5 },
-                { text: "wishing", start: 83.3, duration: 0.4 },
-                { text: "they", start: 83.7, duration: 0.2 },
-                { text: "could", start: 83.9, duration: 0.2 },
-                { text: "silence", start: 84.1, duration: 0.5 },
-                { text: "me", start: 84.6, duration: 0.4 },
-                { text: "(Shh,", start: 85.0, duration: 0.4 },
-                { text: "they", start: 85.4, duration: 0.2 },
-                { text: "could", start: 85.6, duration: 0.2 },
-                { text: "never", start: 85.8, duration: 0.3 },
+                { text: "Rotten", start: 84.0, duration: 0.4 },
+                { text: "in", start: 84.4, duration: 0.2 },
+                { text: "they", start: 84.6, duration: 0.2 },
+                { text: "eyes,", start: 84.8, duration: 0.5 },
+                { text: "wishing", start: 85.3, duration: 0.4 },
+                { text: "they", start: 85.7, duration: 0.2 },
+                { text: "could", start: 85.9, duration: 0.2 },
                 { text: "silence", start: 86.1, duration: 0.5 },
-                { text: "me)", start: 86.6, duration: 0.4 }
+                { text: "me", start: 86.6, duration: 0.4 },
+                { text: "(Shh,", start: 87.0, duration: 0.4 },
+                { text: "they", start: 87.4, duration: 0.2 },
+                { text: "could", start: 87.6, duration: 0.2 },
+                { text: "never", start: 87.8, duration: 0.3 },
+                { text: "silence", start: 88.1, duration: 0.5 },
+                { text: "me)", start: 88.6, duration: 0.4 }
             ]
         },
         {
-            start: 87.5,
-            end: 90.5,
+            start: 89.5,
+            end: 92.5,
             words: [
-                { text: "Swords", start: 87.5, duration: 0.5 },
-                { text: "on", start: 88.0, duration: 0.2 },
-                { text: "my", start: 88.2, duration: 0.2 },
-                { text: "back,", start: 88.4, duration: 0.6 },
-                { text: "serpents", start: 89.0, duration: 0.6 },
-                { text: "on", start: 89.6, duration: 0.3 },
-                { text: "attack", start: 89.9, duration: 0.6 }
+                { text: "Swords", start: 89.5, duration: 0.5 },
+                { text: "on", start: 90.0, duration: 0.2 },
+                { text: "my", start: 90.2, duration: 0.2 },
+                { text: "back,", start: 90.4, duration: 0.6 },
+                { text: "serpents", start: 91.0, duration: 0.6 },
+                { text: "on", start: 91.6, duration: 0.3 },
+                { text: "attack", start: 91.9, duration: 0.6 }
             ]
         },
         {
-            start: 91.0,
-            end: 94.0,
+            start: 93.0,
+            end: 96.0,
             words: [
-                { text: "Venom", start: 91.0, duration: 0.5 },
-                { text: "when", start: 91.5, duration: 0.3 },
-                { text: "they", start: 91.8, duration: 0.2 },
-                { text: "smile,", start: 92.0, duration: 0.5 },
-                { text: "but", start: 92.5, duration: 0.2 },
-                { text: "my", start: 92.7, duration: 0.2 },
-                { text: "halo", start: 92.9, duration: 0.4 },
-                { text: "keep", start: 93.3, duration: 0.3 },
-                { text: "me", start: 93.6, duration: 0.2 },
-                { text: "strapped", start: 93.8, duration: 0.2 }
+                { text: "Venom", start: 93.0, duration: 0.5 },
+                { text: "when", start: 93.5, duration: 0.3 },
+                { text: "they", start: 93.8, duration: 0.2 },
+                { text: "smile,", start: 94.0, duration: 0.5 },
+                { text: "but", start: 94.5, duration: 0.2 },
+                { text: "my", start: 94.7, duration: 0.2 },
+                { text: "halo", start: 94.9, duration: 0.4 },
+                { text: "keep", start: 95.3, duration: 0.3 },
+                { text: "me", start: 95.6, duration: 0.2 },
+                { text: "strapped", start: 95.8, duration: 0.2 }
             ]
         },
         {
-            start: 94.5,
-            end: 96.5,
+            start: 96.5,
+            end: 98.5,
             words: [
-                { text: "(But", start: 94.5, duration: 0.3 },
-                { text: "my", start: 94.8, duration: 0.2 },
-                { text: "halo", start: 95.0, duration: 0.4 },
-                { text: "keep", start: 95.4, duration: 0.3 },
-                { text: "me", start: 95.7, duration: 0.2 },
-                { text: "strapped)", start: 95.9, duration: 0.6 }
+                { text: "(But", start: 96.5, duration: 0.3 },
+                { text: "my", start: 96.8, duration: 0.2 },
+                { text: "halo", start: 97.0, duration: 0.4 },
+                { text: "keep", start: 97.4, duration: 0.3 },
+                { text: "me", start: 97.7, duration: 0.2 },
+                { text: "strapped)", start: 97.9, duration: 0.6 }
             ]
         },
         {
-            start: 97.0,
-            end: 99.0,
+            start: 99.0,
+            end: 101.0,
             words: [
-                { text: "I", start: 97.0, duration: 0.2 },
-                { text: "don't", start: 97.2, duration: 0.2 },
-                { text: "know", start: 97.4, duration: 0.2 },
-                { text: "why", start: 97.6, duration: 0.2 },
-                { text: "they", start: 97.8, duration: 0.2 },
-                { text: "hate", start: 98.0, duration: 0.4 },
-                { text: "on", start: 98.4, duration: 0.2 },
-                { text: "me", start: 98.6, duration: 0.4 }
+                { text: "I", start: 99.0, duration: 0.2 },
+                { text: "don't", start: 99.2, duration: 0.2 },
+                { text: "know", start: 99.4, duration: 0.2 },
+                { text: "why", start: 99.6, duration: 0.2 },
+                { text: "they", start: 99.8, duration: 0.2 },
+                { text: "hate", start: 100.0, duration: 0.4 },
+                { text: "on", start: 100.4, duration: 0.2 },
+                { text: "me", start: 100.6, duration: 0.4 }
             ]
         },
         {
-            start: 99.5,
-            end: 101.5,
+            start: 101.5,
+            end: 103.5,
             words: [
-                { text: "They", start: 99.5, duration: 0.2 },
-                { text: "can", start: 99.7, duration: 0.2 },
-                { text: "smell", start: 99.9, duration: 0.4 },
-                { text: "the", start: 100.3, duration: 0.2 },
-                { text: "legacy", start: 100.5, duration: 1.0 }
+                { text: "They", start: 101.5, duration: 0.2 },
+                { text: "can", start: 101.7, duration: 0.2 },
+                { text: "smell", start: 101.9, duration: 0.4 },
+                { text: "the", start: 102.3, duration: 0.2 },
+                { text: "legacy", start: 102.5, duration: 1.0 }
             ]
         },
         {
-            start: 102.0,
-            end: 104.0,
+            start: 104.0,
+            end: 106.0,
             words: [
-                { text: "I'm", start: 102.0, duration: 0.2 },
-                { text: "standing", start: 102.2, duration: 0.5 },
-                { text: "on", start: 102.7, duration: 0.3 },
-                { text: "supremacy", start: 103.0, duration: 1.0 }
+                { text: "I'm", start: 104.0, duration: 0.2 },
+                { text: "standing", start: 104.2, duration: 0.5 },
+                { text: "on", start: 104.7, duration: 0.3 },
+                { text: "supremacy", start: 105.0, duration: 1.0 }
             ]
         },
         {
-            start: 104.5,
-            end: 106.5,
+            start: 106.5,
+            end: 108.5,
             words: [
-                { text: "Got", start: 104.5, duration: 0.2 },
-                { text: "bitches", start: 104.7, duration: 0.5 },
-                { text: "tryna", start: 105.2, duration: 0.4 },
-                { text: "come", start: 105.6, duration: 0.3 },
-                { text: "for", start: 105.9, duration: 0.2 },
-                { text: "me", start: 106.1, duration: 0.4 }
+                { text: "Got", start: 106.5, duration: 0.2 },
+                { text: "bitches", start: 106.7, duration: 0.5 },
+                { text: "tryna", start: 107.2, duration: 0.4 },
+                { text: "come", start: 107.6, duration: 0.3 },
+                { text: "for", start: 107.9, duration: 0.2 },
+                { text: "me", start: 108.1, duration: 0.4 }
             ]
         },
         {
-            start: 107.0,
-            end: 110.0,
+            start: 109.0,
+            end: 112.0,
             words: [
-                { text: "Sh-show", start: 107.0, duration: 0.6 },
-                { text: "me", start: 107.6, duration: 0.3 },
-                { text: "you", start: 107.9, duration: 0.3 },
-                { text: "would", start: 108.2, duration: 0.3 },
-                { text: "ride", start: 108.5, duration: 0.5 },
-                { text: "for", start: 109.0, duration: 0.3 },
-                { text: "me", start: 109.3, duration: 0.7 }
+                { text: "Sh-show", start: 109.0, duration: 0.6 },
+                { text: "me", start: 109.6, duration: 0.3 },
+                { text: "you", start: 109.9, duration: 0.3 },
+                { text: "would", start: 110.2, duration: 0.3 },
+                { text: "ride", start: 110.5, duration: 0.5 },
+                { text: "for", start: 111.0, duration: 0.3 },
+                { text: "me", start: 111.3, duration: 0.7 }
             ]
         },
         {
-            start: 110.5,
-            end: 113.0,
+            start: 112.5,
+            end: 115.0,
             words: [
-                { text: "Got", start: 110.5, duration: 0.3 },
-                { text: "bitches", start: 110.8, duration: 0.6 },
-                { text: "tryna", start: 111.4, duration: 0.4 },
-                { text: "come", start: 111.8, duration: 0.3 },
-                { text: "for", start: 112.1, duration: 0.2 },
-                { text: "me", start: 112.3, duration: 0.7 }
+                { text: "Got", start: 112.5, duration: 0.3 },
+                { text: "bitches", start: 112.8, duration: 0.6 },
+                { text: "tryna", start: 113.4, duration: 0.4 },
+                { text: "come", start: 113.8, duration: 0.3 },
+                { text: "for", start: 114.1, duration: 0.2 },
+                { text: "me", start: 114.3, duration: 0.7 }
             ]
         },
         {
-            start: 113.5,
-            end: 116.5,
+            start: 115.5,
+            end: 118.5,
             words: [
-                { text: "Tell", start: 113.5, duration: 0.4 },
-                { text: "me", start: 113.9, duration: 0.3 },
-                { text: "you", start: 114.2, duration: 0.3 },
-                { text: "would", start: 114.5, duration: 0.3 },
-                { text: "ride", start: 114.8, duration: 0.5 },
-                { text: "for", start: 115.3, duration: 0.3 },
-                { text: "me", start: 115.6, duration: 0.9 }
+                { text: "Tell", start: 115.5, duration: 0.4 },
+                { text: "me", start: 115.9, duration: 0.3 },
+                { text: "you", start: 116.2, duration: 0.3 },
+                { text: "would", start: 116.5, duration: 0.3 },
+                { text: "ride", start: 116.8, duration: 0.5 },
+                { text: "for", start: 117.3, duration: 0.3 },
+                { text: "me", start: 117.6, duration: 0.9 }
             ]
         },
         {
-            start: 117.0,
-            end: 119.5,
+            start: 119.0,
+            end: 121.5,
             words: [
-                { text: "Bad,", start: 117.0, duration: 0.8 },
-                { text: "bad", start: 117.8, duration: 1.7 }
-            ]
-        },
-        {
-            start: 124.0,
-            end: 125.5,
-            words: [
-                { text: "Why", start: 124.0, duration: 0.3 },
-                { text: "you", start: 124.3, duration: 0.2 },
-                { text: "so", start: 124.5, duration: 0.3 },
-                { text: "mad?", start: 124.8, duration: 0.7 }
+                { text: "Bad,", start: 119.0, duration: 0.8 },
+                { text: "bad", start: 119.8, duration: 1.7 }
             ]
         },
         {
             start: 126.0,
-            end: 129.0,
+            end: 127.5,
             words: [
-                { text: "Snakes", start: 126.0, duration: 0.5 },
-                { text: "everywhere,", start: 126.5, duration: 0.8 },
-                { text: "bro", start: 127.3, duration: 1.7 }
+                { text: "Why", start: 126.0, duration: 0.3 },
+                { text: "you", start: 126.3, duration: 0.2 },
+                { text: "so", start: 126.5, duration: 0.3 },
+                { text: "mad?", start: 126.8, duration: 0.7 }
             ]
-        }
-    ],
-    'deorc-decuple': [
+        },
         {
-            start: 0.0,
-            end: 225.0,
+            start: 128.0,
+            end: 131.0,
             words: [
-                { text: "(Instrumental)", start: 0.0, duration: 225.0 }
+                { text: "Snakes", start: 128.0, duration: 0.5 },
+                { text: "everywhere,", start: 128.5, duration: 0.8 },
+                { text: "bro", start: 129.3, duration: 1.7 }
             ]
         }
     ]
