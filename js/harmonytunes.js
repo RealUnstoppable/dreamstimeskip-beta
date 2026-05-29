@@ -144,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
-    const viewPlaylist = document.getElementById('view-playlist');
 
     // --- INITIALIZATION ---
     function init() {
