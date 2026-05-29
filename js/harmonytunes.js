@@ -35,6 +35,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
 
+    const songColors = {
+        'pixy-legacy': '#1e385c',      // Dim Blue
+        'deorc-decuple': '#4a1515',    // Dim Red
+        'no-pole-remix': '#4a4a15'     // Dim Yellow
+    };
+
     const tiktokData = [
         { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
         { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
@@ -332,6 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerTitle.textContent = song.title;
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
+        document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
 
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
@@ -672,6 +679,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playerTitle.textContent = song.title;
             playerArtist.textContent = song.artist;
             playerArt.src = song.art;
+            document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
             
             const isFav = userFavoritesIds.has(song.id);
             playerLikeBtn.textContent = isFav ? '❤' : '♡';
