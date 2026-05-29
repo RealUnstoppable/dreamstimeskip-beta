@@ -593,29 +593,35 @@ body {
 @media (min-width: 600px) {
     #lyrics-btn, #viral-skip-btn { display: flex; }
 }
-#mixer-btn { color: #ffffff; }
-#mixer-btn.active { color: var(--accent-green); }
-/* Mixer OFF = white, ON = green is handled via JS style.color */
-
-@keyframes pulseGreen {
-    0%   { color: #1ed760; filter: drop-shadow(0 0 4px #1ed760); }
-    50%  { color: #8df0b0; filter: drop-shadow(0 0 12px #8df0b0); }
-    100% { color: #1ed760; filter: drop-shadow(0 0 4px #1ed760); }
+/* Mixer button color: white=off, green=on */
+#mixer-btn {
+    color: #ffffff !important;
+    transition: color 0.2s ease;
 }
-/* Lime-green pulse when actively crossfading */
-#mixer-btn.pulsing,
-#fs-mixer-btn.pulsing {
+#mixer-btn.active {
+    color: var(--accent-green) !important;
+    transition: color 0.2s ease;
+}
+
+/* Lime-green pulse when actively crossfading (only when mixer is on) */
+@keyframes pulseGreen {
+    0%   { color: #1ed760 !important; filter: drop-shadow(0 0 5px #1ed760); }
+    50%  { color: #9effc0 !important; filter: drop-shadow(0 0 14px #9effc0); }
+    100% { color: #1ed760 !important; filter: drop-shadow(0 0 5px #1ed760); }
+}
+#mixer-btn.active.pulsing,
+#fs-mixer-btn.active.pulsing {
     animation: pulseGreen 1.2s ease-in-out infinite !important;
 }
 
+/* Blue pulse when analyzing/pre-listening (only when mixer is on) */
 @keyframes pulseBlue {
-    0%   { color: #5b9cf6; filter: drop-shadow(0 0 4px #5b9cf6); }
-    50%  { color: #93c5fd; filter: drop-shadow(0 0 12px #93c5fd); }
-    100% { color: #5b9cf6; filter: drop-shadow(0 0 4px #5b9cf6); }
+    0%   { color: #5b9cf6 !important; filter: drop-shadow(0 0 5px #5b9cf6); }
+    50%  { color: #bfdbfe !important; filter: drop-shadow(0 0 14px #bfdbfe); }
+    100% { color: #5b9cf6 !important; filter: drop-shadow(0 0 5px #5b9cf6); }
 }
-/* Blue pulse when analyzing/pre-listening */
-#mixer-btn.analyzing,
-#fs-mixer-btn.analyzing {
+#mixer-btn.active.analyzing,
+#fs-mixer-btn.active.analyzing {
     animation: pulseBlue 0.7s ease-in-out infinite !important;
 }
 

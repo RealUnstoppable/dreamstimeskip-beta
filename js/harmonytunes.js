@@ -1172,14 +1172,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         mixerBtn.addEventListener('click', () => {
-            
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
                 setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(console.error);
             }
-
+            // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
+            if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
         });
 
         volumeSlider.addEventListener('input', (e) => {
@@ -1274,18 +1274,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Fullscreen Player
-        playerArt.addEventListener('click', openFullscreen);
-        if(playerTitle) playerTitle.addEventListener('click', openFullscreen);
-        const songInfoText = document.querySelector('.current-song-details .song-info-text');
-        if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
-        if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
-        playerArt.addEventListener('click', () => {
+        function openFullscreen() {
             const song = currentQueue[currentSongIndex];
             if(!song) return;
             fsArt.src = song.art;
             fsBg.style.backgroundImage = `url(${song.art})`;
             fsTitle.textContent = song.title;
             fsArtist.textContent = song.artist;
+            // Sync state into fullscreen buttons
+            if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+            if(fsShuffleBtn) fsShuffleBtn.classList.toggle('active', isShuffle);
+            // Sync progress
+            if(fsProgress && activeAudio.duration) {
+                fsProgress.style.width = `${(activeAudio.currentTime / activeAudio.duration) * 100}%`;
+            }
             fsPlayer.style.display = 'flex';
             if (isPlaying) {
                 if(fsPlayIcon) fsPlayIcon.style.display = 'none';
@@ -1294,13 +1296,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(fsPlayIcon) fsPlayIcon.style.display = 'block';
                 if(fsPauseIcon) fsPauseIcon.style.display = 'none';
             }
-        });
-        closeFsBtn.addEventListener('click', () => {
+        }
+        function closeFullscreen() {
             fsPlayer.style.display = 'none';
+        }
+
+        playerArt.addEventListener('click', openFullscreen);
+        if(playerTitle) playerTitle.addEventListener('click', openFullscreen);
+        const songInfoText = document.querySelector('.current-song-details .song-info-text');
+        if(songInfoText) songInfoText.style.cursor = 'pointer';
+        if(songInfoText) songInfoText.addEventListener('click', (e) => {
+            if (!e.target.closest('.like-btn-player')) openFullscreen();
         });
-        fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        fsNextBtn.addEventListener('click', nextSong);
-        fsPrevBtn.addEventListener('click', prevSong);
+        if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
+        if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
+        if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
+        if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
+
         
         // Artist Profile
         const openArtistProfile = (artistName) => {
