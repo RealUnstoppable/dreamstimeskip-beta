@@ -732,6 +732,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         init();
     });
+
+    // --- WHAT'S NEW MODAL ---
+    const whatsNewOverlay = document.getElementById('whats-new-overlay');
+    const closeWhatsNewBtn = document.getElementById('close-whats-new-btn');
+    const gotItBtn = document.getElementById('got-it-btn');
+
+    const WHAT_NEW_VERSION = 'harmonytunes_whatsnew_v1';
+    
+    if (whatsNewOverlay && !localStorage.getItem(WHAT_NEW_VERSION)) {
+        setTimeout(() => {
+            whatsNewOverlay.style.display = 'flex';
+        }, 1000);
+    }
+
+    function closeWhatsNew() {
+        if(whatsNewOverlay) {
+            whatsNewOverlay.style.display = 'none';
+            localStorage.setItem(WHAT_NEW_VERSION, 'true');
+        }
+    }
+
+    if(closeWhatsNewBtn) closeWhatsNewBtn.addEventListener('click', closeWhatsNew);
+    if(gotItBtn) gotItBtn.addEventListener('click', closeWhatsNew);
+
 });
 
 export function createSongCard(song) {
