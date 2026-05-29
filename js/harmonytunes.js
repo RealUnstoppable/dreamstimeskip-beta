@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false;
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
+    let activeLineIndex = -1;
+    let isAutoScrolling = true;
+    let autoScrollTimeout = null;
+    let isProgrammaticScroll = false;
     let currentUser = null;
     window.__setCurrentUser = (u) => currentUser = u;
     window.__setUserFavorites = (f) => {
@@ -435,6 +439,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Lyrics Events
         lyricsBtn.addEventListener('click', () => {
             viewLyrics.style.display = 'flex';
+            setTimeout(() => {
+                const activeLine = lyricsContent.querySelector('.lyric-line.active');
+                if (activeLine && isAutoScrolling) {
+                    isProgrammaticScroll = true;
+                    lyricsContainer.scrollTo({
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                        behavior: 'auto'
+                    });
+                    setTimeout(() => isProgrammaticScroll = false, 800);
+                }
+            }, 50);
         });
 
         closeLyricsBtn.addEventListener('click', () => {
@@ -469,11 +484,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let activeLineIndex = -1;
-    let isAutoScrolling = true;
-    let autoScrollTimeout = null;
-
     function handleLyricsScroll() {
+        if (isProgrammaticScroll) return;
         isAutoScrolling = false;
         clearTimeout(autoScrollTimeout);
         autoScrollTimeout = setTimeout(() => {
@@ -482,18 +494,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lines = lyricsContent.querySelectorAll('.lyric-line');
                 const activeLine = lines[activeLineIndex];
                 if (activeLine) {
+                    isProgrammaticScroll = true;
                     lyricsContainer.scrollTo({
-                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
                         behavior: 'smooth'
                     });
+                    setTimeout(() => isProgrammaticScroll = false, 800);
                 }
             }
         }, 3000);
     }
 
-    lyricsContainer.addEventListener('wheel', handleLyricsScroll, { passive: true });
-    lyricsContainer.addEventListener('touchstart', handleLyricsScroll, { passive: true });
-    lyricsContainer.addEventListener('touchmove', handleLyricsScroll, { passive: true });
+    lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
     function syncLyrics() {
         if (viewLyrics.style.display === 'none') return;
@@ -538,10 +550,12 @@ document.addEventListener('DOMContentLoaded', () => {
             activeLineIndex = newActiveLineIndex;
             if (isAutoScrolling) {
                 const activeLine = lines[activeLineIndex];
+                isProgrammaticScroll = true;
                 lyricsContainer.scrollTo({
-                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
+                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
                     behavior: 'smooth'
                 });
+                setTimeout(() => isProgrammaticScroll = false, 800);
             }
         }
     }
