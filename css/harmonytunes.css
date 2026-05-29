@@ -959,3 +959,12 @@ body {
 .fs-player-options .control-button {
     transform: scale(1.2);
 }
+
+.search-highlight {
+    background: rgba(50, 205, 50, 0.4);
+    color: lime;
+    border-radius: 2px;
+}
+#search-container {
+    transition: all 0.3s ease;
+}

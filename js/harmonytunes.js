@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "2:17", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'deorc-decuple',
@@ -22,7 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:45", 
             src: "/music/ES_Deorc Decuple - FormantX.mp3", 
             art: "/images/harmony-tunes-card.jpg",
-            bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15
+            bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'no-pole-remix',
@@ -31,7 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "2:30", 
             src: "/music/No Pole x Where Have You Been (Remix).mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15
+            bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-0',
@@ -40,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 108, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 108, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-1',
@@ -49,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-2',
@@ -58,7 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 116, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 116, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-3',
@@ -67,7 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-4',
@@ -76,7 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-5',
@@ -85,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 136, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 136, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-6',
@@ -94,7 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-7',
@@ -103,7 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-8',
@@ -112,7 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-9',
@@ -121,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-10',
@@ -130,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-11',
@@ -139,7 +153,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-12',
@@ -148,7 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-13',
@@ -157,7 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 113, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 113, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-14',
@@ -166,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 134, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 134, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-15',
@@ -175,7 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-16',
@@ -184,7 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-17',
@@ -193,7 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-18',
@@ -202,7 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-19',
@@ -211,7 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-20',
@@ -220,7 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 119, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 119, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-21',
@@ -229,7 +253,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-22',
@@ -238,7 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-23',
@@ -247,7 +273,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-24',
@@ -256,7 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 135, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 135, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-25',
@@ -265,7 +293,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-26',
@@ -274,7 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-27',
@@ -283,7 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-28',
@@ -292,7 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-29',
@@ -301,7 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-30',
@@ -310,7 +343,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-31',
@@ -319,7 +353,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 118, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 118, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-32',
@@ -328,7 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 137, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 137, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-33',
@@ -337,7 +373,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-34',
@@ -346,7 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 130, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 130, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-35',
@@ -355,7 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-36',
@@ -364,7 +403,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-37',
@@ -373,7 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-38',
@@ -382,7 +423,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-39',
@@ -391,7 +433,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 117, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 117, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-40',
@@ -400,7 +443,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-41',
@@ -409,7 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-42',
@@ -418,7 +463,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-43',
@@ -427,7 +473,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         },
         { 
             id: 'top-hit-44',
@@ -436,7 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['party', 'dance', 'club']
         },
         { 
             id: 'top-hit-45',
@@ -445,7 +493,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 102, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 102, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['dark', 'electronic', 'intense']
         },
         { 
             id: 'top-hit-46',
@@ -454,7 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['chill', 'lo-fi', 'relaxed']
         },
         { 
             id: 'top-hit-47',
@@ -463,7 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['upbeat', 'pop', 'happy']
         },
         { 
             id: 'top-hit-48',
@@ -472,7 +523,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['workout', 'high-energy', 'hip-hop']
         },
         { 
             id: 'top-hit-49',
@@ -481,7 +533,8 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: "3:00", 
             src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
-            bpm: 126, energy: 0.8, inmixPoint: 15, outmixPoint: 15
+            bpm: 126, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['acoustic', 'mellow', 'sad']
         }
     ];
 
@@ -596,6 +649,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
+    
+
     const fsLyricsBtn = document.getElementById('fs-lyrics-btn');
     const fsViralSkipBtn = document.getElementById('fs-viral-skip-btn');
     const fsLikeBtn = document.getElementById('fs-like-btn');
@@ -611,6 +666,65 @@ document.addEventListener('DOMContentLoaded', () => {
     const globalSearch = document.getElementById('global-search');
 
     // --- INITIALIZATION ---
+    
+    const searchInput = document.getElementById('global-search');
+    const searchContainer = document.getElementById('search-container');
+    const navSearchBtn = document.getElementById('nav-search');
+
+    if(navSearchBtn) {
+        navSearchBtn.addEventListener('click', () => {
+            searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
+            if(searchContainer.style.display === 'flex') searchInput.focus();
+        });
+    }
+
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.song-card');
+            cards.forEach(card => {
+                const titleEl = card.querySelector('.song-title');
+                const artistEl = card.querySelector('p:last-of-type');
+                if(!titleEl || !artistEl) return;
+                
+                const titleText = titleEl.textContent;
+                const artistText = artistEl.textContent;
+                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+                
+                card.style.display = isMatch ? 'flex' : 'none';
+                
+                if(query && isMatch) {
+                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                } else {
+                    titleEl.textContent = titleText;
+                    artistEl.textContent = artistText;
+                }
+            });
+            
+            const rows = document.querySelectorAll('.song-table tbody tr');
+            rows.forEach(row => {
+                const titleEl = row.querySelector('.song-title');
+                const artistEl = row.querySelector('.song-artist');
+                if(!titleEl || !artistEl) return;
+                
+                const titleText = titleEl.textContent;
+                const artistText = artistEl.textContent;
+                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+                
+                row.style.display = isMatch ? 'table-row' : 'none';
+                
+                if(query && isMatch) {
+                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                } else {
+                    titleEl.textContent = titleText;
+                    artistEl.textContent = artistText;
+                }
+            });
+        });
+    }
+
     function init() {
         renderHome();
         setupNavigation();
@@ -931,6 +1045,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function nextSong() {
+        if(activeAudio && currentQueue[currentSongIndex]) {
+            const currentTime = activeAudio.currentTime;
+            const duration = activeAudio.duration;
+            const songId = currentQueue[currentSongIndex].id;
+            
+            if (currentTime < 5) {
+                logPlaybackEvent('skip_quick', songId, { skippedAt: currentTime });
+            } else if (duration && currentTime < duration * 0.5) {
+                logPlaybackEvent('skip_through', songId, { skippedAt: currentTime, percentCompleted: (currentTime / duration) * 100 });
+            }
+        }
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
             if (repeatMode === 1) nextIndex = 0;
@@ -958,6 +1083,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENTS ---
     function setupPlayerEvents() {
+        
+        if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
+        if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
+        if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
+        if(fsMixerBtn) fsMixerBtn.addEventListener('click', () => mixerBtn.click());
+
         if(fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
         if(fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
         if(fsLikeBtn) fsLikeBtn.addEventListener('click', () => playerLikeBtn.click());
@@ -971,6 +1102,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const duration = activeAudio.duration;
                 if(duration) {
                     activeAudio.currentTime = (clickX / width) * duration;
+                    const targetTime = (clickX / width) * duration;
+                    if(currentQueue[currentSongIndex]) {
+                        logPlaybackEvent('scrub_to', currentQueue[currentSongIndex].id, {
+                            fromTime: activeAudio.currentTime,
+                            toTime: targetTime
+                        });
+                    }
                 }
             });
         }
@@ -999,7 +1137,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         mixerBtn.addEventListener('click', () => {
+            
             isMixerMode = !isMixerMode;
+            if(currentUser) {
+                const userRef = doc(db, "users", currentUser.uid);
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(console.error);
+            }
+
             mixerBtn.classList.toggle('active', isMixerMode);
         });
 
@@ -1265,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
-            mixerBtn.classList.add('analyzing');
+            mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             
             if (repeatMode !== 2 && currentQueue.length > 1) {
                 const currentMetadata = librarySongsMap.get(currentQueue[currentSongIndex].id);
@@ -1299,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isListening = false;
             mixerBtn.classList.remove('analyzing');
             isCrossfading = true;
-            mixerBtn.classList.add('pulsing');
+            mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
             
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
@@ -1454,13 +1598,20 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
-                if (docSnap.exists() && docSnap.data().musicFavorites) {
+                if (docSnap.exists()) {
+                    if(docSnap.data().mixerToggled !== undefined) {
+                        isMixerMode = docSnap.data().mixerToggled;
+                        mixerBtn.classList.toggle('active', isMixerMode);
+                        if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+                    }
+                    if(docSnap.data().musicFavorites) {
                     const favIds = docSnap.data().musicFavorites;
                     // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
                     const favIdsSet = new Set(favIds);
                     userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
                     favoriteIds = new Set(favIds);
                     userFavoritesIds = new Set(favIds);
+                    }
                 }
             } catch (e) { console.error(e); }
             
