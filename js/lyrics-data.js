@@ -33,6 +33,7 @@ export const lyricsData = {
         {
             start: 18.0,
             end: 19.5,
+            trending: true,
             words: [
                 { text: "I", start: 18.0, duration: 0.2 },
                 { text: "was", start: 18.2, duration: 0.2 },
@@ -45,6 +46,7 @@ export const lyricsData = {
         {
             start: 19.5,
             end: 21.0,
+            trending: true,
             words: [
                 { text: "hate", start: 19.5, duration: 0.5 },
                 { text: "on", start: 20.0, duration: 0.5 },

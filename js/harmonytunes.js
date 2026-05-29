@@ -123,10 +123,26 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Lyrics Elements
     const lyricsBtn = document.getElementById('lyrics-btn');
-    const viewLyrics = document.getElementById('view-lyrics');
-    const closeLyricsBtn = document.getElementById('close-lyrics-btn');
-    const lyricsContent = document.getElementById('lyrics-content');
     const lyricsContainer = document.getElementById('lyrics-container');
+    const closeLyricsBtn = document.getElementById('close-lyrics-btn');
+
+    // New Features
+    const viralSkipBtn = document.getElementById('viral-skip-btn');
+    const fsPlayer = document.getElementById('fullscreen-player');
+    const closeFsBtn = document.getElementById('close-fullscreen-btn');
+    const fsBg = document.getElementById('fullscreen-bg');
+    const fsArt = document.getElementById('fullscreen-art');
+    const fsTitle = document.getElementById('fullscreen-title');
+    const fsArtist = document.getElementById('fullscreen-artist');
+    const fsPlayPauseBtn = document.getElementById('fs-play-pause-btn');
+    const fsNextBtn = document.getElementById('fs-next-btn');
+    const fsPrevBtn = document.getElementById('fs-prev-btn');
+    const fsPlayIcon = fsPlayPauseBtn.querySelector('.play-icon');
+    const fsPauseIcon = fsPlayPauseBtn.querySelector('.pause-icon');
+    const artistProfile = document.getElementById('artist-profile');
+    const closeArtistBtn = document.getElementById('close-artist-btn');
+
+    const viewPlaylist = document.getElementById('view-playlist');
 
     // --- INITIALIZATION ---
     function init() {
@@ -371,6 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
+            fsPlayIcon.style.display = 'none';
+            fsPauseIcon.style.display = 'block';
             return;
         }
 
@@ -379,6 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
+            fsPlayIcon.style.display = 'none';
+            fsPauseIcon.style.display = 'block';
             
             const fadeStep = 50;
             const durationMs = 500;
@@ -402,6 +422,8 @@ document.addEventListener('DOMContentLoaded', () => {
         isPlaying = false;
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
+        fsPlayIcon.style.display = 'block';
+        fsPauseIcon.style.display = 'none';
 
         if (isCrossfading) {
             activeAudio.pause();
@@ -530,24 +552,95 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Viral Skip
+        viralSkipBtn.addEventListener('click', () => {
+            const currentSong = currentQueue[currentSongIndex];
+            if(!currentSong) return;
+            const data = lyricsData[currentSong.id];
+            if(data) {
+                const trendingLine = data.find(l => l.trending);
+                if(trendingLine) {
+                    activeAudio.currentTime = trendingLine.start;
+                    playSong();
+                }
+            }
+        });
+
         // Lyrics Events
         lyricsBtn.addEventListener('click', () => {
-            viewLyrics.style.display = 'flex';
-            setTimeout(() => {
-                const activeLine = lyricsContent.querySelector('.lyric-line.active');
-                if (activeLine && isAutoScrolling) {
-                    isProgrammaticScroll = true;
-                    lyricsContainer.scrollTo({
-                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
-                        behavior: 'auto'
-                    });
-                    setTimeout(() => isProgrammaticScroll = false, 800);
-                }
-            }, 50);
+            if (viewLyrics.style.display !== 'none' && !viewLyrics.classList.contains('slide-down-active')) {
+                viewLyrics.classList.remove('slide-up-active');
+                viewLyrics.classList.add('slide-down-active');
+                setTimeout(() => {
+                    viewLyrics.style.display = 'none';
+                    viewLyrics.classList.remove('slide-down-active');
+                }, 400);
+            } else {
+                viewLyrics.classList.remove('slide-down-active');
+                viewLyrics.classList.add('slide-up-active');
+                viewLyrics.style.display = 'flex';
+                setTimeout(() => {
+                    const activeLine = lyricsContent.querySelector('.lyric-line.active');
+                    if (activeLine && isAutoScrolling) {
+                        isProgrammaticScroll = true;
+                        lyricsContainer.scrollTo({
+                            top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                            behavior: 'auto'
+                        });
+                        setTimeout(() => isProgrammaticScroll = false, 800);
+                    }
+                }, 50);
+            }
         });
 
         closeLyricsBtn.addEventListener('click', () => {
-            viewLyrics.style.display = 'none';
+            viewLyrics.classList.remove('slide-up-active');
+            viewLyrics.classList.add('slide-down-active');
+            setTimeout(() => {
+                viewLyrics.style.display = 'none';
+                viewLyrics.classList.remove('slide-down-active');
+            }, 400);
+        });
+
+        // Fullscreen Player
+        playerArt.addEventListener('click', () => {
+            const song = currentQueue[currentSongIndex];
+            if(!song) return;
+            fsArt.src = song.art;
+            fsBg.style.backgroundImage = `url(${song.art})`;
+            fsTitle.textContent = song.title;
+            fsArtist.textContent = song.artist;
+            fsPlayer.style.display = 'flex';
+            if (isPlaying) {
+                fsPlayIcon.style.display = 'none';
+                fsPauseIcon.style.display = 'block';
+            } else {
+                fsPlayIcon.style.display = 'block';
+                fsPauseIcon.style.display = 'none';
+            }
+        });
+        closeFsBtn.addEventListener('click', () => {
+            fsPlayer.style.display = 'none';
+        });
+        fsPlayPauseBtn.addEventListener('click', togglePlayPause);
+        fsNextBtn.addEventListener('click', nextSong);
+        fsPrevBtn.addEventListener('click', prevSong);
+        
+        // Artist Profile
+        const openArtistProfile = (artistName) => {
+            document.getElementById('artist-name').textContent = artistName;
+            artistProfile.style.display = 'block';
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+        };
+        playerArtist.addEventListener('click', () => {
+            if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
+        });
+        fsArtist.addEventListener('click', () => {
+            fsPlayer.style.display = 'none';
+            if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
+        });
+        closeArtistBtn.addEventListener('click', () => {
+            artistProfile.style.display = 'none';
         });
     }
 
@@ -562,7 +655,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const wordsHtml = line.words.map((word, wordIndex) => {
                 return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
             }).join(' ');
-            return `<div class="lyric-line" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            const trendingClass = line.trending ? ' trending-lyric' : '';
+            return `<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
         }).join('');
         
         // Seek on click
@@ -792,39 +886,51 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
         const song = librarySongsMap.get(songId);
-        // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
+        if (!song) return;
+        
         const isFav = userFavoritesIds.has(songId);
         const userRef = doc(db, "users", currentUser.uid);
 
         try {
             if (isFav) {
-                favoriteIds.delete(songId);
                 userFavorites = userFavorites.filter(s => s.id !== songId);
                 userFavoritesIds.delete(songId);
                 await updateDoc(userRef, { musicFavorites: arrayRemove(songId) });
             } else {
-                favoriteIds.add(songId);
                 userFavorites.push(song);
                 userFavoritesIds.add(songId);
                 await updateDoc(userRef, { musicFavorites: arrayUnion(songId) });
             }
-            // Update UI
-            const isPlayingFav = (currentQueue[currentSongIndex]?.id === songId);
-            if(isPlayingFav) {
-                playerLikeBtn.textContent = !isFav ? '❤' : '♡'; // Toggle logic was inverted in var check
-                playerLikeBtn.classList.toggle('active', !isFav);
-            }
-            if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
-                renderSongTable(userFavorites);
-            }
         } catch (e) {
             if (e.code === 'not-found') {
                 await setDoc(userRef, { musicFavorites: [songId] }, { merge: true });
-                favoriteIds.add(songId);
-                userFavorites.push(song);
+                if(!isFav) {
+                    userFavorites.push(song);
+                    userFavoritesIds.add(songId);
+                }
+            } else {
+                console.error("Firebase error:", e);
+                // Revert state on failure
+                if (isFav) {
+                    userFavorites.push(song);
+                    userFavoritesIds.add(songId);
+                } else {
+                    userFavorites = userFavorites.filter(s => s.id !== songId);
+                    userFavoritesIds.delete(songId);
+                }
             }
+        }
+        
+        // Update UI unconditionally based on actual final state
+        const finalFav = userFavoritesIds.has(songId);
+        const isPlayingFav = (currentQueue[currentSongIndex]?.id === songId);
+        if(isPlayingFav && playerLikeBtn) {
+            playerLikeBtn.textContent = finalFav ? '❤' : '♡';
+            playerLikeBtn.classList.toggle('active', finalFav);
+        }
+        if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
+            renderSongTable(userFavorites);
         }
     }
 

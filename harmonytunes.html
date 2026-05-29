@@ -103,15 +103,59 @@
         </main>
     </div>
 
-    <div id="view-lyrics" class="lyrics-overlay" style="display: none;">
+    <div id="view-lyrics" class="view-lyrics" style="display: none;">
+        <div class="lyrics-bg"></div>
         <button id="close-lyrics-btn" class="close-lyrics-btn" aria-label="Close Lyrics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="lyrics-header">
+            <h2 id="lyrics-title">...</h2>
+            <p id="lyrics-artist">...</p>
+        </div>
+        <div class="lyrics-container" id="lyrics-container">
+            <!-- Lyrics injected via JS -->
+        </div>
+    </div>
+
+    <!-- Fullscreen Player -->
+    <div id="fullscreen-player" class="fullscreen-player" style="display: none;">
+        <div class="fullscreen-bg" id="fullscreen-bg"></div>
+        <button id="close-fullscreen-btn" class="close-fullscreen-btn" aria-label="Close Fullscreen">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
-        <div class="lyrics-bg" id="lyrics-bg"></div>
-        <div class="lyrics-container" id="lyrics-container">
-            <div id="lyrics-content">
-                <!-- Lyrics injected via JS -->
+        <div class="fullscreen-content">
+            <img id="fullscreen-art" src="" alt="Album Art" class="fullscreen-art">
+            <h1 id="fullscreen-title">Song Title</h1>
+            <h2 id="fullscreen-artist">Artist</h2>
+            <div class="fullscreen-controls">
+                <!-- Mirrored Controls -->
+                <button class="control-button" id="fs-prev-btn" aria-label="Previous">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke-width="2" stroke="currentColor"></line></svg>
+                </button>
+                <button class="control-button play-pause-btn" id="fs-play-pause-btn" aria-label="Play/Pause">
+                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="black" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                </button>
+                <button class="control-button" id="fs-next-btn" aria-label="Next">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke-width="2" stroke="currentColor"></line></svg>
+                </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Artist Profile -->
+    <div id="artist-profile" class="artist-profile" style="display: none;">
+        <button id="close-artist-btn" class="close-fullscreen-btn" aria-label="Close Profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="artist-header">
+            <div class="artist-avatar" id="artist-avatar"></div>
+            <h1 id="artist-name">Artist Name</h1>
+            <p>1.2M Monthly Listeners</p>
+        </div>
+        <div class="artist-tracks">
+            <h3>Popular Tracks</h3>
+            <div id="artist-track-list"></div>
         </div>
     </div>
 
@@ -178,6 +222,9 @@
                 </button>
                 <button class="control-button" id="lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </button>
+                <button class="control-button" id="viral-skip-btn" title="Viral Skip" aria-label="Skip to trending part">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                 </button>
             </div>
             
