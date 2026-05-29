@@ -646,8 +646,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fsPlayPauseBtn = document.getElementById('fs-play-pause-btn');
     const fsNextBtn = document.getElementById('fs-next-btn');
     const fsPrevBtn = document.getElementById('fs-prev-btn');
-    const fsPlayIcon = fsPlayPauseBtn.querySelector('.play-icon');
-    const fsPauseIcon = fsPlayPauseBtn.querySelector('.pause-icon');
+    const fsPlayIcon = fsPlayPauseBtn ? fsPlayPauseBtn.querySelector('.play-icon') : null;
+    const fsPauseIcon = fsPlayPauseBtn ? fsPlayPauseBtn.querySelector('.pause-icon') : null;
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
@@ -1145,8 +1145,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
         if(fsMixerBtn) fsMixerBtn.addEventListener('click', () => mixerBtn.click());
 
-        if(fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
-        if(fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
+        if(typeof fsLyricsBtn !== 'undefined' && fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
+        if(typeof fsViralSkipBtn !== 'undefined' && fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
         if(fsLikeBtn) fsLikeBtn.addEventListener('click', () => playerLikeBtn.click());
         if(fsShuffleBtn) fsShuffleBtn.addEventListener('click', () => shuffleBtn.click());
         if(fsRepeatBtn) fsRepeatBtn.addEventListener('click', () => repeatBtn.click());
@@ -1305,9 +1305,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const songInfoText = document.querySelector('.current-song-details .song-info-text');
         if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
         if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
-        fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        fsNextBtn.addEventListener('click', nextSong);
-        fsPrevBtn.addEventListener('click', prevSong);
+        if(typeof fsPlayPauseBtn !== 'undefined' && fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
+        if(typeof fsNextBtn !== 'undefined' && fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
+        if(typeof fsPrevBtn !== 'undefined' && fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
         
         // Artist Profile
         const openArtistProfile = (artistName) => {
