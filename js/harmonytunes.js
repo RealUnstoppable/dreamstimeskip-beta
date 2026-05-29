@@ -604,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMixerMode = false;
     let isCrossfading = false;
     let isListening = false;
+    let viralLocked = false;
     let crossfadeDuration = 15;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
@@ -1125,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         bindEvent(fsMixerBtn, () => triggerClick(mixerBtn));
         bindEvent(fsLyricsBtn, () => { triggerClick(lyricsBtn); closeFullscreen(); });
-        bindEvent(fsViralSkipBtn, () => { triggerClick(viralSkipBtn); closeFullscreen(); });
+        // fsViralSkipBtn is handled via pointer events below, so it's not bound to basic click here
         bindEvent(fsLikeBtn, () => triggerClick(playerLikeBtn));
         bindEvent(fsShuffleBtn, () => triggerClick(shuffleBtn));
         bindEvent(fsRepeatBtn, () => triggerClick(repeatBtn));
@@ -1156,6 +1157,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target === activeAudio) {
                     updateProgress();
                     checkCrossfade();
+
+                    // Viral Loop Logic
+                    if (viralLocked) {
+                        const currentSong = currentQueue[currentSongIndex];
+                        if (currentSong && lyricsData[currentSong.id]) {
+                            const trendingLine = lyricsData[currentSong.id].find(l => l.trending);
+                            if (trendingLine) {
+                                // Assume end is either next line's start or end of song
+                                const idx = lyricsData[currentSong.id].indexOf(trendingLine);
+                                const nextLine = lyricsData[currentSong.id][idx + 1];
+                                const trendingEnd = nextLine ? nextLine.start : activeAudio.duration;
+                                if (activeAudio.currentTime >= trendingEnd) {
+                                    activeAudio.currentTime = trendingLine.start;
+                                }
+                            }
+                        }
+                    }
                 }
             });
             player.addEventListener('ended', (e) => {
@@ -1223,18 +1241,67 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Viral Skip
-        viralSkipBtn.addEventListener('click', () => {
-            const currentSong = currentQueue[currentSongIndex];
-            if(!currentSong) return;
-            const data = lyricsData[currentSong.id];
-            if(data) {
-                const trendingLine = data.find(l => l.trending);
-                if(trendingLine) {
-                    activeAudio.currentTime = trendingLine.start;
-                    playSong();
+        // Viral Skip: Hold to Loop, Click to Skip
+        let viralPressTimer = null;
+        let viralDownTime = 0;
+        const toggleViralLock = (forceUnlock = false) => {
+            if (viralLocked || forceUnlock) {
+                viralLocked = false;
+                viralSkipBtn.classList.remove('viral-locked');
+                if(fsViralSkipBtn) fsViralSkipBtn.classList.remove('viral-locked');
+            } else {
+                viralLocked = true;
+                viralSkipBtn.classList.add('viral-locked');
+                if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
+            }
+        };
+        const handleViralDown = (e) => {
+            viralDownTime = Date.now();
+            viralPressTimer = setTimeout(() => {
+                if (!viralLocked) {
+                    toggleViralLock(); // Lock it
+                    // Jump to viral start immediately
+                    const song = currentQueue[currentSongIndex];
+                    if (song && lyricsData[song.id]) {
+                        const trendingLine = lyricsData[song.id].find(l => l.trending);
+                        if (trendingLine) {
+                            activeAudio.currentTime = trendingLine.start;
+                            playSong();
+                        }
+                    }
+                }
+            }, 600); // 600ms hold required
+        };
+        const handleViralUp = (e) => {
+            clearTimeout(viralPressTimer);
+            const duration = Date.now() - viralDownTime;
+            if (duration < 600) {
+                // Short click
+                if (viralLocked) {
+                    toggleViralLock(true); // Unlock
+                } else {
+                    // Normal skip to viral part
+                    const song = currentQueue[currentSongIndex];
+                    if(!song) return;
+                    const data = lyricsData[song.id];
+                    if(data) {
+                        const trendingLine = data.find(l => l.trending);
+                        if(trendingLine) {
+                            activeAudio.currentTime = trendingLine.start;
+                            playSong();
+                        }
+                    }
                 }
             }
+        };
+
+        [viralSkipBtn, fsViralSkipBtn].forEach(btn => {
+            if (!btn) return;
+            btn.addEventListener('pointerdown', handleViralDown);
+            btn.addEventListener('pointerup', handleViralUp);
+            btn.addEventListener('pointerleave', () => clearTimeout(viralPressTimer));
+            btn.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent long press context menu
+            btn.addEventListener('click', (e) => e.preventDefault()); // Disable default click
         });
 
         // Lyrics Events
@@ -1284,6 +1351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sync state into fullscreen buttons
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
             if(fsShuffleBtn) fsShuffleBtn.classList.toggle('active', isShuffle);
+            if(fsViralSkipBtn) fsViralSkipBtn.classList.toggle('viral-locked', viralLocked);
             // Sync progress
             if(fsProgress && activeAudio.duration) {
                 fsProgress.style.width = `${(activeAudio.currentTime / activeAudio.duration) * 100}%`;
@@ -1342,6 +1410,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderMusicGrid(filtered);
             }
         });
+
+        // --- Mobile Overflow ("...") Button ---
+        const mobileOverlay = document.getElementById('mobile-controls-overlay');
+        const mobileOverflowBtn = document.getElementById('mobile-overflow-btn');
+        if (mobileOverflowBtn && mobileOverlay) {
+            mobileOverflowBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                mobileOverlay.classList.toggle('hidden');
+            });
+            // Delegate mobile button clicks to desktop counterparts
+            document.getElementById('mob-shuffle-btn')?.addEventListener('click', () => { triggerClick(shuffleBtn); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { triggerClick(mixerBtn); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { triggerClick(repeatBtn); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
+            
+            // For Viral Skip, the desktop button uses pointerdown/up. Triggering click directly might not work because we prevented default.
+            // So we'll dispatch a pointerdown then a pointerup shortly after to simulate a click,
+            // OR we can directly do the short-click logic.
+            document.getElementById('mob-viral-btn')?.addEventListener('click', () => {
+                // Simulate a short click (skip to viral)
+                const song = currentQueue[currentSongIndex];
+                if(song && lyricsData[song.id]) {
+                    const trendingLine = lyricsData[song.id].find(l => l.trending);
+                    if(trendingLine) {
+                        activeAudio.currentTime = trendingLine.start;
+                        playSong();
+                    }
+                }
+                mobileOverlay.classList.add('hidden');
+            });
+
+            // Close overlay when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!mobileOverlay.classList.contains('hidden') && !mobileOverlay.contains(e.target) && e.target !== mobileOverflowBtn) {
+                    mobileOverlay.classList.add('hidden');
+                }
+            });
+        }
     }
 
     // --- LYRICS RENDERING ---
