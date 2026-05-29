@@ -652,8 +652,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
-    
-
     const fsLyricsBtn = document.getElementById('fs-lyrics-btn');
     const fsViralSkipBtn = document.getElementById('fs-viral-skip-btn');
     const fsLikeBtn = document.getElementById('fs-like-btn');
@@ -661,6 +659,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fsRepeatBtn = document.getElementById('fs-repeat-btn');
     const fsProgressBar = document.getElementById('fs-progress-bar');
     const fsProgress = document.getElementById('fs-progress');
+
     const fsCurrentTime = document.querySelector('.fs-current-time');
     const fsTotalTime = document.querySelector('.fs-total-time');
 
@@ -1108,16 +1107,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupPlayerEvents() {
         
-        if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
-        if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
-        if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        if(fsMixerBtn) fsMixerBtn.addEventListener('click', () => mixerBtn.click());
+        const bindEvent = (btn, handler) => {
+            if(btn) {
+                btn.addEventListener('click', (e) => { e.preventDefault(); handler(); });
+                btn.addEventListener('touchstart', (e) => { e.preventDefault(); handler(); }, {passive: false});
+            }
+        };
 
-        if(fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
-        if(fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
-        if(fsLikeBtn) fsLikeBtn.addEventListener('click', () => playerLikeBtn.click());
-        if(fsShuffleBtn) fsShuffleBtn.addEventListener('click', () => shuffleBtn.click());
-        if(fsRepeatBtn) fsRepeatBtn.addEventListener('click', () => repeatBtn.click());
+        bindEvent(fsPrevBtn, prevSong);
+        bindEvent(fsNextBtn, nextSong);
+        bindEvent(fsPlayPauseBtn, togglePlayPause);
+
+        // Instead of calling .click(), call the actual handlers directly or dispatch proper Event
+        const triggerClick = (targetBtn) => {
+            if(targetBtn) targetBtn.dispatchEvent(new Event('click', { bubbles: true }));
+        };
+
+        bindEvent(fsMixerBtn, () => triggerClick(mixerBtn));
+        bindEvent(fsLyricsBtn, () => { triggerClick(lyricsBtn); closeFullscreen(); });
+        bindEvent(fsViralSkipBtn, () => { triggerClick(viralSkipBtn); closeFullscreen(); });
+        bindEvent(fsLikeBtn, () => triggerClick(playerLikeBtn));
+        bindEvent(fsShuffleBtn, () => triggerClick(shuffleBtn));
+        bindEvent(fsRepeatBtn, () => triggerClick(repeatBtn));
         
         if(fsProgressBar) {
             fsProgressBar.addEventListener('click', (e) => {
@@ -1263,6 +1274,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Fullscreen Player
+        playerArt.addEventListener('click', openFullscreen);
+        if(playerTitle) playerTitle.addEventListener('click', openFullscreen);
+        const songInfoText = document.querySelector('.current-song-details .song-info-text');
+        if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
+        if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
         playerArt.addEventListener('click', () => {
             const song = currentQueue[currentSongIndex];
             if(!song) return;
