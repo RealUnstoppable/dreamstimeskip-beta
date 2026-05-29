@@ -569,7 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerTitle = document.getElementById('player-song-title');
     const playerArtist = document.getElementById('player-song-artist');
     const playerArt = document.getElementById('player-album-art');
-    const playerLikeBtn = document.getElementById('player-like-btn');
     
     // Lyrics Elements
     const lyricsBtn = document.getElementById('lyrics-btn');
@@ -577,6 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeLyricsBtn = document.getElementById('close-lyrics-btn');
     const lyricsContent = document.getElementById('lyrics-content');
     const lyricsContainer = document.getElementById('lyrics-container');
+
+    // Player Bar Global Buttons
+    const playerLikeBtn = document.getElementById('player-like-btn');
 
     // New Features
     const viralSkipBtn = document.getElementById('viral-skip-btn');
@@ -602,6 +604,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderHome();
         setupNavigation();
         setupPlayerEvents();
+        
+        // Initialize the queue so the player bar (and favorites) work before pressing play
+        currentQueue = [...librarySongs];
+        currentSongIndex = 0;
+        loadSong(0);
     }
 
     // --- NAVIGATION ---
@@ -822,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
-        playerLikeBtn.textContent = isFav ? '❤' : '♡';
+        playerLikeBtn.textContent = isFav ? '♥' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
         renderLyrics(song.id);
@@ -1298,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
             
             const isFav = userFavoritesIds.has(song.id);
-            playerLikeBtn.textContent = isFav ? '❤' : '♡';
+            playerLikeBtn.textContent = isFav ? '♥' : '♡';
             playerLikeBtn.classList.toggle('active', isFav);
 
             renderLyrics(song.id);
@@ -1401,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const finalFav = userFavoritesIds.has(songId);
         const isPlayingFav = (currentQueue[currentSongIndex]?.id === songId);
         if(isPlayingFav && playerLikeBtn) {
-            playerLikeBtn.textContent = finalFav ? '❤' : '♡';
+            playerLikeBtn.textContent = finalFav ? '♥' : '♡';
             playerLikeBtn.classList.toggle('active', finalFav);
         }
         if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {

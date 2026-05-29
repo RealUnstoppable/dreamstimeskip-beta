@@ -719,7 +719,7 @@ body {
     background: none; border: none; color: #b3b3b3; cursor: pointer; font-size: 1.2rem;
     margin-left: 5px;
 }
-.like-btn-player.active { color: var(--accent-green); }
+.like-btn-player.active { color: var(--accent-green) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
 
 /* --- LYRICS OVERLAY --- */
 .lyrics-overlay {
