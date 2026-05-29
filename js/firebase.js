@@ -18,11 +18,11 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-// Initialize App Check
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
-  isTokenAutoRefreshEnabled: true
-});
+// Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
+// export const appCheck = initializeAppCheck(app, {
+//   provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
+//   isTokenAutoRefreshEnabled: true
+// });
 
 // Initialize Auth
 export const auth = getAuth(app);
