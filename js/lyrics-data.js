@@ -3,22 +3,22 @@ export const lyricsData = {
     'pixy-legacy': [
         {
             start: 0.0,
-            end: 4.0,
+            end: 3.0,
             words: [
-                { text: "(Instrumental", start: 0.0, duration: 2.0 },
-                { text: "Intro)", start: 2.0, duration: 2.0 }
+                { text: "(Instrumental", start: 0.0, duration: 3.0 },
+                { text: "Why you so mad?)", start: 3.0, duration: 4.0 }
             ]
         },
         {
             start: 5.0,
             end: 8.0,
             words: [
-                { text: "We", start: 5.0, duration: 0.4 },
-                { text: "built", start: 5.4, duration: 0.4 },
-                { text: "this", start: 5.8, duration: 0.4 },
-                { text: "legacy", start: 6.2, duration: 1.0 },
+                { text: "Snakes", start: 5.0, duration: 0.4 },
+                { text: "everywhere,", start: 5.4, duration: 0.4 },
+                { text: "bro", start: 5.8, duration: 0.4 },
+                { text: "Back", start: 6.2, duration: 1.0 },
                 { text: "from", start: 7.2, duration: 0.3 },
-                { text: "dust.", start: 7.5, duration: 0.5 }
+                { text: "paradise.", start: 7.5, duration: 0.5 }
             ]
         },
         {
