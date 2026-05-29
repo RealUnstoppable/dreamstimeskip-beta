@@ -620,21 +620,7 @@ body {
 }
 .play-pause-btn:hover { color: black; transform: scale(1.05); }
 
-.music-player-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: var(--player-height);
-    background: rgba(10, 10, 10, 0.95);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid #1f1f1f;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    z-index: 1000;
-}
+
 
 .progress-bar-container {
     width: 100%;
@@ -675,7 +661,7 @@ body {
     display: none;
     align-items: center;
     gap: 8px;
-    flex: 0.5;
+    flex: 1;
     justify-content: flex-end;
 }
 
