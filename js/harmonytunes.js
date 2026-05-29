@@ -470,6 +470,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let activeLineIndex = -1;
+    let isAutoScrolling = true;
+    let autoScrollTimeout = null;
+
+    function handleLyricsScroll() {
+        isAutoScrolling = false;
+        clearTimeout(autoScrollTimeout);
+        autoScrollTimeout = setTimeout(() => {
+            isAutoScrolling = true;
+            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none') {
+                const lines = lyricsContent.querySelectorAll('.lyric-line');
+                const activeLine = lines[activeLineIndex];
+                if (activeLine) {
+                    lyricsContainer.scrollTo({
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }, 3000);
+    }
+
+    lyricsContainer.addEventListener('wheel', handleLyricsScroll, { passive: true });
+    lyricsContainer.addEventListener('touchstart', handleLyricsScroll, { passive: true });
+    lyricsContainer.addEventListener('touchmove', handleLyricsScroll, { passive: true });
+
     function syncLyrics() {
         if (viewLyrics.style.display === 'none') return;
         const currentTime = audioPlayer.currentTime;
@@ -511,11 +536,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
-            const activeLine = lines[activeLineIndex];
-            lyricsContainer.scrollTo({
-                top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
-                behavior: 'smooth'
-            });
+            if (isAutoScrolling) {
+                const activeLine = lines[activeLineIndex];
+                lyricsContainer.scrollTo({
+                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
+                    behavior: 'smooth'
+                });
+            }
         }
     }
 
