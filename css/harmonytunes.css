@@ -1,13 +1,16 @@
 :root {
     --player-height: 80px;
-    --card-bg: #181818;
-    --card-bg-hover: #282828;
+    --card-bg: #121212;
+    --card-bg-hover: #1f1f1f;
+    --accent-green: #1ed760;
 }
 
 body {
-    background-color: #000;
+    background-color: #0A0A0A;
     overflow-x: hidden;
     padding-bottom: 120px;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
 }
 
 .spotify-layout {
@@ -20,9 +23,38 @@ body {
 
 .harmony-main {
     flex-grow: 1;
-    background: linear-gradient(to bottom, #1e1e1e 0%, #121212 100%);
+    background: #0A0A0A;
     padding: 20px;
     width: 100%;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: #1a1a1a;
+    border-radius: 24px;
+    padding: 10px 20px;
+    margin-bottom: 24px;
+    max-width: 400px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+.search-container:focus-within {
+    border-color: var(--accent-green);
+    background-color: #242424;
+}
+.search-input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    width: 100%;
+    margin-left: 10px;
+    outline: none;
+}
+.search-input::placeholder {
+    color: #b3b3b3;
 }
 
 @media (min-width: 768px) {
@@ -135,7 +167,7 @@ body {
     width: 100%;
     aspect-ratio: 1/1;
     margin-bottom: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -570,6 +602,22 @@ body {
 }
 .play-pause-btn:hover { color: black; transform: scale(1.05); }
 
+.music-player-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--player-height);
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid #1f1f1f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 1000;
+}
+
 .progress-bar-container {
     width: 100%;
     max-width: 300px;
@@ -790,12 +838,11 @@ body {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    z-index: 2000;
+    z-index: 9999;
     display: flex;
     justify-content: center;
     align-items: center;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn .3s ease;
 }
 
 .modal-content {
