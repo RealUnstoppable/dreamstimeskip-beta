@@ -1,11 +1,19 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
+import { lyricsData } from './lyrics-data.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
     const librarySongs = [
+        { 
+            id: 'pixy-legacy',
+            title: "PIXY - LEGACY", 
+            artist: "Catalin", 
+            duration: "2:17", 
+            src: "/music/PIXY - LEGACY.mp3", 
+            art: "/images/dreams-lobby.jpg"
+        },
         { 
             id: 'deorc-decuple',
             title: "Deorc Decuple", 
@@ -90,6 +98,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerArtist = document.getElementById('player-song-artist');
     const playerArt = document.getElementById('player-album-art');
     const playerLikeBtn = document.getElementById('player-like-btn');
+    
+    // Lyrics Elements
+    const lyricsBtn = document.getElementById('lyrics-btn');
+    const viewLyrics = document.getElementById('view-lyrics');
+    const closeLyricsBtn = document.getElementById('close-lyrics-btn');
+    const lyricsContent = document.getElementById('lyrics-content');
+    const lyricsContainer = document.getElementById('lyrics-container');
 
     // --- INITIALIZATION ---
     function init() {
@@ -311,6 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
         playerLikeBtn.textContent = isFav ? '❤' : '♡';
         playerLikeBtn.classList.toggle('active', isFav);
 
+        renderLyrics(song.id);
+
         updateProgress();
         if(viewPlaylist.style.display !== 'none') {
             const showingFavs = playlistTitleEl.textContent === "Liked Songs";
@@ -414,6 +431,92 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleFavorite(currentQueue[currentSongIndex].id);
             }
         });
+
+        // Lyrics Events
+        lyricsBtn.addEventListener('click', () => {
+            viewLyrics.style.display = 'flex';
+        });
+
+        closeLyricsBtn.addEventListener('click', () => {
+            viewLyrics.style.display = 'none';
+        });
+    }
+
+    // --- LYRICS RENDERING ---
+    function renderLyrics(songId) {
+        const data = lyricsData[songId];
+        if (!data) {
+            lyricsContent.innerHTML = '<p class="lyric-line" style="text-align: center; margin-top: 50px;">No lyrics available.</p>';
+            return;
+        }
+        lyricsContent.innerHTML = data.map((line, lineIndex) => {
+            const wordsHtml = line.words.map((word, wordIndex) => {
+                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+            }).join(' ');
+            return `<div class="lyric-line" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+        }).join('');
+        
+        // Seek on click
+        const lines = lyricsContent.querySelectorAll('.lyric-line');
+        lines.forEach(line => {
+            line.addEventListener('click', () => {
+                const start = parseFloat(line.getAttribute('data-start'));
+                if (!isNaN(start)) {
+                    audioPlayer.currentTime = start;
+                    playSong();
+                }
+            });
+        });
+    }
+
+    let activeLineIndex = -1;
+    function syncLyrics() {
+        if (viewLyrics.style.display === 'none') return;
+        const currentTime = audioPlayer.currentTime;
+        const lines = lyricsContent.querySelectorAll('.lyric-line');
+        
+        let newActiveLineIndex = -1;
+        lines.forEach((line, index) => {
+            const start = parseFloat(line.getAttribute('data-start'));
+            const end = parseFloat(line.getAttribute('data-end'));
+            
+            // Allow active line to persist slightly if it's the last one sung, 
+            // but strict matching is better for beat-by-beat
+            if (currentTime >= start && currentTime <= end) {
+                newActiveLineIndex = index;
+                line.classList.add('active');
+                
+                const words = line.querySelectorAll('.lyric-word');
+                words.forEach(word => {
+                    const wStart = parseFloat(word.getAttribute('data-start'));
+                    if (currentTime >= wStart) {
+                        word.classList.add('active-word');
+                    } else {
+                        word.classList.remove('active-word');
+                    }
+                });
+            } else {
+                line.classList.remove('active');
+                // clear word highlights if passed
+                const words = line.querySelectorAll('.lyric-word');
+                words.forEach(word => {
+                    if (currentTime > end) {
+                        word.classList.add('active-word');
+                    } else {
+                        word.classList.remove('active-word');
+                    }
+                });
+            }
+        });
+        
+        if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
+            activeLineIndex = newActiveLineIndex;
+            const activeLine = lines[activeLineIndex];
+            lyricsContainer.scrollTo({
+                top: activeLine.offsetTop - lyricsContainer.clientHeight / 2 + 150,
+                behavior: 'smooth'
+            });
+        }
     }
 
     // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
@@ -429,6 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentTimeEl.textContent = formatTime(currentTime);
                     totalTimeEl.textContent = formatTime(duration);
                 }
+                syncLyrics();
                 isUpdatingProgress = false;
             });
             isUpdatingProgress = true;

@@ -103,6 +103,18 @@
         </main>
     </div>
 
+    <div id="view-lyrics" class="lyrics-overlay" style="display: none;">
+        <button id="close-lyrics-btn" class="close-lyrics-btn" aria-label="Close Lyrics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="lyrics-bg" id="lyrics-bg"></div>
+        <div class="lyrics-container" id="lyrics-container">
+            <div id="lyrics-content">
+                <!-- Lyrics injected via JS -->
+            </div>
+        </div>
+    </div>
+
     <div class="music-player-bar glass-panel">
         
         <div class="current-song-details">
@@ -132,6 +144,9 @@
                 <button class="control-button" id="repeat-btn" title="Repeat" aria-label="Toggle Repeat">
                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                      <span class="repeat-indicator"></span>
+                </button>
+                <button class="control-button" id="lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                 </button>
             </div>
             
