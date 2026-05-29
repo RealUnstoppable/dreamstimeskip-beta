@@ -968,3 +968,8 @@ body {
 #search-container {
     transition: all 0.3s ease;
 }
+
+.total-time, .fs-total-time {
+    cursor: pointer;
+    user-select: none;
+}

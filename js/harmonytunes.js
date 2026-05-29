@@ -614,8 +614,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('next-btn');
     const shuffleBtn = document.getElementById('shuffle-btn');
     const repeatBtn = document.getElementById('repeat-btn');
-    const progressBar = document.querySelector('.progress-bar');
-    const progress = document.querySelector('.progress');
+    const progressBar = document.querySelector('.music-player-bar .progress-bar');
+    const progress = document.querySelector('.music-player-bar .progress');
     const currentTimeEl = document.querySelector('.current-time');
     const totalTimeEl = document.querySelector('.total-time');
     const volumeSlider = document.querySelector('.volume-slider');
@@ -1082,6 +1082,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- EVENTS ---
+    
+    let showCountdown = false;
+    const toggleCountdown = () => { showCountdown = !showCountdown; updateProgress(); };
+    if(totalTimeEl) totalTimeEl.addEventListener('click', toggleCountdown);
+    if(fsTotalTime) fsTotalTime.addEventListener('click', toggleCountdown);
+
     function setupPlayerEvents() {
         
         if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
@@ -1524,10 +1530,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     progress.style.width = `${percent}%`;
             if(fsProgress) fsProgress.style.width = `${percent}%`;
             if(fsCurrentTime) fsCurrentTime.textContent = formatTime(activeAudio.currentTime);
-            if(fsTotalTime && activeAudio.duration) fsTotalTime.textContent = formatTime(activeAudio.duration);
+            if(fsTotalTime && activeAudio.duration) fsTotalTime.textContent = showCountdown ? "-" + formatTime(activeAudio.duration - activeAudio.currentTime) : formatTime(activeAudio.duration);
 
                     currentTimeEl.textContent = formatTime(currentTime);
-                    totalTimeEl.textContent = formatTime(duration);
+                    totalTimeEl.textContent = showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration);
                 }
                 syncLyrics();
                 isUpdatingProgress = false;
