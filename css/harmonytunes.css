@@ -441,7 +441,15 @@ body {
     100% { color: var(--accent-green); text-shadow: 0 0 5px var(--accent-green); }
 }
 #mixer-btn.active.pulsing {
-    animation: pulseGreen 1.5s infinite;
+    animation: pulseGreen 1.5s infinite !important;
+}
+@keyframes pulseBlue {
+    0% { color: var(--accent-green); text-shadow: 0 0 5px var(--accent-green); }
+    50% { color: #5c9ce6; text-shadow: 0 0 15px #5c9ce6; }
+    100% { color: var(--accent-green); text-shadow: 0 0 5px var(--accent-green); }
+}
+#mixer-btn.active.analyzing {
+    animation: pulseBlue 0.8s infinite !important;
 }
 
 .play-pause-btn {

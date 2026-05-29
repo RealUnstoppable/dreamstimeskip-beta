@@ -12,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
             artist: "Catalin", 
             duration: "2:17", 
             src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg"
+            art: "/images/dreams-lobby.jpg",
+            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15
         },
         { 
             id: 'deorc-decuple',
@@ -20,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
             artist: "FormantX", 
             duration: "3:45", 
             src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/harmony-tunes-card.jpg"
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15
         },
         { 
             id: 'no-pole-remix',
@@ -28,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
             artist: "Remix", 
             duration: "2:30", 
             src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/dreams-lobby.jpg"
+            art: "/images/dreams-lobby.jpg",
+            bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15
         }
     ];
 
@@ -97,7 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let nextAudio = audioPlayer2;
     let isMixerMode = false;
     let isCrossfading = false;
-    let crossfadeDuration = 7;
+    let isListening = false;
+    let crossfadeDuration = 15;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
@@ -334,6 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (index < 0 || index >= currentQueue.length) return;
         const song = currentQueue[index];
         
+        isListening = false;
+        if(mixerBtn) mixerBtn.classList.remove('analyzing');
+
         activeAudio.src = song.src;
         playerTitle.textContent = song.title;
         playerArtist.textContent = song.artist;
@@ -648,10 +655,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkCrossfade() {
-        if (!isMixerMode || isCrossfading) return;
+        if (!isMixerMode) return;
         
         const remaining = activeAudio.duration - activeAudio.currentTime;
-        if (remaining > 0 && remaining <= crossfadeDuration) {
+
+        if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
+            isListening = true;
+            mixerBtn.classList.add('analyzing');
+            
+            if (repeatMode !== 2 && currentQueue.length > 1) {
+                const currentMetadata = librarySongsMap.get(currentQueue[currentSongIndex].id);
+                if (currentMetadata) {
+                    let bestMatchIndex = currentSongIndex + 1;
+                    if (bestMatchIndex >= currentQueue.length) bestMatchIndex = 0;
+                    
+                    let smallestBpmDiff = Infinity;
+                    for (let i = 0; i < currentQueue.length; i++) {
+                        if (i === currentSongIndex) continue;
+                        const candidate = librarySongsMap.get(currentQueue[i].id);
+                        if (candidate) {
+                            const diff = Math.abs((candidate.bpm || 120) - currentMetadata.bpm);
+                            if (diff < smallestBpmDiff) {
+                                smallestBpmDiff = diff;
+                                bestMatchIndex = i;
+                            }
+                        }
+                    }
+                    
+                    if (bestMatchIndex !== (currentSongIndex + 1) % currentQueue.length && !isShuffle) {
+                        const temp = currentQueue[(currentSongIndex + 1) % currentQueue.length];
+                        currentQueue[(currentSongIndex + 1) % currentQueue.length] = currentQueue[bestMatchIndex];
+                        currentQueue[bestMatchIndex] = temp;
+                    }
+                }
+            }
+        }
+
+        if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
+            isListening = false;
+            mixerBtn.classList.remove('analyzing');
             isCrossfading = true;
             mixerBtn.classList.add('pulsing');
             
@@ -675,7 +717,12 @@ document.addEventListener('DOMContentLoaded', () => {
             currentSongIndex = nextIndex;
             
             const song = currentQueue[currentSongIndex];
+            const songMetadata = librarySongsMap.get(song.id);
+            
             activeAudio.src = song.src;
+            const inmixPoint = songMetadata?.inmixPoint || 15;
+            activeAudio.currentTime = inmixPoint;
+            
             playerTitle.textContent = song.title;
             playerArtist.textContent = song.artist;
             playerArt.src = song.art;
