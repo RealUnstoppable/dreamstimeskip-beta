@@ -641,6 +641,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const fsArt = document.getElementById('fullscreen-art');
     const fsTitle = document.getElementById('fullscreen-title');
     const fsArtist = document.getElementById('fullscreen-artist');
+    
+
     const fsPlayPauseBtn = document.getElementById('fs-play-pause-btn');
     const fsNextBtn = document.getElementById('fs-next-btn');
     const fsPrevBtn = document.getElementById('fs-prev-btn');
@@ -947,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
 
         activeAudio.src = song.src;
-        playerTitle.textContent = song.title;
+        playerTitle.textContent = song.title; checkMarquee();
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
         document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
@@ -1477,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const inmixPoint = songMetadata?.inmixPoint || 15;
             activeAudio.currentTime = inmixPoint;
             
-            playerTitle.textContent = song.title;
+            playerTitle.textContent = song.title; checkMarquee();
             playerArtist.textContent = song.artist;
             playerArt.src = song.art;
             document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
