@@ -432,7 +432,17 @@ body {
 @media (min-width: 600px) {
     #shuffle-btn, #repeat-btn, #mixer-btn { display: flex; }
 }
+#mixer-btn { color: #ffffff; }
 #mixer-btn.active { color: var(--accent-green); }
+
+@keyframes pulseGreen {
+    0% { color: var(--accent-green); text-shadow: 0 0 5px var(--accent-green); }
+    50% { color: #8df0b0; text-shadow: 0 0 15px #8df0b0; }
+    100% { color: var(--accent-green); text-shadow: 0 0 5px var(--accent-green); }
+}
+#mixer-btn.active.pulsing {
+    animation: pulseGreen 1.5s infinite;
+}
 
 .play-pause-btn {
     background-color: white;

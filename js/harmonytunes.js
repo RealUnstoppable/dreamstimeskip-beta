@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMixerMode = false;
     let isCrossfading = false;
     let crossfadeDuration = 7;
+    let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
     const playIcon = playPauseBtn.querySelector('.play-icon');
@@ -347,18 +348,70 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playSong() {
+        if (fadeInterval) clearInterval(fadeInterval);
+        
+        const targetVol = parseFloat(volumeSlider.value) || 1;
+        
+        if (isCrossfading) {
+            activeAudio.play().catch(e => console.error(e));
+            isPlaying = true;
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            return;
+        }
+
+        activeAudio.volume = 0;
         activeAudio.play().then(() => {
             isPlaying = true;
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
+            
+            const fadeStep = 50;
+            const durationMs = 500;
+            const steps = durationMs / fadeStep;
+            let currentStep = 0;
+            
+            fadeInterval = setInterval(() => {
+                currentStep++;
+                activeAudio.volume = targetVol * (currentStep / steps);
+                if (currentStep >= steps) {
+                    clearInterval(fadeInterval);
+                    activeAudio.volume = targetVol;
+                }
+            }, fadeStep);
         }).catch(e => console.error(e));
     }
 
     function pauseSong() {
-        activeAudio.pause();
+        if (fadeInterval) clearInterval(fadeInterval);
+        
         isPlaying = false;
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
+
+        if (isCrossfading) {
+            activeAudio.pause();
+            nextAudio.pause();
+            return;
+        }
+
+        const startVol = activeAudio.volume;
+        const targetVol = parseFloat(volumeSlider.value) || 1;
+        const fadeStep = 50;
+        const durationMs = 500;
+        const steps = durationMs / fadeStep;
+        let currentStep = 0;
+        
+        fadeInterval = setInterval(() => {
+            currentStep++;
+            const newVol = startVol * (1 - (currentStep / steps));
+            activeAudio.volume = Math.max(0, newVol);
+            if (currentStep >= steps) {
+                clearInterval(fadeInterval);
+                activeAudio.pause();
+                activeAudio.volume = targetVol;
+            }
+        }, fadeStep);
     }
 
     function togglePlayPause() {
@@ -419,10 +472,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mixerBtn.addEventListener('click', () => {
             isMixerMode = !isMixerMode;
-            mixerBtn.style.color = isMixerMode ? 'var(--accent-green)' : '#ffffff';
+            mixerBtn.classList.toggle('active', isMixerMode);
         });
 
-        volumeSlider.addEventListener('input', (e) => activeAudio.volume = e.target.value);
+        volumeSlider.addEventListener('input', (e) => {
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+            activeAudio.volume = e.target.value;
+        });
 
         progressBar.parentElement.addEventListener('click', (e) => {
             const width = progressBar.parentElement.clientWidth;
@@ -587,17 +646,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const remaining = activeAudio.duration - activeAudio.currentTime;
         if (remaining > 0 && remaining <= crossfadeDuration) {
             isCrossfading = true;
+            mixerBtn.classList.add('pulsing');
             
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
             nextAudio = prevAudio;
 
             let nextIndex = currentSongIndex + 1;
-            if (nextIndex >= currentQueue.length) {
+            if (repeatMode === 2) {
+                nextIndex = currentSongIndex;
+            } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
-                else if (repeatMode === 2) nextIndex = currentSongIndex;
                 else {
                     isCrossfading = false;
+                    mixerBtn.classList.remove('pulsing');
                     nextAudio = activeAudio;
                     activeAudio = prevAudio;
                     return; 
@@ -627,9 +689,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const fadeStep = 50;
             const steps = (crossfadeDuration * 1000) / fadeStep;
             let currentStep = 0;
-            const baseVolume = volumeSlider.value || 1;
+            const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeInterval = setInterval(() => {
+            const fadeIntervalCrossfade = setInterval(() => {
                 currentStep++;
                 const ratio = currentStep / steps;
                 
@@ -637,10 +699,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (currentStep >= steps) {
-                    clearInterval(fadeInterval);
+                    clearInterval(fadeIntervalCrossfade);
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
+                    mixerBtn.classList.remove('pulsing');
                 }
             }, fadeStep);
         }
