@@ -596,6 +596,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const artistProfile = document.getElementById('artist-profile');
     const closeArtistBtn = document.getElementById('close-artist-btn');
 
+    const fsLyricsBtn = document.getElementById('fs-lyrics-btn');
+    const fsViralSkipBtn = document.getElementById('fs-viral-skip-btn');
+    const fsLikeBtn = document.getElementById('fs-like-btn');
+    const fsShuffleBtn = document.getElementById('fs-shuffle-btn');
+    const fsRepeatBtn = document.getElementById('fs-repeat-btn');
+    const fsProgressBar = document.getElementById('fs-progress-bar');
+    const fsProgress = document.getElementById('fs-progress');
+    const fsCurrentTime = document.querySelector('.fs-current-time');
+    const fsTotalTime = document.querySelector('.fs-total-time');
+
+
     // Global Search
     const globalSearch = document.getElementById('global-search');
 
@@ -829,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
-        playerLikeBtn.textContent = isFav ? '♥' : '♡';
+        playerLikeBtn.textContent = isFav ? '♥' : '♡'; if(fsLikeBtn) { fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', isFav); }
         playerLikeBtn.classList.toggle('active', isFav);
 
         renderLyrics(song.id);
@@ -947,6 +958,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENTS ---
     function setupPlayerEvents() {
+        if(fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
+        if(fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
+        if(fsLikeBtn) fsLikeBtn.addEventListener('click', () => playerLikeBtn.click());
+        if(fsShuffleBtn) fsShuffleBtn.addEventListener('click', () => shuffleBtn.click());
+        if(fsRepeatBtn) fsRepeatBtn.addEventListener('click', () => repeatBtn.click());
+        
+        if(fsProgressBar) {
+            fsProgressBar.addEventListener('click', (e) => {
+                const width = fsProgressBar.clientWidth;
+                const clickX = e.offsetX;
+                const duration = activeAudio.duration;
+                if(duration) {
+                    activeAudio.currentTime = (clickX / width) * duration;
+                }
+            });
+        }
+
         playPauseBtn.addEventListener('click', togglePlayPause);
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
@@ -983,8 +1011,8 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.volume = e.target.value;
         });
 
-        progressBar.parentElement.addEventListener('click', (e) => {
-            const width = progressBar.parentElement.clientWidth;
+        progressBar.addEventListener('click', (e) => {
+            const width = progressBar.clientWidth;
             const clickX = e.offsetX;
             const duration = activeAudio.duration;
             activeAudio.currentTime = (clickX / width) * duration;
@@ -997,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         repeatBtn.addEventListener('click', () => {
             repeatMode = (repeatMode + 1) % 3;
-            const indicator = repeatBtn.querySelector('.repeat-indicator');
+            const indicator = repeatBtn.querySelector('.repeat-indicator'); const fsIndicator = document.getElementById('fs-repeat-indicator');
             if (repeatMode === 0) {
                 repeatBtn.style.color = '#b3b3b3';
                 indicator.textContent = '';
@@ -1305,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
             
             const isFav = userFavoritesIds.has(song.id);
-            playerLikeBtn.textContent = isFav ? '♥' : '♡';
+            playerLikeBtn.textContent = isFav ? '♥' : '♡'; if(fsLikeBtn) { fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', isFav); }
             playerLikeBtn.classList.toggle('active', isFav);
 
             renderLyrics(song.id);
@@ -1350,6 +1378,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (duration) {
                     const percent = (currentTime / duration) * 100;
                     progress.style.width = `${percent}%`;
+            if(fsProgress) fsProgress.style.width = `${percent}%`;
+            if(fsCurrentTime) fsCurrentTime.textContent = formatTime(activeAudio.currentTime);
+            if(fsTotalTime && activeAudio.duration) fsTotalTime.textContent = formatTime(activeAudio.duration);
+
                     currentTimeEl.textContent = formatTime(currentTime);
                     totalTimeEl.textContent = formatTime(duration);
                 }
@@ -1409,7 +1441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isPlayingFav = (currentQueue[currentSongIndex]?.id === songId);
         if(isPlayingFav && playerLikeBtn) {
             playerLikeBtn.textContent = finalFav ? '♥' : '♡';
-            playerLikeBtn.classList.toggle('active', finalFav);
+            playerLikeBtn.classList.toggle('active', finalFav); if(fsLikeBtn) { fsLikeBtn.innerHTML = finalFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', finalFav); }
         }
         if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
             renderSongTable(userFavorites);
