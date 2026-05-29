@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
 
     const songColors = {
-        'pixy-legacy': '#1e385c',      // Dim Blue
-        'deorc-decuple': '#4a1515',    // Dim Red
-        'no-pole-remix': '#4a4a15'     // Dim Yellow
+        'pixy-legacy': '#19548a',      // Dim Blue
+        'deorc-decuple': '#8a196e',    // Dim Pink
+        'no-pole-remix': '#2e8a19'     // Dim Green
     };
 
     const tiktokData = [
