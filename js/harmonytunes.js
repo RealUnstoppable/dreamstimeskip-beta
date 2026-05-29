@@ -1140,16 +1140,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupPlayerEvents() {
         
-        if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
-        if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
-        if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        if(fsMixerBtn) fsMixerBtn.addEventListener('click', () => mixerBtn.click());
+        const bindEvent = (btn, handler) => {
+            if(btn) {
+                btn.addEventListener('click', (e) => { e.preventDefault(); handler(); });
+                btn.addEventListener('touchstart', (e) => { e.preventDefault(); handler(); }, {passive: false});
+            }
+        };
 
-        if(typeof fsLyricsBtn !== 'undefined' && fsLyricsBtn) fsLyricsBtn.addEventListener('click', () => { lyricsBtn.click(); closeFullscreen(); });
-        if(typeof fsViralSkipBtn !== 'undefined' && fsViralSkipBtn) fsViralSkipBtn.addEventListener('click', () => { viralSkipBtn.click(); closeFullscreen(); });
-        if(fsLikeBtn) fsLikeBtn.addEventListener('click', () => playerLikeBtn.click());
-        if(fsShuffleBtn) fsShuffleBtn.addEventListener('click', () => shuffleBtn.click());
-        if(fsRepeatBtn) fsRepeatBtn.addEventListener('click', () => repeatBtn.click());
+        bindEvent(fsPrevBtn, prevSong);
+        bindEvent(fsNextBtn, nextSong);
+        bindEvent(fsPlayPauseBtn, togglePlayPause);
+
+        // Instead of calling .click(), call the actual handlers directly or dispatch proper Event
+        const triggerClick = (targetBtn) => {
+            if(targetBtn) targetBtn.dispatchEvent(new Event('click', { bubbles: true }));
+        };
+
+        bindEvent(fsMixerBtn, () => triggerClick(mixerBtn));
+        bindEvent(typeof fsLyricsBtn !== 'undefined' ? fsLyricsBtn : null, () => { triggerClick(lyricsBtn); closeFullscreen(); });
+        bindEvent(typeof fsViralSkipBtn !== 'undefined' ? fsViralSkipBtn : null, () => { triggerClick(viralSkipBtn); closeFullscreen(); });
+        bindEvent(fsLikeBtn, () => triggerClick(playerLikeBtn));
+        bindEvent(fsShuffleBtn, () => triggerClick(shuffleBtn));
+        bindEvent(fsRepeatBtn, () => triggerClick(repeatBtn));
         
         if(fsProgressBar) {
             fsProgressBar.addEventListener('click', (e) => {
@@ -1305,9 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const songInfoText = document.querySelector('.current-song-details .song-info-text');
         if(songInfoText) songInfoText.addEventListener('click', openFullscreen);
         if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
-        if(typeof fsPlayPauseBtn !== 'undefined' && fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        if(typeof fsNextBtn !== 'undefined' && fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
-        if(typeof fsPrevBtn !== 'undefined' && fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
+        // removed duplicates
         
         // Artist Profile
         const openArtistProfile = (artistName) => {
