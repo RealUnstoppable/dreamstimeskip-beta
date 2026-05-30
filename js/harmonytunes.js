@@ -1194,7 +1194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 logPlaybackEvent('skip_through', songId, { skippedAt: currentTime, percentCompleted: (currentTime / duration) * 100 });
             }
         }
-      function playNext() {
+
         if(typeof window.__pullFromUserQueue === 'function') {
             const nextUserSong = window.__pullFromUserQueue();
             if(nextUserSong) {
