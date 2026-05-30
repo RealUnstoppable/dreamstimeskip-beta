@@ -45,7 +45,7 @@
                 <section class="shelf">
                     <div class="shelf-header">
                         <h2>Jump Back In</h2>
-                        <span class="see-all">History</span>
+                        <span class="see-all" id="home-history-btn" style="cursor: pointer;">History</span>
                     </div>
                     <div class="card-grid" id="container-jump-back-in">
                         </div>
@@ -328,8 +328,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <span style="font-size:10px;margin-top:3px;">Lyrics</span>
         </button>
-        <button class="control-button" id="mob-viral-btn" aria-label="Viral Skip">
+        <button class="control-button viral-skip-wrapper" id="mob-viral-btn" aria-label="Viral Skip">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span class="viral-repeat-badge" style="display:none;">&#x21BA;</span>
             <span style="font-size:10px;margin-top:3px;">Viral</span>
         </button>
     </div>

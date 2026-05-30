@@ -600,6 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerTikToks = document.getElementById('container-tiktoks');
     const containerPlaylists = document.getElementById('container-playlists');
     const songListBody = document.getElementById('song-list-body');
+    const homeHistoryBtn = document.getElementById('home-history-btn');
     
     // Playlist Elements
     const playlistTitleEl = document.getElementById('playlist-title');
@@ -908,6 +909,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
         containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
+        containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
+        document.getElementById('show-more-recommended').addEventListener('click', (e) => {
+            containerRecommended.classList.toggle('expanded');
+            e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
+        });
 
         // 3. TikToks
         containerTikToks.innerHTML = tiktokData.map(tk => `
@@ -1368,7 +1374,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
-            shuffleBtn.style.color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            const color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            shuffleBtn.style.color = color;
+            if(fsShuffleBtn) fsShuffleBtn.style.color = color;
+            const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
+            if(mobShuffleBtn) mobShuffleBtn.style.color = color;
         });
 
         repeatBtn.addEventListener('click', () => {
@@ -1436,19 +1446,24 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('contextmenu', (e) => e.preventDefault());
         });
 
-        // Lyrics Events
         lyricsBtn.addEventListener('click', () => {
+            const mobLyricsBtn = document.getElementById('mob-lyrics-btn');
             if (viewLyrics.style.display !== 'none' && !viewLyrics.classList.contains('slide-down-active')) {
                 viewLyrics.classList.remove('slide-up-active');
                 viewLyrics.classList.add('slide-down-active');
                 setTimeout(() => {
                     viewLyrics.style.display = 'none';
-                    viewLyrics.classList.remove('slide-down-active');
-                }, 400);
+                    lyricsBtn.style.color = '#b3b3b3';
+                    if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
+                    if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
+                }, 300);
             } else {
                 viewLyrics.classList.remove('slide-down-active');
                 viewLyrics.classList.add('slide-up-active');
                 viewLyrics.style.display = 'flex';
+                lyricsBtn.style.color = 'var(--accent-green)';
+                if(fsLyricsBtn) fsLyricsBtn.style.color = 'var(--accent-green)';
+                if(mobLyricsBtn) mobLyricsBtn.style.color = 'var(--accent-green)';
                 setTimeout(() => {
                     const activeLine = lyricsContent.querySelector('.lyric-line.active');
                     if (activeLine && isAutoScrolling) {
@@ -2163,6 +2178,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if(contextMenu) contextMenu.classList.add('hidden');
     });
+
+    if(homeHistoryBtn) {
+        homeHistoryBtn.addEventListener('click', () => {
+            if (!queuePanel.classList.contains('open')) {
+                if(queueBtn) queueBtn.click();
+            }
+            const histTab = document.getElementById('tab-history');
+            if(histTab) histTab.click();
+        });
+    }
 
     if(queueBtn) {
         queueBtn.addEventListener('click', () => {
