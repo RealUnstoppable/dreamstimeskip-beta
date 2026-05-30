@@ -2246,6 +2246,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (isDragging && dragItem === item) {
                         const deltaY = e.clientY - dragStartY;
                         item.style.transform = `translateY(${deltaY}px)`;
+
+                        // Visual Drop Indicator
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+                        
+                        for (let i = 0; i < items.length; i++) {
+                            if (items[i] === item) continue;
+                            const rect = items[i].getBoundingClientRect();
+                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                                if (e.clientY < rect.top + rect.height / 2) {
+                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                                } else {
+                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                                }
+                                break;
+                            }
+                        }
                     }
                 });
                 
@@ -2276,8 +2293,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (droppedIdx !== idx) {
                             const movedSong = userQueue.splice(idx, 1)[0];
                             userQueue.splice(droppedIdx, 0, movedSong);
-                            renderQueue();
                         }
+                        renderQueue();
                     } else if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         openQueueContextMenu(e, song.id, idx);
@@ -2318,7 +2335,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => {
-        if (!queueContextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu')) {
+        if (!queueContextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu') && !e.target.closest('.queue-more-btn')) {
             queueContextMenu.classList.add('hidden');
         }
     });
@@ -2401,6 +2418,7 @@ export function formatTime(seconds) {
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
     // --- BACKGROUND MIXXER AI ---
     window.backgroundMixxerAI = async function() {
         if (!activeAudio || !currentQueue[currentSongIndex]) return;
@@ -2435,7 +2453,8 @@ export function formatTime(seconds) {
                 if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
             }
         }
-    }
+    };
+    
     const clearQueueBtn = document.getElementById('clear-queue-btn');
     if (clearQueueBtn) {
         clearQueueBtn.addEventListener('click', () => {
