@@ -943,9 +943,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
                     const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
+                }
+                return;
+            }
+
+            const addQueueBtn = e.target.closest('.add-queue-btn');
+            if (addQueueBtn) {
+                e.stopPropagation();
+                const card = addQueueBtn.closest('.music-card');
+                const songId = card.dataset.songId;
+                if (songId) {
+                    const song = librarySongsMap.get(songId);
+                    if (song && typeof window.__addToUserQueue === 'function') {
+                        window.__addToUserQueue(song);
+                        // Brief success animation
+                        const originalText = addQueueBtn.innerHTML;
+                        addQueueBtn.innerHTML = '✓';
+                        setTimeout(() => addQueueBtn.innerHTML = originalText, 1000);
+                    }
                 }
                 return;
             }
@@ -1020,8 +1037,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadSong(index) {
-        if (index < 0 || index >= currentQueue.length) return;
-        const song = currentQueue[index];
+        if(index < 0 || index >= currentQueue.length) return;
+        
+        if (currentSongIndex >= 0 && currentQueue[currentSongIndex] && currentSongIndex !== index) {
+            if(typeof window.__pushToHistory === 'function') {
+                window.__pushToHistory(currentQueue[currentSongIndex]);
+            }
+        }
+
+        currentSongIndex = index;
+        const song = currentQueue[currentSongIndex];
         
         isListening = false;
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
@@ -1067,12 +1092,30 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetVol = parseFloat(volumeSlider.value) || 1;
         
         if (isCrossfading) {
-            activeAudio.play().catch(e => console.error(e));
-            isPlaying = true;
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-            if(fsPlayIcon) fsPlayIcon.style.display = 'none';
-            if(fsPauseIcon) fsPauseIcon.style.display = 'block';
+            nextAudio.play().then(() => {
+                const fadeStep = 50;
+                const steps = (fadeDur * 1000) / fadeStep;
+                let currentStep = 0;
+                
+                crossfadeInterval = setInterval(() => {
+                    currentStep++;
+                    if (currentStep >= steps) {
+                        clearInterval(crossfadeInterval);
+                        activeAudio.pause();
+                        activeAudio.currentTime = 0;
+                        activeAudio.volume = targetVol;
+                        nextAudio.volume = targetVol;
+                        isCrossfading = false;
+                        if(window.__triggerSurvey) window.__triggerSurvey();
+                    } else {
+                        activeAudio.volume = Math.max(0, targetVol * (1 - currentStep/steps));
+                        nextAudio.volume = Math.min(targetVol, targetVol * (currentStep/steps));
+                    }
+                }, fadeStep);
+            }).catch(e => {
+                console.error("Crossfade play failed:", e);
+                isCrossfading = false;
+            });
             return;
         }
 
@@ -1151,6 +1194,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 logPlaybackEvent('skip_through', songId, { skippedAt: currentTime, percentCompleted: (currentTime / duration) * 100 });
             }
         }
+      function playNext() {
+        if(typeof window.__pullFromUserQueue === 'function') {
+            const nextUserSong = window.__pullFromUserQueue();
+            if(nextUserSong) {
+                currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                loadSong(currentSongIndex + 1);
+                playSong();
+                return;
+            }
+        }
+
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
             if (repeatMode === 1) nextIndex = 0;
@@ -1939,6 +1993,149 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeWhatsNewBtn) closeWhatsNewBtn.addEventListener('click', closeWhatsNew);
     if(gotItBtn) gotItBtn.addEventListener('click', closeWhatsNew);
 
+    // --- QUEUE & HISTORY STATE & LOGIC ---
+    let userQueue = [];
+    let historyQueue = [];
+    let currentTab = 'upnext';
+    let surveyTimeout = null;
+
+    const queuePanel = document.getElementById('queue-panel');
+    const queueBtn = document.getElementById('queue-btn');
+    const closeQueueBtn = document.getElementById('close-queue-btn');
+    const tabUpNext = document.getElementById('tab-up-next');
+    const tabHistory = document.getElementById('tab-history');
+    const queueContentArea = document.getElementById('queue-content-area');
+    
+    const mixxerSurvey = document.getElementById('mixxer-survey');
+    const surveyUp = document.getElementById('survey-up');
+    const surveyDown = document.getElementById('survey-down');
+
+    window.__addToUserQueue = (song) => {
+        userQueue.push(song);
+        if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+    };
+
+    window.__pullFromUserQueue = () => {
+        if(userQueue.length > 0) {
+            const song = userQueue.shift();
+            if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+            return song;
+        }
+        return null;
+    };
+
+    window.__pushToHistory = (song) => {
+        historyQueue.push(song);
+        if(historyQueue.length > 50) historyQueue.shift();
+        if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+    };
+
+    if(queueBtn) {
+        queueBtn.addEventListener('click', () => {
+            queuePanel.classList.remove('hidden');
+            queuePanel.classList.add('open');
+            renderQueue();
+        });
+    }
+    if(closeQueueBtn) {
+        closeQueueBtn.addEventListener('click', () => {
+            queuePanel.classList.remove('open');
+        });
+    }
+    
+    if(tabUpNext) {
+        tabUpNext.addEventListener('click', () => {
+            currentTab = 'upnext';
+            tabUpNext.classList.add('active');
+            tabHistory.classList.remove('active');
+            renderQueue();
+        });
+    }
+    if(tabHistory) {
+        tabHistory.addEventListener('click', () => {
+            currentTab = 'history';
+            tabHistory.classList.add('active');
+            tabUpNext.classList.remove('active');
+            renderQueue();
+        });
+    }
+
+    function renderQueue() {
+        if(!queueContentArea) return;
+        queueContentArea.innerHTML = '';
+        
+        let displayList = [];
+        if (currentTab === 'upnext') {
+            displayList = [...userQueue];
+        } else {
+            displayList = [...historyQueue].reverse(); // Most recent first
+        }
+
+        if(displayList.length === 0) {
+            queueContentArea.innerHTML = `<p style="text-align: center; color: #b3b3b3; margin-top: 20px;">${currentTab === 'upnext' ? 'Queue is empty' : 'No history yet'}</p>`;
+            return;
+        }
+
+        displayList.forEach((song, idx) => {
+            const item = document.createElement('div');
+            item.className = 'queue-item';
+            item.draggable = currentTab === 'upnext'; 
+            item.dataset.index = idx;
+            
+            item.innerHTML = `
+                ${currentTab === 'upnext' ? '<div class="queue-item-drag">≡</div>' : ''}
+                <img src="${song.art}" alt="${song.title}">
+                <div class="queue-item-info">
+                    <h4>${song.title}</h4>
+                    <p>${song.artist}</p>
+                </div>
+            `;
+            
+            if(currentTab === 'upnext') {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', idx);
+                    item.classList.add('dragging');
+                });
+                item.addEventListener('dragend', () => item.classList.remove('dragging'));
+                item.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    item.style.borderTop = "2px solid white";
+                });
+                item.addEventListener('dragleave', () => item.style.borderTop = "");
+                item.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    item.style.borderTop = "";
+                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+                    const toIdx = idx;
+                    if(fromIdx !== toIdx && !isNaN(fromIdx)) {
+                        const movedSong = userQueue.splice(fromIdx, 1)[0];
+                        userQueue.splice(toIdx, 0, movedSong);
+                        renderQueue();
+                    }
+                });
+            }
+
+            queueContentArea.appendChild(item);
+        });
+    }
+
+    window.__triggerSurvey = () => {
+        if(!mixxerSurvey) return;
+        if(surveyTimeout) clearTimeout(surveyTimeout);
+        mixxerSurvey.classList.add('visible');
+        surveyTimeout = setTimeout(() => {
+            mixxerSurvey.classList.remove('visible');
+        }, 15000);
+    };
+    
+    [surveyUp, surveyDown].forEach(btn => {
+        if(!btn) return;
+        btn.addEventListener('click', () => {
+            mixxerSurvey.classList.remove('visible');
+            if(surveyTimeout) clearTimeout(surveyTimeout);
+        });
+    });
+
 });
 
 export function createSongCard(song) {
@@ -1947,6 +2144,7 @@ export function createSongCard(song) {
             <div class="card-img-wrapper">
                 <img src="${song.art}" alt="${song.title}">
                 <button class="card-play-btn">▶</button>
+                <button class="add-queue-btn" title="Add to Queue">+</button>
             </div>
             <div class="card-title">${song.title}</div>
             <div class="card-desc">${song.artist}</div>

@@ -1081,3 +1081,195 @@ body {
 .mobile-controls-overlay.hidden {
     display: none;
 }
+
+/* Queue Panel Styles */
+.queue-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 100%;
+    max-width: 400px;
+    height: 100vh;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: right 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(25, 25, 25, 0.4);
+    backdrop-filter: blur(40px) saturate(200%) brightness(120%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(120%);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+@media (max-width: 600px) {
+    .queue-panel {
+        right: 0;
+        bottom: -100%;
+        top: auto;
+        width: 100%;
+        height: 85vh;
+        border-radius: 24px 24px 0 0;
+        border-left: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        transition: bottom 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .queue-panel.open {
+        bottom: 0 !important;
+        right: 0 !important;
+    }
+}
+
+.queue-panel.open {
+    right: 0;
+}
+
+.queue-panel.hidden {
+    display: flex; /* Override default hidden so animation works */
+    pointer-events: none;
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.queue-header h2 { margin: 0; font-size: 1.5rem; font-weight: 700; }
+
+.queue-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+.queue-tab {
+    background: none; border: none; color: #b3b3b3;
+    font-size: 1rem; font-weight: 600; cursor: pointer; padding: 5px 10px;
+}
+.queue-tab.active {
+    color: white;
+    border-bottom: 2px solid white;
+}
+
+.queue-content {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Queue Items */
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+    cursor: grab;
+}
+.queue-item:active { cursor: grabbing; }
+.queue-item:hover { background: rgba(255, 255, 255, 0.1); }
+.queue-item.playing { border-left: 3px solid var(--accent-green); background: rgba(255, 255, 255, 0.1); }
+.queue-item img {
+    width: 40px; height: 40px; border-radius: 6px; object-fit: cover;
+}
+.queue-item-info {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.queue-item-info h4 { margin: 0; font-size: 0.95rem; text-overflow: ellipsis; overflow: hidden; }
+.queue-item-info p { margin: 0; font-size: 0.8rem; color: #b3b3b3; text-overflow: ellipsis; overflow: hidden; }
+
+.queue-item-drag {
+    color: #b3b3b3;
+    padding: 5px;
+    cursor: grab;
+}
+
+.add-queue-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s, background 0.2s;
+}
+.song-card:hover .add-queue-btn { opacity: 1; }
+.add-queue-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+
+/* Drag and Drop styling */
+.queue-item.dragging {
+    opacity: 0.5;
+    background: rgba(255,255,255,0.2);
+}
+
+/* Mixxer Survey */
+.mixxer-survey {
+    position: fixed;
+    bottom: calc(var(--player-height) + 40px); /* Just above the miniplayer */
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 20px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(40px) saturate(200%) brightness(120%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%) brightness(120%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.mixxer-survey p { margin: 0; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
+
+.mixxer-survey.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) !important;
+}
+
+.survey-btns { display: flex; gap: 10px; }
+.survey-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+    padding: 0;
+}
+.survey-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.2); }
+
+@media (max-width: 600px) {
+    .mixxer-survey {
+        bottom: calc(var(--player-height) + 90px); /* A bit higher on mobile if needed */
+        width: 90%;
+        max-width: 320px;
+        justify-content: space-between;
+    }
+}
