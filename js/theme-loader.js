@@ -23,10 +23,23 @@ const applyTheme = (theme, accentColor) => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
+            // ⚡ Bolt: Check sessionStorage cache to prevent redundant Firestore reads
+            const cacheKey = `profile_${user.uid}`;
+            const cachedProfile = sessionStorage.getItem(cacheKey);
+            let userData = null;
+
+            if (cachedProfile) {
+                userData = JSON.parse(cachedProfile);
+            } else {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    userData = userDoc.data();
+                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                }
+            }
+
+            if (userData) {
                 applyTheme(userData.theme, userData.accentColor);
             } else {
                 // Fallback for new users or data not found
