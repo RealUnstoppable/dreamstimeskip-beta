@@ -606,6 +606,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let isListening = false;
     let viralLocked = false;
 
+    // Calculate optimal crossfade duration in seconds based on BPM
+    // Aim for 4 bars (16 beats) or 8 bars (32 beats) of overlap
+    const calculateOptimalCrossfade = (bpm) => {
+        if (!bpm || bpm <= 0) return 8; // Default 8 seconds if no BPM
+        // 1 beat = 60 / BPM seconds
+        const beatDuration = 60 / bpm;
+        let fadeDuration = beatDuration * 16; // 4 bars
+        if (fadeDuration < 5) fadeDuration = beatDuration * 32; // 8 bars if 4 bars is too short
+        if (fadeDuration > 15) fadeDuration = 15; // Cap at 15s
+        return fadeDuration;
+    };
+
     // Helper to get viral block bounds
     const getViralBlock = (songId, audioEl) => {
         const data = lyricsData[songId];
@@ -622,34 +634,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const blockStart = firstLine.start;
         const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : (audioEl.duration || blockStart + 15));
         
-        // Include up to 2 lines before and 2 lines after for smoothing
+        // Identify up to 2 lines before and after to determine maximum safe crossfade padding
         const startLineIdx = Math.max(0, firstIdx - 2);
         const endLineIdx = Math.min(data.length - 1, lastIdx + 2);
         
-        const paddedStart = data[startLineIdx].start;
-        const maxEnd = audioEl.duration || blockEnd + 15;
+        const maxLeadIn = blockStart - data[startLineIdx].start;
         
+        const maxEnd = audioEl.duration || blockEnd + 15;
         let paddedEndVal = data[endLineIdx].end;
         if (!paddedEndVal) {
             paddedEndVal = data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEnd;
         }
+        const maxTailOut = Math.max(0, Math.min(maxEnd, paddedEndVal) - blockEnd);
         
-        // Ensure paddedEnd is at least slightly after blockEnd if the next lines don't exist
-        const paddedEnd = Math.max(blockEnd, Math.min(maxEnd, paddedEndVal));
+        // Calculate optimal fade and cap it so we NEVER fade during the actual viral lyrics
+        const bpm = librarySongsMap.get(songId)?.bpm || 0;
+        const optimalFade = calculateOptimalCrossfade(bpm);
+        const actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
         
-        return { blockStart, blockEnd, paddedStart, paddedEnd };
-    };
-
-    // Calculate optimal crossfade duration in seconds based on BPM
-    // Aim for 4 bars (16 beats) or 8 bars (32 beats) of overlap
-    const calculateOptimalCrossfade = (bpm) => {
-        if (!bpm || bpm <= 0) return 8; // Default 8 seconds if no BPM
-        // 1 beat = 60 / BPM seconds
-        const beatDuration = 60 / bpm;
-        let fadeDuration = beatDuration * 16; // 4 bars
-        if (fadeDuration < 5) fadeDuration = beatDuration * 32; // 8 bars if 4 bars is too short
-        if (fadeDuration > 15) fadeDuration = 15; // Cap at 15s
-        return fadeDuration;
+        // Only use the padding needed for the crossfade
+        const paddedStart = blockStart - actualFadeDur;
+        const paddedEnd = blockEnd + actualFadeDur;
+        
+        return { blockStart, blockEnd, paddedStart, paddedEnd, actualFadeDur };
     };
 
     let crossfadeDuration = 15;
@@ -1608,9 +1615,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // If Mixxer is ON, apply the dynamic crossfade
-        const bpm = librarySongsMap.get(song.id)?.bpm || 0;
-        const fadeDur = calculateOptimalCrossfade(bpm);
+        const fadeDur = block.actualFadeDur;
         
+        if (fadeDur <= 0) {
+            // No room to crossfade without bleeding into viral lyrics, fallback to cut
+            if (activeAudio.currentTime >= block.paddedEnd) {
+                activeAudio.currentTime = block.paddedStart;
+            }
+            return;
+        }
+
         // "Analyzing" phase (start analyzing 3 seconds before the crossfade)
         if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
             isListening = true;
