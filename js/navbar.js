@@ -57,8 +57,25 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                // ⚡ Bolt: Check sessionStorage cache to prevent redundant Firestore reads
+                const cacheKey = `profile_${user.uid}`;
+                const cachedProfile = sessionStorage.getItem(cacheKey);
+                let userData = null;
+                let userExists = false;
+
+                if (cachedProfile) {
+                    userData = JSON.parse(cachedProfile);
+                    userExists = true;
+                } else {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        userExists = true;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+                }
+
+                const destination = userExists && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {
