@@ -579,6 +579,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 0;
+    filter: drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.6));
 }
 .control-button:hover { color: white; }
 
@@ -720,6 +721,7 @@ body {
 
 .like-btn-player {
     background: none; border: none; color: #b3b3b3; cursor: pointer; font-size: 1.2rem;
+    filter: drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.6));
     margin-left: 5px;
 }
 .like-btn-player.active { color: var(--accent-green) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
