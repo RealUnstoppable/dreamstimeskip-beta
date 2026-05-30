@@ -2157,7 +2157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let displayList = [];
         if (currentTab === 'upnext') {
-            displayList = [...userQueue];
+            displayList = [
+                ...userQueue.map(s => ({...s, isUserQueue: true})),
+                ...currentQueue.slice(currentSongIndex + 1).map(s => ({...s, isUserQueue: false}))
+            ];
         } else {
             displayList = [...historyQueue].reverse(); // Most recent first
         }
@@ -2170,11 +2173,13 @@ document.addEventListener('DOMContentLoaded', () => {
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
-            item.draggable = currentTab === 'upnext'; 
+            
+            const isDraggable = currentTab === 'upnext' && song.isUserQueue;
+            item.draggable = isDraggable;
             item.dataset.index = idx;
             
             item.innerHTML = `
-                ${currentTab === 'upnext' ? '<div class="queue-item-drag">≡</div>' : ''}
+                ${isDraggable ? '<div class="queue-item-drag">≡</div>' : ''}
                 <img src="${song.art}" alt="${song.title}">
                 <div class="queue-item-info">
                     <h4>${song.title}</h4>
@@ -2182,7 +2187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             
-            if(currentTab === 'upnext') {
+            if(isDraggable) {
                 item.addEventListener('dragstart', (e) => {
                     e.dataTransfer.setData('text/plain', idx);
                     item.classList.add('dragging');
