@@ -632,24 +632,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastIdx = data.indexOf(lastLine);
         
         const blockStart = firstLine.start;
-        const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : (audioEl.duration || blockStart + 15));
+        const maxEndDur = audioEl.duration || blockStart + 15;
+        const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : maxEndDur);
         
-        // Identify up to 2 lines before and after to determine maximum safe crossfade padding
-        const startLineIdx = Math.max(0, firstIdx - 2);
-        const endLineIdx = Math.min(data.length - 1, lastIdx + 2);
+        // Calculate optimal fade based on BPM
+        const bpm = librarySongsMap.get(songId)?.bpm || 0;
+        const optimalFade = calculateOptimalCrossfade(bpm);
+        
+        // Dynamically find how many lines before we need to satisfy optimalFade (max 3 edge cases)
+        let startLineIdx = firstIdx;
+        let leadIn = 0;
+        while (startLineIdx > 0 && leadIn < optimalFade && (firstIdx - startLineIdx) < 3) {
+            startLineIdx--;
+            leadIn = blockStart - data[startLineIdx].start;
+        }
+        
+        // Dynamically find how many lines after we need to satisfy optimalFade (max 3 edge cases)
+        let endLineIdx = lastIdx;
+        let tailOut = 0;
+        while (endLineIdx < data.length - 1 && tailOut < optimalFade && (endLineIdx - lastIdx) < 3) {
+            endLineIdx++;
+            let currentEnd = data[endLineIdx].end || (data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEndDur);
+            tailOut = currentEnd - blockEnd;
+        }
         
         const maxLeadIn = blockStart - data[startLineIdx].start;
         
-        const maxEnd = audioEl.duration || blockEnd + 15;
-        let paddedEndVal = data[endLineIdx].end;
-        if (!paddedEndVal) {
-            paddedEndVal = data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEnd;
-        }
-        const maxTailOut = Math.max(0, Math.min(maxEnd, paddedEndVal) - blockEnd);
+        let paddedEndVal = data[endLineIdx].end || (data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEndDur);
+        const maxTailOut = Math.max(0, Math.min(maxEndDur, paddedEndVal) - blockEnd);
         
-        // Calculate optimal fade and cap it so we NEVER fade during the actual viral lyrics
-        const bpm = librarySongsMap.get(songId)?.bpm || 0;
-        const optimalFade = calculateOptimalCrossfade(bpm);
+        // Cap actualFadeDur to the dynamically found boundaries
         const actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
         
         // Only use the padding needed for the crossfade
@@ -1306,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (song) {
                         const block = getViralBlock(song.id, activeAudio);
                         if (block) {
-                            activeAudio.currentTime = block.paddedStart;
+                            activeAudio.currentTime = isMixerMode ? block.paddedStart : block.blockStart;
                             playSong();
                         }
                     }
@@ -1326,7 +1338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(song) {
                         const block = getViralBlock(song.id, activeAudio);
                         if (block) {
-                            activeAudio.currentTime = block.paddedStart;
+                            activeAudio.currentTime = isMixerMode ? block.paddedStart : block.blockStart;
                             playSong();
                         }
                     }
@@ -1606,10 +1618,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const remainingToViralEnd = block.paddedEnd - activeAudio.currentTime;
 
-        // If Mixxer is OFF, just do a hard cut
+        // If Mixxer is OFF, just do a hard cut exactly at the viral lyrics boundary
         if (!isMixerMode) {
-            if (activeAudio.currentTime >= block.paddedEnd) {
-                activeAudio.currentTime = block.paddedStart;
+            if (activeAudio.currentTime >= block.blockEnd) {
+                activeAudio.currentTime = block.blockStart;
             }
             return;
         }
