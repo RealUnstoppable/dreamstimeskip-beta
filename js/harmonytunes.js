@@ -17,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
             tags: ['dark', 'electronic', 'intense']
         },
         { 
+            id: 'kesha-blow',
+            title: "Blow", 
+            artist: "Kesha", 
+            duration: "3:40", 
+            src: "/music/Blow - Kesha.mp3", 
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['pop', 'party', 'electronic']
+        },
+        { 
             id: 'deorc-decuple',
             title: "Deorc Decuple", 
             artist: "FormantX", 
