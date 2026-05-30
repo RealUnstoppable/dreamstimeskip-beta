@@ -628,6 +628,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return { blockStart, blockEnd, paddedStart, paddedEnd };
     };
 
+    // Calculate optimal crossfade duration in seconds based on BPM
+    // Aim for 4 bars (16 beats) or 8 bars (32 beats) of overlap
+    const calculateOptimalCrossfade = (bpm) => {
+        if (!bpm || bpm <= 0) return 8; // Default 8 seconds if no BPM
+        // 1 beat = 60 / BPM seconds
+        const beatDuration = 60 / bpm;
+        let fadeDuration = beatDuration * 16; // 4 bars
+        if (fadeDuration < 5) fadeDuration = beatDuration * 32; // 8 bars if 4 bars is too short
+        if (fadeDuration > 15) fadeDuration = 15; // Cap at 15s
+        return fadeDuration;
+    };
+
     let crossfadeDuration = 15;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
@@ -1179,17 +1191,10 @@ document.addEventListener('DOMContentLoaded', () => {
             player.addEventListener('timeupdate', (e) => {
                 if (e.target === activeAudio) {
                     updateProgress();
-                    checkCrossfade();
-
-                    // Viral Loop Logic
                     if (viralLocked) {
-                        const currentSong = currentQueue[currentSongIndex];
-                        if (currentSong) {
-                            const block = getViralBlock(currentSong.id, activeAudio);
-                            if (block && activeAudio.currentTime >= block.paddedEnd) {
-                                activeAudio.currentTime = block.paddedStart;
-                            }
-                        }
+                        checkViralCrossfade();
+                    } else {
+                        checkCrossfade();
                     }
                 }
             });
@@ -1570,6 +1575,75 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 setTimeout(() => isProgrammaticScroll = false, 800);
             }
+        }
+    }
+
+    function checkViralCrossfade() {
+        if (!viralLocked) return;
+        const song = currentQueue[currentSongIndex];
+        if (!song) return;
+        const block = getViralBlock(song.id, activeAudio);
+        if (!block) return;
+        
+        const remainingToViralEnd = block.paddedEnd - activeAudio.currentTime;
+
+        // If Mixxer is OFF, just do a hard cut
+        if (!isMixerMode) {
+            if (activeAudio.currentTime >= block.paddedEnd) {
+                activeAudio.currentTime = block.paddedStart;
+            }
+            return;
+        }
+
+        // If Mixxer is ON, apply the dynamic crossfade
+        const bpm = librarySongsMap.get(song.id)?.bpm || 0;
+        const fadeDur = calculateOptimalCrossfade(bpm);
+        
+        // "Analyzing" phase (start analyzing 3 seconds before the crossfade)
+        if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
+            isListening = true;
+            mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+        }
+
+        // "Crossfading" phase
+        if (remainingToViralEnd > 0 && remainingToViralEnd <= fadeDur && !isCrossfading) {
+            isListening = false;
+            mixerBtn.classList.remove('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+            isCrossfading = true;
+            mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
+            
+            // Swap players for intra-song crossfade
+            const prevAudio = activeAudio;
+            activeAudio = nextAudio;
+            nextAudio = prevAudio;
+
+            // Load the same song into the new active audio
+            activeAudio.src = song.src;
+            activeAudio.currentTime = block.paddedStart;
+            
+            activeAudio.volume = 0;
+            activeAudio.play().catch(e => console.error(e));
+
+            const fadeStep = 50;
+            const steps = (fadeDur * 1000) / fadeStep;
+            let currentStep = 0;
+            const baseVolume = parseFloat(volumeSlider.value) || 1;
+            
+            const fadeIntervalCrossfade = setInterval(() => {
+                currentStep++;
+                const ratio = currentStep / steps;
+                
+                prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
+                activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
+
+                if (currentStep >= steps) {
+                    clearInterval(fadeIntervalCrossfade);
+                    prevAudio.pause();
+                    prevAudio.currentTime = 0;
+                    isCrossfading = false;
+                    mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                }
+            }, fadeStep);
         }
     }
 
