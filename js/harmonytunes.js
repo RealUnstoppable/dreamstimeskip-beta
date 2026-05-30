@@ -1071,6 +1071,9 @@ document.addEventListener('DOMContentLoaded', () => {
         activeAudio.removeAttribute('data-no-crossfade');
         isListening = false;
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
+        if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
         activeAudio.src = song.src;
         playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
@@ -1554,6 +1557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { triggerClick(mixerBtn); mobileOverlay.classList.add('hidden'); });
             document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { triggerClick(repeatBtn); mobileOverlay.classList.add('hidden'); });
             document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-queue-btn')?.addEventListener('click', () => { triggerClick(queueBtn); mobileOverlay.classList.add('hidden'); });
             
             // For Viral Skip
             const mobViralBtn = document.getElementById('mob-viral-btn');
@@ -1715,14 +1719,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
         }
 
         // "Crossfading" phase
         if (remainingToViralEnd > 0 && remainingToViralEnd <= fadeDur && !isCrossfading) {
             isListening = false;
             mixerBtn.classList.remove('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             isCrossfading = true;
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
+            if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
             // Swap players for intra-song crossfade
             const prevAudio = activeAudio;
@@ -1754,6 +1761,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                    const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
             }, 50);
         }
@@ -1768,6 +1776,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
             // If there is no next song and repeat is off, auto-queue the best fit using AI
             if (currentSongIndex + 1 >= currentQueue.length && repeatMode !== 1) {
@@ -1807,8 +1816,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
             isListening = false;
             mixerBtn.classList.remove('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             isCrossfading = true;
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
+            if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
@@ -1831,6 +1842,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         isCrossfading = false;
                         mixerBtn.classList.remove('pulsing');
                         if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                        const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                         nextAudio = activeAudio;
                         activeAudio = prevAudio;
                         activeAudio.setAttribute('data-no-crossfade', 'true');
@@ -1883,6 +1895,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing');
+                    if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                    const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
             }, 50);
         }

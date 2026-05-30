@@ -1047,12 +1047,12 @@ body {
     filter: drop-shadow(0 0 4px var(--accent-green));
 }
 
-/* ---- Mobile overflow button ---- */
-.mobile-overflow-btn {
+/* ---- Mobile overflow and queue button ---- */
+.mobile-overflow-btn, .mobile-queue-btn {
     display: flex;
 }
 @media (min-width: 600px) {
-    .mobile-overflow-btn { display: none !important; }
+    .mobile-overflow-btn, .mobile-queue-btn { display: none !important; }
 }
 
 /* Mobile overlay panel */
