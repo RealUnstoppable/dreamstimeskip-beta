@@ -993,6 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.playSongById = (id) => {
+        __recordHistory();
         const songIndex = librarySongs.findIndex(s => s.id === id);
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
@@ -1038,7 +1039,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- PLAYER LOGIC ---
+    function __recordHistory() {
+        if (currentSongIndex >= 0 && currentQueue[currentSongIndex]) {
+            if(typeof window.__pushToHistory === 'function') {
+                window.__pushToHistory(currentQueue[currentSongIndex]);
+            }
+        }
+    }
+
     function playContext(newQueue, startIndex) {
+        __recordHistory();
         currentQueue = [...newQueue];
         if (isShuffle) {
             const first = currentQueue[startIndex];
@@ -1054,12 +1064,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function loadSong(index) {
         if(index < 0 || index >= currentQueue.length) return;
-        
-        if (currentSongIndex >= 0 && currentQueue[currentSongIndex] && currentSongIndex !== index) {
-            if(typeof window.__pushToHistory === 'function') {
-                window.__pushToHistory(currentQueue[currentSongIndex]);
-            }
-        }
 
         currentSongIndex = index;
         const song = currentQueue[currentSongIndex];
@@ -1084,6 +1088,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(viewPlaylist.style.display !== 'none') {
             const showingFavs = playlistTitleEl.textContent === "Liked Songs";
             renderSongTable(showingFavs ? userFavorites : librarySongs);
+        }
+        
+        // Trigger Background Mixxer AI
+        if (typeof backgroundMixxerAI === 'function') {
+            backgroundMixxerAI();
         }
     }
 
@@ -1221,6 +1230,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        __recordHistory();
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
             if (repeatMode === 1) nextIndex = 0;
@@ -1235,6 +1245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeAudio.currentTime > 3) {
             activeAudio.currentTime = 0;
         } else {
+            __recordHistory();
             let prevIndex = currentSongIndex - 1;
             if (prevIndex < 0) {
                 if (repeatMode === 1) prevIndex = currentQueue.length - 1;
@@ -2167,6 +2178,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    let dragItem = null;
+    let dragStartY = 0;
+    let dragStartTop = 0;
+    let dragTimeout = null;
+
     function renderQueue() {
         if(!queueContentArea) return;
         queueContentArea.innerHTML = '';
@@ -2191,38 +2207,76 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'queue-item';
             
             const isDraggable = currentTab === 'upnext' && song.isUserQueue;
-            item.draggable = isDraggable;
             item.dataset.index = idx;
+            item.dataset.songId = song.id;
             
             item.innerHTML = `
-                ${isDraggable ? '<div class="queue-item-drag">≡</div>' : ''}
                 <img src="${song.art}" alt="${song.title}">
                 <div class="queue-item-info">
                     <h4>${song.title}</h4>
                     <p>${song.artist}</p>
                 </div>
+                ${isDraggable ? '<div class="queue-more-btn" title="Drag to move, click for options">...</div>' : ''}
             `;
             
             if(isDraggable) {
-                item.addEventListener('dragstart', (e) => {
-                    e.dataTransfer.setData('text/plain', idx);
-                    item.classList.add('dragging');
-                });
-                item.addEventListener('dragend', () => item.classList.remove('dragging'));
-                item.addEventListener('dragover', (e) => {
+                const moreBtn = item.querySelector('.queue-more-btn');
+                let isDragging = false;
+                
+                moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
-                    item.style.borderTop = "2px solid white";
+                    isDragging = false;
+                    dragTimeout = setTimeout(() => {
+                        isDragging = true;
+                        dragItem = item;
+                        dragStartY = e.clientY;
+                        dragStartTop = item.offsetTop;
+                        item.style.position = 'relative';
+                        item.style.zIndex = '100';
+                        item.classList.add('dragging');
+                        queueContentArea.style.cursor = 'grabbing';
+                    }, 200); // 200ms hold to drag
                 });
-                item.addEventListener('dragleave', () => item.style.borderTop = "");
-                item.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    item.style.borderTop = "";
-                    const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-                    const toIdx = idx;
-                    if(fromIdx !== toIdx && !isNaN(fromIdx)) {
-                        const movedSong = userQueue.splice(fromIdx, 1)[0];
-                        userQueue.splice(toIdx, 0, movedSong);
-                        renderQueue();
+                
+                document.addEventListener('pointermove', (e) => {
+                    if (isDragging && dragItem === item) {
+                        const deltaY = e.clientY - dragStartY;
+                        item.style.transform = `translateY(${deltaY}px)`;
+                    }
+                });
+                
+                moreBtn.addEventListener('pointerup', (e) => {
+                    if (dragTimeout) clearTimeout(dragTimeout);
+                    if (isDragging && dragItem === item) {
+                        isDragging = false;
+                        dragItem = null;
+                        item.style.position = '';
+                        item.style.zIndex = '';
+                        item.style.transform = '';
+                        item.classList.remove('dragging');
+                        queueContentArea.style.cursor = '';
+                        
+                        // Calculate drop index based on position
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        let droppedIdx = idx;
+                        for (let i = 0; i < items.length; i++) {
+                            const rect = items[i].getBoundingClientRect();
+                            if (e.clientY < rect.top + rect.height / 2) {
+                                droppedIdx = i;
+                                break;
+                            } else if (i === items.length - 1) {
+                                droppedIdx = items.length - 1;
+                            }
+                        }
+                        
+                        if (droppedIdx !== idx) {
+                            const movedSong = userQueue.splice(idx, 1)[0];
+                            userQueue.splice(droppedIdx, 0, movedSong);
+                            renderQueue();
+                        }
+                    } else if (!isDragging) {
+                        // It was just a tap/click! Open context menu
+                        openQueueContextMenu(e, song.id, idx);
                     }
                 });
             }
@@ -2230,6 +2284,79 @@ document.addEventListener('DOMContentLoaded', () => {
             queueContentArea.appendChild(item);
         });
     }
+
+    // Queue Context Menu
+    const queueContextMenu = document.createElement('div');
+    queueContextMenu.className = 'song-context-menu hidden glass-panel';
+    queueContextMenu.innerHTML = `
+        <button class="context-menu-item" id="qctx-play-next">Play Next</button>
+        <button class="context-menu-item" id="qctx-play-last">Play Last</button>
+        <button class="context-menu-item" id="qctx-favorite">Favorite</button>
+        <button class="context-menu-item" id="qctx-suggest-more">Suggest More by Mixxer</button>
+        <button class="context-menu-item" id="qctx-suggest-less">Suggest Less</button>
+        <button class="context-menu-item" id="qctx-remove" style="color: #ff4444;">Remove from Queue</button>
+    `;
+    queueContextMenu.style.zIndex = '3100';
+    document.body.appendChild(queueContextMenu);
+    
+    let qctxTargetId = null;
+    let qctxTargetIdx = null;
+
+    function openQueueContextMenu(e, songId, idx) {
+        e.preventDefault();
+        e.stopPropagation();
+        qctxTargetId = songId;
+        qctxTargetIdx = idx;
+        const rect = e.target.getBoundingClientRect();
+        queueContextMenu.style.left = `${Math.min(rect.left - 150, window.innerWidth - 220)}px`;
+        queueContextMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        queueContextMenu.classList.remove('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!queueContextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu')) {
+            queueContextMenu.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('qctx-play-next')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
+            userQueue.unshift(movedSong);
+            renderQueue();
+        }
+        queueContextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('qctx-play-last')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
+            userQueue.push(movedSong);
+            renderQueue();
+        }
+        queueContextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('qctx-favorite')?.addEventListener('click', () => {
+        if (qctxTargetId && typeof toggleFavorite === 'function') toggleFavorite(qctxTargetId);
+        queueContextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('qctx-remove')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            userQueue.splice(qctxTargetIdx, 1);
+            renderQueue();
+        }
+        queueContextMenu.classList.add('hidden');
+    });
+    
+    document.getElementById('qctx-suggest-more')?.addEventListener('click', () => {
+        queueContextMenu.classList.add('hidden');
+    });
+    
+    document.getElementById('qctx-suggest-less')?.addEventListener('click', () => {
+        queueContextMenu.classList.add('hidden');
+    });
 
     window.__triggerSurvey = () => {
         if(!mixxerSurvey) return;
@@ -2270,3 +2397,54 @@ export function formatTime(seconds) {
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
+    // --- BACKGROUND MIXXER AI ---
+    window.backgroundMixxerAI = async function() {
+        if (!activeAudio || !currentQueue[currentSongIndex]) return;
+        
+        // If we have plenty of songs queued, or user manually queued songs, do nothing
+        if (currentQueue.length - currentSongIndex > 3 || userQueue.length > 0) return;
+        
+        const currentSong = currentQueue[currentSongIndex];
+        const currentBpm = currentSong.bpm || 120;
+        
+        // Find songs in the library that match the BPM roughly, aren't recently played, and aren't already in queue
+        const historyIds = new Set(historyQueue.map(s => s.id));
+        const queueIds = new Set(currentQueue.map(s => s.id));
+        
+        const candidates = librarySongs.filter(song => {
+            if (historyIds.has(song.id) || queueIds.has(song.id)) return false;
+            const bpmDiff = Math.abs((song.bpm || 120) - currentBpm);
+            return bpmDiff < 15; // Within 15 BPM
+        });
+        
+        if (candidates.length > 0) {
+            // Pick a random compatible song
+            const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
+            currentQueue.push(nextSuggested);
+            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
+            if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
+        } else {
+            // Fallback: just add a random unplayed song
+            const fallback = librarySongs.find(s => !historyIds.has(s.id) && !queueIds.has(s.id));
+            if (fallback) {
+                currentQueue.push(fallback);
+                if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
+            }
+        }
+    }
+    const clearQueueBtn = document.getElementById('clear-queue-btn');
+    if (clearQueueBtn) {
+        clearQueueBtn.addEventListener('click', () => {
+            if (currentTab === 'upnext') {
+                userQueue = [];
+                renderQueue();
+            } else if (currentTab === 'history') {
+                historyQueue = [];
+                if(currentUser) {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    updateDoc(userRef, { musicHistory: [] }).catch(console.error);
+                }
+                renderQueue();
+            }
+        });
+    }

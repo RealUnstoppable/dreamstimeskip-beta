@@ -1339,3 +1339,25 @@ body {
 }
 .song-card:hover .card-more-btn { opacity: 1; }
 .card-more-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.1); }
+.queue-more-btn {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    user-select: none;
+    touch-action: none; /* Crucial for pointer events on mobile */
+}
+
+.queue-more-btn:hover {
+    opacity: 1;
+}
+
+.queue-more-btn:active {
+    transform: scale(0.9);
+}
