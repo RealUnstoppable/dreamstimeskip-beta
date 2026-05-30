@@ -2150,9 +2150,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if(queueBtn) {
         queueBtn.addEventListener('click', () => {
-            queuePanel.classList.remove('hidden');
-            queuePanel.classList.add('open');
-            renderQueue();
+            if (queuePanel.classList.contains('open')) {
+                queuePanel.classList.remove('open');
+            } else {
+                queuePanel.classList.remove('hidden');
+                setTimeout(() => queuePanel.classList.add('open'), 10);
+                renderQueue();
+            }
         });
     }
     if(closeQueueBtn) {
