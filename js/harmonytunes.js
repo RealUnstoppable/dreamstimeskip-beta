@@ -1650,26 +1650,26 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.volume = 0;
             activeAudio.play().catch(e => console.error(e));
 
-            const fadeStep = 50;
-            const steps = (fadeDur * 1000) / fadeStep;
-            let currentStep = 0;
+            const fadeMs = fadeDur * 1000;
+            const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
             const fadeIntervalCrossfade = setInterval(() => {
-                currentStep++;
-                const ratio = currentStep / steps;
+                let elapsed = Date.now() - startTime;
+                let ratio = elapsed / fadeMs;
+                if (ratio >= 1) ratio = 1;
                 
                 prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
-                if (currentStep >= steps) {
+                if (ratio >= 1) {
                     clearInterval(fadeIntervalCrossfade);
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                 }
-            }, fadeStep);
+            }, 50);
         }
     }
 
@@ -1760,26 +1760,26 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.volume = 0;
             activeAudio.play().catch(e => console.error(e));
 
-            const fadeStep = 50;
-            const steps = (crossfadeDuration * 1000) / fadeStep;
-            let currentStep = 0;
+            const fadeMs = crossfadeDuration * 1000;
+            const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
             const fadeIntervalCrossfade = setInterval(() => {
-                currentStep++;
-                const ratio = currentStep / steps;
+                let elapsed = Date.now() - startTime;
+                let ratio = elapsed / fadeMs;
+                if (ratio >= 1) ratio = 1;
                 
                 prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
-                if (currentStep >= steps) {
+                if (ratio >= 1) {
                     clearInterval(fadeIntervalCrossfade);
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing');
                 }
-            }, fadeStep);
+            }, 50);
         }
     }
 
