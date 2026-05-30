@@ -605,6 +605,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let isCrossfading = false;
     let isListening = false;
     let viralLocked = false;
+
+    // Helper to get viral block bounds
+    const getViralBlock = (songId, audioEl) => {
+        const data = lyricsData[songId];
+        if (!data) return null;
+        const trendingLines = data.filter(l => l.trending);
+        if (trendingLines.length === 0) return null;
+        
+        const firstLine = trendingLines[0];
+        const lastLine = trendingLines[trendingLines.length - 1];
+        const endIdx = data.indexOf(lastLine);
+        const nextLine = data[endIdx + 1];
+        
+        const blockStart = firstLine.start;
+        const blockEnd = lastLine.end || (nextLine ? nextLine.start : (audioEl.duration || blockStart + 15));
+        
+        const paddedStart = Math.max(0, blockStart - 5);
+        const maxEnd = audioEl.duration ? audioEl.duration : blockEnd + 5;
+        const paddedEnd = Math.min(maxEnd, blockEnd + 5);
+        
+        return { blockStart, blockEnd, paddedStart, paddedEnd };
+    };
+
     let crossfadeDuration = 15;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
@@ -1161,16 +1184,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Viral Loop Logic
                     if (viralLocked) {
                         const currentSong = currentQueue[currentSongIndex];
-                        if (currentSong && lyricsData[currentSong.id]) {
-                            const trendingLine = lyricsData[currentSong.id].find(l => l.trending);
-                            if (trendingLine) {
-                                // Assume end is either next line's start or end of song
-                                const idx = lyricsData[currentSong.id].indexOf(trendingLine);
-                                const nextLine = lyricsData[currentSong.id][idx + 1];
-                                const trendingEnd = nextLine ? nextLine.start : activeAudio.duration;
-                                if (activeAudio.currentTime >= trendingEnd) {
-                                    activeAudio.currentTime = trendingLine.start;
-                                }
+                        if (currentSong) {
+                            const block = getViralBlock(currentSong.id, activeAudio);
+                            if (block && activeAudio.currentTime >= block.paddedEnd) {
+                                activeAudio.currentTime = block.paddedStart;
                             }
                         }
                     }
@@ -1262,10 +1279,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     toggleViralLock(); // Lock it
                     // Jump to viral start immediately
                     const song = currentQueue[currentSongIndex];
-                    if (song && lyricsData[song.id]) {
-                        const trendingLine = lyricsData[song.id].find(l => l.trending);
-                        if (trendingLine) {
-                            activeAudio.currentTime = trendingLine.start;
+                    if (song) {
+                        const block = getViralBlock(song.id, activeAudio);
+                        if (block) {
+                            activeAudio.currentTime = block.paddedStart;
                             playSong();
                         }
                     }
@@ -1282,12 +1299,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     // Normal skip to viral part
                     const song = currentQueue[currentSongIndex];
-                    if(!song) return;
-                    const data = lyricsData[song.id];
-                    if(data) {
-                        const trendingLine = data.find(l => l.trending);
-                        if(trendingLine) {
-                            activeAudio.currentTime = trendingLine.start;
+                    if(song) {
+                        const block = getViralBlock(song.id, activeAudio);
+                        if (block) {
+                            activeAudio.currentTime = block.paddedStart;
                             playSong();
                         }
                     }
@@ -1425,16 +1440,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { triggerClick(repeatBtn); mobileOverlay.classList.add('hidden'); });
             document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
             
-            // For Viral Skip, the desktop button uses pointerdown/up. Triggering click directly might not work because we prevented default.
-            // So we'll dispatch a pointerdown then a pointerup shortly after to simulate a click,
-            // OR we can directly do the short-click logic.
+            // For Viral Skip
             document.getElementById('mob-viral-btn')?.addEventListener('click', () => {
                 // Simulate a short click (skip to viral)
                 const song = currentQueue[currentSongIndex];
-                if(song && lyricsData[song.id]) {
-                    const trendingLine = lyricsData[song.id].find(l => l.trending);
-                    if(trendingLine) {
-                        activeAudio.currentTime = trendingLine.start;
+                if(song) {
+                    const block = getViralBlock(song.id, activeAudio);
+                    if (block) {
+                        activeAudio.currentTime = block.paddedStart;
                         playSong();
                     }
                 }
