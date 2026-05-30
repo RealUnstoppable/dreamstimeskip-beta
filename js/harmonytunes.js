@@ -615,15 +615,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const firstLine = trendingLines[0];
         const lastLine = trendingLines[trendingLines.length - 1];
-        const endIdx = data.indexOf(lastLine);
-        const nextLine = data[endIdx + 1];
+        
+        const firstIdx = data.indexOf(firstLine);
+        const lastIdx = data.indexOf(lastLine);
         
         const blockStart = firstLine.start;
-        const blockEnd = lastLine.end || (nextLine ? nextLine.start : (audioEl.duration || blockStart + 15));
+        const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : (audioEl.duration || blockStart + 15));
         
-        const paddedStart = Math.max(0, blockStart - 5);
-        const maxEnd = audioEl.duration ? audioEl.duration : blockEnd + 5;
-        const paddedEnd = Math.min(maxEnd, blockEnd + 5);
+        // Include up to 2 lines before and 2 lines after for smoothing
+        const startLineIdx = Math.max(0, firstIdx - 2);
+        const endLineIdx = Math.min(data.length - 1, lastIdx + 2);
+        
+        const paddedStart = data[startLineIdx].start;
+        const maxEnd = audioEl.duration || blockEnd + 15;
+        
+        let paddedEndVal = data[endLineIdx].end;
+        if (!paddedEndVal) {
+            paddedEndVal = data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEnd;
+        }
+        
+        // Ensure paddedEnd is at least slightly after blockEnd if the next lines don't exist
+        const paddedEnd = Math.max(blockEnd, Math.min(maxEnd, paddedEndVal));
         
         return { blockStart, blockEnd, paddedStart, paddedEnd };
     };
