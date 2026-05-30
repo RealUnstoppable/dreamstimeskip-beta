@@ -1068,6 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSongIndex = index;
         const song = currentQueue[currentSongIndex];
         
+        activeAudio.removeAttribute('data-no-crossfade');
         isListening = false;
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
 
@@ -1760,12 +1761,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkCrossfade() {
         if (!isMixerMode) return;
+        if (activeAudio.getAttribute('data-no-crossfade') === 'true') return;
         
         const remaining = activeAudio.duration - activeAudio.currentTime;
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            
+            // If there is no next song and repeat is off, auto-queue the best fit using AI
+            if (currentSongIndex + 1 >= currentQueue.length && repeatMode !== 1) {
+                if (typeof backgroundMixxerAI === 'function') {
+                    backgroundMixxerAI(); // Analyzes and adds the next song
+                }
+            }
             
             if (repeatMode !== 2 && currentQueue.length > 1) {
                 const currentMetadata = librarySongsMap.get(currentQueue[currentSongIndex].id);
@@ -1811,11 +1820,22 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
                 else {
-                    isCrossfading = false;
-                    mixerBtn.classList.remove('pulsing');
-                    nextAudio = activeAudio;
-                    activeAudio = prevAudio;
-                    return; 
+                    // Try one last time if it's still empty!
+                    if (typeof backgroundMixxerAI === 'function') {
+                        backgroundMixxerAI();
+                    }
+                    if (currentSongIndex + 1 < currentQueue.length) {
+                        nextIndex = currentSongIndex + 1;
+                    } else {
+                        // Utterly failed to find a song, abort crossfade completely
+                        isCrossfading = false;
+                        mixerBtn.classList.remove('pulsing');
+                        if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                        nextAudio = activeAudio;
+                        activeAudio = prevAudio;
+                        activeAudio.setAttribute('data-no-crossfade', 'true');
+                        return; 
+                    }
                 }
             }
             currentSongIndex = nextIndex;
