@@ -1343,6 +1343,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+            const mobMixerBtn = document.getElementById('mob-mixer-btn');
+            if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
         });
 
         volumeSlider.addEventListener('input', (e) => {
@@ -1979,6 +1981,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         isMixerMode = docSnap.data().mixerToggled;
                         mixerBtn.classList.toggle('active', isMixerMode);
                         if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+                        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+                        if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
                     }
                     if(docSnap.data().musicFavorites) {
                         const favIds = docSnap.data().musicFavorites;

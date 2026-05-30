@@ -580,6 +580,10 @@ body {
     justify-content: center;
     padding: 0;
     filter: drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.6));
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
 }
 .control-button:hover { color: white; }
 
@@ -1078,6 +1082,7 @@ body {
     min-width: 44px;
 }
 .mobile-controls-overlay .control-button:hover { color: #fff; }
+.mobile-controls-overlay .control-button.active, #mob-mixer-btn.active { color: var(--accent-green) !important; }
 .mobile-controls-overlay.hidden {
     display: none;
 }
