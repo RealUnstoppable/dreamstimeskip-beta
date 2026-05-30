@@ -673,11 +673,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxTailOut = Math.max(0, Math.min(maxEndDur, paddedEndVal) - blockEnd);
         
         // Cap actualFadeDur to the dynamically found boundaries
-        const actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
+        let actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
+        
+        // --- "NEURAL NETWORK" SHORT SONG RULE ---
+        const songDuration = audioEl.duration || 180;
+        const blockDuration = blockEnd - blockStart;
+        
+        // Never let the crossfade overlap be longer than 35% of the viral block itself
+        actualFadeDur = Math.min(actualFadeDur, blockDuration * 0.35);
+
+        // Scale down aggressively for short songs (preventing interfering overlap)
+        if (songDuration < 60) {
+            actualFadeDur = Math.min(actualFadeDur, 3);
+        } else if (songDuration < 120) {
+            actualFadeDur = Math.min(actualFadeDur, 7);
+        }
         
         // Only use the padding needed for the crossfade
-        const paddedStart = blockStart - actualFadeDur;
-        const paddedEnd = blockEnd + actualFadeDur;
+        const paddedStart = Math.max(0, blockStart - actualFadeDur);
+        const paddedEnd = Math.min(songDuration, blockEnd + actualFadeDur);
         
         return { blockStart, blockEnd, paddedStart, paddedEnd, actualFadeDur };
     };
