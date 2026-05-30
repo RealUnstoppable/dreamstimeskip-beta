@@ -1369,17 +1369,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         repeatBtn.addEventListener('click', () => {
             repeatMode = (repeatMode + 1) % 3;
-            const indicator = repeatBtn.querySelector('.repeat-indicator'); const fsIndicator = document.getElementById('fs-repeat-indicator');
-            if (repeatMode === 0) {
-                repeatBtn.style.color = '#b3b3b3';
-                indicator.textContent = '';
-            } else if (repeatMode === 1) {
-                repeatBtn.style.color = 'var(--accent-green)';
-                indicator.textContent = '.';
-            } else {
-                repeatBtn.style.color = 'var(--accent-green)';
-                indicator.textContent = '1';
-            }
+            const updateRepeatVisuals = (btn, indicator) => {
+                if(!btn) return;
+                if (repeatMode === 0) {
+                    btn.style.color = '#b3b3b3';
+                    if(indicator) indicator.textContent = '';
+                } else if (repeatMode === 1) {
+                    btn.style.color = 'var(--accent-green)';
+                    if(indicator) indicator.textContent = '.';
+                } else {
+                    btn.style.color = 'var(--accent-green)';
+                    if(indicator) indicator.textContent = '1';
+                }
+            };
+            
+            updateRepeatVisuals(repeatBtn, repeatBtn.querySelector('.repeat-indicator'));
+            if(fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
+            const mobRepeatBtn = document.getElementById('mob-repeat-btn');
+            if(mobRepeatBtn) updateRepeatVisuals(mobRepeatBtn, null);
         });
 
         playerLikeBtn.addEventListener('click', () => {
@@ -1388,9 +1395,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Viral Skip: Hold to Loop, Click to Skip
-        let viralPressTimer = null;
-        let viralDownTime = 0;
+        // Viral Skip: Double Tap to Loop, Single Tap to Skip
+        let viralLastTapTime = 0;
         const toggleViralLock = (forceUnlock = false) => {
             if (viralLocked || forceUnlock) {
                 viralLocked = false;
@@ -1402,51 +1408,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
             }
         };
-        const handleViralDown = (e) => {
-            viralDownTime = Date.now();
-            viralPressTimer = setTimeout(() => {
-                if (!viralLocked) {
-                    toggleViralLock(); // Lock it
-                    // Jump to viral start immediately
-                    const song = currentQueue[currentSongIndex];
-                    if (song) {
-                        const block = getViralBlock(song.id, activeAudio);
-                        if (block) {
-                            activeAudio.currentTime = isMixerMode ? block.paddedStart : block.blockStart;
-                            playSong();
-                        }
-                    }
-                }
-            }, 600); // 600ms hold required
-        };
-        const handleViralUp = (e) => {
-            clearTimeout(viralPressTimer);
-            const duration = Date.now() - viralDownTime;
-            if (duration < 600) {
-                // Short click
-                if (viralLocked) {
-                    toggleViralLock(true); // Unlock
-                } else {
-                    // Normal skip to viral part
-                    const song = currentQueue[currentSongIndex];
-                    if(song) {
-                        const block = getViralBlock(song.id, activeAudio);
-                        if (block) {
-                            activeAudio.currentTime = isMixerMode ? block.paddedStart : block.blockStart;
-                            playSong();
-                        }
-                    }
+        const handleViralClick = (e) => {
+            if(e) e.preventDefault();
+            const now = Date.now();
+            if (now - viralLastTapTime < 5000 && viralLastTapTime !== 0) {
+                // Double tap detected (within 5 seconds)
+                toggleViralLock();
+                viralLastTapTime = 0; // reset
+            } else {
+                // Single tap detected
+                viralLastTapTime = now;
+                const song = currentQueue[currentSongIndex];
+                if (song && song.inmixPoint) {
+                    activeAudio.currentTime = song.inmixPoint;
+                    if (activeAudio.paused) playSong();
                 }
             }
         };
 
         [viralSkipBtn, fsViralSkipBtn].forEach(btn => {
             if (!btn) return;
-            btn.addEventListener('pointerdown', handleViralDown);
-            btn.addEventListener('pointerup', handleViralUp);
-            btn.addEventListener('pointerleave', () => clearTimeout(viralPressTimer));
-            btn.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent long press context menu
-            btn.addEventListener('click', (e) => e.preventDefault()); // Disable default click
+            btn.addEventListener('click', handleViralClick);
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
         });
 
         // Lyrics Events
@@ -1572,18 +1555,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
             
             // For Viral Skip
-            document.getElementById('mob-viral-btn')?.addEventListener('click', () => {
-                // Simulate a short click (skip to viral)
-                const song = currentQueue[currentSongIndex];
-                if(song) {
-                    const block = getViralBlock(song.id, activeAudio);
-                    if (block) {
-                        activeAudio.currentTime = block.paddedStart;
-                        playSong();
-                    }
-                }
-                mobileOverlay.classList.add('hidden');
-            });
+            const mobViralBtn = document.getElementById('mob-viral-btn');
+            if (mobViralBtn) {
+                mobViralBtn.addEventListener('click', (e) => {
+                    handleViralClick(e);
+                    // Overlay intentionally stays open for double tap
+                });
+            }
 
             // Close overlay when clicking outside
             document.addEventListener('click', (e) => {
@@ -2349,8 +2327,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
             userQueue.unshift(movedSong);
             renderQueue();
+            qctxTargetIdx = 0; // update index in case they click something else
         }
-        queueContextMenu.classList.add('hidden');
     });
 
     document.getElementById('qctx-play-last')?.addEventListener('click', () => {
@@ -2358,13 +2336,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
             userQueue.push(movedSong);
             renderQueue();
+            qctxTargetIdx = userQueue.length - 1; // update index
         }
-        queueContextMenu.classList.add('hidden');
     });
 
     document.getElementById('qctx-favorite')?.addEventListener('click', () => {
         if (qctxTargetId && typeof toggleFavorite === 'function') toggleFavorite(qctxTargetId);
-        queueContextMenu.classList.add('hidden');
     });
 
     document.getElementById('qctx-remove')?.addEventListener('click', () => {
@@ -2372,15 +2349,15 @@ document.addEventListener('DOMContentLoaded', () => {
             userQueue.splice(qctxTargetIdx, 1);
             renderQueue();
         }
-        queueContextMenu.classList.add('hidden');
+        queueContextMenu.classList.add('hidden'); // explicitly hide when removing, since the target no longer exists
     });
     
     document.getElementById('qctx-suggest-more')?.addEventListener('click', () => {
-        queueContextMenu.classList.add('hidden');
+        // Implement suggest more logic if needed
     });
     
     document.getElementById('qctx-suggest-less')?.addEventListener('click', () => {
-        queueContextMenu.classList.add('hidden');
+        // Implement suggest less logic if needed
     });
 
     window.__triggerSurvey = () => {
