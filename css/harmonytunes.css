@@ -24,7 +24,7 @@ body {
 .harmony-main {
     flex-grow: 1;
     background: #0A0A0A;
-    padding: 20px;
+    padding: 16px;
     width: 100%;
 }
 
@@ -150,14 +150,25 @@ body {
 .see-all:hover { text-decoration: underline; color: white; }
 
 
+/* Mobile: Horizontally scrolling row */
 .card-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     gap: 16px;
+    padding-bottom: 8px; /* space for potential scrollbar / drop shadow */
 }
+.card-grid::-webkit-scrollbar { display: none; }
 
+/* Desktop: Standard Grid */
 @media (min-width: 600px) {
-    .card-grid { grid-template-columns: repeat(3, 1fr); }
+    .card-grid { 
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); 
+        overflow-x: visible;
+    }
 }
 @media (min-width: 900px) {
     .card-grid { grid-template-columns: repeat(4, 1fr); }
@@ -174,6 +185,16 @@ body {
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    
+    /* Mobile specific sizing */
+    flex: 0 0 140px; 
+    scroll-snap-align: start;
+}
+
+@media (min-width: 600px) {
+    .music-card {
+        flex: auto; /* Reset flex constraints on desktop grid */
+    }
 }
 
 .music-card:hover {
@@ -224,20 +245,25 @@ body {
 .card-title {
     color: white;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.card-desc {
+    color: #b3b3b3;
+    font-size: 0.85rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.card-desc {
-    color: #b3b3b3;
-    font-size: 0.8rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+@media (min-width: 600px) {
+    .card-title { font-size: 1.1rem; }
+    .card-desc { font-size: 0.9rem; }
 }
 
 
@@ -245,20 +271,20 @@ body {
     display: flex;
     gap: 16px;
     overflow-x: auto;
+    scroll-snap-type: x mandatory;
     padding-bottom: 10px;
     scrollbar-width: none;
 }
 .tiktok-grid::-webkit-scrollbar { display: none; }
 
 .tiktok-card {
-    background-color: var(--card-bg);
+    background-color: transparent;
     border-radius: 8px;
     overflow: hidden;
-    cursor: pointer;
     transition: transform 0.2s;
-    width: 120px;
-    height: 213px;
+    width: 325px; /* updated for embeds */
     flex-shrink: 0;
+    scroll-snap-align: start;
     position: relative;
 }
 
@@ -1190,8 +1216,20 @@ body {
 
 .queue-item-drag {
     color: #b3b3b3;
-    padding: 5px;
+    padding: 10px; /* larger hit area */
     cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 599px) {
+    .queue-item {
+        padding: 14px 10px; /* larger touch target */
+    }
+    .queue-more-btn {
+        padding: 10px;
+    }
 }
 
 .add-queue-btn {
@@ -1364,9 +1402,9 @@ body {
 
 /* Recommended Container Limits */
 #container-recommended .music-card { display: none; }
-@media (max-width: 599px) { #container-recommended .music-card:nth-child(-n+4) { display: block; } }
-@media (min-width: 600px) { #container-recommended .music-card:nth-child(-n+10) { display: block; } }
-#container-recommended.expanded .music-card { display: block !important; }
+@media (max-width: 599px) { #container-recommended .music-card { display: flex; } }
+@media (min-width: 600px) { #container-recommended .music-card:nth-child(-n+10) { display: flex; } }
+#container-recommended.expanded .music-card { display: flex !important; }
 
 .show-more-btn {
     background: rgba(255, 255, 255, 0.1);
@@ -1384,4 +1422,8 @@ body {
 }
 .show-more-btn:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 599px) {
+    .show-more-btn { display: none !important; }
 }
