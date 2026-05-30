@@ -1532,6 +1532,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mobileOverflowBtn = document.getElementById('mobile-overflow-btn');
         if (mobileOverflowBtn && mobileOverlay) {
             mobileOverflowBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 mobileOverlay.classList.toggle('hidden');
             });
@@ -1953,12 +1954,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
                     }
                     if(docSnap.data().musicFavorites) {
-                    const favIds = docSnap.data().musicFavorites;
-                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
-                    const favIdsSet = new Set(favIds);
-                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
-                    favoriteIds = new Set(favIds);
-                    userFavoritesIds = new Set(favIds);
+                        const favIds = docSnap.data().musicFavorites;
+                        // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                        const favIdsSet = new Set(favIds);
+                        userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
+                        favoriteIds = new Set(favIds);
+                        userFavoritesIds = new Set(favIds);
+                    }
+                    if(docSnap.data().musicHistory) {
+                        const historyIds = docSnap.data().musicHistory;
+                        historyQueue = historyIds.map(id => librarySongsMap.get(id)).filter(s => s);
+                        if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
             } catch (e) { console.error(e); }
@@ -2028,7 +2034,92 @@ document.addEventListener('DOMContentLoaded', () => {
         historyQueue.push(song);
         if(historyQueue.length > 50) historyQueue.shift();
         if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+        
+        // Push to Firebase
+        if(currentUser) {
+            const userRef = doc(db, "users", currentUser.uid);
+            const historyIds = historyQueue.map(s => s.id);
+            updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
+                if(e.code === 'not-found') {
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(console.error);
+                } else {
+                    console.error("Firebase history update error:", e);
+                }
+            });
+        }
     };
+
+    // --- CONTEXT MENU LOGIC ---
+    const contextMenu = document.getElementById('song-context-menu');
+    let contextMenuTargetSongId = null;
+
+    document.addEventListener('click', (e) => {
+        const moreBtn = e.target.closest('.card-more-btn');
+        if (moreBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const card = moreBtn.closest('.music-card');
+            contextMenuTargetSongId = card.dataset.songId;
+            
+            // Position menu
+            const rect = moreBtn.getBoundingClientRect();
+            if (contextMenu) {
+                contextMenu.style.left = `${Math.min(rect.left, window.innerWidth - 220)}px`;
+                contextMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                contextMenu.classList.remove('hidden');
+            }
+            return;
+        }
+        
+        // Hide on outside click
+        if (contextMenu && !contextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu')) {
+            contextMenu.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('ctx-play-next')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) {
+                userQueue.unshift(song);
+                if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-play-last')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) window.__addToUserQueue(song);
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-favorite')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            if(typeof window.toggleFavorite === 'function') {
+                window.toggleFavorite(contextMenuTargetSongId);
+            } else if (typeof toggleFavorite === 'function') {
+                toggleFavorite(contextMenuTargetSongId);
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-view-artist')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) {
+                if (typeof window.openArtistProfile === 'function') {
+                    window.openArtistProfile(song.artist);
+                } else if (typeof openArtistProfile === 'function') {
+                    openArtistProfile(song.artist);
+                }
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
 
     if(queueBtn) {
         queueBtn.addEventListener('click', () => {
@@ -2145,6 +2236,7 @@ export function createSongCard(song) {
                 <img src="${song.art}" alt="${song.title}">
                 <button class="card-play-btn">▶</button>
                 <button class="add-queue-btn" title="Add to Queue">+</button>
+                <button class="card-more-btn" title="More Options">...</button>
             </div>
             <div class="card-title">${song.title}</div>
             <div class="card-desc">${song.artist}</div>
