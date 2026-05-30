@@ -633,7 +633,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const blockStart = firstLine.start;
         const maxEndDur = audioEl.duration || blockStart + 15;
-        const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : maxEndDur);
+        // Add 2 seconds to blockEnd to ensure the entire final lyric is captured when Mixxer is OFF
+        const blockEnd = (lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : maxEndDur)) + 2;
         
         // Calculate optimal fade based on BPM
         const bpm = librarySongsMap.get(songId)?.bpm || 0;
