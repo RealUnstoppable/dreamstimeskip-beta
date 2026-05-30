@@ -981,6 +981,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            if (e.target.closest('.card-more-btn')) return;
+
             const musicCard = e.target.closest('.music-card[data-song-id]');
             if (musicCard) {
                 const id = musicCard.getAttribute('data-song-id');
