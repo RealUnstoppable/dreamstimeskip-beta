@@ -774,49 +774,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(searchInput) {
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.song-card');
-            cards.forEach(card => {
-                const titleEl = card.querySelector('.song-title');
-                const artistEl = card.querySelector('p:last-of-type');
-                if(!titleEl || !artistEl) return;
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.song-card');
+                cards.forEach(card => {
+                    const titleEl = card.querySelector('.song-title');
+                    const artistEl = card.querySelector('p:last-of-type');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    card.style.display = isMatch ? 'flex' : 'none';
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    } else {
+                        titleEl.textContent = titleText;
+                        artistEl.textContent = artistText;
+                    }
+                });
                 
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                card.style.display = isMatch ? 'flex' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
-            
-            const rows = document.querySelectorAll('.song-table tbody tr');
-            rows.forEach(row => {
-                const titleEl = row.querySelector('.song-title');
-                const artistEl = row.querySelector('.song-artist');
-                if(!titleEl || !artistEl) return;
-                
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                row.style.display = isMatch ? 'table-row' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
+                const rows = document.querySelectorAll('.song-table tbody tr');
+                rows.forEach(row => {
+                    const titleEl = row.querySelector('.song-title');
+                    const artistEl = row.querySelector('.song-artist');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    row.style.display = isMatch ? 'table-row' : 'none';
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    } else {
+                        titleEl.textContent = titleText;
+                        artistEl.textContent = artistText;
+                    }
+                });
+            }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
         });
     }
 
@@ -1550,15 +1554,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Global Search
+        let globalSearchTimeout;
         globalSearch.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
-                const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderSongTable(filtered);
-            } else if (viewHome.style.display !== 'none') {
-                const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderMusicGrid(filtered);
-            }
+            clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase().trim();
+                if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
+                    const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderSongTable(filtered);
+                } else if (viewHome.style.display !== 'none') {
+                    const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderMusicGrid(filtered);
+                }
+            }, 300); // ⚡ Bolt: Debounce global search to reduce unnecessary re-renders
         });
 
         // --- Mobile Overflow ("...") Button ---
