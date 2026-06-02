@@ -165,7 +165,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore:", error);
+                console.error("Error saving wishlist to Firestore - Manager info: [" + error.message + "]", error);
                 reject(error);
             }
         }, 500);
@@ -193,7 +193,7 @@ async function saveCart() {
                 const userCartRef = doc(db, 'carts', currentUser.uid);
                 await setDoc(userCartRef, { items: cart });
             } catch (error) {
-                console.error("Error saving cart to Firestore:", error);
+                console.error("Error saving cart to Firestore - Manager info: [" + error.message + "]", error);
             }
         }, 500); // 500ms debounce
         } else {
@@ -213,7 +213,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore:", error);
+                    console.error("Error saving cart to Firestore - Manager info: [" + error.message + "]", error);
                 }
             } else {
                 // **MODIFIED**: Save cart to localStorage for logged-out users
@@ -319,7 +319,7 @@ onAuthStateChanged(auth, async (user) => {
                     wishlist = new Set();
                 }
             } catch (error) {
-                console.error("Error loading wishlist:", error);
+                console.error("Error loading wishlist - Manager info: [" + error.message + "]", error);
             }
 
             const userCartRef = doc(db, 'carts', user.uid);
