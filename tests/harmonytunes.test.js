@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 // Set up minimal DOM before requiring the script
 document.body.innerHTML = `
     <div id="view-home"></div>
@@ -26,12 +27,19 @@ document.body.innerHTML = `
     <img id="player-album-art">
     <button id="player-like-btn"></button>
     <div id="greeting"></div>
+    <button id="lyrics-btn"></button>
+    <div id="view-lyrics" style="display: none;"></div>
+    <button id="close-lyrics-btn"></button>
+    <div id="lyrics-content"></div>
+    <div id="lyrics-container"></div>
 `;
 
 import { jest } from '@jest/globals';
 
 // Import the script as ES module
 await import('../js/harmonytunes.js');
+// Import the script
+import '../js/harmonytunes.js';
 
 // Dispatch DOMContentLoaded so the script actually runs its init block
 const event = new Event('DOMContentLoaded');
