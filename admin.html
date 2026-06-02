@@ -328,46 +328,28 @@
             setupEventListeners();
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = true) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
                 // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
-
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
-
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
-
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                let users = await fetchCollectionData("users");
+                let carts = await fetchCollectionData("carts");
+                let orders = await fetchCollectionData("orders", false);
+                let subscribers = await fetchCollectionData("newsletterSubscribers", false);
 
                 // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
-
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                let bookings = await fetchCollectionData("bookings");
+                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
+                let quotes = await fetchCollectionData("quotes");
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -409,7 +391,7 @@
                 }
 
             } catch (error) {
-                console.error("Error loading admin data:", error);
+                console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
         }
 
