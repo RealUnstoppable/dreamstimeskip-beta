@@ -33,7 +33,7 @@ onAuthStateChanged(auth, async (user) => {
                 applyTheme('dark', 'blue');
             }
         } catch (error) {
-            console.error("Error loading theme from Firestore:", error);
+            console.error("Error loading theme from Firestore - Manager info:", error.message);
             applyTheme('dark', 'blue');
         }
     } else {
