@@ -33,7 +33,12 @@
 **Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
 **Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
 
-## 2024-05-18 - [Fix DOM-based XSS in JS Components]
-**Vulnerability:** Several vanilla JS components (`js/auth.js`, `js/shop.js`, `js/harmonytunes.js`) were directly injecting user data and static arrays into the DOM using `.innerHTML` without sanitization. For example, `userData.membershipLevel` loaded from Firebase was placed directly into a template literal in `js/auth.js`.
-**Learning:** Always sanitize data retrieved from databases or provided by variables before injecting it into the DOM using `.innerHTML` in pure JavaScript code.
-**Prevention:** Use a shared utility like `escapeHTML` and consistently wrap all interpolations within template literals that are assigned to `.innerHTML`.
+## 2024-05-18 - [Fix DOM-based XSS Bypass in Admin Dashboard escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` was incorrectly returning non-string inputs (like arrays) as-is. If an array containing a malicious payload was passed to it, the array would bypass escaping, and when subsequently interpolated into an HTML string, JavaScript's implicit `.toString()` would render the unescaped payload into the DOM, resulting in XSS.
+**Learning:** `typeof str !== 'string'` is insufficient as an early return in escape utilities because arrays are coerced to strings implicitly during template literal interpolation.
+**Prevention:** Always explicitly coerce variables to strings (e.g., `str.toString()` or `String(str)`) before escaping, and handle null/undefined explicitly.
+## 2024-05-18 - [Fix XSS Bypass in Admin Dashboard Escape Utility]
+**Vulnerability:** The `escapeHTML` function in `admin.html` returned non-string inputs unmodified instead of casting them to strings. This allowed for an XSS bypass if an attacker provided an array of malicious strings, which bypasses the `typeof str !== 'string'` check but still implicitly coerces into an unescaped string when interpolated into `innerHTML`.
+**Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
+**Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.
+## 2026-05-27 - [Fix Hardcoded Stripe Secret in Server]\n**Vulnerability:** The Stripe initialization in `server.js` used a hardcoded string (`"sk_test_placeholder"`) instead of retrieving the secret key securely from an environment variable.\n**Learning:** Relying on hardcoded placeholders for sensitive API keys increases the risk of developers accidentally committing real, live secrets if they overwrite the placeholder directly in the source file during testing or deployment.\n**Prevention:** Always instantiate third-party SDKs using environment variables (e.g., `process.env.STRIPE_SECRET_KEY`) to decouple credentials from the source code and prevent accidental exposure.

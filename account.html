@@ -1,134 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script type="module" src="/js/theme-loader.js"></script>
+    <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account | DTS HUB</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>My Account | DTS Hub</title>
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
-    <style>
-        :root {
-            --accent-blue: #2563EB;
-            --accent-red: #DC2626;
-            --accent-green: #16A34A;
-            --accent-yellow: #FBBF24;
-            --font-main: 'Inter', sans-serif;
-        }
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-        }
-        .account-layout {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            gap: 30px;
-        }
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-        }
-        .btn-admin-back {
-            display: none;
-            background-color: var(--accent-yellow);
-            color: #000;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            text-decoration: none;
-            margin-bottom: 20px;
-            transition: opacity 0.2s;
-            cursor: pointer;
-        }
-        .btn-admin-back:hover { opacity: 0.85; }
-        .sidebar-header {
-            padding: 20px;
-            background-color: var(--primary-card-color);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .sidebar-header h2 { font-size: 1.2rem; margin: 0 0 5px 0; line-height: 1.2; }
-        .sidebar-header p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; word-wrap: break-word; }
-        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar-nav a {
-            display: block; padding: 15px 20px; color: var(--text-secondary);
-            text-decoration: none; border-radius: 8px; margin-bottom: 5px;
-            font-weight: 500; transition: background-color 0.2s, color 0.2s;
-        }
-        .sidebar-nav a:hover { background-color: var(--primary-card-color); color: var(--text-primary); }
-        .sidebar-nav a.active { background-color: var(--accent-blue); color: #fff; }
-        .sign-out-btn {
-            width: 100%; margin-top: 20px; padding: 15px 20px;
-            background-color: var(--primary-card-color); border: 1px solid var(--border-color);
-            color: var(--text-secondary); font-weight: 500; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s, color 0.2s;
-        }
-        .sign-out-btn:hover { background-color: var(--accent-red); color: #fff; border-color: var(--accent-red); }
-        .main-content { flex-grow: 1; }
-        .content-section {
-            display: none; background-color: var(--primary-card-color);
-            padding: 40px; border-radius: 12px; border: 1px solid var(--border-color);
-        }
-        .content-section.active { display: block; }
-        .content-section h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; }
-        .card {
-            background-color: var(--secondary-card-color); padding: 25px;
-            border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);
-        }
-        .card h4 { margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px; border: 1px solid var(--border-color);
-            background-color: var(--input-bg); color: var(--text-primary);
-            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
-        }
-        .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn {
-            padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer;
-            text-decoration: none; display: inline-block; text-align: center; border: 1px solid transparent; transition: all 0.2s;
-        }
-        .btn-primary { background-color: var(--accent-blue); color: white; }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-danger { background-color: var(--accent-red); color: white; }
-        .btn-danger:hover { opacity: 0.9; }
-        #delete-account-card { border-color: var(--accent-red); }
-        .notification { padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 15px; display: none; }
-        .notification.success { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
-        .notification.error { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
-        .accent-options { display: flex; gap: 15px; flex-wrap: wrap; }
-        
-        @media (max-width: 768px) {
-            body { padding: 20px 10px; }
-            .account-layout { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .main-content { width: 100%; }
-            .content-section { padding: 25px; }
-        }
-    </style>
 </head>
-<body style="display: none;">
-    <div class="account-layout">
+<body>
+    <div id="loading-spinner" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);">Loading...</div>
+    <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
-            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
+            <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
             <div class="sidebar-header">
                 <h2 id="welcome-header">Loading...</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="index.html">← Return to Home</a></li>
+                    <li><a href="index.html">&#8592; Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
@@ -219,8 +111,26 @@
             <section id="support" class="content-section">
                 <h3>Contact Support</h3>
                 <div class="card">
-                    <p>If you need help, please reach out. We're happy to assist!</p>
-                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                    <h4>Submit a Ticket</h4>
+                    <form id="support-ticket-form">
+                        <div class="form-group">
+                            <label for="ticket-subject">Subject</label>
+                            <input type="text" id="ticket-subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticket-message">Message</label>
+                            <textarea id="ticket-message" rows="4" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                        <div id="ticket-notification" class="notification"></div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h4>Your Tickets</h4>
+                    <div id="user-tickets-container">
+                        <p style="color: var(--text-secondary);">Loading tickets...</p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -229,29 +139,101 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { createTicket, getUserTickets } from '/js/ticket-service.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
+                    // Check sessionStorage first to optimize reads
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        initializePage(user, userData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                        return; // Exit early if we have cached data
+                    }
+
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData)); // Cache data
                         initializePage(user, userData);
                         setupEventListeners(user);
-                        document.body.style.display = 'flex';
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                    } else {
+                        const fallbackData = {
+                            username: user.displayName || "User",
+                            email: user.email,
+                            membershipLevel: 'free',
+                            isAdmin: false
+                        };
+                        try {
+                            await setDoc(userDocRef, fallbackData);
+                            sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
+                        } catch(e) {
+                            console.error("Failed to set default profile", e);
+                        }
+                        initializePage(user, fallbackData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
                     }
                 } catch (error) {
                     console.error("Error loading profile:", error);
                 }
             } else {
-                window.location.replace('sign in beta.html');
+                if (!window.location.pathname.includes('sign in beta.html')) {
+                    window.location.replace('sign in beta.html');
+                }
             }
         });
 
+        async function loadUserTickets(userId) {
+            const container = document.getElementById('user-tickets-container');
+            try {
+                const tickets = await getUserTickets(userId);
+                if (tickets.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">You have not submitted any tickets yet.</p>';
+                    return;
+                }
+
+                let html = '<div class="tickets-list">';
+                tickets.forEach(ticket => {
+                    const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
+                                      ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
+
+                    html += `
+                        <div class="ticket-item" style="border-bottom: 1px solid var(--border-color); padding: 10px 0; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${escapeHTML(ticket.subject)}</strong>
+                                <span style="color: ${statusColor}; font-size: 0.9em; text-transform: uppercase;">${ticket.status}</span>
+                            </div>
+                            <p style="margin: 5px 0; font-size: 0.9em;">${escapeHTML(ticket.message)}</p>
+                            ${ticket.adminReply ? `<div style="background: var(--primary-card-color); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9em; border-left: 3px solid var(--accent-blue);"><strong>Admin Reply:</strong><br>${escapeHTML(ticket.adminReply)}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load tickets.</p>';
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
         function initializePage(user, userData) {
+            document.getElementById('loading-spinner').style.display = 'none';
+            loadUserTickets(user.uid);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
@@ -277,6 +259,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
+                sessionStorage.removeItem(`profile_${user.uid}`);
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
@@ -294,6 +277,38 @@
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.username = newUsername;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                }
+            });
+
+            document.getElementById('support-ticket-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const subject = document.getElementById('ticket-subject').value;
+                const message = document.getElementById('ticket-message').value;
+                const notificationEl = document.getElementById('ticket-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+
+                try {
+                    await createTicket(user.uid, user.email, subject, message);
+                    showNotification(notificationEl, 'Ticket submitted successfully!', 'success');
+                    e.target.reset();
+                    await loadUserTickets(user.uid);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -307,6 +322,11 @@
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -315,8 +335,20 @@
                     document.body.dataset.accent = accentColor;
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.theme = theme;
+                        userData.accentColor = accentColor;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
@@ -350,6 +382,18 @@
                 setTimeout(() => { element.style.display = 'none'; }, 5000);
             };
         }
+    </script>
+    <header class="main-header"></header>
+    <main style="padding: 120px 20px; text-align: center; min-height: 60vh;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">User Account</h1>
+        <p style="color: var(--text-secondary);">This is a placeholder account page. Add your account management UI here.</p>
+    </main>
+    <footer class="main-footer"></footer>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>

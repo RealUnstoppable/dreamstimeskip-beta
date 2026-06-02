@@ -6,8 +6,8 @@
     if (localAccent) document.body.dataset.accent = localAccent;
 })();
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 const applyTheme = (theme, accentColor) => {
     document.body.dataset.theme = theme || 'dark';
@@ -23,14 +23,23 @@ const applyTheme = (theme, accentColor) => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
+            const cacheKey = `profile_${user.uid}`;
+            const cachedProfile = sessionStorage.getItem(cacheKey);
+
+            if (cachedProfile) {
+                const userData = JSON.parse(cachedProfile);
                 applyTheme(userData.theme, userData.accentColor);
             } else {
-                // Fallback for new users or data not found
-                applyTheme('dark', 'blue');
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    applyTheme(userData.theme, userData.accentColor);
+                } else {
+                    // Fallback for new users or data not found
+                    applyTheme('dark', 'blue');
+                }
             }
         } catch (error) {
             console.error("Error loading theme from Firestore:", error);

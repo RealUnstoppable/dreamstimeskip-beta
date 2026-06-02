@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 export function loadNavbar() {
     const headerHTML = `
@@ -39,6 +39,14 @@ function attachNavEvents() {
             hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
         });
+        
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
+        });
     }
 }
 
@@ -49,8 +57,21 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                const cacheKey = `profile_${user.uid}`;
+                const cachedProfile = sessionStorage.getItem(cacheKey);
+                let userData = null;
+
+                if (cachedProfile) {
+                    userData = JSON.parse(cachedProfile);
+                } else {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+                }
+
+                const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {

@@ -6,7 +6,18 @@
     <title>Unstoppable</title>
 </head>
 <body>
+    <header class="main-header"></header>
+
     <h1>Unstoppable</h1>
     <p>Welcome to the Unstoppable page! This is a placeholder for content related to the unstoppable theme. Stay tuned for updates and exciting features coming soon!</p>   
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
 </body>
 </html>

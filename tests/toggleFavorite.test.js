@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { updateDoc, setDoc, arrayUnion, arrayRemove, doc } from './__mocks__/firebase-firestore.js';
+import { updateDoc, setDoc, arrayUnion, arrayRemove, doc } from '../__mocks__/firebase-firestore.js';
 
 document.body.innerHTML = `
     <div class="nav-pill" id="nav-home"></div>

@@ -1,20 +1,29 @@
 import { jest } from '@jest/globals';
 
-// MOCK REQUIRED DOM ELEMENTS BEFORE IMPORTING SHOP.JS
 document.body.innerHTML = `
-    <div id="cart-item-count"></div>
-    <div id="cart-total-price"></div>
+    <div id="product-grid"></div>
+    <button id="cart-button"></button>
+    <div id="cart-modal"></div>
+    <button id="close-cart-btn"></button>
+    <div id="cart-items-container"></div>
+    <span id="cart-item-count"></span>
+    <span id="cart-total-price"></span>
     <button id="checkout-btn"></button>
     <div id="nav-cta-container"></div>
     <div class="hamburger"></div>
     <div class="nav-links"></div>
-    <div id="product-grid"></div>
-    <div id="cart-items-container"></div>
 `;
 
-import { handleUpdateQuantity, cart } from '../js/shop.js';
-
 describe('handleUpdateQuantity', () => {
+    let handleUpdateQuantity;
+    let cart;
+
+    beforeAll(async () => {
+        const module = await import('../js/shop.js');
+        handleUpdateQuantity = module.handleUpdateQuantity;
+        cart = module.cart;
+    });
+
     beforeEach(() => {
         // Reset cart to a known state
         for (let key in cart) delete cart[key];
