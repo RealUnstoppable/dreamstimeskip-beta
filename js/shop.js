@@ -3,6 +3,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
+import { escapeHTML } from './utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
