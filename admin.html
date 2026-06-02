@@ -118,6 +118,7 @@
                     <li><a href="#bookings" class="nav-link">Bookings</a></li>
                     <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
+                    <li><a href="#support-tickets" class="nav-link">Support Tickets</a></li>
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
@@ -171,6 +172,26 @@
                         </thead>
                         <tbody id="bookings-list-body">
                             <tr><td colspan="6" style="text-align: center;">Loading bookings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="support-tickets" class="content-section">
+                <h3>Support Tickets</h3>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>User Email</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="support-tickets-list-body">
+                            <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -265,6 +286,7 @@
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
 
         let performanceChart;
 
@@ -285,10 +307,6 @@
                 if (!window.location.pathname.includes('sign in beta.html')) {
                     window.location.replace('sign in beta.html');
                 }
-                    safeRedirect('account.html');
-                }
-            } else {
-                safeRedirect('sign in beta.html');
             }
         });
 
@@ -356,6 +374,11 @@
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
                 document.getElementById('total-purchases').textContent = orders.length;
 
+                try {
+                    const tickets = await getAllTickets();
+                    renderSupportTicketsTable(tickets);
+                } catch(e) { console.error('Error fetching support tickets', e); }
+
                 // Renderers
                 renderUserTable(users);
                 renderNewsletterTable(subscribers); 
@@ -396,6 +419,8 @@
             if(bookings.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No bookings found.</td></tr>'; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+            const fragment = document.createDocumentFragment();
             bookings.forEach(b => {
                 const row = document.createElement('tr');
                 const name = b.customerName || 'N/A';
@@ -417,8 +442,9 @@
                         ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${escapeHTML(b.id)}">Mark Done</button>` : ''}
                     </td>
                 `;
-                tbody.appendChild(row);
+                fragment.appendChild(row);
             });
+            tbody.appendChild(fragment);
         }
 
         function renderQuotesTable(quotes) {
@@ -427,6 +453,8 @@
             if(quotes.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No quotes pending.</td></tr>'; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+            const fragment = document.createDocumentFragment();
             quotes.forEach(q => {
                 const row = document.createElement('tr');
                 const badgeClass = q.status === 'responded' ? 'active' : 'pending';
@@ -439,13 +467,16 @@
                         <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${escapeHTML(q.id)}">Delete</button>
                     </td>
                 `;
-                tbody.appendChild(row);
+                fragment.appendChild(row);
             });
+            tbody.appendChild(fragment);
         }
 
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
             userListBody.innerHTML = '';
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+            const fragment = document.createDocumentFragment();
             users.filter(user => !user.isAdmin).forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
@@ -454,14 +485,15 @@
                 const subStatus = user.subscription?.status === 'active' ? `<span class="subscription-text">Active Pro</span>` : `<span style="color: var(--text-secondary);">Free</span>`;
                 
                 row.innerHTML = `
-                    <td>${escapeHTML(user.username) || escapeHTML(user.name) || "N/A"}</td>
+                    <td>${escapeHTML(user.username || user.name || "N/A")}</td>
                     <td>${escapeHTML(user.email)}</td>
                     <td>${signupDate}</td>
                     <td>${subStatus}</td>
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>`;
-                userListBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            userListBody.appendChild(fragment);
         }
 
         function renderFeatureRequestsTable(requests) {
@@ -470,6 +502,8 @@
             if(requests.length === 0) {
                 listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+            const fragment = document.createDocumentFragment();
             requests.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
             requests.forEach(req => {
                 const row = document.createElement('tr');
@@ -488,9 +522,52 @@
                     <td>${tierBadge}</td>
                     <td>${statusStr}</td>
                     <td>${actionButton}</td>`;
+                fragment.appendChild(row);
+            });
+            listBody.appendChild(fragment);
+        }
+
+        function renderSupportTicketsTable(tickets) {
+            const listBody = document.getElementById('support-tickets-list-body');
+            listBody.innerHTML = '';
+            if (tickets.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary);">No support tickets submitted yet.</td></tr>`;
+                return;
+            }
+
+            tickets.forEach(ticket => {
+                const row = document.createElement('tr');
+                const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
+                const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
+                                  ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
+                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
+
+                const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+
+                row.innerHTML = `
+                    <td>${reqDate}</td>
+                    <td>${escapeHTML(ticket.userEmail) || "Unknown User"}</td>
+                    <td style="max-width:300px; word-wrap:break-word;">
+                        <strong>${escapeHTML(ticket.subject)}</strong><br>
+                        <span style="font-size: 0.85em; color: var(--text-secondary);">${escapeHTML(ticket.message)}</span>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>${replyAction}${closeAction}</td>`;
                 listBody.appendChild(row);
             });
         }
+
+        window.closeSupportTicket = async function(ticketId) {
+            if (confirm("Are you sure you want to close this ticket?")) {
+                try {
+                    await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
+                    loadAdminData();
+                } catch (error) {
+                    alert("Error closing ticket: " + error.message);
+                }
+            }
+        };
 
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
@@ -498,12 +575,15 @@
             if(subscribers.length === 0) {
                 newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">No subscribers yet.</td></tr>`; return;
             }
+            // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+            const fragment = document.createDocumentFragment();
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
                 const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
                 row.innerHTML = `<td>${escapeHTML(subscriber.email)}</td><td>${subscriptionDate}</td>`;
-                newsletterListBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            newsletterListBody.appendChild(fragment);
         }
 
         function calculatePerformanceMetrics(users, carts, orders = [], bookings = [], quotes = []) {
@@ -570,6 +650,21 @@
                 }
             });
             
+            // Support Tickets Reply Toggle
+            document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
+                const reqId = e.target.dataset.id;
+                if (!reqId || !e.target.classList.contains('admin-reply-btn')) return;
+                const reply = prompt("Enter your reply to the user:");
+                if (reply !== null && reply.trim() !== "") {
+                    try {
+                        await replyToTicket(reqId, reply, 'answered');
+                        loadAdminData();
+                    } catch (error) {
+                        alert("Error replying to ticket: " + error.message);
+                    }
+                }
+            });
+
             // Feature Request Complete Toggle
             document.getElementById('feature-request-list-body').addEventListener('click', async (e) => {
                 const reqId = e.target.dataset.id;

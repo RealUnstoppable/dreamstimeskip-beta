@@ -111,8 +111,26 @@
             <section id="support" class="content-section">
                 <h3>Contact Support</h3>
                 <div class="card">
-                    <p>If you need help, please reach out. We're happy to assist!</p>
-                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                    <h4>Submit a Ticket</h4>
+                    <form id="support-ticket-form">
+                        <div class="form-group">
+                            <label for="ticket-subject">Subject</label>
+                            <input type="text" id="ticket-subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticket-message">Message</label>
+                            <textarea id="ticket-message" rows="4" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                        <div id="ticket-notification" class="notification"></div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h4>Your Tickets</h4>
+                    <div id="user-tickets-container">
+                        <p style="color: var(--text-secondary);">Loading tickets...</p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -122,6 +140,7 @@
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { createTicket, getUserTickets } from '/js/ticket-service.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -172,8 +191,48 @@
             }
         });
 
+        async function loadUserTickets(userId) {
+            const container = document.getElementById('user-tickets-container');
+            try {
+                const tickets = await getUserTickets(userId);
+                if (tickets.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">You have not submitted any tickets yet.</p>';
+                    return;
+                }
+
+                let html = '<div class="tickets-list">';
+                tickets.forEach(ticket => {
+                    const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
+                                      ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
+
+                    html += `
+                        <div class="ticket-item" style="border-bottom: 1px solid var(--border-color); padding: 10px 0; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${escapeHTML(ticket.subject)}</strong>
+                                <span style="color: ${statusColor}; font-size: 0.9em; text-transform: uppercase;">${ticket.status}</span>
+                            </div>
+                            <p style="margin: 5px 0; font-size: 0.9em;">${escapeHTML(ticket.message)}</p>
+                            ${ticket.adminReply ? `<div style="background: var(--primary-card-color); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9em; border-left: 3px solid var(--accent-blue);"><strong>Admin Reply:</strong><br>${escapeHTML(ticket.adminReply)}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load tickets.</p>';
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
         function initializePage(user, userData) {
             document.getElementById('loading-spinner').style.display = 'none';
+            loadUserTickets(user.uid);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
@@ -225,11 +284,40 @@
                 }
             });
 
+            document.getElementById('support-ticket-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const subject = document.getElementById('ticket-subject').value;
+                const message = document.getElementById('ticket-message').value;
+                const notificationEl = document.getElementById('ticket-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+
+                try {
+                    await createTicket(user.uid, user.email, subject, message);
+                    showNotification(notificationEl, 'Ticket submitted successfully!', 'success');
+                    e.target.reset();
+                    await loadUserTickets(user.uid);
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                }
+            });
+
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const theme = document.getElementById('theme-select').value;
                 const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -240,6 +328,9 @@
                     localStorage.setItem('userAccent', accentColor);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 

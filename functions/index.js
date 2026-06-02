@@ -135,9 +135,6 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 
     try {
       const uid = decodedToken.uid;
-    const uid = decodedToken.uid;
-
-    try {
 
       const userDoc = await admin.firestore().collection("users")
           .doc(uid).get();
