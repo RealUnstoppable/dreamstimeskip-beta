@@ -454,7 +454,7 @@
                 const subStatus = user.subscription?.status === 'active' ? `<span class="subscription-text">Active Pro</span>` : `<span style="color: var(--text-secondary);">Free</span>`;
                 
                 row.innerHTML = `
-                    <td>${escapeHTML(user.username) || escapeHTML(user.name) || "N/A"}</td>
+                    <td>${escapeHTML(user.username || user.name || "N/A")}</td>
                     <td>${escapeHTML(user.email)}</td>
                     <td>${signupDate}</td>
                     <td>${subStatus}</td>
