@@ -13,14 +13,14 @@
     <div id="loading-spinner" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);">Loading...</div>
     <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
-            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
+            <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
             <div class="sidebar-header">
                 <h2 id="welcome-header">Loading...</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="index.html">← Return to Home</a></li>
+                    <li><a href="index.html">&#8592; Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
@@ -146,7 +146,8 @@
             if (user) {
                 try {
                     // Check sessionStorage first to optimize reads
-                    const cachedData = sessionStorage.getItem('userData');
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
                     if (cachedData) {
                         const userData = JSON.parse(cachedData);
                         initializePage(user, userData);
@@ -160,7 +161,7 @@
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        sessionStorage.setItem('userData', JSON.stringify(userData)); // Cache data
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData)); // Cache data
                         initializePage(user, userData);
                         setupEventListeners(user);
                         document.getElementById('account-layout-container').style.display = 'flex';
@@ -173,7 +174,7 @@
                         };
                         try {
                             await setDoc(userDocRef, fallbackData);
-                            sessionStorage.setItem('userData', JSON.stringify(fallbackData)); // Cache data
+                            sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
                         } catch(e) {
                             console.error("Failed to set default profile", e);
                         }
@@ -258,7 +259,7 @@
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
-                sessionStorage.removeItem('userData');
+                sessionStorage.removeItem(`profile_${user.uid}`);
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
@@ -276,6 +277,14 @@
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.username = newUsername;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -326,6 +335,15 @@
                     document.body.dataset.accent = accentColor;
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.theme = theme;
+                        userData.accentColor = accentColor;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -364,6 +382,7 @@
                 setTimeout(() => { element.style.display = 'none'; }, 5000);
             };
         }
+    </script>
     <header class="main-header"></header>
     <main style="padding: 120px 20px; text-align: center; min-height: 60vh;">
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">User Account</h1>
