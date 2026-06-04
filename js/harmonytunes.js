@@ -2258,6 +2258,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM inserts, reducing reflows from O(N) to O(1)
+        const fragment = document.createDocumentFragment();
+
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
@@ -2354,8 +2357,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            queueContentArea.appendChild(item);
+            fragment.appendChild(item);
         });
+
+        queueContentArea.appendChild(fragment);
     }
 
     // Queue Context Menu
