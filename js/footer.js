@@ -30,9 +30,9 @@ export function loadFooter() {
                 <div class="footer-column">
                     <h5>Company</h5>
                     <ul>
-                        <li><a href="tracker.html">About Us</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Shop</a></li>
+                        <li><a href="portfolio.html">About Us</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="shop.html">Shop</a></li>
                         <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
                     </ul>
                 </div>

@@ -1,12 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unstoppable</title>
+    <title>Unstoppable | The Unstoppable Ecosystem</title>
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
 </head>
 <body>
-    <h1>Unstoppable</h1>
-    <p>Welcome to the Unstoppable page! This is a placeholder for content related to the unstoppable theme. Stay tuned for updates and exciting features coming soon!</p>   
+    <header class="main-header">
+        <div id="navbar-placeholder"></div>
+    </header>
+
+    <main class="harmony-main" style="padding-top: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh;">
+        <div class="glass-card" style="text-align: center; max-width: 600px; padding: 40px; border-radius: 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px);">
+            <h1 style="margin-bottom: 20px; font-size: 2.5rem;">Unstoppable</h1>
+            <p style="color: #b3b3b3; line-height: 1.6;">Welcome to the Unstoppable page! This is a placeholder for content related to the unstoppable theme. Stay tuned for updates and exciting features coming soon!</p>
+        </div>
+    </main>
+
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        import { auth, db } from './js/auth.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNavbar();
+            loadFooter();
+        });
+    </script>
+    <script src="/js/script.js"></script>
 </body>
 </html>

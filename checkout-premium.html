@@ -228,6 +228,8 @@
                 </div>
             </section>
         </div>
+    <footer class="main-footer"></footer>
+
     </main>
 
     <script src="/js/script.js"></script> <script>
@@ -250,6 +252,11 @@
  <script src="/js/script.js"></script>
      <script type="module">
     import { loadNavbar } from './js/navbar.js';
-    document.addEventListener('DOMContentLoaded', loadNavbar);
+    import { loadFooter } from './js/footer.js';
+    import { auth, db } from './js/auth.js';
+    document.addEventListener('DOMContentLoaded', () => {
+        loadNavbar();
+        loadFooter();
+    });
 </script>
    

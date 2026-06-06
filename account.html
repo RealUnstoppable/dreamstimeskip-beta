@@ -9,6 +9,7 @@
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
     <style>
         :root {
@@ -24,8 +25,14 @@
             color: var(--text-primary);
             margin: 0;
             display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .account-page-wrapper {
+            display: flex;
             justify-content: center;
             padding: 40px 20px;
+            flex-grow: 1;
         }
         .account-layout {
             display: flex;
@@ -110,7 +117,7 @@
         .accent-options { display: flex; gap: 15px; flex-wrap: wrap; }
         
         @media (max-width: 768px) {
-            body { padding: 20px 10px; }
+            .account-page-wrapper { padding: 20px 10px; }
             .account-layout { flex-direction: column; }
             .sidebar { width: 100%; }
             .main-content { width: 100%; }
@@ -119,7 +126,11 @@
     </style>
 </head>
 <body>
+    <header class="main-header" style="position: relative; z-index: 50;">
+        <div id="navbar-placeholder"></div>
+    </header>
     <div id="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: var(--text-primary);">Loading Profile...</div>
+    <div class="account-page-wrapper">
     <div class="account-layout" style="display: none;" id="account-layout">
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
@@ -226,7 +237,11 @@
             </section>
         </main>
     </div>
+    </div>
 
+    <footer class="main-footer"></footer>
+
+    <script src="/js/script.js"></script>
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
@@ -236,8 +251,15 @@
         import { doc, getDoc, updateDoc, deleteDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { productMap } from '/js/shop.js';
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNavbar();
+            loadFooter();
+        });
 
         let listenersSetup = false;
         onAuthStateChanged(auth, async (user) => {

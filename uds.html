@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Unstoppable Detailing Services | Premium Auto Care</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <style>
         /* =========================================
            MOBILE-FIRST BASE STYLES
@@ -151,19 +153,9 @@
 </head>
 <body>
 
-    <nav>
-        <a href="#" class="logo">UNSTOPPABLE</a>
-        <div class="menu-toggle" id="mobile-menu-btn">☰</div>
-        <div class="nav-links" id="nav-links">
-            <a href="#process" onclick="closeMenu()">Process</a>
-            <a href="#pricing" onclick="closeMenu()">Pricing</a>
-            <a href="#gallery" onclick="closeMenu()">Gallery</a>
-            <a href="#reviews" onclick="closeMenu()">Reviews</a>
-            <a href="#contact" onclick="closeMenu()">Contact</a>
-            <a href="booking.html">Book Now</a>
-            <a href="sign in beta.html" class="auth-btn" id="nav-auth-btn">Sign In</a>
-        </div>
-    </nav>
+    <header class="main-header" style="position: relative; z-index: 50;">
+        <div id="navbar-placeholder"></div>
+    </header>
 
     <header class="hero">
         <div>
@@ -254,49 +246,18 @@
         </div>
     </section>
 
-    <footer id="contact">
-        <h2>Stay Unstoppable</h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Join our newsletter for detailing tips and 10% off your first wash.</p>
-        <div class="newsletter" id="newsletter-form">
-            <input type="email" id="news-email" placeholder="Enter your email address" required>
-            <button onclick="subscribeNewsletter()">Subscribe</button>
-        </div>
-        <p id="news-msg" style="font-size: 0.85rem; margin-top: 15px; font-weight: 600;"></p>
-        
-        <div class="socials">
-            <a href="#">Instagram</a> | <a href="#">Facebook</a> | <a href="#">YouTube</a>
-        </div>
-        <p style="color: #666; margin-top: 40px; font-size: 0.8rem;">&copy; 2026 Unstoppable Detailing Services. Buford, GA.</p>
-    </footer>
+    <footer class="main-footer"></footer>
 
     <script type="module">
-        import { auth, db } from '/js/auth.js';
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        import { auth, db } from './js/auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-        // Mobile Menu Toggle Logic
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const navLinks = document.getElementById('nav-links');
-        
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-        });
-
-        window.closeMenu = () => {
-            if(window.innerWidth < 768) {
-                navLinks.classList.remove('active');
-                menuBtn.textContent = '☰';
-            }
-        };
-
-        // Update Nav based on Auth Status
-        onAuthStateChanged(auth, (user) => {
-            const authBtn = document.getElementById('nav-auth-btn');
-            if (user) {
-                authBtn.textContent = "My Account";
-                authBtn.href = "account.html";
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNavbar();
+            loadFooter();
         });
 
         // Newsletter Logic
