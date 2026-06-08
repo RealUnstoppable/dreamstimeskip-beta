@@ -42,3 +42,8 @@
 **Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
 **Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.
 ## 2026-05-27 - [Fix Hardcoded Stripe Secret in Server]\n**Vulnerability:** The Stripe initialization in `server.js` used a hardcoded string (`"sk_test_placeholder"`) instead of retrieving the secret key securely from an environment variable.\n**Learning:** Relying on hardcoded placeholders for sensitive API keys increases the risk of developers accidentally committing real, live secrets if they overwrite the placeholder directly in the source file during testing or deployment.\n**Prevention:** Always instantiate third-party SDKs using environment variables (e.g., `process.env.STRIPE_SECRET_KEY`) to decouple credentials from the source code and prevent accidental exposure.
+
+## 2026-06-08 - Firestore Rules Privilege Escalation (IDOR)
+**Vulnerability:** The default `firestore.rules` for the `users` collection allowed `write: if request.auth.uid == userId`. This meant users had unrestricted ability to write *any* field to their profile document from the client side, including sensitive fields like `isAdmin`, `membershipLevel`, and `plan`.
+**Learning:** Using overly broad `allow write` rules in NoSQL databases inherently trusts the client payload, leading to mass assignment vulnerabilities and privilege escalation.
+**Prevention:** Always separate `write` into `create`, `update`, and `delete`. Use `request.resource.data.diff(resource.data).affectedKeys().hasAny([...])` on updates to explicitly restrict sensitive fields from client-side modification.
