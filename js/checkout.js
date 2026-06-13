@@ -5,7 +5,7 @@ import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://ww
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { products, productMap } from './shop.js';
+import { products, productMap } from './products.js';
 
 let currentUser = null;
 let userCart = {};
