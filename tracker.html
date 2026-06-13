@@ -640,11 +640,11 @@
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
-                        <input type="text" id="setupRole" placeholder="Shift Manager">
+                        <input type="text" id="setupRole" placeholder="Shift Manager" aria-label="Your Role">
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
-                        <select id="setupStore">
+                        <select id="setupStore" aria-label="Select Store or Brand">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
                             <option value="tacobell">Taco Bell</option>
@@ -711,7 +711,7 @@
                         <div id="routineContainer" class="grid sm:grid-cols-2 gap-4"></div>
                         <div class="mt-8 flex gap-3">
                             <input type="text" id="newRoutineTask" placeholder="Add custom daily task..."
-                                class="flex-1">
+                                class="flex-1" aria-label="Add custom daily task">
                             <button type="button" onclick="addRoutineTask()" class="btn btn-outline">Add</button>
                         </div>
                     </div>
