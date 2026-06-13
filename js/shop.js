@@ -149,6 +149,30 @@ async function handleRemoveFromCart(productId) {
     renderCart();
 }
 
+export async function toggleWishlist(productId) {
+    if (!currentUser) {
+        window.location.href = 'sign in beta.html';
+        return;
+    }
+
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    renderProducts();
+
+    // Dispatch a custom event so account.html can listen to updates if needed
+    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { wishlist } }));
+
+    try {
+        await saveWishlist();
+    } catch (error) {
+        console.error('Failed to update wishlist - Manager info:', error.message);
+    }
+}
+
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 let saveCartTimeout = null;
 let saveWishlistTimeout = null;
