@@ -9,3 +9,7 @@
 ## 2026-05-23 - Async Form Submission Loading States
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
+
+## 2024-05-24 - Tracker Component Accessibility
+**Learning:** Even when inputs are visually labelled via text in `<label>` tags above them (common with Tailwind grid layouts), or when they are generated dynamically via JavaScript (like in the `tracker.html` drawers, deposits, or inventory components), they are still invisible or confusing to screen readers without explicit `aria-label` or `for` attributes.
+**Action:** Always verify that every single `<input>`, regardless of visual presentation or dynamic generation, has an explicit accessibility label (e.g. `aria-label`). Do not assume visual layout equals accessibility context.
