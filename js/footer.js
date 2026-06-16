@@ -40,7 +40,7 @@ export function loadFooter() {
                     <h5>Stay in the Loop</h5>
                     <p>Sign up for news, announcements, and exclusive beta access.</p>
                     <form class="signup-form">
-                        <input type="email" placeholder="your.email@example.com" required>
+                        <input type="email" placeholder="your.email@example.com" required aria-label="Email Address">
                         <button type="submit">Sign Up</button>
                     </form>
                 </div>
