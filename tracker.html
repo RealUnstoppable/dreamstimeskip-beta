@@ -917,7 +917,7 @@
                             <input type="email" id="profEmail" readonly
                                 class="bg-slate-50 opacity-60 dark:bg-slate-800">
                             <input type="text" id="profPhone" placeholder="Phone">
-                            <button onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
+                            <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
                                 Changes</button>
                         </div>
                     </div>
@@ -1698,15 +1698,23 @@
 
         window.saveProfileToFirebase = function() {
             if(!currentUser) return;
-        function saveProfileToFirebase() {
-            if (!currentUser) return;
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
             const userDocRef = doc(db, 'users', currentUser.uid);
-            setDoc(userDocRef, data, { merge: true }).then(() => alert("Profile Updated!"));
+            setDoc(userDocRef, data, { merge: true })
+                .then(() => alert("Profile Updated!"))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                });
         }
 
         window.copyReferral = function() {
