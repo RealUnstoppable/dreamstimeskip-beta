@@ -19,11 +19,15 @@ onAuthStateChanged(auth, async (user) => {
         if (cachedProfile) {
             userData = JSON.parse(cachedProfile);
         } else {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                userData = userDoc.data();
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    userData = userDoc.data();
+                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                }
+            } catch (error) {
+                console.error("Manager info: Error fetching user profile during auth state change:", error);
             }
         }
 
