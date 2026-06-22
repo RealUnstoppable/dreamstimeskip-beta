@@ -328,46 +328,37 @@
             setupEventListeners();
         }
 
+
+        async function fetchCollectionData(collectionName, isMapWithId = true) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                if (isMapWithId) {
+                    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                } else {
+                    return snapshot.docs.map(d => d.data());
+                }
+            } catch (e) {
+                console.error("Manager info: Error fetching " + collectionName + ":", e);
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
                 // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
+                let users = await fetchCollectionData("users");
 
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
+                let carts = await fetchCollectionData("carts");
 
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
+                let orders = await fetchCollectionData("orders", false);
 
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                let subscribers = await fetchCollectionData("newsletterSubscribers", false);
 
                 // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
+                let bookings = await fetchCollectionData("bookings");
+                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
 
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                let quotes = await fetchCollectionData("quotes");
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -562,7 +553,19 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+
+                    // DOM Mutation instead of reload
+                    const btn = document.querySelector(`.admin-close-btn[data-id="${escapeHTML(ticketId)}"]`);
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge closed';
+                        badge.textContent = 'closed';
+
+                        // Update Action Cell
+                        const actionCell = row.querySelector('td:last-child');
+                        actionCell.innerHTML = `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -645,8 +648,27 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
-                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+
+                        // DOM Mutation instead of reload
+                        if (shouldBeBanned) {
+                            e.target.classList.replace('btn-ban', 'btn-unban');
+                            e.target.textContent = 'Unban';
+                            const badge = e.target.closest('tr').querySelector('.status-badge');
+                            badge.classList.replace('active', 'banned');
+                            badge.textContent = 'Banned';
+                        } else {
+                            e.target.classList.replace('btn-unban', 'btn-ban');
+                            e.target.textContent = 'Ban';
+                            const badge = e.target.closest('tr').querySelector('.status-badge');
+                            badge.classList.replace('banned', 'active');
+                            badge.textContent = 'Active';
+                        }
+                    } catch (error) {
+                        console.error("Manager info: Failed to toggle user ban status:", error);
+                        alert("Error updating user status: " + error.message);
+                    }
                 }
             });
             
@@ -658,7 +680,12 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+
+                        // DOM Mutation instead of reload
+                        const row = e.target.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge answered';
+                        badge.textContent = 'answered';
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -670,8 +697,19 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
-                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
+
+                        // DOM Mutation instead of reload
+                        const row = e.target.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge completed';
+                        badge.textContent = 'completed';
+                        e.target.remove(); // Remove the "Mark Complete" button
+                    } catch (error) {
+                        console.error("Manager info: Failed to mark feature request complete:", error);
+                        alert("Error updating feature request: " + error.message);
+                    }
                 }
             });
 
@@ -681,12 +719,26 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
-                if (action === 'cancel' && confirm("Cancel this booking?")) {
-                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
-                } else if (action === 'complete') {
-                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                try {
+                    if (action === 'cancel' && confirm("Cancel this booking?")) {
+                        await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                        const row = e.target.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge cancelled';
+                        badge.textContent = 'cancelled';
+                        row.querySelector('td:last-child').innerHTML = ''; // Remove actions
+                    } else if (action === 'complete') {
+                        await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                        const row = e.target.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge completed';
+                        badge.textContent = 'completed';
+                        row.querySelector('td:last-child').innerHTML = ''; // Remove actions
+                    }
+                } catch (error) {
+                    console.error("Manager info: Failed to update booking status:", error);
+                    alert("Error updating booking: " + error.message);
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +747,22 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
-                if (action === 'responded') {
-                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
-                } else if (action === 'delete' && confirm("Delete this quote request?")) {
-                    await deleteDoc(doc(db, "quotes", id));
+                try {
+                    if (action === 'responded') {
+                        await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                        const row = e.target.closest('tr');
+                        const badge = row.querySelector('.status-badge');
+                        badge.className = 'status-badge active';
+                        badge.textContent = 'responded';
+                        e.target.remove(); // Remove responded button
+                    } else if (action === 'delete' && confirm("Delete this quote request?")) {
+                        await deleteDoc(doc(db, "quotes", id));
+                        e.target.closest('tr').remove();
+                    }
+                } catch (error) {
+                    console.error("Manager info: Failed to update quote status:", error);
+                    alert("Error updating quote: " + error.message);
                 }
-                loadAdminData();
             });
 
             // Navigation
