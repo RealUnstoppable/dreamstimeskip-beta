@@ -657,7 +657,7 @@
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
-                <button onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
+                <button id="finishSetupBtn" onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
             </div>
         </div>
 
@@ -1197,10 +1197,20 @@
 
             if (!data.name) return alert("Name is required.");
 
+            const btn = document.getElementById('finishSetupBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Processing...';
+
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
+            }).catch(err => {
+                alert("Error saving setup: " + err.message);
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
             });
         }
 
