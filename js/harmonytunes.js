@@ -2238,6 +2238,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
+    let isDraggingQueueItem = false;
+
+    // Move global pointermove outside of renderQueue to prevent exponential memory leaks
+    document.addEventListener('pointermove', (e) => {
+        if (isDraggingQueueItem && dragItem) {
+            const queueContentArea = document.getElementById('queue-content-area');
+            if(!queueContentArea) return;
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2258,6 +2286,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
@@ -2277,13 +2307,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');
-                let isDragging = false;
+                let isDraggingLocal = false;
                 
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
-                    isDragging = false;
+                    isDraggingLocal = false;
+                    isDraggingQueueItem = false;
                     dragTimeout = setTimeout(() => {
-                        isDragging = true;
+                        isDraggingLocal = true;
+                        isDraggingQueueItem = true;
                         dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
@@ -2294,34 +2326,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 200); // 200ms hold to drag
                 });
                 
-                document.addEventListener('pointermove', (e) => {
-                    if (isDragging && dragItem === item) {
-                        const deltaY = e.clientY - dragStartY;
-                        item.style.transform = `translateY(${deltaY}px)`;
-
-                        // Visual Drop Indicator
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-                        
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i] === item) continue;
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                                if (e.clientY < rect.top + rect.height / 2) {
-                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                                } else {
-                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                                }
-                                break;
-                            }
-                        }
-                    }
-                });
-                
                 moreBtn.addEventListener('pointerup', (e) => {
                     if (dragTimeout) clearTimeout(dragTimeout);
-                    if (isDragging && dragItem === item) {
-                        isDragging = false;
+                    if (isDraggingLocal && dragItem === item) {
+                        isDraggingLocal = false;
+                        isDraggingQueueItem = false;
                         dragItem = null;
                         item.style.position = '';
                         item.style.zIndex = '';
@@ -2347,15 +2356,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             userQueue.splice(droppedIdx, 0, movedSong);
                         }
                         renderQueue();
-                    } else if (!isDragging) {
+                    } else if (!isDraggingLocal) {
                         // It was just a tap/click! Open context menu
                         openQueueContextMenu(e, song.id, idx);
                     }
                 });
             }
 
-            queueContentArea.appendChild(item);
+            fragment.appendChild(item);
         });
+        queueContentArea.appendChild(fragment);
     }
 
     // Queue Context Menu
