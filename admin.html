@@ -543,7 +543,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -558,7 +558,12 @@
             });
         }
 
-        window.closeSupportTicket = async function(ticketId) {
+        document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
+            const btn = e.target.closest('.admin-close-btn');
+            if (!btn) return;
+            const ticketId = btn.dataset.id;
+            if (!ticketId) return;
+
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
@@ -567,7 +572,7 @@
                     alert("Error closing ticket: " + error.message);
                 }
             }
-        };
+        });
 
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
