@@ -328,46 +328,36 @@
             setupEventListeners();
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                if (isMapWithId) {
+                    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                } else {
+                    return snapshot.docs.map(d => d.data());
+                }
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info:`, e.message);
+                if (collectionName === "feature_requests") {
+                    return null;
+                }
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
                 // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
-
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
-
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
-
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                const users = await fetchCollectionData("users", true);
+                const carts = await fetchCollectionData("carts", true);
+                const orders = await fetchCollectionData("orders", false);
+                const subscribers = await fetchCollectionData("newsletterSubscribers", false);
 
                 // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
+                const bookings = await fetchCollectionData("bookings", true);
+                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
 
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                const quotes = await fetchCollectionData("quotes", true);
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -388,13 +378,11 @@
                 renderQuotesTable(quotes);
                 
                 // Fetch Feature Requests
-                try {
-                    const featureRequestsSnapshot = await getDocs(collection(db, "feature_requests"));
-                    const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                    renderFeatureRequestsTable(requests);
-                } catch (frError) {
-                    console.log("Could not load feature requests. Missing Firestore rules?", frError);
+                const requests = await fetchCollectionData("feature_requests", true);
+                if (requests === null) {
                     document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                } else {
+                    renderFeatureRequestsTable(requests);
                 }
                 
                 // Download Stats
@@ -562,7 +550,18 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    // ⚡ Bolt: Targeted DOM mutation to avoid full-page re-render
+                    const closeBtn = document.querySelector(`.admin-close-btn[data-id="${ticketId}"]`);
+                    if (closeBtn) {
+                        const tr = closeBtn.closest('tr');
+                        const statusBadge = tr.querySelector('td:nth-child(4)');
+                        if (statusBadge) statusBadge.innerHTML = `<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>`;
+
+                        const replyBtn = tr.querySelector('.admin-reply-btn');
+                        if (replyBtn) replyBtn.remove();
+
+                        closeBtn.outerHTML = `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -646,7 +645,18 @@
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    // ⚡ Bolt: Targeted DOM mutation
+                    const tr = e.target.closest('tr');
+                    const statusTd = tr.querySelector('td:nth-child(4)');
+                    if (shouldBeBanned) {
+                        statusTd.innerHTML = `<span class="status-badge banned">Banned</span>`;
+                        e.target.textContent = 'Unban';
+                        e.target.classList.replace('btn-ban', 'btn-unban');
+                    } else {
+                        statusTd.innerHTML = `<span class="status-badge active">Active</span>`;
+                        e.target.textContent = 'Ban';
+                        e.target.classList.replace('btn-unban', 'btn-ban');
+                    }
                 }
             });
             
@@ -658,7 +668,10 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        // ⚡ Bolt: Targeted DOM mutation
+                        const tr = e.target.closest('tr');
+                        const statusBadge = tr.querySelector('td:nth-child(4)');
+                        if (statusBadge) statusBadge.innerHTML = `<span style="color: var(--accent-green); text-transform: uppercase;">answered</span>`;
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -671,7 +684,11 @@
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    // ⚡ Bolt: Targeted DOM mutation
+                    const tr = e.target.closest('tr');
+                    const statusTd = tr.querySelector('td:nth-child(5)');
+                    if (statusTd) statusTd.innerHTML = `<span class="status-badge active">completed</span>`;
+                    e.target.remove();
                 }
             });
 
@@ -681,12 +698,21 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+
+                const tr = btn.closest('tr');
+                const statusTd = tr.querySelector('td:nth-child(5)');
+
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    // ⚡ Bolt: Targeted DOM mutation
+                    if (statusTd) statusTd.innerHTML = `<span class="status-badge cancelled">cancelled</span>`;
+                    tr.querySelectorAll('.action-btn').forEach(b => b.remove());
                 } else if (action === 'complete') {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    // ⚡ Bolt: Targeted DOM mutation
+                    if (statusTd) statusTd.innerHTML = `<span class="status-badge active">completed</span>`;
+                    btn.remove();
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +721,20 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+
+                const tr = btn.closest('tr');
+
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    // ⚡ Bolt: Targeted DOM mutation
+                    const statusTd = tr.querySelector('td:nth-child(3)');
+                    if (statusTd) statusTd.innerHTML = `<span class="status-badge active">responded</span>`;
+                    btn.remove();
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    // ⚡ Bolt: Targeted DOM mutation
+                    tr.remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
