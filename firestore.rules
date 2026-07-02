@@ -4,7 +4,16 @@ service cloud.firestore {
 
     // Users collection: Users can only read/write their own profile
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId
+                    && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
+                    && (!('isBanned' in request.resource.data) || request.resource.data.isBanned == false)
+                    && (!('plan' in request.resource.data) || request.resource.data.plan == 'free' || request.resource.data.plan == '')
+                    && (!('membershipLevel' in request.resource.data) || request.resource.data.membershipLevel == 'free' || request.resource.data.membershipLevel == '')
+                    && (!('subscription' in request.resource.data));
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'plan', 'membershipLevel', 'subscription']);
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     // Carts collection: Users can only read/write their own cart
