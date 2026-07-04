@@ -93,31 +93,41 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await admin.firestore().collection("users").doc(uid).set({
-        plan: planName, // Updates the frontend to unlock pro features
-        subscription: {
-          status: "active",
-          customerId: session.customer,
-        },
-      }, {merge: true});
+      try {
+        await admin.firestore().collection("users").doc(uid).set({
+          plan: planName, // Updates the frontend to unlock pro features
+          subscription: {
+            status: "active",
+            customerId: session.customer,
+          },
+        }, {merge: true});
+      } catch (err) {
+        console.error("Webhook Update Error - Manager info:", err.message);
+        return res.status(500).json({error: "Database update failed"});
+      }
     }
   }
 
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object;
 
-    const snapshot = await admin.firestore()
-        .collection("users")
-        .where("subscription.customerId", "==", sub.customer)
-        .get();
+    try {
+      const snapshot = await admin.firestore()
+          .collection("users")
+          .where("subscription.customerId", "==", sub.customer)
+          .get();
 
-    const updates = snapshot.docs.map((doc) =>
-      doc.ref.update({
-        "plan": "free",
-        "subscription.status": "canceled",
-      }),
-    );
-    await Promise.all(updates);
+      const updates = snapshot.docs.map((doc) =>
+        doc.ref.update({
+          "plan": "free",
+          "subscription.status": "canceled",
+        }),
+      );
+      await Promise.all(updates);
+    } catch (err) {
+      console.error("Webhook Update Error - Manager info:", err.message);
+      return res.status(500).json({error: "Database update failed"});
+    }
   }
 
   res.json({received: true});
