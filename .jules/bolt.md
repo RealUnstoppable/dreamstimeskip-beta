@@ -22,3 +22,7 @@
 ## 2024-05-27 - Caching Shared Profile Data with sessionStorage
 **Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
 **Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
+
+## 2024-07-05 - Global Event Listeners in Render Loops
+**Learning:** Attaching global `document` event listeners (e.g., `pointermove`) inside a list rendering loop (e.g., `renderQueue()`) causes exponential memory leaks because listeners are added every render without being cleaned up.
+**Action:** Attach global event listeners once in the outer scope, using global state variables and event delegation to track context instead of relying on loop closures.
