@@ -9,3 +9,7 @@
 ## 2026-05-23 - Async Form Submission Loading States
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
+
+## 2026-05-25 - Form Accessibility
+**Learning:** Found several input fields in HTML files (like `tracker.html`, `checkout-premium.html`, `checkout-ultimate.html`, `harmonytunes.html`, `uds.html`) that used `placeholder` attributes as their only accessible name without explicit `<label>` elements or `aria-label` attributes. This practice makes it difficult for screen reader users to identify the purpose of the input fields, especially if the placeholder text disappears when the user starts typing.
+**Action:** When auditing forms, ensure every input element either has a visually hidden or visible `<label>` element properly bound using the `for` attribute, or an explicit `aria-label` attribute if a label element is not feasible. Do not rely solely on placeholder text for accessibility.

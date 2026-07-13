@@ -631,19 +631,19 @@
 
                 <div class="grid md:grid-cols-2 gap-6 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <label for="setupName" class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                         <input type="text" id="setupName" placeholder="Catalin Andrian">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
+                        <label for="setupPhone" class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
                         <input type="text" id="setupPhone" placeholder="(555) 000-0000">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
+                        <label for="setupRole" class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
                         <input type="text" id="setupRole" placeholder="Shift Manager">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
+                        <label for="setupStore" class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
                         <select id="setupStore">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
@@ -653,7 +653,7 @@
                         </select>
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
+                        <label for="setupLocation" class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
@@ -680,20 +680,20 @@
                 <form id="trackerForm" class="space-y-8">
                     <div class="card grid md:grid-cols-3 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
+                            <label for="shiftManager" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
                                 Manager</label>
                             <input type="text" id="shiftManager" placeholder="Enter Name">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
+                            <label for="shiftDate" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
                                 Time</label>
                             <div class="flex gap-2">
                                 <input type="date" id="shiftDate">
-                                <input type="time" id="shiftTime">
+                                <input type="time" id="shiftTime" aria-label="Shift Time">
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
+                            <label for="timerBtn" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
                                 Control</label>
                             <div class="flex gap-2 items-center">
                                 <button type="button" id="timerBtn" onclick="toggleShiftTimer()"
