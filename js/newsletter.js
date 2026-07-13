@@ -6,7 +6,6 @@ const firestore = isTest
     : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
 
 const { doc, setDoc, serverTimestamp } = firestore;
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Use event delegation to catch submissions from dynamically loaded footers
 document.addEventListener('submit', async (e) => {
@@ -17,15 +16,12 @@ document.addEventListener('submit', async (e) => {
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
         const email = emailInput.value.trim();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
 
-                    // Show a success message
-                    alert("You've successfully subscribed to the newsletter!");
-                    emailInput.value = ''; // Clear the input
-                } catch (error) {
-                    console.error("Error submitting email:", error);
-                    alert("There was an error subscribing. Please try again later.");
-                }
-            }
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+
         try {
             // Save to Firestore
             await setDoc(doc(db, "newsletter_subscribers", email), {
@@ -38,6 +34,9 @@ document.addEventListener('submit', async (e) => {
         } catch (error) {
             console.error("Error submitting email:", error);
             alert("There was an error subscribing. Please try again later.");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
     }
 });
