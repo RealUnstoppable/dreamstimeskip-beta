@@ -1184,6 +1184,11 @@
 
         window.completeSetup = function() {
             if (!currentUser) return;
+            const btn = document.querySelector('#view-setup button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
             const data = {
                 name: document.getElementById('setupName').value,
                 phone: document.getElementById('setupPhone').value,
@@ -1195,12 +1200,19 @@
                 signupDate: serverTimestamp()
             };
 
-            if (!data.name) return alert("Name is required.");
+            if (!data.name) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return alert("Name is required.");
+            }
 
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
+            }).finally(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
             });
         }
 
