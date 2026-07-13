@@ -20,6 +20,12 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
+    match /product_reviews/{reviewId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
     // Support tickets collection
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
