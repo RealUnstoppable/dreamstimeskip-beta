@@ -23,6 +23,7 @@
                     <li><a href="index.html">&#8592; Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#wishlist" class="nav-link">My Wishlist</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
                     <li><a href="#support" class="nav-link">Support</a></li>
@@ -45,6 +46,16 @@
                 <div class="card">
                     <h4>Recent Purchases</h4>
                     <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                </div>
+            </section>
+
+            <section id="wishlist" class="content-section">
+                <h3>My Wishlist</h3>
+                <div class="card">
+                    <h4>Saved Items</h4>
+                    <div id="wishlist-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                        <p style="color: var(--text-secondary);">Loading your wishlist...</p>
+                    </div>
                 </div>
             </section>
 
@@ -141,6 +152,8 @@
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
+        import { products, productMap } from './js/products.js';
+        import { toggleWishlist, handleAddToCart, wishlist } from './js/shop.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -231,9 +244,67 @@
             }[tag]));
         }
 
+        async function loadUserWishlist(userId) {
+            const container = document.getElementById('wishlist-container');
+            try {
+                const userWishlistRef = doc(db, 'wishlists', userId);
+                const wishlistSnap = await getDoc(userWishlistRef);
+                let savedItems = [];
+
+                if (wishlistSnap.exists() && wishlistSnap.data().items) {
+                    savedItems = wishlistSnap.data().items;
+                }
+
+                if (savedItems.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty.</p>';
+                    return;
+                }
+
+                let html = '';
+                savedItems.forEach(productId => {
+                    const product = productMap.get(productId);
+                    if (product) {
+                        html += `
+                            <div class="wishlist-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 10px 0;">
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="${product.imageUrl}" alt="${product.name}" style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover;">
+                                    <div>
+                                        <h5 style="margin: 0; font-size: 1em;">${product.name}</h5>
+                                        <span style="color: var(--text-secondary);">$${product.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px;">
+                                    <button class="cta-button" style="padding: 5px 15px; font-size: 0.85em;" onclick="handleWishlistAddToCart('${product.id}')">Add to Cart</button>
+                                    <button class="remove-wishlist-btn" style="background: none; border: 1px solid var(--accent-red); color: var(--accent-red); padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 0.85em;" onclick="handleRemoveFromWishlist('${product.id}', '${userId}')">Remove</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load wishlist.</p>';
+                console.error("Error loading wishlist:", error);
+            }
+        }
+
+        // Make functions globally available for inline event handlers
+        window.handleRemoveFromWishlist = async (productId, userId) => {
+            if (confirm("Remove this item from your wishlist?")) {
+                await toggleWishlist(productId);
+                await loadUserWishlist(userId);
+            }
+        };
+
+        window.handleWishlistAddToCart = async (productId) => {
+            await handleAddToCart(productId);
+            alert("Item added to cart!");
+        };
+
         function initializePage(user, userData) {
             document.getElementById('loading-spinner').style.display = 'none';
             loadUserTickets(user.uid);
+            loadUserWishlist(user.uid);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
