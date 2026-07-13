@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { fetchCollectionData } from '/js/utils.js';
 
         let performanceChart;
 
@@ -331,43 +332,17 @@
         async function loadAdminData() {
             try {
                 // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
-
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
-
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
-
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                let users = await fetchCollectionData(db, "users", true);
+                let carts = await fetchCollectionData(db, "carts", true);
+                let orders = await fetchCollectionData(db, "orders", false);
+                let subscribers = await fetchCollectionData(db, "newsletterSubscribers", false);
 
                 // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                let bookings = await fetchCollectionData(db, "bookings", true);
+                if (bookings.length > 0) {
                     bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
-
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                }
+                let quotes = await fetchCollectionData(db, "quotes", true);
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -562,7 +537,16 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const btn = document.querySelector(`button[onclick="window.closeSupportTicket('${ticketId}')"]`);
+                    if (btn) {
+                        const row = btn.closest('tr');
+                        if (row) {
+                            const statusTd = row.children[3];
+                            if (statusTd) statusTd.innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
+                            const actionTd = row.children[4];
+                            if (actionTd) actionTd.innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
+                        }
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -645,8 +629,21 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
+                  try {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.className = `status-badge ${shouldBeBanned ? 'banned' : 'active'}`;
+                            statusBadge.textContent = shouldBeBanned ? 'Banned' : 'Active';
+                        }
+                        e.target.className = `btn-sm ${shouldBeBanned ? 'btn-unban' : 'btn-ban'}`;
+                        e.target.textContent = shouldBeBanned ? 'Unban' : 'Ban';
+                    }
+                  } catch(error) {
+                      alert("Error updating user status. Manager info: " + error.message);
+                  }
                 }
             });
             
@@ -658,7 +655,11 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        const row = e.target.closest('tr');
+                        if (row) {
+                            const statusTd = row.children[3];
+                            if (statusTd) statusTd.innerHTML = '<span style="color: var(--accent-green); text-transform: uppercase;">answered</span>';
+                        }
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -670,8 +671,17 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
+                  try {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    const row = e.target.closest('tr');
+                    if (row) {
+                        const statusTd = row.children[4];
+                        if (statusTd) statusTd.innerHTML = '<span style="color:var(--accent-green);">Completed</span>';
+                        e.target.outerHTML = '<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>';
+                    }
+                  } catch(error) {
+                      alert("Error completing request. Manager info: " + error.message);
+                  }
                 }
             });
 
@@ -682,11 +692,34 @@
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    const row = btn.closest('tr');
+                    if (row) {
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.className = 'status-badge cancelled';
+                            statusBadge.textContent = 'Cancelled';
+                        }
+                    }
+                  } catch(error) {
+                      alert("Error cancelling booking. Manager info: " + error.message);
+                  }
                 } else if (action === 'complete') {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    const row = btn.closest('tr');
+                    if (row) {
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.className = 'status-badge active';
+                            statusBadge.textContent = 'Completed';
+                        }
+                    }
+                  } catch(error) {
+                      alert("Error completing booking. Manager info: " + error.message);
+                  }
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -697,10 +730,19 @@
                 const id = btn.dataset.id;
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    const row = btn.closest('tr');
+                    if (row) {
+                        const statusBadge = row.querySelector('.status-badge');
+                        if (statusBadge) {
+                            statusBadge.className = 'status-badge active';
+                            statusBadge.textContent = 'Responded';
+                        }
+                    }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    const row = btn.closest('tr');
+                    if (row) row.remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
