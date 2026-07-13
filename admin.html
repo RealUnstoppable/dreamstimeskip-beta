@@ -641,10 +641,14 @@
         function setupEventListeners() {
             // User Ban Toggle
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
-                const userId = e.target.dataset.id;
+                const btn = e.target;
+                const userId = btn.dataset.id;
                 if (!userId) return;
-                const shouldBeBanned = e.target.classList.contains('btn-ban');
+                const shouldBeBanned = btn.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
                     loadAdminData();
                 }
@@ -652,24 +656,34 @@
             
             // Support Tickets Reply Toggle
             document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
-                const reqId = e.target.dataset.id;
-                if (!reqId || !e.target.classList.contains('admin-reply-btn')) return;
+                const btn = e.target;
+                const reqId = btn.dataset.id;
+                if (!reqId || !btn.classList.contains('admin-reply-btn')) return;
                 const reply = prompt("Enter your reply to the user:");
                 if (reply !== null && reply.trim() !== "") {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     try {
                         await replyToTicket(reqId, reply, 'answered');
                         loadAdminData();
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
                 }
             });
 
             // Feature Request Complete Toggle
             document.getElementById('feature-request-list-body').addEventListener('click', async (e) => {
-                const reqId = e.target.dataset.id;
-                if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
+                const btn = e.target;
+                const reqId = btn.dataset.id;
+                if (!reqId || !btn.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
                     loadAdminData();
                 }
@@ -682,8 +696,14 @@
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
                 } else if (action === 'complete') {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
                 }
                 loadAdminData();
@@ -696,8 +716,14 @@
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'responded') {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await deleteDoc(doc(db, "quotes", id));
                 }
                 loadAdminData();
