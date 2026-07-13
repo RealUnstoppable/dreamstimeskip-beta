@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
+import { submitReview, getProductReviews, getAverageRating } from './review-service.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
@@ -56,10 +57,22 @@ const cartTotalPriceEl = document.getElementById('cart-total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
 const navCtaContainer = document.getElementById('nav-cta-container');
 
+// Review DOM Elements
+const reviewsModal = document.getElementById('reviews-modal');
+const closeReviewsBtn = document.getElementById('close-reviews-btn');
+const reviewsList = document.getElementById('reviews-list');
+const reviewFormContainer = document.getElementById('review-form-container');
+const reviewForm = document.getElementById('review-form');
+const reviewStatusMessage = document.getElementById('review-status-message');
+const submitReviewBtn = document.getElementById('submit-review-btn');
+const reviewLoginPrompt = document.getElementById('review-login-prompt');
+let currentReviewProductId = null;
+
 
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
     if (!productGrid) return;
+
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
@@ -73,15 +86,36 @@ function renderProducts() {
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
                 <div class="product-info">
                     <h3>${product.name}</h3>
+                    <div class="product-rating" id="rating-${product.id}">
+                        <span class="star-display">★</span> Loading...
+                    </div>
                     <p>${product.description}</p>
                     <div class="product-footer">
                         <span class="product-price">$${product.price.toFixed(2)}</span>
                         <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                     </div>
+                    <button class="view-reviews-btn" data-id="${product.id}" style="width: 100%; margin-top: 10px; background: none; border: 1px solid var(--accent-blue); color: var(--accent-blue); padding: 8px; border-radius: 8px; cursor: pointer;">View Reviews</button>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Fetch and update ratings asynchronously without blocking UI render
+    updateAllProductRatings();
+}
+
+async function updateAllProductRatings() {
+    for (const product of products) {
+        updateProductRatingDisplay(product.id);
+    }
+}
+
+async function updateProductRatingDisplay(productId) {
+    const ratingEl = document.getElementById(`rating-${productId}`);
+    if (ratingEl) {
+        const ratingInfo = await getAverageRating(productId);
+        ratingEl.innerHTML = `<span class="star-display">★</span> ${ratingInfo.average} (${ratingInfo.count} reviews)`;
+    }
 }
 
 function renderCart() {
@@ -185,25 +219,6 @@ async function saveCart() {
     // Always update local cache immediately
     if (!currentUser) {
         localStorage.setItem('localCart', JSON.stringify(cart));
-    } else {
-        // Debounce Firestore writes for authenticated users
-        saveCartTimeout = setTimeout(async () => {
-    saveCartTimeout = setTimeout(async () => {
-        if (currentUser) {
-            try {
-                const userCartRef = doc(db, 'carts', currentUser.uid);
-                await setDoc(userCartRef, { items: cart });
-            } catch (error) {
-                console.error("Error saving cart to Firestore:", error);
-            }
-        }, 500); // 500ms debounce
-        } else {
-            // Save cart to localStorage for logged-out users
-            localStorage.setItem('localCart', JSON.stringify(cart));
-        }
-    }, 500); // Wait 500ms before committing to backend
-    if (saveCartTimeout) {
-        clearTimeout(saveCartTimeout);
     }
 
     return new Promise((resolve) => {
@@ -217,7 +232,7 @@ async function saveCart() {
                     console.error("Error saving cart to Firestore:", error);
                 }
             } else {
-                // **MODIFIED**: Save cart to localStorage for logged-out users
+                // Save cart to localStorage for logged-out users
                 localStorage.setItem('localCart', JSON.stringify(cart));
             }
             // Resolve all promises that were waiting for this debounce cycle
@@ -246,19 +261,30 @@ function setupEventListeners() {
             if (e.target.classList.contains('add-to-cart-btn')) {
                 const productId = e.target.dataset.id;
                 handleAddToCart(productId);
+            } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
+                const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
+                const productId = btn.dataset.id;
+                toggleWishlist(productId);
+            } else if (e.target.classList.contains('view-reviews-btn')) {
+                const productId = e.target.dataset.id;
+                openReviewsModal(productId);
             }
         });
     }
-    productGrid.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-to-cart-btn')) {
-            const productId = e.target.dataset.id;
-            handleAddToCart(productId);
-        } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
-            const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
-            const productId = btn.dataset.id;
-            toggleWishlist(productId);
-        }
-    });
+
+    // Reviews modal listeners
+    if (reviewsModal && closeReviewsBtn) {
+        closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === reviewsModal) {
+                reviewsModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', handleReviewSubmit);
+    }
 
     // Cart modal listeners
     if (cartButton && cartModal && closeCartBtn) {
@@ -296,6 +322,90 @@ function setupEventListeners() {
     }
 }
 
+
+// --- REVIEW LOGIC ---
+async function openReviewsModal(productId) {
+    if (!reviewsModal) return;
+
+    currentReviewProductId = productId;
+    const product = productMap.get(productId);
+    document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
+
+    reviewsModal.style.display = 'block';
+    reviewsList.innerHTML = '<div style="text-align: center; padding: 20px;">Loading reviews...</div>';
+
+    if (currentUser) {
+        reviewFormContainer.style.display = 'block';
+        reviewLoginPrompt.style.display = 'none';
+    } else {
+        reviewFormContainer.style.display = 'none';
+        reviewLoginPrompt.style.display = 'block';
+    }
+
+    const reviews = await getProductReviews(productId);
+
+    if (reviews.length === 0) {
+        reviewsList.innerHTML = '<p class="empty-cart-message">No reviews yet. Be the first to review!</p>';
+    } else {
+        reviewsList.innerHTML = reviews.map(review => `
+            <div class="review-item">
+                <div class="review-header">
+                    <strong>${escapeHTML(review.userEmail.split('@')[0])}</strong>
+                    <span class="review-date">${review.createdAtDate}</span>
+                </div>
+                <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                <p class="review-text">${escapeHTML(review.reviewText)}</p>
+            </div>
+        `).join('');
+    }
+}
+
+// Make accessible to testing via window
+window.openReviewsModal = openReviewsModal;
+
+
+async function handleReviewSubmit(e) {
+    e.preventDefault();
+    if (!currentUser || !currentReviewProductId) return;
+
+    const ratingInput = document.querySelector('input[name="rating"]:checked');
+    const reviewText = document.getElementById('review-text').value;
+
+    if (!ratingInput || !reviewText.trim()) {
+        reviewStatusMessage.textContent = 'Please provide both a rating and a review.';
+        reviewStatusMessage.style.color = 'red';
+        return;
+    }
+
+    const rating = parseInt(ratingInput.value, 10);
+    submitReviewBtn.disabled = true;
+    submitReviewBtn.textContent = 'Submitting...';
+    reviewStatusMessage.textContent = '';
+
+    try {
+        const result = await submitReview(currentReviewProductId, currentUser.uid, currentUser.email, rating, reviewText.trim());
+
+        if (result.success) {
+            reviewStatusMessage.textContent = 'Review submitted successfully!';
+            reviewStatusMessage.style.color = 'green';
+            reviewForm.reset();
+            // Refresh reviews list
+            await openReviewsModal(currentReviewProductId);
+            // Refresh specific product rating without full re-render
+            updateProductRatingDisplay(currentReviewProductId);
+        } else {
+            reviewStatusMessage.textContent = result.error || 'Failed to submit review.';
+            reviewStatusMessage.style.color = 'red';
+        }
+    } catch (error) {
+        console.error('Submit review error:', error);
+        reviewStatusMessage.textContent = 'An error occurred. Please try again.';
+        reviewStatusMessage.style.color = 'red';
+    } finally {
+        submitReviewBtn.disabled = false;
+        submitReviewBtn.textContent = 'Submit Review';
+    }
+}
 
 // --- INITIALIZATION ---
 renderProducts();

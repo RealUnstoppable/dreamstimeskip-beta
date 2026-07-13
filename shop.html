@@ -34,6 +34,42 @@
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
 
+    <!-- Reviews Modal -->
+    <div id="reviews-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-modal-header">
+                <h2 id="reviews-modal-title">Product Reviews</h2>
+                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews">&times;</button>
+            </div>
+
+            <div class="reviews-container">
+                <div id="reviews-list" class="reviews-list">
+                    <!-- Reviews will be loaded here dynamically -->
+                    <div style="text-align: center; padding: 20px;">Loading reviews...</div>
+                </div>
+
+                <div class="review-form-container" id="review-form-container">
+                    <h3>Write a Review</h3>
+                    <form id="review-form">
+                        <div class="star-rating-input">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3">★</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2">★</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1">★</label>
+                        </div>
+                        <textarea id="review-text" rows="4" placeholder="Tell others what you think about this product..." required></textarea>
+                        <button type="submit" id="submit-review-btn" class="btn-checkout">Submit Review</button>
+                    </form>
+                    <p id="review-status-message"></p>
+                </div>
+                <div id="review-login-prompt" style="display: none; text-align: center; margin-top: 20px;">
+                    <p>Please <a href="sign in beta.html">log in</a> to leave a review.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="cart-modal" class="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-modal-header">

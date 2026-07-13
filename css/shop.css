@@ -337,4 +337,103 @@
     padding: 40px 0;
 }
 
+/* Reviews Modal specific styles */
+.reviews-container {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.reviews-list {
+    margin-bottom: 20px;
+}
+
+.review-item {
+    background-color: var(--secondary-card-color, #1A1A1A);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.review-rating {
+    color: #FFD700;
+    margin-bottom: 10px;
+}
+
+.review-text {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.review-form-container {
+    background-color: var(--primary-card-color);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-top: 20px;
+}
+
+.review-form-container h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.star-rating-input {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.star-rating-input input {
+    display: none;
+}
+
+.star-rating-input label {
+    font-size: 2rem;
+    color: #ccc;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.star-rating-input label:hover,
+.star-rating-input label:hover ~ label,
+.star-rating-input input:checked ~ label {
+    color: #FFD700;
+}
+
+#review-text {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 15px;
+}
+
+.star-display {
+    color: #FFD700;
+}
+
+.product-rating {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
 /* --- End of shop.css --- */
