@@ -27,9 +27,23 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error creating ticket:', error);
+        console.error('Error creating ticket - Manager info:', error.message || error);
         throw error;
     }
+}
+
+async function fetchAndSortTickets(q) {
+    const querySnapshot = await getDocs(q);
+    const tickets = [];
+    querySnapshot.forEach((doc) => {
+        tickets.push({ id: doc.id, ...doc.data() });
+    });
+
+    return tickets.sort((a, b) => {
+         const timeA = a.createdAt?.toMillis() || 0;
+         const timeB = b.createdAt?.toMillis() || 0;
+         return timeB - timeA;
+    });
 }
 
 /**
@@ -46,20 +60,9 @@ export async function getUserTickets(userId) {
             // Note: orderBy requires a composite index if used with where.
             // If the index doesn't exist, this might fail, so we fetch and sort client-side.
         );
-        const querySnapshot = await getDocs(q);
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
-
-        // Sort descending by createdAt locally to avoid composite index requirement
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
+        return await fetchAndSortTickets(q);
     } catch (error) {
-        console.error('Error fetching user tickets:', error);
+        console.error('Error fetching user tickets - Manager info:', error.message || error);
         throw error;
     }
 }
@@ -69,20 +72,9 @@ export async function getUserTickets(userId) {
  */
 export async function getAllTickets() {
     try {
-        const querySnapshot = await getDocs(collection(db, TICKETS_COLLECTION));
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
-
-        // Sort descending by createdAt
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
+        return await fetchAndSortTickets(collection(db, TICKETS_COLLECTION));
     } catch (error) {
-        console.error('Error fetching all tickets:', error);
+        console.error('Error fetching all tickets - Manager info:', error.message || error);
         throw error;
     }
 }
@@ -107,7 +99,7 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
         });
         return { success: true };
     } catch (error) {
-        console.error('Error replying to ticket:', error);
+        console.error('Error replying to ticket - Manager info:', error.message || error);
         throw error;
     }
 }

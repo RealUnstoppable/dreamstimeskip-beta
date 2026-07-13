@@ -543,7 +543,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}', this)">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -558,11 +558,17 @@
             });
         }
 
-        window.closeSupportTicket = async function(ticketId) {
+        window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    if (btnElement) {
+                        const row = btnElement.closest('tr');
+                        const statusBadgeSpan = row.cells[3].querySelector('span');
+                        statusBadgeSpan.style.color = 'var(--text-secondary)';
+                        statusBadgeSpan.textContent = 'CLOSED';
+                        row.cells[4].innerHTML = `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -645,8 +651,29 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
-                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                        if (shouldBeBanned) {
+                            e.target.classList.remove('btn-ban');
+                            e.target.classList.add('btn-unban');
+                            e.target.textContent = 'Unban';
+                            const badge = e.target.closest('tr').querySelector('.status-badge');
+                            badge.classList.remove('active');
+                            badge.classList.add('banned');
+                            badge.textContent = 'Banned';
+                        } else {
+                            e.target.classList.remove('btn-unban');
+                            e.target.classList.add('btn-ban');
+                            e.target.textContent = 'Ban';
+                            const badge = e.target.closest('tr').querySelector('.status-badge');
+                            badge.classList.remove('banned');
+                            badge.classList.add('active');
+                            badge.textContent = 'Active';
+                        }
+                    } catch (error) {
+                        console.error("Error updating user status - Manager info:", error.message || error);
+                        alert("Failed to update user status.");
+                    }
                 }
             });
             
@@ -658,7 +685,10 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        const row = e.target.closest('tr');
+                        const statusBadgeSpan = row.cells[3].querySelector('span');
+                        statusBadgeSpan.style.color = 'var(--accent-green)';
+                        statusBadgeSpan.textContent = 'ANSWERED';
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -670,8 +700,15 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
-                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
+                    e.target.closest('td').innerHTML = `<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>`;
+                    const statusTd = e.target.closest('tr').cells[4];
+                    statusTd.innerHTML = `<span style="color:var(--accent-green);">Completed</span>`;
+                    } catch (error) {
+                        console.error("Error marking feature request complete - Manager info:", error.message || error);
+                        alert("Failed to update feature request.");
+                    }
                 }
             });
 
@@ -682,11 +719,30 @@
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
-                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    try {
+                        await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    const badge = btn.closest('tr').querySelector('.status-badge');
+                    badge.classList.remove('pending', 'active');
+                    badge.classList.add('cancelled');
+                    badge.textContent = 'Cancelled';
+                    btn.closest('td').innerHTML = ''; // Remove actions
+                    } catch (error) {
+                        console.error("Error cancelling booking - Manager info:", error.message || error);
+                        alert("Failed to cancel booking.");
+                    }
                 } else if (action === 'complete') {
-                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    try {
+                        await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    const badge = btn.closest('tr').querySelector('.status-badge');
+                    badge.classList.remove('pending', 'cancelled');
+                    badge.classList.add('active');
+                    badge.textContent = 'Completed';
+                    btn.closest('td').innerHTML = ''; // Remove actions
+                    } catch (error) {
+                        console.error("Error completing booking - Manager info:", error.message || error);
+                        alert("Failed to complete booking.");
+                    }
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -696,11 +752,26 @@
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'responded') {
-                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    try {
+                        await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    const badge = btn.closest('tr').querySelector('.status-badge');
+                    badge.classList.remove('pending');
+                    badge.classList.add('active');
+                    badge.textContent = 'Responded';
+                    btn.remove(); // Remove "Mark Responded" button
+                    } catch (error) {
+                        console.error("Error marking quote responded - Manager info:", error.message || error);
+                        alert("Failed to update quote status.");
+                    }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
-                    await deleteDoc(doc(db, "quotes", id));
+                    try {
+                        await deleteDoc(doc(db, "quotes", id));
+                    btn.closest('tr').remove();
+                    } catch (error) {
+                        console.error("Error deleting quote - Manager info:", error.message || error);
+                        alert("Failed to delete quote.");
+                    }
                 }
-                loadAdminData();
             });
 
             // Navigation
