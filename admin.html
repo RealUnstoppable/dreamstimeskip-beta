@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { escapeHTML } from '/js/utils.js';
 
         let performanceChart;
 
@@ -309,18 +310,6 @@
                 }
             }
         });
-
-        function escapeHTML(str) {
-            if (str == null) return "";
-            if (typeof str !== 'string') str = str.toString();
-            if (typeof str !== 'string') str = String(str);
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
 
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
@@ -543,7 +532,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}', this)">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -558,11 +547,13 @@
             });
         }
 
-        window.closeSupportTicket = async function(ticketId) {
+        window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const row = btnElement.closest('tr');
+                    row.children[3].innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
+                    row.children[4].innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -646,7 +637,16 @@
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    const row = e.target.closest('tr');
+                    const statusTd = row.children[4];
+                    const actionTd = row.children[5];
+                    if (shouldBeBanned) {
+                        statusTd.innerHTML = '<span class="status-badge banned">Banned</span>';
+                        actionTd.innerHTML = `<button class="btn-sm btn-unban" data-id="${escapeHTML(userId)}">Unban</button>`;
+                    } else {
+                        statusTd.innerHTML = '<span class="status-badge active">Active</span>';
+                        actionTd.innerHTML = `<button class="btn-sm btn-ban" data-id="${escapeHTML(userId)}">Ban</button>`;
+                    }
                 }
             });
             
@@ -658,7 +658,10 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        const row = e.target.closest('tr');
+                        const statusTd = row.children[3];
+                        statusTd.innerHTML = '<span style="color: var(--accent-green); text-transform: uppercase;">answered</span>';
+                        e.target.remove();
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -671,7 +674,9 @@
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    const row = e.target.closest('tr');
+                    row.children[4].innerHTML = '<span style="color:var(--accent-green);">Completed</span>';
+                    row.children[5].innerHTML = '<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>';
                 }
             });
 
@@ -681,12 +686,16 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const row = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    row.children[4].innerHTML = '<span class="status-badge cancelled">cancelled</span>';
+                    row.children[5].innerHTML = '';
                 } else if (action === 'complete') {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    row.children[4].innerHTML = '<span class="status-badge active">completed</span>';
+                    row.children[5].innerHTML = '';
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +704,15 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const row = btn.closest('tr');
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    row.children[2].innerHTML = '<span class="status-badge active">responded</span>';
+                    btn.remove();
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    row.remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
