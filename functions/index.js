@@ -22,8 +22,8 @@ async function authenticateRequest(req, res) {
   try {
     return await admin.auth().verifyIdToken(token);
   } catch (err) {
-    console.error("Auth Error:", err);
-    console.error("Auth Error - Manager info:", err.message);
+
+    console.error("Auth Error. Manager info:", err.message);
     res.status(401).send("Unauthorized");
     return null;
   }
@@ -68,8 +68,8 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error - Manager info:", err.message);
-      res.status(500).json({error: err.message});
+      console.error("Checkout Error. Manager info: [" + err.message + "]");
+      res.status(500).json({error: "Manager info: " + err.message});
     }
   });
 });
@@ -82,7 +82,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error - Manager info:", err.message);
+    console.error("Webhook Error. Manager info: [" + err.message + "]");
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -157,8 +157,8 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error - Manager info:", err.message);
-      res.status(500).json({error: err.message});
+      console.error("Cancel Error. Manager info: [" + err.message + "]");
+      res.status(500).json({error: "Manager info: " + err.message});
     }
   });
 });

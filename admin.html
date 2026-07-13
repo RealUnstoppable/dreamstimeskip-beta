@@ -328,46 +328,33 @@
             setupEventListeners();
         }
 
+
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (error) {
+                console.error(`Error fetching ${collectionName} - Manager info:`, error.message);
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
                 // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
+                let users = await fetchCollectionData('users', true);
 
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
+                let carts = await fetchCollectionData('carts', true);
 
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
+                let orders = await fetchCollectionData('orders', false);
 
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                let subscribers = await fetchCollectionData('newsletterSubscribers', false);
 
                 // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
+                let bookings = await fetchCollectionData('bookings', true);
+                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
 
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                let quotes = await fetchCollectionData('quotes', true);
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -377,7 +364,7 @@
                 try {
                     const tickets = await getAllTickets();
                     renderSupportTicketsTable(tickets);
-                } catch(e) { console.error('Error fetching support tickets', e); }
+                } catch(e) { console.error('Error fetching support tickets - Manager info:', e.message); }
 
                 // Renderers
                 renderUserTable(users);
@@ -393,7 +380,7 @@
                     const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderFeatureRequestsTable(requests);
                 } catch (frError) {
-                    console.log("Could not load feature requests. Missing Firestore rules?", frError);
+                    console.error('Error loading feature requests - Manager info:', frError.message);
                     document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                 }
                 
@@ -409,7 +396,7 @@
                 }
 
             } catch (error) {
-                console.error("Error loading admin data:", error);
+                console.error('Error loading admin data - Manager info:', error.message);
             }
         }
 
@@ -562,7 +549,14 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const btn = document.querySelector(`button[onclick="window.closeSupportTicket('${ticketId}')"]`);
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                        btn.style.backgroundColor = '';
+                        btn.textContent = 'Closed';
+                        btn.closest('tr').querySelector('td:nth-child(4)').innerHTML = `<span class="status-badge" style="background: var(--text-secondary);">Closed</span>`;
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -646,7 +640,11 @@
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    e.target.classList.toggle('btn-ban');
+                    e.target.classList.toggle('btn-unban');
+                    e.target.textContent = shouldBeBanned ? 'Unban' : 'Ban';
+                    e.target.closest('tr').querySelector('.status-badge').className = `status-badge ${shouldBeBanned ? 'banned' : 'active'}`;
+                    e.target.closest('tr').querySelector('.status-badge').textContent = shouldBeBanned ? 'Banned' : 'Active';
                 }
             });
             
@@ -658,7 +656,7 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        e.target.closest('tr').querySelector('td:nth-child(4)').innerHTML = `<span class="status-badge" style="background: var(--accent-green);">Answered</span>`;
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -671,7 +669,8 @@
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    e.target.closest('tr').querySelector('td:nth-child(5)').innerHTML = `<span class="status-badge completed">Completed</span>`;
+                    e.target.remove();
                 }
             });
 
@@ -683,10 +682,13 @@
                 const id = btn.dataset.id;
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    btn.closest('tr').querySelector('.status-badge').className = 'status-badge cancelled';
+                    btn.closest('tr').querySelector('.status-badge').textContent = 'Cancelled';
                 } else if (action === 'complete') {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    btn.closest('tr').querySelector('.status-badge').className = 'status-badge completed';
+                    btn.closest('tr').querySelector('.status-badge').textContent = 'Completed';
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -697,10 +699,12 @@
                 const id = btn.dataset.id;
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    btn.closest('tr').querySelector('.status-badge').className = 'status-badge completed';
+                    btn.closest('tr').querySelector('.status-badge').textContent = 'Responded';
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    btn.closest('tr').remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
