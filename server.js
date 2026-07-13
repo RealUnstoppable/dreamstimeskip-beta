@@ -6,8 +6,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "sk_test_placeholder";
-const stripe = new Stripe(stripeSecretKey); // 🔴 replace
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  console.error("FATAL ERROR: STRIPE_SECRET_KEY environment variable is not set.");
+  process.exit(1);
+}
+const stripe = new Stripe(stripeSecretKey);
 
 app.post("/create-checkout-session", async (req, res) => {
   const { plan } = req.body;
