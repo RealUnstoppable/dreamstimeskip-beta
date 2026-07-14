@@ -631,19 +631,19 @@
 
                 <div class="grid md:grid-cols-2 gap-6 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <label for="setupName" class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                         <input type="text" id="setupName" placeholder="Catalin Andrian">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
+                        <label for="setupPhone" class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
                         <input type="text" id="setupPhone" placeholder="(555) 000-0000">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
+                        <label for="setupRole" class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
                         <input type="text" id="setupRole" placeholder="Shift Manager">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
+                        <label for="setupStore" class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
                         <select id="setupStore">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
@@ -653,11 +653,11 @@
                         </select>
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
+                        <label for="setupLocation" class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
-                <button onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
+                <button id="setupBtn" onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
             </div>
         </div>
 
@@ -1197,10 +1197,21 @@
 
             if (!data.name) return alert("Name is required.");
 
+            const btn = document.getElementById('setupBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Processing...';
+
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
+            }).catch(err => {
+                console.error('Manager info: setup failed', err);
+                alert('Setup failed: ' + err.message);
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
             });
         }
 
