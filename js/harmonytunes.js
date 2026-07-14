@@ -575,6 +575,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let activeLineIndex = -1;
+    // ⚡ Bolt: Cache DOM queries for lyrics to prevent O(N) DOM lookups on every timeupdate
+    let cachedLyricLines = [];
     let isAutoScrolling = true;
     let autoScrollTimeout = null;
     let isProgrammaticScroll = false;
@@ -1624,9 +1626,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
         }).join('');
         
-        // Seek on click
+        // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
         const lines = lyricsContent.querySelectorAll('.lyric-line');
-        lines.forEach(line => {
+        cachedLyricLines = Array.from(lines).map(line => ({
+            el: line,
+            start: parseFloat(line.getAttribute('data-start')),
+            end: parseFloat(line.getAttribute('data-end')),
+            words: Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }))
+        }));
+
+        // Seek on click
+        cachedLyricLines.forEach(lineData => {
+            const line = lineData.el;
             line.addEventListener('click', () => {
                 const start = parseFloat(line.getAttribute('data-start'));
                 if (!isNaN(start)) {
@@ -1644,8 +1658,7 @@ document.addEventListener('DOMContentLoaded', () => {
         autoScrollTimeout = setTimeout(() => {
             isAutoScrolling = true;
             if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none') {
-                const lines = lyricsContent.querySelectorAll('.lyric-line');
-                const activeLine = lines[activeLineIndex];
+                const activeLine = cachedLyricLines[activeLineIndex]?.el;
                 if (activeLine) {
                     isProgrammaticScroll = true;
                     lyricsContainer.scrollTo({
@@ -1662,38 +1675,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncLyrics() {
         if (viewLyrics.style.display === 'none') return;
+        if (!cachedLyricLines || cachedLyricLines.length === 0) return;
         const currentTime = activeAudio.currentTime;
-        const lines = lyricsContent.querySelectorAll('.lyric-line');
         
         let newActiveLineIndex = -1;
-        lines.forEach((line, index) => {
-            const start = parseFloat(line.getAttribute('data-start'));
-            const end = parseFloat(line.getAttribute('data-end'));
+        // ⚡ Bolt: Iterate over cached data instead of querying DOM and parsing attributes repeatedly
+        cachedLyricLines.forEach((lineData, index) => {
+            const { el, start, end, words } = lineData;
             
             // Allow active line to persist slightly if it's the last one sung, 
             // but strict matching is better for beat-by-beat
             if (currentTime >= start && currentTime <= end) {
                 newActiveLineIndex = index;
-                line.classList.add('active');
+                el.classList.add('active');
                 
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
-                    const wStart = parseFloat(word.getAttribute('data-start'));
-                    if (currentTime >= wStart) {
-                        word.classList.add('active-word');
+                words.forEach(wData => {
+                    if (currentTime >= wData.start) {
+                        wData.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wData.el.classList.remove('active-word');
                     }
                 });
             } else {
-                line.classList.remove('active');
+                el.classList.remove('active');
                 // clear word highlights if passed
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
+                words.forEach(wData => {
                     if (currentTime > end) {
-                        word.classList.add('active-word');
+                        wData.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wData.el.classList.remove('active-word');
                     }
                 });
             }
@@ -1702,7 +1712,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
             if (isAutoScrolling) {
-                const activeLine = lines[activeLineIndex];
+                const activeLine = cachedLyricLines[activeLineIndex].el;
                 isProgrammaticScroll = true;
                 lyricsContainer.scrollTo({
                     top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
