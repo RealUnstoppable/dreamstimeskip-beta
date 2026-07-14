@@ -12,6 +12,11 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // Wishlists collection: Users can only read/write their own wishlist
+    match /wishlists/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Orders collection: Users can read their own orders and create new ones
     match /orders/{orderId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;

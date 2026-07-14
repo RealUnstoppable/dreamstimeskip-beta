@@ -1,3 +1,29 @@
-
-> app@1.0.0 start
-> node server.js
+127.0.0.1 - - [14/Jul/2026 04:49:04] "GET /shop.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /css/shop.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/shop.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/firebase.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:49:05] "GET /js/newsletter.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /shop.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /css/shop.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /js/shop.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:26] "GET /js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:27] "GET /images/UnstoppableHoodieModel300x300.png HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /account.html HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /js/ticket-service.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /js/shop.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jul/2026 04:50:28] "GET /images/UnstoppableHoodieModel300x300.png HTTP/1.1" 200 -
