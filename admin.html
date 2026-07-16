@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { mapCollectionData } from '/js/utils.js';
 
         let performanceChart;
 
@@ -334,40 +335,40 @@
                 let users = [];
                 try {
                     const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
+                    users = mapCollectionData(usersSnapshot, true);
+                } catch (e) { console.error("Manager info: Error fetching users:", e); }
 
                 let carts = [];
                 try {
                     const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
+                    carts = mapCollectionData(cartsSnapshot, true);
+                } catch (e) { console.error("Manager info: Error fetching carts:", e); }
 
                 let orders = [];
                 try {
                     const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
+                    orders = mapCollectionData(ordersSnapshot);
+                } catch (e) { console.error("Manager info: Error fetching orders:", e); }
 
                 let subscribers = [];
                 try {
                     const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
+                    subscribers = mapCollectionData(newsletterSnapshot);
+                } catch (e) { console.error("Manager info: Error fetching newsletter:", e); }
 
                 // Fetch Detailing Bookings & Quotes
                 let bookings = [];
                 try {
                     const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    bookings = mapCollectionData(bookingsSnap, true);
                     bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
+                } catch (e) { console.error("Manager info: Error fetching bookings:", e); }
 
                 let quotes = [];
                 try {
                     const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                    quotes = mapCollectionData(quotesSnap, true);
+                } catch (e) { console.error("Manager info: Error fetching quotes:", e); }
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -377,7 +378,7 @@
                 try {
                     const tickets = await getAllTickets();
                     renderSupportTicketsTable(tickets);
-                } catch(e) { console.error('Error fetching support tickets', e); }
+                } catch(e) { console.error("Manager info: Error fetching support tickets:", e); }
 
                 // Renderers
                 renderUserTable(users);
@@ -390,7 +391,7 @@
                 // Fetch Feature Requests
                 try {
                     const featureRequestsSnapshot = await getDocs(collection(db, "feature_requests"));
-                    const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    const requests = mapCollectionData(featureRequestsSnapshot, true);
                     renderFeatureRequestsTable(requests);
                 } catch (frError) {
                     console.log("Could not load feature requests. Missing Firestore rules?", frError);
@@ -562,7 +563,12 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const btn = document.querySelector(`.admin-close-btn[data-id="${ticketId}"]`);
+                    if (btn) {
+                        const tr = btn.closest('tr');
+                        tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">CLOSED</span>';
+                        btn.parentElement.innerHTML = `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -645,8 +651,17 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
-                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                        const tr = e.target.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(5)').innerHTML = shouldBeBanned ? '<span class="status-badge banned">Banned</span>' : '<span class="status-badge active">Active</span>';
+                            e.target.outerHTML = shouldBeBanned ? `<button class="btn-sm btn-unban" data-id="${escapeHTML(userId)}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${escapeHTML(userId)}">Ban</button>`;
+                        }
+                    } catch (error) {
+                        console.error("Manager info: Error updating ban status:", error);
+                        alert("Error updating user status: " + error.message);
+                    }
                 }
             });
             
@@ -658,7 +673,10 @@
                 if (reply !== null && reply.trim() !== "") {
                     try {
                         await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
+                        const tr = e.target.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--accent-green); text-transform: uppercase;">ANSWERED</span>';
+                        }
                     } catch (error) {
                         alert("Error replying to ticket: " + error.message);
                     }
@@ -670,8 +688,17 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
-                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    try {
+                        await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
+                        const tr = e.target.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(5)').innerHTML = '<span style="color:var(--accent-green);">Completed</span>';
+                            e.target.outerHTML = `<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>`;
+                        }
+                    } catch (error) {
+                        console.error("Manager info: Error marking feature complete:", error);
+                        alert("Error marking feature complete: " + error.message);
+                    }
                 }
             });
 
@@ -681,12 +708,20 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
-                if (action === 'cancel' && confirm("Cancel this booking?")) {
-                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
-                } else if (action === 'complete') {
-                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                try {
+                    if (action === 'cancel' && confirm("Cancel this booking?")) {
+                        await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                        const tr = e.target.closest('tr');
+                        if (tr) tr.querySelector('td:nth-child(6)').innerHTML = '<span style="color:var(--accent-red)">Cancelled</span>';
+                    } else if (action === 'complete') {
+                        await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                        const tr = e.target.closest('tr');
+                        if (tr) tr.querySelector('td:nth-child(6)').innerHTML = '<span style="color:var(--accent-green)">Completed</span>';
+                    }
+                } catch (error) {
+                    console.error("Manager info: Error updating booking:", error);
+                    alert("Error updating booking: " + error.message);
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +730,22 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
-                if (action === 'responded') {
-                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
-                } else if (action === 'delete' && confirm("Delete this quote request?")) {
-                    await deleteDoc(doc(db, "quotes", id));
+                try {
+                    if (action === 'responded') {
+                        await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                        const tr = e.target.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(6)').innerHTML = '<span style="color:var(--accent-green)">Responded</span>';
+                        }
+                    } else if (action === 'delete' && confirm("Delete this quote request?")) {
+                        await deleteDoc(doc(db, "quotes", id));
+                        const tr = e.target.closest('tr');
+                        if (tr) tr.remove();
+                    }
+                } catch (error) {
+                    console.error("Manager info: Error updating quote:", error);
+                    alert("Error updating quote: " + error.message);
                 }
-                loadAdminData();
             });
 
             // Navigation
