@@ -44,7 +44,7 @@
                 <h3>Order History</h3>
                 <div class="card">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <div id="user-orders-container">Loading orders...</div>
                 </div>
             </section>
 
@@ -139,8 +139,9 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
+        import { productMap } from '/js/shop.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -231,9 +232,91 @@
             }[tag]));
         }
 
+        async function loadUserOrders(userId) {
+            const container = document.getElementById('user-orders-container');
+            if (!container) return;
+
+            try {
+                const ordersRef = collection(db, 'orders');
+                const q = query(ordersRef, where('userId', '==', userId)); // Requires an index if sorting is added, for now just where clause
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">You have no recent orders.</p>';
+                    return;
+                }
+
+                // Sort orders by date descending in memory to avoid needing a composite index immediately
+                const orders = [];
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    orders.push({ id: doc.id, ...data });
+                });
+
+                orders.sort((a, b) => {
+                    const dateA = a.orderDate ? a.orderDate.toMillis() : 0;
+                    const dateB = b.orderDate ? b.orderDate.toMillis() : 0;
+                    return dateB - dateA;
+                });
+
+                let html = '<div class="orders-list" style="display: flex; flex-direction: column; gap: 15px;">';
+                orders.forEach(order => {
+                    const orderDate = order.orderDate ? new Date(order.orderDate.toMillis()).toLocaleDateString() : 'Unknown Date';
+
+                    let itemsHtml = '';
+                    let subtotal = 0;
+
+                    if (order.items) {
+                        itemsHtml += '<ul style="list-style: none; padding: 0; margin: 10px 0;">';
+                        for (const [productId, quantity] of Object.entries(order.items)) {
+                            const product = productMap.get(productId);
+                            const name = product ? product.name : 'Unknown Product';
+                            const price = product ? product.price : 0;
+                            subtotal += (price * quantity);
+                            itemsHtml += `<li style="font-size: 0.9em; margin-bottom: 5px;">${quantity}x ${escapeHTML(name)} <span style="float: right;">$${(price * quantity).toFixed(2)}</span></li>`;
+                        }
+                        itemsHtml += '</ul>';
+                    }
+
+                    const tax = subtotal * 0.07;
+                    const total = subtotal + tax;
+
+                    html += `
+                        <div class="order-item" style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; background: var(--bg-color);">
+                            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px;">
+                                <div>
+                                    <strong>Order ID:</strong> <span style="font-size: 0.9em; color: var(--text-secondary);">${escapeHTML(order.id)}</span>
+                                    <div style="font-size: 0.85em; color: var(--text-secondary); margin-top: 5px;">Placed on: ${orderDate}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; background: var(--accent-blue); color: #fff; text-transform: uppercase;">${escapeHTML(order.status || 'Processing')}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <strong>Items:</strong>
+                                ${itemsHtml}
+                            </div>
+
+                            <div style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px; text-align: right;">
+                                <strong>Total: $${total.toFixed(2)}</strong>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load orders. Please try again later.</p>';
+            }
+        }
+
         function initializePage(user, userData) {
             document.getElementById('loading-spinner').style.display = 'none';
             loadUserTickets(user.uid);
+            loadUserOrders(user.uid);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
