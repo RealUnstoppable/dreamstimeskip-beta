@@ -338,6 +338,21 @@
             loadAdminData();
             setupEventListeners();
         }
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snap = await getDocs(collection(db, collectionName));
+                if (isMapWithId) {
+                    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                }
+                return snap.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName}:`, e);
+                console.error(`Error fetching ${collectionName} - Manager info:`, e.message);
+                const errArr = [];
+                errArr._error = true;
+                return errArr;
+            }
+        }
 
         async function fetchCollectionData(collectionName, isMapWithId = true) {
             try {
@@ -753,7 +768,6 @@
                     }
                 }
             });
-
             // Quotes Action Buttons
             document.getElementById('quotes-list-body').addEventListener('click', async (e) => {
                 const btn = e.target.closest('.action-btn');
