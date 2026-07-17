@@ -566,6 +566,13 @@
         window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
+                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                    let originalText = 'Close';
+                    if (btn) {
+                        originalText = btn.textContent;
+                        btn.textContent = 'Processing...';
+                        btn.disabled = true;
+                    }
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
                     const btn = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
                     if (btn) {
@@ -578,6 +585,11 @@
                 } catch (error) {
                     console.error('Error closing support ticket - Manager info:', error.message);
                     alert("Error closing ticket: " + error.message);
+                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Close';
+                    }
                 }
             }
         };
@@ -704,8 +716,9 @@
 
             // Feature Request Complete Toggle
             document.getElementById('feature-request-list-body').addEventListener('click', async (e) => {
-                const reqId = e.target.dataset.id;
-                if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
+                const btn = e.target;
+                const reqId = btn.dataset.id;
+                if (!reqId || !btn.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                   try {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
