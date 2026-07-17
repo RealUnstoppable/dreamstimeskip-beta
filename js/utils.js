@@ -1,6 +1,11 @@
-export function mapCollectionData(querySnapshot, mapWithId = false) {
-    if (!querySnapshot || !querySnapshot.docs) return [];
-    return querySnapshot.docs.map(d => mapWithId ? { id: d.id, ...d.data() } : d.data());
+export async function fetchCollectionData(db, getDocs, collection, collectionName, isMapWithId = true) {
+    try {
+        const snapshot = await getDocs(collection(db, collectionName));
+        return snapshot.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
+    } catch (error) {
+        console.error(`Error fetching ${collectionName} - Manager info:`, error.message);
+        return [];
+    }
 }
 
 export function escapeHTML(str) {
@@ -12,4 +17,18 @@ export function escapeHTML(str) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+export async function fetchCollectionData(db, collectionName, isMapWithId = false) {
+    try {
+        const snapshot = await getDocs(collection(db, collectionName));
+        if (isMapWithId) {
+            return snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        } else {
+            return snapshot.docs.map(d => d.data());
+        }
+    } catch (e) {
+        console.error(`Error fetching ${collectionName} - Manager info:`, e.message);
+        return [];
+    }
 }
