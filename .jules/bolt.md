@@ -16,3 +16,12 @@
 ## 2024-05-23 - Batching DOM Inserts with DocumentFragment
 **Learning:** Appending elements directly to the DOM inside a loop (e.g., `container.appendChild(el)`) causes O(N) reflows and repaints, which is a significant performance anti-pattern during list rendering.
 **Action:** Always construct elements and append them to a `DocumentFragment` first, then append the entire fragment to the container outside the loop to minimize reflows to O(1).
+## 2024-05-24 - Throttling High-Frequency Media Events
+**Learning:** High-frequency media events like `timeupdate` on HTMLAudioElement fire several times a second and trigger expensive DOM updates and string formatting synchronously. This causes main-thread blocking and frame drops.
+**Action:** Always throttle high-frequency media events using `requestAnimationFrame` coupled with a state tracking flag (e.g., `isUpdatingProgress`) to decouple rapid event firing from expensive DOM updates.
+## 2024-05-27 - Caching Shared Profile Data with sessionStorage
+**Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
+**Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
+## 2024-11-20 - Concurrent Promise Failures
+**Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
+**Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.

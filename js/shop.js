@@ -3,6 +3,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
+import { escapeHTML } from './utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
@@ -18,21 +19,21 @@ export const products = [
         name: 'DTS Model Tee',
         price: 24.99,
         description: 'Iconic tee featuring the official Dreams TimeSkip character art.',
-        imageUrl: 'images/DreamsTimeSkipModel300x300.jpg'
+        imageUrl: '/images/dreams-lobby.jpg'
     },
     {
         id: 'harmonytunes-shirt',
         name: 'HarmonyTunes Cap',
         price: 24.99,
         description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
-        imageUrl: 'images/HarmonyTunesModel300x300.png'
+        imageUrl: '/images/harmony-tunes-card.jpg'
     },
     {
         id: 'unstoppable-mousepad',
         name: 'Unstoppable Mousepad',
         price: 19.99,
         description: 'High-performance mousepad for gaming precision.',
-        imageUrl: 'images/unstoppablemousepadmodel2-300x300.jpg'
+        imageUrl: '/images/MugAllBrands300x300.png'
     }
 ];
 
@@ -59,15 +60,6 @@ const navCtaContainer = document.getElementById('nav-cta-container');
 // --- RENDER FUNCTIONS ---
 function renderProducts() {
     if (!productGrid) return;
-    productGrid.innerHTML = products.map(product => `
-        <div class="product-card">
-            <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
-            <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
-                <div class="product-footer">
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
@@ -83,7 +75,7 @@ function renderProducts() {
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
                     <div class="product-footer">
-                        <span class="product-price">${product.price.toFixed(2)}</span>
+                        <span class="product-price">$${product.price.toFixed(2)}</span>
                         <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                     </div>
                 </div>
@@ -184,11 +176,18 @@ async function saveWishlist() {
 async function saveCart() {
     updateCartSummary(); // Update UI immediately for responsiveness
 
+    // Clear existing timeout if there is one
     // Debounce the Firestore write
     if (saveCartTimeout) {
         clearTimeout(saveCartTimeout);
     }
 
+    // Always update local cache immediately
+    if (!currentUser) {
+        localStorage.setItem('localCart', JSON.stringify(cart));
+    } else {
+        // Debounce Firestore writes for authenticated users
+        saveCartTimeout = setTimeout(async () => {
     saveCartTimeout = setTimeout(async () => {
         if (currentUser) {
             try {
@@ -197,6 +196,7 @@ async function saveCart() {
             } catch (error) {
                 console.error("Error saving cart to Firestore:", error);
             }
+        }, 500); // 500ms debounce
         } else {
             // Save cart to localStorage for logged-out users
             localStorage.setItem('localCart', JSON.stringify(cart));

@@ -69,7 +69,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       res.status(200).json({url: session.url});
     } catch (err) {
       console.error("Checkout Error - Manager info:", err.message);
-      res.status(500).json({error: err.message});
+      res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
     }
   });
 });
@@ -135,9 +135,6 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 
     try {
       const uid = decodedToken.uid;
-    const uid = decodedToken.uid;
-
-    try {
 
       const userDoc = await admin.firestore().collection("users")
           .doc(uid).get();

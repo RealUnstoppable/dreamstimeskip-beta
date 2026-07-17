@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
@@ -32,6 +32,12 @@
                     <button class="nav-pill" id="nav-favorites">Favorites</button>
                 </nav>
 
+            <!-- Global Search -->
+            <div class="search-container" id="search-container" style="display: none; width: 90%; max-width: 600px; margin: 15px auto;">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3b3b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="global-search" class="search-input" placeholder="Search songs, artists, moods...">
+            </div>
+
                 <div class="greet-section">
                     <h1 id="greeting">Welcome Back</h1>
                 </div>
@@ -39,7 +45,7 @@
                 <section class="shelf">
                     <div class="shelf-header">
                         <h2>Jump Back In</h2>
-                        <span class="see-all">History</span>
+                        <span class="see-all" id="home-history-btn" style="cursor: pointer;">History</span>
                     </div>
                     <div class="card-grid" id="container-jump-back-in">
                         </div>
@@ -103,6 +109,133 @@
         </main>
     </div>
 
+    <div id="view-lyrics" class="view-lyrics" style="display: none;">
+        <div class="lyrics-bg"></div>
+        <button id="close-lyrics-btn" class="close-lyrics-btn" aria-label="Close Lyrics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="lyrics-header">
+            <h2 id="lyrics-title">...</h2>
+            <p id="lyrics-artist">...</p>
+        </div>
+        <div class="lyrics-container" id="lyrics-container">
+            <div id="lyrics-content">
+                <!-- Lyrics injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Fullscreen Player -->
+    <div id="fullscreen-player" class="fullscreen-player" style="display: none;">
+        <div class="fullscreen-bg" id="fullscreen-bg"></div>
+        <button id="close-fullscreen-btn" class="close-fullscreen-btn" aria-label="Close Fullscreen">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="fullscreen-content">
+            <img id="fullscreen-art" src="" alt="Album Art" class="fullscreen-art">
+            <h1 id="fullscreen-title">Song Title</h1>
+            <h2 id="fullscreen-artist">Artist</h2>
+            <div class="fullscreen-player-ui">
+                <!-- Top Row: Player Options -->
+                <div class="fs-player-options">
+                    <button class="control-button" id="fs-lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </button>
+                    <button class="control-button" id="fs-viral-skip-btn" title="Viral Skip" aria-label="Skip to trending part">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                    </button>
+                    <button class="like-btn-player fs-heart" id="fs-like-btn" aria-label="Like song">♡</button>
+                                        <button class="control-button" id="fs-mixer-btn" title="Mixxer" aria-label="Toggle Mixer">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"></circle><path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path><rect x="3" y="12" width="2" height="6" rx="1"></rect><rect x="19" y="12" width="2" height="6" rx="1"></rect></svg>
+                    </button>
+                    <button class="control-button" id="fs-shuffle-btn" title="Shuffle" aria-label="Toggle Shuffle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                    </button>
+                    <button class="control-button" id="fs-repeat-btn" title="Repeat" aria-label="Toggle Repeat">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                         <span class="repeat-indicator" id="fs-repeat-indicator"></span>
+                    </button>
+                </div>
+
+                <!-- Middle Row: Controls -->
+                <div class="fullscreen-controls">
+                    <button class="control-button" id="fs-prev-btn" aria-label="Previous">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke-width="2" stroke="currentColor"></line></svg>
+                    </button>
+                    <button class="control-button play-pause-btn" id="fs-play-pause-btn" aria-label="Play/Pause">
+                        <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="black" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    </button>
+                    <button class="control-button" id="fs-next-btn" aria-label="Next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke-width="2" stroke="currentColor"></line></svg>
+                    </button>
+                </div>
+
+                <!-- Bottom Row: Progress Bar -->
+                <div class="fs-progress-bar-container">
+                    <span class="fs-current-time">0:00</span>
+                    <div class="progress-bar" id="fs-progress-bar">
+                        <div class="progress" id="fs-progress"></div>
+                    </div>
+                    <span class="fs-total-time">0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Artist Profile -->
+    <div id="artist-profile" class="artist-profile" style="display: none;">
+        <button id="close-artist-btn" class="close-fullscreen-btn" aria-label="Close Profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="artist-header">
+            <div class="artist-avatar" id="artist-avatar"></div>
+            <h1 id="artist-name">Artist Name</h1>
+            <p>1.2M Monthly Listeners</p>
+        </div>
+        <div class="artist-tracks">
+            <h3>Popular Tracks</h3>
+            <div id="artist-track-list"></div>
+        </div>
+    </div>
+
+    <!-- What's New Popup -->
+    <div id="whats-new-overlay" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-whats-new-btn" class="close-modal-btn" aria-label="Close">&times;</button>
+            <h2 class="modal-title">What's New in HarmonyTunes ✨</h2>
+            <div class="feature-item">
+                <div class="feature-icon">🎤</div>
+                <div class="feature-text">
+                    <h3>Beat-by-Beat Lyrics</h3>
+                    <p>Sing along perfectly with our new animated, auto-scrolling lyrics view.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-text">
+                    <h3>Automix DJ & Viral Loops</h3>
+                    <p>Enable the Mixer to seamlessly crossfade songs, automatically calculate dynamic BPM fading padding, and create endless infinite loops of the best parts!</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎵</div>
+                <div class="feature-text">
+                    <h3>Intelligent Queue & History</h3>
+                    <p>Build your perfect vibe. Add songs to your queue, drag to rearrange them, and look back at your play history—all housed in our stunning Apple Glass UI.</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✨</div>
+                <div class="feature-text">
+                    <h3>New Music Added</h3>
+                    <p>We've added "Blow" by Kesha to the library, fully synced and ready for the Automix DJ!</p>
+                </div>
+            </div>
+            <button id="got-it-btn" class="primary-btn">Got It!</button>
+        </div>
+    </div>
+
     <div class="music-player-bar glass-panel">
         
         <div class="current-song-details">
@@ -119,12 +252,20 @@
                 <button class="control-button" id="shuffle-btn" title="Shuffle" aria-label="Toggle Shuffle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
                 </button>
+                <button class="control-button" id="mixer-btn" title="Mixxer" aria-label="Toggle Mixer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="14" r="5"></circle>
+                        <path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path>
+                        <rect x="3" y="12" width="2" height="6" rx="1"></rect>
+                        <rect x="19" y="12" width="2" height="6" rx="1"></rect>
+                    </svg>
+                </button>
                 <button class="control-button" id="prev-btn" title="Previous" aria-label="Previous song">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke-width="2" stroke="currentColor"></line></svg>
                 </button>
                 <button class="control-button play-pause-btn" id="play-pause-btn" title="Play/Pause" aria-label="Play/Pause">
-                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    <svg class="play-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="black" stroke="black" stroke-width="2" stroke-linejoin="round" style="transform: translateX(1px);"><polygon points="6 4 19 12 6 20 6 4"></polygon></svg>
+                    <svg class="pause-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="black" style="display: none;"><rect x="6" y="4" width="4" height="16" rx="2"></rect><rect x="14" y="4" width="4" height="16" rx="2"></rect></svg>
                 </button>
                 <button class="control-button" id="next-btn" title="Next" aria-label="Next song">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke-width="2" stroke="currentColor"></line></svg>
@@ -132,6 +273,20 @@
                 <button class="control-button" id="repeat-btn" title="Repeat" aria-label="Toggle Repeat">
                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                      <span class="repeat-indicator"></span>
+                </button>
+                <button class="control-button" id="lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </button>
+                <button class="control-button viral-skip-wrapper" id="viral-skip-btn" title="Viral Skip" aria-label="Skip to trending part">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                     <span class="viral-repeat-badge" style="display:none;">&#x21BA;</span>
+                </button>
+                <!-- Mobile overflow button -->
+                <button class="control-button mobile-overflow-btn" id="mobile-overflow-btn" title="More" aria-label="More controls">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                </button>
+                <button class="control-button mobile-queue-btn" id="mob-queue-btn" title="Queue" aria-label="Queue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                 </button>
             </div>
             
@@ -145,14 +300,80 @@
         </div>
 
         <div class="volume-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
+            <button id="queue-btn" class="control-button" aria-label="Queue" title="Queue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            </button>
+            <svg class="volume-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>
             <div class="volume-slider-wrapper">
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
             </div>
         </div>
     </div>
-    
+
+    <!-- Mobile Controls Overlay (shown when ... is tapped on mobile) -->
+    <div class="mobile-controls-overlay hidden" id="mobile-controls-overlay">
+        <button class="control-button" id="mob-shuffle-btn" aria-label="Shuffle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            <span style="font-size:10px;margin-top:3px;">Shuffle</span>
+        </button>
+        <button class="control-button" id="mob-mixer-btn" aria-label="Mixer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"></circle><path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path><rect x="3" y="12" width="2" height="6" rx="1"></rect><rect x="19" y="12" width="2" height="6" rx="1"></rect></svg>
+            <span style="font-size:10px;margin-top:3px;">Mixer</span>
+        </button>
+        <button class="control-button" id="mob-repeat-btn" aria-label="Repeat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+            <span style="font-size:10px;margin-top:3px;">Repeat</span>
+        </button>
+        <button class="control-button" id="mob-lyrics-btn" aria-label="Lyrics">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span style="font-size:10px;margin-top:3px;">Lyrics</span>
+        </button>
+        <button class="control-button viral-skip-wrapper" id="mob-viral-btn" aria-label="Viral Skip">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span class="viral-repeat-badge" style="display:none;">&#x21BA;</span>
+            <span style="font-size:10px;margin-top:3px;">Viral</span>
+        </button>
+    </div>
+
+    <!-- Queue Panel -->
+    <div id="queue-panel" class="queue-panel hidden glass-panel">
+        <div class="queue-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h2>Queue</h2>
+                <button id="clear-queue-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;">Clear</button>
+            </div>
+            <button id="close-queue-btn" class="control-button" aria-label="Close Queue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <div class="queue-tabs">
+            <button class="queue-tab active" id="tab-up-next">Up Next</button>
+            <button class="queue-tab" id="tab-history">History</button>
+        </div>
+        <div class="queue-content" id="queue-content-area">
+            <!-- Dynamically populated by JS -->
+        </div>
+    </div>
+
+    <!-- Mixxer Survey Popup -->
+    <div id="mixxer-survey" class="mixxer-survey glass-panel" style="opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px);">
+        <p>How did Mixxer do?</p>
+        <div class="survey-btns">
+            <button class="survey-btn up" id="survey-up" aria-label="Thumbs Up">👍</button>
+            <button class="survey-btn down" id="survey-down" aria-label="Thumbs Down">👎</button>
+        </div>
+    </div>
+
+    <!-- Song Context Menu -->
+    <div id="song-context-menu" class="song-context-menu hidden glass-panel">
+        <button class="context-menu-item" id="ctx-play-next">Play Next</button>
+        <button class="context-menu-item" id="ctx-play-last">Play Last</button>
+        <button class="context-menu-item" id="ctx-favorite">Favorite</button>
+        <button class="context-menu-item" id="ctx-view-artist">View Artist</button>
+    </div>
+
     <audio id="audio-player"></audio>
+    <audio id="audio-player-2"></audio>
 
   <footer class="main-footer"></footer> 
 
