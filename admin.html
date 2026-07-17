@@ -328,6 +328,16 @@
             setupEventListeners();
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = true) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
                 // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
@@ -390,7 +400,7 @@
                 }
 
             } catch (error) {
-                console.error("Error loading admin data:", error);
+                console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
         }
 

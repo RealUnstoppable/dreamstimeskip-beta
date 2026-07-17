@@ -176,14 +176,14 @@
                             await setDoc(userDocRef, fallbackData);
                             sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
                         } catch(e) {
-                            console.error("Failed to set default profile", e);
+                            console.error("Failed to set default profile - Manager info: [" + e.message + "]", e);
                         }
                         initializePage(user, fallbackData);
                         setupEventListeners(user);
                         document.getElementById('account-layout-container').style.display = 'flex';
                     }
                 } catch (error) {
-                    console.error("Error loading profile:", error);
+                    console.error("Error loading profile - Manager info: [" + error.message + "]", error);
                 }
             } else {
                 if (!window.location.pathname.includes('sign in beta.html')) {
