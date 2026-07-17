@@ -6,6 +6,18 @@ import { app, auth, db } from "./firebase.js";
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
@@ -100,14 +112,12 @@ if (document.getElementById('auth-form')) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
 
-        if (isSignUp) {
-            if (!username || !email || !password) {
-                showMessage("All fields are required.");
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-                return;
-            }
-            try {
+        try {
+            if (isSignUp) {
+                if (!username || !email || !password) {
+                    showMessage("All fields are required.");
+                    return;
+                }
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await setDoc(doc(db, "users", userCredential.user.uid), {
                     username: username || "User",
@@ -119,14 +129,7 @@ if (document.getElementById('auth-form')) {
                 });
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
-            } catch (error) {
-                console.error("Signup Error - Manager info:", error.message);
-                showMessage(getFirebaseErrorMessage(error));
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-            }
-        } else {
-            try {
+            } else {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
@@ -136,15 +139,14 @@ if (document.getElementById('auth-form')) {
                 } else {
                     await signOut(auth);
                     showMessage("This account is suspended or does not exist.");
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalBtnText;
                 }
-            } catch (error) {
-                console.error("Signin Error - Manager info:", error.message);
-                showMessage(getFirebaseErrorMessage(error));
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
             }
+        } catch (error) {
+            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error - Manager info:`, error.message);
+            showMessage(getFirebaseErrorMessage(error));
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
         }
     });
 
