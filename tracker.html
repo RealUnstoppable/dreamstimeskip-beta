@@ -631,19 +631,19 @@
 
                 <div class="grid md:grid-cols-2 gap-6 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <label for="setupName" class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                         <input type="text" id="setupName" placeholder="Catalin Andrian">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
+                        <label for="setupPhone" class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
                         <input type="text" id="setupPhone" placeholder="(555) 000-0000">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
+                        <label for="setupRole" class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
                         <input type="text" id="setupRole" placeholder="Shift Manager">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
+                        <label for="setupStore" class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
                         <select id="setupStore">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
@@ -653,11 +653,11 @@
                         </select>
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
+                        <label for="setupLocation" class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
-                <button onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
+                <button id="finishSetupBtn" onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
             </div>
         </div>
 
@@ -914,10 +914,10 @@
                         <div class="space-y-4">
                             <input type="text" id="profName" placeholder="Name">
                             <input type="text" id="profRole" placeholder="Role">
-                            <input type="email" id="profEmail" readonly
+                            <input type="email" id="profEmail" readonly title="Email cannot be changed"
                                 class="bg-slate-50 opacity-60 dark:bg-slate-800">
                             <input type="text" id="profPhone" placeholder="Phone">
-                            <button onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
+                            <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
                                 Changes</button>
                         </div>
                     </div>
@@ -1197,10 +1197,18 @@
 
             if (!data.name) return alert("Name is required.");
 
+            const btn = document.getElementById('finishSetupBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
             });
         }
 
@@ -1319,9 +1327,9 @@
             div.className = 'inventory-item animate-fadeIn';
             div.innerHTML = `
                 <input type="text" placeholder="Item Name" class="inv-name" value="${escapeHTML(name)}">
-                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" onchange="triggerDraftSync()">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
@@ -1362,7 +1370,6 @@
 
         document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
         
-        window.triggerDraftSync = function() {
         document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
 
         function triggerDraftSync() {
@@ -1373,9 +1380,8 @@
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 setDoc(userDocRef, { trackerDraft: state }, { merge: true });
             }, 3000); 
-                db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
-            }, 3000);
         }
+        window.triggerDraftSync = triggerDraftSync;
 
         function syncDraftFromServer() {
             if (!currentUser) return;
@@ -1429,8 +1435,6 @@
             });
         }
 
-        window.manualSaveHistory = function() {
-            if(!currentUser) return alert("Please Sign In first.");
         function manualSaveHistory() {
             if (!currentUser) return alert("Please Sign In first.");
             const state = getTrackerState();
@@ -1443,6 +1447,7 @@
                 fetchCloudHistory();
             });
         }
+        window.manualSaveHistory = manualSaveHistory;
 
         function fetchCloudHistory() {
             if (!currentUser) return;
@@ -1580,8 +1585,6 @@
             }
         }
 
-        window.saveCustomPreset = function() {
-            if(!currentUser) return;
         function saveCustomPreset() {
             if (!currentUser) return;
             const name = document.getElementById('customPresetName').value || "Unnamed Preset";
@@ -1599,14 +1602,15 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             setDoc(userDocRef, {
                 customPresets: arrayUnion({ id: Date.now().toString(), name, items })
-
-            db.collection('users').doc(currentUser.uid).set({
-                customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
             }, { merge: true }).then(() => {
                 alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
+            }).catch((error) => {
+                console.error("Error saving custom preset - Manager info: [" + error.message + "]");
+                alert("There was an error saving the preset. Please try again later.");
             });
         }
+        window.saveCustomPreset = saveCustomPreset;
 
         function loadCustomPresets() {
             if (!currentUser) return;
@@ -1614,10 +1618,10 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             onSnapshot(userDocRef, docSnap => {
                 container.innerHTML = "";
+                const fragment = document.createDocumentFragment();
                 if(docSnap.exists() && docSnap.data().customPresets) {
+                    const fragment = document.createDocumentFragment();
                     docSnap.data().customPresets.forEach(p => {
-                if (doc.exists && doc.data().customPresets) {
-                    doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
@@ -1638,11 +1642,6 @@
                 const preset = (docSnap.data().customPresets || []).find(p => p.id == id);
                 if(preset) {
                     const addInv = window.addInventoryItem || addInventoryItem;
-        function applyCustomPreset(id) {
-            if (!confirm("Replace current inventory layout with this custom preset?")) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const preset = (doc.data().customPresets || []).find(p => p.id == id);
-                if (preset) {
                     document.getElementById('inventoryContainer').innerHTML = '';
                     preset.items.forEach(i => {
                         if (typeof i === 'string') {
@@ -1659,8 +1658,6 @@
 
         window.generateReport = function() {
             if(!currentUser) return alert("Sign in required.");
-        function generateReport() {
-            if (!currentUser) return alert("Sign in required.");
             const state = getTrackerState();
 
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
@@ -1698,15 +1695,23 @@
 
         window.saveProfileToFirebase = function() {
             if(!currentUser) return;
-        function saveProfileToFirebase() {
-            if (!currentUser) return;
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
             const userDocRef = doc(db, 'users', currentUser.uid);
-            setDoc(userDocRef, data, { merge: true }).then(() => alert("Profile Updated!"));
+            setDoc(userDocRef, data, { merge: true }).then(() => {
+                alert("Profile Updated!");
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            });
         }
 
         window.copyReferral = function() {
@@ -1718,8 +1723,6 @@
 
         window.clearData = function() {
             if(confirm("Are you sure? This will wipe the current tracker form.")) {
-        function clearData() {
-            if (confirm("Are you sure? This will wipe the current tracker form.")) {
                 document.getElementById('trackerForm').reset();
                 document.getElementById('drawersContainer').innerHTML = '';
                 document.getElementById('depositsContainer').innerHTML = '';
@@ -1738,7 +1741,7 @@
             }
         }
 
-        window.initDefaults = function() {
+        function initDefaults() {
             if (document.getElementById('inventoryContainer').innerHTML.trim() === "") {
                 document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('shiftTime').value = new Date().toTimeString().slice(0, 5);
@@ -1749,6 +1752,7 @@
                 presets['arbys'].forEach(name => addInventoryItem(name));
             }
         }
+        window.initDefaults = initDefaults;
 
         async function processCheckout(planName) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
