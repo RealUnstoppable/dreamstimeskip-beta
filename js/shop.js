@@ -149,6 +149,30 @@ async function handleRemoveFromCart(productId) {
     renderCart();
 }
 
+export async function toggleWishlist(productId) {
+    if (!currentUser) {
+        window.location.href = 'sign in beta.html';
+        return;
+    }
+
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    renderProducts();
+
+    // Dispatch a custom event so account.html can listen to updates if needed
+    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { wishlist } }));
+
+    try {
+        await saveWishlist();
+    } catch (error) {
+        console.error('Failed to update wishlist - Manager info:', error.message);
+    }
+}
+
 // --- FIREBASE & LOCALSTORAGE INTEGRATION ---
 let saveCartTimeout = null;
 let saveWishlistTimeout = null;
@@ -166,7 +190,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore - Manager info: [" + error.message + "]", error);
+                console.error("Error saving wishlist to Firestore - Manager info:", error.message);
                 reject(error);
             }
         }, 500);
@@ -194,7 +218,7 @@ async function saveCart() {
                 const userCartRef = doc(db, 'carts', currentUser.uid);
                 await setDoc(userCartRef, { items: cart });
             } catch (error) {
-                console.error("Error saving cart to Firestore - Manager info: [" + error.message + "]", error);
+                console.error("Error saving cart to Firestore - Manager info:", error.message);
             }
         }, 500); // 500ms debounce
         } else {
@@ -214,7 +238,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore - Manager info: [" + error.message + "]", error);
+                    console.error("Error saving cart to Firestore - Manager info:", error.message);
                 }
             } else {
                 // **MODIFIED**: Save cart to localStorage for logged-out users
@@ -320,7 +344,7 @@ onAuthStateChanged(auth, async (user) => {
                     wishlist = new Set();
                 }
             } catch (error) {
-                console.error("Error loading wishlist - Manager info: [" + error.message + "]", error);
+                console.error("Error loading wishlist - Manager info:", error.message);
             }
 
             const userCartRef = doc(db, 'carts', user.uid);
