@@ -9,10 +9,10 @@
       ]
     },
     {
-      "collectionGroup": "product_reviews",
+      "collectionGroup": "blog_comments",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "productId", "order": "ASCENDING" },
+        { "fieldPath": "postId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     }

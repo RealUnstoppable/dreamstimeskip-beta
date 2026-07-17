@@ -34,6 +34,45 @@
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
 
+    <!-- Reviews Modal -->
+    <div id="reviews-modal" class="cart-modal">
+        <div class="cart-modal-content">
+            <div class="cart-modal-header">
+                <h2 id="reviews-modal-title">Product Reviews</h2>
+                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews">&times;</button>
+            </div>
+
+            <div class="reviews-summary" id="reviews-summary">
+                <div class="average-rating" id="modal-average-rating">0.0</div>
+                <div class="stars-display" id="modal-stars-display">★★★★★</div>
+                <div class="review-count" id="modal-review-count">0 reviews</div>
+            </div>
+
+            <div id="review-submission-section" class="review-submission-section" style="display: none;">
+                <h3>Write a Review</h3>
+                <form id="review-form">
+                    <div class="star-rating-input" id="star-rating-input" role="radiogroup" aria-label="Rating">
+                        <span class="star-input" data-value="1" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="2" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="3" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
+                    </div>
+                    <textarea id="review-text" placeholder="Share your thoughts about this product..." required aria-label="Review text"></textarea>
+                    <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
+                    <div id="review-notification" class="notification"></div>
+                </form>
+            </div>
+            <div id="login-prompt-section" class="login-prompt-section">
+                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+            </div>
+
+            <div id="reviews-list-container" class="reviews-list-container">
+                <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>
+            </div>
+        </div>
+    </div>
+
     <div id="cart-modal" class="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-modal-header">
