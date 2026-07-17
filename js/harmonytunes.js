@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -1604,6 +1604,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LYRICS RENDERING ---
+    // ⚡ Bolt: Cache DOM elements and timestamps to avoid O(N) queries on every frame
+    let cachedLyricsDOM = [];
+
     function renderLyrics(songId) {
         const data = lyricsData[songId];
         if (!data) {
@@ -1635,6 +1638,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
+
+        // Cache DOM and timestamps
+        cachedLyricsDOM = Array.from(lines).map(line => {
+            const words = Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }));
+
+            return {
+                el: line,
+                start: parseFloat(line.getAttribute('data-start')),
+                end: parseFloat(line.getAttribute('data-end')),
+                words: words
+            };
+        });
     }
 
     function handleLyricsScroll() {
@@ -1643,9 +1661,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(autoScrollTimeout);
         autoScrollTimeout = setTimeout(() => {
             isAutoScrolling = true;
-            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none') {
-                const lines = lyricsContent.querySelectorAll('.lyric-line');
-                const activeLine = lines[activeLineIndex];
+            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none' && cachedLyricsDOM.length > 0) {
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 if (activeLine) {
                     isProgrammaticScroll = true;
                     lyricsContainer.scrollTo({
@@ -1661,39 +1678,34 @@ document.addEventListener('DOMContentLoaded', () => {
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
     function syncLyrics() {
-        if (viewLyrics.style.display === 'none') return;
+        if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
-        const lines = lyricsContent.querySelectorAll('.lyric-line');
         
         let newActiveLineIndex = -1;
-        lines.forEach((line, index) => {
-            const start = parseFloat(line.getAttribute('data-start'));
-            const end = parseFloat(line.getAttribute('data-end'));
+        cachedLyricsDOM.forEach((lineCache, index) => {
+            const { el: lineEl, start, end, words } = lineCache;
             
             // Allow active line to persist slightly if it's the last one sung, 
             // but strict matching is better for beat-by-beat
             if (currentTime >= start && currentTime <= end) {
                 newActiveLineIndex = index;
-                line.classList.add('active');
+                lineEl.classList.add('active');
                 
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
-                    const wStart = parseFloat(word.getAttribute('data-start'));
-                    if (currentTime >= wStart) {
-                        word.classList.add('active-word');
+                words.forEach(wordCache => {
+                    if (currentTime >= wordCache.start) {
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             } else {
-                line.classList.remove('active');
+                lineEl.classList.remove('active');
                 // clear word highlights if passed
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
+                words.forEach(wordCache => {
                     if (currentTime > end) {
-                        word.classList.add('active-word');
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             }
@@ -1702,7 +1714,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
             if (isAutoScrolling) {
-                const activeLine = lines[activeLineIndex];
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 isProgrammaticScroll = true;
                 lyricsContainer.scrollTo({
                     top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
@@ -2240,7 +2252,6 @@ let dragItem = null;
     let dragTimeout = null;
     let isDragging = false;
 
-    // ⚡ Bolt: Bind global pointermove/up events once outside the render loop to prevent exponential memory leaks
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
             const deltaY = e.clientY - dragStartY;
@@ -2268,23 +2279,20 @@ let dragItem = null;
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const idx = itemsNodeList.indexOf(dragItem);
+
             isDragging = false;
 
-            const currentItem = dragItem;
-            dragItem = null;
-            currentItem.style.position = '';
-            currentItem.style.zIndex = '';
-            currentItem.style.transform = '';
-            currentItem.classList.remove('dragging');
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
             const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-
-            // ⚡ Bolt: Calculate original index dynamically instead of relying on stale closure variable idx
-            const originalIdx = items.indexOf(currentItem);
-
-            let droppedIdx = originalIdx;
+            let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
@@ -2295,10 +2303,11 @@ let dragItem = null;
                 }
             }
 
-            if (originalIdx !== -1 && droppedIdx !== originalIdx) {
-                const movedSong = userQueue.splice(originalIdx, 1)[0];
+            if (droppedIdx !== idx) {
+                const movedSong = userQueue.splice(idx, 1)[0];
                 userQueue.splice(droppedIdx, 0, movedSong);
             }
+            dragItem = null;
             renderQueue();
         }
     });
@@ -2322,7 +2331,7 @@ let dragItem = null;
             return;
         }
 
-        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid O(N) synchronous reflows
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
         const fragment = document.createDocumentFragment();
 
         displayList.forEach((song, idx) => {
@@ -2348,15 +2357,15 @@ let dragItem = null;
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
                     isDragging = false;
+                    dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
                         item.style.zIndex = '100';
                         item.classList.add('dragging');
-                        queueContentArea.style.cursor = 'grabbing';
+                        if(queueContentArea) queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
                 });
                 
@@ -2471,9 +2480,9 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
             <div class="card-title">${escapeHTML(song.title)}</div>
             <div class="card-desc">${escapeHTML(song.artist)}</div>
