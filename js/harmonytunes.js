@@ -2489,7 +2489,6 @@ export function createSongCard(song) {
         </div>
     `;
 }
-}
 
 export function formatTime(seconds) {
     const m = Math.floor(seconds / 60);
