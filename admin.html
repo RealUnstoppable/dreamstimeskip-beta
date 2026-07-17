@@ -557,7 +557,14 @@
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const btn = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
+                    if (btn) {
+                        const tr = btn.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
+                            tr.querySelector('td:nth-child(5)').innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
+                        }
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -641,7 +648,19 @@
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    if (shouldBeBanned) {
+                        e.target.textContent = 'Unban';
+                        e.target.classList.remove('btn-ban');
+                        e.target.classList.add('btn-unban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Banned';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge cancelled';
+                    } else {
+                        e.target.textContent = 'Ban';
+                        e.target.classList.remove('btn-unban');
+                        e.target.classList.add('btn-ban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Active';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
+                    }
                 }
             });
             
@@ -671,7 +690,9 @@
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
+                    e.target.remove();
                 }
             });
 
@@ -681,12 +702,22 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'cancelled';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 } else if (action === 'complete') {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'completed';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +726,18 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'responded';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    if (tr) tr.remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
