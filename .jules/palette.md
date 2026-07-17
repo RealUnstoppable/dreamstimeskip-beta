@@ -9,3 +9,7 @@
 ## 2026-05-23 - Async Form Submission Loading States
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
+
+## 2026-05-23 - Simulated Async Loading States
+**Learning:** Found mock/simulated async form submissions (like the Promo code form in `checkout-premium.html` and `checkout-ultimate.html` and `js/newsletter.js`) that fired instantly and didn't disable the submit button, leaving users without any visual feedback of their action. Adding a `setTimeout` to simulate async processing helps clarify the user interface flow.
+**Action:** For static mock forms or pseudo-async actions, simulate a true async UI workflow by disabling the submit button, updating the button's text to a loading state (e.g., "Applying..."), and wrapping the final action/state recovery in a short `setTimeout` loop.
