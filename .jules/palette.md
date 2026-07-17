@@ -9,7 +9,6 @@
 ## 2026-05-23 - Async Form Submission Loading States
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
-
-## 2026-06-20 - Global Search Accessibility
-**Learning:** Found an implicitly labeled input field (`#global-search` in `harmonytunes.html`) that relied solely on placeholder text for visual context, lacking an explicit `for` label or `aria-label`. Without an explicit `aria-label`, screen readers may not announce the field's purpose correctly.
-**Action:** Always proactively add explicit `aria-label` attributes to implicitly labeled inputs with placeholder text, especially for generic elements like search fields or promo code inputs, to maintain screen reader accessibility without disrupting visual layouts.
+## 2026-05-26 - Missing Form Label Associations
+**Learning:** Many form `<label>` elements in this app (like in booking.html or detailing.html) lack `for` attributes. This breaks the programmatic association for screen readers and reduces the click target area for sighted users.
+**Action:** Always add matching `for` and `id` attributes to label/input pairs to ensure proper keyboard accessibility and screen reader support.
