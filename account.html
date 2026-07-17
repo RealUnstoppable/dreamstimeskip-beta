@@ -211,7 +211,7 @@
                         <div class="ticket-item" style="border-bottom: 1px solid var(--border-color); padding: 10px 0; margin-bottom: 10px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                 <strong>${escapeHTML(ticket.subject)}</strong>
-                                <span style="color: ${statusColor}; font-size: 0.9em; text-transform: uppercase;">${ticket.status}</span>
+                                <span style="color: ${statusColor}; font-size: 0.9em; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>
                             </div>
                             <p style="margin: 5px 0; font-size: 0.9em;">${escapeHTML(ticket.message)}</p>
                             ${ticket.adminReply ? `<div style="background: var(--primary-card-color); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9em; border-left: 3px solid var(--accent-blue);"><strong>Admin Reply:</strong><br>${escapeHTML(ticket.adminReply)}</div>` : ''}
