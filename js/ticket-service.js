@@ -1,5 +1,6 @@
 import { db } from './auth.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { mapCollectionData } from './utils.js';
 
 const TICKETS_COLLECTION = 'support_tickets';
 
@@ -54,11 +55,8 @@ export async function getUserTickets(userId) {
             // Note: orderBy requires a composite index if used with where.
             // If the index doesn't exist, this might fail, so we fetch and sort client-side.
         );
-        const querySnapshot = await getDocs(q);
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
+        const snap = await getDocs(q);
+        const tickets = mapCollectionData(snap, true);
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
@@ -72,11 +70,8 @@ export async function getUserTickets(userId) {
  */
 export async function getAllTickets() {
     try {
-        const querySnapshot = await getDocs(collection(db, TICKETS_COLLECTION));
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
+        const snap = await getDocs(collection(db, TICKETS_COLLECTION));
+        const tickets = mapCollectionData(snap, true);
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
