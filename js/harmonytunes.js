@@ -2365,7 +2365,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         item.style.position = 'relative';
                         item.style.zIndex = '100';
                         item.classList.add('dragging');
-                        queueContentArea.style.cursor = 'grabbing';
+                        if(queueContentArea) queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
                 });
                 
