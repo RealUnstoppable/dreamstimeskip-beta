@@ -1,32 +1,43 @@
 import { db } from './auth.js';
+// Check if we are in a testing environment that doesn't support https imports
+const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+const firestore = isTest
+    ? await import('../tests/__mocks__/firebase-firestore.js')
+    : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
+
+const { doc, setDoc, serverTimestamp } = firestore;
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Use event delegation to catch submissions from dynamically loaded footers
-if (typeof document !== 'undefined') {
-    document.addEventListener('submit', async (e) => {
-        // Check if the submitted element has the .signup-form class
-        if (e.target && e.target.matches('.signup-form')) {
-            e.preventDefault();
+document.addEventListener('submit', async (e) => {
+    // Check if the submitted element has the .signup-form class
+    if (e.target && e.target.matches('.signup-form')) {
+        e.preventDefault();
 
-            const form = e.target;
-            const emailInput = form.querySelector('input[type="email"]');
-            const email = emailInput.value.trim();
+        const form = e.target;
+        const emailInput = form.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
 
-            if (email) {
-                try {
-                    await setDoc(doc(db, "newsletterSubscribers", email), {
-                        email: email,
-                        subscribedAt: serverTimestamp()
-                    });
-
-                // Show a success message
-                alert("You've successfully subscribed to the newsletter!");
-                emailInput.value = ''; // Clear the input
-            } catch (error) {
-                console.error("Error submitting email - Manager info:", error.message);
-                alert("There was an error subscribing. Please try again later.");
+                    // Show a success message
+                    alert("You've successfully subscribed to the newsletter!");
+                    emailInput.value = ''; // Clear the input
+                } catch (error) {
+                    console.error("Error submitting email:", error);
+                    alert("There was an error subscribing. Please try again later.");
+                }
             }
+        try {
+            // Save to Firestore
+            await setDoc(doc(db, "newsletter_subscribers", email), {
+                email,
+                subscribedAt: serverTimestamp()
+            });
+            // Show a success message
+            alert("You've successfully subscribed to the newsletter!");
+            emailInput.value = ''; // Clear the input
+        } catch (error) {
+            console.error("Error submitting email:", error);
+            alert("There was an error subscribing. Please try again later.");
         }
-        }
-    });
-}
+    }
+});

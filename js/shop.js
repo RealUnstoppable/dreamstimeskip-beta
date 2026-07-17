@@ -3,6 +3,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
+import { escapeHTML } from './utils.js';
 
 // --- PRODUCT DATA (Could be moved to Firestore later) ---
 export const products = [
@@ -18,21 +19,21 @@ export const products = [
         name: 'DTS Model Tee',
         price: 24.99,
         description: 'Iconic tee featuring the official Dreams TimeSkip character art.',
-        imageUrl: 'images/DreamsTimeSkipModel300x300.jpg'
+        imageUrl: '/images/dreams-lobby.jpg'
     },
     {
         id: 'harmonytunes-shirt',
         name: 'HarmonyTunes Cap',
         price: 24.99,
         description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
-        imageUrl: 'images/HarmonyTunesModel300x300.png'
+        imageUrl: '/images/harmony-tunes-card.jpg'
     },
     {
         id: 'unstoppable-mousepad',
         name: 'Unstoppable Mousepad',
         price: 19.99,
         description: 'High-performance mousepad for gaming precision.',
-        imageUrl: 'images/unstoppablemousepadmodel2-300x300.jpg'
+        imageUrl: '/images/MugAllBrands300x300.png'
     }
 ];
 

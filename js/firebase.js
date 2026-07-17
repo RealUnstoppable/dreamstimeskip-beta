@@ -18,11 +18,11 @@ const firebaseConfig = {
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
-// Initialize App Check
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
-  isTokenAutoRefreshEnabled: true
-});
+// Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
+// export const appCheck = initializeAppCheck(app, {
+//   provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
+//   isTokenAutoRefreshEnabled: true
+// });
 
 // Initialize Auth
 export const auth = getAuth(app);
@@ -47,7 +47,7 @@ export async function verifyFirebaseConnection() {
     await getDoc(healthDoc);
     return true; // Document read successfully
   } catch (error) {
-    if (error.code === 'permission-denied') {
+    if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
         console.log("Firebase connection healthy (backend reached, request blocked by rules).");
@@ -56,6 +56,7 @@ export async function verifyFirebaseConnection() {
 
     // Any other error means the connection failed
     console.error("Firebase connection dead:", error);
+    console.error("Code:", error.code, "Message:", error.message);
 
     // Display error banner
     const banner = document.createElement('div');
