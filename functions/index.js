@@ -10,6 +10,11 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+// 🛡️ Shared Utils
+function getUserDocRef(uid) {
+  return admin.firestore().collection("users").doc(uid);
+}
+
 // 🛡️ Shared Auth Utility
 async function authenticateRequest(req, res) {
   const authHeader = req.headers.authorization;
@@ -22,8 +27,7 @@ async function authenticateRequest(req, res) {
   try {
     return await admin.auth().verifyIdToken(token);
   } catch (err) {
-    console.error("Auth Error:", err);
-    console.error("Auth Error - Manager info:", err.message);
+    console.error("Auth Error - Manager info: [" + err.message + "]");
     res.status(401).send("Unauthorized");
     return null;
   }
@@ -82,7 +86,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error - Manager info:", err.message);
+    console.error("Webhook Error - Manager info: [" + err.message + "]");
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -93,7 +97,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await admin.firestore().collection("users").doc(uid).set({
+      await getUserDocRef(uid).set({
         plan: planName, // Updates the frontend to unlock pro features
         subscription: {
           status: "active",
@@ -136,8 +140,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
     try {
       const uid = decodedToken.uid;
 
-      const userDoc = await admin.firestore().collection("users")
-          .doc(uid).get();
+      const userDoc = await getUserDocRef(uid).get();
       if (!userDoc.exists) {
         return res.status(404).send("User not found");
       }
@@ -157,7 +160,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error - Manager info:", err.message);
+      console.error("Cancel Error - Manager info: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
   });
