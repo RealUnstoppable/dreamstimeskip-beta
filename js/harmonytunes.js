@@ -2373,7 +2373,13 @@ let dragItem = null;
                     if (dragTimeout) clearTimeout(dragTimeout);
                     if (!isDragging) {
                         // It was just a tap/click! Open context menu
-                        openQueueContextMenu(e, song.id, idx);
+                        let contextMenuIdx = idx;
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const currentItemIdx = items.indexOf(item);
+                        if (currentItemIdx !== -1) {
+                            contextMenuIdx = currentItemIdx;
+                        }
+                        openQueueContextMenu(e, song.id, contextMenuIdx);
                     }
                 });
             }
