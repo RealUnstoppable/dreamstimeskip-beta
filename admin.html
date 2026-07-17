@@ -576,6 +576,7 @@
                         }
                     }
                 } catch (error) {
+                    console.error('Error closing support ticket - Manager info:', error.message);
                     alert("Error closing ticket: " + error.message);
                 }
             }
@@ -655,7 +656,13 @@
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
                 const userId = e.target.dataset.id;
                 if (!userId) return;
-                const shouldBeBanned = e.target.classList.contains('btn-ban');
+                const isBanBtn = e.target.classList.contains('btn-ban');
+                const isUnbanBtn = e.target.classList.contains('btn-unban');
+
+                if (!isBanBtn && !isUnbanBtn) return;
+
+                const shouldBeBanned = isBanBtn;
+
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                   try {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
