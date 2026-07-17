@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { fetchCollectionData } from '/js/utils.js';
 
         let performanceChart;
 
@@ -322,62 +323,73 @@
                 .replace(/'/g, "&#039;");
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snap = await getDocs(collection(db, collectionName));
+                return snap.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
+            } catch (error) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${error.message}]`, error);
+                throw error;
+            }
+        }
+
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
             setupEventListeners();
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = true) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
+                return [];
+            }
+        }
+
         async function loadAdminData() {
             try {
-                // Fetch Core Data
-                let users = [];
-                try {
-                    const usersSnapshot = await getDocs(collection(db, "users"));
-                    users = usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching users:", e); }
+                // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
+                const promises = [
+                    getDocs(collection(db, "users")).catch(e => { console.error("Error fetching users:", e); return null; }),
+                    getDocs(collection(db, "carts")).catch(e => { console.error("Error fetching carts:", e); return null; }),
+                    getDocs(collection(db, "orders")).catch(e => { console.error("Error fetching orders:", e); return null; }),
+                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Error fetching newsletter:", e); return null; }),
+                    getDocs(collection(db, "bookings")).catch(e => { console.error("Error fetching bookings:", e); return null; }),
+                    getDocs(collection(db, "quotes")).catch(e => { console.error("Error fetching quotes:", e); return null; }),
+                    typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Error fetching support tickets', e); return []; }) : Promise.resolve([]),
+                    getDocs(collection(db, "feature_requests")).catch(e => {
+                        console.log("Could not load feature requests. Missing Firestore rules?", e);
+                        document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                        return null;
+                    }),
+                    getDoc(doc(db, "site_stats", "downloads")).catch(e => {
+                        document.getElementById('download-count-infosheet').textContent = "N/A";
+                        return null;
+                    })
+                ];
 
-                let carts = [];
-                try {
-                    const cartsSnapshot = await getDocs(collection(db, "carts"));
-                    carts = cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching carts:", e); }
+                const [
+                    usersSnapshot, cartsSnapshot, ordersSnapshot, newsletterSnapshot,
+                    bookingsSnap, quotesSnap, tickets, featureRequestsSnapshot, statsDoc
+                ] = await Promise.all(promises);
 
-                let orders = [];
-                try {
-                    const ordersSnapshot = await getDocs(collection(db, "orders"));
-                    orders = ordersSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching orders:", e); }
-
-                let subscribers = [];
-                try {
-                    const newsletterSnapshot = await getDocs(collection(db, "newsletterSubscribers"));
-                    subscribers = newsletterSnapshot.docs.map(d => d.data());
-                } catch (e) { console.error("Error fetching newsletter:", e); }
-
-                // Fetch Detailing Bookings & Quotes
-                let bookings = [];
-                try {
-                    const bookingsSnap = await getDocs(collection(db, "bookings"));
-                    bookings = bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-                } catch (e) { console.error("Error fetching bookings:", e); }
-
-                let quotes = [];
-                try {
-                    const quotesSnap = await getDocs(collection(db, "quotes"));
-                    quotes = quotesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch (e) { console.error("Error fetching quotes:", e); }
+                let users = usersSnapshot ? usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let carts = cartsSnapshot ? cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let orders = ordersSnapshot ? ordersSnapshot.docs.map(d => d.data()) : [];
+                let subscribers = newsletterSnapshot ? newsletterSnapshot.docs.map(d => d.data()) : [];
+                let bookings = bookingsSnap ? bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
+                let quotes = quotesSnap ? quotesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
                 document.getElementById('total-purchases').textContent = orders.length;
 
-                try {
-                    const tickets = await getAllTickets();
-                    renderSupportTicketsTable(tickets);
-                } catch(e) { console.error('Error fetching support tickets', e); }
+                renderSupportTicketsTable(tickets);
 
                 // Renderers
                 renderUserTable(users);
@@ -387,29 +399,19 @@
                 renderBookingsTable(bookings);
                 renderQuotesTable(quotes);
                 
-                // Fetch Feature Requests
-                try {
-                    const featureRequestsSnapshot = await getDocs(collection(db, "feature_requests"));
+                // Feature Requests
+                if (featureRequestsSnapshot) {
                     const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderFeatureRequestsTable(requests);
-                } catch (frError) {
-                    console.log("Could not load feature requests. Missing Firestore rules?", frError);
-                    document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                 }
                 
                 // Download Stats
-                try {
-                    const statsRef = doc(db, "site_stats", "downloads");
-                    const statsDoc = await getDoc(statsRef);
-                    if (statsDoc.exists()) {
-                        document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
-                    }
-                } catch (e) {
-                    document.getElementById('download-count-infosheet').textContent = "N/A";
+                if (statsDoc && statsDoc.exists()) {
+                    document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
                 }
 
             } catch (error) {
-                console.error("Error loading admin data:", error);
+                console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
         }
 
@@ -535,6 +537,8 @@
                 return;
             }
 
+            const fragment = document.createDocumentFragment();
+
             tickets.forEach(ticket => {
                 const row = document.createElement('tr');
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
@@ -543,7 +547,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -554,15 +558,23 @@
                     </td>
                     <td>${statusBadge}</td>
                     <td>${replyAction}${closeAction}</td>`;
-                listBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            listBody.appendChild(fragment);
         }
 
-        window.closeSupportTicket = async function(ticketId) {
+        window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    loadAdminData();
+                    const btn = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
+                    if (btn) {
+                        const tr = btn.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
+                            tr.querySelector('td:nth-child(5)').innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
+                        }
+                    }
                 } catch (error) {
                     alert("Error closing ticket: " + error.message);
                 }
@@ -645,23 +657,41 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
+                  try {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                    loadAdminData();
+                    if (shouldBeBanned) {
+                        e.target.textContent = 'Unban';
+                        e.target.classList.remove('btn-ban');
+                        e.target.classList.add('btn-unban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Banned';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge cancelled';
+                    } else {
+                        e.target.textContent = 'Ban';
+                        e.target.classList.remove('btn-unban');
+                        e.target.classList.add('btn-ban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Active';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
+                    }
                 }
             });
             
             // Support Tickets Reply Toggle
             document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
                 const reqId = e.target.dataset.id;
-                if (!reqId || !e.target.classList.contains('admin-reply-btn')) return;
-                const reply = prompt("Enter your reply to the user:");
-                if (reply !== null && reply.trim() !== "") {
-                    try {
-                        await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
-                    } catch (error) {
-                        alert("Error replying to ticket: " + error.message);
+                if (!reqId) return;
+
+                if (e.target.classList.contains('admin-reply-btn')) {
+                    const reply = prompt("Enter your reply to the user:");
+                    if (reply !== null && reply.trim() !== "") {
+                        try {
+                            await replyToTicket(reqId, reply, 'answered');
+                            loadAdminData();
+                        } catch (error) {
+                            alert("Error replying to ticket: " + error.message);
+                        }
                     }
+                } else if (e.target.classList.contains('admin-close-btn')) {
+                    window.closeSupportTicket(reqId);
                 }
             });
 
@@ -670,8 +700,11 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
+                  try {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                    loadAdminData();
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
+                    e.target.remove();
                 }
             });
 
@@ -681,12 +714,24 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'cancelled';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 } else if (action === 'complete') {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'completed';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 }
-                loadAdminData();
             });
 
             // Quotes Action Buttons
@@ -695,12 +740,18 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'responded') {
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'responded';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     await deleteDoc(doc(db, "quotes", id));
+                    if (tr) tr.remove();
                 }
-                loadAdminData();
             });
 
             // Navigation
