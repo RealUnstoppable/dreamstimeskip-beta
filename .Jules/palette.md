@@ -10,6 +10,6 @@
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
 
-## 2024-05-25 - Checking multiple layout variants for common fields
-**Learning:** Found an accessibility issue where `#promo-code` inputs lacked explicit `aria-label` or `for` tags across two identical variants of the checkout page (`checkout-premium.html` and `checkout-ultimate.html`). If an accessibility gap exists in one place, it usually exists in duplicated components or templates.
-**Action:** When adding missing `aria-label` to fields, always search the codebase for similar or identical templates and ensure the fix is applied consistently across all instances.
+## 2026-06-14 - Implicitly Labeled Input Fields
+**Learning:** Found a recurring pattern across multiple frontend files (e.g., `harmonytunes.html`, `checkout-premium.html`, `checkout-ultimate.html`, `tracker.html`, and `js/footer.js`) where text inputs (like search bars, promo codes, preset names, and newsletter emails) rely exclusively on placeholder text instead of explicitly bound `<label>` tags. This renders them difficult for screen readers to identify accurately without breaking visual UI layouts.
+**Action:** Proactively add descriptive `aria-label` attributes to these implicitly labeled inputs to ensure accessibility and screen reader compatibility while preserving visual fidelity.
