@@ -2339,7 +2339,7 @@ let dragItem = null;
             item.className = 'queue-item';
             
             const isDraggable = currentTab === 'upnext' && song.isUserQueue;
-            item.dataset.index = idx;
+            item.dataset.index = idx; // Maps 1:1 with userQueue index since userQueue is added first
             item.dataset.songId = song.id;
             
             item.innerHTML = `
