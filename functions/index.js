@@ -162,3 +162,41 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
     }
   });
 });
+// ⭐️ Update Product Stats on New Review
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+
+exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
+    const snap = event.data;
+    const context = event;
+    const newReview = snap.data();
+    const productId = newReview.productId;
+    const rating = newReview.rating;
+
+    // Validate rating
+    if (typeof rating !== "number" || rating < 1 || rating > 5) {
+      console.error("Invalid rating:", rating);
+      return null;
+    }
+
+    const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
+
+    return admin.firestore().runTransaction(async (transaction) => {
+      const statsDoc = await transaction.get(productStatsRef);
+      let reviewCount = 0;
+      let averageRating = 0;
+
+      if (statsDoc.exists) {
+        const data = statsDoc.data();
+        reviewCount = data.reviewCount || 0;
+        averageRating = data.averageRating || 0;
+      }
+
+      const newReviewCount = reviewCount + 1;
+      const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
+
+      transaction.set(productStatsRef, {
+        reviewCount: newReviewCount,
+        averageRating: newAverageRating
+      }, { merge: true });
+    });
+  });

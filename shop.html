@@ -51,6 +51,35 @@
             </div>
         </div>
     </div>
+    <!-- Reviews Modal -->
+    <div id="reviews-modal" class="cart-modal">
+        <div class="cart-modal-content reviews-modal-content">
+            <div class="cart-modal-header">
+                <h2>Product Reviews</h2>
+                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews">&times;</button>
+            </div>
+            <div id="reviews-list-container" class="cart-items-container" style="margin-bottom: 20px;">
+                <!-- Reviews will be injected here -->
+            </div>
+            <div class="reviews-modal-footer">
+                <h3>Leave a Review</h3>
+                <form id="review-submit-form" style="display: flex; flex-direction: column; gap: 10px;">
+                    <input type="hidden" id="review-product-id">
+                    <select id="review-rating" required style="padding: 10px; background: #2c2c2c; color: white; border: 1px solid var(--border-color); border-radius: 5px;">
+                        <option value="" disabled selected>Select Rating</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                    <textarea id="review-text" required placeholder="Write your review here..." style="padding: 10px; background: #2c2c2c; color: white; border: 1px solid var(--border-color); border-radius: 5px; min-height: 80px;"></textarea>
+                    <button type="submit" class="add-to-cart-btn" style="width: 100%;">Submit Review</button>
+                    <p id="review-auth-message" style="color: var(--accent-red); display: none; font-size: 0.9em; text-align: center;">You must be logged in to leave a review.</p>
+                </form>
+            </div>
+        </div>
+    </div>
     <footer class="main-footer"></footer>
 
 
@@ -70,4 +99,5 @@
     <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    </script>
+    </script></body>
+</html>

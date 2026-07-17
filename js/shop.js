@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, addDoc, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 
@@ -58,12 +58,28 @@ const navCtaContainer = document.getElementById('nav-cta-container');
 
 
 // --- RENDER FUNCTIONS ---
-function renderProducts() {
+async function renderProducts() {
     if (!productGrid) return;
+
+    let statsMap = {};
+    try {
+        const statsSnap = await getDocs(collection(db, 'product_stats'));
+        statsSnap.forEach(doc => {
+            statsMap[doc.id] = doc.data();
+        });
+    } catch (error) {
+        console.error("Manager info: Error fetching product stats", error);
+    }
+
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
+
+        const stats = statsMap[product.id];
+        const ratingDisplay = stats && stats.reviewCount > 0
+            ? `★ ${stats.averageRating.toFixed(1)} (${stats.reviewCount})`
+            : 'No reviews';
 
         return `
             <div class="product-card">
@@ -73,10 +89,14 @@ function renderProducts() {
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
                 <div class="product-info">
                     <h3>${product.name}</h3>
+                    <div class="product-rating" style="color: #fbbf24; font-size: 0.9em; margin-bottom: 5px;">${ratingDisplay}</div>
                     <p>${product.description}</p>
                     <div class="product-footer">
                         <span class="product-price">$${product.price.toFixed(2)}</span>
-                        <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="view-reviews-btn" style="background-color: #4b5563; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.2s;" data-id="${product.id}">Reviews</button>
+                            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -348,4 +368,109 @@ onAuthStateChanged(auth, async (user) => {
 
         updateUserNav(user);
         renderCart(); // Render the final cart state
+    });// --- REVIEWS LOGIC ---
+const reviewsModal = document.getElementById('reviews-modal');
+const closeReviewsBtn = document.getElementById('close-reviews-btn');
+const reviewsListContainer = document.getElementById('reviews-list-container');
+const reviewSubmitForm = document.getElementById('review-submit-form');
+const reviewProductIdInput = document.getElementById('review-product-id');
+const reviewAuthMessage = document.getElementById('review-auth-message');
+
+async function openReviewsModal(productId) {
+    if (!reviewsModal) return;
+    reviewProductIdInput.value = productId;
+    reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
+    reviewsModal.style.display = 'block';
+
+    if (!currentUser) {
+        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'none';
+        reviewAuthMessage.style.display = 'block';
+    } else {
+        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'block';
+        reviewAuthMessage.style.display = 'none';
+    }
+
+    try {
+        const q = query(collection(db, 'product_reviews'), where('productId', '==', productId), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            reviewsListContainer.innerHTML = '<p>No reviews yet. Be the first!</p>';
+            return;
+        }
+
+        reviewsListContainer.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const date = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Just now';
+            reviewsListContainer.innerHTML += `
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <strong>${escapeHTML(data.authorName || 'Anonymous')}</strong>
+                        <span style="color: #fbbf24;">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9em; color: var(--text-secondary);">${escapeHTML(data.text)}</p>
+                    <small style="color: #666;">${date}</small>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Manager info: Error loading reviews", error);
+        reviewsListContainer.innerHTML = '<p>Error loading reviews.</p>';
+    }
+}
+
+if (reviewSubmitForm) {
+    reviewSubmitForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const productId = reviewProductIdInput.value;
+        const rating = parseInt(document.getElementById('review-rating').value, 10);
+        const text = document.getElementById('review-text').value;
+        const submitBtn = reviewSubmitForm.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        try {
+            await addDoc(collection(db, 'product_reviews'), {
+                productId,
+                userId: currentUser.uid,
+                authorName: (currentUser.email ? currentUser.email.split("@")[0] : "Anonymous"), // Safe fallback
+                rating,
+                text,
+                createdAt: new Date().toISOString()
+            });
+            reviewSubmitForm.reset();
+            await openReviewsModal(productId); // Reload reviews
+            await renderProducts(); // Refresh stats on grid
+        } catch (error) {
+            console.error("Manager info: Error submitting review", error);
+            alert('Error submitting review.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Review';
+        }
     });
+}
+
+if (closeReviewsBtn) {
+    closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
+}
+window.addEventListener('click', (e) => {
+    if (e.target === reviewsModal) reviewsModal.style.display = 'none';
+});
+
+// Add event delegation for the new "Reviews" button
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('product-grid');
+    if (grid) {
+        grid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-reviews-btn')) {
+                const productId = e.target.dataset.id;
+                openReviewsModal(productId);
+            }
+        });
+    }
+});
