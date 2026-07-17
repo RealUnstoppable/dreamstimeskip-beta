@@ -78,6 +78,48 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   });
 });
 
+// 📊 Aggregate Ratings on Review Write
+exports.onReviewWrite = functions.firestore
+    .document("reviews/{reviewId}")
+    .onWrite(async (change, context) => {
+      const reviewData = change.after.exists ? change.after.data() : change.before.data();
+      const productId = reviewData.productId;
+
+      if (!productId) {
+        return null;
+      }
+
+      const db = admin.firestore();
+      const reviewsRef = db.collection("reviews");
+
+      try {
+        const snapshot = await reviewsRef.where("productId", "==", productId).get();
+        let totalRating = 0;
+        let count = 0;
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.rating) {
+            totalRating += data.rating;
+            count++;
+          }
+        });
+
+        const averageRating = count > 0 ? totalRating / count : 0;
+
+        await db.collection("product_stats").doc(productId).set({
+          averageRating: averageRating,
+          reviewCount: count,
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        return null;
+      } catch (error) {
+        console.error("Error aggregating ratings - Manager info:", error.message);
+        return null;
+      }
+    });
+
 // 🔐 STRIPE WEBHOOK (SECURE)
 exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];

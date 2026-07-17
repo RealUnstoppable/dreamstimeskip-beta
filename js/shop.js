@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 
@@ -44,6 +44,8 @@ export const productMap = new Map(products.map(p => [p.id, p]));
 export let cart = {}; // { productId: quantity, ... }
 export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
+let currentReviewProductId = null;
+let productStatsMap = new Map();
 
 // --- DOM ELEMENTS ---
 const productGrid = document.getElementById('product-grid');
@@ -56,14 +58,39 @@ const cartTotalPriceEl = document.getElementById('cart-total-price');
 const checkoutBtn = document.getElementById('checkout-btn');
 const navCtaContainer = document.getElementById('nav-cta-container');
 
+// Review Elements
+const reviewsModal = document.getElementById('reviews-modal');
+const closeReviewsBtn = document.getElementById('close-reviews-btn');
+const reviewSubmissionSection = document.getElementById('review-submission-section');
+const loginPromptSection = document.getElementById('login-prompt-section');
+const reviewForm = document.getElementById('review-form');
+const starInputs = document.querySelectorAll('.star-input');
+const reviewText = document.getElementById('review-text');
+const reviewsListContainer = document.getElementById('reviews-list-container');
+const submitReviewBtn = document.getElementById('submit-review-btn');
+const reviewNotification = document.getElementById('review-notification');
+
+let currentRating = 0;
 
 // --- RENDER FUNCTIONS ---
+function generateStarsHtml(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+
+    return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+}
+
 function renderProducts() {
     if (!productGrid) return;
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
+
+        const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
+        const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
+        const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
         return `
             <div class="product-card">
@@ -74,14 +101,31 @@ function renderProducts() {
                 <div class="product-info">
                     <h3>${product.name}</h3>
                     <p>${product.description}</p>
+                    <div class="product-stars-container">
+                        ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
+                        <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
+                    </div>
                     <div class="product-footer">
                         <span class="product-price">$${product.price.toFixed(2)}</span>
                         <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                     </div>
+                    <button class="reviews-btn" data-id="${product.id}">Read Reviews</button>
                 </div>
             </div>
         `;
     }).join('');
+}
+
+async function loadProductStats() {
+    try {
+        const statsSnapshot = await getDocs(collection(db, 'product_stats'));
+        statsSnapshot.forEach(doc => {
+            productStatsMap.set(doc.id, doc.data());
+        });
+        renderProducts();
+    } catch (error) {
+        console.error("Error loading product stats:", error);
+    }
 }
 
 function renderCart() {
@@ -281,8 +325,45 @@ function setupEventListeners() {
             const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
             const productId = btn.dataset.id;
             toggleWishlist(productId);
+        } else if (e.target.classList.contains('reviews-btn')) {
+            const productId = e.target.dataset.id;
+            openReviewsModal(productId);
         }
     });
+
+    // Review Modal Listeners
+    if (closeReviewsBtn && reviewsModal) {
+        closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
+        window.addEventListener('click', (e) => {
+            if (e.target === reviewsModal) {
+                reviewsModal.style.display = 'none';
+            }
+        });
+    }
+
+    // Star Rating Logic
+    starInputs.forEach(star => {
+        star.addEventListener('click', (e) => {
+            currentRating = parseInt(e.target.dataset.value);
+            starInputs.forEach(s => {
+                s.classList.toggle('active', parseInt(s.dataset.value) <= currentRating);
+                s.setAttribute('aria-checked', parseInt(s.dataset.value) <= currentRating ? 'true' : 'false');
+            });
+        });
+
+        // Keyboard accessibility for stars
+        star.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                star.click();
+            }
+        });
+    });
+
+    // Review Form Submit
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', handleReviewSubmit);
+    }
 
     // Cart modal listeners
     if (cartButton && cartModal && closeCartBtn) {
@@ -321,8 +402,148 @@ function setupEventListeners() {
 }
 
 
+// --- REVIEW FUNCTIONS ---
+async function openReviewsModal(productId) {
+    currentReviewProductId = productId;
+    const product = productMap.get(productId);
+
+    document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
+    reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>';
+
+    // Reset Form
+    currentRating = 0;
+    starInputs.forEach(s => {
+        s.classList.remove('active');
+        s.setAttribute('aria-checked', 'false');
+    });
+    reviewText.value = '';
+    reviewNotification.innerHTML = '';
+
+    // Toggle Auth Sections
+    if (currentUser) {
+        reviewSubmissionSection.style.display = 'block';
+        loginPromptSection.style.display = 'none';
+    } else {
+        reviewSubmissionSection.style.display = 'none';
+        loginPromptSection.style.display = 'block';
+    }
+
+    // Load Stats and Reviews
+    const stats = productStatsMap.get(productId) || { averageRating: 0, reviewCount: 0 };
+    document.getElementById('modal-average-rating').textContent = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '0.0';
+    document.getElementById('modal-stars-display').innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
+    document.getElementById('modal-review-count').textContent = `${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''}`;
+
+    reviewsModal.style.display = 'block';
+    await loadReviews(productId);
+}
+
+async function loadReviews(productId) {
+    try {
+        const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first!</p>';
+            return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+            const review = doc.data();
+            const date = review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now';
+            html += `
+                <div class="review-item">
+                    <div class="review-header">
+                        <span class="review-author">${escapeHTML(review.authorName || 'Anonymous')}</span>
+                        <span class="review-date">${date}</span>
+                    </div>
+                    <div class="review-stars">${generateStarsHtml(review.rating)}</div>
+                    <p class="review-content">${escapeHTML(review.text)}</p>
+                </div>
+            `;
+        });
+        reviewsListContainer.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error loading reviews - Manager info:", error.message);
+        reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
+    }
+}
+
+async function handleReviewSubmit(e) {
+    e.preventDefault();
+    if (!currentUser || !currentReviewProductId) return;
+
+    if (currentRating === 0) {
+        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Please select a star rating.</span>';
+        return;
+    }
+
+    const text = reviewText.value.trim();
+    if (!text) return;
+
+    const originalText = submitReviewBtn.textContent;
+    submitReviewBtn.disabled = true;
+    submitReviewBtn.textContent = 'Submitting...';
+
+    try {
+        const cacheKey = `profile_${currentUser.uid}`;
+        const cachedProfile = sessionStorage.getItem(cacheKey);
+        let authorName = currentUser.displayName || 'Anonymous';
+
+        if (cachedProfile) {
+            const userData = JSON.parse(cachedProfile);
+            if (userData.username) authorName = userData.username;
+        } else {
+             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+             if (userDoc.exists() && userDoc.data().username) {
+                 authorName = userDoc.data().username;
+             }
+        }
+
+        await addDoc(collection(db, "reviews"), {
+            productId: currentReviewProductId,
+            userId: currentUser.uid,
+            authorName: authorName,
+            rating: currentRating,
+            text: text,
+            createdAt: serverTimestamp()
+        });
+
+        // Optimistic UI Update for stats
+        const currentStats = productStatsMap.get(currentReviewProductId) || { averageRating: 0, reviewCount: 0 };
+        const newTotal = (currentStats.averageRating * currentStats.reviewCount) + currentRating;
+        const newCount = currentStats.reviewCount + 1;
+        productStatsMap.set(currentReviewProductId, {
+            averageRating: newTotal / newCount,
+            reviewCount: newCount
+        });
+
+        reviewText.value = '';
+        currentRating = 0;
+        starInputs.forEach(s => {
+            s.classList.remove('active');
+            s.setAttribute('aria-checked', 'false');
+        });
+
+        reviewNotification.innerHTML = '<span style="color: var(--accent-green);">Review submitted successfully!</span>';
+        setTimeout(() => reviewNotification.innerHTML = '', 3000);
+
+        renderProducts(); // Update stars on grid
+        await openReviewsModal(currentReviewProductId); // Refresh modal
+
+    } catch (error) {
+        console.error("Error submitting review - Manager info:", error.message);
+        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
+    } finally {
+        submitReviewBtn.disabled = false;
+        submitReviewBtn.textContent = originalText;
+    }
+}
+
 // --- INITIALIZATION ---
-renderProducts();
+loadProductStats();
 setupEventListeners();
 
 // **MODIFIED**: Reworked auth state change to handle local cart
