@@ -23,11 +23,14 @@
     </style>
 </head>
 <body>
-    <header class="main-header"></header>
     <div class="container">
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
             <form id="auth-form">
+                <div class="input-group" id="username-group" style="display: none;">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username">
+                </div>
                 <div class="input-group" id="email-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
@@ -42,17 +45,23 @@
             </form>
         </div>
     </div>
-    <footer class="main-footer"></footer>
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        // Authentication handling logic (add as needed)
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !sessionStorage.getItem('newUser')) {
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && !userDoc.data().isBanned) {
+                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    if (!window.location.pathname.includes(destination)) {
+                        window.location.replace(destination);
+                    }
+                }
+            }
+        });
     </script>
-    <script type="module">
-        import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js';
-        if (typeof loadNavbar === 'function') loadNavbar();
-        if (typeof loadFooter === 'function') loadFooter();
-    </script>
+
 </body>
 </html>
