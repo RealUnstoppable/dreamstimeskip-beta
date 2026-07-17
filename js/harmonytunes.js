@@ -2246,7 +2246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let dragItem = null;
+let dragItem = null;
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
