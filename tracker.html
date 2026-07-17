@@ -1327,9 +1327,9 @@
             div.className = 'inventory-item animate-fadeIn';
             div.innerHTML = `
                 <input type="text" placeholder="Item Name" class="inv-name" value="${escapeHTML(name)}">
-                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" onchange="triggerDraftSync()">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
