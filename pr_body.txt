@@ -1,7 +1,4 @@
-💡 What: Optimized the `syncLyrics()` function by caching the required DOM elements and parsing their timestamp attributes (`data-start`/`data-end`) once during the initial `renderLyrics()` call, instead of querying the DOM and float-parsing on every frame.
-
-🎯 Why: `syncLyrics()` is called inside `updateProgress()` which runs on `requestAnimationFrame()`. Previously, it performed `querySelectorAll` and parsed strings to floats repeatedly, which was highly inefficient and caused unnecessary reflows/jank during high-frequency audio playback.
-
-📊 Impact: Reduces CPU workload significantly during playback by eliminating O(N) DOM node traversals and string parsing on every frame update, preventing layout thrashing and delivering smoother UI synchronicity.
-
-🔬 Measurement: Verify during playback by turning on lyrics view. Performance profile during playback should show drastically reduced time spent in JavaScript execution, particularly on DOM parsing functions.
+💡 **What**: Added descriptive `aria-label` attributes to implicitly labeled form inputs across several main HTML files, including the global search bar, checkout promo code inputs, and various setup/tracker configuration fields.
+🎯 **Why**: The UI heavily utilizes placeholder text in place of explicit `<label>` tags for a cleaner aesthetic. While visually clear, this left screen readers with no context for what these inputs were for, making the experience confusing for visually impaired users.
+📸 **Before/After**: No visual changes to the UI. Structural HTML updates only.
+♿ **Accessibility**: Improves WCAG compliance by ensuring assistive technologies correctly announce the purpose of critical input fields like `#global-search`, `#promo-code`, and custom tracker presets.
