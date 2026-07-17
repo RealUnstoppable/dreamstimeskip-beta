@@ -155,7 +155,6 @@ export async function handlePlaceOrder(e) {
         setTimeout(() => safeRedirect('./account.html'), 3000);
 
     } catch (error) {
-        console.error("Manager info: Error placing order:", error);
         console.error("Error placing order - Manager info:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
