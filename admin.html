@@ -563,7 +563,7 @@
             listBody.appendChild(fragment);
         }
 
-        window.closeSupportTicket = async function(ticketId) {
+        window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
                 try {
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
