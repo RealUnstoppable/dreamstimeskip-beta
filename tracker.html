@@ -1594,12 +1594,12 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             setDoc(userDocRef, {
                 customPresets: arrayUnion({ id: Date.now().toString(), name, items })
-
-            db.collection('users').doc(currentUser.uid).set({
-                customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
             }, { merge: true }).then(() => {
                 alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
+            }).catch((error) => {
+                console.error("Error saving custom preset - Manager info: [" + error.message + "]");
+                alert("There was an error saving the preset. Please try again later.");
             });
         }
         window.saveCustomPreset = saveCustomPreset;
@@ -1612,6 +1612,7 @@
                 container.innerHTML = "";
                 const fragment = document.createDocumentFragment();
                 if(docSnap.exists() && docSnap.data().customPresets) {
+                    const fragment = document.createDocumentFragment();
                     docSnap.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
