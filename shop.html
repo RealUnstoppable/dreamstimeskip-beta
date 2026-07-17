@@ -90,6 +90,52 @@
             </div>
         </div>
     </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="review-modal" style="display: none;">
+        <div class="review-modal-content">
+            <div class="review-modal-header">
+                <h2>Product Reviews</h2>
+                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews">&times;</button>
+            </div>
+
+            <div class="review-stats" id="review-stats">
+                <div class="avg-rating">
+                    <span id="avg-rating-value">0.0</span> <span class="star-rating">★</span>
+                </div>
+                <div class="total-reviews" id="total-reviews-count">0 reviews</div>
+            </div>
+
+            <div id="reviews-list-container" class="reviews-list-container">
+                <!-- Reviews will be injected here -->
+            </div>
+
+            <div id="write-review-section" class="write-review-section" style="display: none;">
+                <h3>Write a Review</h3>
+                <form id="write-review-form">
+                    <div class="rating-input">
+                        <label for="review-rating">Rating (1-5):</label>
+                        <select id="review-rating" required>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="comment-input">
+                        <textarea id="review-comment" rows="4" placeholder="Share your thoughts about this product..." required></textarea>
+                    </div>
+                    <button type="submit" id="submit-review-btn" class="submit-review-btn">Submit Review</button>
+                    <div id="review-message" class="review-message"></div>
+                </form>
+            </div>
+            <div id="login-to-review-msg" class="login-to-review-msg" style="display: none;">
+                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+            </div>
+        </div>
+    </div>
+
     <footer class="main-footer"></footer>
 
 
