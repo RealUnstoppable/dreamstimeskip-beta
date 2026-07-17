@@ -8,3 +8,11 @@ export function escapeHTML(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+export function mapCollectionData(querySnapshot) {
+    const items = [];
+    querySnapshot.forEach(doc => {
+        items.push({ id: doc.id, ...doc.data() });
+    });
+    return items;
+}
