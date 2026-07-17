@@ -10,6 +10,11 @@ const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
+// 🛡️ Shared Utils
+function getUserDocRef(uid) {
+  return admin.firestore().collection("users").doc(uid);
+}
+
 // 🛡️ Shared Auth Utility
 async function authenticateRequest(req, res) {
   const authHeader = req.headers.authorization;
@@ -67,8 +72,8 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error - Manager info: [" + err.message + "]");
-      res.status(500).json({error: err.message});
+      console.error("Checkout Error - Manager info:", err.message);
+      res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
     }
   });
 });
@@ -92,7 +97,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await admin.firestore().collection("users").doc(uid).set({
+      await getUserDocRef(uid).set({
         plan: planName, // Updates the frontend to unlock pro features
         subscription: {
           status: "active",
@@ -135,8 +140,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
     try {
       const uid = decodedToken.uid;
 
-      const userDoc = await admin.firestore().collection("users")
-          .doc(uid).get();
+      const userDoc = await getUserDocRef(uid).get();
       if (!userDoc.exists) {
         return res.status(404).send("User not found");
       }

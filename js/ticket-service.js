@@ -3,6 +3,14 @@ import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimest
 
 const TICKETS_COLLECTION = 'support_tickets';
 
+function sortTicketsByDateDesc(tickets) {
+    return tickets.sort((a, b) => {
+         const timeA = a.createdAt?.toMillis() || 0;
+         const timeB = b.createdAt?.toMillis() || 0;
+         return timeB - timeA;
+    });
+}
+
 /**
  * Creates a new support ticket
  * @param {string} userId - ID of the user creating the ticket
@@ -52,12 +60,7 @@ export async function getUserTickets(userId) {
             tickets.push({ id: doc.id, ...doc.data() });
         });
 
-        // Sort descending by createdAt locally to avoid composite index requirement
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
+        return sortTicketsByDateDesc(tickets);
     } catch (error) {
         console.error('Error fetching user tickets - Manager info: [' + error.message + ']');
         throw error;
@@ -75,12 +78,7 @@ export async function getAllTickets() {
             tickets.push({ id: doc.id, ...doc.data() });
         });
 
-        // Sort descending by createdAt
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
+        return sortTicketsByDateDesc(tickets);
     } catch (error) {
         console.error('Error fetching all tickets - Manager info: [' + error.message + ']');
         throw error;

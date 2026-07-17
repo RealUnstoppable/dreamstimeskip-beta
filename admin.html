@@ -331,36 +331,54 @@
         async function fetchCollectionData(collectionName, isMapWithId = true) {
             try {
                 const snapshot = await getDocs(collection(db, collectionName));
-                return snapshot.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
-            } catch (error) {
-                console.error(`Error fetching ${collectionName} - Manager info: [${error.message}]`);
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
                 return [];
             }
         }
 
         async function loadAdminData() {
             try {
-                // Fetch Core Data
-                const users = await fetchCollectionData("users", true);
-                const carts = await fetchCollectionData("carts", true);
-                const orders = await fetchCollectionData("orders", false);
-                const subscribers = await fetchCollectionData("newsletterSubscribers", false);
+                // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
+                const promises = [
+                    getDocs(collection(db, "users")).catch(e => { console.error("Error fetching users:", e); return null; }),
+                    getDocs(collection(db, "carts")).catch(e => { console.error("Error fetching carts:", e); return null; }),
+                    getDocs(collection(db, "orders")).catch(e => { console.error("Error fetching orders:", e); return null; }),
+                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Error fetching newsletter:", e); return null; }),
+                    getDocs(collection(db, "bookings")).catch(e => { console.error("Error fetching bookings:", e); return null; }),
+                    getDocs(collection(db, "quotes")).catch(e => { console.error("Error fetching quotes:", e); return null; }),
+                    typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Error fetching support tickets', e); return []; }) : Promise.resolve([]),
+                    getDocs(collection(db, "feature_requests")).catch(e => {
+                        console.log("Could not load feature requests. Missing Firestore rules?", e);
+                        document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                        return null;
+                    }),
+                    getDoc(doc(db, "site_stats", "downloads")).catch(e => {
+                        document.getElementById('download-count-infosheet').textContent = "N/A";
+                        return null;
+                    })
+                ];
 
-                // Fetch Detailing Bookings & Quotes
-                const bookings = await fetchCollectionData("bookings", true);
+                const [
+                    usersSnapshot, cartsSnapshot, ordersSnapshot, newsletterSnapshot,
+                    bookingsSnap, quotesSnap, tickets, featureRequestsSnapshot, statsDoc
+                ] = await Promise.all(promises);
+
+                let users = usersSnapshot ? usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let carts = cartsSnapshot ? cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let orders = ordersSnapshot ? ordersSnapshot.docs.map(d => d.data()) : [];
+                let subscribers = newsletterSnapshot ? newsletterSnapshot.docs.map(d => d.data()) : [];
+                let bookings = bookingsSnap ? bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
                 bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-
-                const quotes = await fetchCollectionData("quotes", true);
+                let quotes = quotesSnap ? quotesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
                 document.getElementById('total-purchases').textContent = orders.length;
 
-                try {
-                    const tickets = await getAllTickets();
-                    renderSupportTicketsTable(tickets);
-                } catch(e) { console.error('Error fetching support tickets - Manager info: [' + e.message + ']'); }
+                renderSupportTicketsTable(tickets);
 
                 // Renderers
                 renderUserTable(users);
@@ -370,29 +388,19 @@
                 renderBookingsTable(bookings);
                 renderQuotesTable(quotes);
                 
-                // Fetch Feature Requests
-                try {
-                    const featureRequestsSnapshot = await getDocs(collection(db, "feature_requests"));
+                // Feature Requests
+                if (featureRequestsSnapshot) {
                     const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderFeatureRequestsTable(requests);
-                } catch (frError) {
-                    console.error("Could not load feature requests - Manager info: [" + frError.message + "]");
-                    document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                 }
                 
                 // Download Stats
-                try {
-                    const statsRef = doc(db, "site_stats", "downloads");
-                    const statsDoc = await getDoc(statsRef);
-                    if (statsDoc.exists()) {
-                        document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
-                    }
-                } catch (e) {
-                    document.getElementById('download-count-infosheet').textContent = "N/A";
+                if (statsDoc && statsDoc.exists()) {
+                    document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
                 }
 
             } catch (error) {
-                console.error("Error loading admin data - Manager info: [" + error.message + "]");
+                console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
         }
 
@@ -526,7 +534,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm" style="background-color: var(--accent-red); color: white;" class="admin-close-btn" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -539,6 +547,7 @@
                     <td>${replyAction}${closeAction}</td>`;
                 listBody.appendChild(row);
             });
+            listBody.appendChild(fragment);
         }
 
         window.closeSupportTicket = async function(ticketId) {
@@ -636,15 +645,20 @@
             // Support Tickets Reply Toggle
             document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
                 const reqId = e.target.dataset.id;
-                if (!reqId || !e.target.classList.contains('admin-reply-btn')) return;
-                const reply = prompt("Enter your reply to the user:");
-                if (reply !== null && reply.trim() !== "") {
-                    try {
-                        await replyToTicket(reqId, reply, 'answered');
-                        loadAdminData();
-                    } catch (error) {
-                        alert("Error replying to ticket: " + error.message);
+                if (!reqId) return;
+
+                if (e.target.classList.contains('admin-reply-btn')) {
+                    const reply = prompt("Enter your reply to the user:");
+                    if (reply !== null && reply.trim() !== "") {
+                        try {
+                            await replyToTicket(reqId, reply, 'answered');
+                            loadAdminData();
+                        } catch (error) {
+                            alert("Error replying to ticket: " + error.message);
+                        }
                     }
+                } else if (e.target.classList.contains('admin-close-btn')) {
+                    window.closeSupportTicket(reqId);
                 }
             });
 
