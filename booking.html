@@ -97,7 +97,7 @@
                 </div>
 
                 <div id="account-creation-block" class="account-prompt">
-                    <label class="checkbox-label" for="create-account-cb">
+                    <label for="create-account-cb" class="checkbox-label">
                         <input type="checkbox" id="create-account-cb"> 
                         Create an account for faster checkout?
                     </label>
@@ -139,7 +139,7 @@
                     <label for="q-details">Vehicle Make, Model & Condition *</label>
                     <input type="text" id="q-details" required placeholder="e.g. 2022 Porsche 911 - heavy swirl marks">
                 </div>
-                <button type="submit">Request Custom Quote</button>
+                <button type="submit" id="quote-submit-btn">Request Custom Quote</button>
             </form>
         </div>
 
@@ -283,9 +283,12 @@
 
         // Quote Logic
         document.getElementById('quote-form').addEventListener('submit', async (e) => {
-            // ... (Keep existing quote logic here) ...
-             e.preventDefault();
+            e.preventDefault();
             const msg = document.getElementById('msg');
+            const submitBtn = document.getElementById('quote-submit-btn');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Processing...";
             try {
                 await addDoc(collection(db, "quotes"), {
                     email: document.getElementById('q-email').value,
@@ -299,6 +302,9 @@
             } catch (error) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error submitting quote.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         });
     </script>

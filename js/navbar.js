@@ -57,8 +57,21 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                const destination = userDoc.exists() && userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                const cacheKey = `profile_${user.uid}`;
+                const cachedProfile = sessionStorage.getItem(cacheKey);
+                let userData = null;
+
+                if (cachedProfile) {
+                    userData = JSON.parse(cachedProfile);
+                } else {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+                }
+
+                const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {

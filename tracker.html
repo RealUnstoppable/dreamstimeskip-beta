@@ -1605,7 +1605,6 @@
             }, { merge: true }).then(() => {
                 alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
-                loadCustomPresets();
             });
         }
 
@@ -1777,7 +1776,7 @@
                     alert("Error creating checkout session: " + (data.error || "Unknown error"));
                 }
             } catch (err) {
-                alert("Payment system unreachable. Please try again later.");
+                alert("Payment system unreachable. Please try again later. Manager info: [" + err.message + "]");
             }
         }
 
