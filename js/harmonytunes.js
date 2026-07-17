@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -2239,11 +2239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartTop = 0;
     let dragTimeout = null;
     let isDragging = false;
-    let dragItem = null;
-    let dragStartY = 0;
-    let dragStartTop = 0;
 
-    // Attach global drag event listeners once
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
             const deltaY = e.clientY - dragStartY;
@@ -2271,20 +2267,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const idx = itemsNodeList.indexOf(dragItem);
+
             isDragging = false;
-            const currentDragItem = dragItem; // save reference
-            dragItem = null;
-            currentDragItem.style.position = '';
-            currentDragItem.style.zIndex = '';
-            currentDragItem.style.transform = '';
-            currentDragItem.classList.remove('dragging');
+
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
             const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-            let droppedIdx = parseInt(currentDragItem.dataset.index, 10);
-            const originalIdx = droppedIdx;
-
+            let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
@@ -2295,24 +2291,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Re-calculate the actual index dynamically in case it moved
-            const activeItems = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-            const actualOriginalIdx = activeItems.indexOf(currentDragItem);
-
-            if (droppedIdx !== actualOriginalIdx && actualOriginalIdx !== -1) {
-                const movedSong = userQueue.splice(actualOriginalIdx, 1)[0];
+            if (droppedIdx !== idx) {
+                const movedSong = userQueue.splice(idx, 1)[0];
                 userQueue.splice(droppedIdx, 0, movedSong);
             }
-            renderQueue();
-        } else if (dragItem && !isDragging) {
-            // It was just a tap/click! Open context menu
-            const songId = dragItem.dataset.songId;
-            const idx = parseInt(dragItem.dataset.index, 10);
             dragItem = null;
-            openQueueContextMenu(e, songId, idx);
-        } else {
-             dragItem = null;
-             isDragging = false;
+            renderQueue();
         }
     });
 
@@ -2335,6 +2319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
         const fragment = document.createDocumentFragment();
 
         displayList.forEach((song, idx) => {
@@ -2370,6 +2355,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         item.classList.add('dragging');
                         queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
+                });
+                
+                moreBtn.addEventListener('pointerup', (e) => {
+                    if (dragTimeout) clearTimeout(dragTimeout);
+                    if (!isDragging) {
+                        // It was just a tap/click! Open context menu
+                        openQueueContextMenu(e, song.id, idx);
+                    }
                 });
             }
 
@@ -2475,9 +2468,9 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
             <div class="card-title">${escapeHTML(song.title)}</div>
             <div class="card-desc">${escapeHTML(song.artist)}</div>
