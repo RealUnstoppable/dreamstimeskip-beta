@@ -6,17 +6,40 @@ import { app, auth, db } from "./firebase.js";
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
 
     if (user) {
         // User is signed in
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
+        const cacheKey = `profile_${user.uid}`;
+        const cachedProfile = sessionStorage.getItem(cacheKey);
+        let userData = null;
 
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
+        if (cachedProfile) {
+            userData = JSON.parse(cachedProfile);
+        } else {
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                userData = userDoc.data();
+                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            }
+        }
+
+        if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
 
             if (authLink) {
@@ -25,7 +48,7 @@ onAuthStateChanged(auth, async (user) => {
             }
 
             if (membershipStatusContainer) {
-                membershipStatusContainer.innerHTML = `<span class="membership-status ${userData.membershipLevel}">${userData.membershipLevel}</span>`;
+                membershipStatusContainer.innerHTML = `<span class="membership-status ${escapeHTML(userData.membershipLevel)}">${escapeHTML(userData.membershipLevel)}</span>`;
             }
 
             const currentPath = window.location.pathname;

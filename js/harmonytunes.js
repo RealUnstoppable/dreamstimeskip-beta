@@ -774,49 +774,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(searchInput) {
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.song-card');
-            cards.forEach(card => {
-                const titleEl = card.querySelector('.song-title');
-                const artistEl = card.querySelector('p:last-of-type');
-                if(!titleEl || !artistEl) return;
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.song-card');
+                cards.forEach(card => {
+                    const titleEl = card.querySelector('.song-title');
+                    const artistEl = card.querySelector('p:last-of-type');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    card.style.display = isMatch ? 'flex' : 'none';
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    } else {
+                        titleEl.textContent = titleText;
+                        artistEl.textContent = artistText;
+                    }
+                });
                 
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                card.style.display = isMatch ? 'flex' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
-            
-            const rows = document.querySelectorAll('.song-table tbody tr');
-            rows.forEach(row => {
-                const titleEl = row.querySelector('.song-title');
-                const artistEl = row.querySelector('.song-artist');
-                if(!titleEl || !artistEl) return;
-                
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                row.style.display = isMatch ? 'table-row' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
+                const rows = document.querySelectorAll('.song-table tbody tr');
+                rows.forEach(row => {
+                    const titleEl = row.querySelector('.song-title');
+                    const artistEl = row.querySelector('.song-artist');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    row.style.display = isMatch ? 'table-row' : 'none';
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                    } else {
+                        titleEl.textContent = titleText;
+                        artistEl.textContent = artistText;
+                    }
+                });
+            }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
         });
     }
 
@@ -934,13 +938,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card playlist-card" data-playlist-id="${pl.id}">
+            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
                     <button class="card-play-btn">▶</button>
                 </div>
-                <div class="card-title">${pl.title}</div>
-                <div class="card-desc">${pl.desc}</div>
+                <div class="card-title">${escapeHTML(pl.title)}</div>
+                <div class="card-desc">${escapeHTML(pl.desc)}</div>
             </div>
         `).join('');
 
@@ -1029,12 +1033,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
-                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
+                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
                     <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
                 </td>
-                <td class="song-title">${song.title}</td>
-                <td>${song.artist}</td>
-                <td style="text-align: right;">${song.duration}</td>
+                <td class="song-title">${escapeHTML(song.title)}</td>
+                <td>${escapeHTML(song.artist)}</td>
+                <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
 
             row.addEventListener('click', () => {
@@ -1550,15 +1554,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Global Search
+        let globalSearchTimeout;
         globalSearch.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
-                const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderSongTable(filtered);
-            } else if (viewHome.style.display !== 'none') {
-                const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderMusicGrid(filtered);
-            }
+            clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase().trim();
+                if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
+                    const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderSongTable(filtered);
+                } else if (viewHome.style.display !== 'none') {
+                    const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderMusicGrid(filtered);
+                }
+            }, 300); // ⚡ Bolt: Debounce global search to reduce unnecessary re-renders
         });
 
         // --- Mobile Overflow ("...") Button ---
@@ -2443,17 +2451,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 export function createSongCard(song) {
     return `
-        <div class="music-card" data-song-id="${song.id}">
+        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
-                <img src="${song.art}" alt="${song.title}">
+                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
                 <button class="card-play-btn">▶</button>
                 <button class="add-queue-btn" title="Add to Queue">+</button>
                 <button class="card-more-btn" title="More Options">...</button>
             </div>
-            <div class="card-title">${song.title}</div>
-            <div class="card-desc">${song.artist}</div>
+            <div class="card-title">${escapeHTML(song.title)}</div>
+            <div class="card-desc">${escapeHTML(song.artist)}</div>
         </div>
     `;
+}
 }
 
 export function formatTime(seconds) {
