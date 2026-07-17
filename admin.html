@@ -323,6 +323,16 @@
                 .replace(/'/g, "&#039;");
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snap = await getDocs(collection(db, collectionName));
+                return snap.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
+            } catch (error) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${error.message}]`, error);
+                throw error;
+            }
+        }
+
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
