@@ -42,7 +42,11 @@
 **Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
 **Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.
 ## 2026-05-27 - [Fix Hardcoded Stripe Secret in Server]\n**Vulnerability:** The Stripe initialization in `server.js` used a hardcoded string (`"sk_test_placeholder"`) instead of retrieving the secret key securely from an environment variable.\n**Learning:** Relying on hardcoded placeholders for sensitive API keys increases the risk of developers accidentally committing real, live secrets if they overwrite the placeholder directly in the source file during testing or deployment.\n**Prevention:** Always instantiate third-party SDKs using environment variables (e.g., `process.env.STRIPE_SECRET_KEY`) to decouple credentials from the source code and prevent accidental exposure.
-## 2024-10-24 - Firestore Privilege Escalation
-**Vulnerability:** A critical privilege escalation vulnerability existed in `firestore.rules` where a user could modify their own `users` document to set `isAdmin: true` or `isBanned: false` because the `write` rule merely checked if the user owned the document (`request.auth.uid == userId`).
-**Learning:** Generic `allow write` rules are dangerous as they permit unrestricted creation, updates, and deletions. Relying solely on ownership checks allows users to inject arbitrary fields like admin flags or bypass ban statuses if they exist in the schema.
-**Prevention:** Split `write` operations into `create`, `update`, and `delete`. Explicitly enforce strict schema checks for sensitive fields on `create` (e.g., `request.resource.data.isAdmin == false`) and prevent them from being modified entirely on `update` (e.g., `!request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned'])`).
+## 2026-06-02 - [Fix DOM-based XSS in Admin Dashboard (Attributes)]
+**Vulnerability:** `admin.html` was injecting `escapeHTML`-sanitized data directly into `onclick` attribute strings: `onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')"`. Since HTML entities inside HTML attributes are decoded by the browser *before* evaluating the JavaScript, this allowed for DOM-based XSS if a malicious payload was present in `ticket.id`.
+**Learning:** `escapeHTML` is not sufficient to sanitize strings interpolated directly into inline JavaScript within HTML attributes.
+**Prevention:** Use `data-` attributes and retrieve the value safely inside the handler using `e.target.dataset.id`, or use standard event delegation instead of inline handlers.
+## 2026-06-02 - [Fix Regression: Missing classes due to HTML parsing]
+**Vulnerability/Regression:** When replacing an inline event handler, the duplicate `class` attribute was ignored by the browser, breaking the event delegation.
+**Learning:** HTML5 parsing rules keep the first `class` attribute and ignore duplicates.
+**Prevention:** Combine all classes into a single `class` attribute when modifying DOM strings.
