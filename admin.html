@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { fetchCollectionData } from '/js/utils.js';
 
         let performanceChart;
 
@@ -526,6 +527,8 @@
                 return;
             }
 
+            const fragment = document.createDocumentFragment();
+
             tickets.forEach(ticket => {
                 const row = document.createElement('tr');
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
@@ -545,7 +548,7 @@
                     </td>
                     <td>${statusBadge}</td>
                     <td>${replyAction}${closeAction}</td>`;
-                listBody.appendChild(row);
+                fragment.appendChild(row);
             });
             listBody.appendChild(fragment);
         }
