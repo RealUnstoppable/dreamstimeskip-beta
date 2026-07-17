@@ -657,6 +657,7 @@
                 if (!userId) return;
                 const shouldBeBanned = e.target.classList.contains('btn-ban');
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
+                  try {
                     await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
                     if (shouldBeBanned) {
                         e.target.textContent = 'Unban';
@@ -699,6 +700,7 @@
                 const reqId = e.target.dataset.id;
                 if (!reqId || !e.target.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
+                  try {
                     await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
                     e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
                     e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
@@ -714,6 +716,7 @@
                 const id = btn.dataset.id;
                 const tr = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
@@ -721,6 +724,7 @@
                         tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
                 } else if (action === 'complete') {
+                  try {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
