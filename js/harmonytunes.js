@@ -2238,6 +2238,32 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
+    let isDragging = false;
+
+    // ⚡ Bolt: Global pointermove listener replaces N listeners inside the loop to fix memory leak
+    document.addEventListener('pointermove', (e) => {
+        if (isDragging && dragItem) {
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2258,6 +2284,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions to minimize reflows
+        const fragment = document.createDocumentFragment();
+
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
@@ -2277,7 +2306,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');
-                let isDragging = false;
                 
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
@@ -2292,30 +2320,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         item.classList.add('dragging');
                         queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
-                });
-                
-                document.addEventListener('pointermove', (e) => {
-                    if (isDragging && dragItem === item) {
-                        const deltaY = e.clientY - dragStartY;
-                        item.style.transform = `translateY(${deltaY}px)`;
-
-                        // Visual Drop Indicator
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-                        
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i] === item) continue;
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                                if (e.clientY < rect.top + rect.height / 2) {
-                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                                } else {
-                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                                }
-                                break;
-                            }
-                        }
-                    }
                 });
                 
                 moreBtn.addEventListener('pointerup', (e) => {
@@ -2354,8 +2358,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
 
-            queueContentArea.appendChild(item);
+            fragment.appendChild(item);
         });
+
+        queueContentArea.appendChild(fragment);
     }
 
     // Queue Context Menu
@@ -2462,7 +2468,6 @@ export function createSongCard(song) {
             <div class="card-desc">${escapeHTML(song.artist)}</div>
         </div>
     `;
-}
 }
 
 export function formatTime(seconds) {
