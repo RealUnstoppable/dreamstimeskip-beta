@@ -1184,6 +1184,9 @@
 
         window.completeSetup = function() {
             if (!currentUser) return;
+            const btn = document.querySelector('button[onclick="completeSetup()"]');
+            const originalText = btn ? btn.innerText : 'Finish Setup';
+
             const data = {
                 name: document.getElementById('setupName').value,
                 phone: document.getElementById('setupPhone').value,
@@ -1197,10 +1200,22 @@
 
             if (!data.name) return alert("Name is required.");
 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Processing...';
+            }
+
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
+            }).catch(err => {
+                alert("Error: " + err.message);
+            }).finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
             });
         }
 
@@ -1700,13 +1715,31 @@
             if(!currentUser) return;
         function saveProfileToFirebase() {
             if (!currentUser) return;
+
+            const btn = document.querySelector('button[onclick="saveProfileToFirebase()"]');
+            const originalText = btn ? btn.innerText : 'Save Changes';
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Saving...';
+            }
+
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
             const userDocRef = doc(db, 'users', currentUser.uid);
-            setDoc(userDocRef, data, { merge: true }).then(() => alert("Profile Updated!"));
+            setDoc(userDocRef, data, { merge: true }).then(() => {
+                alert("Profile Updated!");
+            }).catch(err => {
+                alert("Error: " + err.message);
+            }).finally(() => {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
         }
 
         window.copyReferral = function() {
