@@ -152,18 +152,22 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object;
 
-    const snapshot = await admin.firestore()
-        .collection("users")
-        .where("subscription.customerId", "==", sub.customer)
-        .get();
+    try {
+      const snapshot = await admin.firestore()
+          .collection("users")
+          .where("subscription.customerId", "==", sub.customer)
+          .get();
 
-    const updates = snapshot.docs.map((doc) =>
-      doc.ref.update({
-        "plan": "free",
-        "subscription.status": "canceled",
-      }),
-    );
-    await Promise.all(updates);
+      const updates = snapshot.docs.map((doc) =>
+        doc.ref.update({
+          "plan": "free",
+          "subscription.status": "canceled",
+        }),
+      );
+      await Promise.all(updates);
+    } catch (error) {
+      console.error("Error processing customer.subscription.deleted - Manager info:", error.message);
+    }
   }
 
   res.json({received: true});
