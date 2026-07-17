@@ -22,7 +22,6 @@
 ## 2024-05-27 - Caching Shared Profile Data with sessionStorage
 **Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
 **Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
-
-## 2024-05-18 - DocumentFragment for DOM rendering
-**Learning:** Appending DOM nodes dynamically within loops can be costly, triggering layout reflows sequentially. `renderQueue` in `js/harmonytunes.js` iteratively appended queue items to the DOM, potentially degrading performance on long queue iterations.
-**Action:** Always batch DOM additions within looping statements via `DocumentFragment` (`document.createDocumentFragment()`). The fragment can capture all items iteratively and be appended to the live DOM in one single O(1) synchronous operation to minimize thrashing.
+## 2024-11-20 - Concurrent Promise Failures
+**Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
+**Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.
