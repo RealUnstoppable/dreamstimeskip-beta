@@ -176,14 +176,14 @@
                             await setDoc(userDocRef, fallbackData);
                             sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
                         } catch(e) {
-                            console.error("Failed to set default profile", e);
+                            console.error("Failed to set default profile - Manager info: [" + e.message + "]", e);
                         }
                         initializePage(user, fallbackData);
                         setupEventListeners(user);
                         document.getElementById('account-layout-container').style.display = 'flex';
                     }
                 } catch (error) {
-                    console.error("Error loading profile:", error);
+                    console.error("Error loading profile - Manager info: [" + error.message + "]", error);
                 }
             } else {
                 if (!window.location.pathname.includes('sign in beta.html')) {
@@ -384,10 +384,28 @@
         }
     </script>
     <header class="main-header"></header>
-    <main style="padding: 120px 20px; text-align: center; min-height: 60vh;">
-        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 20px;">User Account</h1>
-        <p style="color: var(--text-secondary);">This is a placeholder account page. Add your account management UI here.</p>
+    <main style="padding: 120px 20px; min-height: 60vh; max-width: 800px; margin: 0 auto;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 30px; text-align: center;">My Account</h1>
+
+        <div id="account-dashboard">
+            <!-- Profile Section -->
+            <section class="profile-section" style="background: var(--bg-card); padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Profile Information</h2>
+                <div id="profile-details" style="display: flex; flex-direction: column; gap: 15px;">
+                    <p style="color: var(--text-secondary);">Loading profile...</p>
+                </div>
+            </section>
+
+            <!-- Order History Section -->
+            <section class="orders-section">
+                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Order History</h2>
+                <div id="orders-list" style="display: flex; flex-direction: column; gap: 20px;">
+                    <p style="color: var(--text-secondary);">Loading orders...</p>
+                </div>
+            </section>
+        </div>
     </main>
+    <script type="module" src="/js/account.js"></script>
     <footer class="main-footer"></footer>
     <script type="module">
         import { loadNavbar } from './js/navbar.js';
