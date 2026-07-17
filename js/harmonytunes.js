@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -2258,7 +2258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
         const fragment = document.createDocumentFragment();
 
         displayList.forEach((song, idx) => {
@@ -2459,9 +2459,9 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
             <div class="card-title">${escapeHTML(song.title)}</div>
             <div class="card-desc">${escapeHTML(song.artist)}</div>
