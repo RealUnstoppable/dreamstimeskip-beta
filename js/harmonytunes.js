@@ -2345,9 +2345,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
                     isDragging = false;
+                    dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
