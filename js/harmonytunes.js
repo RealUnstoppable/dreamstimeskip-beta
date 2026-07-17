@@ -941,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn">▶</button>
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -2238,6 +2238,67 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
+    let isDragging = false;
+
+    document.addEventListener('pointermove', (e) => {
+        if (isDragging && dragItem) {
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (dragTimeout) clearTimeout(dragTimeout);
+        if (isDragging && dragItem) {
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const idx = itemsNodeList.indexOf(dragItem);
+
+            isDragging = false;
+
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
+            queueContentArea.style.cursor = '';
+
+            // Calculate drop index based on position
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            let droppedIdx = idx;
+            for (let i = 0; i < items.length; i++) {
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY < rect.top + rect.height / 2) {
+                    droppedIdx = i;
+                    break;
+                } else if (i === items.length - 1) {
+                    droppedIdx = items.length - 1;
+                }
+            }
+
+            if (droppedIdx !== idx) {
+                const movedSong = userQueue.splice(idx, 1)[0];
+                userQueue.splice(droppedIdx, 0, movedSong);
+            }
+            dragItem = null;
+            renderQueue();
+        }
+    });
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2258,6 +2319,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
+        const fragment = document.createDocumentFragment();
+
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
@@ -2277,14 +2341,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');
-                let isDragging = false;
                 
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
                     isDragging = false;
+                    dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -2294,68 +2357,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 200); // 200ms hold to drag
                 });
                 
-                document.addEventListener('pointermove', (e) => {
-                    if (isDragging && dragItem === item) {
-                        const deltaY = e.clientY - dragStartY;
-                        item.style.transform = `translateY(${deltaY}px)`;
-
-                        // Visual Drop Indicator
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-                        
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i] === item) continue;
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                                if (e.clientY < rect.top + rect.height / 2) {
-                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                                } else {
-                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                                }
-                                break;
-                            }
-                        }
-                    }
-                });
-                
                 moreBtn.addEventListener('pointerup', (e) => {
                     if (dragTimeout) clearTimeout(dragTimeout);
-                    if (isDragging && dragItem === item) {
-                        isDragging = false;
-                        dragItem = null;
-                        item.style.position = '';
-                        item.style.zIndex = '';
-                        item.style.transform = '';
-                        item.classList.remove('dragging');
-                        queueContentArea.style.cursor = '';
-                        
-                        // Calculate drop index based on position
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        let droppedIdx = idx;
-                        for (let i = 0; i < items.length; i++) {
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY < rect.top + rect.height / 2) {
-                                droppedIdx = i;
-                                break;
-                            } else if (i === items.length - 1) {
-                                droppedIdx = items.length - 1;
-                            }
-                        }
-                        
-                        if (droppedIdx !== idx) {
-                            const movedSong = userQueue.splice(idx, 1)[0];
-                            userQueue.splice(droppedIdx, 0, movedSong);
-                        }
-                        renderQueue();
-                    } else if (!isDragging) {
+                    if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         openQueueContextMenu(e, song.id, idx);
                     }
                 });
             }
 
-            queueContentArea.appendChild(item);
+            fragment.appendChild(item);
         });
+
+        queueContentArea.appendChild(fragment);
     }
 
     // Queue Context Menu
@@ -2454,9 +2468,9 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
             <div class="card-title">${escapeHTML(song.title)}</div>
             <div class="card-desc">${escapeHTML(song.artist)}</div>
