@@ -7,10 +7,9 @@ app.use(cors());
 app.use(express.json());
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("CRITICAL ERROR: STRIPE_SECRET_KEY environment variable is not set.");
+  console.error("CRITICAL: STRIPE_SECRET_KEY environment variable is missing.");
   process.exit(1);
 }
-
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const stripe = new Stripe(stripeSecretKey);
 
