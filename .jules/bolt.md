@@ -1,6 +1,3 @@
-## 2024-04-29 - requestAnimationFrame State Management Bug
-**Learning:** When throttling events like `mousemove` with `requestAnimationFrame` using an `isTicking` flag and `latestEvent` state, ensure that the early return (e.g. `if (!latestEvent) return;`) also resets the `isTicking` flag (`isTicking = false;`). Otherwise, if the event state is cleared (like in a `mouseleave` handler) before the animation frame executes, the ticking state gets permanently locked, disabling the handler. It is also good practice to reset the ticking state in the `mouseleave` handler directly.
-**Action:** Always verify that early returns inside throttled or debounced callbacks properly clean up or reset tracking flags to avoid permanently locking the event listener state.
 
 ## 2024-05-01 - Concurrent API Calls
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
@@ -22,7 +19,6 @@
 ## 2024-05-27 - Caching Shared Profile Data with sessionStorage
 **Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
 **Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
-
-## 2024-07-10 - Exponential Memory Leaks from Render Loop Listeners
-**Learning:** Attaching global event listeners (like `document.addEventListener`) inside a render loop without removal causes an exponential memory leak, as multiple global listeners are added every time the component is re-rendered, severely degrading performance.
-**Action:** Always attach global event listeners outside of render loops and use global state variables to manage context, instead of relying on loop closures.
+## 2024-11-20 - Concurrent Promise Failures
+**Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
+**Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.
