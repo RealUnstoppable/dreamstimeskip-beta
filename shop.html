@@ -34,61 +34,41 @@
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
 
-    <!-- Product Details / Reviews Modal -->
-    <div id="product-details-modal" class="cart-modal" style="display: none;">
-        <div class="cart-modal-content" style="max-width: 600px;">
+    <!-- Reviews Modal -->
+    <div id="reviews-modal" class="cart-modal">
+        <div class="cart-modal-content">
             <div class="cart-modal-header">
-                <h2 id="details-modal-title">Product Details</h2>
-                <button id="close-details-btn" class="close-cart-btn" aria-label="Close details">&times;</button>
+                <h2 id="reviews-modal-title">Product Reviews</h2>
+                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews">&times;</button>
             </div>
 
-            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                <img id="details-modal-img" src="" alt="" style="width: 150px; height: 150px; object-fit: cover; border-radius: 8px;">
-                <div>
-                    <h3 id="details-modal-name" style="margin-top: 0;"></h3>
-                    <p id="details-modal-price" style="font-weight: bold; color: var(--accent-blue);"></p>
-                    <p id="details-modal-desc" style="color: var(--text-secondary); font-size: 0.9rem;"></p>
-                </div>
+            <div class="reviews-summary" id="reviews-summary">
+                <div class="average-rating" id="modal-average-rating">0.0</div>
+                <div class="stars-display" id="modal-stars-display">★★★★★</div>
+                <div class="review-count" id="modal-review-count">0 reviews</div>
             </div>
 
-            <!-- Reviews Section -->
-            <div class="reviews-section">
-                <h3>Customer Reviews</h3>
-                <div id="reviews-list" class="reviews-container">
-                    <p style="color: var(--text-secondary);">Loading reviews...</p>
-                </div>
+            <div id="review-submission-section" class="review-submission-section" style="display: none;">
+                <h3>Write a Review</h3>
+                <form id="review-form">
+                    <div class="star-rating-input" id="star-rating-input" role="radiogroup" aria-label="Rating">
+                        <span class="star-input" data-value="1" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="2" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="3" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
+                        <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
+                    </div>
+                    <textarea id="review-text" placeholder="Share your thoughts about this product..." required aria-label="Review text"></textarea>
+                    <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
+                    <div id="review-notification" class="notification"></div>
+                </form>
+            </div>
+            <div id="login-prompt-section" class="login-prompt-section">
+                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+            </div>
 
-                <!-- Review Form (Visible only if logged in) -->
-                <div id="review-form-wrapper" class="review-form-container" style="display: none;">
-                    <h4>Write a Review</h4>
-                    <form id="review-form" class="review-form">
-                        <input type="hidden" id="review-product-id">
-
-                        <div class="rating-input">
-                            <input type="radio" id="star5" name="rating" value="5" required />
-                            <label for="star5" title="5 stars">★</label>
-
-                            <input type="radio" id="star4" name="rating" value="4" />
-                            <label for="star4" title="4 stars">★</label>
-
-                            <input type="radio" id="star3" name="rating" value="3" />
-                            <label for="star3" title="3 stars">★</label>
-
-                            <input type="radio" id="star2" name="rating" value="2" />
-                            <label for="star2" title="2 stars">★</label>
-
-                            <input type="radio" id="star1" name="rating" value="1" />
-                            <label for="star1" title="1 star">★</label>
-                        </div>
-
-                        <textarea id="review-comment" class="review-textarea" placeholder="Share your thoughts about this product..." required></textarea>
-
-                        <button type="submit" id="submit-review-btn" class="btn-submit-review">Submit Review</button>
-                    </form>
-                </div>
-                <div id="review-login-prompt" style="margin-top: 1.5rem; text-align: center; display: none;">
-                    <p><a href="sign in beta.html" style="color: var(--accent-blue);">Log in</a> to leave a review.</p>
-                </div>
+            <div id="reviews-list-container" class="reviews-list-container">
+                <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>
             </div>
         </div>
     </div>
@@ -110,6 +90,52 @@
             </div>
         </div>
     </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="review-modal" style="display: none;">
+        <div class="review-modal-content">
+            <div class="review-modal-header">
+                <h2>Product Reviews</h2>
+                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews">&times;</button>
+            </div>
+
+            <div class="review-stats" id="review-stats">
+                <div class="avg-rating">
+                    <span id="avg-rating-value">0.0</span> <span class="star-rating">★</span>
+                </div>
+                <div class="total-reviews" id="total-reviews-count">0 reviews</div>
+            </div>
+
+            <div id="reviews-list-container" class="reviews-list-container">
+                <!-- Reviews will be injected here -->
+            </div>
+
+            <div id="write-review-section" class="write-review-section" style="display: none;">
+                <h3>Write a Review</h3>
+                <form id="write-review-form">
+                    <div class="rating-input">
+                        <label for="review-rating">Rating (1-5):</label>
+                        <select id="review-rating" required>
+                            <option value="5">5 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="2">2 Stars</option>
+                            <option value="1">1 Star</option>
+                        </select>
+                    </div>
+                    <div class="comment-input">
+                        <textarea id="review-comment" rows="4" placeholder="Share your thoughts about this product..." required></textarea>
+                    </div>
+                    <button type="submit" id="submit-review-btn" class="submit-review-btn">Submit Review</button>
+                    <div id="review-message" class="review-message"></div>
+                </form>
+            </div>
+            <div id="login-to-review-msg" class="login-to-review-msg" style="display: none;">
+                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+            </div>
+        </div>
+    </div>
+
     <footer class="main-footer"></footer>
 
 
