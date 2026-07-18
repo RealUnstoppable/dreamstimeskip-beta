@@ -2554,3 +2554,26 @@ export function formatTime(seconds) {
             }
         });
     }
+
+});
+
+export function createSongCard(song) {
+    return `
+        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
+            <div class="card-img-wrapper">
+                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
+                <button class="card-play-btn">▶</button>
+                <button class="add-queue-btn" title="Add to Queue">+</button>
+                <button class="card-more-btn" title="More Options">...</button>
+            </div>
+            <div class="card-title">${escapeHTML(song.title)}</div>
+            <div class="card-desc">${escapeHTML(song.artist)}</div>
+        </div>
+    `;
+}
+
+export function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
