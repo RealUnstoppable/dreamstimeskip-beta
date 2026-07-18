@@ -2408,6 +2408,9 @@ let dragItem = null;
                         }
                         openQueueContextMenu(e, song.id, contextMenuIdx);
                     }
+                    if (!isDragging) {
+                        dragItem = null;
+                    }
                 });
             }
 
