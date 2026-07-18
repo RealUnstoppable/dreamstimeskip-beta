@@ -1007,7 +1007,7 @@
                 <p class="text-slate-500 mb-8">Direct line to the engineering team. Pro users receive priority.</p>
                 <textarea id="featureReqText" class="h-48 mb-6"
                     placeholder="I would love it if ezManage could..."></textarea>
-                <button onclick="submitFeatureRequest()" class="btn btn-accent w-full py-4">Send Directly to
+                <button id="featureReqBtn" onclick="submitFeatureRequest()" class="btn btn-accent w-full py-4">Send Directly to
                     Admin</button>
             </div>
         </div>
@@ -1787,15 +1787,25 @@
         window.submitFeatureRequest = function() {
             const msg = document.getElementById('featureReqText').value;
             if(!msg) return;
+            const btn = document.getElementById('featureReqBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
             const featureRequestsRef = collection(db, 'feature_requests');
             addDoc(featureRequestsRef, {
-            if (!msg) return;
-            db.collection('feature_requests').add({
                 uid: currentUser.uid,
                 email: currentUser.email,
                 message: msg,
                 timestamp: new Date().toISOString()
-            }).then(() => { alert("Sent!"); document.getElementById('featureReqText').value = ""; });
+            }).then(() => {
+                alert("Sent!");
+                document.getElementById('featureReqText').value = "";
+            }).catch((err) => {
+                alert("Error sending request: " + err.message);
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
         }
 
         window.onload = () => {
