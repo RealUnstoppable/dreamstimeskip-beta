@@ -287,6 +287,7 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
+        import { fetchCollectionData } from '/js/utils.js';
 
         let performanceChart;
 
@@ -322,49 +323,88 @@
                 .replace(/'/g, "&#039;");
         }
 
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
+            try {
+                const snap = await getDocs(collection(db, collectionName));
+                return snap.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
+            } catch (error) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${error.message}]`, error);
+                throw error;
+            }
+        }
+
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
             setupEventListeners();
         }
-
-        async function fetchCollectionData(collectionName, isMapWithId = false, throwError = false) {
+        async function fetchCollectionData(collectionName, isMapWithId = false) {
             try {
-                const snapshot = await getDocs(collection(db, collectionName));
-                return isMapWithId
-                    ? snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-                    : snapshot.docs.map(d => d.data());
+                const snap = await getDocs(collection(db, collectionName));
+                if (isMapWithId) {
+                    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                }
+                return snap.docs.map(d => d.data());
             } catch (e) {
                 console.error(`Error fetching ${collectionName}:`, e);
-                console.error('Manager info:', e.message);
-                if (throwError) throw e;
+                console.error(`Error fetching ${collectionName} - Manager info:`, e.message);
+                const errArr = [];
+                errArr._error = true;
+                return errArr;
+            }
+        }
+
+        async function fetchCollectionData(collectionName, isMapWithId = true) {
+            try {
+                const snapshot = await getDocs(collection(db, collectionName));
+                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
+            } catch (e) {
+                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
                 return [];
             }
         }
 
         async function loadAdminData() {
             try {
-                // Fetch Core Data
-                let users = await fetchCollectionData("users", true);
-                let carts = await fetchCollectionData("carts", true);
-                let orders = await fetchCollectionData("orders", false);
-                let subscribers = await fetchCollectionData("newsletterSubscribers", false);
+                // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
+                const promises = [
+                    getDocs(collection(db, "users")).catch(e => { console.error("Error fetching users:", e); return null; }),
+                    getDocs(collection(db, "carts")).catch(e => { console.error("Error fetching carts:", e); return null; }),
+                    getDocs(collection(db, "orders")).catch(e => { console.error("Error fetching orders:", e); return null; }),
+                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Error fetching newsletter:", e); return null; }),
+                    getDocs(collection(db, "bookings")).catch(e => { console.error("Error fetching bookings:", e); return null; }),
+                    getDocs(collection(db, "quotes")).catch(e => { console.error("Error fetching quotes:", e); return null; }),
+                    typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Error fetching support tickets', e); return []; }) : Promise.resolve([]),
+                    getDocs(collection(db, "feature_requests")).catch(e => {
+                        console.log("Could not load feature requests. Missing Firestore rules?", e);
+                        document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                        return null;
+                    }),
+                    getDoc(doc(db, "site_stats", "downloads")).catch(e => {
+                        document.getElementById('download-count-infosheet').textContent = "N/A";
+                        return null;
+                    })
+                ];
 
-                // Fetch Detailing Bookings & Quotes
-                let bookings = await fetchCollectionData("bookings", true);
+                const [
+                    usersSnapshot, cartsSnapshot, ordersSnapshot, newsletterSnapshot,
+                    bookingsSnap, quotesSnap, tickets, featureRequestsSnapshot, statsDoc
+                ] = await Promise.all(promises);
+
+                let users = usersSnapshot ? usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let carts = cartsSnapshot ? cartsSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let orders = ordersSnapshot ? ordersSnapshot.docs.map(d => d.data()) : [];
+                let subscribers = newsletterSnapshot ? newsletterSnapshot.docs.map(d => d.data()) : [];
+                let bookings = bookingsSnap ? bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
                 bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
-
-                let quotes = await fetchCollectionData("quotes", true);
+                let quotes = quotesSnap ? quotesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
                 document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
                 document.getElementById('total-purchases').textContent = orders.length;
 
-                try {
-                    const tickets = await getAllTickets();
-                    renderSupportTicketsTable(tickets);
-                } catch(e) { console.error('Error fetching support tickets', e); console.error('Manager info:', e.message); }
+                renderSupportTicketsTable(tickets);
 
                 // Renderers
                 renderUserTable(users);
@@ -374,28 +414,19 @@
                 renderBookingsTable(bookings);
                 renderQuotesTable(quotes);
                 
-                // Fetch Feature Requests
-                try {
-                    const requests = await fetchCollectionData("feature_requests", true, true);
+                // Feature Requests
+                if (featureRequestsSnapshot) {
+                    const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderFeatureRequestsTable(requests);
-                } catch (frError) {
-                    console.error("Could not load feature requests. Missing Firestore rules?", frError);
-                    document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                 }
                 
                 // Download Stats
-                try {
-                    const statsRef = doc(db, "site_stats", "downloads");
-                    const statsDoc = await getDoc(statsRef);
-                    if (statsDoc.exists()) {
-                        document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
-                    }
-                } catch (e) {
-                    document.getElementById('download-count-infosheet').textContent = "N/A";
+                if (statsDoc && statsDoc.exists()) {
+                    document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
                 }
 
             } catch (error) {
-                console.error("Error loading admin data:", error);
+                console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
         }
 
@@ -521,6 +552,8 @@
                 return;
             }
 
+            const fragment = document.createDocumentFragment();
+
             tickets.forEach(ticket => {
                 const row = document.createElement('tr');
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
@@ -529,7 +562,7 @@
                 const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}" onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}', this)">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
@@ -540,8 +573,9 @@
                     </td>
                     <td>${statusBadge}</td>
                     <td>${replyAction}${closeAction}</td>`;
-                listBody.appendChild(row);
+                fragment.appendChild(row);
             });
+            listBody.appendChild(fragment);
         }
 
         window.closeSupportTicket = async function(ticketId, btnElement) {
@@ -550,20 +584,33 @@
                 btnElement.textContent = 'Processing...';
                 btnElement.disabled = true;
                 try {
+                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                    let originalText = 'Close';
+                    if (btn) {
+                        originalText = btn.textContent;
+                        btn.textContent = 'Processing...';
+                        btn.disabled = true;
+                    }
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    const tr = btnElement.closest('tr');
-                    const statusCell = tr.children[3];
-                    statusCell.innerHTML = `<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>`;
-                    const actionCell = tr.children[4];
-                    actionCell.innerHTML = `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                    const btn = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
+                    if (btn) {
+                        const tr = btn.closest('tr');
+                        if (tr) {
+                            tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
+                            tr.querySelector('td:nth-child(5)').innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
+                        }
+                    }
                 } catch (error) {
-                    console.error('Manager info:', error.message);
+                    console.error('Error closing support ticket - Manager info:', error.message);
                     alert("Error closing ticket: " + error.message);
-                    btnElement.textContent = originalText;
-                    btnElement.disabled = false;
+                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Close';
+                    }
                 }
             }
-        };
+        });
 
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
@@ -637,60 +684,51 @@
         function setupEventListeners() {
             // User Ban Toggle
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
-                const btn = e.target;
-                const userId = btn.dataset.id;
-                if (!userId || (!btn.classList.contains('btn-ban') && !btn.classList.contains('btn-unban'))) return;
-                const shouldBeBanned = btn.classList.contains('btn-ban');
+                const userId = e.target.dataset.id;
+                if (!userId) return;
+                const isBanBtn = e.target.classList.contains('btn-ban');
+                const isUnbanBtn = e.target.classList.contains('btn-unban');
+
+                if (!isBanBtn && !isUnbanBtn) return;
+
+                const shouldBeBanned = isBanBtn;
+
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[4];
-                        if (shouldBeBanned) {
-                            statusCell.innerHTML = `<span class="status-badge banned">Banned</span>`;
-                            btn.className = 'btn-sm btn-unban';
-                            btn.textContent = 'Unban';
-                        } else {
-                            statusCell.innerHTML = `<span class="status-badge active">Active</span>`;
-                            btn.className = 'btn-sm btn-ban';
-                            btn.textContent = 'Ban';
-                        }
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error updating user: " + error.message);
-                        btn.textContent = originalText;
-                    } finally {
-                        btn.disabled = false;
+                  try {
+                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                    if (shouldBeBanned) {
+                        e.target.textContent = 'Unban';
+                        e.target.classList.remove('btn-ban');
+                        e.target.classList.add('btn-unban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Banned';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge cancelled';
+                    } else {
+                        e.target.textContent = 'Ban';
+                        e.target.classList.remove('btn-unban');
+                        e.target.classList.add('btn-ban');
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Active';
+                        e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
                     }
                 }
             });
             
             // Support Tickets Reply Toggle
             document.getElementById('support-tickets-list-body').addEventListener('click', async (e) => {
-                const btn = e.target;
-                const reqId = btn.dataset.id;
-                if (!reqId || !btn.classList.contains('admin-reply-btn')) return;
-                const reply = prompt("Enter your reply to the user:");
-                if (reply !== null && reply.trim() !== "") {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await replyToTicket(reqId, reply, 'answered');
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[3];
-                        statusCell.innerHTML = `<span style="color: var(--accent-green); text-transform: uppercase;">answered</span>`;
-                        btn.textContent = originalText;
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error replying to ticket: " + error.message);
-                        btn.textContent = originalText;
-                    } finally {
-                        btn.disabled = false;
+                const reqId = e.target.dataset.id;
+                if (!reqId) return;
+
+                if (e.target.classList.contains('admin-reply-btn')) {
+                    const reply = prompt("Enter your reply to the user:");
+                    if (reply !== null && reply.trim() !== "") {
+                        try {
+                            await replyToTicket(reqId, reply, 'answered');
+                            loadAdminData();
+                        } catch (error) {
+                            alert("Error replying to ticket: " + error.message);
+                        }
                     }
+                } else if (e.target.classList.contains('admin-close-btn')) {
+                    window.closeSupportTicket(reqId);
                 }
             });
 
@@ -700,22 +738,11 @@
                 const reqId = btn.dataset.id;
                 if (!reqId || !btn.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[4];
-                        statusCell.innerHTML = `<span style="color:var(--accent-green);">Completed</span>`;
-                        const actionCell = tr.children[5];
-                        actionCell.innerHTML = `<button class="btn-sm" style="background-color:var(--border-color); cursor:not-allowed;" disabled>Done</button>`;
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error updating feature request: " + error.message);
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
+                  try {
+                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
+                    e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
+                    e.target.remove();
                 }
             });
 
@@ -725,78 +752,42 @@
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[4];
-                        statusCell.innerHTML = `<span class="status-badge cancelled">cancelled</span>`;
-                        const actionCell = tr.children[5];
-                        actionCell.innerHTML = '';
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error updating booking: " + error.message);
-                        btn.textContent = originalText;
-                        btn.disabled = false;
+                  try {
+                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+2                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'cancelled';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
                 } else if (action === 'complete') {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "bookings", id), { status: 'completed' });
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[4];
-                        statusCell.innerHTML = `<span class="status-badge active">completed</span>`;
-                        const actionCell = tr.children[5];
-                        actionCell.innerHTML = '';
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error updating booking: " + error.message);
-                        btn.textContent = originalText;
-                        btn.disabled = false;
+                  try {
+                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'completed';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
                 }
             });
-
             // Quotes Action Buttons
             document.getElementById('quotes-list-body').addEventListener('click', async (e) => {
                 const btn = e.target.closest('.action-btn');
                 if(!btn) return;
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
+                const tr = btn.closest('tr');
                 if (action === 'responded') {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "quotes", id), { status: 'responded' });
-                        const tr = btn.closest('tr');
-                        const statusCell = tr.children[2];
-                        statusCell.innerHTML = `<span class="status-badge active">responded</span>`;
-                        btn.remove();
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error updating quote: " + error.message);
-                        btn.textContent = originalText;
-                        btn.disabled = false;
+                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    if(tr) {
+                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                        tr.querySelector('td:nth-child(5) span').textContent = 'responded';
+                        tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Processing...';
-                    btn.disabled = true;
-                    try {
-                        await deleteDoc(doc(db, "quotes", id));
-                        btn.closest('tr').remove();
-                    } catch (error) {
-                        console.error('Manager info:', error.message);
-                        alert("Error deleting quote: " + error.message);
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
+                    await deleteDoc(doc(db, "quotes", id));
+                    if (tr) tr.remove();
                 }
             });
 
