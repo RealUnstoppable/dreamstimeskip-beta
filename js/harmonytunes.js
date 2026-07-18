@@ -779,6 +779,11 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const query = e.target.value.toLowerCase();
+                // ⚡ Bolt: Optimize search highlight logic to use a single compiled RegExp outside the loops
+                // and skip DOM updates if the state hasn't changed.
+                const queryRegex = query ? new RegExp(query, 'gi') : null;
+                const replaceFn = match => `<span class="search-highlight">${match}</span>`;
+
                 const cards = document.querySelectorAll('.song-card');
                 cards.forEach(card => {
                     const titleEl = card.querySelector('.song-title');
@@ -789,14 +794,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    card.style.display = isMatch ? 'flex' : 'none';
+                    const newDisplay = isMatch ? 'flex' : 'none';
+                    if (card.style.display !== newDisplay) {
+                        card.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        // Avoid unnecessary textContent assignments which trigger style recalculations
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
                 
@@ -810,14 +819,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    row.style.display = isMatch ? 'table-row' : 'none';
+                    const newDisplay = isMatch ? 'table-row' : 'none';
+                    if (row.style.display !== newDisplay) {
+                        row.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
             }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
