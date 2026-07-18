@@ -580,6 +580,9 @@
 
         window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
+                const originalText = btnElement.textContent;
+                btnElement.textContent = 'Processing...';
+                btnElement.disabled = true;
                 try {
                     const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
                     let originalText = 'Close';
