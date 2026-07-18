@@ -175,6 +175,28 @@ function updateCartSummary() {
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
+// --- WISHLIST LOGIC ---
+export async function toggleWishlist(productId) {
+    if (!currentUser) {
+        alert("Please sign in to use the wishlist.");
+        return;
+    }
+
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    renderProducts(); // Re-render to update the heart icon
+
+    try {
+        await saveWishlist();
+    } catch (error) {
+        console.error('Failed to update wishlist - Manager info:', error.message);
+    }
+}
+
 // --- CART LOGIC ---
 export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
