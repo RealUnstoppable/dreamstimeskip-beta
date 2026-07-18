@@ -36,7 +36,7 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error creating ticket - Manager info: [' + error.message + ']');
+1        console.error('Error creating ticket - Manager info: [' + error.message + ']');
         throw error;
     }
 }
