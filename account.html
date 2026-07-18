@@ -417,8 +417,12 @@
                 }
             });
 
-            document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
                 if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Deleting...';
                 try {
                     const userId = user.uid;
                     await deleteUser(user);
@@ -427,6 +431,8 @@
                     window.location.replace('index.html');
                 } catch (error) {
                     alert('Error: Please sign out, sign back in, and try again.');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
 

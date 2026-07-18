@@ -684,7 +684,8 @@
         function setupEventListeners() {
             // User Ban Toggle
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
-                const userId = e.target.dataset.id;
+                const btn = e.target;
+                const userId = btn.dataset.id;
                 if (!userId) return;
                 const isBanBtn = e.target.classList.contains('btn-ban');
                 const isUnbanBtn = e.target.classList.contains('btn-unban');
@@ -779,6 +780,9 @@
                 const id = btn.dataset.id;
                 const tr = btn.closest('tr');
                 if (action === 'responded') {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await updateDoc(doc(db, "quotes", id), { status: 'responded' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
@@ -786,6 +790,9 @@
                         tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Processing...';
                     await deleteDoc(doc(db, "quotes", id));
                     if (tr) tr.remove();
                 }
