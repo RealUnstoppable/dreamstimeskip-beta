@@ -1,6 +1,3 @@
-## 2024-04-29 - requestAnimationFrame State Management Bug
-**Learning:** When throttling events like `mousemove` with `requestAnimationFrame` using an `isTicking` flag and `latestEvent` state, ensure that the early return (e.g. `if (!latestEvent) return;`) also resets the `isTicking` flag (`isTicking = false;`). Otherwise, if the event state is cleared (like in a `mouseleave` handler) before the animation frame executes, the ticking state gets permanently locked, disabling the handler. It is also good practice to reset the ticking state in the `mouseleave` handler directly.
-**Action:** Always verify that early returns inside throttled or debounced callbacks properly clean up or reset tracking flags to avoid permanently locking the event listener state.
 
 ## 2024-05-01 - Concurrent API Calls
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
@@ -22,9 +19,6 @@
 ## 2024-05-27 - Caching Shared Profile Data with sessionStorage
 **Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
 **Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
-## 2024-06-25 - Attaching event listeners inside render loops
-**Learning:** Attaching global event listeners (like `document.addEventListener`) inside a render loop that executes repeatedly (e.g., `renderQueue()`) results in multiple duplicate event listeners being attached every time the view is re-rendered. This causes memory leaks and performance degradation as the listeners stack up and all fire for a single event.
-**Action:** When generating dynamic lists in vanilla JavaScript, do not attach global `document` event listeners inside the render loop. Attach them once in the outer scope, using global state variables and event delegation to track context instead of relying on loop closures.
-## 2024-07-04 - Replacing Closures with Event Delegation
-**Learning:** When refactoring local event listeners to global document listeners (e.g., for drag-and-drop), avoid relying on dynamically set data attributes like `dataset.index`, as they can lead to simulated code reviewer rejections evaluating them as undefined or `NaN` if the DOM element isn't fully mocked or if they become stale. Dynamically calculate the active element's index by querying the DOM (e.g., `Array.from(parentElement.querySelectorAll(...)).indexOf(dragItem)`).
-**Action:** Always dynamically calculate the active element's index by querying the DOM instead of relying on statically bound dataset attributes when using event delegation for list items.
+## 2024-11-20 - Concurrent Promise Failures
+**Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
+**Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.
