@@ -61,12 +61,34 @@ function renderProducts() {
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
+        // Fetch rating
+        let ratingHtml = '';
+        try {
+            const { average, count } = await getProductAverageRating(product.id);
+            if (count > 0) {
+                ratingHtml = `
+                    <div class="product-rating-summary" data-id="${product.id}" aria-label="View Reviews">
+                        <span class="star-rating">★</span>
+                        <span>${average} (${count} reviews)</span>
+                    </div>
+                `;
+            } else {
+                 ratingHtml = `
+                    <div class="product-rating-summary" data-id="${product.id}" aria-label="Write a Review">
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;">No reviews yet</span>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error("Failed to load rating for", product.id, e);
+        }
+
         return `
             <div class="product-card">
                 <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
-                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
                 <div class="product-info">
                     <h3>${product.name}</h3>
                     <div class="product-rating-summary">${ratingDisplay}</div>
@@ -363,8 +385,12 @@ function setupEventListeners() {
     // Product grid listeners
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
-            if (e.target.classList.contains('add-to-cart-btn')) {
-                const productId = e.target.dataset.id;
+            const addBtn = e.target.closest('.add-to-cart-btn');
+            const wishlistBtn = e.target.closest('.wishlist-btn');
+            const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title') || e.target.closest('.product-rating-summary');
+
+            if (addBtn) {
+                const productId = addBtn.dataset.id;
                 handleAddToCart(productId);
             } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
                 const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');

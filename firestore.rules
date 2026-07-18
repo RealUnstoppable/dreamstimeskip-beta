@@ -85,6 +85,12 @@ w      allow read: if request.auth != null && (request.auth.uid == userId || isA
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
+    // Reviews collection: Public read, authenticated users can create their own reviews
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+
     // Deny all other access by default
     match /{document=**} {
       allow read, write: if false;
