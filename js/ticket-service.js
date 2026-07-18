@@ -1,7 +1,16 @@
 import { db } from './auth.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { mapCollectionData } from './utils.js';
 
 const TICKETS_COLLECTION = 'support_tickets';
+
+function sortTicketsByDateDesc(tickets) {
+    return tickets.sort((a, b) => {
+         const timeA = a.createdAt?.toMillis() || 0;
+         const timeB = b.createdAt?.toMillis() || 0;
+         return timeB - timeA;
+    });
+}
 
 /**
  * Creates a new support ticket
@@ -27,7 +36,7 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error creating ticket - Manager info:', error.message || error);
+1        console.error('Error creating ticket - Manager info: [' + error.message + ']');
         throw error;
     }
 }
@@ -60,9 +69,12 @@ export async function getUserTickets(userId) {
             // Note: orderBy requires a composite index if used with where.
             // If the index doesn't exist, this might fail, so we fetch and sort client-side.
         );
-        return await fetchAndSortTickets(q);
+        const snap = await getDocs(q);
+        const tickets = mapCollectionData(snap, true);
+
+        return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching user tickets - Manager info:', error.message || error);
+        console.error('Error fetching user tickets - Manager info: [' + error.message + ']');
         throw error;
     }
 }
@@ -72,9 +84,12 @@ export async function getUserTickets(userId) {
  */
 export async function getAllTickets() {
     try {
-        return await fetchAndSortTickets(collection(db, TICKETS_COLLECTION));
+        const snap = await getDocs(collection(db, TICKETS_COLLECTION));
+        const tickets = mapCollectionData(snap, true);
+
+        return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching all tickets - Manager info:', error.message || error);
+        console.error('Error fetching all tickets - Manager info: [' + error.message + ']');
         throw error;
     }
 }
@@ -99,7 +114,7 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
         });
         return { success: true };
     } catch (error) {
-        console.error('Error replying to ticket - Manager info:', error.message || error);
+        console.error('Error replying to ticket - Manager info: [' + error.message + ']');
         throw error;
     }
 }
