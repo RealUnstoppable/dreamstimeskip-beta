@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <div id="queue-content-area">
+        <div class="queue-item" data-index="0" data-song-id="song1">
+            <div class="queue-more-btn">...</div>
+        </div>
+        <div class="queue-item" data-index="1" data-song-id="song2">
+            <div class="queue-more-btn">...</div>
+        </div>
+    </div>
+    <script>
+        const queueContentArea = document.getElementById('queue-content-area');
+        let userQueue = [{id: 'song1'}, {id: 'song2'}];
+        let dragItem = document.querySelector('[data-index="0"]');
+        let isDragging = true;
+
+        const e = new Event('pointerup');
+        // Let's just simulate the logic in JS
+        const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+        const idx = itemsNodeList.indexOf(dragItem);
+
+        console.log('Calculated idx:', idx);
+    </script>
+</body>
+</html>
