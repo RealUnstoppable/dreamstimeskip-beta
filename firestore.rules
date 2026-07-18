@@ -2,18 +2,27 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
     // Users collection: Users can only read/write their own profile
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId
-                    && (!('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false)
-                    && (!('isBanned' in request.resource.data) || request.resource.data.isBanned == false)
-                    && (!('plan' in request.resource.data) || request.resource.data.plan == 'free')
-                    && (!('membershipLevel' in request.resource.data) || request.resource.data.membershipLevel == 'free')
-                    && !('subscription' in request.resource.data);
-      allow update: if request.auth != null && request.auth.uid == userId
-                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'plan', 'membershipLevel', 'subscription']);
-      allow delete: if request.auth != null && request.auth.uid == userId;
+w      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && (
+        (request.auth.uid == userId
+         && request.resource.data.get('isAdmin', false) == false
+         && request.resource.data.get('isBanned', false) == false
+         && request.resource.data.get('membershipLevel', 'free') == 'free'
+         && !request.resource.data.keys().hasAny(['plan', 'subscription']))
+        || isAdmin()
+      );
+      allow update: if request.auth != null && (
+        (request.auth.uid == userId
+         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription']))
+        || isAdmin()
+      );
+      allow delete: if isAdmin();
     }
 
     // Carts collection: Users can only read/write their own cart
@@ -29,11 +38,51 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
+    match /product_reviews/{reviewId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
     // Support tickets collection
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Blog Comments Collection
+    match /blog_comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+
+    // Reviews collection: Anyone can read, but only authenticated users can create
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+
+    // Product stats collection: Anyone can read, only backend can write
+    match /product_stats/{productId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Product reviews collection
+    match /product_reviews/{reviewId} {
+      // Anyone can read reviews
+      allow read: if true;
+      // Users can only create their own reviews, rating must be 1-5
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.userEmail == request.auth.token.email
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5;
+      // Users can update or delete their own reviews
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // Deny all other access by default
