@@ -8,7 +8,7 @@ service cloud.firestore {
 
     // Users collection: Users can only read/write their own profile
     match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+w      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow create: if request.auth != null && (
         (request.auth.uid == userId
          && request.resource.data.get('isAdmin', false) == false
