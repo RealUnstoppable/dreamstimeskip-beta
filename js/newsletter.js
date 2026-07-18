@@ -18,12 +18,6 @@ document.addEventListener('submit', async (e) => {
         const submitBtn = form.querySelector('button[type="submit"]');
         const email = emailInput.value.trim();
 
-        const originalText = submitBtn ? submitBtn.textContent : 'Sign Up';
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
-        }
-
         try {
             // Save to Firestore
             await setDoc(doc(db, "newsletter_subscribers", email), {
@@ -34,7 +28,7 @@ document.addEventListener('submit', async (e) => {
             alert("You've successfully subscribed to the newsletter!");
             emailInput.value = ''; // Clear the input
         } catch (error) {
-            console.error("Error submitting email:", error);
+            console.error("Error submitting email - Manager info: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
         } finally {
             if (submitBtn) {

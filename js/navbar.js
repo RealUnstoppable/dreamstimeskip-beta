@@ -75,7 +75,7 @@ function updateAuthLink() {
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {
-                console.error("Nav Error", e);
+                console.error("Nav Error - Manager info: [" + e.message + "]", e);
             }
         } else {
             authLink.href = 'sign in beta.html';
