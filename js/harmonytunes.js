@@ -2238,6 +2238,81 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
+    let isDragging = false;
+    let currentTapSongId = null;
+    let currentTapIdx = null;
+
+    // Global drag event listeners attached once
+    document.addEventListener('pointermove', (e) => {
+        if (isDragging && dragItem) {
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (dragTimeout) clearTimeout(dragTimeout);
+        if (isDragging && dragItem) {
+            isDragging = false;
+
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
+            queueContentArea.style.cursor = '';
+
+            // Calculate drop index based on position
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const originalIdx = items.indexOf(dragItem);
+
+            let droppedIdx = originalIdx;
+            if (originalIdx !== -1) {
+                for (let i = 0; i < items.length; i++) {
+                    const rect = items[i].getBoundingClientRect();
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        droppedIdx = i;
+                        break;
+                    } else if (i === items.length - 1) {
+                        droppedIdx = items.length - 1;
+                    }
+                }
+
+                if (droppedIdx !== originalIdx) {
+                    const movedSong = userQueue.splice(originalIdx, 1)[0];
+                    userQueue.splice(droppedIdx, 0, movedSong);
+                }
+            }
+            dragItem = null;
+            renderQueue();
+        } else if (!isDragging && dragItem) {
+            // It was just a tap/click! Open context menu
+            dragItem = null;
+            if (currentTapSongId !== null && currentTapIdx !== null) {
+                openQueueContextMenu(e, currentTapSongId, currentTapIdx);
+            }
+        } else {
+            dragItem = null;
+        }
+        currentTapSongId = null;
+        currentTapIdx = null;
+    });
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2258,6 +2333,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         displayList.forEach((song, idx) => {
             const item = document.createElement('div');
             item.className = 'queue-item';
@@ -2277,14 +2354,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');
-                let isDragging = false;
                 
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
                     isDragging = false;
+                    dragItem = item;
+                    currentTapSongId = song.id;
+                    currentTapIdx = idx;
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -2293,69 +2371,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
                 });
-                
-                document.addEventListener('pointermove', (e) => {
-                    if (isDragging && dragItem === item) {
-                        const deltaY = e.clientY - dragStartY;
-                        item.style.transform = `translateY(${deltaY}px)`;
-
-                        // Visual Drop Indicator
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-                        
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i] === item) continue;
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                                if (e.clientY < rect.top + rect.height / 2) {
-                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                                } else {
-                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                                }
-                                break;
-                            }
-                        }
-                    }
-                });
-                
-                moreBtn.addEventListener('pointerup', (e) => {
-                    if (dragTimeout) clearTimeout(dragTimeout);
-                    if (isDragging && dragItem === item) {
-                        isDragging = false;
-                        dragItem = null;
-                        item.style.position = '';
-                        item.style.zIndex = '';
-                        item.style.transform = '';
-                        item.classList.remove('dragging');
-                        queueContentArea.style.cursor = '';
-                        
-                        // Calculate drop index based on position
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        let droppedIdx = idx;
-                        for (let i = 0; i < items.length; i++) {
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY < rect.top + rect.height / 2) {
-                                droppedIdx = i;
-                                break;
-                            } else if (i === items.length - 1) {
-                                droppedIdx = items.length - 1;
-                            }
-                        }
-                        
-                        if (droppedIdx !== idx) {
-                            const movedSong = userQueue.splice(idx, 1)[0];
-                            userQueue.splice(droppedIdx, 0, movedSong);
-                        }
-                        renderQueue();
-                    } else if (!isDragging) {
-                        // It was just a tap/click! Open context menu
-                        openQueueContextMenu(e, song.id, idx);
-                    }
-                });
             }
 
-            queueContentArea.appendChild(item);
+            fragment.appendChild(item);
         });
+
+        queueContentArea.appendChild(fragment);
     }
 
     // Queue Context Menu
