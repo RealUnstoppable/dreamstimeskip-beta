@@ -575,6 +575,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let activeLineIndex = -1;
+    // ⚡ Bolt: Cache DOM queries for lyrics to prevent O(N) DOM lookups on every timeupdate
+    let cachedLyricLines = [];
     let isAutoScrolling = true;
     let autoScrollTimeout = null;
     let isProgrammaticScroll = false;
@@ -1627,9 +1629,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
         }).join('');
         
-        // Seek on click
+        // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
         const lines = lyricsContent.querySelectorAll('.lyric-line');
-        lines.forEach(line => {
+        cachedLyricLines = Array.from(lines).map(line => ({
+            el: line,
+            start: parseFloat(line.getAttribute('data-start')),
+            end: parseFloat(line.getAttribute('data-end')),
+            words: Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }))
+        }));
+
+        // Seek on click
+        cachedLyricLines.forEach(lineData => {
+            const line = lineData.el;
             line.addEventListener('click', () => {
                 const start = parseFloat(line.getAttribute('data-start'));
                 if (!isNaN(start)) {
