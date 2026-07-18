@@ -49,6 +49,7 @@ function generateStarsHtml(rating) {
 
 function renderProducts() {
     if (!productGrid) return;
+
     productGrid.innerHTML = products.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
@@ -83,6 +84,23 @@ function renderProducts() {
             </div>
         `;
     }).join('');
+
+    // Fetch and update ratings asynchronously without blocking UI render
+    updateAllProductRatings();
+}
+
+async function updateAllProductRatings() {
+    for (const product of products) {
+        updateProductRatingDisplay(product.id);
+    }
+}
+
+async function updateProductRatingDisplay(productId) {
+    const ratingEl = document.getElementById(`rating-${productId}`);
+    if (ratingEl) {
+        const ratingInfo = await getAverageRating(productId);
+        ratingEl.innerHTML = `<span class="star-display">★</span> ${ratingInfo.average} (${ratingInfo.count} reviews)`;
+    }
 }
 
 async function loadProductStats() {
@@ -254,7 +272,7 @@ async function saveCart() {
                     console.error("Error saving cart to Firestore - Manager info:", error.message);
                 }
             } else {
-                // **MODIFIED**: Save cart to localStorage for logged-out users
+                // Save cart to localStorage for logged-out users
                 localStorage.setItem('localCart', JSON.stringify(cart));
             }
             // Resolve all promises that were waiting for this debounce cycle
@@ -644,6 +662,90 @@ async function handleReviewSubmit(e) {
     } finally {
         submitReviewBtn.disabled = false;
         submitReviewBtn.textContent = originalText;
+    }
+}
+
+// --- REVIEW LOGIC ---
+async function openReviewsModal(productId) {
+    if (!reviewsModal) return;
+
+    currentReviewProductId = productId;
+    const product = productMap.get(productId);
+    document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
+
+    reviewsModal.style.display = 'block';
+    reviewsList.innerHTML = '<div style="text-align: center; padding: 20px;">Loading reviews...</div>';
+
+    if (currentUser) {
+        reviewFormContainer.style.display = 'block';
+        reviewLoginPrompt.style.display = 'none';
+    } else {
+        reviewFormContainer.style.display = 'none';
+        reviewLoginPrompt.style.display = 'block';
+    }
+
+    const reviews = await getProductReviews(productId);
+
+    if (reviews.length === 0) {
+        reviewsList.innerHTML = '<p class="empty-cart-message">No reviews yet. Be the first to review!</p>';
+    } else {
+        reviewsList.innerHTML = reviews.map(review => `
+            <div class="review-item">
+                <div class="review-header">
+                    <strong>${escapeHTML(review.userEmail.split('@')[0])}</strong>
+                    <span class="review-date">${review.createdAtDate}</span>
+                </div>
+                <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                <p class="review-text">${escapeHTML(review.reviewText)}</p>
+            </div>
+        `).join('');
+    }
+}
+
+// Make accessible to testing via window
+window.openReviewsModal = openReviewsModal;
+
+
+async function handleReviewSubmit(e) {
+    e.preventDefault();
+    if (!currentUser || !currentReviewProductId) return;
+
+    const ratingInput = document.querySelector('input[name="rating"]:checked');
+    const reviewText = document.getElementById('review-text').value;
+
+    if (!ratingInput || !reviewText.trim()) {
+        reviewStatusMessage.textContent = 'Please provide both a rating and a review.';
+        reviewStatusMessage.style.color = 'red';
+        return;
+    }
+
+    const rating = parseInt(ratingInput.value, 10);
+    submitReviewBtn.disabled = true;
+    submitReviewBtn.textContent = 'Submitting...';
+    reviewStatusMessage.textContent = '';
+
+    try {
+        const result = await submitReview(currentReviewProductId, currentUser.uid, currentUser.email, rating, reviewText.trim());
+
+        if (result.success) {
+            reviewStatusMessage.textContent = 'Review submitted successfully!';
+            reviewStatusMessage.style.color = 'green';
+            reviewForm.reset();
+            // Refresh reviews list
+            await openReviewsModal(currentReviewProductId);
+            // Refresh specific product rating without full re-render
+            updateProductRatingDisplay(currentReviewProductId);
+        } else {
+            reviewStatusMessage.textContent = result.error || 'Failed to submit review.';
+            reviewStatusMessage.style.color = 'red';
+        }
+    } catch (error) {
+        console.error('Submit review error:', error);
+        reviewStatusMessage.textContent = 'An error occurred. Please try again.';
+        reviewStatusMessage.style.color = 'red';
+    } finally {
+        submitReviewBtn.disabled = false;
+        submitReviewBtn.textContent = 'Submit Review';
     }
 }
 
