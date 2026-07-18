@@ -15,6 +15,7 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
         const email = emailInput.value.trim();
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
@@ -32,11 +33,13 @@ document.addEventListener('submit', async (e) => {
             alert("You've successfully subscribed to the newsletter!");
             emailInput.value = ''; // Clear the input
         } catch (error) {
-            console.error("Error submitting email:", error);
+            console.error("Error submitting email - Manager info: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
         } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
         }
     }
 });
