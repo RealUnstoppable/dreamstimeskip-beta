@@ -17,6 +17,11 @@ document.addEventListener('submit', async (e) => {
         const emailInput = form.querySelector('input[type="email"]');
         const submitBtn = form.querySelector('button[type="submit"]');
         const email = emailInput.value.trim();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
 
         try {
             // Save to Firestore
