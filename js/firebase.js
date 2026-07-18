@@ -1,7 +1,7 @@
 // js/firebase.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
@@ -84,6 +84,21 @@ export async function verifyFirebaseConnection() {
 
     return false;
   }
+}
+
+/**
+ * Shared Utility to fetch a collection's data
+ * @param {string} collectionName
+ * @param {boolean} includeId - If true, adds document id to data
+ */
+export async function fetchCollectionData(collectionName, includeId = false) {
+    try {
+        const querySnapshot = await getDocs(collection(db, collectionName));
+        return querySnapshot.docs.map(doc => includeId ? { id: doc.id, ...doc.data() } : doc.data());
+    } catch (e) {
+        console.error(`Manager info: Error fetching collection ${collectionName}`, e);
+        return [];
+    }
 }
 
 // Auto-run verification on load
