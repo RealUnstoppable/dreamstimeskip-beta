@@ -680,12 +680,12 @@
                 <form id="trackerForm" class="space-y-8">
                     <div class="card grid md:grid-cols-3 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
+                            <label for="shiftManager" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
                                 Manager</label>
                             <input type="text" id="shiftManager" placeholder="Enter Name" aria-label="Shift Manager">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
+                            <label for="shiftDate" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
                                 Time</label>
                             <div class="flex gap-2">
                                 <input type="date" id="shiftDate" aria-label="Shift Date">
@@ -693,7 +693,7 @@
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
+                            <label for="timerBtn" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
                                 Control</label>
                             <div class="flex gap-2 items-center">
                                 <button type="button" id="timerBtn" onclick="toggleShiftTimer()"
