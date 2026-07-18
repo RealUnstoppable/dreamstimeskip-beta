@@ -260,8 +260,8 @@
         <h2>Stay Unstoppable</h2>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Join our newsletter for detailing tips and 10% off your first wash.</p>
         <div class="newsletter" id="newsletter-form">
-            <input type="email" id="news-email" placeholder="Enter your email address" required>
-            <button onclick="subscribeNewsletter()">Subscribe</button>
+            <input type="email" id="news-email" placeholder="Enter your email address" required aria-label="Email address for newsletter">
+            <button id="news-submit-btn" onclick="subscribeNewsletter()">Subscribe</button>
         </div>
         <p id="news-msg" style="font-size: 0.85rem; margin-top: 15px; font-weight: 600;"></p>
         
@@ -305,12 +305,18 @@
         window.subscribeNewsletter = async () => {
             const email = document.getElementById('news-email').value;
             const msg = document.getElementById('news-msg');
+            const submitBtn = document.getElementById('news-submit-btn');
+
             if(!email) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Please enter an email address.";
                 return;
             }
             
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
             try {
                 await setDoc(doc(db, "newsletterSubscribers", email), {
                     email: email,
@@ -322,6 +328,9 @@
             } catch(e) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error subscribing. Please try again.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         };
     </script>
