@@ -50,3 +50,8 @@
 **Vulnerability/Regression:** When replacing an inline event handler, the duplicate `class` attribute was ignored by the browser, breaking the event delegation.
 **Learning:** HTML5 parsing rules keep the first `class` attribute and ignore duplicates.
 **Prevention:** Combine all classes into a single `class` attribute when modifying DOM strings.
+
+## 2025-02-18 - [Fix Duplicate Firestore Rules Bypassing Validation]
+**Vulnerability:** A duplicate, overly permissive match block for `product_reviews` allowed any authenticated user to create/update reviews, bypassing rating constraints (1-5) and email validation defined in a later, more secure block.
+**Learning:** In Firebase Firestore, if multiple rules match a document, access is granted if ANY of them evaluate to true (logical OR). Less restrictive rules will silently override stricter ones for the same path.
+**Prevention:** Always ensure there is only one match block per collection path or carefully audit intersecting paths to ensure no unintended permissive rules are allowing access that stricter rules intend to block.
