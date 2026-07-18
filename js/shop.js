@@ -156,7 +156,7 @@ function renderCart() {
                             <p>$${product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input">
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" aria-label="Quantity for ${product.name}">
                             <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
                         </div>
                     </div>
