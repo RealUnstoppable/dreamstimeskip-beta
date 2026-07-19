@@ -12,7 +12,3 @@
 ## 2026-05-26 - Missing Form Label Associations
 **Learning:** Many form `<label>` elements in this app (like in booking.html or detailing.html) lack `for` attributes. This breaks the programmatic association for screen readers and reduces the click target area for sighted users.
 **Action:** Always add matching `for` and `id` attributes to label/input pairs to ensure proper keyboard accessibility and screen reader support.
-
-## 2026-05-27 - Missing ARIA Labels on Dynamically Rendered Components
-**Learning:** Icon-only buttons generated dynamically via template literals (e.g., `createSongCard` in `js/harmonytunes.js`) often miss crucial `aria-label`s because they aren't caught by static HTML linting.
-**Action:** Always verify that dynamically injected UI components with icon-only controls include descriptive `aria-label`s, utilizing interpolated data (like song titles) to maximize screen reader context.
