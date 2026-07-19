@@ -8,7 +8,7 @@ service cloud.firestore {
 
     // Users collection: Users can only read/write their own profile
     match /users/{userId} {
-w      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow create: if request.auth != null && (
         (request.auth.uid == userId
          && request.resource.data.get('isAdmin', false) == false
@@ -43,11 +43,6 @@ w      allow read: if request.auth != null && (request.auth.uid == userId || isA
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
-    match /product_reviews/{reviewId} {
-      allow read: if true;
-      allow create, update: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
-    }
 
     // Support tickets collection
     match /support_tickets/{ticketId} {
