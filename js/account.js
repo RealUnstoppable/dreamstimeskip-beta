@@ -2,39 +2,15 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
+import { escapeHTML, formatDate } from './utils.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
 const ordersList = document.getElementById('orders-list');
 
-// Utility to escape HTML
-function escapeHTML(str) {
-    if (typeof str !== 'string') return String(str).replace(/[&<>'"]/g,
-        tag => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[tag] || tag)
-    );
-    return str.replace(/[&<>'"]/g,
-        tag => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[tag] || tag)
-    );
-}
 
-// Format Date
-function formatDate(timestamp) {
-    if (!timestamp) return 'N/A';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-}
+
+
 
 // Render Profile
 async function renderProfile(user) {

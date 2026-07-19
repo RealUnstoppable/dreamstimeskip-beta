@@ -99,7 +99,10 @@ function renderProducts() {
                     </div>
                     <div class="product-footer">
                         <span class="product-price">$${product.price.toFixed(2)}</span>
-                        <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="view-reviews-btn" style="background-color: #4b5563; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.2s;" data-id="${product.id}">Reviews</button>
+                            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                        </div>
                     </div>
                     <button class="reviews-btn" data-id="${product.id}">Read Reviews</button>
                 </div>
@@ -133,7 +136,7 @@ async function loadProductStats() {
         });
         renderProducts();
     } catch (error) {
-        console.error("Error loading product stats:", error);
+        console.error("Error loading product stats - Manager info:", error);
     }
 }
 
@@ -198,6 +201,28 @@ export async function toggleWishlist(productId) {
 }
 
 // --- CART LOGIC ---
+export function toggleWishlist(productId) {
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    // Update UI
+    const wishlistBtns = document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`);
+    wishlistBtns.forEach(btn => {
+        if (wishlist.has(productId)) {
+            btn.classList.add('active');
+            btn.textContent = '❤️';
+        } else {
+            btn.classList.remove('active');
+            btn.textContent = '🤍';
+        }
+    });
+
+    saveWishlist();
+}
+
 export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
     try {
@@ -381,7 +406,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("Manager info: [Error fetching reviews:]", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -561,7 +586,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Error submitting review:", error);
+                console.error("Manager info: [Error submitting review:]", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -788,7 +813,7 @@ async function handleReviewSubmit(e) {
             reviewStatusMessage.style.color = 'red';
         }
     } catch (error) {
-        console.error('Submit review error:', error);
+        console.error('Manager info: [Submit review error:]', error);
         reviewStatusMessage.textContent = 'An error occurred. Please try again.';
         reviewStatusMessage.style.color = 'red';
     } finally {
@@ -848,4 +873,109 @@ onAuthStateChanged(auth, async (user) => {
 
         updateUserNav(user);
         renderCart(); // Render the final cart state
+    });// --- REVIEWS LOGIC ---
+const reviewsModal = document.getElementById('reviews-modal');
+const closeReviewsBtn = document.getElementById('close-reviews-btn');
+const reviewsListContainer = document.getElementById('reviews-list-container');
+const reviewSubmitForm = document.getElementById('review-submit-form');
+const reviewProductIdInput = document.getElementById('review-product-id');
+const reviewAuthMessage = document.getElementById('review-auth-message');
+
+async function openReviewsModal(productId) {
+    if (!reviewsModal) return;
+    reviewProductIdInput.value = productId;
+    reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
+    reviewsModal.style.display = 'block';
+
+    if (!currentUser) {
+        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'none';
+        reviewAuthMessage.style.display = 'block';
+    } else {
+        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'block';
+        reviewAuthMessage.style.display = 'none';
+    }
+
+    try {
+        const q = query(collection(db, 'product_reviews'), where('productId', '==', productId), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            reviewsListContainer.innerHTML = '<p>No reviews yet. Be the first!</p>';
+            return;
+        }
+
+        reviewsListContainer.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const date = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Just now';
+            reviewsListContainer.innerHTML += `
+                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <strong>${escapeHTML(data.authorName || 'Anonymous')}</strong>
+                        <span style="color: #fbbf24;">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</span>
+                    </div>
+                    <p style="margin: 0; font-size: 0.9em; color: var(--text-secondary);">${escapeHTML(data.text)}</p>
+                    <small style="color: #666;">${date}</small>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Manager info: Error loading reviews", error);
+        reviewsListContainer.innerHTML = '<p>Error loading reviews.</p>';
+    }
+}
+
+if (reviewSubmitForm) {
+    reviewSubmitForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+
+        const productId = reviewProductIdInput.value;
+        const rating = parseInt(document.getElementById('review-rating').value, 10);
+        const text = document.getElementById('review-text').value;
+        const submitBtn = reviewSubmitForm.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        try {
+            await addDoc(collection(db, 'product_reviews'), {
+                productId,
+                userId: currentUser.uid,
+                authorName: (currentUser.email ? currentUser.email.split("@")[0] : "Anonymous"), // Safe fallback
+                rating,
+                text,
+                createdAt: new Date().toISOString()
+            });
+            reviewSubmitForm.reset();
+            await openReviewsModal(productId); // Reload reviews
+            await renderProducts(); // Refresh stats on grid
+        } catch (error) {
+            console.error("Manager info: Error submitting review", error);
+            alert('Error submitting review.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Review';
+        }
     });
+}
+
+if (closeReviewsBtn) {
+    closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
+}
+window.addEventListener('click', (e) => {
+    if (e.target === reviewsModal) reviewsModal.style.display = 'none';
+});
+
+// Add event delegation for the new "Reviews" button
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('product-grid');
+    if (grid) {
+        grid.addEventListener('click', (e) => {
+            if (e.target.classList.contains('view-reviews-btn')) {
+                const productId = e.target.dataset.id;
+                openReviewsModal(productId);
+            }
+        });
+    }
+});
