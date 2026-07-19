@@ -1211,6 +1211,11 @@
             btn.disabled = true;
             btn.innerText = 'Saving...';
 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'Processing...';
+            }
+
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;

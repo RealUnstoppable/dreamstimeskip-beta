@@ -50,7 +50,8 @@
 **Vulnerability/Regression:** When replacing an inline event handler, the duplicate `class` attribute was ignored by the browser, breaking the event delegation.
 **Learning:** HTML5 parsing rules keep the first `class` attribute and ignore duplicates.
 **Prevention:** Combine all classes into a single `class` attribute when modifying DOM strings.
-## 2024-05-18 - [Fix Authorization Bypass in Firestore Rules]
-**Vulnerability:** The `firestore.rules` file contained duplicate, less restrictive `match` blocks for `/product_reviews/{reviewId}` and `/reviews/{reviewId}`. Because Firebase evaluates overlapping rules with a logical OR, these less restrictive blocks bypassed the intended stricter validations (e.g., rating checks, email validation) located elsewhere in the file.
-**Learning:** Duplicate `match` blocks for the same collection path can silently undermine security rules because the most permissive rule always wins.
-**Prevention:** Strictly avoid duplicate `match` blocks for the same collection path. Centralize all logic for a specific collection path within a single `match` block.
+
+## 2026-06-05 - [Fix Stored XSS in Support Tickets]
+**Vulnerability:** The `admin.html` and `account.html` pages directly interpolated the `ticket.status` field into the DOM via inline style templates without utilizing the available `escapeHTML` utility. Because standard user creation rules did not restrict the length or content of string status fields created via API or manual updates, an attacker could inject an XSS payload via a manipulated status string.
+**Learning:** Even internal tracking fields like `status` that are typically manipulated via trusted backend logic can be vectors for Stored XSS if the underlying database rules do not restrict arbitrary string modifications on the client side.
+**Prevention:** Always sanitize every dynamically rendered string value from a database response, regardless of whether the field is expected to only contain constrained enum values like "open" or "closed".

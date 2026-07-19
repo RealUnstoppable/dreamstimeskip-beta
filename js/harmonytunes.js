@@ -781,6 +781,11 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const query = e.target.value.toLowerCase();
+                // ⚡ Bolt: Optimize search highlight logic to use a single compiled RegExp outside the loops
+                // and skip DOM updates if the state hasn't changed.
+                const queryRegex = query ? new RegExp(query, 'gi') : null;
+                const replaceFn = match => `<span class="search-highlight">${match}</span>`;
+
                 const cards = document.querySelectorAll('.song-card');
                 cards.forEach(card => {
                     const titleEl = card.querySelector('.song-title');
@@ -791,14 +796,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    card.style.display = isMatch ? 'flex' : 'none';
+                    const newDisplay = isMatch ? 'flex' : 'none';
+                    if (card.style.display !== newDisplay) {
+                        card.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        // Avoid unnecessary textContent assignments which trigger style recalculations
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
                 
@@ -812,14 +821,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    row.style.display = isMatch ? 'table-row' : 'none';
+                    const newDisplay = isMatch ? 'table-row' : 'none';
+                    if (row.style.display !== newDisplay) {
+                        row.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
             }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
@@ -899,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist:", error);
+            console.error("Error loading playlist - Manager info:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -1157,7 +1169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, fadeStep);
             }).catch(e => {
-                console.error("Crossfade play failed:", e);
+                console.error("Crossfade play failed - Manager info:", e);
                 isCrossfading = false;
             });
             return;
@@ -1184,7 +1196,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error(e));
+        }).catch(e => console.error("Manager info:", e));
     }
 
     function pauseSong() {
@@ -1357,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(console.error);
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
@@ -1793,7 +1805,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1927,7 +1939,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -2010,7 +2022,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error:", e);
+                console.error("Firebase error - Manager info:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2062,7 +2074,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Manager info:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2136,9 +2148,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(console.error);
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Firebase history update error:", e);
+                    console.error("Firebase history update error - Manager info:", e);
                 }
             });
         }
@@ -2592,7 +2604,7 @@ export function formatTime(seconds) {
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(console.error);
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
                 }
                 renderQueue();
             }
