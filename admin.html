@@ -323,47 +323,12 @@
                 .replace(/'/g, "&#039;");
         }
 
-        async function fetchCollectionData(collectionName, isMapWithId = false) {
-            try {
-                const snap = await getDocs(collection(db, collectionName));
-                return snap.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
-            } catch (error) {
-                console.error(`Error fetching ${collectionName} - Manager info: [${error.message}]`, error);
-                throw error;
-            }
-        }
 
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
             setupEventListeners();
         }
-        async function fetchCollectionData(collectionName, isMapWithId = false) {
-            try {
-                const snap = await getDocs(collection(db, collectionName));
-                if (isMapWithId) {
-                    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                }
-                return snap.docs.map(d => d.data());
-            } catch (e) {
-                console.error(`Error fetching ${collectionName}:`, e);
-                console.error(`Error fetching ${collectionName} - Manager info:`, e.message);
-                const errArr = [];
-                errArr._error = true;
-                return errArr;
-            }
-        }
-
-        async function fetchCollectionData(collectionName, isMapWithId = true) {
-            try {
-                const snapshot = await getDocs(collection(db, collectionName));
-                return isMapWithId ? snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : snapshot.docs.map(d => d.data());
-            } catch (e) {
-                console.error(`Error fetching ${collectionName} - Manager info: [${e.message}]`, e);
-                return [];
-            }
-        }
-
         async function loadAdminData() {
             try {
                 // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
@@ -723,7 +688,7 @@
                     if (reply !== null && reply.trim() !== "") {
                         try {
                             await replyToTicket(reqId, reply, 'answered');
-                            loadAdminData();
+                            const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
                         } catch (error) {
                             alert("Error replying to ticket: " + error.message);
                         }

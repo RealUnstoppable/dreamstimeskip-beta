@@ -136,7 +136,7 @@ async function loadProductStats() {
         });
         renderProducts();
     } catch (error) {
-        console.error("Error loading product stats:", error);
+        console.error("Error loading product stats - Manager info:", error);
     }
 }
 
