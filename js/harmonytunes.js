@@ -2618,9 +2618,9 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
             <div class="card-title">${escapeHTML(song.title)}</div>
             <div class="card-desc">${escapeHTML(song.artist)}</div>
