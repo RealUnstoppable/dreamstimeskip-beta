@@ -22,3 +22,6 @@
 ## 2024-11-20 - Concurrent Promise Failures
 **Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
 **Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.
+## 2024-11-20 - Optimizing Regex Compilation in Loops
+**Learning:** Instantiating `new RegExp()` inside a loop over hundreds of DOM nodes causes severe performance degradation and GC thrashing during fast inputs. Unconditional assignments to `.innerHTML` and `.style.display` also trigger unnecessary style recalculations.
+**Action:** Always extract regex compilation outside the loop, and wrap DOM assignments in conditional checks (e.g., `if (el.innerHTML !== newHTML)`) to minimize expensive repaints.

@@ -308,6 +308,17 @@
             }
         });
 
+        function escapeHTML(str) {
+            if (str == null) return "";
+            if (typeof str !== 'string') str = str.toString();
+            if (typeof str !== 'string') str = String(str);
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
 
         function initializeAdminPage(adminUser) {
@@ -315,7 +326,6 @@
             loadAdminData();
             setupEventListeners();
         }
-
         async function loadAdminData() {
             try {
                 // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
@@ -511,7 +521,7 @@
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
                 const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
                                   ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
-                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
+                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
                 const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
@@ -678,12 +688,7 @@
                     if (reply !== null && reply.trim() !== "") {
                         try {
                             await replyToTicket(reqId, reply, 'answered');
-                            e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'ANSWERED';
-                            e.target.closest('tr').querySelector('td:nth-child(4) span').style.color = 'var(--accent-green)';
-                            // Disable the buttons
-                            e.target.style.display = 'none';
-                            const closeBtn = e.target.closest('tr').querySelector('.admin-close-btn');
-                            if (closeBtn) closeBtn.style.display = 'none';
+                            const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
                         } catch (error) {
                             alert("Error replying to ticket: " + error.message);
                         }

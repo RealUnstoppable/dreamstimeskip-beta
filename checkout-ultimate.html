@@ -236,15 +236,26 @@
             e.preventDefault();
             const promoInput = document.getElementById('promo-code');
             const promoMsg = document.getElementById('promo-message');
-            if (promoInput.value.toUpperCase() === 'TEST10') {
-                promoMsg.textContent = "Promo 'TEST10' applied!";
-                promoMsg.style.color = "var(--accent-green)";
-                promoMsg.style.display = "block";
-            } else {
-                promoMsg.textContent = "Invalid promo code.";
-                promoMsg.style.color = "var(--accent-red)";
-                promoMsg.style.display = "block";
-            }
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+
+            btn.disabled = true;
+            btn.innerText = 'Applying...';
+            promoMsg.style.display = "none";
+
+            setTimeout(() => {
+                if (promoInput.value.toUpperCase() === 'TEST10') {
+                    promoMsg.textContent = "Promo 'TEST10' applied!";
+                    promoMsg.style.color = "var(--accent-green)";
+                    promoMsg.style.display = "block";
+                } else {
+                    promoMsg.textContent = "Invalid promo code.";
+                    promoMsg.style.color = "var(--accent-red)";
+                    promoMsg.style.display = "block";
+                }
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }, 500);
         });
     </script>
 

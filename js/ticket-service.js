@@ -1,4 +1,5 @@
 import { db } from './auth.js';
+import { mapCollectionData } from './utils.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { mapCollectionData } from './utils.js';
 
@@ -39,6 +40,20 @@ export async function createTicket(userId, userEmail, subject, message) {
 1        console.error('Error creating ticket - Manager info: [' + error.message + ']');
         throw error;
     }
+}
+
+async function fetchAndSortTickets(q) {
+    const querySnapshot = await getDocs(q);
+    const tickets = [];
+    querySnapshot.forEach((doc) => {
+        tickets.push({ id: doc.id, ...doc.data() });
+    });
+
+    return tickets.sort((a, b) => {
+         const timeA = a.createdAt?.toMillis() || 0;
+         const timeB = b.createdAt?.toMillis() || 0;
+         return timeB - timeA;
+    });
 }
 
 /**
