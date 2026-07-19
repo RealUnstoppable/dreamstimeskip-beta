@@ -260,8 +260,8 @@
         <h2>Stay Unstoppable</h2>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Join our newsletter for detailing tips and 10% off your first wash.</p>
         <div class="newsletter" id="newsletter-form">
-            <input type="email" id="news-email" placeholder="Enter your email address" required>
-            <button onclick="subscribeNewsletter()">Subscribe</button>
+            <input type="email" id="news-email" placeholder="Enter your email address" required aria-label="Email address for newsletter">
+            <button id="news-submit-btn" onclick="subscribeNewsletter()">Subscribe</button>
         </div>
         <p id="news-msg" style="font-size: 0.85rem; margin-top: 15px; font-weight: 600;"></p>
         
@@ -305,7 +305,7 @@
         window.subscribeNewsletter = async () => {
             const email = document.getElementById('news-email').value;
             const msg = document.getElementById('news-msg');
-            const submitBtn = document.querySelector('#newsletter-form button');
+            const submitBtn = document.getElementById('news-submit-btn');
 
             if(!email) {
                 msg.style.color = "#ef4444";
@@ -319,6 +319,10 @@
                 submitBtn.innerText = 'Subscribing...';
             }
             
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
             try {
                 await setDoc(doc(db, "newsletterSubscribers", email), {
                     email: email,
@@ -331,10 +335,8 @@
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error subscribing. Please try again.";
             } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = originalBtnText;
-                }
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         };
     </script>

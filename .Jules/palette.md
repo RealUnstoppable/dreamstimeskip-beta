@@ -9,7 +9,6 @@
 ## 2026-05-23 - Async Form Submission Loading States
 **Learning:** Found an async form submission (`auth-form` in `js/auth.js`) where the submit button was disabled during the request, but its text was not updated. Without changing the text to explicitly indicate loading (e.g., "Processing..."), users might mistake the disabled button for a generic UI error or think the form is inactive.
 **Action:** Always update the `textContent` of submit buttons for async operations to provide explicit visual feedback, and ensure the original text is restored in `finally` or all error paths.
-
-## 2026-05-24 - Async Loading States in Event Listeners
-**Learning:** Found multiple form submissions across different files (`js/newsletter.js`, `uds.html`, `tracker.html`) that lacked loading states. This seems to be a common issue in this codebase, where async operations take time but give no feedback to the user, potentially causing double submissions.
-**Action:** When working on UX improvements, prioritize adding async loading states (disabling the button and changing text) to any form submission or async function triggered by user interaction to improve the overall experience and prevent duplicate requests.
+## 2026-05-26 - Missing Form Label Associations
+**Learning:** Many form `<label>` elements in this app (like in booking.html or detailing.html) lack `for` attributes. This breaks the programmatic association for screen readers and reduces the click target area for sighted users.
+**Action:** Always add matching `for` and `id` attributes to label/input pairs to ensure proper keyboard accessibility and screen reader support.

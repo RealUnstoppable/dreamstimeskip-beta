@@ -331,7 +331,7 @@
             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <span class="text-xs font-bold uppercase tracking-widest">Dark Mode</span>
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()">
+                    <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()" aria-label="Toggle Dark Mode">
                     <div
                         class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
                     </div>
@@ -631,19 +631,19 @@
 
                 <div class="grid md:grid-cols-2 gap-6 text-left">
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
+                        <label for="setupName" class="text-xs font-black uppercase tracking-widest text-slate-400">Full Name</label>
                         <input type="text" id="setupName" placeholder="Catalin Andrian">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
+                        <label for="setupPhone" class="text-xs font-black uppercase tracking-widest text-slate-400">Phone</label>
                         <input type="text" id="setupPhone" placeholder="(555) 000-0000">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
+                        <label for="setupRole" class="text-xs font-black uppercase tracking-widest text-slate-400">Your Role</label>
                         <input type="text" id="setupRole" placeholder="Shift Manager">
                     </div>
                     <div class="space-y-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
+                        <label for="setupStore" class="text-xs font-black uppercase tracking-widest text-slate-400">Store / Brand</label>
                         <select id="setupStore">
                             <option value="arbys">Arby's</option>
                             <option value="mcdonalds">McDonald's</option>
@@ -653,11 +653,11 @@
                         </select>
                     </div>
                     <div class="space-y-2 md:col-span-2">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
+                        <label for="setupLocation" class="text-xs font-black uppercase tracking-widest text-slate-400">Location</label>
                         <input type="text" id="setupLocation" placeholder="Buford, GA">
                     </div>
                 </div>
-                <button onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
+                <button id="finishSetupBtn" onclick="completeSetup()" class="btn btn-accent w-full py-5 mt-8 text-lg">Finish Setup</button>
             </div>
         </div>
 
@@ -680,20 +680,20 @@
                 <form id="trackerForm" class="space-y-8">
                     <div class="card grid md:grid-cols-3 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
+                            <label for="shiftManager" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Shift
                                 Manager</label>
-                            <input type="text" id="shiftManager" placeholder="Enter Name">
+                            <input type="text" id="shiftManager" placeholder="Enter Name" aria-label="Shift Manager">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
+                            <label for="shiftDate" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Date &
                                 Time</label>
                             <div class="flex gap-2">
-                                <input type="date" id="shiftDate">
-                                <input type="time" id="shiftTime">
+                                <input type="date" id="shiftDate" aria-label="Shift Date">
+                                <input type="time" id="shiftTime" aria-label="Shift Time">
                             </div>
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
+                            <label for="timerBtn" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Timer
                                 Control</label>
                             <div class="flex gap-2 items-center">
                                 <button type="button" id="timerBtn" onclick="toggleShiftTimer()"
@@ -711,7 +711,7 @@
                         <div id="routineContainer" class="grid sm:grid-cols-2 gap-4"></div>
                         <div class="mt-8 flex gap-3">
                             <input type="text" id="newRoutineTask" placeholder="Add custom daily task..."
-                                class="flex-1">
+                                class="flex-1" aria-label="Add custom daily task">
                             <button type="button" onclick="addRoutineTask()" class="btn btn-outline">Add</button>
                         </div>
                     </div>
@@ -722,7 +722,7 @@
                         <div class="grid md:grid-cols-2 gap-8">
                             <div class="space-y-4">
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Prep
+                                    <label for="prepNotes" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Prep
                                         Notes</label>
                                     <textarea id="prepNotes" placeholder="e.g. Amber prepped 8 pans of lettuce..."
                                         class="h-32"></textarea>
@@ -730,20 +730,20 @@
                             </div>
                             <div class="grid grid-cols-1 gap-4">
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Main
+                                    <label for="beefCook" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Main
                                         Prep Count (Beef/Protien)</label>
-                                    <input type="text" id="beefCook" placeholder="Cooked Count">
+                                    <input type="text" id="beefCook" placeholder="Cooked Count" aria-label="Main Prep Count">
                                 </div>
                                 <div class="space-y-2">
-                                    <label
+                                    <label for="beefTempered"
                                         class="text-[10px] font-black uppercase tracking-widest text-slate-400">Tempered
                                         / Thawed</label>
-                                    <input type="text" id="beefTempered" placeholder="Tempered Count">
+                                    <input type="text" id="beefTempered" placeholder="Tempered Count" aria-label="Tempered/Thawed Count">
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Labor
+                                    <label for="laborVariance" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Labor
                                         Variance %</label>
-                                    <input type="text" id="laborVariance" placeholder="e.g. -2.5%">
+                                    <input type="text" id="laborVariance" placeholder="e.g. -2.5%" aria-label="Labor Variance Percentage">
                                 </div>
                             </div>
                         </div>
@@ -764,9 +764,9 @@
                             </div>
                             <div class="space-y-6">
                                 <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Safe
+                                    <label for="safeCount" class="text-[10px] font-black uppercase tracking-widest text-slate-400">Safe
                                         Count ($)</label>
-                                    <input type="text" id="safeCount" placeholder="$1,100.00">
+                                    <input type="text" id="safeCount" placeholder="$1,100.00" aria-label="Safe Count">
                                 </div>
                                 <div class="space-y-2">
                                     <label
@@ -778,7 +778,7 @@
                                         Deposit</button>
                                 </div>
                                 <div class="space-y-2">
-                                    <label
+                                    <label for="changeNeeded"
                                         class="text-[10px] font-black uppercase tracking-widest text-slate-400">Change
                                         Needed</label>
                                     <textarea id="changeNeeded" placeholder="List bills/coins needed from bank..."
@@ -886,7 +886,7 @@
                                 item quantities) so you can recall it instantly.</p>
                             <div class="flex gap-2 mb-8">
                                 <input type="text" id="customPresetName" placeholder="e.g. Closing Shift Layout"
-                                    class="flex-1">
+                                    class="flex-1" aria-label="Preset Name">
                                 <button onclick="saveCustomPreset()" class="btn btn-outline">Save Current</button>
                             </div>
                             <div id="customPresetsContainer" class="space-y-3"></div>
@@ -914,17 +914,17 @@
                         <div class="space-y-4">
                             <input type="text" id="profName" placeholder="Name">
                             <input type="text" id="profRole" placeholder="Role">
-                            <input type="email" id="profEmail" readonly
+                            <input type="email" id="profEmail" readonly title="Email cannot be changed"
                                 class="bg-slate-50 opacity-60 dark:bg-slate-800">
                             <input type="text" id="profPhone" placeholder="Phone">
-                            <button onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
+                            <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
                                 Changes</button>
                         </div>
                     </div>
                     <div class="card">
                         <h3 class="text-xl font-black mb-6">Affiliate Program</h3>
                         <p class="text-slate-500 mb-6 text-sm">Earn premium credits by referring other managers.</p>
-                        <input type="text" id="referralLink" readonly
+                        <input type="text" id="referralLink" readonly aria-label="Referral Link"
                             class="font-mono text-xs mb-4 bg-slate-50 opacity-60 dark:bg-slate-800">
                         <button onclick="copyReferral()" class="btn btn-outline w-full">Copy My Link</button>
                         <div id="referralStatus" class="mt-4 text-[10px] font-black uppercase text-emerald-500 hidden">
@@ -1007,7 +1007,7 @@
                 <p class="text-slate-500 mb-8">Direct line to the engineering team. Pro users receive priority.</p>
                 <textarea id="featureReqText" class="h-48 mb-6"
                     placeholder="I would love it if ezManage could..."></textarea>
-                <button onclick="submitFeatureRequest()" class="btn btn-accent w-full py-4">Send Directly to
+                <button id="featureReqBtn" onclick="submitFeatureRequest()" class="btn btn-accent w-full py-4">Send Directly to
                     Admin</button>
             </div>
         </div>
@@ -1184,8 +1184,10 @@
 
         window.completeSetup = function() {
             if (!currentUser) return;
-            const btn = document.querySelector('button[onclick="completeSetup()"]');
-            const originalText = btn ? btn.innerText : 'Finish Setup';
+            const btn = document.querySelector('#view-setup button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
 
             const data = {
                 name: document.getElementById('setupName').value,
@@ -1198,7 +1200,16 @@
                 signupDate: serverTimestamp()
             };
 
-            if (!data.name) return alert("Name is required.");
+            if (!data.name) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                return alert("Name is required.");
+            }
+
+            const btn = document.getElementById('finishSetupBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
 
             if (btn) {
                 btn.disabled = true;
@@ -1209,13 +1220,9 @@
             setDoc(userDocRef, data).then(() => {
                 document.getElementById('shiftManager').value = data.name;
                 window.navTo('tracker');
-            }).catch(err => {
-                alert("Error: " + err.message);
             }).finally(() => {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = originalText;
-                }
+                btn.disabled = false;
+                btn.innerText = originalText;
             });
         }
 
@@ -1280,9 +1287,9 @@
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center animate-fadeIn";
             div.innerHTML = `
-                <input type="text" placeholder="Drawer Label" class="drawer-name" value="${escapeHTML(label)}" style="flex: 2;">
-                <input type="number" step="0.01" value="${escapeHTML(val)}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)">
-                <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;">
+                <input type="text" placeholder="Drawer Label" class="drawer-name" value="${escapeHTML(label)}" style="flex: 2;" aria-label="Drawer Label">
+                <input type="number" step="0.01" value="${escapeHTML(val)}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)" aria-label="Drawer Value">
+                <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;" aria-label="Drawer Result">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('drawersContainer').appendChild(div);
@@ -1303,7 +1310,7 @@
             const div = document.createElement('div');
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
             div.innerHTML = `
-                <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;">
+                <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;" aria-label="Deposit Amount">
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
@@ -1319,7 +1326,7 @@
             const div = document.createElement('div');
             div.className = "flex items-center gap-3 p-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm";
             div.innerHTML = `
-                <input type="checkbox" class="routine-chk w-5 h-5 accent-sky-500" ${isChecked ? 'checked' : ''} onchange="triggerDraftSync()"> 
+                <input type="checkbox" class="routine-chk w-5 h-5 accent-sky-500" aria-label="Toggle routine task" ${isChecked ? 'checked' : ''} onchange="triggerDraftSync()">
                 <span class="routine-name flex-1 font-semibold text-sm">${escapeHTML(taskName)}</span>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
             `;
@@ -1334,9 +1341,9 @@
             div.className = 'inventory-item animate-fadeIn';
             div.innerHTML = `
                 <input type="text" placeholder="Item Name" class="inv-name" value="${escapeHTML(name)}">
-                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" oninput="triggerDraftSync()">
-                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" oninput="triggerDraftSync()">
+                <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" onchange="triggerDraftSync()">
+                <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" onchange="triggerDraftSync()">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
@@ -1377,7 +1384,6 @@
 
         document.getElementById('trackerForm').addEventListener('change', triggerDraftSync);
         
-        window.triggerDraftSync = function() {
         document.getElementById('trackerForm').addEventListener('input', triggerDraftSync);
 
         function triggerDraftSync() {
@@ -1388,9 +1394,8 @@
                 const userDocRef = doc(db, 'users', currentUser.uid);
                 setDoc(userDocRef, { trackerDraft: state }, { merge: true });
             }, 3000); 
-                db.collection('users').doc(currentUser.uid).set({ trackerDraft: state }, { merge: true });
-            }, 3000);
         }
+        window.triggerDraftSync = triggerDraftSync;
 
         function syncDraftFromServer() {
             if (!currentUser) return;
@@ -1444,8 +1449,6 @@
             });
         }
 
-        window.manualSaveHistory = function() {
-            if(!currentUser) return alert("Please Sign In first.");
         function manualSaveHistory() {
             if (!currentUser) return alert("Please Sign In first.");
             const state = getTrackerState();
@@ -1458,6 +1461,7 @@
                 fetchCloudHistory();
             });
         }
+        window.manualSaveHistory = manualSaveHistory;
 
         function fetchCloudHistory() {
             if (!currentUser) return;
@@ -1595,8 +1599,6 @@
             }
         }
 
-        window.saveCustomPreset = function() {
-            if(!currentUser) return;
         function saveCustomPreset() {
             if (!currentUser) return;
             const name = document.getElementById('customPresetName').value || "Unnamed Preset";
@@ -1614,14 +1616,15 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             setDoc(userDocRef, {
                 customPresets: arrayUnion({ id: Date.now().toString(), name, items })
-
-            db.collection('users').doc(currentUser.uid).set({
-                customPresets: firebase.firestore.FieldValue.arrayUnion({ id: Date.now().toString(), name, items })
             }, { merge: true }).then(() => {
                 alert("Inventory Layout & Counts Saved Successfully!");
                 document.getElementById('customPresetName').value = "";
+            }).catch((error) => {
+                console.error("Error saving custom preset - Manager info: [" + error.message + "]");
+                alert("There was an error saving the preset. Please try again later.");
             });
         }
+        window.saveCustomPreset = saveCustomPreset;
 
         function loadCustomPresets() {
             if (!currentUser) return;
@@ -1629,10 +1632,10 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             onSnapshot(userDocRef, docSnap => {
                 container.innerHTML = "";
+                const fragment = document.createDocumentFragment();
                 if(docSnap.exists() && docSnap.data().customPresets) {
+                    const fragment = document.createDocumentFragment();
                     docSnap.data().customPresets.forEach(p => {
-                if (doc.exists && doc.data().customPresets) {
-                    doc.data().customPresets.forEach(p => {
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-xl group border border-slate-100 dark:border-slate-700";
                         div.innerHTML = `
@@ -1653,11 +1656,6 @@
                 const preset = (docSnap.data().customPresets || []).find(p => p.id == id);
                 if(preset) {
                     const addInv = window.addInventoryItem || addInventoryItem;
-        function applyCustomPreset(id) {
-            if (!confirm("Replace current inventory layout with this custom preset?")) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const preset = (doc.data().customPresets || []).find(p => p.id == id);
-                if (preset) {
                     document.getElementById('inventoryContainer').innerHTML = '';
                     preset.items.forEach(i => {
                         if (typeof i === 'string') {
@@ -1674,8 +1672,6 @@
 
         window.generateReport = function() {
             if(!currentUser) return alert("Sign in required.");
-        function generateReport() {
-            if (!currentUser) return alert("Sign in required.");
             const state = getTrackerState();
 
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
@@ -1713,32 +1709,22 @@
 
         window.saveProfileToFirebase = function() {
             if(!currentUser) return;
-        function saveProfileToFirebase() {
-            if (!currentUser) return;
-
-            const btn = document.querySelector('button[onclick="saveProfileToFirebase()"]');
-            const originalText = btn ? btn.innerText : 'Save Changes';
-
-            if (btn) {
-                btn.disabled = true;
-                btn.innerText = 'Saving...';
-            }
-
             const data = {
                 name: document.getElementById('profName').value,
                 role: document.getElementById('profRole').value,
                 phone: document.getElementById('profPhone').value
             };
+            const btn = document.getElementById('saveProfileBtn');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
             const userDocRef = doc(db, 'users', currentUser.uid);
             setDoc(userDocRef, data, { merge: true }).then(() => {
                 alert("Profile Updated!");
-            }).catch(err => {
-                alert("Error: " + err.message);
             }).finally(() => {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerText = originalText;
-                }
+                btn.disabled = false;
+                btn.innerText = originalText;
             });
         }
 
@@ -1751,8 +1737,6 @@
 
         window.clearData = function() {
             if(confirm("Are you sure? This will wipe the current tracker form.")) {
-        function clearData() {
-            if (confirm("Are you sure? This will wipe the current tracker form.")) {
                 document.getElementById('trackerForm').reset();
                 document.getElementById('drawersContainer').innerHTML = '';
                 document.getElementById('depositsContainer').innerHTML = '';
@@ -1771,7 +1755,7 @@
             }
         }
 
-        window.initDefaults = function() {
+        function initDefaults() {
             if (document.getElementById('inventoryContainer').innerHTML.trim() === "") {
                 document.getElementById('shiftDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('shiftTime').value = new Date().toTimeString().slice(0, 5);
@@ -1782,6 +1766,7 @@
                 presets['arbys'].forEach(name => addInventoryItem(name));
             }
         }
+        window.initDefaults = initDefaults;
 
         async function processCheckout(planName) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
@@ -1816,15 +1801,25 @@
         window.submitFeatureRequest = function() {
             const msg = document.getElementById('featureReqText').value;
             if(!msg) return;
+            const btn = document.getElementById('featureReqBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerText = 'Sending...';
             const featureRequestsRef = collection(db, 'feature_requests');
             addDoc(featureRequestsRef, {
-            if (!msg) return;
-            db.collection('feature_requests').add({
                 uid: currentUser.uid,
                 email: currentUser.email,
                 message: msg,
                 timestamp: new Date().toISOString()
-            }).then(() => { alert("Sent!"); document.getElementById('featureReqText').value = ""; });
+            }).then(() => {
+                alert("Sent!");
+                document.getElementById('featureReqText').value = "";
+            }).catch((err) => {
+                alert("Error sending request: " + err.message);
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
         }
 
         window.onload = () => {
