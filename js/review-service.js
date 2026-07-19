@@ -32,7 +32,7 @@ export async function submitReview(productId, userId, userEmail, rating, reviewT
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error submitting review:', error);
+        console.error('Manager info: [Error submitting review:]', error);
         return { success: false, error: error.message };
     }
 }
@@ -60,7 +60,7 @@ export async function getProductReviews(productId) {
             createdAtDate: doc.data().createdAt ? doc.data().createdAt.toDate().toLocaleDateString() : 'Just now'
         }));
     } catch (error) {
-        console.error('Error fetching product reviews:', error);
+        console.error('Manager info: [Error fetching product reviews:]', error);
         return [];
     }
 }
@@ -87,7 +87,7 @@ export async function getAverageRating(productId) {
             count: data.totalReviews || 0
         };
     } catch (error) {
-        console.error('Error calculating average rating:', error);
+        console.error('Manager info: [Error calculating average rating:]', error);
         return { average: 0, count: 0 };
     }
 }

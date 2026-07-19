@@ -280,14 +280,11 @@
     </div>
 
    <script type="module">
-        import { auth, db, safeRedirect } from '/js/auth.js';
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
-        import { fetchCollectionData } from '/js/utils.js';
+        import { fetchCollectionData, escapeHTML } from '/js/utils.js';
 
         let performanceChart;
 
@@ -322,6 +319,8 @@
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
         }
+
+
         function initializeAdminPage(adminUser) {
             document.getElementById('user-email-sidebar').textContent = adminUser.email;
             loadAdminData();
@@ -331,13 +330,13 @@
             try {
                 // ⚡ Bolt: Fire all independent data queries concurrently (O(N) -> O(1) latency)
                 const promises = [
-                    getDocs(collection(db, "users")).catch(e => { console.error("Manager info: [Error fetching users]", e); return null; }),
-                    getDocs(collection(db, "carts")).catch(e => { console.error("Manager info: [Error fetching carts]", e); return null; }),
-                    getDocs(collection(db, "orders")).catch(e => { console.error("Manager info: [Error fetching orders]", e); return null; }),
-                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Manager info: [Error fetching newsletter]", e); return null; }),
-                    getDocs(collection(db, "bookings")).catch(e => { console.error("Manager info: [Error fetching bookings]", e); return null; }),
-                    getDocs(collection(db, "quotes")).catch(e => { console.error("Manager info: [Error fetching quotes]", e); return null; }),
-                    typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error("Manager info: [Error fetching support tickets]", e); return []; }) : Promise.resolve([]),
+                    getDocs(collection(db, "users")).catch(e => { console.error("Manager info: [Error fetching users:]", e); return null; }),
+                    getDocs(collection(db, "carts")).catch(e => { console.error("Manager info: [Error fetching carts:]", e); return null; }),
+                    getDocs(collection(db, "orders")).catch(e => { console.error("Manager info: [Error fetching orders:]", e); return null; }),
+                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Manager info: [Error fetching newsletter:]", e); return null; }),
+                    getDocs(collection(db, "bookings")).catch(e => { console.error("Manager info: [Error fetching bookings:]", e); return null; }),
+                    getDocs(collection(db, "quotes")).catch(e => { console.error("Manager info: [Error fetching quotes:]", e); return null; }),
+                    typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Manager info: [Error fetching support tickets]', e); return []; }) : Promise.resolve([]),
                     getDocs(collection(db, "feature_requests")).catch(e => {
                         console.log("Could not load feature requests. Missing Firestore rules?", e);
                         document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
@@ -522,7 +521,7 @@
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
                 const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
                                   ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
-                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
+                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
                 const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
@@ -547,17 +546,17 @@
                 btnElement.textContent = 'Processing...';
                 btnElement.disabled = true;
                 try {
-                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
-                    let originalText = 'Close';
-                    if (btn) {
-                        originalText = btn.textContent;
-                        btn.textContent = 'Processing...';
-                        btn.disabled = true;
+                    const btnEl = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                    let origText = 'Close';
+                    if (btnEl) {
+                        origText = btnEl.textContent;
+                        btnEl.textContent = 'Processing...';
+                        btnEl.disabled = true;
                     }
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    const btn = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
-                    if (btn) {
-                        const tr = btn.closest('tr');
+                    const btnEl2 = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
+                    if (btnEl2) {
+                        const tr = btnEl2.closest('tr');
                         if (tr) {
                             tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
                             tr.querySelector('td:nth-child(5)').innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
@@ -573,7 +572,7 @@
                     }
                 }
             }
-        });
+        }
 
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
@@ -673,6 +672,9 @@
                         e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'Active';
                         e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
                     }
+                  } catch (error) {
+                    console.error("Manager info: [Error toggling ban status:]", error);
+                  }
                 }
             });
             
@@ -686,14 +688,7 @@
                     if (reply !== null && reply.trim() !== "") {
                         try {
                             await replyToTicket(reqId, reply, 'answered');
-                            const btn = document.querySelector(`.admin-reply-btn[data-id="${reqId}"]`);
-                            if (btn) {
-                                const tr = btn.closest('tr');
-                                if (tr) {
-                                    tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--accent-green); text-transform: uppercase;">answered</span>';
-                                }
-                            }
-
+                            const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
                         } catch (error) {
                             alert("Error replying to ticket: " + error.message);
                         }
@@ -714,6 +709,9 @@
                     e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
                     e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
                     e.target.remove();
+                  } catch(error) {
+                    console.error("Manager info: [Error completing feature request:]", error);
+                  }
                 }
             });
 
@@ -727,11 +725,14 @@
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                   try {
                     await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
-2                    if(tr) {
+                    if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
                         tr.querySelector('td:nth-child(5) span').textContent = 'cancelled';
                         tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
+                  } catch (error) {
+                    console.error("Manager info: [Error cancelling booking:]", error);
+                  }
                 } else if (action === 'complete') {
                   try {
                     await updateDoc(doc(db, "bookings", id), { status: 'completed' });
@@ -740,6 +741,9 @@
                         tr.querySelector('td:nth-child(5) span').textContent = 'completed';
                         tr.querySelector('td:nth-child(6)').innerHTML = '';
                     }
+                  } catch (error) {
+                    console.error("Manager info: [Error completing booking:]", error);
+                  }
                 }
             });
             // Quotes Action Buttons

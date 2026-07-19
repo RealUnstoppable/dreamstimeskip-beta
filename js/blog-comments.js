@@ -1,4 +1,5 @@
 import { auth, db } from './auth.js';
+import { escapeHTML } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
@@ -182,12 +183,7 @@ async function loadComments(postId) {
     }
 }
 
-function escapeHTML(str) {
-    if (!str) return '';
-    return str.replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-    }[tag]));
-}
+
 
 function showNotification(element, message, type) {
     if (!element) return;

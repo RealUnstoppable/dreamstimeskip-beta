@@ -17,7 +17,7 @@ export async function fetchCollectionData(collectionName, includeId = true) {
             return includeId ? { id: doc.id, ...data } : data;
         });
     } catch (error) {
-        console.error(`Manager info: [Error fetching collection ${collectionName}]`, error);
+        console.error(`Manager info: [Error fetching collection ${collectionName}:]`, error);
         return [];
     }
 }
