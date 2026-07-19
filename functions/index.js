@@ -73,7 +73,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error - Manager info:", err.message);
+      console.error("Checkout Error - Manager info: [" + err.message + "]");
       res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
     }
   });
@@ -140,7 +140,7 @@ exports.onReviewWrite = functions.firestore
 
         return null;
       } catch (error) {
-        console.error("Error aggregating ratings - Manager info:", error.message);
+        console.error("Error aggregating ratings - Manager info: [" + error.message + "]");
         return null;
       }
     });
@@ -191,7 +191,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       );
       await Promise.all(updates);
     } catch (error) {
-      console.error("Error processing customer.subscription.deleted - Manager info:", error.message);
+      console.error("Error processing customer.subscription.deleted - Manager info: [" + error.message + "]");
     }
   }
 
