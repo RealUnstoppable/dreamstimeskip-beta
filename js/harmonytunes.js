@@ -3,6 +3,18 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- STATE ---
     const librarySongs = [
@@ -700,6 +712,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let crossfadeDuration = 15;
+    let crossfadeInterval = null;
+    let fadeIntervalCrossfade = null;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
@@ -1153,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const steps = (fadeDur * 1000) / fadeStep;
                 let currentStep = 0;
                 
+                if (crossfadeInterval) clearInterval(crossfadeInterval);
                 crossfadeInterval = setInterval(() => {
                     currentStep++;
                     if (currentStep >= steps) {
@@ -1811,7 +1826,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -1945,7 +1961,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;

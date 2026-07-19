@@ -1148,7 +1148,7 @@
             btn.innerText = 'Processing...';
 
             if (isRegisterMode) {
-                createUserWithEmailAndPassword(auth, email, pass)
+                auth.createUserWithEmailAndPassword(email, pass)
                     .then(() => window.navTo('setup'))
                     .catch(err => alert(err.message))
                     .finally(() => {
@@ -1156,7 +1156,7 @@
                         btn.innerText = originalText;
                     });
             } else {
-                signInWithEmailAndPassword(auth, email, pass)
+                auth.signInWithEmailAndPassword(email, pass)
                     .catch(err => alert(err.message))
                     .finally(() => {
                         btn.disabled = false;

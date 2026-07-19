@@ -313,10 +313,12 @@
 
     <script type="module">
         import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js'; // Add this line
+        import { loadFooter } from './js/footer.js'; 
 
-        loadNavbar();
-        loadFooter();
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNavbar();
+            loadFooter();
+        });
     </script>
 
     <script src="/js/script.js"></script>
