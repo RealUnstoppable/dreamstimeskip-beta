@@ -111,7 +111,7 @@ async function loadProductStats() {
         });
         renderProducts();
     } catch (error) {
-        console.error("Error loading product stats:", error);
+        console.error("Manager info: [Error loading product stats:]", error);
     }
 }
 
@@ -337,7 +337,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("Manager info: [Error fetching reviews:]", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -513,7 +513,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Error submitting review:", error);
+                console.error("Manager info: [Error submitting review:]", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -740,7 +740,7 @@ async function handleReviewSubmit(e) {
             reviewStatusMessage.style.color = 'red';
         }
     } catch (error) {
-        console.error('Submit review error:', error);
+        console.error('Manager info: [Submit review error:]', error);
         reviewStatusMessage.textContent = 'An error occurred. Please try again.';
         reviewStatusMessage.style.color = 'red';
     } finally {

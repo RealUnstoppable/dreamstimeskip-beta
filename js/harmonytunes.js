@@ -897,7 +897,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist:", error);
+            console.error("Manager info: [Error loading playlist:]", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -1155,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }, fadeStep);
             }).catch(e => {
-                console.error("Crossfade play failed:", e);
+                console.error("Manager info: [Crossfade play failed:]", e);
                 isCrossfading = false;
             });
             return;
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error(e));
+        }).catch(e => console.error("Manager info: [Error] ", e));
     }
 
     function pauseSong() {
@@ -1779,7 +1779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info: [Error] ", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1913,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info: [Error] ", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -1996,7 +1996,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error:", e);
+                console.error("Manager info: [Firebase error:]", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2048,7 +2048,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Manager info: [Error] ", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2124,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(e.code === 'not-found') {
                     setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(console.error);
                 } else {
-                    console.error("Firebase history update error:", e);
+                    console.error("Manager info: [Firebase history update error:]", e);
                 }
             });
         }

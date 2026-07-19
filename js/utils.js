@@ -32,3 +32,9 @@ export async function fetchCollectionData(db, collectionName, isMapWithId = fals
         return [];
     }
 }
+
+export function formatDate(timestamp) {
+    if (!timestamp) return 'N/A';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+}
