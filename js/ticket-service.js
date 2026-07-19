@@ -1,4 +1,5 @@
 import { db } from './auth.js';
+import { mapCollectionData } from './utils.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { mapCollectionData } from './utils.js';
 
