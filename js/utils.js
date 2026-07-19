@@ -32,3 +32,9 @@ export async function fetchCollectionData(db, collectionName, isMapWithId = fals
         return [];
     }
 }
+
+export function mapCollectionData(querySnapshot, isMapWithId = true) {
+    return querySnapshot.docs.map(doc => {
+        return isMapWithId ? { id: doc.id, ...doc.data() } : doc.data();
+    });
+}

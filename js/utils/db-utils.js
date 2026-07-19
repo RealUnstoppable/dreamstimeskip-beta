@@ -9,6 +9,7 @@ import { db } from '../auth.js';
  * @returns {Promise<Array<Object>>} - A promise that resolves to an array of document data.
  */
 export async function fetchCollectionData(collectionName, includeId = true) {
+    // Deprecated: use fetchCollectionData from js/utils.js instead
     try {
         const querySnapshot = await getDocs(collection(db, collectionName));
         return querySnapshot.docs.map(doc => {
@@ -16,7 +17,7 @@ export async function fetchCollectionData(collectionName, includeId = true) {
             return includeId ? { id: doc.id, ...data } : data;
         });
     } catch (error) {
-        console.error(`Error fetching collection ${collectionName}:`, error);
+        console.error(`Manager info: [Error fetching collection ${collectionName}]`, error);
         return [];
     }
 }
