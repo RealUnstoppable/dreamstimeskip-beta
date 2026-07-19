@@ -312,6 +312,12 @@
                 msg.textContent = "Please enter an email address.";
                 return;
             }
+
+            const originalBtnText = submitBtn ? submitBtn.innerText : 'Subscribe';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Subscribing...';
+            }
             
             const originalBtnText = submitBtn.textContent;
             submitBtn.disabled = true;

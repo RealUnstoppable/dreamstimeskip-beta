@@ -15,7 +15,13 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
         const email = emailInput.value.trim();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
 
         try {
             // Save to Firestore
@@ -29,6 +35,11 @@ document.addEventListener('submit', async (e) => {
         } catch (error) {
             console.error("Error submitting email - Manager info: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
         }
     }
 });
