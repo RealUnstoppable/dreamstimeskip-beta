@@ -198,6 +198,28 @@ export async function toggleWishlist(productId) {
 }
 
 // --- CART LOGIC ---
+export function toggleWishlist(productId) {
+    if (wishlist.has(productId)) {
+        wishlist.delete(productId);
+    } else {
+        wishlist.add(productId);
+    }
+
+    // Update UI
+    const wishlistBtns = document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`);
+    wishlistBtns.forEach(btn => {
+        if (wishlist.has(productId)) {
+            btn.classList.add('active');
+            btn.textContent = '❤️';
+        } else {
+            btn.classList.remove('active');
+            btn.textContent = '🤍';
+        }
+    });
+
+    saveWishlist();
+}
+
 export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
     try {
