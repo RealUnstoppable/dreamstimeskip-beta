@@ -559,7 +559,7 @@
                 const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
                 const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
                                   ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
-                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${ticket.status}</span>`;
+                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>`;
 
                 const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
                 const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
