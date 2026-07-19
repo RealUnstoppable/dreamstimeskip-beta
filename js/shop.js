@@ -362,33 +362,35 @@ async function handleViewReviews(productId) {
 function setupEventListeners() {
     // Product grid listeners
     if (productGrid) {
-        productGrid.addEventListener('click', (e) => {
+        productGrid.addEventListener('click', async (e) => {
             if (e.target.classList.contains('add-to-cart-btn')) {
-                const productId = e.target.dataset.id;
-                handleAddToCart(productId);
+                const btn = e.target;
+                const productId = btn.dataset.id;
+                const originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Adding...';
+
+                await handleAddToCart(productId);
+
+                btn.textContent = 'Added!';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }, 2000);
             } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
                 const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
                 const productId = btn.dataset.id;
                 toggleWishlist(productId);
-            } else if (e.target.classList.contains('view-reviews-btn')) {
+            } else if (e.target.classList.contains('view-reviews-btn') || e.target.classList.contains('reviews-btn')) {
                 const productId = e.target.dataset.id;
-                handleViewReviews(productId);
+                if (e.target.classList.contains('view-reviews-btn')) {
+                    handleViewReviews(productId);
+                } else {
+                    openReviewsModal(productId);
+                }
             }
         });
     }
-    productGrid.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-to-cart-btn')) {
-            const productId = e.target.dataset.id;
-            handleAddToCart(productId);
-        } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
-            const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
-            const productId = btn.dataset.id;
-            toggleWishlist(productId);
-        } else if (e.target.classList.contains('reviews-btn')) {
-            const productId = e.target.dataset.id;
-            openReviewsModal(productId);
-        }
-    });
 
     // Review Modal Listeners
     if (closeReviewsBtn && reviewsModal) {

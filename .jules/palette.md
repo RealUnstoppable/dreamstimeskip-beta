@@ -12,3 +12,6 @@
 ## 2026-05-26 - Missing Form Label Associations
 **Learning:** Many form `<label>` elements in this app (like in booking.html or detailing.html) lack `for` attributes. This breaks the programmatic association for screen readers and reduces the click target area for sighted users.
 **Action:** Always add matching `for` and `id` attributes to label/input pairs to ensure proper keyboard accessibility and screen reader support.
+## 2026-05-28 - Icon-Only Action Buttons Accessibility
+**Learning:** Found multiple icon-only utility buttons in `tracker.html` (e.g., delete drawer, remove deposit) that relied solely on `aria-label`s for screen reader support but lacked visible tooltips (`title` attributes) for sighted users.
+**Action:** When adding `aria-label`s to icon-only buttons for accessibility, also add matching `title` attributes so sighted users can discover their function via hover tooltips.

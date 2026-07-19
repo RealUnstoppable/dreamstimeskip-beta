@@ -1276,7 +1276,7 @@
                 <input type="text" placeholder="Drawer Label" class="drawer-name" value="${escapeHTML(label)}" style="flex: 2;" aria-label="Drawer Label">
                 <input type="number" step="0.01" value="${escapeHTML(val)}" class="drawer-val" style="flex: 1;" oninput="calcDrawer(this)" aria-label="Drawer Value">
                 <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;" aria-label="Drawer Result">
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer" title="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('drawersContainer').appendChild(div);
             calcDrawer(div.querySelector('.drawer-val'));
@@ -1299,7 +1299,7 @@
                 <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;" aria-label="Deposit Amount">
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit" title="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             document.getElementById('depositsContainer').appendChild(div);
             lucide.createIcons();
@@ -1314,7 +1314,7 @@
             div.innerHTML = `
                 <input type="checkbox" class="routine-chk w-5 h-5 accent-sky-500" aria-label="Toggle routine task" ${isChecked ? 'checked' : ''} onchange="triggerDraftSync()">
                 <span class="routine-name flex-1 font-semibold text-sm">${escapeHTML(taskName)}</span>
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task" title="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
             `;
             document.getElementById('routineContainer').appendChild(div);
             document.getElementById('newRoutineTask').value = "";
@@ -1330,7 +1330,7 @@
                 <input type="text" placeholder="Backline" class="inv-backline" value="${escapeHTML(bl)}" onchange="triggerDraftSync()">
                 <input type="text" placeholder="Cooler" class="inv-cooler" value="${escapeHTML(cl)}" onchange="triggerDraftSync()">
                 <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" onchange="triggerDraftSync()">
-                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
+                <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item" title="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
             document.getElementById('inventoryContainer').appendChild(div);
             lucide.createIcons();

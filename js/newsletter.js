@@ -17,6 +17,15 @@ document.addEventListener('submit', async (e) => {
         const emailInput = form.querySelector('input[type="email"]');
         const email = emailInput.value.trim();
 
+        const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
+        let originalText = 'Subscribe';
+        if (submitBtn) {
+            originalText = submitBtn.textContent || submitBtn.value;
+            submitBtn.disabled = true;
+            if (submitBtn.textContent) submitBtn.textContent = 'Submitting...';
+            else submitBtn.value = 'Submitting...';
+        }
+
         try {
             // Save to Firestore
             await setDoc(doc(db, "newsletter_subscribers", email), {
@@ -29,6 +38,12 @@ document.addEventListener('submit', async (e) => {
         } catch (error) {
             console.error("Error submitting email - Manager info: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                if (submitBtn.textContent) submitBtn.textContent = originalText;
+                else submitBtn.value = originalText;
+            }
         }
     }
 });
