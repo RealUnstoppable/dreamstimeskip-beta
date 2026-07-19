@@ -1,11 +1,8 @@
 // js/checkout.js
 import { auth, db, safeRedirect } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { products, productMap } from './shop.js';
+import { products, productMap } from './products.js';
 
 let currentUser = null;
 let userCart = {};
@@ -89,41 +86,46 @@ function renderCheckoutPage() {
 }
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
-    await runTransaction(db, async (transaction) => {
-        // 1. Concurrent Reads: Fetch all product stats to avoid N+1 sequential queries
-        const productIds = Object.keys(cart);
-        const statRefs = productIds.map(id => doc(db, 'product_stats', id));
-        const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
+    try {
+        await runTransaction(db, async (transaction) => {
+            // 1. Concurrent Reads: Fetch all product stats to avoid N+1 sequential queries
+            const productIds = Object.keys(cart);
+            const statRefs = productIds.map(id => doc(db, 'product_stats', id));
+            const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
 
-        // Prepare a map of current stats for the writes phase
-        const currentStats = {};
-        statDocs.forEach((statDoc, index) => {
-            const productId = productIds[index];
-            currentStats[productId] = statDoc;
-        });
+            // Prepare a map of current stats for the writes phase
+            const currentStats = {};
+            statDocs.forEach((statDoc, index) => {
+                const productId = productIds[index];
+                currentStats[productId] = statDoc;
+            });
 
-        // 2. Writes
-        // 2a. Create the order document
-        const newOrderRef = doc(db, 'orders', `${uid}_${Date.now()}`);
-        transaction.set(newOrderRef, orderDetails);
+            // 2. Writes
+            // 2a. Create the order document
+            const newOrderRef = doc(db, 'orders', `${uid}_${Date.now()}`);
+            transaction.set(newOrderRef, orderDetails);
 
-        // 2b. Update product order counts based on the concurrently fetched reads
-        for (const [productId, quantity] of Object.entries(cart)) {
-            const productStatRef = doc(db, 'product_stats', productId);
-            const statDoc = currentStats[productId];
+            // 2b. Update product order counts based on the concurrently fetched reads
+            for (const [productId, quantity] of Object.entries(cart)) {
+                const productStatRef = doc(db, 'product_stats', productId);
+                const statDoc = currentStats[productId];
 
-            if (!statDoc.exists()) {
-                transaction.set(productStatRef, { orderedCount: quantity });
-            } else {
-                const newCount = statDoc.data().orderedCount + quantity;
-                transaction.update(productStatRef, { orderedCount: newCount });
+                if (!statDoc.exists()) {
+                    transaction.set(productStatRef, { orderedCount: quantity });
+                } else {
+                    const newCount = statDoc.data().orderedCount + quantity;
+                    transaction.update(productStatRef, { orderedCount: newCount });
+                }
             }
-        }
 
-        // 2c. Clear the user's cart
-        const userCartRef = doc(db, 'carts', uid);
-        transaction.update(userCartRef, { items: {} });
-    });
+            // 2c. Clear the user's cart
+            const userCartRef = doc(db, 'carts', uid);
+            transaction.update(userCartRef, { items: {} });
+        });
+    } catch (error) {
+        console.error('Manager info: Error processing order transaction:', error);
+        throw error;
+    }
 }
 
 export async function handlePlaceOrder(e) {
@@ -155,7 +157,6 @@ export async function handlePlaceOrder(e) {
         setTimeout(() => safeRedirect('./account.html'), 3000);
 
     } catch (error) {
-        console.error("Manager info: Error placing order:", error);
         console.error("Error placing order - Manager info:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
