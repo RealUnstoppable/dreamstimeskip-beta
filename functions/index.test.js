@@ -19,18 +19,6 @@ jest.mock("stripe", () => {
   }));
 });
 
-// Mock admin before index.js import
-const mockVerifyIdToken = jest.fn();
-jest.mock("firebase-admin", () => {
-  return {
-    initializeApp: jest.fn(),
-    auth: () => ({
-      verifyIdToken: mockVerifyIdToken,
-    }),
-    firestore: jest.fn(),
-  };
-});
-
 // Mock request and response objects
 const mockReq = (options = {}) => ({
   method: "POST",
@@ -71,6 +59,30 @@ jest.mock("firebase-admin", () => {
       }),
     }),
   };
+});
+
+
+jest.mock('firebase-functions', () => {
+    const originalModule = jest.requireActual('firebase-functions');
+    return {
+        ...originalModule,
+        https: {
+            ...originalModule.https,
+            onRequest: jest.fn((cb) => cb)
+        },
+        firestore: {
+            ...originalModule.firestore,
+            document: jest.fn().mockReturnValue({
+                onWrite: jest.fn()
+            })
+        }
+    };
+});
+
+jest.mock('firebase-functions/v2/firestore', () => {
+    return {
+        onDocumentUpdated: jest.fn()
+    };
 });
 
 // Import functions after mocks
@@ -118,7 +130,7 @@ describe("createCheckoutSession", () => {
   });
 
   it("should create session with Pro plan & fallback URLs", async () => {
-    mockVerifyIdToken.mockResolvedValueOnce({
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
       uid: "user123",
       email: "test@example.com",
     });
@@ -204,7 +216,7 @@ describe("createCheckoutSession", () => {
     // Suppress console.error in tests for expected errors
     jest.spyOn(console, "error").mockImplementation(() => {});
 
-    mockVerifyIdToken.mockResolvedValueOnce({
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
       uid: "user123",
       email: "test@example.com",
     });
@@ -225,7 +237,7 @@ describe("createCheckoutSession", () => {
     });
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({error: "Stripe API Error"});
+    expect(res.json).toHaveBeenCalledWith({error: "Checkout Error. Manager info: [Stripe API Error]"});
 
     console.error.mockRestore();
   });
