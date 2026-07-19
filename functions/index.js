@@ -1,4 +1,5 @@
 const functions = require("firebase-functions");
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const cors = require("cors")({origin: true});
 
@@ -76,6 +77,30 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
     }
   });
+});
+
+// 🔔 Notification on Support Ticket Update
+exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", async (event) => {
+  const beforeData = event.data.before.data();
+  const afterData = event.data.after.data();
+
+  // Check if adminReply was newly added or changed
+  if (afterData.adminReply && afterData.adminReply !== beforeData.adminReply) {
+    try {
+      const db = admin.firestore();
+      await db.collection("notifications").add({
+        userId: afterData.userId,
+        title: "Support Ticket Reply",
+        message: `An admin has replied to your ticket: "${afterData.subject}"`,
+        isRead: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        link: "account.html#support",
+        type: "ticket_reply"
+      });
+    } catch (error) {
+      console.error("Error creating notification - Manager info: [" + error.message + "]");
+    }
+  }
 });
 
 // 📊 Aggregate Ratings on Review Write
