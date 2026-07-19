@@ -1,0 +1,1 @@
+The root tests failed because of missing mock modules and syntax errors in the tests themselves (which were mentioned in the instructions as 'known baseline test failures' that should be left unmodified unless specifically addressed).
