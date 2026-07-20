@@ -72,10 +72,8 @@
         import { loadNavbar } from './js/navbar.js';
         import { loadFooter } from './js/footer.js';
         
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof loadNavbar === 'function') loadNavbar();
-            if (typeof loadFooter === 'function') loadFooter();
-        });
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>

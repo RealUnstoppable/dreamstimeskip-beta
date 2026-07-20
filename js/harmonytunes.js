@@ -15,7 +15,7 @@ function escapeHTML(str) {
         .replace(/'/g, "&#039;");
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
         { 
@@ -2552,7 +2552,13 @@ let dragItem = null;
         });
     });
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHarmonyTunes);
+} else {
+    initHarmonyTunes();
+}
 
 export function createSongCard(song) {
     return `

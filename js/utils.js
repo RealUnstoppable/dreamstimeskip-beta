@@ -18,3 +18,10 @@ export function escapeHTML(str) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
+
+export function mapCollectionData(querySnapshot, isMapWithId = true) {
+    return querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return isMapWithId ? { id: doc.id, ...data } : data;
+    });
+}
