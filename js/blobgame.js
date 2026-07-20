@@ -78,6 +78,7 @@ function setupUI() {
     // Leaderboard Username Binding
     const usernameInput = document.getElementById('username-input');
     const btnSaveUser = document.getElementById('btn-save-username');
+    const btnGuest = document.getElementById('btn-guest');
     const bindingSection = document.getElementById('username-binding');
 
     if (getLocalUsername()) {
@@ -87,8 +88,17 @@ function setupUI() {
     btnSaveUser.addEventListener('click', () => {
         if (setLocalUsername(usernameInput.value)) {
             bindingSection.classList.add('hidden');
+            loadLeaderboard(); // refresh in case it affects display
         }
     });
+    
+    if (btnGuest) {
+        btnGuest.addEventListener('click', () => {
+            setLocalUsername('Guest');
+            bindingSection.classList.add('hidden');
+            loadLeaderboard();
+        });
+    }
 }
 
 function showMenu(menuEl) {
@@ -242,8 +252,14 @@ function popBlob(blobObj) {
 }
 
 function missBlob() {
-    combo = 1;
-    misses++;
+    if (combo > 1) {
+        // Combo shield: if they were in a combo, they just lose the combo, no miss counted
+        combo = 1;
+    } else {
+        // Not in a combo, this is a real miss
+        misses++;
+    }
+    
     updateHUD();
     
     if (misses >= 5) {
