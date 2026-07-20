@@ -25,3 +25,6 @@
 ## 2024-11-20 - Optimizing Regex Compilation in Loops
 **Learning:** Instantiating `new RegExp()` inside a loop over hundreds of DOM nodes causes severe performance degradation and GC thrashing during fast inputs. Unconditional assignments to `.innerHTML` and `.style.display` also trigger unnecessary style recalculations.
 **Action:** Always extract regex compilation outside the loop, and wrap DOM assignments in conditional checks (e.g., `if (el.innerHTML !== newHTML)`) to minimize expensive repaints.
+## 2025-02-23 - Optimizing Firestore Aggregations
+**Learning:** Fetching and iterating over an entire collection manually (e.g., using `getDocs()` or `.get()` and `forEach`) to calculate a count or average rating causes O(N) read costs and can lead to N+1 query performance bottlenecks.
+**Action:** Always use Firestore's built-in server-side aggregations (`aggregate({ count: AggregateField.count(), average: AggregateField.average('field') })`) to compute counts and averages efficiently without excessive document reads.

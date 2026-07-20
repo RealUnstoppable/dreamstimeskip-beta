@@ -1,5 +1,6 @@
 const functions = require("firebase-functions");
-const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const {onDocumentUpdated} = require("firebase-functions/v2/firestore");
+const {AggregateField} = require("firebase-admin/firestore");
 const admin = require("firebase-admin");
 const cors = require("cors")({origin: true});
 
@@ -95,7 +96,7 @@ exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", 
         isRead: false,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         link: "account.html#support",
-        type: "ticket_reply"
+        type: "ticket_reply",
       });
     } catch (error) {
       console.error("Error creating notification - Manager info: [" + error.message + "]");
@@ -118,25 +119,19 @@ exports.onReviewWrite = functions.firestore
       const reviewsRef = db.collection("reviews");
 
       try {
-        const snapshot = await reviewsRef.where("productId", "==", productId).get();
-        let totalRating = 0;
-        let count = 0;
+        const snapshot = await reviewsRef.where("productId", "==", productId).aggregate({
+          count: AggregateField.count(),
+          averageRating: AggregateField.average("rating"),
+        }).get();
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.rating) {
-            totalRating += data.rating;
-            count++;
-          }
-        });
-
-        const averageRating = count > 0 ? totalRating / count : 0;
+        const count = snapshot.data().count;
+        const averageRating = snapshot.data().averageRating || 0;
 
         await db.collection("product_stats").doc(productId).set({
           averageRating: averageRating,
           reviewCount: count,
-          lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+          lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+        }, {merge: true});
 
         return null;
       } catch (error) {
@@ -237,40 +232,40 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
   });
 });
 // ⭐️ Update Product Stats on New Review
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
 exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
-    const snap = event.data;
-    const context = event;
-    const newReview = snap.data();
-    const productId = newReview.productId;
-    const rating = newReview.rating;
+  const snap = event.data;
+  const context = event;
+  const newReview = snap.data();
+  const productId = newReview.productId;
+  const rating = newReview.rating;
 
-    // Validate rating
-    if (typeof rating !== "number" || rating < 1 || rating > 5) {
-      console.error("Invalid rating:", rating);
-      return null;
+  // Validate rating
+  if (typeof rating !== "number" || rating < 1 || rating > 5) {
+    console.error("Invalid rating:", rating);
+    return null;
+  }
+
+  const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
+
+  return admin.firestore().runTransaction(async (transaction) => {
+    const statsDoc = await transaction.get(productStatsRef);
+    let reviewCount = 0;
+    let averageRating = 0;
+
+    if (statsDoc.exists) {
+      const data = statsDoc.data();
+      reviewCount = data.reviewCount || 0;
+      averageRating = data.averageRating || 0;
     }
 
-    const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
+    const newReviewCount = reviewCount + 1;
+    const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
 
-    return admin.firestore().runTransaction(async (transaction) => {
-      const statsDoc = await transaction.get(productStatsRef);
-      let reviewCount = 0;
-      let averageRating = 0;
-
-      if (statsDoc.exists) {
-        const data = statsDoc.data();
-        reviewCount = data.reviewCount || 0;
-        averageRating = data.averageRating || 0;
-      }
-
-      const newReviewCount = reviewCount + 1;
-      const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
-
-      transaction.set(productStatsRef, {
-        reviewCount: newReviewCount,
-        averageRating: newAverageRating
-      }, { merge: true });
-    });
+    transaction.set(productStatsRef, {
+      reviewCount: newReviewCount,
+      averageRating: newAverageRating,
+    }, {merge: true});
   });
+});
