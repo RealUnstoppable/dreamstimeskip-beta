@@ -403,30 +403,64 @@ document.addEventListener('DOMContentLoaded', () => {
                     orb.style.boxShadow = baseShadow;
                 }, 1000);
                 
-                // Create wave
-                const wave = document.createElement('div');
-                wave.classList.add('orb-wave');
-                
-                if (tapCount > 10) {
-                    wave.classList.add('massive-wave');
-                    tapCount = 0; // reset after massive wave
-                    orb.style.boxShadow = baseShadow;
-                } else if (tapCount > 5) {
-                    // Intensify outline leading up to massive wave
-                    const intensity = (tapCount - 5) * 5; 
-                    orb.style.boxShadow = `0 0 ${intensity * 2}px ${intensity}px rgba(255,255,255,0.8), inset 0 0 60px 10px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
-                }
-                
                 const rect = orb.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
                 
-                wave.style.left = `${centerX}px`;
-                wave.style.top = `${centerY}px`;
-                
-                document.body.appendChild(wave);
-                
-                setTimeout(() => wave.remove(), 2000);
+                if (tapCount > 10) {
+                    // Massive wave detonation
+                    const wave = document.createElement('div');
+                    wave.classList.add('orb-wave', 'massive-wave');
+                    tapCount = 0; // reset after massive wave
+                    orb.style.boxShadow = baseShadow;
+                    
+                    wave.style.left = `${centerX}px`;
+                    wave.style.top = `${centerY}px`;
+                    
+                    document.body.appendChild(wave);
+                    setTimeout(() => wave.remove(), 2000);
+                } else {
+                    // Particles effect
+                    if (tapCount > 5) {
+                        // Intensify outline leading up to massive wave
+                        const intensity = (tapCount - 5) * 5; 
+                        orb.style.boxShadow = `0 0 ${intensity * 2}px ${intensity}px rgba(255,255,255,0.8), inset 0 0 60px 10px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+                    }
+                    
+                    const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
+                    const numParticles = 8 + Math.floor(Math.random() * 6); // 8-13 particles
+                    
+                    for (let i = 0; i < numParticles; i++) {
+                        const particle = document.createElement('div');
+                        particle.classList.add('orb-particle');
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        // Random spread distance from center
+                        const distance = 120 + Math.random() * 200; 
+                        const tx = Math.cos(angle) * distance;
+                        const ty = Math.sin(angle) * distance;
+                        
+                        particle.style.left = `${centerX}px`;
+                        particle.style.top = `${centerY}px`;
+                        particle.style.setProperty('--tx', `${tx}px`);
+                        particle.style.setProperty('--ty', `${ty}px`);
+                        
+                        // Random color and sizing
+                        particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                        
+                        const size = 4 + Math.random() * 6;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        
+                        // Random duration and delay for organic feel
+                        const duration = 0.8 + Math.random() * 0.5;
+                        particle.style.animationDuration = `${duration}s`;
+                        
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), duration * 1000);
+                    }
+                }
             }
         });
     });
