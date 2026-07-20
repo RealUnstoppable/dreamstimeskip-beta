@@ -13,9 +13,9 @@ Your purpose is to answer questions about the DreamsTimeskip website, HarmonyTun
 
 let chatSession = null;
 try {
-    // Initialize Gemini 2.0 Flash (1.5 was retired)
+    // Initialize Gemini 1.5 Flash (stable for Vertex AI)
     const model = getGenerativeModel(ai, {
-        model: "gemini-2.0-flash",
+        model: "gemini-1.5-flash",
         systemInstruction: systemInstruction,
         generationConfig: {
             temperature: 0.7,
