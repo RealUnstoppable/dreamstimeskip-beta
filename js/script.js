@@ -193,13 +193,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4)`
             : `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
             
-        orb.style.transition = 'box-shadow 0.3s ease'; // Only transition shadow, transform is handled by LERP
+        const baseTransition = 'width 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-radius 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+        orb.style.transition = `${baseTransition}, box-shadow 0.3s ease`; // Preserve width/radius transitions
         
         const physicsLoop = () => {
             if (orb.classList.contains('expanded')) {
-                orb.style.transform = '';
-                requestAnimationFrame(physicsLoop);
-                return;
+                // When expanded, smoothly LERP the stretch back to 0 so it morphs into a perfect pill
+                targetStretch = 0;
+                // DO NOT return here, let the LERP engine mathematically settle it!
             }
 
             const actualTargetStretch = isErratic ? 0 : targetStretch;
@@ -215,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentAngle += diff * 0.25;
             } else {
                 // When visually a circle, silently reset the angle to prevent infinite wrap-around limits
-                // The user will never notice this jagged switch because the stretch is 0!
                 currentAngle = currentAngle % (2 * Math.PI);
                 targetAngle = currentAngle;
             }
@@ -289,11 +289,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         orb.addEventListener('mousedown', (e) => {
+            if (orb.classList.contains('expanded')) return; // Disable drag if expanded
             isDragging = true;
             const rect = orb.getBoundingClientRect();
             startX = rect.left + rect.width / 2;
             startY = rect.top + rect.height / 2;
-            orb.style.transition = 'box-shadow 0.1s ease'; // fast shadow for drag
+            orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`; // fast shadow for drag
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -308,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (distance > SNAP_DISTANCE) {
                 isDragging = false;
                 targetStretch = 0;
-                orb.style.transition = 'box-shadow 0.5s ease'; 
+                orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`; 
                 orb.style.boxShadow = baseShadow;
                 return;
             }
@@ -328,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDragging) {
                 isDragging = false;
                 targetStretch = 0;
-                orb.style.transition = 'box-shadow 0.5s ease';
+                orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`;
                 orb.style.boxShadow = baseShadow;
             }
         });
