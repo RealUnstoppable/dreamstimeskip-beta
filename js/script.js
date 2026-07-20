@@ -179,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let startX = 0, startY = 0;
         let hoverCenterX = 0, hoverCenterY = 0;
         let isHovering = false;
+        let currentAngle = 0; // Track angle continuously to prevent flipping
         const SNAP_DISTANCE = 300; // Distance at which it "snaps" off
         
         // Base shadow to return to
@@ -189,9 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < 1) return;
 
-            const angle = Math.atan2(dy, dx);
-            let stretch = 0;
+            const targetAngle = Math.atan2(dy, dx);
+            let diff = targetAngle - currentAngle;
             
+            // Normalize the difference to the shortest path (-PI to PI)
+            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff < -Math.PI) diff += 2 * Math.PI;
+            
+            currentAngle += diff;
+            
+            let stretch = 0;
             if (isHover) {
                 stretch = Math.min(distance / 300, 0.15); // max 15% stretch on hover
             } else {
@@ -199,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // rotate to face mouse, scaleX to stretch, scaleY to squish, translateX to anchor the back edge
-            orb.style.transform = `rotate(${angle}rad) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) translateX(${stretch * 50}px)`;
+            orb.style.transform = `rotate(${currentAngle}rad) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) translateX(${stretch * 50}px)`;
         };
 
         orb.addEventListener('mouseenter', () => {
@@ -223,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orb.addEventListener('mouseleave', () => {
             isHovering = false;
             if (isDragging) return;
-            orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
+            orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
             orb.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
         });
         
@@ -248,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (distance > SNAP_DISTANCE) {
                 // SNAPS OFF!
                 isDragging = false;
-                orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
+                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
                 orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; // elastic return
                 orb.style.boxShadow = baseShadow;
                 return;
@@ -270,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
+                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
                 orb.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease';
                 orb.style.boxShadow = baseShadow;
             }
