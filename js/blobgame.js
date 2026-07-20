@@ -1,4 +1,5 @@
 import { saveScore, getTopScores, getLocalUsername, setLocalUsername } from './leaderboard.js';
+import { initAudio, playPopSound, startPullSound, updatePullSound, stopPullSound } from './audio-synth.js';
 
 // Elements
 const uiLayer = document.getElementById('ui-layer');
@@ -20,7 +21,6 @@ let sfxEnabled = true;
 let musicEnabled = true;
 
 // Audio
-const sfxPop = document.getElementById('sfx-pop');
 const bgmMusic = document.getElementById('bgm-music');
 
 // Game State
@@ -184,6 +184,7 @@ function gameLoop(currentTime) {
         if (blob.y > height + blob.size) {
             blob.el.remove();
             blobs.splice(i, 1);
+            stopPullSound(); // Stop any pull sound if it falls while dragging
             missBlob();
         }
     }
@@ -212,19 +213,38 @@ function spawnBlob() {
 
     // Interaction
     let startX, startY;
+    let isDragging = false;
+    
     el.addEventListener('pointerdown', (e) => {
         startX = e.clientX;
         startY = e.clientY;
+        isDragging = true;
         el.setPointerCapture(e.pointerId);
+        initAudio(); // Initialize Web Audio Context on first interaction
     });
 
-    el.addEventListener('pointerup', (e) => {
+    el.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         const dist = Math.sqrt(dx*dx + dy*dy);
         
-        // If dragged more than 20px (pulled/swiped) OR just tapped
+        // If dragging more than a tiny threshold, start/modulate pull sound
+        if (dist > 5) {
+            startPullSound(sfxEnabled);
+            updatePullSound(dist, sfxEnabled);
+        }
+    });
+
+    el.addEventListener('pointerup', (e) => {
+        isDragging = false;
+        stopPullSound();
         popBlob(blobObj);
+    });
+    
+    el.addEventListener('pointercancel', (e) => {
+        isDragging = false;
+        stopPullSound();
     });
 }
 
@@ -235,11 +255,7 @@ function popBlob(blobObj) {
         blobObj.el.remove();
 
         // Audio
-        if (sfxEnabled) {
-            // Play crunchy ASMR sound
-            const clone = sfxPop.cloneNode();
-            clone.play().catch(e => {});
-        }
+        playPopSound(sfxEnabled);
 
         // VFX
         spawnExplosion(blobObj.x + blobObj.size/2, blobObj.y + blobObj.size/2, blobObj.size);
