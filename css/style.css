@@ -200,19 +200,9 @@ body {
     background-size: 200% 200%;
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     margin: -80px auto 40px;
-    animation: blob-shape 12s ease-in-out infinite, rotate-orb 30s infinite linear, color-cycle 15s ease-in-out infinite;
+    animation: blob-shape 12s ease-in-out infinite, color-cycle 15s ease-in-out infinite;
     position: relative;
     box-shadow: inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4);
-}
-
-@keyframes rotate-orb {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
 }
 
 @keyframes blob-shape {
