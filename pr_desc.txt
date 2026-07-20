@@ -1,0 +1,12 @@
+💡 What: Refactored the `exports.onReviewWrite` Firebase Cloud Function to replace the manual document iteration (`snapshot.forEach`) with Firestore's native `aggregate()` query using `AggregateField.count()` and `AggregateField.average("rating")`.
+
+🎯 Why: The previous implementation fetched all reviews for a product every time a new review was written just to calculate the average and count. This caused an O(N) read cost pattern (an N+1 query vulnerability at scale), leading to performance degradation and unnecessary database read billing as the product accumulated reviews.
+
+📊 Impact:
+- Reduces Firestore document reads for review aggregation from O(N) to O(1).
+- Significantly lowers execution time for the Cloud Function, as no documents need to be transmitted over the wire to the server.
+- Reduces memory usage on the Cloud Function instance by preventing large payload allocations into memory.
+
+🔬 Measurement:
+- Verified syntax via `pnpm lint`.
+- Verified backend functionality via `cd functions && pnpm test`.

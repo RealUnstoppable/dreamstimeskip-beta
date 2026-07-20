@@ -62,27 +62,28 @@ jest.mock("firebase-admin", () => {
 });
 
 
-jest.mock('firebase-functions', () => {
-    const originalModule = jest.requireActual('firebase-functions');
-    return {
-        ...originalModule,
-        https: {
-            ...originalModule.https,
-            onRequest: jest.fn((cb) => cb)
-        },
-        firestore: {
-            ...originalModule.firestore,
-            document: jest.fn().mockReturnValue({
-                onWrite: jest.fn()
-            })
-        }
-    };
+jest.mock("firebase-functions", () => {
+  const originalModule = jest.requireActual("firebase-functions");
+  return {
+    ...originalModule,
+    https: {
+      ...originalModule.https,
+      onRequest: jest.fn((cb) => cb),
+    },
+    firestore: {
+      ...originalModule.firestore,
+      document: jest.fn().mockReturnValue({
+        onWrite: jest.fn(),
+      }),
+    },
+  };
 });
 
-jest.mock('firebase-functions/v2/firestore', () => {
-    return {
-        onDocumentUpdated: jest.fn()
-    };
+jest.mock("firebase-functions/v2/firestore", () => {
+  return {
+    onDocumentUpdated: jest.fn(),
+    onDocumentCreated: jest.fn(),
+  };
 });
 
 // Import functions after mocks
