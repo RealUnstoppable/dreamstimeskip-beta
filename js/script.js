@@ -179,13 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let startX = 0, startY = 0;
         let hoverCenterX = 0, hoverCenterY = 0;
         let isHovering = false;
-        let currentAngle = 0; // Track angle continuously to prevent flipping
-        const SNAP_DISTANCE = 300; // Distance at which it "snaps" off
+        let currentAngle = 0; 
+        const SNAP_DISTANCE = 300; 
         
-        // Base shadow to return to
         const baseShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
         
-        // Helper to stretch orb
         const applyStretch = (dx, dy, isHover) => {
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < 1) return;
@@ -193,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetAngle = Math.atan2(dy, dx);
             let diff = targetAngle - currentAngle;
             
-            // Normalize the difference to the shortest path (-PI to PI)
             while (diff > Math.PI) diff -= 2 * Math.PI;
             while (diff < -Math.PI) diff += 2 * Math.PI;
             
@@ -201,13 +198,22 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let stretch = 0;
             if (isHover) {
-                stretch = Math.min(distance / 300, 0.15); // max 15% stretch on hover
+                stretch = Math.min(distance / 300, 0.15); 
             } else {
-                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 1.5; // up to 150% stretch on drag
+                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 1.5; 
             }
             
-            // rotate to face mouse, scaleX to stretch, scaleY to squish, translateX to anchor the back edge
-            orb.style.transform = `rotate(${currentAngle}rad) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) translateX(${stretch * 50}px)`;
+            // The "New System": 
+            // By doing rotate(A) -> scale/translate -> rotate(-A), the element stretches 
+            // diagonally towards the cursor, but the background gradient is counter-rotated 
+            // back to its original orientation! This entirely prevents the "spinning CD" effect.
+            // translateX(stretch * 100) perfectly anchors the back edge of the 200px blob.
+            try {
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${stretch * 100}px) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) rotate(${-currentAngle}rad)`;
+            } catch (e) {
+                // Failsafe as requested: fallback to simple rotation if the new system fails
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${stretch * 50}px) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3})`;
+            }
         };
 
         orb.addEventListener('mouseenter', () => {
@@ -231,17 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
         orb.addEventListener('mouseleave', () => {
             isHovering = false;
             if (isDragging) return;
-            orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
+            orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
             orb.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
         });
         
         orb.addEventListener('mousedown', (e) => {
             isDragging = true;
-            // Record the initial center of the orb to calculate true drag distance
             const rect = orb.getBoundingClientRect();
             startX = rect.left + rect.width / 2;
             startY = rect.top + rect.height / 2;
-            orb.style.transition = 'transform 0.1s ease-out, box-shadow 0.1s ease'; // responsive drag
+            orb.style.transition = 'transform 0.1s ease-out, box-shadow 0.1s ease'; 
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -254,10 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const tension = Math.min(distance / SNAP_DISTANCE, 1);
             
             if (distance > SNAP_DISTANCE) {
-                // SNAPS OFF!
                 isDragging = false;
-                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
-                orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; // elastic return
+                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
+                orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; 
                 orb.style.boxShadow = baseShadow;
                 return;
             }
@@ -265,10 +269,8 @@ document.addEventListener('DOMContentLoaded', () => {
             applyStretch(dx, dy, false);
             
             if (tension > 0.8) {
-                // Red glow near snapping
                 orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 60}px rgba(255, 50, 50, 0.9)`;
             } else if (tension > 0.4) {
-                // Yellow glow as it stretches
                 orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 40}px rgba(255, 200, 50, 0.8)`;
             } else {
                 orb.style.boxShadow = baseShadow;
@@ -278,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px)`;
+                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
                 orb.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease';
                 orb.style.boxShadow = baseShadow;
             }
