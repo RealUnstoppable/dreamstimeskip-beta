@@ -179,41 +179,74 @@ document.addEventListener('DOMContentLoaded', () => {
         let startX = 0, startY = 0;
         let hoverCenterX = 0, hoverCenterY = 0;
         let isHovering = false;
-        let currentAngle = 0; 
+        
+        // Physics variables for LERP
+        let currentAngle = 0;
+        let targetAngle = 0;
+        let currentStretch = 0;
+        let targetStretch = 0;
+        let isErratic = false;
+        let erraticTimeout;
         const SNAP_DISTANCE = 300; 
         
         const baseShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+        orb.style.transition = 'box-shadow 0.3s ease'; // Only transition shadow, transform is handled by LERP
         
-        const applyStretch = (dx, dy, isHover) => {
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            if (distance < 1) return;
-
-            const targetAngle = Math.atan2(dy, dx);
-            let diff = targetAngle - currentAngle;
+        const physicsLoop = () => {
+            const actualTargetStretch = isErratic ? 0 : targetStretch;
             
-            while (diff > Math.PI) diff -= 2 * Math.PI;
-            while (diff < -Math.PI) diff += 2 * Math.PI;
+            // Smoothly interpolate stretch
+            currentStretch += (actualTargetStretch - currentStretch) * 0.15;
             
-            currentAngle += diff;
-            
-            let stretch = 0;
-            if (isHover) {
-                stretch = Math.min(distance / 300, 0.15); 
+            if (currentStretch > 0.01) {
+                // Smoothly interpolate angle
+                let diff = targetAngle - currentAngle;
+                while (diff > Math.PI) diff -= 2 * Math.PI;
+                while (diff < -Math.PI) diff += 2 * Math.PI;
+                currentAngle += diff * 0.25;
             } else {
-                // Increased stretch multiplier from 1.5 to 2.5 to make it easier to drag
-                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 2.5; 
+                // When visually a circle, silently reset the angle to prevent infinite wrap-around limits
+                // The user will never notice this jagged switch because the stretch is 0!
+                currentAngle = currentAngle % (2 * Math.PI);
+                targetAngle = currentAngle;
             }
             
-            // The "New System": 
-            // By doing rotate(A) -> scale/translate -> rotate(-A), the element stretches 
-            // diagonally towards the cursor, but the background gradient is counter-rotated 
-            // back to its original orientation! This entirely prevents the "spinning CD" effect.
-            // translateX(stretch * 100) perfectly anchors the back edge of the 200px blob.
             try {
-                orb.style.transform = `rotate(${currentAngle}rad) translateX(${stretch * 100}px) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) rotate(${-currentAngle}rad)`;
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 100}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3}) rotate(${-currentAngle}rad)`;
             } catch (e) {
-                // Failsafe as requested: fallback to simple rotation if the new system fails
-                orb.style.transform = `rotate(${currentAngle}rad) translateX(${stretch * 50}px) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3})`;
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 50}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3})`;
+            }
+            
+            requestAnimationFrame(physicsLoop);
+        };
+        requestAnimationFrame(physicsLoop);
+
+        const updateTarget = (dx, dy, isHover) => {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 1) {
+                targetStretch = 0;
+                return;
+            }
+
+            const rawAngle = Math.atan2(dy, dx);
+            let angleDiff = rawAngle - targetAngle;
+            
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+            
+            // Failsafe: if the user spins the mouse wildly (> ~30 deg per event), trigger erratic mode
+            if (Math.abs(angleDiff) > 0.5) {
+                isErratic = true;
+                clearTimeout(erraticTimeout);
+                erraticTimeout = setTimeout(() => { isErratic = false; }, 200); // 200ms of calm needed
+            }
+            
+            targetAngle += angleDiff;
+            
+            if (isHover) {
+                targetStretch = Math.min(distance / 300, 0.15); 
+            } else {
+                targetStretch = Math.min(distance / SNAP_DISTANCE, 1) * 2.5; 
             }
         };
 
@@ -227,19 +260,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         orb.addEventListener('mousemove', (e) => {
             if (isDragging || !isHovering) return;
-            
             let dx = e.clientX - hoverCenterX;
             let dy = e.clientY - hoverCenterY;
-            
-            applyStretch(dx, dy, true);
-            orb.style.transition = 'transform 0.2s ease-out, box-shadow 0.3s ease';
+            updateTarget(dx, dy, true);
         });
         
         orb.addEventListener('mouseleave', () => {
             isHovering = false;
             if (isDragging) return;
-            orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
-            orb.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+            targetStretch = 0;
         });
         
         orb.addEventListener('mousedown', (e) => {
@@ -247,8 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = orb.getBoundingClientRect();
             startX = rect.left + rect.width / 2;
             startY = rect.top + rect.height / 2;
-            // Removed transform from transition during drag to prevent the "clone" matrix interpolation glitch
-            orb.style.transition = 'box-shadow 0.1s ease'; 
+            orb.style.transition = 'box-shadow 0.1s ease'; // fast shadow for drag
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -262,13 +290,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (distance > SNAP_DISTANCE) {
                 isDragging = false;
-                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
-                orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; 
+                targetStretch = 0;
+                orb.style.transition = 'box-shadow 0.5s ease'; 
                 orb.style.boxShadow = baseShadow;
                 return;
             }
             
-            applyStretch(dx, dy, false);
+            updateTarget(dx, dy, false);
             
             if (tension > 0.8) {
                 orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 60}px rgba(255, 50, 50, 0.9)`;
@@ -282,8 +310,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                orb.style.transform = `rotate(${currentAngle}rad) scale(1) translate(0px, 0px) rotate(${-currentAngle}rad)`;
-                orb.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease';
+                targetStretch = 0;
+                orb.style.transition = 'box-shadow 0.5s ease';
                 orb.style.boxShadow = baseShadow;
             }
         });
