@@ -193,8 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4)`
             : `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
             
-        const baseTransition = 'width 0.6s cubic-bezier(0.23, 1, 0.32, 1), border-radius 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
-        orb.style.transition = `${baseTransition}, box-shadow 0.3s ease`; // Preserve width/radius transitions
+        const baseTransition = 'width 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+        orb.style.transition = `${baseTransition}, box-shadow 0.3s ease`; // Preserve width transitions
         
         const physicsLoop = () => {
             if (orb.classList.contains('expanded')) {
