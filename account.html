@@ -36,9 +36,9 @@
         <main class="main-content">
             <section id="dashboard" class="content-section active">
                 <h3>Dashboard</h3>
-                <div class="card" id="profile-details">
+                <div class="card">
                     <h4>Quick Overview</h4>
-                    <p style="color: var(--text-secondary);">Loading profile...</p>
+                    <p>Welcome to your personal hub. Navigate the sidebar to manage your subscriptions, orders, and themes.</p>
                 </div>
             </section>
 
@@ -46,11 +46,10 @@
                 <h3>Order History</h3>
                 <div class="card">
                     <h4>Recent Purchases</h4>
-                    <div id="orders-list" style="display: flex; flex-direction: column; gap: 20px;">
-                        <p style="color: var(--text-secondary);">Loading orders...</p>
-                    </div>
+                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
                 </div>
             </section>
+
             <section id="wishlist" class="content-section">
                 <h3>My Wishlist</h3>
                 <div class="card">
@@ -518,6 +517,28 @@
             };
         }
     </script>
+    <header class="main-header"></header>
+    <main style="padding: 120px 20px; min-height: 60vh; max-width: 800px; margin: 0 auto;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 30px; text-align: center;">My Account</h1>
+
+        <div id="account-dashboard">
+            <!-- Profile Section -->
+            <section class="profile-section" style="background: var(--bg-card); padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Profile Information</h2>
+                <div id="profile-details" style="display: flex; flex-direction: column; gap: 15px;">
+                    <p style="color: var(--text-secondary);">Loading profile...</p>
+                </div>
+            </section>
+
+            <!-- Order History Section -->
+            <section class="orders-section">
+                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Order History</h2>
+                <div id="orders-list" style="display: flex; flex-direction: column; gap: 20px;">
+                    <p style="color: var(--text-secondary);">Loading orders...</p>
+                </div>
+            </section>
+        </div>
+    </main>
     <script type="module" src="/js/account.js"></script>
     <footer class="main-footer"></footer>
     <script type="module">
