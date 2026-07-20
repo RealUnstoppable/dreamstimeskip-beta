@@ -368,9 +368,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (orb.id === 'siri-orb') {
-                // Handled by chatbot.js now
-            } else {
-                // Main Blob Tap & Wave Easter Egg
+                // Let chatbot.js handle opening the chat on click.
+                // But we STILL run the easter egg particle logic below!
+            }
+            
+            // Main Blob Tap & Wave Easter Egg (runs for ALL orbs now)
                 tapCount++;
                 clearTimeout(tapTimeout);
                 tapTimeout = setTimeout(() => {
@@ -463,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         setTimeout(() => particle.remove(), duration * 1000);
                     }
                 }
-            }
         });
     });
 
