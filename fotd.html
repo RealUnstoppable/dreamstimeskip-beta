@@ -156,7 +156,7 @@
 
     <div class="siri-orb-wrapper">
         <div id="siri-orb">
-            <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
+            <a href="https://www.realunstoppable.store/" class="orb-text">Return Home?</a>
         </div>
     </div>
 
@@ -390,17 +390,7 @@
                 document.querySelector('.hamburger').classList.toggle('active');
                 document.querySelector('.nav-links').classList.toggle('active');
             });
-            const siriOrb = document.getElementById('siri-orb');
-            let inactivityTimeout;
-            siriOrb.addEventListener('click', (event) => {
-                if (event.target.tagName === 'A') return;
-                siriOrb.classList.toggle('expanded');
-                if (siriOrb.classList.contains('expanded')) {
-                    clearTimeout(inactivityTimeout);
-                    inactivityTimeout = setTimeout(() => siriOrb.classList.remove('expanded'), 5000);
-                }
-            });
-            
+
             // --- 7. INITIALIZE PAGE ---
             const initializePage = () => {
                 generateHorizontalScroller();

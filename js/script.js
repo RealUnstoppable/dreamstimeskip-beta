@@ -288,21 +288,32 @@ document.addEventListener('DOMContentLoaded', () => {
             targetStretch = 0;
         });
         
-        orb.addEventListener('mousedown', (e) => {
-            if (orb.classList.contains('expanded')) return; // Disable drag if expanded
+        let hasDragged = false;
+        
+        const handleDragStart = (clientX, clientY) => {
+            if (orb.classList.contains('expanded')) return;
             isDragging = true;
+            hasDragged = false;
             const rect = orb.getBoundingClientRect();
             startX = rect.left + rect.width / 2;
             startY = rect.top + rect.height / 2;
-            orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`; // fast shadow for drag
-        });
+            orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`;
+        };
         
-        document.addEventListener('mousemove', (e) => {
+        orb.addEventListener('mousedown', (e) => handleDragStart(e.clientX, e.clientY));
+        orb.addEventListener('touchstart', (e) => {
+            // Only handle single touch
+            if (e.touches.length === 1) handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        
+        const handleDragMove = (clientX, clientY) => {
             if (!isDragging) return;
             
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
+            const dx = clientX - startX;
+            const dy = clientY - startY;
             const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 5) hasDragged = true; // distinguish drag from click
             
             const tension = Math.min(distance / SNAP_DISTANCE, 1);
             
@@ -323,14 +334,99 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 orb.style.boxShadow = baseShadow;
             }
-        });
+        };
+
+        document.addEventListener('mousemove', (e) => handleDragMove(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault(); // Prevent scrolling while stretching orb
+        }, { passive: false });
         
-        document.addEventListener('mouseup', () => {
+        const handleDragEnd = () => {
             if (isDragging) {
                 isDragging = false;
                 targetStretch = 0;
                 orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`;
                 orb.style.boxShadow = baseShadow;
+            }
+        };
+
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+        
+        // --- Click & Tap Logic ---
+        let expandedAt = 0;
+        let inactivityTimeout;
+        let tapCount = 0;
+        let tapTimeout;
+        
+        orb.addEventListener('click', (e) => {
+            if (hasDragged) {
+                e.preventDefault();
+                return;
+            }
+            
+            if (orb.id === 'siri-orb') {
+                const link = orb.querySelector('a');
+                const isLinkClick = (e.target === link);
+                
+                if (!orb.classList.contains('expanded')) {
+                    if (isLinkClick) e.preventDefault(); // Don't navigate while expanding
+                    
+                    orb.classList.add('expanded');
+                    expandedAt = Date.now();
+                    
+                    clearTimeout(inactivityTimeout);
+                    inactivityTimeout = setTimeout(() => {
+                        orb.classList.remove('expanded');
+                    }, 5000);
+                } else {
+                    if (isLinkClick) {
+                        if (Date.now() - expandedAt < 1000) {
+                            e.preventDefault(); // Clicked too fast after expanding!
+                        }
+                    } else {
+                        // Clicked the pill background, keep it open longer
+                        clearTimeout(inactivityTimeout);
+                        inactivityTimeout = setTimeout(() => {
+                            orb.classList.remove('expanded');
+                        }, 5000);
+                    }
+                }
+            } else {
+                // Main Blob Tap & Wave Easter Egg
+                tapCount++;
+                clearTimeout(tapTimeout);
+                tapTimeout = setTimeout(() => {
+                    tapCount = 0;
+                    orb.style.boxShadow = baseShadow;
+                }, 1000);
+                
+                // Create wave
+                const wave = document.createElement('div');
+                wave.classList.add('orb-wave');
+                
+                if (tapCount > 10) {
+                    wave.classList.add('massive-wave');
+                    tapCount = 0; // reset after massive wave
+                    orb.style.boxShadow = baseShadow;
+                } else if (tapCount > 5) {
+                    // Intensify outline leading up to massive wave
+                    const intensity = (tapCount - 5) * 5; 
+                    orb.style.boxShadow = `0 0 ${intensity * 2}px ${intensity}px rgba(255,255,255,0.8), inset 0 0 60px 10px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+                }
+                
+                const rect = orb.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                wave.style.left = `${centerX}px`;
+                wave.style.top = `${centerY}px`;
+                
+                document.body.appendChild(wave);
+                
+                setTimeout(() => wave.remove(), 2000);
             }
         });
     });
