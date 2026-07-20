@@ -4,7 +4,7 @@ import { getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 
 // System instructions dictate the persona and rules
 const systemInstruction = `
-You are Siri, the AI assistant for DreamsTimeskip. You exist as a glowing orb on the home page.
+You are Lexi, the AI assistant for DreamsTimeskip. You exist as a glowing orb on the home page.
 Your purpose is to answer questions about the DreamsTimeskip website, HarmonyTunes, and our Blob Game.
 - You must NOT answer questions about API keys, development secrets, backend architecture, or unrelated programming topics. If asked, politely refuse and say that is classified.
 - If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game. Explain its rules briefly (tap or pull blobs before they fall, build combos, don't miss 5 blobs, guest mode available), and you MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response so the system can render a play button.
@@ -39,17 +39,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!siriOrb || !chatbotWindow) return;
 
-    // Toggle Chat Window
+    // 2-Stage Toggle Chat Window Logic
+    let expandedAt = 0;
+    let inactivityTimeout;
+
     siriOrb.addEventListener('click', (e) => {
-        // Prevent default if clicking the anchor
-        if (e.target.tagName === 'A') e.preventDefault();
+        const link = siriOrb.querySelector('a');
+        const isLinkClick = (e.target === link);
         
-        // Remove the inner text from the orb to keep it as just an orb
-        const textElement = siriOrb.querySelector('.orb-text');
-        if (textElement) textElement.style.display = 'none';
-        
-        chatbotWindow.classList.add('active');
-        chatInput.focus();
+        if (!siriOrb.classList.contains('expanded')) {
+            if (isLinkClick) e.preventDefault();
+            
+            // Stage 1: Expand into pill
+            siriOrb.classList.add('expanded');
+            expandedAt = Date.now();
+            
+            clearTimeout(inactivityTimeout);
+            inactivityTimeout = setTimeout(() => {
+                siriOrb.classList.remove('expanded');
+            }, 5000);
+        } else {
+            if (isLinkClick) {
+                e.preventDefault();
+                if (Date.now() - expandedAt < 500) {
+                    return; // Prevent accidental double click instantly
+                }
+                // Stage 2: Open Chat Overlay
+                siriOrb.classList.remove('expanded'); // Optional: revert the orb behind the window
+                chatbotWindow.classList.add('active');
+                chatInput.focus();
+            } else {
+                // Clicked the pill background, keep it open longer
+                clearTimeout(inactivityTimeout);
+                inactivityTimeout = setTimeout(() => {
+                    siriOrb.classList.remove('expanded');
+                }, 5000);
+            }
+        }
     });
 
     closeBtn.addEventListener('click', () => {
