@@ -178,51 +178,7 @@ function updateCartSummary() {
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
 }
 
-// --- WISHLIST LOGIC ---
-export async function toggleWishlist(productId) {
-    if (!currentUser) {
-        alert("Please sign in to use the wishlist.");
-        return;
-    }
-
-    if (wishlist.has(productId)) {
-        wishlist.delete(productId);
-    } else {
-        wishlist.add(productId);
-    }
-
-    renderProducts(); // Re-render to update the heart icon
-
-    try {
-        await saveWishlist();
-    } catch (error) {
-        console.error('Failed to update wishlist - Manager info:', error.message);
-    }
-}
-
 // --- CART LOGIC ---
-export function toggleWishlist(productId) {
-    if (wishlist.has(productId)) {
-        wishlist.delete(productId);
-    } else {
-        wishlist.add(productId);
-    }
-
-    // Update UI
-    const wishlistBtns = document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`);
-    wishlistBtns.forEach(btn => {
-        if (wishlist.has(productId)) {
-            btn.classList.add('active');
-            btn.textContent = '❤️';
-        } else {
-            btn.classList.remove('active');
-            btn.textContent = '🤍';
-        }
-    });
-
-    saveWishlist();
-}
-
 export async function handleAddToCart(productId) {
     cart[productId] = (cart[productId] || 0) + 1;
     try {
