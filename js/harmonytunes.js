@@ -1855,32 +1855,6 @@ let dragItem = null;
         }
     });
 
-    let isDragging = false;
-
-    // Global pointermove listener for dragging queue items
-    document.addEventListener('pointermove', (e) => {
-        if (isDragging && dragItem) {
-            const deltaY = e.clientY - dragStartY;
-            dragItem.style.transform = `translateY(${deltaY}px)`;
-
-            // Visual Drop Indicator
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-
-            for (let i = 0; i < items.length; i++) {
-                if (items[i] === dragItem) continue;
-                const rect = items[i].getBoundingClientRect();
-                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                    if (e.clientY < rect.top + rect.height / 2) {
-                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                    } else {
-                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                    }
-                    break;
-                }
-            }
-        }
-    });
 
     function renderQueue() {
         if(!queueContentArea) return;
