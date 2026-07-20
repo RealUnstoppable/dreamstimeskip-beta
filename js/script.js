@@ -413,7 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     orb.style.setProperty('--charge-opacity', '0');
                     
                     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
-                    const numParticles = 80; // Huge wave of dots
+                    const numParticles = 100; // 100 particles at 10 taps
                     
                     for (let i = 0; i < numParticles; i++) {
                         const particle = document.createElement('div');
@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
-                    const numParticles = 8 + Math.floor(Math.random() * 6); // 8-13 particles
+                    const numParticles = tapCount * 10; // Scales up to 50 at 5 taps, 100 at 10 taps
                     
                     for (let i = 0; i < numParticles; i++) {
                         const particle = document.createElement('div');
