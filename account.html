@@ -11,7 +11,7 @@
 <link rel="stylesheet" href="/css/shop.css">
 </head>
 <body>
-    <div id="loading-spinner" style="position:fixed; top:50%; left:50%; transform:translate(-50%, -50%);">Loading...</div>
+    <!-- Spinner removed -->
     <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
@@ -359,7 +359,6 @@
         }
 
         function initializePage(user, userData) {
-            document.getElementById('loading-spinner').style.display = 'none';
             loadUserTickets(user.uid);
             loadUserWishlist(user.uid);
             if (userData.isAdmin) {
