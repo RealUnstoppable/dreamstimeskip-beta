@@ -679,9 +679,50 @@ textarea:focus-visible {
 .notification-item.unread { background: rgba(255, 255, 255, 0.05); }
 .notification-item small { color: var(--text-secondary); display: block; margin-top: 5px; font-size: 0.8rem; }
 
-/* --- Siri Orb Interactive Blob --- */
+/* --- Siri Orb Interactive Blob & Glow --- */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spinGlowAngle {
+    0% { --glow-angle: 0deg; }
+    100% { --glow-angle: 360deg; }
+}
+
 .siri-orb-wrapper { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; }
-#siri-orb { width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
-#siri-orb.expanded { width: 220px; border-radius: 50px !important; background: #000; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+
+.siri-orb-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 60px;
+    border-radius: 50px;
+    background: conic-gradient(
+        from var(--glow-angle),
+        rgba(255, 0, 127, 0.8), 
+        rgba(127, 0, 255, 0.2), 
+        rgba(0, 127, 255, 0.8), 
+        rgba(0, 255, 127, 0.2), 
+        rgba(255, 127, 0, 0.8), 
+        rgba(255, 0, 127, 0.8)
+    );
+    filter: blur(15px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: spinGlowAngle 3s linear infinite;
+}
+
+.siri-orb-wrapper:has(#siri-orb.expanded)::before {
+    opacity: 1;
+}
+
+#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
+#siri-orb.expanded { width: 220px; border-radius: 50px !important; background: #000; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); }
 .orb-text { color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 1rem; text-decoration: none; opacity: 0; transition: opacity 0.3s ease 0.4s; white-space: nowrap; transform: translateY(20px); }
 #siri-orb.expanded .orb-text { opacity: 1; transform: translateY(0); }
