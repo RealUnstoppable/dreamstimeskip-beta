@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Orb Physics & Easter Egg ---
-    const orbElements = document.querySelectorAll('.orb');
+    const orbElements = document.querySelectorAll('.orb, #siri-orb');
     
     orbElements.forEach(orb => {
         let isDragging = false;
@@ -189,10 +189,19 @@ document.addEventListener('DOMContentLoaded', () => {
         let erraticTimeout;
         const SNAP_DISTANCE = 300; 
         
-        const baseShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+        const baseShadow = orb.id === 'siri-orb' 
+            ? `inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4)`
+            : `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+            
         orb.style.transition = 'box-shadow 0.3s ease'; // Only transition shadow, transform is handled by LERP
         
         const physicsLoop = () => {
+            if (orb.classList.contains('expanded')) {
+                orb.style.transform = '';
+                requestAnimationFrame(physicsLoop);
+                return;
+            }
+
             const actualTargetStretch = isErratic ? 0 : targetStretch;
             
             // Smoothly interpolate stretch
@@ -222,6 +231,10 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(physicsLoop);
 
         const updateTarget = (dx, dy, isHover) => {
+            if (orb.classList.contains('expanded')) {
+                targetStretch = 0;
+                return;
+            }
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < 1) {
                 targetStretch = 0;
