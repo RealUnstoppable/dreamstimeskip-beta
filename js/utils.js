@@ -25,3 +25,9 @@ export function mapCollectionData(querySnapshot, isMapWithId = true) {
         return isMapWithId ? { id: doc.id, ...data } : data;
     });
 }
+
+export function formatDate(timestamp) {
+    if (!timestamp) return 'N/A';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+}
