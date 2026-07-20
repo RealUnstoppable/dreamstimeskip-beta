@@ -23,6 +23,15 @@ document.addEventListener('submit', async (e) => {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
 
+        const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
+        let originalText = 'Subscribe';
+        if (submitBtn) {
+            originalText = submitBtn.textContent || submitBtn.value;
+            submitBtn.disabled = true;
+            if (submitBtn.textContent) submitBtn.textContent = 'Submitting...';
+            else submitBtn.value = 'Submitting...';
+        }
+
         try {
             // Save to Firestore
             await setDoc(doc(db, "newsletter_subscribers", email), {
