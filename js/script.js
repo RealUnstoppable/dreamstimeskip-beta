@@ -246,7 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isHover) {
                 targetStretch = Math.min(distance / 300, 0.15); 
             } else {
-                targetStretch = Math.min(distance / SNAP_DISTANCE, 1) * 2.5; 
+                let nDist = Math.min(distance / SNAP_DISTANCE, 1);
+                // Ease-out curve simulates physical resistance: 
+                // it stretches easily at first, but resists (stretches less per pixel) as you pull further
+                let resistanceDist = 1 - Math.pow(1 - nDist, 2);
+                targetStretch = resistanceDist * 2.5; 
             }
         };
 
