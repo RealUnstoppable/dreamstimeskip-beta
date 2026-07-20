@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Blob Game | Unstoppable</title>
+    
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/blobgame.css">
+</head>
+
+<body>
+    <!-- Navigation back to hub -->
+    <a href="index.html" class="back-btn" aria-label="Back to Hub">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Hub
+    </a>
+
+    <!-- Game HUD -->
+    <div id="game-hud" class="hidden">
+        <div class="hud-left">
+            <div class="score-display">Score: <span id="score-val">0</span></div>
+            <div class="combo-display">Combo: x<span id="combo-val">1</span></div>
+        </div>
+        <div class="hud-right">
+            <div class="misses-display">Misses: <span id="misses-val">0</span>/5</div>
+        </div>
+    </div>
+
+    <!-- Game Area where blobs fall -->
+    <div id="game-container"></div>
+
+    <!-- UI Overlays -->
+    <div id="ui-layer" class="overlay-container">
+        
+        <!-- Main Menu -->
+        <div id="menu-main" class="menu-panel">
+            <h1>Blob Pop</h1>
+            <p class="subtitle">A juicy, ASMR arcade experience.</p>
+            <button id="btn-play" class="primary-btn">Play</button>
+            <button id="btn-tutorial" class="secondary-btn">How to Play</button>
+            <button id="btn-leaderboard" class="secondary-btn">Leaderboard</button>
+            <button id="btn-options" class="secondary-btn">Options</button>
+        </div>
+
+        <!-- Tutorial -->
+        <div id="menu-tutorial" class="menu-panel hidden">
+            <h2>How to Play</h2>
+            <div class="tutorial-content">
+                <p><strong>Blobs</strong> will fall from the top of the screen.</p>
+                <p><strong>Tap</strong> them, or <strong>swipe/pull</strong> them to make them explode into juicy dots!</p>
+                <p>Don't let them hit the bottom. If you miss <strong>5</strong>, it's Game Over.</p>
+                <p>Pop multiple in a row without missing to build your <strong>Combo Multiplier</strong>!</p>
+            </div>
+            <button id="btn-tut-back" class="secondary-btn">Back</button>
+        </div>
+
+        <!-- Options -->
+        <div id="menu-options" class="menu-panel hidden">
+            <h2>Options</h2>
+            
+            <div class="option-group">
+                <label>Graphics Quality</label>
+                <div class="toggle-group" id="quality-toggles">
+                    <button class="toggle-btn" data-val="low">Low</button>
+                    <button class="toggle-btn" data-val="medium">Med</button>
+                    <button class="toggle-btn active" data-val="high">High</button>
+                </div>
+                <small class="option-desc" id="quality-desc">High: Animated blobs, massive dot explosions.</small>
+            </div>
+
+            <div class="option-group">
+                <label>Audio</label>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="toggle-sfx" checked> <label for="toggle-sfx">ASMR SFX</label>
+                </div>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="toggle-music" checked> <label for="toggle-music">Music</label>
+                </div>
+            </div>
+
+            <button id="btn-opt-back" class="secondary-btn">Back</button>
+        </div>
+
+        <!-- Leaderboard -->
+        <div id="menu-leaderboard" class="menu-panel hidden">
+            <h2>Leaderboard</h2>
+            
+            <div id="username-binding" class="hidden">
+                <p>Enter a username to claim your spot on the board!</p>
+                <input type="text" id="username-input" placeholder="Your Username" maxlength="15">
+                <button id="btn-save-username" class="primary-btn">Save</button>
+            </div>
+
+            <div class="leaderboard-list">
+                <div class="lb-loading" id="lb-loading">Loading scores...</div>
+                <ul id="lb-scores">
+                    <!-- Scores injected here -->
+                </ul>
+            </div>
+
+            <button id="btn-lb-back" class="secondary-btn">Back</button>
+        </div>
+
+        <!-- Game Over -->
+        <div id="menu-gameover" class="menu-panel hidden">
+            <h2>Game Over</h2>
+            <div class="final-score-display">
+                Score: <span id="go-score">0</span>
+            </div>
+            <div class="best-score-display">
+                Best: <span id="go-best">0</span>
+            </div>
+            <button id="btn-replay" class="primary-btn">Play Again</button>
+            <button id="btn-go-menu" class="secondary-btn">Main Menu</button>
+        </div>
+
+    </div>
+
+    <!-- Audio Elements -->
+    <!-- Placeholder for ASMR pop -->
+    <audio id="sfx-pop" preload="auto"></audio> 
+    <audio id="bgm-music" preload="auto" loop></audio>
+
+    <!-- Scripts -->
+    <!-- Use module so we can import Firebase -->
+    <script type="module" src="/js/blobgame.js"></script>
+</body>
+</html>

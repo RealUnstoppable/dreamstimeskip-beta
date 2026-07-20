@@ -1,0 +1,330 @@
+/* css/blobgame.css */
+
+/* Prevent scrolling on game page */
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color); /* from style.css */
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    touch-action: none; /* Prevent browser gestures during play */
+}
+
+/* Back button */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Game Container */
+#game-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    overflow: hidden;
+    pointer-events: none; /* Let touches pass through if needed, but JS will bind directly to blobs */
+}
+
+/* Game HUD */
+#game-hud {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    z-index: 20;
+    pointer-events: none;
+    font-weight: 700;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+}
+
+.hud-left, .hud-right {
+    display: flex;
+    flex-direction: column;
+}
+
+.hud-left { align-items: flex-start; }
+.hud-right { align-items: flex-end; }
+
+.combo-display {
+    font-size: 1.2rem;
+    color: #f59e0b;
+}
+
+.misses-display {
+    color: #ef4444;
+}
+
+/* UI Overlays */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease;
+}
+
+.overlay-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.menu-panel {
+    background: rgba(20, 20, 25, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+}
+
+.menu-panel.hidden {
+    display: none;
+}
+
+.menu-panel h1 { margin: 0; font-size: 3rem; background: linear-gradient(45deg, #ff007f, #007fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.menu-panel h2 { margin: 0 0 10px 0; font-size: 2rem; }
+.menu-panel .subtitle { color: var(--text-secondary); margin-top: -10px; margin-bottom: 20px; }
+
+/* Buttons */
+button {
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+button:active { transform: scale(0.95); }
+
+.primary-btn {
+    background: linear-gradient(45deg, #9333EA, #3B82F6);
+    color: white;
+    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+}
+
+.primary-btn:hover { background: linear-gradient(45deg, #a855f7, #60a5fa); }
+
+.secondary-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+/* Options Menu specifics */
+.option-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.option-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.toggle-group {
+    display: flex;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    flex: 1;
+    background: transparent;
+    color: var(--text-secondary);
+    border-radius: 0;
+    padding: 10px;
+}
+
+.toggle-btn.active {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #9333EA;
+}
+
+.checkbox-row label {
+    margin: 0;
+    color: white;
+}
+
+.option-desc {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+/* Leaderboard specifics */
+#username-binding {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+#username-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(0,0,0,0.3);
+    color: white;
+    font-family: inherit;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.leaderboard-list {
+    max-height: 300px;
+    overflow-y: auto;
+    text-align: left;
+    background: rgba(0,0,0,0.2);
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.leaderboard-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.leaderboard-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.leaderboard-list li:last-child { border: none; }
+.leaderboard-list li .lb-rank { color: #f59e0b; width: 25px; font-weight: bold; }
+.leaderboard-list li .lb-name { flex: 1; font-weight: 600; }
+.leaderboard-list li .lb-score { font-family: monospace; font-size: 1.1rem; }
+
+/* In-Game Blob Entities */
+.game-blob {
+    position: absolute;
+    pointer-events: auto;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+    /* Default animated styling (High/Med) */
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 50%),
+        linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%);
+    background-size: 200% 200%;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    animation: blob-shape 6s ease-in-out infinite, color-cycle 8s ease-in-out infinite;
+    box-shadow: inset 0 0 20px 5px rgba(0,0,0,0.2), 0 0 20px rgba(147, 51, 234, 0.4);
+    z-index: 15;
+}
+
+/* Low Quality Blob - Static, Spherical */
+.game-blob.low-quality {
+    animation: none; /* No heavy keyframes */
+    background-size: 100% 100%;
+    border-radius: 50%; /* Perfect circle */
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 20%),
+                radial-gradient(circle at center, #9333EA 0%, #3B82F6 100%);
+    box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5);
+}
+
+/* Shared keyframes for animated blobs */
+@keyframes blob-shape {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    33% { border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%; }
+    66% { border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%; }
+}
+
+@keyframes color-cycle {
+    0%, 100% { filter: hue-rotate(0deg); background-position: 0% 50%; }
+    50% { filter: hue-rotate(180deg); background-position: 100% 50%; }
+}
+
+/* Pop Particles */
+.game-particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 14;
+    transform: translate(-50%, -50%);
+    animation: game-particle-spread forwards ease-out;
+}
+
+@keyframes game-particle-spread {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.8);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
+        opacity: 0;
+    }
+}
