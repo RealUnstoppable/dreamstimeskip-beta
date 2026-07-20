@@ -171,4 +171,89 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Orb Physics & Easter Egg ---
+    const orbElements = document.querySelectorAll('.orb');
+    
+    orbElements.forEach(orb => {
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        const MAX_HOVER_PULL = 25; // Max distance for hover disturbance
+        const SNAP_DISTANCE = 200; // Distance at which it "snaps" off
+        
+        // Base shadow to return to
+        const baseShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+        
+        orb.addEventListener('mousemove', (e) => {
+            if (isDragging) return;
+            const rect = orb.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            let dx = e.clientX - centerX;
+            let dy = e.clientY - centerY;
+            
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const pullFactor = Math.min(distance, rect.width / 2) / (rect.width / 2);
+            
+            const moveX = (dx / distance) * (MAX_HOVER_PULL * pullFactor) || 0;
+            const moveY = (dy / distance) * (MAX_HOVER_PULL * pullFactor) || 0;
+            
+            orb.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            orb.style.transition = 'transform 0.2s ease-out, box-shadow 0.3s ease';
+        });
+        
+        orb.addEventListener('mouseleave', () => {
+            if (isDragging) return;
+            orb.style.transform = 'translate(0px, 0px)';
+            orb.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
+        });
+        
+        orb.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            orb.style.transition = 'none'; // instant drag
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            const tension = Math.min(distance / SNAP_DISTANCE, 1);
+            
+            if (distance > SNAP_DISTANCE) {
+                // SNAPS OFF!
+                isDragging = false;
+                orb.style.transform = 'translate(0px, 0px)';
+                orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; // elastic return
+                orb.style.boxShadow = baseShadow;
+                return;
+            }
+            
+            orb.style.transform = `translate(${dx}px, ${dy}px)`;
+            
+            if (tension > 0.8) {
+                // Red glow near snapping
+                orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 60}px rgba(255, 50, 50, 0.9)`;
+            } else if (tension > 0.4) {
+                // Yellow glow as it stretches
+                orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 40}px rgba(255, 200, 50, 0.8)`;
+            } else {
+                orb.style.boxShadow = baseShadow;
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                orb.style.transform = 'translate(0px, 0px)';
+                orb.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease';
+                orb.style.boxShadow = baseShadow;
+            }
+        });
+    });
+
 });
