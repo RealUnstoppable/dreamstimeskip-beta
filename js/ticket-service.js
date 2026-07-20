@@ -1,6 +1,6 @@
 import { db } from './auth.js';
-import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 import { mapCollectionData } from './utils.js';
+import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const TICKETS_COLLECTION = 'support_tickets';
 
@@ -36,9 +36,23 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-1        console.error('Error creating ticket - Manager info: [' + error.message + ']');
+        console.error('Error creating ticket - Manager info: [' + error.message + ']');
         throw error;
     }
+}
+
+async function fetchAndSortTickets(q) {
+    const querySnapshot = await getDocs(q);
+    const tickets = [];
+    querySnapshot.forEach((doc) => {
+        tickets.push({ id: doc.id, ...doc.data() });
+    });
+
+    return tickets.sort((a, b) => {
+         const timeA = a.createdAt?.toMillis() || 0;
+         const timeB = b.createdAt?.toMillis() || 0;
+         return timeB - timeA;
+    });
 }
 
 /**

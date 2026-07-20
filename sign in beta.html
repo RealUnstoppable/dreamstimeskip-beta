@@ -18,11 +18,14 @@
         input {width: 100%; padding: 12px; border: 1px solid #333; background-color: #2c2c2c; color: #e0e0e0; border-radius: 5px; box-sizing: border-box; font-size: 16px;}
         button {width: 100%; padding: 12px; border: none; background-color: var(--accent-color); color: #fff; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover {background-color: #0056b3;}
+        button:disabled {background-color: #555; cursor: not-allowed;}
         .toggle-link {margin-top: 20px; color: var(--accent-color); cursor: pointer; font-size: 14px;}
         #message {margin-top: 15px; color: #ff4d4d; font-size: 14px; height: 20px;}
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
+
     <div class="container">
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
@@ -63,5 +66,14 @@
         });
     </script>
 
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=1784516229';
+        import { loadFooter } from './js/footer.js?v=1784516229';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
 </body>
 </html>

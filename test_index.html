@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <body>
+    <header class="main-header"></header>
+
     <div id="queue-content-area">
         <div class="queue-item" data-index="0" data-song-id="song1">
             <div class="queue-more-btn">...</div>
@@ -21,6 +23,15 @@
         const idx = itemsNodeList.indexOf(dragItem);
 
         console.log('Calculated idx:', idx);
+    </script>
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=1784516229';
+        import { loadFooter } from './js/footer.js?v=1784516229';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>

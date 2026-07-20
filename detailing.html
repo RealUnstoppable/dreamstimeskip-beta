@@ -324,23 +324,20 @@
     </footer>
 
     <script type="module">
-        import { loadNavbar } from '/js/navbar.js';
-        import { loadFooter } from '/js/footer.js';
+        import { loadNavbar } from '/js/navbar.js?v=1784516229';
+        import { loadFooter } from '/js/footer.js?v=1784516229';
         
         // Load Navbar and Footer
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inject navbar logic manually since the placeholder might differ
-            const header = document.querySelector('.main-header');
-            if(header) {
-                loadNavbar(); 
-            }
+        const header = document.querySelector('.main-header');
+        if(header) {
+            loadNavbar(); 
+        }
 
-            // Inject footer logic so the newsletter form appears
-            const footer = document.querySelector('.main-footer');
-            if(footer) {
-                loadFooter();
-            }
-        });
+        // Inject footer logic so the newsletter form appears
+        const footer = document.querySelector('.main-footer');
+        if(footer) {
+            loadFooter();
+        }
     </script>
 
     <script type="module" src="/js/newsletter.js"></script>

@@ -15,7 +15,13 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]');
         const email = emailInput.value.trim();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
 
         const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
         let originalText = 'Subscribe';
@@ -41,8 +47,7 @@ document.addEventListener('submit', async (e) => {
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
-                if (submitBtn.textContent) submitBtn.textContent = originalText;
-                else submitBtn.value = originalText;
+                submitBtn.textContent = originalText;
             }
         }
     }

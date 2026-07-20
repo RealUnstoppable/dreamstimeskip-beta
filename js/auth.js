@@ -3,20 +3,12 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
 
+import { escapeHTML } from './utils.js';
+
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
-// Utility to prevent DOM-based and Stored XSS
-function escapeHTML(str) {
-    if (str == null) return "";
-    if (typeof str !== 'string') str = String(str);
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+
 
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');

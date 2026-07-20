@@ -50,3 +50,8 @@
 **Vulnerability/Regression:** When replacing an inline event handler, the duplicate `class` attribute was ignored by the browser, breaking the event delegation.
 **Learning:** HTML5 parsing rules keep the first `class` attribute and ignore duplicates.
 **Prevention:** Combine all classes into a single `class` attribute when modifying DOM strings.
+
+## 2026-06-05 - [Fix Stored XSS in Support Tickets]
+**Vulnerability:** The `admin.html` and `account.html` pages directly interpolated the `ticket.status` field into the DOM via inline style templates without utilizing the available `escapeHTML` utility. Because standard user creation rules did not restrict the length or content of string status fields created via API or manual updates, an attacker could inject an XSS payload via a manipulated status string.
+**Learning:** Even internal tracking fields like `status` that are typically manipulated via trusted backend logic can be vectors for Stored XSS if the underlying database rules do not restrict arbitrary string modifications on the client side.
+**Prevention:** Always sanitize every dynamically rendered string value from a database response, regardless of whether the field is expected to only contain constrained enum values like "open" or "closed".
