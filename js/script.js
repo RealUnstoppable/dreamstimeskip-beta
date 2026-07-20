@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearTimeout(tapTimeout);
                 tapTimeout = setTimeout(() => {
                     tapCount = 0;
-                    orb.style.boxShadow = baseShadow;
+                    orb.style.setProperty('--charge-opacity', '0');
                 }, 1000);
                 
                 const rect = orb.getBoundingClientRect();
@@ -408,23 +408,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 const centerY = rect.top + rect.height / 2;
                 
                 if (tapCount > 10) {
-                    // Massive wave detonation
-                    const wave = document.createElement('div');
-                    wave.classList.add('orb-wave', 'massive-wave');
+                    // Massive wave detonation of dots
                     tapCount = 0; // reset after massive wave
-                    orb.style.boxShadow = baseShadow;
+                    orb.style.setProperty('--charge-opacity', '0');
                     
-                    wave.style.left = `${centerX}px`;
-                    wave.style.top = `${centerY}px`;
+                    const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
+                    const numParticles = 80; // Huge wave of dots
                     
-                    document.body.appendChild(wave);
-                    setTimeout(() => wave.remove(), 2000);
+                    for (let i = 0; i < numParticles; i++) {
+                        const particle = document.createElement('div');
+                        particle.classList.add('orb-particle');
+                        
+                        // Distribute evenly in a circle with slight randomness
+                        const angle = (i / numParticles) * Math.PI * 2 + (Math.random() * 0.1);
+                        const distance = 300 + Math.random() * 300; 
+                        const tx = Math.cos(angle) * distance;
+                        const ty = Math.sin(angle) * distance;
+                        
+                        particle.style.left = `${centerX}px`;
+                        particle.style.top = `${centerY}px`;
+                        particle.style.setProperty('--tx', `${tx}px`);
+                        particle.style.setProperty('--ty', `${ty}px`);
+                        
+                        particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                        
+                        const size = 6 + Math.random() * 8;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        
+                        const duration = 1.5 + Math.random() * 0.5;
+                        particle.style.animationDuration = `${duration}s`;
+                        
+                        document.body.appendChild(particle);
+                        setTimeout(() => particle.remove(), duration * 1000);
+                    }
                 } else {
-                    // Particles effect
+                    // Particles effect & outline charge
                     if (tapCount > 5) {
-                        // Intensify outline leading up to massive wave
-                        const intensity = (tapCount - 5) * 5; 
-                        orb.style.boxShadow = `0 0 ${intensity * 2}px ${intensity}px rgba(255,255,255,0.8), inset 0 0 60px 10px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+                        const opacity = (tapCount - 5) * 0.2; 
+                        orb.style.setProperty('--charge-opacity', Math.min(opacity, 1));
                     }
                     
                     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
