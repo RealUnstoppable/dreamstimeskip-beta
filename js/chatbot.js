@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Chat Error:", error);
             removeElement(typingId);
-            addMessage("I'm sorry, my neural link is experiencing interference. Please try again later.", 'siri');
+            addMessage(`I'm sorry, my neural link is experiencing interference: ${error.message || error}. Please try again later.`, 'siri');
         } finally {
             sendBtn.disabled = false;
             chatInput.focus();
