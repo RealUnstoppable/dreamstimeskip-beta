@@ -1,8 +1,9 @@
 // js/firebase.js
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
+import { getVertexAI } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,6 +36,9 @@ setPersistence(auth, browserLocalPersistence).catch((error) => {
 
 // Initialize Firestore
 export const db = getFirestore(app);
+
+// Initialize AI Logic
+export const ai = getVertexAI(app);
 
 /**
  * Verify Connection Health

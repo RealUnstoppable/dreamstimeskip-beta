@@ -368,32 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (orb.id === 'siri-orb') {
-                const link = orb.querySelector('a');
-                const isLinkClick = (e.target === link);
-                
-                if (!orb.classList.contains('expanded')) {
-                    if (isLinkClick) e.preventDefault(); // Don't navigate while expanding
-                    
-                    orb.classList.add('expanded');
-                    expandedAt = Date.now();
-                    
-                    clearTimeout(inactivityTimeout);
-                    inactivityTimeout = setTimeout(() => {
-                        orb.classList.remove('expanded');
-                    }, 5000);
-                } else {
-                    if (isLinkClick) {
-                        if (Date.now() - expandedAt < 1000) {
-                            e.preventDefault(); // Clicked too fast after expanding!
-                        }
-                    } else {
-                        // Clicked the pill background, keep it open longer
-                        clearTimeout(inactivityTimeout);
-                        inactivityTimeout = setTimeout(() => {
-                            orb.classList.remove('expanded');
-                        }, 5000);
-                    }
-                }
+                // Handled by chatbot.js now
             } else {
                 // Main Blob Tap & Wave Easter Egg
                 tapCount++;
