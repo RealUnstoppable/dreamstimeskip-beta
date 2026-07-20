@@ -451,7 +451,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
-                    const numParticles = tapCount * 10; // Scales up to 50 at 5 taps, 100 at 10 taps
+                    let numParticles = 8 + Math.floor(Math.random() * 6); // Original 8-13 particles
+                    
+                    if (tapCount === 5) {
+                        numParticles = 50; // Medium burst halfway
+                    }
                     
                     for (let i = 0; i < numParticles; i++) {
                         const particle = document.createElement('div');
