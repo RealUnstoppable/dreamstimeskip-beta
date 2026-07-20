@@ -15,21 +15,17 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const email = emailInput.value.trim();
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-
         const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
-        let originalText = 'Subscribe';
+        const email = emailInput.value.trim();
+        let originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : 'Subscribe';
+
         if (submitBtn) {
-            originalText = submitBtn.textContent || submitBtn.value;
             submitBtn.disabled = true;
-            if (submitBtn.textContent) submitBtn.textContent = 'Submitting...';
-            else submitBtn.value = 'Submitting...';
+            if (submitBtn.tagName === 'INPUT') {
+                submitBtn.value = 'Processing...';
+            } else {
+                submitBtn.textContent = 'Processing...';
+            }
         }
 
         try {

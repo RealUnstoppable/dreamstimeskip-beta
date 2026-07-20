@@ -1,5 +1,5 @@
 // js/firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
@@ -15,8 +15,8 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+// Initialize Firebase safely to avoid duplicate app errors
+export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
 // export const appCheck = initializeAppCheck(app, {
