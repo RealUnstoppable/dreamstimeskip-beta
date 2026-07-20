@@ -200,7 +200,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isHover) {
                 stretch = Math.min(distance / 300, 0.15); 
             } else {
-                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 1.5; 
+                // Increased stretch multiplier from 1.5 to 2.5 to make it easier to drag
+                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 2.5; 
             }
             
             // The "New System": 
@@ -246,7 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const rect = orb.getBoundingClientRect();
             startX = rect.left + rect.width / 2;
             startY = rect.top + rect.height / 2;
-            orb.style.transition = 'transform 0.1s ease-out, box-shadow 0.1s ease'; 
+            // Removed transform from transition during drag to prevent the "clone" matrix interpolation glitch
+            orb.style.transition = 'box-shadow 0.1s ease'; 
         });
         
         document.addEventListener('mousemove', (e) => {
