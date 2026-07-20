@@ -177,42 +177,63 @@ document.addEventListener('DOMContentLoaded', () => {
     orbElements.forEach(orb => {
         let isDragging = false;
         let startX = 0, startY = 0;
-        const MAX_HOVER_PULL = 25; // Max distance for hover disturbance
-        const SNAP_DISTANCE = 200; // Distance at which it "snaps" off
+        let hoverCenterX = 0, hoverCenterY = 0;
+        let isHovering = false;
+        const SNAP_DISTANCE = 300; // Distance at which it "snaps" off
         
         // Base shadow to return to
         const baseShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
         
-        orb.addEventListener('mousemove', (e) => {
+        // Helper to stretch orb
+        const applyStretch = (dx, dy, isHover) => {
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 1) return;
+
+            const angle = Math.atan2(dy, dx);
+            let stretch = 0;
+            
+            if (isHover) {
+                stretch = Math.min(distance / 300, 0.15); // max 15% stretch on hover
+            } else {
+                stretch = Math.min(distance / SNAP_DISTANCE, 1) * 1.5; // up to 150% stretch on drag
+            }
+            
+            // rotate to face mouse, scaleX to stretch, scaleY to squish, translateX to anchor the back edge
+            orb.style.transform = `rotate(${angle}rad) scaleX(${1 + stretch}) scaleY(${1 - stretch * 0.3}) translateX(${stretch * 50}px)`;
+        };
+
+        orb.addEventListener('mouseenter', () => {
             if (isDragging) return;
             const rect = orb.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+            hoverCenterX = rect.left + rect.width / 2;
+            hoverCenterY = rect.top + rect.height / 2;
+            isHovering = true;
+        });
+
+        orb.addEventListener('mousemove', (e) => {
+            if (isDragging || !isHovering) return;
             
-            let dx = e.clientX - centerX;
-            let dy = e.clientY - centerY;
+            let dx = e.clientX - hoverCenterX;
+            let dy = e.clientY - hoverCenterY;
             
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const pullFactor = Math.min(distance, rect.width / 2) / (rect.width / 2);
-            
-            const moveX = (dx / distance) * (MAX_HOVER_PULL * pullFactor) || 0;
-            const moveY = (dy / distance) * (MAX_HOVER_PULL * pullFactor) || 0;
-            
-            orb.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            applyStretch(dx, dy, true);
             orb.style.transition = 'transform 0.2s ease-out, box-shadow 0.3s ease';
         });
         
         orb.addEventListener('mouseleave', () => {
+            isHovering = false;
             if (isDragging) return;
-            orb.style.transform = 'translate(0px, 0px)';
+            orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
             orb.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
         });
         
         orb.addEventListener('mousedown', (e) => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            orb.style.transition = 'none'; // instant drag
+            // Record the initial center of the orb to calculate true drag distance
+            const rect = orb.getBoundingClientRect();
+            startX = rect.left + rect.width / 2;
+            startY = rect.top + rect.height / 2;
+            orb.style.transition = 'transform 0.1s ease-out, box-shadow 0.1s ease'; // responsive drag
         });
         
         document.addEventListener('mousemove', (e) => {
@@ -227,13 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (distance > SNAP_DISTANCE) {
                 // SNAPS OFF!
                 isDragging = false;
-                orb.style.transform = 'translate(0px, 0px)';
+                orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
                 orb.style.transition = 'transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease'; // elastic return
                 orb.style.boxShadow = baseShadow;
                 return;
             }
             
-            orb.style.transform = `translate(${dx}px, ${dy}px)`;
+            applyStretch(dx, dy, false);
             
             if (tension > 0.8) {
                 // Red glow near snapping
@@ -249,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                orb.style.transform = 'translate(0px, 0px)';
+                orb.style.transform = 'rotate(0rad) scale(1) translate(0px, 0px)';
                 orb.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease';
                 orb.style.boxShadow = baseShadow;
             }
