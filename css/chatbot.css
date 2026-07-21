@@ -50,9 +50,7 @@
     margin: 0;
     font-size: 1.2rem;
     font-weight: 600;
-    background: linear-gradient(45deg, #ff007f, #007fff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: white;
 }
 
 .chatbot-close {
@@ -117,6 +115,15 @@
     background: rgba(255, 255, 255, 0.1);
     color: #e2e8f0;
     border-bottom-left-radius: 4px;
+}
+
+.chat-msg.siri::before {
+    content: 'Lexi';
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 5px;
+    font-weight: 500;
 }
 
 .chat-msg.siri p {
