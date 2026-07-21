@@ -153,19 +153,7 @@
     <header class="main-header"></header>
 
 
-    <nav>
-        <a href="index.html" class="logo">UNSTOPPABLE</a>
-        <div class="menu-toggle" id="mobile-menu-btn">☰</div>
-        <div class="nav-links" id="nav-links">
-            <a href="#process" onclick="closeMenu()">Process</a>
-            <a href="#pricing" onclick="closeMenu()">Pricing</a>
-            <a href="#gallery" onclick="closeMenu()">Gallery</a>
-            <a href="#reviews" onclick="closeMenu()">Reviews</a>
-            <a href="#contact" onclick="closeMenu()">Contact</a>
-            <a href="booking.html">Book Now</a>
-            <a href="sign in beta.html" class="auth-btn" id="nav-auth-btn">Sign In</a>
-        </div>
-    </nav>
+    <!-- Main navbar is injected here -->
 
     <header class="hero">
         <div>
@@ -275,31 +263,7 @@
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-        // Mobile Menu Toggle Logic
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const navLinks = document.getElementById('nav-links');
-        
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-        });
-
-        window.closeMenu = () => {
-            if(window.innerWidth < 768) {
-                navLinks.classList.remove('active');
-                menuBtn.textContent = '☰';
-            }
-        };
-
-        // Update Nav based on Auth Status
-        onAuthStateChanged(auth, (user) => {
-            const authBtn = document.getElementById('nav-auth-btn');
-            if (user) {
-                authBtn.textContent = "My Account";
-                authBtn.href = "account.html";
-            }
-        });
+        // Removed hardcoded mobile menu logic and auth state nav update since navbar.js handles this
 
         // Newsletter Logic
         window.subscribeNewsletter = async () => {

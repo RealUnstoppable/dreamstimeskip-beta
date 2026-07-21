@@ -91,8 +91,27 @@
                 position: fixed; top: 0; left: -100%; height: 100vh; z-index: 1000;
                 background-color: var(--bg-color); width: 80%; max-width: 300px;
                 padding: 20px; border-right: 1px solid var(--border-color);
+                overflow-y: auto;
             }
             .sidebar.open { transform: translateX(100%); }
+            
+            /* Mobile Dropdown Nav */
+            .mobile-nav-dropdown {
+                width: 100%;
+                padding: 10px;
+                background: var(--primary-card-color);
+                color: var(--text-primary);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                font-size: 1rem;
+                margin-bottom: 20px;
+                display: none;
+            }
+            @media (max-width: 768px) {
+                .mobile-nav-dropdown { display: block; }
+                .mobile-header { flex-direction: column; align-items: flex-start; }
+                .hamburger-btn { display: none; }
+            }
         }
     </style>
 </head>
@@ -100,7 +119,21 @@
     <header class="main-header"></header>
  
     <div class="mobile-header">
-        <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
+        <h2 style="margin:0; margin-bottom: 15px; color: var(--accent-blue);">Admin Dashboard</h2>
+        <select class="mobile-nav-dropdown" id="mobile-nav-select" aria-label="Mobile Navigation">
+            <option value="#performance">Performance</option>
+            <option value="#bookings">Bookings</option>
+            <option value="#quotes">Quotes</option>
+            <option value="#users">User Management</option>
+            <option value="#support-tickets">Support Tickets</option>
+            <option value="#featurerequests">Feature Requests</option>
+            <option value="#downloads">Downloads</option>
+            <option value="#newsletter">Newsletter</option>
+            <option value="#admin-settings">Admin Settings</option>
+            <option value="account.html">My Account (Public)</option>
+            <option value="index.html">← Return to Home</option>
+            <option value="signout">Sign Out</option>
+        </select>
         <button class="hamburger-btn" aria-label="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
     </div>
 
@@ -124,7 +157,9 @@
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
-                    <li><a href="account.html">My Account Settings</a></li>
+                    <li><hr style="border-color: var(--border-color); margin: 10px 0;"></li>
+                    <li><a href="#admin-settings" class="nav-link">Admin Settings</a></li>
+                    <li><a href="account.html">My Account (Public)</a></li>
                 </ul>
             </nav>
             <button class="sign-out-btn" id="sign-out">Sign Out</button>
@@ -276,6 +311,30 @@
                         <thead><tr><th>Email</th><th>Subscription Date</th></tr></thead>
                         <tbody id="newsletter-list-body"></tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- Admin Settings Section -->
+            <section id="admin-settings" class="content-section">
+                <h3>Admin Settings</h3>
+                <div style="background-color: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px;">
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your administrator account settings and preferences here.</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 5px; color: var(--text-secondary);">Change Administrator Email</label>
+                        <input type="email" id="admin-email-input" placeholder="New Email Address" style="width: 100%; max-width: 400px; padding: 10px; background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: 6px;">
+                        <button class="btn-sm btn-action" style="margin-top: 10px;" onclick="alert('Email change feature coming soon for security compliance.')">Update Email</button>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; font-weight: 500; margin-bottom: 5px; color: var(--text-secondary);">Password Reset</label>
+                        <button class="btn-sm btn-action" onclick="alert('Password reset link will be sent to your email.')">Send Password Reset Email</button>
+                    </div>
+
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <h4 style="color: var(--accent-red); margin-bottom: 10px;">Danger Zone</h4>
+                        <button class="btn-sm btn-danger" onclick="alert('Revoking admin access requires contacting the system owner.')">Revoke My Admin Access</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -772,8 +831,29 @@
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                     if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); }
                 });
+                });
             });
 
+            const mobileNavSelect = document.getElementById('mobile-nav-select');
+            if (mobileNavSelect) {
+                mobileNavSelect.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#')) {
+                        document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+                        
+                        const targetSection = document.querySelector(val);
+                        if(targetSection) targetSection.classList.add('active');
+                        
+                        const correspondingLink = document.querySelector(`.sidebar-nav a[href="${val}"]`);
+                        if(correspondingLink) correspondingLink.classList.add('active');
+                    } else if (val === 'signout') {
+                        signOut(auth);
+                    } else {
+                        window.location.href = val;
+                    }
+                });
+            }
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
         }

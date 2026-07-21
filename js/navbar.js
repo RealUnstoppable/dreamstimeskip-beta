@@ -22,7 +22,15 @@ export function loadNavbar() {
         <ul class="nav-links">
             
             <li><a href="unstoppable.html">Unstoppable</a></li>
-            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+            <li class="nav-dropdown-wrapper">
+                <a href="#" style="cursor: default;">Dreams TimeSkip ▾</a>
+                <div class="nav-dropdown">
+                    <a href="dreamstimeskip.html">Dreams TimeSkip Main</a>
+                    <a href="new-dts.html">New DTS Experience</a>
+                    <a href="dreams-timeskip-first-look.html">First Look</a>
+                    <a href="fotd.html">Flavor of the Day</a>
+                </div>
+            </li>
             <li><a href="harmonytunes.html">HarmonyTunes</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>

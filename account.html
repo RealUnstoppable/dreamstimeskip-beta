@@ -9,6 +9,62 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
 <link rel="stylesheet" href="/css/shop.css">
+    <style>
+        /* Glassmorphism redesign for account page */
+        body {
+            background-image: radial-gradient(circle at 10% 20%, rgba(90, 92, 106, 1) 0%, rgba(32, 45, 58, 1) 81.3%);
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        
+        .account-layout {
+            background: transparent !important;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card, .profile-section, .orders-section {
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1) !important;
+            color: #fff;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 8px;
+        }
+        
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+        
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        input, select, textarea {
+            background: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #fff !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Spinner removed -->
@@ -88,35 +144,40 @@
                 </div>
 
                 <div class="card">
-                    <h4>Display Settings</h4>
+                    <h4>Appearance & Themes</h4>
                     <form id="theme-settings-form">
                         <div class="form-group">
-                            <label for="theme-select">Theme</label>
+                            <label for="theme-select">Theme Preset</label>
                             <select id="theme-select">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                                <option value="midnight">Midnight</option>
-                                <option value="forest">Forest</option>
+                                <option value="system">System Default</option>
+                                <option value="black">Deep Black</option>
+                                <option value="white">Silk White</option>
+                                <option value="pink">Lotus Pink (Premium)</option>
+                                <option value="forest">Rainforest (Premium)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Accent Color</label>
-                            <div class="accent-options">
-                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
-                                <label><input type="radio" name="accent-color" value="red"> Red</label>
-                                <label><input type="radio" name="accent-color" value="green"> Green</label>
-                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
-                            </div>
+                        <div class="form-group" id="premium-hex-container">
+                            <label>Custom Hex Color (Premium)</label>
+                            <input type="color" id="custom-hex-color" value="#00ffcc" disabled title="Requires Premium">
                         </div>
                         <button type="submit" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
 
+                <div class="card" id="security-card">
+                    <h4>Security & 2FA</h4>
+                    <button class="btn btn-primary" id="change-password-btn">Send Password Reset Email</button>
+                    <p style="margin-top: 15px;">Enable Two-Factor Authentication</p>
+                    <button class="btn btn-secondary" id="enable-2fa-email-btn">Setup Email 2FA</button>
+                    <button class="btn btn-secondary" id="enable-2fa-sms-btn" style="margin-left: 10px;">Setup SMS 2FA</button>
+                    <div id="security-notification" class="notification"></div>
+                </div>
+
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
-                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
-                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                    <p>This action will soft-delete your account for 90 days. During this time, you can recover it by logging in and contacting support. After 90 days, all your data will be permanently removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Deactivate My Account</button>
                 </div>
             </section>
             
@@ -150,7 +211,7 @@
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
         import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
@@ -378,10 +439,21 @@
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
 
-            document.getElementById('theme-select').value = userData.theme || 'dark';
-            const currentAccent = userData.accentColor || 'blue';
-            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
-            if (accentRadio) accentRadio.checked = true;
+            document.getElementById('theme-select').value = userData.theme || 'system';
+            
+            const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+            const customHex = document.getElementById('custom-hex-color');
+            if (isPremium) {
+                customHex.disabled = false;
+                customHex.title = 'Select custom accent color';
+            } else {
+                customHex.disabled = true;
+                customHex.title = 'Requires Premium';
+            }
+            if (userData.accentColor && userData.accentColor.startsWith('#')) {
+                customHex.value = userData.accentColor;
+            }
+            // Ensure the UI matches the current user data state for accent radio buttons if they existed
         }
 
         function setupEventListeners(user) {
@@ -446,8 +518,21 @@
 
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const userData = cachedData ? JSON.parse(cachedData) : {};
+                
                 const theme = document.getElementById('theme-select').value;
-                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const customHex = document.getElementById('custom-hex-color').value;
+                
+                const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+                if (!isPremium && (theme === 'pink' || theme === 'forest')) {
+                    showNotification(document.getElementById('theme-notification'), 'Error: Lotus Pink and Rainforest themes require Premium.', 'error');
+                    return;
+                }
+
+                const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
+                
                 const notificationEl = document.getElementById('theme-notification');
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalText = submitBtn.innerText;
@@ -459,14 +544,11 @@
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
                     document.body.dataset.theme = theme;
-                    document.body.dataset.accent = accentColor;
+                    document.documentElement.style.setProperty('--accent-color', accentColor);
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
 
-                    const cacheKey = `profile_${user.uid}`;
-                    const cachedData = sessionStorage.getItem(cacheKey);
                     if (cachedData) {
-                        const userData = JSON.parse(cachedData);
                         userData.theme = theme;
                         userData.accentColor = accentColor;
                         sessionStorage.setItem(cacheKey, JSON.stringify(userData));
@@ -479,20 +561,46 @@
                 }
             });
 
+            document.getElementById('change-password-btn').addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Send Password Reset Email';
+                }
+            });
+
+            document.getElementById('enable-2fa-email-btn').addEventListener('click', () => {
+                alert('Email 2FA setup flow is currently under construction. Please check back later.');
+            });
+
+            document.getElementById('enable-2fa-sms-btn').addEventListener('click', () => {
+                alert('SMS 2FA setup flow is currently under construction. Note: standard SMS rates may apply.');
+            });
+
             document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
-                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                if (!confirm('WARNING: Your account will be soft-deleted and permanently removed after 90 days. Are you sure you want to deactivate?')) return;
                 const btn = e.currentTarget;
                 const originalText = btn.innerText;
                 btn.disabled = true;
-                btn.innerText = 'Deleting...';
+                btn.innerText = 'Deactivating...';
                 try {
                     const userId = user.uid;
-                    await deleteUser(user);
-                    await deleteDoc(doc(db, "users", userId));
-                    alert('Your account has been permanently deleted.');
+                    await updateDoc(doc(db, "users", userId), {
+                        isDeleted: true,
+                        deletedAt: new Date()
+                    });
+                    alert('Your account has been deactivated. You will be signed out.');
+                    await signOut(auth);
                     window.location.replace('index.html');
                 } catch (error) {
-                    alert('Error: Please sign out, sign back in, and try again.');
+                    alert('Error: Please try again or contact support.');
                     btn.disabled = false;
                     btn.innerText = originalText;
                 }

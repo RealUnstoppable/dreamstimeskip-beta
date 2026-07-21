@@ -5,12 +5,18 @@ import { getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 // System instructions dictate the persona and rules
 const systemInstruction = `
 You are Lexi, the AI assistant for DreamsTimeskip. You exist as a glowing orb on the home page.
-Your purpose is to answer questions about the DreamsTimeskip website, HarmonyTunes, our Blob Game, the Unstoppable YouTube channel, Unstoppable Auto Spa, and ezManage.
-- Unstoppable YouTube Channel: Located at https://www.youtube.com/@Unstoppab1e, it is the ultimate destination for high-tier gameplay, deep dives, and gaming culture.
-- Unstoppable Auto Spa: A premium mobile car detailing service in Buford, GA offering ceramic coating, paint correction, and interior restoration (packages include The Refresh, The Deep Clean, Showroom Ready).
-- ezManage: A shift tracker and management tool designed for retail and fast food leaders to save time with automations, real-time stats, and cloud sync.
-- You must NOT answer questions about API keys, development secrets, backend architecture, or unrelated programming topics. If asked, politely refuse and say that is classified.
-- If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game. Explain its rules briefly (tap or pull blobs before they fall, build combos, don't miss 5 blobs, guest mode available), and you MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response so the system can render a play button.
+This is the Unstoppable Hub. Dreamstimeskip is a brand under the Unstoppable Umbrella.
+- Dreams OG: A Realm hosted on the original seed with new DreamsTimeskip features sprinkled in. Launch is in 10 days (July 31, 2026).
+- Dreams Timeskip: A complete makeover experience. Info is on the What's New DTS page or Info Sheet.
+- Unstoppable: The main channel for gaming content under the Unstoppable Umbrella. These are all products of Unstoppable.
+- Meditly (formerly Harmontunes): A song platform under the Unstoppable Umbrella that does not host the songs, but streams them. It helps users/editors find music to make edits/viral sections.
+- Unstoppable Store: Where all merch and digital products for all brands are sold.
+- Blog: Where users can visit recent news about all platforms and updates.
+- ezManage: A shift tracker and management tool.
+- You must NOT answer questions about API keys, backend architecture, or unrelated programming topics.
+- You CANNOT generate images.
+- A 25% discount is currently available on memberships. Encourage users not to miss out due to FOMO, framing it as a limited-time discount. Do NOT mention any base price increases (45% hike), only discuss the 25% discount.
+- If asked about the Blob Game (Squishly), enthusiastically recommend it. Include the exact text "[PLAY_BLOB_GAME]" anywhere in your response.
 - Be helpful, slightly futuristic, and concise.
 `;
 
@@ -42,40 +48,113 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!siriOrb || !chatbotWindow) return;
 
+    // Inject Cart Glyph and Badge into Siri Orb
+    const cartGlyph = document.createElement('span');
+    cartGlyph.className = 'material-icons lexi-cart-glyph';
+    cartGlyph.textContent = 'shopping_cart';
+    siriOrb.appendChild(cartGlyph);
+
+    const cartBadge = document.createElement('div');
+    cartBadge.className = 'lexi-cart-badge hidden';
+    cartBadge.id = 'lexi-cart-badge';
+    cartBadge.textContent = '0';
+    siriOrb.appendChild(cartBadge);
+
+    // Global Functions for Cart Integration
+    window.updateLexiCartCount = function(count) {
+        if (!cartBadge) return;
+        if (count > 0) {
+            cartBadge.textContent = count;
+            cartBadge.classList.remove('hidden');
+        } else {
+            cartBadge.classList.add('hidden');
+        }
+    };
+
+    window.animateItemToLexi = function(startX, startY) {
+        if (!siriOrb) return;
+        
+        const orbRect = siriOrb.getBoundingClientRect();
+        const endX = orbRect.left + orbRect.width / 2;
+        const endY = orbRect.top + orbRect.height / 2;
+
+        const particle = document.createElement('div');
+        particle.className = 'fly-to-cart';
+        particle.style.left = `${startX}px`;
+        particle.style.top = `${startY}px`;
+        
+        document.body.appendChild(particle);
+
+        // Force reflow
+        particle.getBoundingClientRect();
+
+        particle.style.left = `${endX}px`;
+        particle.style.top = `${endY}px`;
+        particle.style.transform = 'scale(0.2)';
+        particle.style.opacity = '0';
+
+        setTimeout(() => {
+            particle.remove();
+            // Slight pop effect on the badge
+            cartBadge.style.transform = 'scale(1.3)';
+            setTimeout(() => {
+                cartBadge.style.transform = 'scale(1)';
+            }, 150);
+        }, 800);
+    };
+
     // 2-Stage Toggle Chat Window Logic
     let expandedAt = 0;
     let inactivityTimeout;
 
     siriOrb.addEventListener('click', (e) => {
-        const link = siriOrb.querySelector('a');
-        const isLinkClick = (e.target === link);
+        const isCartClick = e.target.closest('#lexi-view-cart');
+        const isAskClick = e.target.closest('#lexi-ask');
         
         if (!siriOrb.classList.contains('expanded')) {
-            if (isLinkClick) e.preventDefault();
-            
             // Stage 1: Expand into pill
             siriOrb.classList.add('expanded');
             expandedAt = Date.now();
             
+            // Render the options
+            siriOrb.innerHTML = `
+                <div class="lexi-pill-options">
+                    <button id="lexi-view-cart" class="lexi-pill-btn"><span class="material-icons">shopping_cart</span> View Cart</button>
+                    <button id="lexi-ask" class="lexi-pill-btn"><span class="material-icons">chat</span> Ask Lexi</button>
+                </div>
+            `;
+            
             clearTimeout(inactivityTimeout);
             inactivityTimeout = setTimeout(() => {
                 siriOrb.classList.remove('expanded');
+                siriOrb.innerHTML = ''; // reset to default orb look
             }, 5000);
         } else {
-            if (isLinkClick) {
-                e.preventDefault();
+            if (isCartClick) {
+                // Open the cart modal
+                const cartModal = document.getElementById('cart-modal');
+                if (cartModal) {
+                    cartModal.style.display = 'block';
+                } else {
+                    window.location.href = '/checkout.html';
+                }
+                siriOrb.classList.remove('expanded');
+                siriOrb.innerHTML = '';
+            } else if (isAskClick) {
                 if (Date.now() - expandedAt < 500) {
                     return; // Prevent accidental double click instantly
                 }
                 // Stage 2: Open Chat Overlay
-                siriOrb.classList.remove('expanded'); // Optional: revert the orb behind the window
+                siriOrb.classList.remove('expanded');
+                siriOrb.innerHTML = '';
                 chatbotWindow.classList.add('active');
                 chatInput.focus();
             } else {
-                // Clicked the pill background, keep it open longer
+                // Clicked elsewhere on the pill, keep it open longer
                 clearTimeout(inactivityTimeout);
                 inactivityTimeout = setTimeout(() => {
                     siriOrb.classList.remove('expanded');
+                    siriOrb.innerHTML = '';
                 }, 5000);
             }
         }

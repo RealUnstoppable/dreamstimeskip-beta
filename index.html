@@ -224,10 +224,6 @@
                         <span>All Systems</span>
                         <span class="status-indicator online">Operational</span>
                     </div>
-                    <div class="status-item">
-                        <span>FOTD | API</span>
-                        <span class="status-indicator down">Maintenance</span>
-                    </div>
                     <p>Last check: Jan 31, 2026</p>
                 </div>
                 <a href="#harmony" class="bento-card reveal" id="bento-harmony">
@@ -240,7 +236,7 @@
                 <a href="fotd.html" class="bento-card reveal" id="bento-fotd">
                     <div class="card-content">
                         <h3>Fact of the Day</h3>
-                        <p>The heart of a blue whale is so big, a human could swim through its arteries.</p>
+                        <p id="homepage-fotd-text">Loading...</p>
                     </div>
                 </a>
                 <div class="bento-card reveal" id="bento-founder">
@@ -260,17 +256,42 @@
         </section>
 
         <div class="scroll-container">
-            <section id="unstoppable" class="brand-section">
+            <section id="unstoppable" class="brand-section" style="height: auto; min-height: 100vh; padding: 100px 20px;">
                 <div class="section-background" style="background-image: url('UnstoppableHoodieModel300x300.png');">
                 </div>
                 <div class="section-overlay"
-                    style="background: linear-gradient(0deg, rgba(139,0,0,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
-                <div class="brand-content reveal">
+                    style="background: linear-gradient(0deg, rgba(139,0,0,0.85) 0%, rgba(20,20,20,0.95) 100%);"></div>
+                <div class="brand-content reveal" style="max-width: 1000px; width: 100%;">
                     <h2>Unstoppable</h2>
-                    <p class="section-subtitle">The ultimate destination for high-tier gameplay, deep dives, and gaming
-                        culture. Join the action and witness top-level competitive play.</p>
-                    <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button">Watch on
-                        YouTube</a>
+                    <p class="section-subtitle" style="margin-bottom: 2rem;">The ultimate destination for high-tier gameplay, deep dives, and gaming culture.</p>
+                    
+                    <div class="youtube-container" style="display: flex; flex-direction: column; gap: 2rem; align-items: center; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                        <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed?listType=search&list=Unstoppab1e+gaming" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        
+                        <div class="youtube-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                            <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" target="_blank" class="cta-button" style="background: #FF0000; color: white; display: flex; align-items: center; gap: 8px;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                                Subscribe to @Unstoppab1e
+                            </a>
+                            <a href="#" class="cta-button" style="background: #FF8C00; color: white;">Support Us / Donate</a>
+                        </div>
+
+                        <div class="coming-soon-videos" style="width: 100%; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: #FFD700;">Coming Soon</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                    <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">Dreams OG Launch Trailer</h4>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">An exclusive look into the upcoming realm.</p>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                    <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">High-Tier Gameplay Montages</h4>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">Witness competitive play at its finest.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -385,6 +406,19 @@
         // --- END: Pre-register Popup Script ---
     </script>
 
+    <script type="module">
+        import { getFactForDate, getLocalDateString } from './js/fotd-data.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const fotdTextEl = document.getElementById('homepage-fotd-text');
+            if (fotdTextEl) {
+                const today = new Date();
+                const dateString = getLocalDateString(today);
+                const fact = getFactForDate(dateString);
+                fotdTextEl.textContent = fact;
+            }
+        });
+    </script>
 </body>
 
 </html>

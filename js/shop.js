@@ -61,27 +61,7 @@ function renderProducts() {
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
-        // Fetch rating
-        let ratingHtml = '';
-        try {
-            const { average, count } = await getProductAverageRating(product.id);
-            if (count > 0) {
-                ratingHtml = `
-                    <div class="product-rating-summary" data-id="${product.id}" aria-label="View Reviews">
-                        <span class="star-rating">★</span>
-                        <span>${average} (${count} reviews)</span>
-                    </div>
-                `;
-            } else {
-                 ratingHtml = `
-                    <div class="product-rating-summary" data-id="${product.id}" aria-label="Write a Review">
-                        <span style="color: var(--text-secondary); font-size: 0.8rem;">No reviews yet</span>
-                    </div>
-                `;
-            }
-        } catch (e) {
-            console.error("Failed to load rating for", product.id, e);
-        }
+
 
         return `
             <div class="product-card">
@@ -134,9 +114,10 @@ async function loadProductStats() {
         statsSnapshot.forEach(doc => {
             productStatsMap.set(doc.id, doc.data());
         });
-        renderProducts();
     } catch (error) {
         console.error("Error loading product stats - Manager info:", error);
+    } finally {
+        renderProducts();
     }
 }
 
@@ -176,6 +157,11 @@ function updateCartSummary() {
 
     if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    
+    // Update Lexi cart badge if window.updateLexiCartCount exists
+    if (window.updateLexiCartCount) {
+        window.updateLexiCartCount(itemCount);
+    }
 }
 
 // --- CART LOGIC ---
@@ -369,6 +355,12 @@ function setupEventListeners() {
             if (addBtn) {
                 const productId = addBtn.dataset.id;
                 handleAddToCart(productId);
+                
+                // Lexi animation
+                if (window.animateItemToLexi) {
+                    const rect = addBtn.getBoundingClientRect();
+                    window.animateItemToLexi(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                }
             } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
                 const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
                 const productId = btn.dataset.id;

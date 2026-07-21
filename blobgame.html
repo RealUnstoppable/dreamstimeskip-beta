@@ -43,7 +43,7 @@
         
         <!-- Main Menu -->
         <div id="menu-main" class="menu-panel">
-            <h1>Blob Pop</h1>
+            <img src="/images/squishly_logo.jpg" alt="Squishly Logo" class="game-logo" style="max-width: 250px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); margin-bottom: 1rem;">
             <p class="subtitle">A juicy, ASMR arcade experience.</p>
             <button id="btn-play" class="primary-btn">Play</button>
             <button id="btn-tutorial" class="secondary-btn">How to Play</button>
@@ -70,20 +70,33 @@
             <div class="option-group">
                 <label>Graphics Quality</label>
                 <div class="toggle-group" id="quality-toggles">
-                    <button class="toggle-btn" data-val="low">Low</button>
-                    <button class="toggle-btn" data-val="medium">Med</button>
-                    <button class="toggle-btn active" data-val="high">High</button>
+                    <button class="toggle-btn qual-btn" data-val="low">Low</button>
+                    <button class="toggle-btn qual-btn" data-val="medium">Med</button>
+                    <button class="toggle-btn qual-btn active" data-val="high">High</button>
                 </div>
                 <small class="option-desc" id="quality-desc">High: Animated blobs, massive dot explosions.</small>
             </div>
+            
+            <div class="option-group">
+                <label>FPS Limit</label>
+                <div class="toggle-group" id="fps-toggles">
+                    <button class="toggle-btn fps-btn" data-val="30">30</button>
+                    <button class="toggle-btn fps-btn active" data-val="60">60</button>
+                    <button class="toggle-btn fps-btn" data-val="120">120</button>
+                </div>
+            </div>
 
             <div class="option-group">
-                <label>Audio</label>
-                <div class="checkbox-row">
-                    <input type="checkbox" id="toggle-sfx" checked> <label for="toggle-sfx">ASMR SFX</label>
-                </div>
-                <div class="checkbox-row">
-                    <input type="checkbox" id="toggle-music" checked> <label for="toggle-music">Music</label>
+                <label>Audio Volume</label>
+                <div class="slider-row" style="display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">
+                    <div>
+                        <label for="sfx-vol" style="font-size: 0.9em; display: block; margin-bottom: 5px;">SFX</label>
+                        <input type="range" id="sfx-vol" min="0" max="1" step="0.05" value="1" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="music-vol" style="font-size: 0.9em; display: block; margin-bottom: 5px;">Music</label>
+                        <input type="range" id="music-vol" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+                    </div>
                 </div>
             </div>
 
@@ -130,6 +143,7 @@
 
     <!-- Audio Elements -->
     <audio id="bgm-music" preload="auto" loop></audio>
+    <audio id="bgm-menu" src="/music/Astrophage.mp3" preload="auto" loop></audio>
 
     <!-- Scripts -->
     <!-- Use module so we can import Firebase -->
