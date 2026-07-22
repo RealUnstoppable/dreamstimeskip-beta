@@ -18,9 +18,9 @@ Your purpose is to answer questions about the DreamsTimeskip website, the Merch 
 
 let chatSession = null;
 try {
-    // Initialize Gemini 2.5 Flash
+    // Initialize Gemini 1.5 Flash
     const model = getGenerativeModel(ai, {
-        model: "gemini-2.5-flash",
+        model: "gemini-1.5-flash",
         systemInstruction: systemInstruction,
         generationConfig: {
             temperature: 0.7,
