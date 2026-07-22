@@ -55,3 +55,8 @@
 **Vulnerability:** The `admin.html` and `account.html` pages directly interpolated the `ticket.status` field into the DOM via inline style templates without utilizing the available `escapeHTML` utility. Because standard user creation rules did not restrict the length or content of string status fields created via API or manual updates, an attacker could inject an XSS payload via a manipulated status string.
 **Learning:** Even internal tracking fields like `status` that are typically manipulated via trusted backend logic can be vectors for Stored XSS if the underlying database rules do not restrict arbitrary string modifications on the client side.
 **Prevention:** Always sanitize every dynamically rendered string value from a database response, regardless of whether the field is expected to only contain constrained enum values like "open" or "closed".
+
+## 2024-05-18 - Overlapping Firestore Rules Bypass
+**Vulnerability:** Duplicate match blocks for the same collections (`/reviews`, `/product_stats`, `/product_reviews`) allowed less restrictive rules to silently override stricter ones, and allowed users to bypass update constraints on their product reviews.
+**Learning:** Firebase evaluates overlapping rules with a logical OR, meaning less restrictive blocks will silently bypass intended stricter validations located elsewhere in the file.
+**Prevention:** Avoid duplicate match blocks for the same collection path and strictly centralize all rules for a given path into a single block.
