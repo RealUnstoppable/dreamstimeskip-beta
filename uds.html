@@ -153,19 +153,7 @@
     <header class="main-header"></header>
 
 
-    <nav>
-        <a href="index.html" class="logo">UNSTOPPABLE</a>
-        <div class="menu-toggle" id="mobile-menu-btn">☰</div>
-        <div class="nav-links" id="nav-links">
-            <a href="#process" onclick="closeMenu()">Process</a>
-            <a href="#pricing" onclick="closeMenu()">Pricing</a>
-            <a href="#gallery" onclick="closeMenu()">Gallery</a>
-            <a href="#reviews" onclick="closeMenu()">Reviews</a>
-            <a href="#contact" onclick="closeMenu()">Contact</a>
-            <a href="booking.html">Book Now</a>
-            <a href="sign in beta.html" class="auth-btn" id="nav-auth-btn">Sign In</a>
-        </div>
-    </nav>
+
 
     <header class="hero">
         <div>
@@ -343,10 +331,10 @@
     <footer class="main-footer"></footer>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadUdsNavbar } from './js/navbar.js?v=20260722';
         import { loadFooter } from './js/footer.js?v=20260722';
         
-        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadNavbar === 'function') loadUdsNavbar();
         if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>

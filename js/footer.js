@@ -19,8 +19,8 @@ export function loadFooter() {
                     </ul>
                     <h5 style="margin-top: 15px;">Betas</h5>
                     <ul>
-                        <li><a href="blobgame.html">Blob Game</a></li>
-                        <li><a href="tracker.html">ezmanage/tracker</a></li>
+                        <li><a href="blobgame.html">Squishly</a></li>
+                        <li><a href="tracker.html">ezManage beta</a></li>
                         <li><a href="#" style="color: gray; cursor: default;">App Download (Soon)</a></li>
                         <li><a href="#" style="color: gray; cursor: default;">beta.realunstoppable.store</a></li>
                     </ul>

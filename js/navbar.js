@@ -20,7 +20,6 @@ export function loadNavbar() {
     <nav class="navbar">
         <a href="index.html" class="nav-logo">un<span></span></a>
         <ul class="nav-links">
-            
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
             <li><a href="harmonytunes.html">HarmonyTunes</a></li>
@@ -28,15 +27,39 @@ export function loadNavbar() {
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="portfolio.html">About Me</a></li>
-            ${window.location.pathname.includes('uds.html') || window.location.pathname.includes('detailing.html') ? 
-            `<li class="nav-dropdown-wrapper">
+            <li><a href="uds.html">UDS</a></li>
+            <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
+            <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
+        </ul>
+        <button class="hamburger" aria-label="Open menu">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </button>
+    </nav>`;
+
+    const header = document.querySelector('.main-header');
+    if (header) {
+        header.innerHTML = headerHTML;
+        attachNavEvents();
+        updateAuthLink();
+    }
+}
+
+export function loadUdsNavbar() {
+    const headerHTML = `
+    <nav class="navbar">
+        <a href="index.html" class="nav-logo">un<span></span></a>
+        <ul class="nav-links">
+            <li><a href="unstoppable.html">Unstoppable</a></li>
+            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+            <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li class="nav-dropdown-wrapper">
                 <a href="#" style="cursor: default;">UDS ▾</a>
                 <div class="nav-dropdown">
                     <a href="uds.html">Overview</a>
                     <a href="detailing.html">Services</a>
                 </div>
-            </li>` : 
-            `<li><a href="uds.html">UDS</a></li>`}
+            </li>
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>

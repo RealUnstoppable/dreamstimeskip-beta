@@ -40,30 +40,6 @@ let combo = 1;
 let misses = 0;
 let timeScale = 1.0;
 
-// Countdown Logic
-const launchDate = new Date('2026-07-31T00:00:00Z').getTime();
-const countdownText = document.getElementById('countdown-text');
-
-function updateCountdown() {
-    if (!countdownText) return;
-    const now = new Date().getTime();
-    const distance = launchDate - now;
-
-    if (distance < 0) {
-        countdownText.textContent = "NOW LIVE!";
-        return;
-    }
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-    countdownText.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
 // Setup Event Listeners
 function setupUI() {
     // Menu Navigation

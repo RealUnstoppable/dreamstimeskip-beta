@@ -61,28 +61,6 @@ function renderProducts() {
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
-        // Fetch rating
-        let ratingHtml = '';
-        try {
-            const { average, count } = await getProductAverageRating(product.id);
-            if (count > 0) {
-                ratingHtml = `
-                    <div class="product-rating-summary" data-id="${product.id}" aria-label="View Reviews">
-                        <span class="star-rating">★</span>
-                        <span>${average} (${count} reviews)</span>
-                    </div>
-                `;
-            } else {
-                 ratingHtml = `
-                    <div class="product-rating-summary" data-id="${product.id}" aria-label="Write a Review">
-                        <span style="color: var(--text-secondary); font-size: 0.8rem;">No reviews yet</span>
-                    </div>
-                `;
-            }
-        } catch (e) {
-            console.error("Failed to load rating for", product.id, e);
-        }
-
         return `
             <div class="product-card">
                 <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
