@@ -30,21 +30,28 @@
             <div class="score-display">Score: <span id="score-val">0</span></div>
             <div class="combo-display">Combo: x<span id="combo-val">1</span></div>
         </div>
-        <div class="hud-right">
+        <div class="hud-right" style="display: flex; gap: 10px; align-items: center;">
             <div class="misses-display">Misses: <span id="misses-val">0</span>/5</div>
+            <button id="btn-pause" class="icon-btn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white;" aria-label="Pause">⏸</button>
         </div>
     </div>
 
     <!-- Game Area where blobs fall -->
-    <div id="game-container"></div>
+    <div id="game-container" style="display: none;"></div>
 
     <!-- UI Overlays -->
     <div id="ui-layer" class="overlay-container">
         
         <!-- Main Menu -->
-        <div id="menu-main" class="menu-panel">
-            <h1>Blob Pop</h1>
-            <p class="subtitle">A juicy, ASMR arcade experience.</p>
+        <div id="menu-main" class="menu-panel" style="text-align: center;">
+            <img src="/images/Unstoppable Collection Logo.png" alt="Squishly Logo" style="width: 150px; margin: 0 auto 20px; display: block; border-radius: 50%;">
+            <h1 style="font-size: 3rem; margin-bottom: 5px;">Squishly</h1>
+            <p class="subtitle" style="margin-bottom: 20px;">A juicy, ASMR arcade experience.</p>
+            
+            <div id="countdown-timer" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; font-family: monospace; font-size: 1.2rem;">
+                Launching: <span id="countdown-text">...</span>
+            </div>
+
             <button id="btn-play" class="primary-btn">Play</button>
             <button id="btn-tutorial" class="secondary-btn">How to Play</button>
             <button id="btn-leaderboard" class="secondary-btn">Leaderboard</button>
@@ -72,9 +79,26 @@
                 <div class="toggle-group" id="quality-toggles">
                     <button class="toggle-btn" data-val="low">Low</button>
                     <button class="toggle-btn" data-val="medium">Med</button>
-                    <button class="toggle-btn active" data-val="high">High</button>
+                    <button class="toggle-btn" data-val="high">High</button>
+                    <button class="toggle-btn active" data-val="ultra">Ultra</button>
                 </div>
-                <small class="option-desc" id="quality-desc">High: Animated blobs, massive dot explosions.</small>
+                <small class="option-desc" id="quality-desc">Ultra: Maximum particles and effects.</small>
+            </div>
+
+            <div class="option-group">
+                <label>FPS Limit</label>
+                <div class="toggle-group" id="fps-toggles">
+                    <button class="toggle-btn" data-val="30">30</button>
+                    <button class="toggle-btn active" data-val="60">60</button>
+                    <button class="toggle-btn" data-val="120">120</button>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <label>Cinematic Features</label>
+                <div class="checkbox-row">
+                    <input type="checkbox" id="toggle-cinematic" checked> <label for="toggle-cinematic">Screen Shake & Time Dilation</label>
+                </div>
             </div>
 
             <div class="option-group">
@@ -88,6 +112,16 @@
             </div>
 
             <button id="btn-opt-back" class="secondary-btn">Back</button>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="menu-pause" class="menu-panel hidden">
+            <h2>Paused</h2>
+            <div class="score-display">Score: <span id="pause-score">0</span></div>
+            <div class="combo-display">Combo: x<span id="pause-combo">0</span></div>
+            <button id="btn-resume" class="primary-btn">Resume</button>
+            <button id="btn-retry" class="secondary-btn">Retry</button>
+            <button id="btn-pause-menu" class="secondary-btn">Main Menu</button>
         </div>
 
         <!-- Leaderboard -->

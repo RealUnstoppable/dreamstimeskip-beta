@@ -29,10 +29,14 @@
         </section>
     </main>
 
-    <button id="cart-button" class="cart-fab" aria-label="View cart">
-        <span id="cart-icon">🛒</span>
+    <button id="cart-button" class="lexi-orb" aria-label="View cart">
+        <div class="lexi-core"></div>
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
+    <div id="lexi-menu" class="lexi-menu">
+        <button id="lexi-view-cart-btn" class="lexi-menu-btn">🛒 View Cart</button>
+        <button id="lexi-ask-btn" class="lexi-menu-btn">✨ Ask Lexi</button>
+    </div>
 
     <!-- Reviews Modal -->
     <div id="reviews-modal" class="cart-modal">
@@ -140,20 +144,12 @@
 
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1784516229';
-        import { loadFooter } from './js/footer.js?v=1784516229'; // Add this line
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
 
-        loadNavbar();
-        loadFooter();
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
     <script type="module" src="/js/shop.js"></script>
-
-
-    </script>
-
-
-    <script type="module">
-        import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-    </script></body>
+</body>
 </html>

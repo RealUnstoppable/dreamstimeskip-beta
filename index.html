@@ -224,10 +224,6 @@
                         <span>All Systems</span>
                         <span class="status-indicator online">Operational</span>
                     </div>
-                    <div class="status-item">
-                        <span>FOTD | API</span>
-                        <span class="status-indicator down">Maintenance</span>
-                    </div>
                     <p>Last check: Jan 31, 2026</p>
                 </div>
                 <a href="#harmony" class="bento-card reveal" id="bento-harmony">
@@ -330,9 +326,13 @@
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1784516229';
         import { loadFooter } from './js/footer.js?v=1784516229'; 
+        import { getFactForToday } from './js/fotd-data.js';
 
         loadNavbar();
         loadFooter();
+        
+        const fotdEl = document.querySelector('#bento-fotd p');
+        if (fotdEl) fotdEl.textContent = getFactForToday();
     </script>
 
     <script type="module" src="/js/auth.js?v=2"></script>

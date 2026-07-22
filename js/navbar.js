@@ -28,7 +28,15 @@ export function loadNavbar() {
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="portfolio.html">About Me</a></li>
-            <li><a href="uds.html">UDS</a></li>
+            ${window.location.pathname.includes('uds.html') || window.location.pathname.includes('detailing.html') ? 
+            `<li class="nav-dropdown-wrapper">
+                <a href="#" style="cursor: default;">UDS ▾</a>
+                <div class="nav-dropdown">
+                    <a href="uds.html">Overview</a>
+                    <a href="detailing.html">Services</a>
+                </div>
+            </li>` : 
+            `<li><a href="uds.html">UDS</a></li>`}
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>

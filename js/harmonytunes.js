@@ -18,12 +18,22 @@ function escapeHTML(str) {
 function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'astrophage',
+            title: "Astrophage",
+            artist: "Lupus Nocte",
+            duration: "3:10",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['electronic', 'synth', 'energetic']
+        },
         { 
             id: 'pixy-legacy',
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
@@ -33,7 +43,7 @@ function initHarmonyTunes() {
             title: "Blow", 
             artist: "Kesha", 
             duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
             art: "/images/un-logo.png",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
@@ -43,7 +53,7 @@ function initHarmonyTunes() {
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
             art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
@@ -53,7 +63,7 @@ function initHarmonyTunes() {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
             art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
@@ -658,37 +668,18 @@ function initHarmonyTunes() {
 
     function playSong() {
         if (fadeInterval) clearInterval(fadeInterval);
-        
+        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+        if (crossfadeInterval) clearInterval(crossfadeInterval);
+
+        isCrossfading = false;
+        mixerBtn.classList.remove('pulsing');
+        if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+
+        nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
+
         const targetVol = parseFloat(volumeSlider.value) || 1;
-        
-        if (isCrossfading) {
-            nextAudio.play().then(() => {
-                const fadeStep = 50;
-                const steps = (fadeDur * 1000) / fadeStep;
-                let currentStep = 0;
-                
-                if (crossfadeInterval) clearInterval(crossfadeInterval);
-                crossfadeInterval = setInterval(() => {
-                    currentStep++;
-                    if (currentStep >= steps) {
-                        clearInterval(crossfadeInterval);
-                        activeAudio.pause();
-                        activeAudio.currentTime = 0;
-                        activeAudio.volume = targetVol;
-                        nextAudio.volume = targetVol;
-                        isCrossfading = false;
-                        if(window.__triggerSurvey) window.__triggerSurvey();
-                    } else {
-                        activeAudio.volume = Math.max(0, targetVol * (1 - currentStep/steps));
-                        nextAudio.volume = Math.min(targetVol, targetVol * (currentStep/steps));
-                    }
-                }, fadeStep);
-            }).catch(e => {
-                console.error("Crossfade play failed - Manager info:", e);
-                isCrossfading = false;
-            });
-            return;
-        }
 
         activeAudio.volume = 0;
         activeAudio.play().then(() => {

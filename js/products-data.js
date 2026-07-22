@@ -26,6 +26,14 @@ export const products = [
         price: 19.99,
         description: 'High-performance mousepad for gaming precision.',
         imageUrl: '/images/MugAllBrands300x300.png'
+    },
+    {
+        id: 'dori-pet',
+        name: 'Dori (Dolphin Pet)',
+        price: 0.00,
+        originalPrice: 9.99,
+        description: 'An exclusive in-game dolphin pet for Dreams TimeSkip. Free for Beta users!',
+        imageUrl: '/images/Fact-1-logo-light.png'
     }
 ];
 

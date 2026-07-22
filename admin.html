@@ -124,7 +124,8 @@
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
-                    <li><a href="account.html">My Account Settings</a></li>
+                    <li><a href="#account-settings" class="nav-link">Account Settings</a></li>
+                    <li><a href="account.html">Switch to User Profile</a></li>
                 </ul>
             </nav>
             <button class="sign-out-btn" id="sign-out">Sign Out</button>
@@ -278,13 +279,27 @@
                     </table>
                 </div>
             </section>
+
+            <section id="account-settings" class="content-section">
+                <h3>Account Settings</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="label" style="font-size: 1.1rem; color: #fff; margin-bottom: 10px;">Security</div>
+                        <button id="admin-change-password-btn" class="btn-action btn-sm" style="padding: 10px 15px; width: 100%;">Reset Password Email</button>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label" style="font-size: 1.1rem; color: #fff; margin-bottom: 10px;">Danger Zone</div>
+                        <button id="admin-delete-account-btn" class="btn-sm btn-danger" style="padding: 10px 15px; width: 100%;">Delete Account</button>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
    <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
         import { fetchCollectionData, escapeHTML } from '/js/utils.js';
 
@@ -776,6 +791,34 @@
 
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
+
+            // Account Settings
+            document.getElementById('admin-change-password-btn')?.addEventListener('click', async () => {
+                const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
+                const email = auth.currentUser?.email;
+                if (email) {
+                    try {
+                        await sendPasswordResetEmail(auth, email);
+                        alert('Password reset email sent. Check your inbox.');
+                    } catch (e) {
+                        alert('Error sending email: ' + e.message);
+                    }
+                }
+            });
+            document.getElementById('admin-delete-account-btn')?.addEventListener('click', async () => {
+                if(confirm("Are you absolutely sure you want to delete your admin account? This action cannot be undone.")) {
+                    const user = auth.currentUser;
+                    if(user) {
+                        try {
+                            await deleteDoc(doc(db, "users", user.uid));
+                            await user.delete();
+                            window.location.replace('index.html');
+                        } catch(e) {
+                            alert('Error deleting account: ' + e.message);
+                        }
+                    }
+                }
+            });
         }
     </script>
     <footer class="main-footer"></footer>

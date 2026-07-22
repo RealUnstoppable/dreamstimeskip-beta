@@ -17,6 +17,13 @@ export function loadFooter() {
                         <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
                         <li><a href="harmonytunes.html">HarmonyTunes</a></li>
                     </ul>
+                    <h5 style="margin-top: 15px;">Betas</h5>
+                    <ul>
+                        <li><a href="blobgame.html">Blob Game</a></li>
+                        <li><a href="tracker.html">ezmanage/tracker</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">App Download (Soon)</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">beta.realunstoppable.store</a></li>
+                    </ul>
                 </div>
                 <div class="footer-column">
                     <h5>Connect</h5>
