@@ -1,4 +1,5 @@
-💡 **What**: Added descriptive `aria-label` attributes to implicitly labeled form inputs across several main HTML files, including the global search bar, checkout promo code inputs, and various setup/tracker configuration fields.
-🎯 **Why**: The UI heavily utilizes placeholder text in place of explicit `<label>` tags for a cleaner aesthetic. While visually clear, this left screen readers with no context for what these inputs were for, making the experience confusing for visually impaired users.
-📸 **Before/After**: No visual changes to the UI. Structural HTML updates only.
-♿ **Accessibility**: Improves WCAG compliance by ensuring assistive technologies correctly announce the purpose of critical input fields like `#global-search`, `#promo-code`, and custom tracker presets.
+🚨 Severity: HIGH
+💡 Vulnerability: The `firestore.rules` file contained duplicate `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews`. Since Firebase evaluates overlapping match blocks with a logical OR, the less restrictive rules at the bottom of the file (e.g. `allow read: if true; allow update, delete: if false;`) were silently bypassing the stricter validations (like `request.resource.data.rating >= 1`) defined earlier.
+🎯 Impact: Attackers could bypass intended access controls and validations to update or manipulate data in these collections, as the OR logic of duplicate rules would grant them access based on the least restrictive condition.
+🔧 Fix: Removed the duplicate, overlapping `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews` from the bottom of `firestore.rules` to ensure only the strictly defined, secure `match` blocks evaluate.
+✅ Verification: `pnpm test` passes for the functions directory, and `cat firestore.rules` confirms the duplicates have been removed.
