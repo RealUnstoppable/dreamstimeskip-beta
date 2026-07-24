@@ -434,6 +434,9 @@ async function loadLeaderboard() {
     const scores = await getTopScores();
     loadingEl.style.display = 'none';
 
+    // ⚡ Bolt: Batch DOM inserts to prevent O(N) reflows
+    const fragment = document.createDocumentFragment();
+
     scores.forEach((entry, i) => {
         const li = document.createElement('li');
         
@@ -452,8 +455,10 @@ async function loadLeaderboard() {
         li.appendChild(rank);
         li.appendChild(name);
         li.appendChild(scoreVal);
-        listEl.appendChild(li);
+        fragment.appendChild(li);
     });
+
+    listEl.appendChild(fragment);
 }
 
 // Init
