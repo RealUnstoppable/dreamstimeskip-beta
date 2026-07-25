@@ -1060,7 +1060,7 @@ function initHarmonyTunes() {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
