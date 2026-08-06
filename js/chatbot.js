@@ -16,10 +16,10 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Dreams: A product line under the Unstoppable Umbrella. There are 2 distinct versions:
   1. Dreams TimeSkip (DTS): An upcoming product launching in about a year (there is a live countdown timer on the dreamstimeskip page!).
   2. Dreams OG: A nostalgic trip down memory lane highlighting our classic original Minecraft realms server history.
-- HarmonyTunes: Music platform (soon to be renamed) which is also part of the Unstoppable Umbrella.
-- Merch Store: Selling the 'Unstoppable Hoodie', 'Unstoppable Cap', 'Unstoppable Mug', and 'Dori (Dolphin Pet)' which is currently FREE for Beta users. Do not hallucinate or invent any other products.
+- Medixly: Music platform (formerly HarmonyTunes) which is part of the Unstoppable Umbrella.
+- Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'. Do NOT mention Dori or any dolphin pet. Do not hallucinate or invent any other products.
 - Blob Game: A super fun interactive minigame in the hub.
-- Unstoppable Auto Spa: A premium mobile car detailing service in Buford, GA.
+- Autolux: A premium mobile car detailing service in Buford, GA (formerly Unstoppable Auto Spa).
 - ezManage: A shift tracker and management tool designed for retail and fast food leaders.
 
 Answering "What is DTS?" or "What is Dreams TimeSkip?":
@@ -27,9 +27,10 @@ Answering "What is DTS?" or "What is Dreams TimeSkip?":
 - Clarify that you and the user are currently in the **Unstoppable Hub**, which serves as the main portal to all Unstoppable projects.
 - Explain that Dreams TimeSkip is an upcoming project releasing in about a year (with a live countdown timer on the dreamstimeskip page).
 - Contrast Dreams TimeSkip with Dreams OG (a trip down memory lane and the old Minecraft realms server).
-- Mention that Unstoppable is the gaming channel under the Unstoppable Brand, and HarmonyTunes (soon to be renamed) is also part of the Unstoppable Umbrella alongside the Merch Store, Blob Game, Unstoppable Auto Spa, and ezManage.
+- Mention that Unstoppable is the gaming channel under the Unstoppable Brand, and Medixly (formerly HarmonyTunes) is also part of the Unstoppable Umbrella alongside the Merch Store, Blob Game, Autolux (car detailing), and ezManage.
 
-Restrictions & Guidance:
+Formatting & Restrictions:
+- You may use **bold** text and * **bullet items** in your formatting.
 - You must NOT answer questions about API keys, development secrets, backend architecture, or unrelated programming topics. If asked, politely refuse and say that information is classified.
 - If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game. Explain its rules briefly, and you MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response so the system can render a play button.
 - Be helpful, slightly futuristic, concise, and enthusiastic.
@@ -154,20 +155,19 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (sender === 'siri') {
             // Check for Blob Game token
-            if (text.includes('[PLAY_BLOB_GAME]')) {
+            let hasBlobGameToken = text.includes('[PLAY_BLOB_GAME]');
+            if (hasBlobGameToken) {
                 text = text.replace('[PLAY_BLOB_GAME]', ''); // Remove token from text
-                
-                // Convert text to HTML paragraphs (basic markdown)
-                msgDiv.innerHTML = text.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHTML(p)}</p>`).join('');
-                
-                // Append the button
+            }
+            
+            msgDiv.innerHTML = parseMarkdown(text);
+            
+            if (hasBlobGameToken) {
                 const playBtn = document.createElement('a');
                 playBtn.href = '/blobgame.html';
                 playBtn.className = 'chat-play-btn';
                 playBtn.textContent = 'Play Blob Game';
                 msgDiv.appendChild(playBtn);
-            } else {
-                msgDiv.innerHTML = text.split('\n').filter(p => p.trim()).map(p => `<p>${escapeHTML(p)}</p>`).join('');
             }
         } else {
             msgDiv.textContent = text;
@@ -175,6 +175,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chatMessages.appendChild(msgDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function parseMarkdown(text) {
+        const lines = text.split('\n');
+        return lines.map(line => {
+            let trimmed = line.trim();
+            if (!trimmed) return '';
+
+            let isBullet = false;
+            if (/^[\*\-]\s+/.test(trimmed)) {
+                isBullet = true;
+                trimmed = trimmed.replace(/^[\*\-]\s+/, '');
+            }
+
+            let html = escapeHTML(trimmed);
+            // Replace **bold** with <strong>bold</strong>
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Replace *italic* with <em>italic</em>
+            html = html.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+
+            if (isBullet) {
+                return `<p class="chat-bullet"><span class="bullet-dot">•</span> ${html}</p>`;
+            }
+            return `<p>${html}</p>`;
+        }).filter(p => p !== '').join('');
     }
 
     function addTypingIndicator() {
