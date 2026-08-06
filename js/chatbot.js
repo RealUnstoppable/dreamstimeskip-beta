@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function parseMarkdown(text) {
+        if (!text) return '';
         const lines = text.split('\n');
         return lines.map(line => {
             let trimmed = line.trim();
@@ -191,9 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let html = escapeHTML(trimmed);
             // Replace **bold** with <strong>bold</strong>
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Replace *italic* with <em>italic</em>
-            html = html.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+            html = html.replace(/\*\*([\s\S]+?)\*\*/g, '<strong>$1</strong>');
+            // Replace *italic* or _italic_ with <em>italic</em>
+            html = html.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
+            // Replace markdown links [text](url)
+            html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color: #60a5fa; text-decoration: underline;">$1</a>');
 
             if (isBullet) {
                 return `<p class="chat-bullet"><span class="bullet-dot">•</span> ${html}</p>`;
