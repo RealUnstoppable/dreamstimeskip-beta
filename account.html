@@ -76,9 +76,10 @@
 
             <section id="orders" class="content-section">
                 <h3>Order History</h3>
-                <div class="card">
+                <div class="card" id="orders-container">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <p style="color: var(--text-secondary);" id="no-orders-msg">Loading orders...</p>
+                    <div id="orders-list"></div>
                 </div>
             </section>
 

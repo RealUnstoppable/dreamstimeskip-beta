@@ -115,5 +115,13 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+    match /orders/{orderId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+    match /product_stats/{productId} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }
