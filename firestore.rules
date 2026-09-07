@@ -71,7 +71,7 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Product reviews collection
+        // Product reviews collection
     match /product_reviews/{reviewId} {
       // Anyone can read reviews
       allow read: if true;
@@ -79,6 +79,7 @@ service cloud.firestore {
       allow create: if request.auth != null
                     && request.resource.data.userId == request.auth.uid
                     && request.resource.data.userEmail == request.auth.token.email
+                    && request.resource.data.rating is number
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
       // Users can update or delete their own reviews
