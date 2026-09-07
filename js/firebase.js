@@ -2,7 +2,7 @@
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getVertexAI } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -30,8 +30,6 @@ setPersistence(auth, browserLocalPersistence).catch((error) => {
 // Initialize Firestore
 export const db = getFirestore(app);
 
-// Initialize AI Logic
-export const ai = getVertexAI(app);
 
 /**
  * Verify Connection Health
@@ -47,7 +45,6 @@ export async function verifyFirebaseConnection() {
     if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
-        console.log("Firebase connection healthy (backend reached, request blocked by rules).");
         return true;
     }
 
