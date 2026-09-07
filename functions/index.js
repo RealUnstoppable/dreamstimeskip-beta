@@ -209,13 +209,17 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await getUserDocRef(uid).set({
-        plan: planName, // Updates the frontend to unlock pro features
-        subscription: {
-          status: "active",
-          customerId: session.customer,
-        },
-      }, {merge: true});
+      try {
+        await getUserDocRef(uid).set({
+          plan: planName, // Updates the frontend to unlock pro features
+          subscription: {
+            status: "active",
+            customerId: session.customer,
+          },
+        }, {merge: true});
+      } catch (error) {
+        console.error("Error processing checkout.session.completed - Manager info: [" + error.message + "]");
+      }
     }
   }
 
@@ -299,23 +303,28 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
 
   const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
 
-  return admin.firestore().runTransaction(async (transaction) => {
-    const statsDoc = await transaction.get(productStatsRef);
-    let reviewCount = 0;
-    let averageRating = 0;
+  try {
+    return await admin.firestore().runTransaction(async (transaction) => {
+      const statsDoc = await transaction.get(productStatsRef);
+      let reviewCount = 0;
+      let averageRating = 0;
 
-    if (statsDoc.exists) {
-      const data = statsDoc.data();
-      reviewCount = data.reviewCount || 0;
-      averageRating = data.averageRating || 0;
-    }
+      if (statsDoc.exists) {
+        const data = statsDoc.data();
+        reviewCount = data.reviewCount || 0;
+        averageRating = data.averageRating || 0;
+      }
 
-    const newReviewCount = reviewCount + 1;
-    const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
+      const newReviewCount = reviewCount + 1;
+      const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
 
-    transaction.set(productStatsRef, {
-      reviewCount: newReviewCount,
-      averageRating: newAverageRating,
-    }, {merge: true});
-  });
+      transaction.set(productStatsRef, {
+        reviewCount: newReviewCount,
+        averageRating: newAverageRating,
+      }, {merge: true});
+    });
+  } catch (error) {
+    console.error("Error updating product stats - Manager info: [" + error.message + "]");
+    return null;
+  }
 });
