@@ -72,8 +72,9 @@ export function updatePullSound(distance, enabled = true) {
     if (!enabled || !audioCtx || !pullFilter || !pullOsc) return;
     
     // As the user pulls further, open the filter (brighter sound) and raise pitch slightly (tension)
-    const mappedFreq = Math.min(2000, 100 + distance * 12);
-    const mappedPitch = Math.min(150, 50 + distance * 0.4);
+    // Toned down to make it less harsh
+    const mappedFreq = Math.min(1200, 100 + distance * 6);
+    const mappedPitch = Math.min(100, 50 + distance * 0.2);
     
     pullFilter.frequency.setTargetAtTime(mappedFreq, audioCtx.currentTime, 0.03);
     pullOsc.frequency.setTargetAtTime(mappedPitch, audioCtx.currentTime, 0.03);

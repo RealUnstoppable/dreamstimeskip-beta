@@ -8,9 +8,41 @@
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
-<link rel="stylesheet" href="/css/shop.css">
+    <link rel="stylesheet" href="/css/shop.css">
+    <style>
+        .glass-card {
+            background: rgba(25, 25, 25, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Toggle Switch CSS */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .4s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-blue, #2563EB); }
+        input:checked + .slider:before { transform: translateX(26px); }
+    </style>
 </head>
 <body>
+    <header class="main-header"></header>
     <!-- Spinner removed -->
     <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
@@ -71,7 +103,22 @@
 
             <section id="settings" class="content-section">
                 <h3>Settings</h3>
-                <div class="card">
+                
+                <div class="card glass-card">
+                    <h4>Security</h4>
+                    <form id="security-settings-form">
+                        <button type="button" id="change-password-btn" class="btn btn-primary" style="margin-bottom: 20px;">Send Password Reset Email</button>
+                        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                            <label style="margin: 0;">Enable Two-Factor Authentication (2FA)</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-2fa">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card glass-card">
                     <h4>Update Profile</h4>
                     <form id="update-profile-form">
                         <div class="form-group">
@@ -88,35 +135,40 @@
                 </div>
 
                 <div class="card">
-                    <h4>Display Settings</h4>
+                    <h4>Appearance & Themes</h4>
                     <form id="theme-settings-form">
                         <div class="form-group">
-                            <label for="theme-select">Theme</label>
+                            <label for="theme-select">Theme Preset</label>
                             <select id="theme-select">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                                <option value="midnight">Midnight</option>
-                                <option value="forest">Forest</option>
+                                <option value="system">System Default</option>
+                                <option value="black">Deep Black</option>
+                                <option value="white">Silk White</option>
+                                <option value="pink">Lotus Pink (Premium)</option>
+                                <option value="forest">Rainforest (Premium)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Accent Color</label>
-                            <div class="accent-options">
-                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
-                                <label><input type="radio" name="accent-color" value="red"> Red</label>
-                                <label><input type="radio" name="accent-color" value="green"> Green</label>
-                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
-                            </div>
+                        <div class="form-group" id="premium-hex-container">
+                            <label>Custom Hex Color (Premium)</label>
+                            <input type="color" id="custom-hex-color" value="#00ffcc" disabled title="Requires Premium">
                         </div>
                         <button type="submit" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
 
+                <div class="card" id="security-card">
+                    <h4>Security & 2FA</h4>
+                    <button class="btn btn-primary" id="change-password-btn">Send Password Reset Email</button>
+                    <p style="margin-top: 15px;">Enable Two-Factor Authentication</p>
+                    <button class="btn btn-secondary" id="enable-2fa-email-btn">Setup Email 2FA</button>
+                    <button class="btn btn-secondary" id="enable-2fa-sms-btn" style="margin-left: 10px;">Setup SMS 2FA</button>
+                    <div id="security-notification" class="notification"></div>
+                </div>
+
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
-                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
-                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                    <p>This action will soft-delete your account for 90 days. During this time, you can recover it by logging in and contacting support. After 90 days, all your data will be permanently removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Deactivate My Account</button>
                 </div>
             </section>
             
@@ -150,7 +202,7 @@
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
         import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
@@ -378,10 +430,21 @@
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
 
-            document.getElementById('theme-select').value = userData.theme || 'dark';
-            const currentAccent = userData.accentColor || 'blue';
-            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
-            if (accentRadio) accentRadio.checked = true;
+            document.getElementById('theme-select').value = userData.theme || 'system';
+            
+            const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+            const customHex = document.getElementById('custom-hex-color');
+            if (isPremium) {
+                customHex.disabled = false;
+                customHex.title = 'Select custom accent color';
+            } else {
+                customHex.disabled = true;
+                customHex.title = 'Requires Premium';
+            }
+            if (userData.accentColor && userData.accentColor.startsWith('#')) {
+                customHex.value = userData.accentColor;
+            }
+            // Ensure the UI matches the current user data state for accent radio buttons if they existed
         }
 
         function setupEventListeners(user) {
@@ -446,8 +509,21 @@
 
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const userData = cachedData ? JSON.parse(cachedData) : {};
+                
                 const theme = document.getElementById('theme-select').value;
-                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const customHex = document.getElementById('custom-hex-color').value;
+                
+                const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+                if (!isPremium && (theme === 'pink' || theme === 'forest')) {
+                    showNotification(document.getElementById('theme-notification'), 'Error: Lotus Pink and Rainforest themes require Premium.', 'error');
+                    return;
+                }
+
+                const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
+                
                 const notificationEl = document.getElementById('theme-notification');
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalText = submitBtn.innerText;
@@ -459,14 +535,11 @@
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
                     document.body.dataset.theme = theme;
-                    document.body.dataset.accent = accentColor;
+                    document.documentElement.style.setProperty('--accent-color', accentColor);
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
 
-                    const cacheKey = `profile_${user.uid}`;
-                    const cachedData = sessionStorage.getItem(cacheKey);
                     if (cachedData) {
-                        const userData = JSON.parse(cachedData);
                         userData.theme = theme;
                         userData.accentColor = accentColor;
                         sessionStorage.setItem(cacheKey, JSON.stringify(userData));
@@ -479,24 +552,91 @@
                 }
             });
 
+            document.getElementById('change-password-btn').addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Send Password Reset Email';
+                }
+            });
+
+            document.getElementById('enable-2fa-email-btn').addEventListener('click', () => {
+                alert('Email 2FA setup flow is currently under construction. Please check back later.');
+            });
+
+            document.getElementById('enable-2fa-sms-btn').addEventListener('click', () => {
+                alert('SMS 2FA setup flow is currently under construction. Note: standard SMS rates may apply.');
+            });
+
             document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
-                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                if (!confirm('WARNING: Your account will be soft-deleted and permanently removed after 90 days. Are you sure you want to deactivate?')) return;
                 const btn = e.currentTarget;
                 const originalText = btn.innerText;
                 btn.disabled = true;
-                btn.innerText = 'Deleting...';
+                btn.innerText = 'Deactivating...';
                 try {
                     const userId = user.uid;
-                    await deleteUser(user);
                     await deleteDoc(doc(db, "users", userId));
+                    await deleteUser(user);
                     alert('Your account has been permanently deleted.');
                     window.location.replace('index.html');
                 } catch (error) {
-                    alert('Error: Please sign out, sign back in, and try again.');
+                    alert('Error: Please try again or contact support.');
                     btn.disabled = false;
                     btn.innerText = originalText;
                 }
             });
+
+            // Security Settings
+            document.getElementById('change-password-btn')?.addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js");
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
+
+            const toggle2FA = document.getElementById('toggle-2fa');
+            if (toggle2FA) {
+                // Read from user doc if available
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                if (cachedData) {
+                    const userData = JSON.parse(cachedData);
+                    toggle2FA.checked = !!userData.twoFactorEnabled;
+                }
+                toggle2FA.addEventListener('change', async (e) => {
+                    const isEnabled = e.target.checked;
+                    try {
+                        await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
+                        showNotification(document.getElementById('security-notification'), `2FA ${isEnabled ? 'enabled' : 'disabled'} successfully.`, 'success');
+                        if (cachedData) {
+                            const userData = JSON.parse(cachedData);
+                            userData.twoFactorEnabled = isEnabled;
+                            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                        }
+                    } catch (error) {
+                        e.target.checked = !isEnabled; // Revert
+                        showNotification(document.getElementById('security-notification'), `Error updating 2FA: ${error.message}`, 'error');
+                    }
+                });
+            }
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
@@ -516,33 +656,10 @@
             };
         }
     </script>
-    <header class="main-header"></header>
-    <main style="padding: 120px 20px; min-height: 60vh; max-width: 800px; margin: 0 auto;">
-        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 30px; text-align: center;">My Account</h1>
-
-        <div id="account-dashboard">
-            <!-- Profile Section -->
-            <section class="profile-section" style="background: var(--bg-card); padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Profile Information</h2>
-                <div id="profile-details" style="display: flex; flex-direction: column; gap: 15px;">
-                    <p style="color: var(--text-secondary);">Loading profile...</p>
-                </div>
-            </section>
-
-            <!-- Order History Section -->
-            <section class="orders-section">
-                <h2 style="font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">Order History</h2>
-                <div id="orders-list" style="display: flex; flex-direction: column; gap: 20px;">
-                    <p style="color: var(--text-secondary);">Loading orders...</p>
-                </div>
-            </section>
-        </div>
-    </main>
-    <script type="module" src="/js/account.js"></script>
     <footer class="main-footer"></footer>
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1784516229';
-        import { loadFooter } from './js/footer.js?v=1784516229';
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();
     </script>
