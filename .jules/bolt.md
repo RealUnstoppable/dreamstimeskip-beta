@@ -1,6 +1,3 @@
-## 2024-04-29 - requestAnimationFrame State Management Bug
-**Learning:** When throttling events like `mousemove` with `requestAnimationFrame` using an `isTicking` flag and `latestEvent` state, ensure that the early return (e.g. `if (!latestEvent) return;`) also resets the `isTicking` flag (`isTicking = false;`). Otherwise, if the event state is cleared (like in a `mouseleave` handler) before the animation frame executes, the ticking state gets permanently locked, disabling the handler. It is also good practice to reset the ticking state in the `mouseleave` handler directly.
-**Action:** Always verify that early returns inside throttled or debounced callbacks properly clean up or reset tracking flags to avoid permanently locking the event listener state.
 
 ## 2024-05-01 - Concurrent API Calls
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
@@ -9,8 +6,28 @@
 ## 2024-05-15 - Optimizing Array.find in Loops
 **Learning:** Nested `Array.find()` calls inside loops (like `.map()` or `.reduce()`) over the same static array cause O(N^2) time complexity and create unnecessary performance bottlenecks, especially in list rendering and aggregations.
 **Action:** Always pre-compute a `Map` of objects keyed by their identifier (e.g., `new Map(items.map(i => [i.id, i]))`) and replace O(N) `.find()` lookups inside loops with O(1) `.get()` lookups on the Map.
-## 2026-05-06 - Optimize Array Filtering in harmonytunes.js
 
-**Learning:** Replacing O(M) `Array.includes()` with O(1) `Set.has()` inside an O(N) filter loop reduces overall complexity from O(N*M) to O(N+M). This is particularly impactful when both the source array and the filter list are large.
-
-**Action:** Optimized the favorite songs filtering in `js/harmonytunes.js` by converting the list of favorite IDs to a `Set`.
+## 2024-05-16 - Optimizing Array.includes in Filters
+**Learning:** Using `Array.includes` inside a `.filter()` loop results in O(N^2) time complexity. For user favorites intersecting with a library, this becomes slow as either the library or the favorites list grows. Converting the filter target array into a `Set` before the loop improves the check to O(1), making the entire operation O(N).
+**Action:** Always convert an array of primitives to a `Set` before checking membership in a loop.
+## 2024-05-23 - Batching DOM Inserts with DocumentFragment
+**Learning:** Appending elements directly to the DOM inside a loop (e.g., `container.appendChild(el)`) causes O(N) reflows and repaints, which is a significant performance anti-pattern during list rendering.
+**Action:** Always construct elements and append them to a `DocumentFragment` first, then append the entire fragment to the container outside the loop to minimize reflows to O(1).
+## 2024-05-24 - Throttling High-Frequency Media Events
+**Learning:** High-frequency media events like `timeupdate` on HTMLAudioElement fire several times a second and trigger expensive DOM updates and string formatting synchronously. This causes main-thread blocking and frame drops.
+**Action:** Always throttle high-frequency media events using `requestAnimationFrame` coupled with a state tracking flag (e.g., `isUpdatingProgress`) to decouple rapid event firing from expensive DOM updates.
+## 2024-05-27 - Caching Shared Profile Data with sessionStorage
+**Learning:** Multiple components (like the navbar, theme-loader, and account page) were independently executing redundant `getDoc` calls to fetch the same user profile data from Firestore upon authentication. This caused latency and unnecessary backend reads.
+**Action:** Always cache frequently accessed user profile data in `sessionStorage` using a unified key format like `profile_${user.uid}`. UI-bound components should verify this cache before querying the database, which minimizes load times and optimizes read operations.
+## 2024-11-20 - Concurrent Promise Failures
+**Learning:** When fetching independent Firestore collections concurrently with `Promise.all()`, a single rejection (e.g., due to missing permissions for feature requests) will reject the entire Promise array, breaking the UI.
+**Action:** Always attach individual `.catch(e => null)` handlers to each Promise within the array to ensure safe fallbacks and preserve error-handling behavior.
+## 2024-11-20 - Optimizing Regex Compilation in Loops
+**Learning:** Instantiating `new RegExp()` inside a loop over hundreds of DOM nodes causes severe performance degradation and GC thrashing during fast inputs. Unconditional assignments to `.innerHTML` and `.style.display` also trigger unnecessary style recalculations.
+**Action:** Always extract regex compilation outside the loop, and wrap DOM assignments in conditional checks (e.g., `if (el.innerHTML !== newHTML)`) to minimize expensive repaints.
+## 2025-02-23 - Optimizing Firestore Aggregations
+**Learning:** Fetching and iterating over an entire collection manually (e.g., using `getDocs()` or `.get()` and `forEach`) to calculate a count or average rating causes O(N) read costs and can lead to N+1 query performance bottlenecks.
+**Action:** Always use Firestore's built-in server-side aggregations (`aggregate({ count: AggregateField.count(), average: AggregateField.average('field') })`) to compute counts and averages efficiently without excessive document reads.
+## 2024-11-20 - N+1 Query in Product Ratings Update
+**Learning:** Wrapping individual N queries (e.g., getting average ratings per product) in `Promise.all` only makes them concurrent; it still executes N separate network requests against Firestore which is inefficient. Furthermore, retrieving the entire `reviews` collection to aggregate clientside is a massive memory/bandwidth regression. The correct approach is a single query to a dedicated pre-computed aggregation collection (e.g. `product_stats`) or chunked `in` queries.
+**Action:** When asked to solve an N+1 query issue, verify if an aggregation collection exists (like `product_stats`) and use it to execute a single batch query, then cache the result locally for synchronous UI updates.

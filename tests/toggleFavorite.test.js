@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { updateDoc, setDoc, arrayUnion, arrayRemove, doc } from './__mocks__/firebase-firestore.js';
+import { updateDoc, setDoc, arrayUnion, arrayRemove, doc } from '../__mocks__/firebase-firestore.js';
 
 document.body.innerHTML = `
     <div class="nav-pill" id="nav-home"></div>
@@ -35,7 +35,7 @@ document.body.innerHTML = `
 
 window.alert = jest.fn();
 
-import '../js/harmonytunes.js';
+await import('../js/harmonytunes.js');
 
 describe('toggleFavorite unit tests', () => {
     beforeAll(() => {
