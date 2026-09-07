@@ -9,6 +9,28 @@ admin.initializeApp();
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
+
+async function authenticateRequest(req, res, adminInstance) {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return null;
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+
+  const token = authHeader.split("Bearer ")[1];
+  try {
+    return await adminInstance.auth().verifyIdToken(token);
+  } catch (err) {
+    console.error("Auth Error:", err);
+    res.status(401).send("Unauthorized");
+    return null;
+  }
+}
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
@@ -40,9 +62,8 @@ async function authenticateRequest(req, res) {
 // 🛡️ Admin Action Proxy
 exports.adminAction = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
 
     const decodedToken = await authenticateRequest(req, res);
     if (!decodedToken) return;
