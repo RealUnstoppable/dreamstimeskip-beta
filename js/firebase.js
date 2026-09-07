@@ -2,7 +2,6 @@
 import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 import { getVertexAI } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 // Your web app's Firebase configuration
@@ -18,12 +17,6 @@ const firebaseConfig = {
 
 // Initialize Firebase safely to avoid duplicate app errors
 export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-// Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
-// export const appCheck = initializeAppCheck(app, {
-//   provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
-//   isTokenAutoRefreshEnabled: true
-// });
 
 // Initialize Auth
 export const auth = getAuth(app);
