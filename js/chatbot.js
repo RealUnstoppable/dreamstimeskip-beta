@@ -1,6 +1,6 @@
 // js/chatbot.js
-import { ai } from './firebase.js';
-import { getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { app } from './firebase.js';
+import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 
 // System instructions dictate the persona and rules
 const systemInstruction = `
@@ -37,6 +37,7 @@ Formatting & Restrictions:
 `;
 
 let chatSession = null;
+const ai = getVertexAI(app);
 try {
     // Initialize Gemini 2.5 Flash
     const model = getGenerativeModel(ai, {

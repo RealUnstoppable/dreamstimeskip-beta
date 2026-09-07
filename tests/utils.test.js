@@ -1,31 +1,37 @@
-import { escapeHTML } from '../js/utils.js';
+import { formatDate } from '../js/utils.js';
 
-describe('escapeHTML', () => {
-    it('escapes special characters', () => {
-        expect(escapeHTML('&')).toBe('&amp;');
-        expect(escapeHTML('<')).toBe('&lt;');
-        expect(escapeHTML('>')).toBe('&gt;');
-        expect(escapeHTML('"')).toBe('&quot;');
-        expect(escapeHTML("'")).toBe('&#039;');
+describe('formatDate', () => {
+    it('returns "N/A" if timestamp is falsy', () => {
+        expect(formatDate(null)).toBe('N/A');
+        expect(formatDate(undefined)).toBe('N/A');
+        expect(formatDate('')).toBe('N/A');
     });
 
-    it('escapes combinations of special characters', () => {
-        expect(escapeHTML('<script>alert("XSS & \'hack\'")</script>'))
-            .toBe('&lt;script&gt;alert(&quot;XSS &amp; &#039;hack&#039;&quot;)&lt;/script&gt;');
+    it('formats a standard date correctly', () => {
+        // Use a fixed date to avoid timezone/locale flakiness, or check if toLocaleDateString is used
+        const date = new Date('2023-10-15T12:00:00Z');
+        const formatted = formatDate(date);
+
+        expect(formatted).toContain(date.toLocaleDateString());
+        expect(formatted).toContain(date.toLocaleTimeString());
+        expect(formatted).toBe(date.toLocaleDateString() + ' ' + date.toLocaleTimeString());
     });
 
-    it('returns empty string for null or undefined', () => {
-        expect(escapeHTML(null)).toBe('');
-        expect(escapeHTML(undefined)).toBe('');
+    it('formats a standard timestamp (number) correctly', () => {
+        const timestamp = new Date('2023-10-15T12:00:00Z').getTime();
+        const formatted = formatDate(timestamp);
+        const date = new Date(timestamp);
+
+        expect(formatted).toBe(date.toLocaleDateString() + ' ' + date.toLocaleTimeString());
     });
 
-    it('converts non-string inputs to strings and escapes them', () => {
-        expect(escapeHTML(123)).toBe('123');
-        expect(escapeHTML(true)).toBe('true');
-        expect(escapeHTML({})).toBe('[object Object]');
-    });
+    it('formats a firestore-like Timestamp correctly (has toDate method)', () => {
+        const mockDate = new Date('2023-10-15T12:00:00Z');
+        const mockTimestamp = {
+            toDate: () => mockDate
+        };
 
-    it('returns the same string if there are no special characters', () => {
-        expect(escapeHTML('hello world')).toBe('hello world');
+        const formatted = formatDate(mockTimestamp);
+        expect(formatted).toBe(mockDate.toLocaleDateString() + ' ' + mockDate.toLocaleTimeString());
     });
 });
