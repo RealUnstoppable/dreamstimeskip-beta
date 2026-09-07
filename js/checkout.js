@@ -25,13 +25,33 @@ function renderCheckoutPage() {
         return;
     }
 
-    const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
-        // ⚡ Bolt: O(1) lookup replaces O(N) products.find() to speed up subtotal calculation
-        const product = productMap.get(productId);
-        return sum + (product.price * quantity);
-    }, 0);
-    const tax = subtotal * 0.07; // 7% tax
-    const total = subtotal + tax;
+    let discount = 0;
+    let appliedPromo = '';
+
+    const renderSummary = () => {
+        const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
+            const product = productMap.get(productId);
+            return sum + (product.price * quantity);
+        }, 0);
+        
+        const discountAmount = subtotal * discount;
+        const discountedSubtotal = subtotal - discountAmount;
+        const tax = discountedSubtotal * 0.07;
+        const total = discountedSubtotal + tax;
+
+        return { subtotal, discountAmount, discountedSubtotal, tax, total };
+    };
+
+    const updateSummaryUI = () => {
+        const { subtotal, discountAmount, discountedSubtotal, tax, total } = renderSummary();
+        document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('summary-discount').textContent = `-$${discountAmount.toFixed(2)}`;
+        document.getElementById('summary-discount-row').style.display = discount > 0 ? 'flex' : 'none';
+        document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
+        document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+    };
+
+    const { subtotal, discountAmount, tax, total } = renderSummary();
 
     checkoutContainer.innerHTML = `
         <h1>Checkout</h1>
@@ -48,33 +68,64 @@ function renderCheckoutPage() {
                             <label for="address">Address</label>
                             <input type="text" id="address" required>
                         </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <input type="text" id="city" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="zip">ZIP Code</label>
-                            <input type="text" id="zip" required>
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <input type="text" id="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">ZIP Code</label>
+                                <input type="text" id="zip" required>
+                            </div>
                         </div>
                     </section>
-                    <section>
-                   <div style="background: rgba(255, 255, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba;">
-    <p style="margin: 0; color: #ffca2c; font-size: 0.9rem;"><strong>BETA NOTICE:</strong> No payment is required today. This is a reservation system. We will contact you via email for payment when the item ships.</p>
-</div>
-<button type="submit" class="cta-button place-order-button" id="place-order-btn">Reserve Order (Pay Later)</button>
+                    
+                    <section style="margin-top: 30px;">
+                        <h3>Payment Information (Stripe Test)</h3>
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" placeholder="4242 4242 4242 4242" required>
+                        </div>
+                        <div class="form-group-inline">
+                            <div class="form-group">
+                                <label for="card-expiry">Expiry (MM/YY)</label>
+                                <input type="text" id="card-expiry" placeholder="12/26" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="card-cvc">CVC</label>
+                                <input type="text" id="card-cvc" placeholder="123" required>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div style="background: rgba(255, 255, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; margin-top: 20px;">
+                        <p style="margin: 0; color: #ffca2c; font-size: 0.9rem;"><strong>TEST MODE:</strong> Use the test card number 4242 4242 4242 4242 to simulate a successful payment.</p>
+                    </div>
+                    <button type="submit" class="cta-button place-order-button" id="place-order-btn">Pay Now</button>
+                    <div id="checkout-message"></div>
                 </form>
             </div>
             <div class="checkout-summary-container">
                 <h3>Order Summary</h3>
                 <div id="summary-items">
                     ${Object.entries(userCart).map(([productId, quantity]) => {
-        // ⚡ Bolt: O(1) lookup replaces O(N) products.find() to speed up rendering
-        const product = productMap.get(productId);
-        return `<div class="summary-item"><span>${quantity}x ${product.name}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
-    }).join('')}
+                        const product = productMap.get(productId);
+                        return `<div class="summary-item"><span>${quantity}x ${product.name}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
+                    }).join('')}
                 </div>
+                
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="promo-code" style="font-size: 0.9rem;">Promo Code</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="promo-code" placeholder="e.g. DTS10" style="flex: 1; padding: 8px;">
+                        <button type="button" id="apply-promo-btn" style="padding: 8px 15px; background: var(--text-secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Apply</button>
+                    </div>
+                    <small id="promo-message" style="display: block; margin-top: 5px;"></small>
+                </div>
+
                 <div class="summary-calculation">
                     <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
+                    <div class="summary-item" id="summary-discount-row" style="display: none; color: var(--accent-green);"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
                     <div class="summary-item"><span>Tax</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
                     <div class="summary-total"><span>Total</span> <span id="summary-total">$${total.toFixed(2)}</span></div>
                 </div>
@@ -82,30 +133,43 @@ function renderCheckoutPage() {
         </div>
     `;
 
+    document.getElementById('apply-promo-btn').addEventListener('click', () => {
+        const code = document.getElementById('promo-code').value.trim().toUpperCase();
+        const msgEl = document.getElementById('promo-message');
+        if (code === 'DTS10') {
+            discount = 0.10;
+            appliedPromo = 'DTS10';
+            msgEl.textContent = '10% discount applied!';
+            msgEl.style.color = 'var(--accent-green)';
+            updateSummaryUI();
+        } else {
+            discount = 0;
+            appliedPromo = '';
+            msgEl.textContent = 'Invalid promo code.';
+            msgEl.style.color = 'var(--accent-red)';
+            updateSummaryUI();
+        }
+    });
+
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
     try {
         await runTransaction(db, async (transaction) => {
-            // 1. Concurrent Reads: Fetch all product stats to avoid N+1 sequential queries
             const productIds = Object.keys(cart);
             const statRefs = productIds.map(id => doc(db, 'product_stats', id));
             const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
 
-            // Prepare a map of current stats for the writes phase
             const currentStats = {};
             statDocs.forEach((statDoc, index) => {
                 const productId = productIds[index];
                 currentStats[productId] = statDoc;
             });
 
-            // 2. Writes
-            // 2a. Create the order document
             const newOrderRef = doc(db, 'orders', `${uid}_${Date.now()}`);
             transaction.set(newOrderRef, orderDetails);
 
-            // 2b. Update product order counts based on the concurrently fetched reads
             for (const [productId, quantity] of Object.entries(cart)) {
                 const productStatRef = doc(db, 'product_stats', productId);
                 const statDoc = currentStats[productId];
@@ -118,7 +182,6 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
                 }
             }
 
-            // 2c. Clear the user's cart
             const userCartRef = doc(db, 'carts', uid);
             transaction.update(userCartRef, { items: {} });
         });
@@ -132,36 +195,43 @@ export async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
     const messageEl = document.getElementById('checkout-message');
+    
+    // Stripe Test Logic
+    const cardNumber = document.getElementById('card-number').value.replace(/\s+/g, '');
+    if (!cardNumber.startsWith('4242')) {
+        messageEl.textContent = 'Payment Failed: Invalid test card. Use 4242...';
+        messageEl.style.color = 'var(--accent-red)';
+        return;
+    }
+
     placeOrderBtn.disabled = true;
-    placeOrderBtn.textContent = 'Processing...';
+    placeOrderBtn.textContent = 'Processing Payment...';
 
     const orderDetails = {
         userId: currentUser.uid,
         items: userCart,
         orderDate: serverTimestamp(),
-        status: 'Processing',
+        status: 'Paid',
         shippingInfo: {
             name: document.getElementById('name').value,
             address: document.getElementById('address').value,
             city: document.getElementById('city').value,
             zip: document.getElementById('zip').value,
-        }
+        },
+        paymentStatus: 'Test Payment Successful'
     };
 
     try {
-        // New Feature: Use a transaction to ensure atomicity
         await processOrderTransaction(currentUser.uid, userCart, orderDetails);
-
-        messageEl.textContent = 'Order placed successfully! Redirecting...';
+        messageEl.textContent = 'Payment successful! Order placed. Redirecting...';
         messageEl.style.color = 'var(--accent-green)';
         setTimeout(() => safeRedirect('./account.html'), 3000);
-
     } catch (error) {
         console.error("Error placing order - Manager info:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;
-        placeOrderBtn.textContent = 'Place Order';
+        placeOrderBtn.textContent = 'Pay Now';
     }
 }
 
