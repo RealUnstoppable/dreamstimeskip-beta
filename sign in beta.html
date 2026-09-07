@@ -9,20 +9,23 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
     <style>
-        body {font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;}
-        .container {max-width: 400px; width: 100%; padding: 20px;}
-        .form-container {background-color: var(--primary-card-color); padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: center;}
+        body {font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); display: flex; flex-direction: column; min-height: 100vh; margin: 0;}
+        .container {max-width: 400px; width: 100%; padding: 20px; flex: 1; display: flex; align-items: center; justify-content: center; margin: 0 auto;}
+        .form-container {width: 100%; background-color: var(--primary-card-color); padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: center;}
         h1 {margin-bottom: 25px; color: #fff; font-weight: 600;}
         .input-group {margin-bottom: 20px; text-align: left;}
         label {display: block; margin-bottom: 8px; color: #a0a0a0; font-size: 14px;}
         input {width: 100%; padding: 12px; border: 1px solid #333; background-color: #2c2c2c; color: #e0e0e0; border-radius: 5px; box-sizing: border-box; font-size: 16px;}
         button {width: 100%; padding: 12px; border: none; background-color: var(--accent-color); color: #fff; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
         button:hover {background-color: #0056b3;}
+        button:disabled {background-color: #555; cursor: not-allowed;}
         .toggle-link {margin-top: 20px; color: var(--accent-color); cursor: pointer; font-size: 14px;}
         #message {margin-top: 15px; color: #ff4d4d; font-size: 14px; height: 20px;}
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
+
     <div class="container">
         <div class="form-container" id="form-container">
             <h1 id="form-title">Sign In</h1>
@@ -47,8 +50,8 @@
     </div>
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         onAuthStateChanged(auth, async (user) => {
             if (user && !sessionStorage.getItem('newUser')) {
@@ -63,5 +66,14 @@
         });
     </script>
 
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
 </body>
 </html>
