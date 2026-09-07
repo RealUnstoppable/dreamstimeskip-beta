@@ -376,25 +376,7 @@
 </head>
 <body>
 
-    <header class="main-header">
-        <nav class="navbar">
-            <a href="index.html" class="nav-logo">un<span></span></a>
-            <ul class="nav-links">
-                <li><a href="index.html#bento">Overview</a></li>
-                <li><a href="index.html#unstoppable">Unstoppable</a></li>
-                <li><a href="#dts">Dreams TimeSkip</a></li>
-                <li><a href="index.html#harmony">HarmonyTunes</a></li>
-                <li><a href="shop.html">Shop</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Open menu">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
-    </header>
+    <header class="main-header"></header>
 
     <main>
         <section class="video-hero-container">
@@ -410,7 +392,7 @@
                     </div>
                 <div class="hero-buttons">
                     <a href="https://discord.gg/aYuEdG9Gh7" class="btn btn-primary">Join the Discord</a>
-                    <a href="#" class="btn btn-secondary">Join the Realms</a>
+                    <a href="https://discord.gg/aYuEdG9Gh7" class="btn btn-secondary">Join the Realms</a>
                 </div>
             </div>
         </section>
@@ -418,19 +400,19 @@
         <section class="info-section">
             <div class="info-grid">
                 <div class="info-card">
-                    <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Trailer thumbnail" class="card-image">
+                    <img src="https://i.ytimg.com/vi/-MfSBwzapaU/maxresdefault.jpg" alt="Trailer thumbnail" class="card-image" loading="lazy">
                     <div class="card-content">
                         <h3>Watch The Trailer</h3>
                         <p>Get a glimpse of what's to come. The official trailer showcases the new world, features, and the adventure that awaits.</p>
-                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="card-cta">Watch Now</a>
+                        <a href="https://www.youtube.com/watch?v=-MfSBwzapaU" class="card-cta">Watch Now</a>
                     </div>
                 </div>
                 <div class="info-card">
-                    <img src="https://placehold.co/600x400/0a0a0a/f5f5f7?text=Coming+Soon" alt="New features placeholder" class="card-image">
+                    <img src="https://placehold.co/600x400/0a0a0a/f5f5f7?text=Coming+Soon" alt="New features placeholder" class="card-image" loading="lazy">
                     <div class="card-content">
                         <h3>Everything New</h3>
                         <p>From custom biomes to revamped quests and new bosses, discover all the updates that make this the ultimate OG experience.</p>
-                        <a href="#" class="card-cta">Learn More</a>
+                        <a href="#features" class="card-cta">Learn More</a>
                     </div>
                 </div>
             </div>
@@ -470,31 +452,22 @@
 
 <footer class="main-footer"></footer> 
 
-    <div id="siri-orb">
-        <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
+    <div class="siri-orb-wrapper">
+        <div id="siri-orb">
+            <a href="https://www.realunstoppable.store/" class="orb-text">Return Home?</a>
+        </div>
     </div>
 
    <script type="module">
-        import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js'; // Add this line
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722'; // Add this line
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadNavbar();
-            loadFooter(); // Add this line
-        });
+        loadNavbar();
+        loadFooter();
     </script>
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Mobile Menu Toggle ---
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        if (hamburger && navLinks) {
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
-            });
-        }
         
         // --- Countdown Timer Class ---
         class Countdown {

@@ -1,12 +1,25 @@
-const express = require("express");
-const cors = require("cors");
-const Stripe = require("stripe");
+import express from "express";
+import cors from "cors";
+import Stripe from "stripe";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const stripe = Stripe(""); // 🔴 replace
+// Serve static files from the root directory to fix absolute paths in HTML files
+app.use(express.static(__dirname));
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error("CRITICAL: STRIPE_SECRET_KEY environment variable is missing.");
+  process.exit(1);
+}
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const stripe = new Stripe(stripeSecretKey);
 
 app.post("/create-checkout-session", async (req, res) => {
   const { plan } = req.body;
@@ -36,4 +49,4 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000);

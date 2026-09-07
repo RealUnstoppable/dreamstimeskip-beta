@@ -1,7 +1,9 @@
 // js/footer.js
 
 // Automatically initialize the newsletter logic on any page that loads this footer
-import './newsletter.js';
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+    import('./newsletter.js');
+}
 
 export function loadFooter() {
     const footerHTML = `
@@ -14,6 +16,13 @@ export function loadFooter() {
                         <li><a href="unstoppable.html">Unstoppable</a></li>
                         <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
                         <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+                    </ul>
+                    <h5 style="margin-top: 15px;">Betas</h5>
+                    <ul>
+                        <li><a href="blobgame.html">Squishly</a></li>
+                        <li><a href="tracker.html">ezManage beta</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">App Download (Soon)</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">beta.realunstoppable.store</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -29,8 +38,8 @@ export function loadFooter() {
                     <h5>Company</h5>
                     <ul>
                         <li><a href="tracker.html">About Us</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Shop</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="shop.html">Shop</a></li>
                         <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
                     </ul>
                 </div>
@@ -38,7 +47,7 @@ export function loadFooter() {
                     <h5>Stay in the Loop</h5>
                     <p>Sign up for news, announcements, and exclusive beta access.</p>
                     <form class="signup-form">
-                        <input type="email" placeholder="your.email@example.com" required>
+                        <input type="email" placeholder="your.email@example.com" required aria-label="Email for newsletter">
                         <button type="submit">Sign Up</button>
                     </form>
                 </div>
