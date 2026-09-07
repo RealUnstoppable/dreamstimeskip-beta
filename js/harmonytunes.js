@@ -458,11 +458,44 @@ function initHarmonyTunes() {
         });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokEmbeds.map(embed => `
-            <div class="tiktok-card">
-                ${embed}
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
         
         // Dynamically load TikTok script to render the embeds properly
         const tiktokScript = document.createElement('script');
@@ -1060,7 +1093,7 @@ function initHarmonyTunes() {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1135,7 +1168,7 @@ function initHarmonyTunes() {
         }
         lyricsContent.innerHTML = data.map((line, lineIndex) => {
             const wordsHtml = line.words.map((word, wordIndex) => {
-                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+                return `<span class="lyric-word" data-start="${escapeHTML(word.start)}">${escapeHTML(word.text)}</span>`;
             }).join(' ');
             const trendingClass = line.trending ? ' trending-lyric' : '';
             
@@ -1144,7 +1177,7 @@ function initHarmonyTunes() {
                 badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
-            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
         }).join('');
         
         // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
@@ -2041,7 +2074,6 @@ let dragItem = null;
             // Pick a random compatible song
             const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
             currentQueue.push(nextSuggested);
-            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song
