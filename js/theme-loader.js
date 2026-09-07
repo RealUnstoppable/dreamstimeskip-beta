@@ -1,13 +1,14 @@
 // js/theme-loader.js
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
 (function() {
     const localTheme = localStorage.getItem('userTheme');
     const localAccent = localStorage.getItem('userAccent');
     if (localTheme) document.body.dataset.theme = localTheme;
     if (localAccent) document.body.dataset.accent = localAccent;
 })();
-import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 const applyTheme = (theme, accentColor) => {
     document.body.dataset.theme = theme || 'dark';
@@ -42,7 +43,7 @@ onAuthStateChanged(auth, async (user) => {
                 }
             }
         } catch (error) {
-            console.error("Error loading theme from Firestore:", error);
+            console.error("Error loading theme from Firestore - Manager info:", error.message);
             applyTheme('dark', 'blue');
         }
     } else {

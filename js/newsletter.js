@@ -3,10 +3,9 @@ import { db } from './auth.js';
 const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
 const firestore = isTest
     ? await import('../tests/__mocks__/firebase-firestore.js')
-    : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
+    : await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js");
 
 const { doc, setDoc, serverTimestamp } = firestore;
-import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Use event delegation to catch submissions from dynamically loaded footers
 document.addEventListener('submit', async (e) => {
@@ -16,16 +15,19 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
+        const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
         const email = emailInput.value.trim();
+        let originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : 'Subscribe';
 
-                    // Show a success message
-                    alert("You've successfully subscribed to the newsletter!");
-                    emailInput.value = ''; // Clear the input
-                } catch (error) {
-                    console.error("Error submitting email:", error);
-                    alert("There was an error subscribing. Please try again later.");
-                }
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            if (submitBtn.tagName === 'INPUT') {
+                submitBtn.value = 'Processing...';
+            } else {
+                submitBtn.textContent = 'Processing...';
             }
+        }
+
         try {
             // Save to Firestore
             await setDoc(doc(db, "newsletter_subscribers", email), {
@@ -36,8 +38,13 @@ document.addEventListener('submit', async (e) => {
             alert("You've successfully subscribed to the newsletter!");
             emailInput.value = ''; // Clear the input
         } catch (error) {
-            console.error("Error submitting email:", error);
+            console.error("Error submitting email - Manager info: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
+        } finally {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
         }
     }
 });
