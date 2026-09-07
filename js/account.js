@@ -18,20 +18,21 @@ async function renderProfile(user) {
         const userRef = doc(db, 'users', user.uid);
         let userDoc = await getDoc(userRef);
 
+        let userData;
         if (!userDoc.exists()) {
             // Graceful instantiation if user doc is missing
-            await setDoc(userRef, {
+            userData = {
                 email: user.email,
                 username: user.email.split('@')[0],
                 membershipLevel: 'free',
                 isAdmin: false,
                 isBanned: false,
                 signupDate: new Date()
-            }, { merge: true });
-            userDoc = await getDoc(userRef);
+            };
+            await setDoc(userRef, userData, { merge: true });
+        } else {
+            userData = userDoc.data();
         }
-
-        const userData = userDoc.data();
 
         profileDetails.innerHTML = `
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">

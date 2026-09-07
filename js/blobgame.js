@@ -392,6 +392,8 @@ function spawnExplosion(x, y, size) {
     const numParticles = Math.floor(baseParticles * multiplier);
     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     for (let i = 0; i < numParticles; i++) {
         const particle = document.createElement('div');
         particle.classList.add('game-particle');
@@ -418,9 +420,10 @@ function spawnExplosion(x, y, size) {
         const duration = 0.8 + Math.random() * 0.5;
         particle.style.animationDuration = `${duration}s`;
         
-        gameContainer.appendChild(particle);
+        fragment.appendChild(particle);
         setTimeout(() => particle.remove(), duration * 1000);
     }
+    gameContainer.appendChild(fragment);
 }
 
 // --- Leaderboard UI ---
@@ -434,6 +437,8 @@ async function loadLeaderboard() {
     const scores = await getTopScores();
     loadingEl.style.display = 'none';
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     scores.forEach((entry, i) => {
         const li = document.createElement('li');
         
@@ -452,8 +457,9 @@ async function loadLeaderboard() {
         li.appendChild(rank);
         li.appendChild(name);
         li.appendChild(scoreVal);
-        listEl.appendChild(li);
+        fragment.appendChild(li);
     });
+    listEl.appendChild(fragment);
 }
 
 // Init
