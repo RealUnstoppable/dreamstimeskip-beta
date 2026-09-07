@@ -1,0 +1,4 @@
+💡 **What**: Added descriptive `aria-label` attributes to implicitly labeled form inputs across several main HTML files, including the global search bar, checkout promo code inputs, and various setup/tracker configuration fields.
+🎯 **Why**: The UI heavily utilizes placeholder text in place of explicit `<label>` tags for a cleaner aesthetic. While visually clear, this left screen readers with no context for what these inputs were for, making the experience confusing for visually impaired users.
+📸 **Before/After**: No visual changes to the UI. Structural HTML updates only.
+♿ **Accessibility**: Improves WCAG compliance by ensuring assistive technologies correctly announce the purpose of critical input fields like `#global-search`, `#promo-code`, and custom tracker presets.

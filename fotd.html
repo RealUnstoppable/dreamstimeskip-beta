@@ -30,13 +30,9 @@
         body { font-family: 'Inter', sans-serif; background-color: var(--background-color); color: var(--text-color); display: flex; flex-direction: column; }
         main { flex: 1 0 auto; padding-top: var(--header-height); }
 
-        #siri-orb { position: fixed; bottom: 30px; left: 50%; width: 60px; height: 60px; background: radial-gradient(circle, #6e45e2, #88d3ce); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; z-index: 1000; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: 0 0 20px rgba(110, 69, 226, 0.6); animation: pulse 2.5s infinite; }
-        @keyframes pulse {
-            0% { transform: translateX(-50%) scale(0.95); box-shadow: 0 0 0 0 rgba(110, 69, 226, 0.7); }
-            70% { transform: translateX(-50%) scale(1); box-shadow: 0 0 0 12px rgba(110, 69, 226, 0); }
-            100% { transform: translateX(-50%) scale(0.95); box-shadow: 0 0 0 0 rgba(110, 69, 226, 0); }
-        }
-        #siri-orb.expanded { width: 220px; border-radius: 50px; background: #000; animation: none; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); transform: translateX(-50%); }
+        .siri-orb-wrapper { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+        #siri-orb { width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
+        #siri-orb.expanded { width: 220px; border-radius: 50px !important; background: #000; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
         .orb-text { color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 1rem; text-decoration: none; opacity: 0; transition: opacity 0.3s ease 0.4s; white-space: nowrap; transform: translateY(20px); }
         #siri-orb.expanded .orb-text { opacity: 1; transform: translateY(0); }
 
@@ -129,12 +125,7 @@
 </head>
 <body>
 
-    <header class="main-header">
-        <nav class="navbar">
-           
-            <button class="hamburger" aria-label="Open menu"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-        </nav>
-    </header>
+    <header class="main-header"></header>
 
     <main>
         <section class="fotd-section">
@@ -163,18 +154,18 @@
 
    <footer class="main-footer"></footer> 
 
-    <div id="siri-orb">
-        <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
+    <div class="siri-orb-wrapper">
+        <div id="siri-orb">
+            <a href="https://www.realunstoppable.store/" class="orb-text">Return Home?</a>
+        </div>
     </div>
 
    <script type="module">
-        import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js'; // Add this line
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722'; // Add this line
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadNavbar();
-            loadFooter(); // Add this line
-        });
+        loadNavbar();
+        loadFooter();
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -303,6 +294,7 @@
 
             // --- 5. Component Generation ---
             const generateHorizontalScroller = () => {
+                const fragment = document.createDocumentFragment();
                 for (let i = 0; i < 90; i++) {
                     const date = new Date();
                     date.setDate(today.getDate() - i);
@@ -316,8 +308,9 @@
                     const month = date.toLocaleString('en-US', { month: 'short' });
                     const dayNum = date.getDate();
                     square.innerHTML = `<span>${month}</span><span>${dayNum}</span>`;
-                    dateScroller.appendChild(square);
+                    fragment.appendChild(square);
                 }
+                dateScroller.appendChild(fragment);
             };
             
             const generateFullCalendar = () => {
@@ -335,10 +328,14 @@
                     `;
                     const daysGrid = monthContainer.querySelector('.days-grid');
                     const firstDayOfMonth = new Date(year, month, 1).getDay();
+                    let emptyDaysHtml = '';
                     for (let i = 0; i < firstDayOfMonth; i++) {
-                        daysGrid.innerHTML += '<div class="calendar-day empty"></div>';
+                        emptyDaysHtml += '<div class="calendar-day empty"></div>';
                     }
+                    daysGrid.insertAdjacentHTML('beforeend', emptyDaysHtml);
+
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const fragment = document.createDocumentFragment();
                     for (let day = 1; day <= daysInMonth; day++) {
                         const dayDate = new Date(year, month, day);
                         if (dayDate > today) break;
@@ -352,8 +349,9 @@
                         } else {
                             dayCell.classList.add('past-day');
                         }
-                        daysGrid.appendChild(dayCell);
+                        fragment.appendChild(dayCell);
                     }
+                    daysGrid.appendChild(fragment);
                     calendarGridContainer.appendChild(monthContainer);
                     currentDate.setMonth(currentDate.getMonth() + 1);
                 }
@@ -399,17 +397,7 @@
                 document.querySelector('.hamburger').classList.toggle('active');
                 document.querySelector('.nav-links').classList.toggle('active');
             });
-            const siriOrb = document.getElementById('siri-orb');
-            let inactivityTimeout;
-            siriOrb.addEventListener('click', (event) => {
-                if (event.target.tagName === 'A') return;
-                siriOrb.classList.toggle('expanded');
-                if (siriOrb.classList.contains('expanded')) {
-                    clearTimeout(inactivityTimeout);
-                    inactivityTimeout = setTimeout(() => siriOrb.classList.remove('expanded'), 5000);
-                }
-            });
-            
+
             // --- 7. INITIALIZE PAGE ---
             const initializePage = () => {
                 generateHorizontalScroller();
@@ -421,7 +409,7 @@
    ...
     <script type="module">
       import { auth, db } from '/js/auth.js';
-      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+      import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
       onAuthStateChanged(auth, (user) => {
         if (user) {
           // User is signed in

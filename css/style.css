@@ -1,5 +1,5 @@
-/* css/style.css */
-/* --- CSS VARIABLES & GLOBAL STYLES --- */
+
+
 :root {
     --bg-color: #0A0A0A;
     --primary-card-color: #141414;
@@ -12,11 +12,11 @@
     --accent-green: #16A34A;
     --font-main: 'Inter', sans-serif;
 
-    /* Default Accent Color */
+
     --accent-color: var(--accent-blue);
 }
 
-/* --- THEME ACCENT COLORS --- */
+
 [data-accent="blue"] {
     --accent-color: var(--accent-blue);
 }
@@ -55,7 +55,7 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- HEADER / NAVIGATION --- */
+
 .main-header {
     position: fixed;
     top: 0;
@@ -130,9 +130,28 @@ body {
 
 .hamburger {
     display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 2rem;
+    height: 2rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
 }
 
-/* --- HERO SECTION & 3D ORB --- */
+.hamburger .bar {
+    width: 2rem;
+    height: 0.25rem;
+    background-color: var(--text-primary);
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    transform-origin: 1px;
+}
+
+
 .hero {
     display: flex;
     justify-content: center;
@@ -176,41 +195,63 @@ body {
     width: 200px;
     height: 200px;
     background:
-        radial-gradient(circle at 20% 20%, #9333EA, transparent 40%),
-        radial-gradient(circle at 80% 70%, #2563EB, transparent 40%),
-        radial-gradient(circle at 50% 50%, #0A0A0A 30%, transparent 60%);
-    border-radius: 50%;
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%),
+        linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%);
+    background-size: 200% 200%;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     margin: -80px auto 40px;
-    animation: rotate-orb 20s infinite linear;
+    animation: blob-shape 12s ease-in-out infinite, color-cycle 15s ease-in-out infinite;
     position: relative;
+    /* Soft edges via inset shadows instead of a uniform filter blur */
+    box-shadow: inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4);
+    cursor: pointer;
 }
 
 .orb::before {
     content: '';
     position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    background: conic-gradient(from 90deg at 50% 50%, #FFFFFF00 0%, #FFFFFF33 50%, #FFFFFF00 100%);
-    animation: rotate-highlight 5s infinite linear;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 130%;
+    height: 130%;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--glow-angle),
+        rgba(255, 0, 127, 0.5), 
+        rgba(127, 0, 255, 0.1), 
+        rgba(0, 127, 255, 0.5), 
+        rgba(0, 255, 127, 0.1), 
+        rgba(255, 127, 0, 0.5), 
+        rgba(255, 0, 127, 0.5)
+    );
+    filter: blur(25px);
+    z-index: -1;
+    opacity: var(--charge-opacity, 0);
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    animation: spinGlowAngle 3s linear infinite; 
 }
 
-@keyframes rotate-orb {
-    from {
-        transform: rotate(0deg);
+@keyframes blob-shape {
+    0%, 100% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
     }
-
-    to {
-        transform: rotate(360deg);
+    33% {
+        border-radius: 40% 60% 70% 30% / 40% 40% 60% 50%;
+    }
+    66% {
+        border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
     }
 }
 
-@keyframes rotate-highlight {
-    from {
-        transform: rotate(0deg);
+@keyframes color-cycle {
+    0%, 100% {
+        filter: hue-rotate(0deg);
+        background-position: 0% 50%;
     }
-
-    to {
-        transform: rotate(-360deg);
+    50% {
+        filter: hue-rotate(180deg);
+        background-position: 100% 50%;
     }
 }
 
@@ -247,8 +288,10 @@ p.section-subtitle {
     display: inline-block;
 }
 
-/* --- BENTO GRID SECTION --- */
+
 .bento-section {
+    position: relative;
+    z-index: 2;
     padding: 100px 40px;
 }
 
@@ -294,7 +337,7 @@ p.section-subtitle {
     line-height: 1.5;
 }
 
-/* Grid item sizing */
+
 #bento-unstoppable {
     grid-column: span 2;
 }
@@ -323,7 +366,7 @@ p.section-subtitle {
     grid-column: span 2;
 }
 
-/* Bento card specific styles */
+
 .bento-card img {
     position: absolute;
     right: 0;
@@ -366,7 +409,7 @@ p.section-subtitle {
     font-style: italic;
 }
 
-/* --- SCROLL-SNAPPING SECTIONS --- */
+
 .scroll-container {
     height: 100vh;
     overflow-y: scroll;
@@ -377,6 +420,7 @@ p.section-subtitle {
     height: 100vh;
     scroll-snap-align: start;
     position: relative;
+    z-index: 2;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -395,6 +439,20 @@ p.section-subtitle {
     background-position: center;
     transform: scale(1.1);
     transition: transform 6s ease-out;
+    overflow: hidden;
+}
+
+.section-background iframe {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    height: 56.25vw;
+    min-height: 100vh;
+    min-width: 177.77vh;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    border: none;
 }
 
 .brand-section.is-visible .section-background {
@@ -413,14 +471,35 @@ p.section-subtitle {
 .brand-content {
     z-index: 2;
     position: relative;
+    padding: 40px 35px;
+    border-radius: 24px;
+    background: rgba(10, 15, 25, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    max-width: 780px;
+    margin: 0 auto;
 }
 
 .brand-content h2 {
     font-size: clamp(3rem, 8vw, 6rem);
     letter-spacing: -3px;
+    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.85));
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
 }
 
-/* --- FOOTER --- */
+.brand-content p.section-subtitle {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+    color: #e2e8f0;
+}
+
+.brand-content .cta-button {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 20px rgba(59, 130, 246, 0.4);
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+
 .main-footer {
     background-color: #000;
     color: var(--text-secondary);
@@ -511,7 +590,7 @@ p.section-subtitle {
     gap: 20px;
 }
 
-/* --- ANIMATIONS & RESPONSIVE DESIGN --- */
+
 .reveal {
     opacity: 0;
     transform: translateY(30px);
@@ -542,7 +621,7 @@ p.section-subtitle {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
     .navbar {
         padding: 0 20px;
     }
@@ -550,15 +629,16 @@ p.section-subtitle {
     .nav-links {
         position: fixed;
         left: -100%;
-        top: 64px;
+        top: 0;
         flex-direction: column;
-        background-color: #000;
+        background-color: var(--bg-color);
         width: 100%;
-        height: calc(100vh - 64px);
-        text-align: center;
-        transition: 0.3s;
-        gap: 0;
-        padding-top: 20px;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+        transition: left 0.3s ease-in-out;
+        gap: 2rem;
+        z-index: -1;
     }
 
     .nav-links.active {
@@ -566,11 +646,11 @@ p.section-subtitle {
     }
 
     .nav-links li {
-        padding: 20px 0;
+        padding: 0;
     }
 
     .nav-links a {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
     }
 
     .nav-cta {
@@ -578,31 +658,20 @@ p.section-subtitle {
     }
 
     .hamburger {
-        display: block;
-        cursor: pointer;
-        background: none;
-        border: none;
+        display: flex;
     }
 
-    .hamburger .bar {
-        display: block;
-        width: 25px;
-        height: 2px;
-        margin: 5px auto;
-        background-color: var(--text-primary);
-        transition: all 0.3s ease-in-out;
+    .hamburger.active .bar:nth-child(1) {
+        transform: rotate(45deg);
     }
 
     .hamburger.active .bar:nth-child(2) {
         opacity: 0;
-    }
-
-    .hamburger.active .bar:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
+        transform: translateX(20px);
     }
 
     .hamburger.active .bar:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
+        transform: rotate(-45deg);
     }
 
     .bento-section {
@@ -637,7 +706,7 @@ p.section-subtitle {
     letter-spacing: -5.5px;
 }
 
-/* --- NEW YEAR VIDEO BACKGROUND --- */
+
 .new-year-video {
     position: absolute;
     top: 0;
@@ -645,7 +714,128 @@ p.section-subtitle {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.8;
+}
     z-index: 1; /* Sits below content (z-index 2) but above background */
     pointer-events: none; /* Ensures clicking text still works */
     opacity: 0.8; /* Slight transparency to blend with background color */
+}
+/* --- ACCESSIBILITY: KEYBOARD NAVIGATION --- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+.notification-wrapper { position: relative; display: inline-block; cursor: pointer; }
+.notification-bell { font-size: 1.2rem; }
+.notification-badge { position: absolute; top: -5px; right: -10px; background: var(--accent-red); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; }
+.notification-dropdown { display: none; position: absolute; right: 0; top: 100%; background: var(--primary-card-color); border: 1px solid var(--border-color); border-radius: 8px; width: 250px; max-height: 300px; overflow-y: auto; z-index: 1000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+.notification-wrapper:hover .notification-dropdown { display: block; }
+.notification-item { padding: 10px; border-bottom: 1px solid var(--border-color); cursor: pointer;}
+.notification-item:hover { background: rgba(255, 255, 255, 0.1); }
+.notification-item:last-child { border-bottom: none; }
+.notification-item.unread { background: rgba(255, 255, 255, 0.05); }
+.notification-item small { color: var(--text-secondary); display: block; margin-top: 5px; font-size: 0.8rem; }
+
+/* --- Siri Orb Interactive Blob & Glow --- */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spinGlowAngle {
+    0% { --glow-angle: 0deg; }
+    100% { --glow-angle: 360deg; }
+}
+
+.siri-orb-wrapper { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1000; }
+
+.siri-orb-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 60px;
+    border-radius: 50px;
+    background: conic-gradient(
+        from var(--glow-angle),
+        rgba(255, 0, 127, 0.8), 
+        rgba(127, 0, 255, 0.2), 
+        rgba(0, 127, 255, 0.8), 
+        rgba(0, 255, 127, 0.2), 
+        rgba(255, 127, 0, 0.8), 
+        rgba(255, 0, 127, 0.8)
+    );
+    filter: blur(15px);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    animation: spinGlowAngle 3s linear infinite;
+}
+
+.siri-orb-wrapper:has(#siri-orb.expanded)::before {
+    opacity: 1;
+}
+
+#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50px; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: width 0.6s cubic-bezier(0.23, 1, 0.32, 1); box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
+#siri-orb::after { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1); z-index: -1; }
+#siri-orb.expanded { width: 220px; border-radius: 50px !important; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); }
+#siri-orb.expanded::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 104%;
+    height: 110%;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--glow-angle, 0deg),
+        rgba(255, 0, 127, 0.5), 
+        rgba(127, 0, 255, 0.2), 
+        rgba(0, 127, 255, 0.5), 
+        rgba(0, 255, 127, 0.2), 
+        rgba(255, 127, 0, 0.5), 
+        rgba(255, 0, 127, 0.5)
+    );
+    filter: blur(8px);
+    z-index: -2;
+    animation: spinGlowAngle 4s linear infinite; 
+    opacity: 1;
+}
+#siri-orb.expanded::after { opacity: 1; }
+.orb-text { position: relative; z-index: 2; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 1rem; text-decoration: none; opacity: 0; transition: opacity 0.3s ease 0.4s; white-space: nowrap; transform: translateY(20px); }
+#siri-orb.expanded .orb-text { opacity: 1; transform: translateY(0); }
+
+
+/* --- Orb Tap Particles --- */
+.orb-particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+    animation: particle-spread forwards ease-out;
+}
+
+@keyframes particle-spread {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    80% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.8);
+        opacity: 0.2;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(3);
+        opacity: 0;
+    }
 }
