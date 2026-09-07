@@ -387,8 +387,6 @@ function setupEventListeners() {
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.add-to-cart-btn');
-            const wishlistBtn = e.target.closest('.wishlist-btn');
-            const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title') || e.target.closest('.product-rating-summary');
 
             if (addBtn) {
                 const productId = addBtn.dataset.id;
