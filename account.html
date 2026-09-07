@@ -152,7 +152,7 @@
                             <label>Custom Hex Color (Premium)</label>
                             <input type="color" id="custom-hex-color" value="#00ffcc" disabled title="Requires Premium">
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <button type="submit" id="save-theme-btn" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
@@ -531,6 +531,14 @@
 
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Saving...';
+
+                const submitBtn = e.submitter || document.getElementById('save-theme-btn');
+                const originalText = submitBtn ? submitBtn.innerText : 'Save Theme';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Saving...';
+                }
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
