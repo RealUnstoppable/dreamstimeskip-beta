@@ -2041,7 +2041,6 @@ let dragItem = null;
             // Pick a random compatible song
             const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
             currentQueue.push(nextSuggested);
-            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song

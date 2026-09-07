@@ -54,7 +54,6 @@ export async function verifyFirebaseConnection() {
     if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
-        console.log("Firebase connection healthy (backend reached, request blocked by rules).");
         return true;
     }
 
