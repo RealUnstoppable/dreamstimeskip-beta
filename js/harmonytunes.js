@@ -458,11 +458,44 @@ function initHarmonyTunes() {
         });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokEmbeds.map(embed => `
-            <div class="tiktok-card">
-                ${embed}
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
         
         // Dynamically load TikTok script to render the embeds properly
         const tiktokScript = document.createElement('script');
