@@ -1,136 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <script type="module" src="/js/theme-loader.js"></script>
+    <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Account | DTS HUB</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>My Account | DTS Hub</title>
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/shop.css">
     <style>
-        :root {
-            --accent-blue: #2563EB;
-            --accent-red: #DC2626;
-            --accent-green: #16A34A;
-            --accent-yellow: #FBBF24;
-            --font-main: 'Inter', sans-serif;
-        }
-        body {
-            font-family: var(--font-main);
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            padding: 40px 20px;
-        }
-        .account-layout {
-            display: flex;
-            width: 100%;
-            max-width: 1200px;
-            gap: 30px;
-        }
-        .sidebar {
-            width: 250px;
-            flex-shrink: 0;
-        }
-        .btn-admin-back {
-            display: none;
-            background-color: var(--accent-yellow);
-            color: #000;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
-            text-decoration: none;
-            margin-bottom: 20px;
-            transition: opacity 0.2s;
-            cursor: pointer;
-        }
-        .btn-admin-back:hover { opacity: 0.85; }
-        .sidebar-header {
-            padding: 20px;
-            background-color: var(--primary-card-color);
+        .glass-card {
+            background: rgba(25, 25, 25, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid var(--border-color);
         }
-        .sidebar-header h2 { font-size: 1.2rem; margin: 0 0 5px 0; line-height: 1.2; }
-        .sidebar-header p { font-size: 0.9rem; color: var(--text-secondary); margin: 0; word-wrap: break-word; }
-        .sidebar-nav ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar-nav a {
-            display: block; padding: 15px 20px; color: var(--text-secondary);
-            text-decoration: none; border-radius: 8px; margin-bottom: 5px;
-            font-weight: 500; transition: background-color 0.2s, color 0.2s;
-        }
-        .sidebar-nav a:hover { background-color: var(--primary-card-color); color: var(--text-primary); }
-        .sidebar-nav a.active { background-color: var(--accent-blue); color: #fff; }
-        .sign-out-btn {
-            width: 100%; margin-top: 20px; padding: 15px 20px;
-            background-color: var(--primary-card-color); border: 1px solid var(--border-color);
-            color: var(--text-secondary); font-weight: 500; border-radius: 8px;
-            cursor: pointer; transition: background-color 0.2s, color 0.2s;
-        }
-        .sign-out-btn:hover { background-color: var(--accent-red); color: #fff; border-color: var(--accent-red); }
-        .main-content { flex-grow: 1; }
-        .content-section {
-            display: none; background-color: var(--primary-card-color);
-            padding: 40px; border-radius: 12px; border: 1px solid var(--border-color);
-        }
-        .content-section.active { display: block; }
-        .content-section h3 { font-size: 1.8rem; margin-top: 0; margin-bottom: 30px; }
-        .card {
-            background-color: var(--secondary-card-color); padding: 25px;
-            border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);
-        }
-        .card h4 { margin-top: 0; margin-bottom: 15px; font-size: 1.2rem; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
-        .form-group input, .form-group select {
-            width: 100%; padding: 12px; border: 1px solid var(--border-color);
-            background-color: var(--input-bg); color: var(--text-primary);
-            border-radius: 5px; box-sizing: border-box; font-size: 1rem;
-        }
-        .form-group input:disabled { opacity: 0.6; cursor: not-allowed; }
-        .btn {
-            padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer;
-            text-decoration: none; display: inline-block; text-align: center; border: 1px solid transparent; transition: all 0.2s;
-        }
-        .btn-primary { background-color: var(--accent-blue); color: white; }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-danger { background-color: var(--accent-red); color: white; }
-        .btn-danger:hover { opacity: 0.9; }
-        #delete-account-card { border-color: var(--accent-red); }
-        .notification { padding: 10px; border-radius: 6px; font-size: 0.9rem; margin-top: 15px; display: none; }
-        .notification.success { background-color: rgba(22, 163, 74, 0.2); color: var(--accent-green); }
-        .notification.error { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
-        .accent-options { display: flex; gap: 15px; flex-wrap: wrap; }
         
-        @media (max-width: 768px) {
-            body { padding: 20px 10px; }
-            .account-layout { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .main-content { width: 100%; }
-            .content-section { padding: 25px; }
+        /* Toggle Switch CSS */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
         }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; transition: .4s; border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--accent-blue, #2563EB); }
+        input:checked + .slider:before { transform: translateX(26px); }
     </style>
 </head>
-<body style="display: none;">
-    <div class="account-layout">
+<body>
+    <header class="main-header"></header>
+    <!-- Spinner removed -->
+    <div class="account-layout" id="account-layout-container" style="display: none;">
         <aside class="sidebar">
-            <a href="admin.html" id="admin-back-button" class="btn-admin-back">← Back to Admin</a>
+            <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
             <div class="sidebar-header">
                 <h2 id="welcome-header">Loading...</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
                 <ul>
-                    <li><a href="index.html">← Return to Home</a></li>
+                    <li><a href="index.html">&#8592; Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#wishlist" class="nav-link">My Wishlist</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
                     <li><a href="#support" class="nav-link">Support</a></li>
@@ -150,9 +76,20 @@
 
             <section id="orders" class="content-section">
                 <h3>Order History</h3>
-                <div class="card">
+                <div class="card" id="orders-container">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <p style="color: var(--text-secondary);" id="no-orders-msg">Loading orders...</p>
+                    <div id="orders-list"></div>
+                </div>
+            </section>
+
+            <section id="wishlist" class="content-section">
+                <h3>My Wishlist</h3>
+                <div class="card">
+                    <h4>Saved Items</h4>
+                    <div id="wishlist-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                        <p style="color: var(--text-secondary);">Loading your wishlist...</p>
+                    </div>
                 </div>
             </section>
 
@@ -167,7 +104,22 @@
 
             <section id="settings" class="content-section">
                 <h3>Settings</h3>
-                <div class="card">
+                
+                <div class="card glass-card">
+                    <h4>Security</h4>
+                    <form id="security-settings-form">
+                        <button type="button" id="change-password-btn" class="btn btn-primary" style="margin-bottom: 20px;">Send Password Reset Email</button>
+                        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                            <label style="margin: 0;">Enable Two-Factor Authentication (2FA)</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-2fa">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card glass-card">
                     <h4>Update Profile</h4>
                     <form id="update-profile-form">
                         <div class="form-group">
@@ -184,43 +136,66 @@
                 </div>
 
                 <div class="card">
-                    <h4>Display Settings</h4>
+                    <h4>Appearance & Themes</h4>
                     <form id="theme-settings-form">
                         <div class="form-group">
-                            <label for="theme-select">Theme</label>
+                            <label for="theme-select">Theme Preset</label>
                             <select id="theme-select">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                                <option value="midnight">Midnight</option>
-                                <option value="forest">Forest</option>
+                                <option value="system">System Default</option>
+                                <option value="black">Deep Black</option>
+                                <option value="white">Silk White</option>
+                                <option value="pink">Lotus Pink (Premium)</option>
+                                <option value="forest">Rainforest (Premium)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Accent Color</label>
-                            <div class="accent-options">
-                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
-                                <label><input type="radio" name="accent-color" value="red"> Red</label>
-                                <label><input type="radio" name="accent-color" value="green"> Green</label>
-                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
-                            </div>
+                        <div class="form-group" id="premium-hex-container">
+                            <label>Custom Hex Color (Premium)</label>
+                            <input type="color" id="custom-hex-color" value="#00ffcc" disabled title="Requires Premium">
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <button type="submit" id="save-theme-btn" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
 
+                <div class="card" id="security-card">
+                    <h4>Security & 2FA</h4>
+                    <button class="btn btn-primary" id="change-password-btn">Send Password Reset Email</button>
+                    <p style="margin-top: 15px;">Enable Two-Factor Authentication</p>
+                    <button class="btn btn-secondary" id="enable-2fa-email-btn">Setup Email 2FA</button>
+                    <button class="btn btn-secondary" id="enable-2fa-sms-btn" style="margin-left: 10px;">Setup SMS 2FA</button>
+                    <div id="security-notification" class="notification"></div>
+                </div>
+
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
-                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
-                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                    <p>This action will soft-delete your account for 90 days. During this time, you can recover it by logging in and contacting support. After 90 days, all your data will be permanently removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Deactivate My Account</button>
                 </div>
             </section>
             
             <section id="support" class="content-section">
                 <h3>Contact Support</h3>
                 <div class="card">
-                    <p>If you need help, please reach out. We're happy to assist!</p>
-                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn btn-primary">Email Support</a>
+                    <h4>Submit a Ticket</h4>
+                    <form id="support-ticket-form">
+                        <div class="form-group">
+                            <label for="ticket-subject">Subject</label>
+                            <input type="text" id="ticket-subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ticket-message">Message</label>
+                            <textarea id="ticket-message" rows="4" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary);"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                        <div id="ticket-notification" class="notification"></div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h4>Your Tickets</h4>
+                    <div id="user-tickets-container">
+                        <p style="color: var(--text-secondary);">Loading tickets...</p>
+                    </div>
                 </div>
             </section>
         </main>
@@ -228,30 +203,217 @@
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        import { createTicket, getUserTickets } from '/js/ticket-service.js';
+        import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
+                    // Check sessionStorage first to optimize reads
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        initializePage(user, userData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                        return; // Exit early if we have cached data
+                    }
+
                     const userDocRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userDocRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData)); // Cache data
                         initializePage(user, userData);
                         setupEventListeners(user);
-                        document.body.style.display = 'flex';
+                        document.getElementById('account-layout-container').style.display = 'flex';
+                    } else {
+                        const fallbackData = {
+                            username: user.displayName || "User",
+                            email: user.email,
+                            membershipLevel: 'free',
+                            isAdmin: false
+                        };
+                        try {
+                            await setDoc(userDocRef, fallbackData);
+                            sessionStorage.setItem(cacheKey, JSON.stringify(fallbackData)); // Cache data
+                        } catch(e) {
+                            console.error("Failed to set default profile - Manager info: [" + e.message + "]", e);
+                        }
+                        initializePage(user, fallbackData);
+                        setupEventListeners(user);
+                        document.getElementById('account-layout-container').style.display = 'flex';
                     }
                 } catch (error) {
-                    console.error("Error loading profile:", error);
+                    console.error("Error loading profile - Manager info: [" + error.message + "]", error);
                 }
             } else {
-                window.location.replace('sign in beta.html');
+                if (!window.location.pathname.includes('sign in beta.html')) {
+                    window.location.replace('sign in beta.html');
+                }
             }
         });
 
+        async function loadWishlist(userId) {
+            const container = document.getElementById('wishlist-container');
+            try {
+                const wishlistRef = doc(db, 'wishlists', userId);
+                const wishlistSnap = await getDoc(wishlistRef);
+
+                if (wishlistSnap.exists() && wishlistSnap.data().items && wishlistSnap.data().items.length > 0) {
+                    const wishlistedIds = wishlistSnap.data().items;
+                    let html = '';
+
+                    wishlistedIds.forEach(id => {
+                        const product = productMap.get(id);
+                        if (product) {
+                            html += `
+                                <div class="product-card" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; text-align: center;">
+                                    <img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;">
+                                    <h4 style="margin: 0 0 5px 0;">${product.name}</h4>
+                                    <p style="margin: 0 0 10px 0; font-weight: bold;">$${product.price.toFixed(2)}</p>
+                                    <div style="display: flex; gap: 5px; justify-content: center;">
+                                        <button class="btn btn-primary" onclick="handleAddToCartFromWishlist('${product.id}')" style="padding: 5px 10px; font-size: 0.8rem;">Add to Cart</button>
+                                        <button class="btn" onclick="removeFromWishlist('${product.id}', '${userId}')" style="padding: 5px 10px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-primary);">Remove</button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    if (html === '') {
+                        container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty.</p>';
+                    } else {
+                        container.innerHTML = html;
+                    }
+                } else {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty.</p>';
+                }
+            } catch (error) {
+                console.error("Error loading wishlist:", error);
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load wishlist.</p>';
+            }
+        }
+
+        window.removeFromWishlist = async function(productId, userId) {
+            toggleWishlist(productId);
+            // Re-render
+            await loadWishlist(userId);
+        };
+
+        window.handleAddToCartFromWishlist = async function(productId) {
+            await handleAddToCart(productId);
+            alert('Added to cart!');
+        };
+
+        async function loadUserTickets(userId) {
+            const container = document.getElementById('user-tickets-container');
+            try {
+                const tickets = await getUserTickets(userId);
+                if (tickets.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-secondary);">You have not submitted any tickets yet.</p>';
+                    return;
+                }
+
+                let html = '<div class="tickets-list">';
+                tickets.forEach(ticket => {
+                    const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
+                                      ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
+
+                    html += `
+                        <div class="ticket-item" style="border-bottom: 1px solid var(--border-color); padding: 10px 0; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <strong>${escapeHTML(ticket.subject)}</strong>
+                                <span style="color: ${statusColor}; font-size: 0.9em; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>
+                            </div>
+                            <p style="margin: 5px 0; font-size: 0.9em;">${escapeHTML(ticket.message)}</p>
+                            ${ticket.adminReply ? `<div style="background: var(--primary-card-color); padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.9em; border-left: 3px solid var(--accent-blue);"><strong>Admin Reply:</strong><br>${escapeHTML(ticket.adminReply)}</div>` : ''}
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = '<p style="color: var(--accent-red);">Failed to load tickets.</p>';
+            }
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag]));
+        }
+
+        async function loadUserWishlist(userId) {
+            const container = document.getElementById('user-wishlist-container');
+            try {
+                const wishlistRef = doc(db, 'wishlists', userId);
+                const wishlistSnap = await getDoc(wishlistRef);
+
+                if (!wishlistSnap.exists() || !wishlistSnap.data().items || wishlistSnap.data().items.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-secondary); width: 100%;">Your wishlist is empty.</p>';
+                    return;
+                }
+
+                const itemIds = wishlistSnap.data().items;
+                container.innerHTML = itemIds.map(productId => {
+                    const product = productMap.get(productId);
+                    if (!product) return '';
+                    return `
+                        <div class="product-card" style="display: flex; flex-direction: column; background-color: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; padding-bottom: 15px;">
+                            <img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 200px; object-fit: cover; background-color: #000;">
+                            <div style="padding: 15px; flex-grow: 1;">
+                                <h4 style="margin: 0 0 10px; font-size: 1.1rem;">${product.name}</h4>
+                                <p style="font-size: 1.2rem; font-weight: bold; margin: 0 0 15px;">$${product.price.toFixed(2)}</p>
+                            </div>
+                            <div style="padding: 0 15px; display: flex; gap: 10px;">
+                                <button class="btn btn-primary add-to-cart-btn" data-id="${product.id}" style="flex-grow: 1;">Add to Cart</button>
+                                <button class="btn remove-wishlist-btn" data-id="${product.id}" style="background-color: var(--bg-color); border: 1px solid var(--accent-red, #DC2626); color: var(--accent-red, #DC2626);">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Add event listeners for the rendered buttons
+                container.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const originalText = e.target.innerText;
+                        e.target.innerText = 'Adding...';
+                        e.target.disabled = true;
+                        await handleAddToCart(e.target.dataset.id);
+                        e.target.innerText = 'Added!';
+                        setTimeout(() => {
+                            e.target.innerText = originalText;
+                            e.target.disabled = false;
+                        }, 2000);
+                    });
+                });
+
+                container.querySelectorAll('.remove-wishlist-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const originalText = e.target.innerText;
+                        e.target.innerText = 'Removing...';
+                        e.target.disabled = true;
+                        await toggleWishlist(e.target.dataset.id);
+                        // Re-fetch and render after removing
+                        loadUserWishlist(userId);
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error loading wishlist:", error);
+                container.innerHTML = '<p style="color: var(--accent-red, #DC2626);">Error loading wishlist. Please try again later.</p>';
+            }
+        }
+
         function initializePage(user, userData) {
+            loadUserTickets(user.uid);
+            loadUserWishlist(user.uid);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
@@ -269,14 +431,26 @@
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
 
-            document.getElementById('theme-select').value = userData.theme || 'dark';
-            const currentAccent = userData.accentColor || 'blue';
-            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
-            if (accentRadio) accentRadio.checked = true;
+            document.getElementById('theme-select').value = userData.theme || 'system';
+            
+            const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+            const customHex = document.getElementById('custom-hex-color');
+            if (isPremium) {
+                customHex.disabled = false;
+                customHex.title = 'Select custom accent color';
+            } else {
+                customHex.disabled = true;
+                customHex.title = 'Requires Premium';
+            }
+            if (userData.accentColor && userData.accentColor.startsWith('#')) {
+                customHex.value = userData.accentColor;
+            }
+            // Ensure the UI matches the current user data state for accent radio buttons if they existed
         }
 
         function setupEventListeners(user) {
             document.getElementById('sign-out').addEventListener('click', () => {
+                sessionStorage.removeItem(`profile_${user.uid}`);
                 signOut(auth).then(() => window.location.replace('index.html'));
             });
 
@@ -294,6 +468,38 @@
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                     showNotification(notificationEl, 'Username updated successfully!', 'success');
                     document.getElementById('welcome-header').textContent = `Welcome back, ${newUsername}!`;
+
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.username = newUsername;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+                } catch (error) {
+                    showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
+                }
+            });
+
+            document.getElementById('support-ticket-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const subject = document.getElementById('ticket-subject').value;
+                const message = document.getElementById('ticket-message').value;
+                const notificationEl = document.getElementById('ticket-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Submitting...';
+
+                try {
+                    await createTicket(user.uid, user.email, subject, message);
+                    showNotification(notificationEl, 'Ticket submitted successfully!', 'success');
+                    e.target.reset();
+                    await loadUserTickets(user.uid);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
                 } finally {
@@ -304,34 +510,142 @@
 
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const userData = cachedData ? JSON.parse(cachedData) : {};
+                
                 const theme = document.getElementById('theme-select').value;
-                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const customHex = document.getElementById('custom-hex-color').value;
+                
+                const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+                if (!isPremium && (theme === 'pink' || theme === 'forest')) {
+                    showNotification(document.getElementById('theme-notification'), 'Error: Lotus Pink and Rainforest themes require Premium.', 'error');
+                    return;
+                }
+
+                const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
+                
                 const notificationEl = document.getElementById('theme-notification');
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerText;
+
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Saving...';
+
+                const submitBtn = e.submitter || document.getElementById('save-theme-btn');
+                const originalText = submitBtn ? submitBtn.innerText : 'Save Theme';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Saving...';
+                }
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
                     document.body.dataset.theme = theme;
-                    document.body.dataset.accent = accentColor;
+                    document.documentElement.style.setProperty('--accent-color', accentColor);
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
+
+                    if (cachedData) {
+                        userData.theme = theme;
+                        userData.accentColor = accentColor;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = originalText;
                 }
             });
 
-            document.getElementById('delete-account-btn').addEventListener('click', async () => {
-                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+            document.getElementById('change-password-btn').addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Send Password Reset Email';
+                }
+            });
+
+            document.getElementById('enable-2fa-email-btn').addEventListener('click', () => {
+                alert('Email 2FA setup flow is currently under construction. Please check back later.');
+            });
+
+            document.getElementById('enable-2fa-sms-btn').addEventListener('click', () => {
+                alert('SMS 2FA setup flow is currently under construction. Note: standard SMS rates may apply.');
+            });
+
+            document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
+                if (!confirm('WARNING: Your account will be soft-deleted and permanently removed after 90 days. Are you sure you want to deactivate?')) return;
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Deactivating...';
                 try {
                     const userId = user.uid;
-                    await deleteUser(user);
                     await deleteDoc(doc(db, "users", userId));
+                    await deleteUser(user);
                     alert('Your account has been permanently deleted.');
                     window.location.replace('index.html');
                 } catch (error) {
-                    alert('Error: Please sign out, sign back in, and try again.');
+                    alert('Error: Please try again or contact support.');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
+
+            // Security Settings
+            document.getElementById('change-password-btn')?.addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js");
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
+
+            const toggle2FA = document.getElementById('toggle-2fa');
+            if (toggle2FA) {
+                // Read from user doc if available
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                if (cachedData) {
+                    const userData = JSON.parse(cachedData);
+                    toggle2FA.checked = !!userData.twoFactorEnabled;
+                }
+                toggle2FA.addEventListener('change', async (e) => {
+                    const isEnabled = e.target.checked;
+                    try {
+                        await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
+                        showNotification(document.getElementById('security-notification'), `2FA ${isEnabled ? 'enabled' : 'disabled'} successfully.`, 'success');
+                        if (cachedData) {
+                            const userData = JSON.parse(cachedData);
+                            userData.twoFactorEnabled = isEnabled;
+                            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                        }
+                    } catch (error) {
+                        e.target.checked = !isEnabled; // Revert
+                        showNotification(document.getElementById('security-notification'), `Error updating 2FA: ${error.message}`, 'error');
+                    }
+                });
+            }
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', e => {
@@ -350,6 +664,13 @@
                 setTimeout(() => { element.style.display = 'none'; }, 5000);
             };
         }
+    </script>
+    <footer class="main-footer"></footer>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>
