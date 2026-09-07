@@ -27,3 +27,39 @@
 **Vulnerability:** The `createCheckoutSession` cloud function (`functions/index.js`) blindly trusted the `uid` and `email` properties provided in the POST request body. This allowed an attacker to create a Stripe checkout session with their own parameters but assigned to another user's `uid`. When the payment succeeded, the `stripeWebhook` would incorrectly upgrade the victim's account (or an attacker could manipulate the `uid` to upgrade their own account on someone else's dime).
 **Learning:** Never trust client-provided IDs for sensitive operations. Always extract the user identity securely on the backend from an authenticated session or JWT.
 **Prevention:** Implement `admin.auth().verifyIdToken(token)` inside the Cloud Function and extract the `uid` and `email` directly from the decoded token rather than trusting the `req.body`.
+
+## 2024-05-18 - [Fix DOM-based XSS in Tracker Report Generation]
+**Vulnerability:** The `generateReport` function in `tracker.html` was directly injecting user-provided state data (such as item names, values, and quantities from routines, drawers, and inventory) into the DOM via `innerHTML` string concatenation without sanitization. This allowed for DOM-based XSS if a user's malicious payload was rendered during report generation.
+**Learning:** Even internal operations like "generating a report for printing" that read from a saved state require strict sanitization of all dynamic variables before concatenating them into HTML strings for insertion into the DOM.
+**Prevention:** Always use an `escapeHTML` utility to sanitize untrusted user input before rendering it in the DOM, or rely on `textContent` or `innerText` instead.
+
+## 2024-05-18 - [Fix DOM-based XSS Bypass in Admin Dashboard escapeHTML]
+**Vulnerability:** The `escapeHTML` utility in `admin.html` was incorrectly returning non-string inputs (like arrays) as-is. If an array containing a malicious payload was passed to it, the array would bypass escaping, and when subsequently interpolated into an HTML string, JavaScript's implicit `.toString()` would render the unescaped payload into the DOM, resulting in XSS.
+**Learning:** `typeof str !== 'string'` is insufficient as an early return in escape utilities because arrays are coerced to strings implicitly during template literal interpolation.
+**Prevention:** Always explicitly coerce variables to strings (e.g., `str.toString()` or `String(str)`) before escaping, and handle null/undefined explicitly.
+## 2024-05-18 - [Fix XSS Bypass in Admin Dashboard Escape Utility]
+**Vulnerability:** The `escapeHTML` function in `admin.html` returned non-string inputs unmodified instead of casting them to strings. This allowed for an XSS bypass if an attacker provided an array of malicious strings, which bypasses the `typeof str !== 'string'` check but still implicitly coerces into an unescaped string when interpolated into `innerHTML`.
+**Learning:** Implicit string coercion of arrays in JS template literals can bypass naive string-type sanitization checks.
+**Prevention:** Always explicitly cast inputs to strings (e.g., `String(str)`) and handle null/undefined before applying regex replacements in custom sanitization utilities.
+## 2026-05-27 - [Fix Hardcoded Stripe Secret in Server]\n**Vulnerability:** The Stripe initialization in `server.js` used a hardcoded string (`"sk_test_placeholder"`) instead of retrieving the secret key securely from an environment variable.\n**Learning:** Relying on hardcoded placeholders for sensitive API keys increases the risk of developers accidentally committing real, live secrets if they overwrite the placeholder directly in the source file during testing or deployment.\n**Prevention:** Always instantiate third-party SDKs using environment variables (e.g., `process.env.STRIPE_SECRET_KEY`) to decouple credentials from the source code and prevent accidental exposure.
+## 2026-06-02 - [Fix DOM-based XSS in Admin Dashboard (Attributes)]
+**Vulnerability:** `admin.html` was injecting `escapeHTML`-sanitized data directly into `onclick` attribute strings: `onclick="window.closeSupportTicket('${escapeHTML(ticket.id)}')"`. Since HTML entities inside HTML attributes are decoded by the browser *before* evaluating the JavaScript, this allowed for DOM-based XSS if a malicious payload was present in `ticket.id`.
+**Learning:** `escapeHTML` is not sufficient to sanitize strings interpolated directly into inline JavaScript within HTML attributes.
+**Prevention:** Use `data-` attributes and retrieve the value safely inside the handler using `e.target.dataset.id`, or use standard event delegation instead of inline handlers.
+## 2026-06-02 - [Fix Regression: Missing classes due to HTML parsing]
+**Vulnerability/Regression:** When replacing an inline event handler, the duplicate `class` attribute was ignored by the browser, breaking the event delegation.
+**Learning:** HTML5 parsing rules keep the first `class` attribute and ignore duplicates.
+**Prevention:** Combine all classes into a single `class` attribute when modifying DOM strings.
+
+## 2026-06-05 - [Fix Stored XSS in Support Tickets]
+**Vulnerability:** The `admin.html` and `account.html` pages directly interpolated the `ticket.status` field into the DOM via inline style templates without utilizing the available `escapeHTML` utility. Because standard user creation rules did not restrict the length or content of string status fields created via API or manual updates, an attacker could inject an XSS payload via a manipulated status string.
+**Learning:** Even internal tracking fields like `status` that are typically manipulated via trusted backend logic can be vectors for Stored XSS if the underlying database rules do not restrict arbitrary string modifications on the client side.
+**Prevention:** Always sanitize every dynamically rendered string value from a database response, regardless of whether the field is expected to only contain constrained enum values like "open" or "closed".
+## $(date +%Y-%m-%d) - Fix Stored XSS in Harmony Tunes Lyrics Renderer
+**Vulnerability:** Unescaped strings (`word.text`, `word.start`, `line.start`, `line.end`) from a potentially untrusted lyrics data source were directly interpolated into HTML strings and injected into the DOM via `lyricsContent.innerHTML`, leading to a Stored Cross-Site Scripting (XSS) vulnerability.
+**Learning:** Even when mapping over seemingly structured JSON data (like lyrics), properties intended for DOM injection must be treated as untrusted user input, especially if the data could be maliciously altered in the backend or via API interception.
+**Prevention:** Always wrap dynamically interpolated values in an HTML entity encoding function (like `escapeHTML`) when constructing HTML strings for `innerHTML` injection, or prefer safe DOM APIs like `textContent`.
+## 2024-05-31 - Insecure Access Control via Client-Side Firestore Calls
+**Vulnerability:** The `admin.html` dashboard performed sensitive database operations (banning users, updating feature requests, modifying bookings, handling quotes) directly from the client-side using `updateDoc` and `deleteDoc`. Relying entirely on client-side constraints and basic Firestore rules for administrative tasks exposes the application to unauthorized data manipulation if the rules are misconfigured or bypassed.
+**Learning:** Administrative database operations should never occur directly on the client. They must be routed through a secure, authenticated backend environment (like Firebase Cloud Functions) that explicitly validates the user's administrative privileges and the payload.
+**Prevention:** Implement administrative operations as Cloud Functions. Ensure the function verifies the caller's identity via `authenticateRequest`, explicitly checks for an `isAdmin` flag using the Admin SDK, and rigorously validates all input parameters (e.g., restricting operations to a specific whitelist of collections).
