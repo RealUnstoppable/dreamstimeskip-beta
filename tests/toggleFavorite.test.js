@@ -35,7 +35,7 @@ document.body.innerHTML = `
 
 window.alert = jest.fn();
 
-import '../js/harmonytunes.js';
+await import('../js/harmonytunes.js');
 
 describe('toggleFavorite unit tests', () => {
     beforeAll(() => {

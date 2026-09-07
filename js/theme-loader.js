@@ -1,13 +1,14 @@
 // js/theme-loader.js
+import { auth, db } from './auth.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
 (function() {
     const localTheme = localStorage.getItem('userTheme');
     const localAccent = localStorage.getItem('userAccent');
     if (localTheme) document.body.dataset.theme = localTheme;
     if (localAccent) document.body.dataset.accent = localAccent;
 })();
-import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 const applyTheme = (theme, accentColor) => {
     document.body.dataset.theme = theme || 'dark';
@@ -23,17 +24,26 @@ const applyTheme = (theme, accentColor) => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userDocRef = doc(db, "users", user.uid);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                const userData = userDoc.data();
+            const cacheKey = `profile_${user.uid}`;
+            const cachedProfile = sessionStorage.getItem(cacheKey);
+
+            if (cachedProfile) {
+                const userData = JSON.parse(cachedProfile);
                 applyTheme(userData.theme, userData.accentColor);
             } else {
-                // Fallback for new users or data not found
-                applyTheme('dark', 'blue');
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userDocRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    applyTheme(userData.theme, userData.accentColor);
+                } else {
+                    // Fallback for new users or data not found
+                    applyTheme('dark', 'blue');
+                }
             }
         } catch (error) {
-            console.error("Error loading theme from Firestore:", error);
+            console.error("Error loading theme from Firestore - Manager info:", error.message);
             applyTheme('dark', 'blue');
         }
     } else {
