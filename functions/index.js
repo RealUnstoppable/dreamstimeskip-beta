@@ -36,6 +36,56 @@ async function authenticateRequest(req, res) {
 }
 
 // 🔹 Create Checkout Session
+
+// 🛡️ Admin Action Proxy
+exports.adminAction = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res);
+    if (!decodedToken) return;
+
+    try {
+      const adminDoc = await getUserDocRef(decodedToken.uid).get();
+      if (!adminDoc.exists || !adminDoc.data().isAdmin) {
+        return res.status(403).send("Forbidden: Admins only");
+      }
+
+      const { action, collection, docId, data } = req.body;
+      if (!action || !collection || !docId) {
+        return res.status(400).send("Missing required fields");
+      }
+
+      // Allowed collections for admin actions via this endpoint
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests"];
+      if (!allowedCollections.includes(collection)) {
+        return res.status(400).send("Invalid collection");
+      }
+
+      const db = admin.firestore();
+      const docRef = db.collection(collection).doc(docId);
+
+      if (action === "update") {
+        if (typeof data !== "object" || data === null) {
+          return res.status(400).send("Invalid update data");
+        }
+        await docRef.update(data);
+      } else if (action === "delete") {
+        await docRef.delete();
+      } else {
+        return res.status(400).send("Invalid action");
+      }
+
+      res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Admin Action Error - Manager info: [" + err.message + "]");
+      res.status(500).json({ error: err.message });
+    }
+  });
+});
+
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
@@ -159,13 +209,17 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await getUserDocRef(uid).set({
-        plan: planName, // Updates the frontend to unlock pro features
-        subscription: {
-          status: "active",
-          customerId: session.customer,
-        },
-      }, {merge: true});
+      try {
+        await getUserDocRef(uid).set({
+          plan: planName, // Updates the frontend to unlock pro features
+          subscription: {
+            status: "active",
+            customerId: session.customer,
+          },
+        }, {merge: true});
+      } catch (error) {
+        console.error("Error processing checkout.session.completed - Manager info: [" + error.message + "]");
+      }
     }
   }
 
@@ -249,23 +303,28 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
 
   const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
 
-  return admin.firestore().runTransaction(async (transaction) => {
-    const statsDoc = await transaction.get(productStatsRef);
-    let reviewCount = 0;
-    let averageRating = 0;
+  try {
+    return await admin.firestore().runTransaction(async (transaction) => {
+      const statsDoc = await transaction.get(productStatsRef);
+      let reviewCount = 0;
+      let averageRating = 0;
 
-    if (statsDoc.exists) {
-      const data = statsDoc.data();
-      reviewCount = data.reviewCount || 0;
-      averageRating = data.averageRating || 0;
-    }
+      if (statsDoc.exists) {
+        const data = statsDoc.data();
+        reviewCount = data.reviewCount || 0;
+        averageRating = data.averageRating || 0;
+      }
 
-    const newReviewCount = reviewCount + 1;
-    const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
+      const newReviewCount = reviewCount + 1;
+      const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
 
-    transaction.set(productStatsRef, {
-      reviewCount: newReviewCount,
-      averageRating: newAverageRating,
-    }, {merge: true});
-  });
+      transaction.set(productStatsRef, {
+        reviewCount: newReviewCount,
+        averageRating: newAverageRating,
+      }, {merge: true});
+    });
+  } catch (error) {
+    console.error("Error updating product stats - Manager info: [" + error.message + "]");
+    return null;
+  }
 });
