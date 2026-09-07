@@ -400,11 +400,11 @@
         <section class="info-section">
             <div class="info-grid">
                 <div class="info-card">
-                    <img src="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Trailer thumbnail" class="card-image" loading="lazy">
+                    <img src="https://i.ytimg.com/vi/-MfSBwzapaU/maxresdefault.jpg" alt="Trailer thumbnail" class="card-image" loading="lazy">
                     <div class="card-content">
                         <h3>Watch The Trailer</h3>
                         <p>Get a glimpse of what's to come. The official trailer showcases the new world, features, and the adventure that awaits.</p>
-                        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="card-cta">Watch Now</a>
+                        <a href="https://www.youtube.com/watch?v=-MfSBwzapaU" class="card-cta">Watch Now</a>
                     </div>
                 </div>
                 <div class="info-card">
@@ -452,13 +452,15 @@
 
 <footer class="main-footer"></footer> 
 
-    <div id="siri-orb">
-        <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
+    <div class="siri-orb-wrapper">
+        <div id="siri-orb">
+            <a href="https://www.realunstoppable.store/" class="orb-text">Return Home?</a>
+        </div>
     </div>
 
    <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1784516229';
-        import { loadFooter } from './js/footer.js?v=1784516229'; // Add this line
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722'; // Add this line
         
         loadNavbar();
         loadFooter();
@@ -466,15 +468,6 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // --- Mobile Menu Toggle ---
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        if (hamburger && navLinks) {
-            hamburger.addEventListener('click', () => {
-                hamburger.classList.toggle('active');
-                navLinks.classList.toggle('active');
-            });
-        }
         
         // --- Countdown Timer Class ---
         class Countdown {
@@ -584,7 +577,7 @@
         }
 
         // Initialize both countdowns
-        new Countdown("2025-12-09T12:00:00-04:00", "countdown-1");
+        new Countdown("2026-07-31T12:00:00-04:00", "countdown-1");
         new Countdown("2027-01-15T12:00:00-05:00", "countdown-2", true);
 
 

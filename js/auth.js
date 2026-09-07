@@ -1,6 +1,6 @@
 // js/auth.js
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
 
 import { escapeHTML } from './utils.js';
@@ -117,7 +117,7 @@ if (document.getElementById('auth-form')) {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await setDoc(doc(db, "users", userCredential.user.uid), {
                     username: username || "User",
-                    email: email, // FIX: Use the local variable directly instead of the credential object
+                    email: email,
                     signupDate: serverTimestamp(),
                     isBanned: false,
                     isAdmin: false, 

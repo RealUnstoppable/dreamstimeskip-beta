@@ -7,11 +7,17 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script type="module" src="/js/theme-loader.js"></script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    
+    <!-- Include main style for navbar and footer -->
+    <link rel="stylesheet" href="/css/style.css">
     
     <style>
         body {
@@ -247,8 +253,8 @@
     <footer class="main-footer"></footer>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1784516229';
-        import { loadFooter } from './js/footer.js?v=1784516229';
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
         
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();

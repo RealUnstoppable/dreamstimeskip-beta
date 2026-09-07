@@ -29,17 +29,21 @@
         </section>
     </main>
 
-    <button id="cart-button" class="cart-fab" aria-label="View cart">
-        <span id="cart-icon">🛒</span>
+    <button id="cart-button" class="lexi-orb" aria-label="View cart">
+        <div class="lexi-core"></div>
         <span id="cart-item-count" class="cart-item-count">0</span>
     </button>
+    <div id="lexi-menu" class="lexi-menu">
+        <button id="lexi-view-cart-btn" class="lexi-menu-btn">🛒 View Cart</button>
+        <button id="lexi-ask-btn" class="lexi-menu-btn">✨ Ask Lexi</button>
+    </div>
 
     <!-- Reviews Modal -->
     <div id="reviews-modal" class="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-modal-header">
                 <h2 id="reviews-modal-title">Product Reviews</h2>
-                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews">&times;</button>
+                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews" title="Close reviews">&times;</button>
             </div>
 
             <div class="reviews-summary" id="reviews-summary">
@@ -77,7 +81,7 @@
         <div class="cart-modal-content">
             <div class="cart-modal-header">
                 <h2>Your Cart</h2>
-                <button id="close-cart-btn" class="close-cart-btn" aria-label="Close cart">&times;</button>
+                <button id="close-cart-btn" class="close-cart-btn" aria-label="Close cart" title="Close cart">&times;</button>
             </div>
             <div id="cart-items-container" class="cart-items-container">
             </div>
@@ -96,7 +100,7 @@
         <div class="review-modal-content">
             <div class="review-modal-header">
                 <h2>Product Reviews</h2>
-                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews">&times;</button>
+                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews" title="Close reviews">&times;</button>
             </div>
 
             <div class="review-stats" id="review-stats">
@@ -140,20 +144,12 @@
 
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1784516229';
-        import { loadFooter } from './js/footer.js?v=1784516229'; // Add this line
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
 
-        loadNavbar();
-        loadFooter();
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
     <script type="module" src="/js/shop.js"></script>
-
-
-    </script>
-
-
-    <script type="module">
-        import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    </script></body>
+</body>
 </html>

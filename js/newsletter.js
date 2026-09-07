@@ -3,7 +3,7 @@ import { db } from './auth.js';
 const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
 const firestore = isTest
     ? await import('../tests/__mocks__/firebase-firestore.js')
-    : await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
+    : await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js");
 
 const { doc, setDoc, serverTimestamp } = firestore;
 
@@ -15,21 +15,17 @@ document.addEventListener('submit', async (e) => {
 
         const form = e.target;
         const emailInput = form.querySelector('input[type="email"]');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const email = emailInput.value.trim();
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-
         const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
-        let originalText = 'Subscribe';
+        const email = emailInput.value.trim();
+        let originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : 'Subscribe';
+
         if (submitBtn) {
-            originalText = submitBtn.textContent || submitBtn.value;
             submitBtn.disabled = true;
-            if (submitBtn.textContent) submitBtn.textContent = 'Submitting...';
-            else submitBtn.value = 'Submitting...';
+            if (submitBtn.tagName === 'INPUT') {
+                submitBtn.value = 'Processing...';
+            } else {
+                submitBtn.textContent = 'Processing...';
+            }
         }
 
         try {

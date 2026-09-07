@@ -1,8 +1,8 @@
 // js/firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,14 +15,8 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-
-// Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
-// export const appCheck = initializeAppCheck(app, {
-//   provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
-//   isTokenAutoRefreshEnabled: true
-// });
+// Initialize Firebase safely to avoid duplicate app errors
+export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Auth
 export const auth = getAuth(app);
@@ -35,6 +29,7 @@ setPersistence(auth, browserLocalPersistence).catch((error) => {
 
 // Initialize Firestore
 export const db = getFirestore(app);
+
 
 /**
  * Verify Connection Health
@@ -50,7 +45,6 @@ export async function verifyFirebaseConnection() {
     if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
-        console.log("Firebase connection healthy (backend reached, request blocked by rules).");
         return true;
     }
 

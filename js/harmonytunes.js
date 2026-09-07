@@ -18,12 +18,22 @@ function escapeHTML(str) {
 function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'astrophage',
+            title: "Astrophage",
+            artist: "Lupus Nocte",
+            duration: "3:10",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['electronic', 'synth', 'energetic']
+        },
         { 
             id: 'pixy-legacy',
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
@@ -33,8 +43,8 @@ function initHarmonyTunes() {
             title: "Blow", 
             artist: "Kesha", 
             duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
+            art: "/images/un-logo.png",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
         },
@@ -43,8 +53,8 @@ function initHarmonyTunes() {
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
+            art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
         },
@@ -53,511 +63,11 @@ function initHarmonyTunes() {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/dreams-lobby.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
+            art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
         },
-        { 
-            id: 'top-hit-0',
-            title: "Blinding Lights", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 108, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-1',
-            title: "Shape of You", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-2',
-            title: "Dance Monkey", 
-            artist: "Tones And I", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 116, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-3',
-            title: "Someone You Loved", 
-            artist: "Lewis Capaldi", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-4',
-            title: "Rockstar", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-5',
-            title: "Sunflower", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 136, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-6',
-            title: "One Dance", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-7',
-            title: "Closer", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-8',
-            title: "Believer", 
-            artist: "Imagine Dragons", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-9',
-            title: "Stay", 
-            artist: "The Kid LAROI, Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-10',
-            title: "Perfect", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-11',
-            title: "Heat Waves", 
-            artist: "Glass Animals", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-12',
-            title: "Señorita", 
-            artist: "Shawn Mendes, Camila Cabello", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-13',
-            title: "bad guy", 
-            artist: "Billie Eilish", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 113, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-14',
-            title: "Say You Won't Let Go", 
-            artist: "James Arthur", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 134, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-15',
-            title: "Thinking out Loud", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-16',
-            title: "Lucid Dreams", 
-            artist: "Juice WRLD", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-17',
-            title: "Watermelon Sugar", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-18',
-            title: "God's Plan", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-19',
-            title: "Photograph", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-20',
-            title: "Something Just Like This", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 119, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-21',
-            title: "Shallow", 
-            artist: "Lady Gaga, Bradley Cooper", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-22',
-            title: "Love Yourself", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-23',
-            title: "Bohemian Rhapsody", 
-            artist: "Queen", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-24',
-            title: "Take Me To Church", 
-            artist: "Hozier", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 135, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-25',
-            title: "As It Was", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-26',
-            title: "Sweater Weather", 
-            artist: "The Neighbourhood", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-27',
-            title: "All of Me", 
-            artist: "John Legend", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-28',
-            title: "Counting Stars", 
-            artist: "OneRepublic", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-29',
-            title: "THATS WHAT I LIKE", 
-            artist: "Bruno Mars", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-30',
-            title: "Levitating", 
-            artist: "Dua Lipa", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-31',
-            title: "Peaches", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 118, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-32',
-            title: "good 4 u", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 137, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-33',
-            title: "drivers license", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-34',
-            title: "Save Your Tears", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 130, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-35',
-            title: "Starboy", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-36',
-            title: "Cruel Summer", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-37',
-            title: "Anti-Hero", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-38',
-            title: "Flowers", 
-            artist: "Miley Cyrus", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-39',
-            title: "Kill Bill", 
-            artist: "SZA", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 117, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-40',
-            title: "Creepin'", 
-            artist: "Metro Boomin", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-41',
-            title: "Die For You", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-42',
-            title: "Calm Down", 
-            artist: "Rema", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-43',
-            title: "I'm Good (Blue)", 
-            artist: "David Guetta", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-44',
-            title: "Unholy", 
-            artist: "Sam Smith, Kim Petras", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-45',
-            title: "Ella Baila Sola", 
-            artist: "Eslabon Armado", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 102, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-46',
-            title: "La Bebe - Remix", 
-            artist: "Yng Lvcas", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-47',
-            title: "vampire", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-48',
-            title: "Paint The Town Red", 
-            artist: "Doja Cat", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-49',
-            title: "Water", 
-            artist: "Tyla", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 126, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        }
     ];
 
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
@@ -948,11 +458,44 @@ function initHarmonyTunes() {
         });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokEmbeds.map(embed => `
-            <div class="tiktok-card">
-                ${embed}
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
         
         // Dynamically load TikTok script to render the embeds properly
         const tiktokScript = document.createElement('script');
@@ -1158,37 +701,18 @@ function initHarmonyTunes() {
 
     function playSong() {
         if (fadeInterval) clearInterval(fadeInterval);
-        
+        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+        if (crossfadeInterval) clearInterval(crossfadeInterval);
+
+        isCrossfading = false;
+        mixerBtn.classList.remove('pulsing');
+        if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+
+        nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
+
         const targetVol = parseFloat(volumeSlider.value) || 1;
-        
-        if (isCrossfading) {
-            nextAudio.play().then(() => {
-                const fadeStep = 50;
-                const steps = (fadeDur * 1000) / fadeStep;
-                let currentStep = 0;
-                
-                if (crossfadeInterval) clearInterval(crossfadeInterval);
-                crossfadeInterval = setInterval(() => {
-                    currentStep++;
-                    if (currentStep >= steps) {
-                        clearInterval(crossfadeInterval);
-                        activeAudio.pause();
-                        activeAudio.currentTime = 0;
-                        activeAudio.volume = targetVol;
-                        nextAudio.volume = targetVol;
-                        isCrossfading = false;
-                        if(window.__triggerSurvey) window.__triggerSurvey();
-                    } else {
-                        activeAudio.volume = Math.max(0, targetVol * (1 - currentStep/steps));
-                        nextAudio.volume = Math.min(targetVol, targetVol * (currentStep/steps));
-                    }
-                }, fadeStep);
-            }).catch(e => {
-                console.error("Crossfade play failed - Manager info:", e);
-                isCrossfading = false;
-            });
-            return;
-        }
 
         activeAudio.volume = 0;
         activeAudio.play().then(() => {
@@ -1569,7 +1093,7 @@ function initHarmonyTunes() {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1644,7 +1168,7 @@ function initHarmonyTunes() {
         }
         lyricsContent.innerHTML = data.map((line, lineIndex) => {
             const wordsHtml = line.words.map((word, wordIndex) => {
-                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+                return `<span class="lyric-word" data-start="${escapeHTML(word.start)}">${escapeHTML(word.text)}</span>`;
             }).join(' ');
             const trendingClass = line.trending ? ' trending-lyric' : '';
             
@@ -1653,7 +1177,7 @@ function initHarmonyTunes() {
                 badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
-            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
         }).join('');
         
         // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
@@ -2355,32 +1879,6 @@ let dragItem = null;
         }
     });
 
-    let isDragging = false;
-
-    // Global pointermove listener for dragging queue items
-    document.addEventListener('pointermove', (e) => {
-        if (isDragging && dragItem) {
-            const deltaY = e.clientY - dragStartY;
-            dragItem.style.transform = `translateY(${deltaY}px)`;
-
-            // Visual Drop Indicator
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-
-            for (let i = 0; i < items.length; i++) {
-                if (items[i] === dragItem) continue;
-                const rect = items[i].getBoundingClientRect();
-                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                    if (e.clientY < rect.top + rect.height / 2) {
-                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                    } else {
-                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                    }
-                    break;
-                }
-            }
-        }
-    });
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2552,35 +2050,6 @@ let dragItem = null;
         });
     });
 
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHarmonyTunes);
-} else {
-    initHarmonyTunes();
-}
-
-export function createSongCard(song) {
-    return `
-        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
-            <div class="card-img-wrapper">
-                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
-                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
-                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
-            </div>
-            <div class="card-title">${escapeHTML(song.title)}</div>
-            <div class="card-desc">${escapeHTML(song.artist)}</div>
-        </div>
-    `;
-}
-
-export function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
     // --- BACKGROUND MIXXER AI ---
     window.backgroundMixxerAI = async function() {
         if (!activeAudio || !currentQueue[currentSongIndex]) return;
@@ -2605,7 +2074,6 @@ export function formatTime(seconds) {
             // Pick a random compatible song
             const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
             currentQueue.push(nextSuggested);
-            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song
@@ -2634,7 +2102,13 @@ export function formatTime(seconds) {
         });
     }
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHarmonyTunes);
+} else {
+    initHarmonyTunes();
+}
 
 export function createSongCard(song) {
     return `

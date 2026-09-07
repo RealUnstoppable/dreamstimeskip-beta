@@ -16,6 +16,14 @@ export function loadFooter() {
                         <li><a href="unstoppable.html">Unstoppable</a></li>
                         <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
                         <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+                        <li><a href="blobgame.html">Squishly (Beta)</a></li>
+                    </ul>
+                    <h5 style="margin-top: 15px;">Betas</h5>
+                    <ul>
+                        <li><a href="blobgame.html">Squishly</a></li>
+                        <li><a href="tracker.html">ezManage beta</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">App Download (Soon)</a></li>
+                        <li><a href="#" style="color: gray; cursor: default;">beta.realunstoppable.store</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
