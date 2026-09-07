@@ -1899,6 +1899,9 @@ let dragItem = null;
             return;
         }
 
+        // ⚡ Bolt: Use a DocumentFragment to batch DOM insertions for the queue items.
+        // This reduces synchronous layout reflows from O(N) to O(1), significantly
+        // speeding up render time and preventing main thread blocking, especially for long lists.
         // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
         const fragment = document.createDocumentFragment();
 
