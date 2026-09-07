@@ -19,18 +19,6 @@ jest.mock("stripe", () => {
   }));
 });
 
-// Mock admin before index.js import
-const mockVerifyIdToken = jest.fn();
-jest.mock("firebase-admin", () => {
-  return {
-    initializeApp: jest.fn(),
-    auth: () => ({
-      verifyIdToken: mockVerifyIdToken,
-    }),
-    firestore: jest.fn(),
-  };
-});
-
 // Mock request and response objects
 const mockReq = (options = {}) => ({
   method: "POST",
@@ -73,8 +61,33 @@ jest.mock("firebase-admin", () => {
   };
 });
 
+
+jest.mock("firebase-functions", () => {
+  const originalModule = jest.requireActual("firebase-functions");
+  return {
+    ...originalModule,
+    https: {
+      ...originalModule.https,
+      onRequest: jest.fn((cb) => cb),
+    },
+    firestore: {
+      ...originalModule.firestore,
+      document: jest.fn().mockReturnValue({
+        onWrite: jest.fn(),
+      }),
+    },
+  };
+});
+
+jest.mock("firebase-functions/v2/firestore", () => {
+  return {
+    onDocumentUpdated: jest.fn(),
+    onDocumentCreated: jest.fn(),
+  };
+});
+
 // Import functions after mocks
-const {createCheckoutSession} = require("./index.js");
+const {createCheckoutSession, adminAction} = require("./index.js");
 
 describe("createCheckoutSession", () => {
   beforeEach(() => {
@@ -118,7 +131,7 @@ describe("createCheckoutSession", () => {
   });
 
   it("should create session with Pro plan & fallback URLs", async () => {
-    mockVerifyIdToken.mockResolvedValueOnce({
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
       uid: "user123",
       email: "test@example.com",
     });
@@ -204,7 +217,7 @@ describe("createCheckoutSession", () => {
     // Suppress console.error in tests for expected errors
     jest.spyOn(console, "error").mockImplementation(() => {});
 
-    mockVerifyIdToken.mockResolvedValueOnce({
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
       uid: "user123",
       email: "test@example.com",
     });
@@ -225,7 +238,7 @@ describe("createCheckoutSession", () => {
     });
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({error: "Stripe API Error"});
+    expect(res.json).toHaveBeenCalledWith({error: "Checkout Error. Manager info: [Stripe API Error]"});
 
     console.error.mockRestore();
   });
@@ -273,5 +286,147 @@ describe("createCheckoutSession", () => {
     expect(res.send).toHaveBeenCalledWith("Unauthorized");
 
     console.error.mockRestore();
+  });
+});
+
+
+describe("adminAction", () => {
+  let mockGetDoc;
+  let mockUpdateDoc;
+  let mockDeleteDoc;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetDoc = jest.fn();
+    mockUpdateDoc = jest.fn();
+    mockDeleteDoc = jest.fn();
+
+    // Override the mock we set up earlier for admin
+    require("firebase-admin").firestore().collection().doc.mockReturnValue({
+      get: mockGetDoc,
+      update: mockUpdateDoc,
+      delete: mockDeleteDoc,
+    });
+
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValue({
+      uid: "admin123",
+      email: "admin@example.com",
+    });
+  });
+
+  it("should return 405 Method Not Allowed for non-POST requests", async () => {
+    const req = mockReq({method: "GET"});
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(405);
+  });
+
+  it("should return 401 if missing Authorization header", async () => {
+    const req = mockReq({method: "POST"});
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it("should return 403 if user is not an admin", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ isAdmin: false })
+    });
+
+    const req = mockReq({
+      method: "POST",
+      headers: { authorization: "Bearer valid-token" },
+      body: { action: "update", collection: "users", docId: "u1" }
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(403);
+  });
+
+  it("should return 400 for invalid collection", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ isAdmin: true })
+    });
+
+    const req = mockReq({
+      method: "POST",
+      headers: { authorization: "Bearer valid-token" },
+      body: { action: "update", collection: "secrets", docId: "s1", data: {} }
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.send.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("should perform an update successfully", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ isAdmin: true })
+    });
+
+    mockUpdateDoc.mockResolvedValueOnce();
+
+    const req = mockReq({
+      method: "POST",
+      headers: { authorization: "Bearer valid-token" },
+      body: { action: "update", collection: "users", docId: "u1", data: { isBanned: true } }
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(mockUpdateDoc).toHaveBeenCalledWith({ isBanned: true });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ success: true });
+  });
+
+  it("should perform a delete successfully", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ isAdmin: true })
+    });
+
+    mockDeleteDoc.mockResolvedValueOnce();
+
+    const req = mockReq({
+      method: "POST",
+      headers: { authorization: "Bearer valid-token" },
+      body: { action: "delete", collection: "quotes", docId: "q1" }
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(mockDeleteDoc).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ success: true });
   });
 });
