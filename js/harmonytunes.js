@@ -3,15 +3,37 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'astrophage',
+            title: "Astrophage",
+            artist: "Lupus Nocte",
+            duration: "3:10",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['electronic', 'synth', 'energetic']
+        },
         { 
             id: 'pixy-legacy',
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
@@ -21,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Blow", 
             artist: "Kesha", 
             duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
+            art: "/images/un-logo.png",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
         },
@@ -31,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
+            art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
         },
@@ -41,511 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/dreams-lobby.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
+            art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
         },
-        { 
-            id: 'top-hit-0',
-            title: "Blinding Lights", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 108, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-1',
-            title: "Shape of You", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-2',
-            title: "Dance Monkey", 
-            artist: "Tones And I", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 116, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-3',
-            title: "Someone You Loved", 
-            artist: "Lewis Capaldi", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-4',
-            title: "Rockstar", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-5',
-            title: "Sunflower", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 136, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-6',
-            title: "One Dance", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-7',
-            title: "Closer", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-8',
-            title: "Believer", 
-            artist: "Imagine Dragons", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-9',
-            title: "Stay", 
-            artist: "The Kid LAROI, Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-10',
-            title: "Perfect", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-11',
-            title: "Heat Waves", 
-            artist: "Glass Animals", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-12',
-            title: "Señorita", 
-            artist: "Shawn Mendes, Camila Cabello", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-13',
-            title: "bad guy", 
-            artist: "Billie Eilish", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 113, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-14',
-            title: "Say You Won't Let Go", 
-            artist: "James Arthur", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 134, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-15',
-            title: "Thinking out Loud", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-16',
-            title: "Lucid Dreams", 
-            artist: "Juice WRLD", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-17',
-            title: "Watermelon Sugar", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-18',
-            title: "God's Plan", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-19',
-            title: "Photograph", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-20',
-            title: "Something Just Like This", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 119, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-21',
-            title: "Shallow", 
-            artist: "Lady Gaga, Bradley Cooper", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-22',
-            title: "Love Yourself", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-23',
-            title: "Bohemian Rhapsody", 
-            artist: "Queen", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-24',
-            title: "Take Me To Church", 
-            artist: "Hozier", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 135, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-25',
-            title: "As It Was", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-26',
-            title: "Sweater Weather", 
-            artist: "The Neighbourhood", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-27',
-            title: "All of Me", 
-            artist: "John Legend", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-28',
-            title: "Counting Stars", 
-            artist: "OneRepublic", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-29',
-            title: "THATS WHAT I LIKE", 
-            artist: "Bruno Mars", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-30',
-            title: "Levitating", 
-            artist: "Dua Lipa", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-31',
-            title: "Peaches", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 118, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-32',
-            title: "good 4 u", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 137, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-33',
-            title: "drivers license", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-34',
-            title: "Save Your Tears", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 130, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-35',
-            title: "Starboy", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-36',
-            title: "Cruel Summer", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-37',
-            title: "Anti-Hero", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-38',
-            title: "Flowers", 
-            artist: "Miley Cyrus", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-39',
-            title: "Kill Bill", 
-            artist: "SZA", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 117, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-40',
-            title: "Creepin'", 
-            artist: "Metro Boomin", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-41',
-            title: "Die For You", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-42',
-            title: "Calm Down", 
-            artist: "Rema", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-43',
-            title: "I'm Good (Blue)", 
-            artist: "David Guetta", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-44',
-            title: "Unholy", 
-            artist: "Sam Smith, Kim Petras", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-45',
-            title: "Ella Baila Sola", 
-            artist: "Eslabon Armado", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 102, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-46',
-            title: "La Bebe - Remix", 
-            artist: "Yng Lvcas", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-47',
-            title: "vampire", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-48',
-            title: "Paint The Town Red", 
-            artist: "Doja Cat", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-49',
-            title: "Water", 
-            artist: "Tyla", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 126, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        }
     ];
 
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
@@ -575,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let activeLineIndex = -1;
+    // ⚡ Bolt: Cache DOM queries for lyrics to prevent O(N) DOM lookups on every timeupdate
+    let cachedLyricLines = [];
     let isAutoScrolling = true;
     let autoScrollTimeout = null;
     let isProgrammaticScroll = false;
@@ -698,6 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let crossfadeDuration = 15;
+    let crossfadeInterval = null;
+    let fadeIntervalCrossfade = null;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
@@ -779,6 +305,11 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const query = e.target.value.toLowerCase();
+                // ⚡ Bolt: Optimize search highlight logic to use a single compiled RegExp outside the loops
+                // and skip DOM updates if the state hasn't changed.
+                const queryRegex = query ? new RegExp(query, 'gi') : null;
+                const replaceFn = match => `<span class="search-highlight">${match}</span>`;
+
                 const cards = document.querySelectorAll('.song-card');
                 cards.forEach(card => {
                     const titleEl = card.querySelector('.song-title');
@@ -789,14 +320,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    card.style.display = isMatch ? 'flex' : 'none';
+                    const newDisplay = isMatch ? 'flex' : 'none';
+                    if (card.style.display !== newDisplay) {
+                        card.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        // Avoid unnecessary textContent assignments which trigger style recalculations
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
                 
@@ -810,14 +345,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const artistText = artistEl.textContent;
                     const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
 
-                    row.style.display = isMatch ? 'table-row' : 'none';
+                    const newDisplay = isMatch ? 'table-row' : 'none';
+                    if (row.style.display !== newDisplay) {
+                        row.style.display = newDisplay;
+                    }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                        artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
-                        titleEl.textContent = titleText;
-                        artistEl.textContent = artistText;
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
                     }
                 });
             }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
@@ -897,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist:", error);
+            console.error("Error loading playlist - Manager info:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -920,11 +458,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokEmbeds.map(embed => `
-            <div class="tiktok-card">
-                ${embed}
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
         
         // Dynamically load TikTok script to render the embeds properly
         const tiktokScript = document.createElement('script');
@@ -938,13 +509,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card playlist-card" data-playlist-id="${pl.id}">
+            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
-                    <button class="card-play-btn">▶</button>
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
-                <div class="card-title">${pl.title}</div>
-                <div class="card-desc">${pl.desc}</div>
+                <div class="card-title">${escapeHTML(pl.title)}</div>
+                <div class="card-desc">${escapeHTML(pl.desc)}</div>
             </div>
         `).join('');
 
@@ -1033,12 +604,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
-                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
+                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
                     <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
                 </td>
-                <td class="song-title">${song.title}</td>
-                <td>${song.artist}</td>
-                <td style="text-align: right;">${song.duration}</td>
+                <td class="song-title">${escapeHTML(song.title)}</td>
+                <td>${escapeHTML(song.artist)}</td>
+                <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
 
             row.addEventListener('click', () => {
@@ -1130,36 +701,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playSong() {
         if (fadeInterval) clearInterval(fadeInterval);
-        
+        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+        if (crossfadeInterval) clearInterval(crossfadeInterval);
+
+        isCrossfading = false;
+        mixerBtn.classList.remove('pulsing');
+        if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+
+        nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
+
         const targetVol = parseFloat(volumeSlider.value) || 1;
-        
-        if (isCrossfading) {
-            nextAudio.play().then(() => {
-                const fadeStep = 50;
-                const steps = (fadeDur * 1000) / fadeStep;
-                let currentStep = 0;
-                
-                crossfadeInterval = setInterval(() => {
-                    currentStep++;
-                    if (currentStep >= steps) {
-                        clearInterval(crossfadeInterval);
-                        activeAudio.pause();
-                        activeAudio.currentTime = 0;
-                        activeAudio.volume = targetVol;
-                        nextAudio.volume = targetVol;
-                        isCrossfading = false;
-                        if(window.__triggerSurvey) window.__triggerSurvey();
-                    } else {
-                        activeAudio.volume = Math.max(0, targetVol * (1 - currentStep/steps));
-                        nextAudio.volume = Math.min(targetVol, targetVol * (currentStep/steps));
-                    }
-                }, fadeStep);
-            }).catch(e => {
-                console.error("Crossfade play failed:", e);
-                isCrossfading = false;
-            });
-            return;
-        }
 
         activeAudio.volume = 0;
         activeAudio.play().then(() => {
@@ -1182,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error(e));
+        }).catch(e => console.error("Manager info:", e));
     }
 
     function pauseSong() {
@@ -1355,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(console.error);
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
@@ -1540,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1604,6 +1157,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LYRICS RENDERING ---
+    // ⚡ Bolt: Cache DOM elements and timestamps to avoid O(N) queries on every frame
+    let cachedLyricsDOM = [];
+
     function renderLyrics(songId) {
         const data = lyricsData[songId];
         if (!data) {
@@ -1612,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         lyricsContent.innerHTML = data.map((line, lineIndex) => {
             const wordsHtml = line.words.map((word, wordIndex) => {
-                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+                return `<span class="lyric-word" data-start="${escapeHTML(word.start)}">${escapeHTML(word.text)}</span>`;
             }).join(' ');
             const trendingClass = line.trending ? ' trending-lyric' : '';
             
@@ -1621,12 +1177,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
-            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
         }).join('');
         
-        // Seek on click
+        // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
         const lines = lyricsContent.querySelectorAll('.lyric-line');
-        lines.forEach(line => {
+        cachedLyricLines = Array.from(lines).map(line => ({
+            el: line,
+            start: parseFloat(line.getAttribute('data-start')),
+            end: parseFloat(line.getAttribute('data-end')),
+            words: Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }))
+        }));
+
+        // Seek on click
+        cachedLyricLines.forEach(lineData => {
+            const line = lineData.el;
             line.addEventListener('click', () => {
                 const start = parseFloat(line.getAttribute('data-start'));
                 if (!isNaN(start)) {
@@ -1634,6 +1202,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     playSong();
                 }
             });
+        });
+
+        // Cache DOM and timestamps
+        cachedLyricsDOM = Array.from(lines).map(line => {
+            const words = Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }));
+
+            return {
+                el: line,
+                start: parseFloat(line.getAttribute('data-start')),
+                end: parseFloat(line.getAttribute('data-end')),
+                words: words
+            };
         });
     }
 
@@ -1643,9 +1226,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(autoScrollTimeout);
         autoScrollTimeout = setTimeout(() => {
             isAutoScrolling = true;
-            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none') {
-                const lines = lyricsContent.querySelectorAll('.lyric-line');
-                const activeLine = lines[activeLineIndex];
+            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none' && cachedLyricsDOM.length > 0) {
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 if (activeLine) {
                     isProgrammaticScroll = true;
                     lyricsContainer.scrollTo({
@@ -1661,39 +1243,34 @@ document.addEventListener('DOMContentLoaded', () => {
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
     function syncLyrics() {
-        if (viewLyrics.style.display === 'none') return;
+        if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
-        const lines = lyricsContent.querySelectorAll('.lyric-line');
         
         let newActiveLineIndex = -1;
-        lines.forEach((line, index) => {
-            const start = parseFloat(line.getAttribute('data-start'));
-            const end = parseFloat(line.getAttribute('data-end'));
+        cachedLyricsDOM.forEach((lineCache, index) => {
+            const { el: lineEl, start, end, words } = lineCache;
             
             // Allow active line to persist slightly if it's the last one sung, 
             // but strict matching is better for beat-by-beat
             if (currentTime >= start && currentTime <= end) {
                 newActiveLineIndex = index;
-                line.classList.add('active');
+                lineEl.classList.add('active');
                 
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
-                    const wStart = parseFloat(word.getAttribute('data-start'));
-                    if (currentTime >= wStart) {
-                        word.classList.add('active-word');
+                words.forEach(wordCache => {
+                    if (currentTime >= wordCache.start) {
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             } else {
-                line.classList.remove('active');
+                lineEl.classList.remove('active');
                 // clear word highlights if passed
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
+                words.forEach(wordCache => {
                     if (currentTime > end) {
-                        word.classList.add('active-word');
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             }
@@ -1702,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
             if (isAutoScrolling) {
-                const activeLine = lines[activeLineIndex];
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 isProgrammaticScroll = true;
                 lyricsContainer.scrollTo({
                     top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
@@ -1767,13 +1344,14 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -1901,13 +1479,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -1984,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error:", e);
+                console.error("Firebase error - Manager info:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2036,7 +1615,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Manager info:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2110,9 +1689,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(console.error);
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Firebase history update error:", e);
+                    console.error("Firebase history update error - Manager info:", e);
                 }
             });
         }
@@ -2234,10 +1813,72 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    let dragItem = null;
+let dragItem = null;
     let dragStartY = 0;
     let dragStartTop = 0;
     let dragTimeout = null;
+    let isDragging = false;
+
+    document.addEventListener('pointermove', (e) => {
+        if (isDragging && dragItem) {
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (dragTimeout) clearTimeout(dragTimeout);
+        if (isDragging && dragItem) {
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const idx = itemsNodeList.indexOf(dragItem);
+
+            isDragging = false;
+
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
+            queueContentArea.style.cursor = '';
+
+            // Calculate drop index based on position
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            let droppedIdx = idx;
+            for (let i = 0; i < items.length; i++) {
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY < rect.top + rect.height / 2) {
+                    droppedIdx = i;
+                    break;
+                } else if (i === items.length - 1) {
+                    droppedIdx = items.length - 1;
+                }
+            }
+
+            if (droppedIdx !== idx) {
+                const movedSong = userQueue.splice(idx, 1)[0];
+                userQueue.splice(droppedIdx, 0, movedSong);
+            }
+            dragItem = null;
+            renderQueue();
+        }
+    });
+
 
     function renderQueue() {
         if(!queueContentArea) return;
@@ -2261,6 +1902,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ⚡ Bolt: Use a DocumentFragment to batch DOM insertions for the queue items.
         // This reduces synchronous layout reflows from O(N) to O(1), significantly
         // speeding up render time and preventing main thread blocking, especially for long lists.
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
         const fragment = document.createDocumentFragment();
 
         displayList.forEach((song, idx) => {
@@ -2268,7 +1910,7 @@ document.addEventListener('DOMContentLoaded', () => {
             item.className = 'queue-item';
             
             const isDraggable = currentTab === 'upnext' && song.isUserQueue;
-            item.dataset.index = idx;
+            item.dataset.index = idx; // Maps 1:1 with userQueue index since userQueue is added first
             item.dataset.songId = song.id;
             
             item.innerHTML = `
@@ -2282,79 +1924,36 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');
-                let isDragging = false;
                 
                 moreBtn.addEventListener('pointerdown', (e) => {
                     e.preventDefault();
                     isDragging = false;
+                    dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        dragItem = item;
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
                         item.style.zIndex = '100';
                         item.classList.add('dragging');
-                        queueContentArea.style.cursor = 'grabbing';
+                        if(queueContentArea) queueContentArea.style.cursor = 'grabbing';
                     }, 200); // 200ms hold to drag
-                });
-                
-                document.addEventListener('pointermove', (e) => {
-                    if (isDragging && dragItem === item) {
-                        const deltaY = e.clientY - dragStartY;
-                        item.style.transform = `translateY(${deltaY}px)`;
-
-                        // Visual Drop Indicator
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
-                        
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i] === item) continue;
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
-                                if (e.clientY < rect.top + rect.height / 2) {
-                                    items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
-                                } else {
-                                    items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
-                                }
-                                break;
-                            }
-                        }
-                    }
                 });
                 
                 moreBtn.addEventListener('pointerup', (e) => {
                     if (dragTimeout) clearTimeout(dragTimeout);
-                    if (isDragging && dragItem === item) {
-                        isDragging = false;
-                        dragItem = null;
-                        item.style.position = '';
-                        item.style.zIndex = '';
-                        item.style.transform = '';
-                        item.classList.remove('dragging');
-                        queueContentArea.style.cursor = '';
-                        
-                        // Calculate drop index based on position
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
-                        let droppedIdx = idx;
-                        for (let i = 0; i < items.length; i++) {
-                            const rect = items[i].getBoundingClientRect();
-                            if (e.clientY < rect.top + rect.height / 2) {
-                                droppedIdx = i;
-                                break;
-                            } else if (i === items.length - 1) {
-                                droppedIdx = items.length - 1;
-                            }
-                        }
-                        
-                        if (droppedIdx !== idx) {
-                            const movedSong = userQueue.splice(idx, 1)[0];
-                            userQueue.splice(droppedIdx, 0, movedSong);
-                        }
-                        renderQueue();
-                    } else if (!isDragging) {
+                    if (!isDragging) {
                         // It was just a tap/click! Open context menu
-                        openQueueContextMenu(e, song.id, idx);
+                        let contextMenuIdx = idx;
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const currentItemIdx = items.indexOf(item);
+                        if (currentItemIdx !== -1) {
+                            contextMenuIdx = currentItemIdx;
+                        }
+                        openQueueContextMenu(e, song.id, contextMenuIdx);
+                    }
+                    if (!isDragging) {
+                        dragItem = null;
                     }
                 });
             }
@@ -2454,30 +2053,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-});
-
-export function createSongCard(song) {
-    return `
-        <div class="music-card" data-song-id="${song.id}">
-            <div class="card-img-wrapper">
-                <img src="${song.art}" alt="${song.title}">
-                <button class="card-play-btn">▶</button>
-                <button class="add-queue-btn" title="Add to Queue">+</button>
-                <button class="card-more-btn" title="More Options">...</button>
-            </div>
-            <div class="card-title">${song.title}</div>
-            <div class="card-desc">${song.artist}</div>
-        </div>
-    `;
-}
-}
-
-export function formatTime(seconds) {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
     // --- BACKGROUND MIXXER AI ---
     window.backgroundMixxerAI = async function() {
         if (!activeAudio || !currentQueue[currentSongIndex]) return;
@@ -2502,7 +2077,6 @@ export function formatTime(seconds) {
             // Pick a random compatible song
             const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
             currentQueue.push(nextSuggested);
-            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song
@@ -2524,9 +2098,38 @@ export function formatTime(seconds) {
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(console.error);
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
                 }
                 renderQueue();
             }
         });
     }
+
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHarmonyTunes);
+} else {
+    initHarmonyTunes();
+}
+
+export function createSongCard(song) {
+    return `
+        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
+            <div class="card-img-wrapper">
+                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
+            </div>
+            <div class="card-title">${escapeHTML(song.title)}</div>
+            <div class="card-desc">${escapeHTML(song.artist)}</div>
+        </div>
+    `;
+}
+
+export function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}

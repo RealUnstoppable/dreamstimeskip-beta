@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     heroSection.appendChild(videoBg);
                 }
                 // Ensure it's playing
-                if (videoBg.paused) videoBg.play().catch(e => console.log("Autoplay blocked:", e));
+                if (videoBg.paused) videoBg.play().catch(() => {});
                 
             } else {
                 if (videoBg) {
@@ -170,5 +170,308 @@ document.addEventListener('DOMContentLoaded', () => {
             cookieConsentBanner.style.display = 'none';
         });
     }
+
+    // --- Orb Physics & Easter Egg ---
+    const orbElements = document.querySelectorAll('.orb, #siri-orb');
+    
+    orbElements.forEach(orb => {
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let hoverCenterX = 0, hoverCenterY = 0;
+        let isHovering = false;
+        
+        // Physics variables for LERP
+        let currentAngle = 0;
+        let targetAngle = 0;
+        let currentStretch = 0;
+        let targetStretch = 0;
+        let isErratic = false;
+        let erraticTimeout;
+        const SNAP_DISTANCE = 300; 
+        
+        const baseShadow = orb.id === 'siri-orb' 
+            ? `inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4)`
+            : `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 40px rgba(147, 51, 234, 0.4)`;
+            
+        const baseTransition = 'width 0.6s cubic-bezier(0.23, 1, 0.32, 1)';
+        orb.style.transition = `${baseTransition}, box-shadow 0.3s ease`; // Preserve width transitions
+        
+        const physicsLoop = () => {
+            if (orb.classList.contains('expanded')) {
+                // When expanded, smoothly LERP the stretch back to 0 so it morphs into a perfect pill
+                targetStretch = 0;
+                // DO NOT return here, let the LERP engine mathematically settle it!
+            }
+
+            const actualTargetStretch = isErratic ? 0 : targetStretch;
+            
+            // Smoothly interpolate stretch
+            currentStretch += (actualTargetStretch - currentStretch) * 0.15;
+            
+            if (currentStretch > 0.01) {
+                // Smoothly interpolate angle
+                let diff = targetAngle - currentAngle;
+                while (diff > Math.PI) diff -= 2 * Math.PI;
+                while (diff < -Math.PI) diff += 2 * Math.PI;
+                currentAngle += diff * 0.25;
+            } else {
+                // When visually a circle, silently reset the angle to prevent infinite wrap-around limits
+                currentAngle = currentAngle % (2 * Math.PI);
+                targetAngle = currentAngle;
+            }
+            
+            try {
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 100}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3}) rotate(${-currentAngle}rad)`;
+            } catch (e) {
+                orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 50}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3})`;
+            }
+            
+            requestAnimationFrame(physicsLoop);
+        };
+        requestAnimationFrame(physicsLoop);
+
+        const updateTarget = (dx, dy, isHover) => {
+            if (orb.classList.contains('expanded')) {
+                targetStretch = 0;
+                return;
+            }
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 1) {
+                targetStretch = 0;
+                return;
+            }
+
+            const rawAngle = Math.atan2(dy, dx);
+            let angleDiff = rawAngle - targetAngle;
+            
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+            
+            // Failsafe: if the user spins the mouse wildly (> ~30 deg per event), trigger erratic mode
+            if (Math.abs(angleDiff) > 0.5) {
+                isErratic = true;
+                clearTimeout(erraticTimeout);
+                erraticTimeout = setTimeout(() => { isErratic = false; }, 200); // 200ms of calm needed
+            }
+            
+            targetAngle += angleDiff;
+            
+            if (isHover) {
+                targetStretch = Math.min(distance / 300, 0.15); 
+            } else {
+                let nDist = Math.min(distance / SNAP_DISTANCE, 1);
+                // Ease-out curve simulates physical resistance: 
+                // it stretches easily at first, but resists (stretches less per pixel) as you pull further
+                let resistanceDist = 1 - Math.pow(1 - nDist, 2);
+                targetStretch = resistanceDist * 2.5; 
+            }
+        };
+
+        orb.addEventListener('mouseenter', () => {
+            if (isDragging) return;
+            const rect = orb.getBoundingClientRect();
+            hoverCenterX = rect.left + rect.width / 2;
+            hoverCenterY = rect.top + rect.height / 2;
+            isHovering = true;
+        });
+
+        orb.addEventListener('mousemove', (e) => {
+            if (isDragging || !isHovering) return;
+            let dx = e.clientX - hoverCenterX;
+            let dy = e.clientY - hoverCenterY;
+            updateTarget(dx, dy, true);
+        });
+        
+        orb.addEventListener('mouseleave', () => {
+            isHovering = false;
+            if (isDragging) return;
+            targetStretch = 0;
+        });
+        
+        let hasDragged = false;
+        
+        const handleDragStart = (clientX, clientY) => {
+            if (orb.classList.contains('expanded')) return;
+            isDragging = true;
+            hasDragged = false;
+            const rect = orb.getBoundingClientRect();
+            startX = rect.left + rect.width / 2;
+            startY = rect.top + rect.height / 2;
+            orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`;
+        };
+        
+        orb.addEventListener('mousedown', (e) => handleDragStart(e.clientX, e.clientY));
+        orb.addEventListener('touchstart', (e) => {
+            // Only handle single touch
+            if (e.touches.length === 1) handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: true });
+        
+        const handleDragMove = (clientX, clientY) => {
+            if (!isDragging) return;
+            
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 5) hasDragged = true; // distinguish drag from click
+            
+            const tension = Math.min(distance / SNAP_DISTANCE, 1);
+            
+            if (distance > SNAP_DISTANCE) {
+                isDragging = false;
+                targetStretch = 0;
+                orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`; 
+                orb.style.boxShadow = baseShadow;
+                return;
+            }
+            
+            updateTarget(dx, dy, false);
+            
+            if (tension > 0.8) {
+                orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 60}px rgba(255, 50, 50, 0.9)`;
+            } else if (tension > 0.4) {
+                orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 40}px rgba(255, 200, 50, 0.8)`;
+            } else {
+                orb.style.boxShadow = baseShadow;
+            }
+        };
+
+        document.addEventListener('mousemove', (e) => handleDragMove(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault(); // Prevent scrolling while stretching orb
+        }, { passive: false });
+        
+        const handleDragEnd = () => {
+            if (isDragging) {
+                isDragging = false;
+                targetStretch = 0;
+                orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`;
+                orb.style.boxShadow = baseShadow;
+            }
+        };
+
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+        
+        // --- Click & Tap Logic ---
+        let expandedAt = 0;
+        let inactivityTimeout;
+        let tapCount = 0;
+        let tapTimeout;
+        
+        orb.addEventListener('click', (e) => {
+            if (hasDragged) {
+                e.preventDefault();
+                return;
+            }
+            
+            if (orb.id === 'siri-orb') {
+                // Let chatbot.js handle opening the chat on click.
+                // But we STILL run the easter egg particle logic below!
+            }
+            
+            // Main Blob Tap & Wave Easter Egg (runs for ALL orbs now)
+                tapCount++;
+                clearTimeout(tapTimeout);
+                tapTimeout = setTimeout(() => {
+                    tapCount = 0;
+                    orb.style.setProperty('--charge-opacity', '0');
+                }, 1000);
+                
+                const rect = orb.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                if (tapCount > 10) {
+                    // Massive wave detonation of dots
+                    tapCount = 0; // reset after massive wave
+                    orb.style.setProperty('--charge-opacity', '0');
+                    
+                    const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
+                    const numParticles = 100; // 100 particles at 10 taps
+                    
+                    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+                    const fragment = document.createDocumentFragment();
+                    for (let i = 0; i < numParticles; i++) {
+                        const particle = document.createElement('div');
+                        particle.classList.add('orb-particle');
+                        
+                        // Distribute evenly in a circle with slight randomness
+                        const angle = (i / numParticles) * Math.PI * 2 + (Math.random() * 0.1);
+                        const distance = 300 + Math.random() * 300; 
+                        const tx = Math.cos(angle) * distance;
+                        const ty = Math.sin(angle) * distance;
+                        
+                        particle.style.left = `${centerX}px`;
+                        particle.style.top = `${centerY}px`;
+                        particle.style.setProperty('--tx', `${tx}px`);
+                        particle.style.setProperty('--ty', `${ty}px`);
+                        
+                        particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                        
+                        const size = 6 + Math.random() * 8;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        
+                        const duration = 1.5 + Math.random() * 0.5;
+                        particle.style.animationDuration = `${duration}s`;
+                        
+                        fragment.appendChild(particle);
+                        setTimeout(() => particle.remove(), duration * 1000);
+                    }
+                    document.body.appendChild(fragment);
+                } else {
+                    // Particles effect & outline charge
+                    if (tapCount > 5) {
+                        const opacity = (tapCount - 5) * 0.2; 
+                        orb.style.setProperty('--charge-opacity', Math.min(opacity, 1));
+                    }
+                    
+                    const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
+                    let numParticles = 8 + Math.floor(Math.random() * 6); // Original 8-13 particles
+                    
+                    if (tapCount === 5) {
+                        numParticles = 50; // Medium burst halfway
+                    }
+                    
+                    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+                    const fragment = document.createDocumentFragment();
+                    for (let i = 0; i < numParticles; i++) {
+                        const particle = document.createElement('div');
+                        particle.classList.add('orb-particle');
+                        
+                        const angle = Math.random() * Math.PI * 2;
+                        // Random spread distance from center
+                        const distance = 120 + Math.random() * 200; 
+                        const tx = Math.cos(angle) * distance;
+                        const ty = Math.sin(angle) * distance;
+                        
+                        particle.style.left = `${centerX}px`;
+                        particle.style.top = `${centerY}px`;
+                        particle.style.setProperty('--tx', `${tx}px`);
+                        particle.style.setProperty('--ty', `${ty}px`);
+                        
+                        // Random color and sizing
+                        particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                        
+                        const size = 4 + Math.random() * 6;
+                        particle.style.width = `${size}px`;
+                        particle.style.height = `${size}px`;
+                        
+                        // Random duration and delay for organic feel
+                        const duration = 0.8 + Math.random() * 0.5;
+                        particle.style.animationDuration = `${duration}s`;
+                        
+                        fragment.appendChild(particle);
+                        setTimeout(() => particle.remove(), duration * 1000);
+                    }
+                    document.body.appendChild(fragment);
+                }
+        });
+    });
 
 });
