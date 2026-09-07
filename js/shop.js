@@ -142,9 +142,10 @@ async function loadProductStats() {
         statsSnapshot.forEach(doc => {
             productStatsMap.set(doc.id, doc.data());
         });
-        renderProducts();
     } catch (error) {
         console.error("Error loading product stats - Manager info:", error);
+    } finally {
+        renderProducts();
     }
 }
 
@@ -184,6 +185,11 @@ function updateCartSummary() {
 
     if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+    
+    // Update Lexi cart badge if window.updateLexiCartCount exists
+    if (window.updateLexiCartCount) {
+        window.updateLexiCartCount(itemCount);
+    }
 }
 
 // --- CART LOGIC ---

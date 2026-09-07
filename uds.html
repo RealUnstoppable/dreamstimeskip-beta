@@ -263,31 +263,7 @@
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-        // Mobile Menu Toggle Logic
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const navLinks = document.getElementById('nav-links');
-        
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-        });
-
-        window.closeMenu = () => {
-            if(window.innerWidth < 768) {
-                navLinks.classList.remove('active');
-                menuBtn.textContent = '☰';
-            }
-        };
-
-        // Update Nav based on Auth Status
-        onAuthStateChanged(auth, (user) => {
-            const authBtn = document.getElementById('nav-auth-btn');
-            if (user) {
-                authBtn.textContent = "My Account";
-                authBtn.href = "account.html";
-            }
-        });
+        // Removed hardcoded mobile menu logic and auth state nav update since navbar.js handles this
 
         // Newsletter Logic
         window.subscribeNewsletter = async () => {

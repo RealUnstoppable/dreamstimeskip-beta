@@ -16,6 +16,7 @@ export function loadFooter() {
                         <li><a href="unstoppable.html">Unstoppable</a></li>
                         <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
                         <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+                        <li><a href="blobgame.html">Squishly (Beta)</a></li>
                     </ul>
                     <h5 style="margin-top: 15px;">Betas</h5>
                     <ul>
