@@ -1,4 +1,4 @@
-export const localFacts = [
+export const fotdDatabase = [
     "A group of flamingos is called a 'flamboyance'.",
     "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still perfectly edible.",
     "The national animal of Scotland is the unicorn.",
@@ -21,7 +21,6 @@ export const localFacts = [
     "There is a town in Norway called 'Hell'.",
     "Goats have rectangular pupils.",
     "An ostrich's eye is bigger than its brain.",
-    "The unicorn is the national animal of Scotland.",
     "Some cats are allergic to humans.",
     "Humans share 50% of their DNA with bananas.",
     "The inventor of the Pringles can is now buried in one.",
@@ -49,51 +48,25 @@ export const localFacts = [
     "A sneeze travels at about 100 miles per hour.",
     "Cap'n Crunch's full name is Horatio Magellan Crunch.",
     "A group of pandas is called an 'embarrassment'.",
-    "A day on Mercury lasts 176 Earth days.",
-    "A single strand of spider silk is stronger than a steel wire of the same thickness.",
-    "Cows have best friends and get stressed when separated.",
-    "A blue whale's tongue can weigh as much as an elephant."
+    "A jiffy is an actual unit of time for 1/100th of a second.",
+    "Peanuts aren't technically nuts; they are legumes.",
+    "An ant can lift 50 times its own body weight.",
+    "Water makes up about 71% of the Earth's surface.",
+    "The human nose can detect over 1 trillion different scents."
 ];
 
-export const getLocalDateString = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
-export const getFactForDate = (dateString) => {
-    let factCache = JSON.parse(localStorage.getItem('factCache')) || {};
-    
-    // If a fact for this date is already cached, return it.
-    if (factCache[dateString]) {
-        return factCache[dateString];
+export function getFactForDate(dateString) {
+    let hash = 0;
+    for (let i = 0; i < dateString.length; i++) {
+        hash = ((hash << 5) - hash) + dateString.charCodeAt(i);
+        hash |= 0; 
     }
-    
-    // Get all facts that have already been used.
-    const usedFacts = new Set(Object.values(factCache));
-    
-    // Find all facts from our local list that haven't been used yet.
-    const availableFacts = localFacts.filter(fact => !usedFacts.has(fact));
-    
-    let newFact;
-    if (availableFacts.length > 0) {
-        // Pick a random fact from the available ones.
-        // We use a simple hash of the date string to make it deterministic across multiple calls
-        let hash = 0;
-        for (let i = 0; i < dateString.length; i++) {
-            hash = (Math.imul(31, hash) + dateString.charCodeAt(i)) | 0;
-        }
-        const index = Math.abs(hash) % availableFacts.length;
-        newFact = availableFacts[index];
-    } else {
-        // If we've run out of unique facts, provide a fallback.
-        newFact = "You've seen all the available facts! Check back later for more.";
-    }
+    const index = Math.abs(hash) % fotdDatabase.length;
+    return fotdDatabase[index];
+}
 
-    // Cache the new fact for the given date and save to local storage.
-    factCache[dateString] = newFact;
-    localStorage.setItem('factCache', JSON.stringify(factCache));
-    
-    return newFact;
-};
+export function getFactForToday() {
+    const today = new Date();
+    const dateString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return getFactForDate(dateString);
+}

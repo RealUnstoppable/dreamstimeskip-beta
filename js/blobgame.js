@@ -16,9 +16,12 @@ const comboVal = document.getElementById('combo-val');
 const missesVal = document.getElementById('misses-val');
 
 // Options State
-let quality = 'high'; // 'high', 'medium', 'low'
+let quality = 'ultra'; // 'ultra', 'high', 'medium', 'low'
 let sfxEnabled = true;
 let musicEnabled = true;
+let cinematicEnabled = true;
+let fpsLimit = 60;
+let fpsInterval = 1000 / 60;
 
 // Audio
 const bgmMusic = document.getElementById('bgm-music');
@@ -28,14 +31,17 @@ let lastDrawTime = 0;
 
 // Game State
 let isPlaying = false;
+let isPaused = false;
 let animationFrameId;
 let lastTime = 0;
+let lastDrawTime = 0;
 let spawnTimer = 0;
 let spawnInterval = 1200;
 let blobs = [];
 let score = 0;
 let combo = 1;
 let misses = 0;
+let timeScale = 1.0;
 
 // Setup Event Listeners
 function setupUI() {
@@ -57,60 +63,53 @@ function setupUI() {
     document.getElementById('btn-replay').addEventListener('click', startGame);
     document.getElementById('btn-go-menu').addEventListener('click', () => showMenu(menuMain));
 
-    // Options - Quality
-    document.querySelectorAll('.qual-btn').forEach(btn => {
+    // Options
+    document.querySelectorAll('#quality-toggles .toggle-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.qual-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#quality-toggles .toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             quality = btn.getAttribute('data-val');
             
             const desc = document.getElementById('quality-desc');
+            if (quality === 'ultra') desc.textContent = 'Ultra: Maximum particles and effects.';
             if (quality === 'high') desc.textContent = 'High: Animated blobs, massive dot explosions.';
             if (quality === 'medium') desc.textContent = 'Med: Animated blobs, 25% fewer dots.';
             if (quality === 'low') desc.textContent = 'Low: Static blobs, 50% fewer dots.';
         });
     });
 
-    // Options - FPS
-    document.querySelectorAll('.fps-btn').forEach(btn => {
+    document.querySelectorAll('#fps-toggles .toggle-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.fps-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#fps-toggles .toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            fpsLimit = parseInt(btn.getAttribute('data-val'), 10);
+            fpsLimit = parseInt(btn.getAttribute('data-val'));
+            fpsInterval = 1000 / fpsLimit;
         });
     });
 
-    // Options - Audio Sliders
-    const sfxSlider = document.getElementById('sfx-vol');
-    const musicSlider = document.getElementById('music-vol');
+    document.getElementById('toggle-cinematic')?.addEventListener('change', (e) => cinematicEnabled = e.target.checked);
 
-    sfxSlider.addEventListener('input', (e) => {
-        const vol = parseFloat(e.target.value);
-        sfxEnabled = vol > 0;
-        // The synth could be updated to actually use 'vol' instead of boolean, but for now we'll just toggle off if 0.
+    document.getElementById('toggle-sfx').addEventListener('change', (e) => sfxEnabled = e.target.checked);
+    document.getElementById('toggle-music').addEventListener('change', (e) => {
+        musicEnabled = e.target.checked;
+        if (musicEnabled && isPlaying && !isPaused) bgmMusic.play().catch(e => console.log('Audio play blocked:', e));
+        else bgmMusic.pause();
     });
 
-    musicSlider.addEventListener('input', (e) => {
-        const vol = parseFloat(e.target.value);
-        musicEnabled = vol > 0;
-        bgmMusic.volume = vol;
-        bgmMenu.volume = vol;
-        if (!musicEnabled) {
-            bgmMusic.pause();
-            bgmMenu.pause();
-        } else if (isPlaying) {
-            bgmMusic.play().catch(() => {});
-        } else {
-            bgmMenu.play().catch(() => {});
-        }
-    });
-
-    // Initial play attempt for menu music
-    document.body.addEventListener('pointerdown', () => {
-        if (!isPlaying && musicEnabled && bgmMenu.paused) {
-            bgmMenu.play().catch(() => {});
-        }
-    }, { once: true });
+    // Pause functionality
+    document.getElementById('btn-pause').addEventListener('click', pauseGame);
+    const menuPause = document.getElementById('menu-pause');
+    if (menuPause) {
+        document.getElementById('btn-resume').addEventListener('click', resumeGame);
+        document.getElementById('btn-retry').addEventListener('click', startGame);
+        document.getElementById('btn-pause-menu').addEventListener('click', () => {
+            isPlaying = false;
+            isPaused = false;
+            gameContainer.style.display = 'none';
+            gameHud.classList.add('hidden');
+            showMenu(menuMain);
+        });
+    }
 
     // Leaderboard Username Binding
     const usernameInput = document.getElementById('username-input');
@@ -133,13 +132,16 @@ function setupUI() {
         btnGuest.addEventListener('click', () => {
             setLocalUsername('Guest');
             bindingSection.classList.add('hidden');
-            loadLeaderboard();
+            startGame();
         });
     }
 }
 
 function showMenu(menuEl) {
-    [menuMain, menuTutorial, menuOptions, menuLeaderboard, menuGameover].forEach(m => m.classList.add('hidden'));
+    const allMenus = [menuMain, menuTutorial, menuOptions, menuLeaderboard, menuGameover];
+    const mPause = document.getElementById('menu-pause');
+    if (mPause) allMenus.push(mPause);
+    allMenus.forEach(m => m.classList.add('hidden'));
     menuEl.classList.remove('hidden');
     
     // Crossfade to menu music
@@ -151,9 +153,34 @@ function showMenu(menuEl) {
 
 // --- Game Logic ---
 
+function pauseGame() {
+    if (!isPlaying || isPaused) return;
+    isPaused = true;
+    bgmMusic.pause();
+    uiLayer.classList.remove('hidden');
+    const mPause = document.getElementById('menu-pause');
+    if (mPause) showMenu(mPause);
+    
+    const pauseScore = document.getElementById('pause-score');
+    const pauseCombo = document.getElementById('pause-combo');
+    if (pauseScore) pauseScore.textContent = score;
+    if (pauseCombo) pauseCombo.textContent = combo;
+}
+
+function resumeGame() {
+    if (!isPlaying || !isPaused) return;
+    isPaused = false;
+    uiLayer.classList.add('hidden');
+    lastTime = performance.now();
+    lastDrawTime = performance.now();
+    if (musicEnabled) bgmMusic.play().catch(e => {});
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
+
 function startGame() {
     uiLayer.classList.add('hidden');
     gameHud.classList.remove('hidden');
+    gameContainer.style.display = 'block'; // Reveal on play
     
     score = 0;
     combo = 1;
@@ -164,7 +191,9 @@ function startGame() {
     updateHUD();
 
     isPlaying = true;
+    isPaused = false;
     lastTime = performance.now();
+    lastDrawTime = performance.now();
     
     if (musicEnabled) {
         // Crossfade to game music
@@ -183,6 +212,7 @@ function gameOver() {
 
     gameHud.classList.add('hidden');
     uiLayer.classList.remove('hidden');
+    gameContainer.style.display = 'none'; // Hide on game over
     showMenu(menuGameover);
 
     document.getElementById('go-score').textContent = score;
@@ -205,17 +235,21 @@ function updateHUD() {
 }
 
 function gameLoop(currentTime) {
-    if (!isPlaying) return;
+    if (!isPlaying || isPaused) return;
 
     animationFrameId = requestAnimationFrame(gameLoop);
 
-    // Enforce FPS limit
-    const minFrameTime = 1000 / fpsLimit;
-    if (currentTime - lastDrawTime < minFrameTime) return;
-    lastDrawTime = currentTime;
+    const elapsedDraw = currentTime - lastDrawTime;
+    if (elapsedDraw < fpsInterval) return;
+    lastDrawTime = currentTime - (elapsedDraw % fpsInterval);
 
-    const dt = currentTime - lastTime;
+    let dt = currentTime - lastTime;
     lastTime = currentTime;
+    
+    if (dt > 100) dt = 16; // Cap dt for lag
+    
+    dt *= timeScale;
+
     spawnTimer += dt;
 
     // Spawn new blob
@@ -277,30 +311,53 @@ function spawnBlob() {
     });
 
     el.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
+        if (!isDragging || isPaused) return;
         const dx = e.clientX - startX;
         const dy = e.clientY - startY;
         const dist = Math.sqrt(dx*dx + dy*dy);
         
-        // If dragging more than a tiny threshold, start/modulate pull sound
         if (dist > 5) {
-            blobObj.isStretching = true;
+            if (cinematicEnabled) timeScale = 0.75;
+            
+            const angle = Math.atan2(dy, dx);
+            const scaleX = 1 + (dist / 150);
+            const scaleY = Math.max(0.2, 1 - (dist / 300));
+            
+            el.style.transform = `translate(${blobObj.x}px, ${blobObj.y}px) rotate(${angle}rad) scale(${scaleX}, ${scaleY})`;
+            
+            if (quality !== 'low') {
+                el.style.boxShadow = `0 0 ${dist / 2}px #fff`;
+            }
+
             startPullSound(sfxEnabled);
             updatePullSound(dist, sfxEnabled);
+
+            if (dist > 150) {
+                isDragging = false;
+                timeScale = 1.0;
+                stopPullSound();
+                popBlob(blobObj);
+            }
         }
     });
 
     el.addEventListener('pointerup', (e) => {
-        isDragging = false;
-        blobObj.isStretching = false;
-        stopPullSound();
-        popBlob(blobObj);
+        if (isDragging) {
+            isDragging = false;
+            timeScale = 1.0;
+            stopPullSound();
+            popBlob(blobObj);
+        }
     });
     
     el.addEventListener('pointercancel', (e) => {
-        isDragging = false;
-        blobObj.isStretching = false;
-        stopPullSound();
+        if (isDragging) {
+            isDragging = false;
+            timeScale = 1.0;
+            stopPullSound();
+            el.style.transform = `translate(${blobObj.x}px, ${blobObj.y}px)`;
+            el.style.boxShadow = 'none';
+        }
     });
 }
 
@@ -390,6 +447,8 @@ function spawnExplosion(x, y, size) {
     const numParticles = Math.floor(baseParticles * multiplier);
     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     for (let i = 0; i < numParticles; i++) {
         const particle = document.createElement('div');
         particle.classList.add('game-particle');
@@ -416,9 +475,10 @@ function spawnExplosion(x, y, size) {
         const duration = 0.8 + Math.random() * 0.5;
         particle.style.animationDuration = `${duration}s`;
         
-        gameContainer.appendChild(particle);
+        fragment.appendChild(particle);
         setTimeout(() => particle.remove(), duration * 1000);
     }
+    gameContainer.appendChild(fragment);
 }
 
 // --- Leaderboard UI ---
@@ -432,6 +492,8 @@ async function loadLeaderboard() {
     const scores = await getTopScores();
     loadingEl.style.display = 'none';
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     scores.forEach((entry, i) => {
         const li = document.createElement('li');
         
@@ -450,8 +512,9 @@ async function loadLeaderboard() {
         li.appendChild(rank);
         li.appendChild(name);
         li.appendChild(scoreVal);
-        listEl.appendChild(li);
+        fragment.appendChild(li);
     });
+    listEl.appendChild(fragment);
 }
 
 // Init

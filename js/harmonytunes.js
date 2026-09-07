@@ -18,12 +18,22 @@ function escapeHTML(str) {
 function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'astrophage',
+            title: "Astrophage",
+            artist: "Lupus Nocte",
+            duration: "3:10",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['electronic', 'synth', 'energetic']
+        },
         { 
             id: 'pixy-legacy',
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
@@ -33,7 +43,7 @@ function initHarmonyTunes() {
             title: "Blow", 
             artist: "Kesha", 
             duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
             art: "/images/un-logo.png",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
@@ -43,7 +53,7 @@ function initHarmonyTunes() {
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
             art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
@@ -53,7 +63,7 @@ function initHarmonyTunes() {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
             art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
@@ -448,11 +458,44 @@ function initHarmonyTunes() {
         });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokEmbeds.map(embed => `
-            <div class="tiktok-card">
-                ${embed}
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
         
         // Dynamically load TikTok script to render the embeds properly
         const tiktokScript = document.createElement('script');
@@ -658,37 +701,18 @@ function initHarmonyTunes() {
 
     function playSong() {
         if (fadeInterval) clearInterval(fadeInterval);
-        
+        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+        if (crossfadeInterval) clearInterval(crossfadeInterval);
+
+        isCrossfading = false;
+        mixerBtn.classList.remove('pulsing');
+        if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+
+        nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
+
         const targetVol = parseFloat(volumeSlider.value) || 1;
-        
-        if (isCrossfading) {
-            nextAudio.play().then(() => {
-                const fadeStep = 50;
-                const steps = (fadeDur * 1000) / fadeStep;
-                let currentStep = 0;
-                
-                if (crossfadeInterval) clearInterval(crossfadeInterval);
-                crossfadeInterval = setInterval(() => {
-                    currentStep++;
-                    if (currentStep >= steps) {
-                        clearInterval(crossfadeInterval);
-                        activeAudio.pause();
-                        activeAudio.currentTime = 0;
-                        activeAudio.volume = targetVol;
-                        nextAudio.volume = targetVol;
-                        isCrossfading = false;
-                        if(window.__triggerSurvey) window.__triggerSurvey();
-                    } else {
-                        activeAudio.volume = Math.max(0, targetVol * (1 - currentStep/steps));
-                        nextAudio.volume = Math.min(targetVol, targetVol * (currentStep/steps));
-                    }
-                }, fadeStep);
-            }).catch(e => {
-                console.error("Crossfade play failed - Manager info:", e);
-                isCrossfading = false;
-            });
-            return;
-        }
 
         activeAudio.volume = 0;
         activeAudio.play().then(() => {
@@ -1069,7 +1093,7 @@ function initHarmonyTunes() {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1144,7 +1168,7 @@ function initHarmonyTunes() {
         }
         lyricsContent.innerHTML = data.map((line, lineIndex) => {
             const wordsHtml = line.words.map((word, wordIndex) => {
-                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+                return `<span class="lyric-word" data-start="${escapeHTML(word.start)}">${escapeHTML(word.text)}</span>`;
             }).join(' ');
             const trendingClass = line.trending ? ' trending-lyric' : '';
             
@@ -1153,7 +1177,7 @@ function initHarmonyTunes() {
                 badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
-            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
         }).join('');
         
         // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
@@ -2050,7 +2074,6 @@ let dragItem = null;
             // Pick a random compatible song
             const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
             currentQueue.push(nextSuggested);
-            console.log("Mixxer AI: Seamlessly injected", nextSuggested.title, "to match", currentSong.title);
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song
