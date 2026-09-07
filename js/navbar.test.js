@@ -8,7 +8,7 @@ vi.mock('./auth.js', () => ({
 }));
 
 let mockAuthStateCallback = null;
-vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js', () => ({
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js', () => ({
   onAuthStateChanged: vi.fn((auth, cb) => {
     mockAuthStateCallback = cb;
   })
@@ -18,7 +18,7 @@ let mockDocExists = false;
 let mockDocData = {};
 let mockDocError = null;
 
-vi.mock('https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js', () => ({
+vi.mock('https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js', () => ({
   doc: vi.fn(),
   getDoc: vi.fn(async () => {
     if (mockDocError) throw mockDocError;
