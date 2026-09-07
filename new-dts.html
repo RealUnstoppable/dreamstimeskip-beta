@@ -594,8 +594,8 @@
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
         const authLink = document.getElementById('auth-link');
 
@@ -631,8 +631,8 @@
     <script src="/js/script.js"></script>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js';
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
 
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();

@@ -3,26 +3,58 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'astrophage',
+            title: "Astrophage",
+            artist: "Lupus Nocte",
+            duration: "3:10",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['electronic', 'synth', 'energetic']
+        },
         { 
             id: 'pixy-legacy',
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
+        },
+        { 
+            id: 'kesha-blow',
+            title: "Blow", 
+            artist: "Kesha", 
+            duration: "3:40", 
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
+            art: "/images/un-logo.png",
+            bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
+            tags: ['pop', 'party', 'electronic']
         },
         { 
             id: 'deorc-decuple',
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/harmony-tunes-card.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
+            art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
         },
@@ -31,511 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/dreams-lobby.jpg",
+            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
+            art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
         },
-        { 
-            id: 'top-hit-0',
-            title: "Blinding Lights", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 108, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-1',
-            title: "Shape of You", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-2',
-            title: "Dance Monkey", 
-            artist: "Tones And I", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 116, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-3',
-            title: "Someone You Loved", 
-            artist: "Lewis Capaldi", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-4',
-            title: "Rockstar", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-5',
-            title: "Sunflower", 
-            artist: "Post Malone", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 136, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-6',
-            title: "One Dance", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-7',
-            title: "Closer", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-8',
-            title: "Believer", 
-            artist: "Imagine Dragons", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-9',
-            title: "Stay", 
-            artist: "The Kid LAROI, Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-10',
-            title: "Perfect", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-11',
-            title: "Heat Waves", 
-            artist: "Glass Animals", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-12',
-            title: "Señorita", 
-            artist: "Shawn Mendes, Camila Cabello", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-13',
-            title: "bad guy", 
-            artist: "Billie Eilish", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 113, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-14',
-            title: "Say You Won't Let Go", 
-            artist: "James Arthur", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 134, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-15',
-            title: "Thinking out Loud", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-16',
-            title: "Lucid Dreams", 
-            artist: "Juice WRLD", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-17',
-            title: "Watermelon Sugar", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-18',
-            title: "God's Plan", 
-            artist: "Drake", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-19',
-            title: "Photograph", 
-            artist: "Ed Sheeran", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 114, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-20',
-            title: "Something Just Like This", 
-            artist: "The Chainsmokers", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 119, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-21',
-            title: "Shallow", 
-            artist: "Lady Gaga, Bradley Cooper", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-22',
-            title: "Love Yourself", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-23',
-            title: "Bohemian Rhapsody", 
-            artist: "Queen", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-24',
-            title: "Take Me To Church", 
-            artist: "Hozier", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 135, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-25',
-            title: "As It Was", 
-            artist: "Harry Styles", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 101, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-26',
-            title: "Sweater Weather", 
-            artist: "The Neighbourhood", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-27',
-            title: "All of Me", 
-            artist: "John Legend", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 106, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-28',
-            title: "Counting Stars", 
-            artist: "OneRepublic", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 121, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-29',
-            title: "THATS WHAT I LIKE", 
-            artist: "Bruno Mars", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 125, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-30',
-            title: "Levitating", 
-            artist: "Dua Lipa", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-31',
-            title: "Peaches", 
-            artist: "Justin Bieber", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 118, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-32',
-            title: "good 4 u", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 137, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-33',
-            title: "drivers license", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-34',
-            title: "Save Your Tears", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 130, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-35',
-            title: "Starboy", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-36',
-            title: "Cruel Summer", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-37',
-            title: "Anti-Hero", 
-            artist: "Taylor Swift", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 100, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-38',
-            title: "Flowers", 
-            artist: "Miley Cyrus", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 115, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-39',
-            title: "Kill Bill", 
-            artist: "SZA", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 117, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-40',
-            title: "Creepin'", 
-            artist: "Metro Boomin", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 123, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-41',
-            title: "Die For You", 
-            artist: "The Weeknd", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-42',
-            title: "Calm Down", 
-            artist: "Rema", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 128, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-43',
-            title: "I'm Good (Blue)", 
-            artist: "David Guetta", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        },
-        { 
-            id: 'top-hit-44',
-            title: "Unholy", 
-            artist: "Sam Smith, Kim Petras", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 103, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['party', 'dance', 'club']
-        },
-        { 
-            id: 'top-hit-45',
-            title: "Ella Baila Sola", 
-            artist: "Eslabon Armado", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 102, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'top-hit-46',
-            title: "La Bebe - Remix", 
-            artist: "Yng Lvcas", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 133, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'top-hit-47',
-            title: "vampire", 
-            artist: "Olivia Rodrigo", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 139, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-        { 
-            id: 'top-hit-48',
-            title: "Paint The Town Red", 
-            artist: "Doja Cat", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 109, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['workout', 'high-energy', 'hip-hop']
-        },
-        { 
-            id: 'top-hit-49',
-            title: "Water", 
-            artist: "Tyla", 
-            duration: "3:00", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
-            bpm: 126, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['acoustic', 'mellow', 'sad']
-        }
     ];
 
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
@@ -547,12 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
         'no-pole-remix': '#2e8a19'     // Dim Green
     };
 
-    const tiktokData = [
-        { title: "Viral Hit #1", img: "/images/UnstoppableHoodieModel300x300.png", url: "https://tiktok.com" },
-        { title: "Studio Vibes", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
-        { title: "New Release Teaser", img: "/images/harmony-tunes-card.jpg", url: "https://tiktok.com" },
-        { title: "Behind the Scenes", img: "/images/dreams-lobby.jpg", url: "https://tiktok.com" },
-        { title: "Top 10 This Week", img: "/images/un-logo-1.png", url: "https://tiktok.com" }
+    const tiktokEmbeds = [
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7361214658742652206" data-video-id="7361214658742652206" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> if you read this u have to follow <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a target="_blank" title="♬ Silence 1 Minute - silence moments" href="https://www.tiktok.com/music/Silence-1-Minute-6736021306824738817?refer=embed">♬ Silence 1 Minute - silence moments</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7286740931238317342" data-video-id="7286740931238317342" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> New songs every week! Follow us for the latest popular hits, delivered straight to your feed. We&#39;re the best place to discover new music and stay ahead of the trends. Plus, we&#39;re always up for a good time, so expect plenty of fun videos. <a title="liltay" target="_blank" href="https://www.tiktok.com/tag/liltay?refer=embed">#liltay</a> <a title="edit" target="_blank" href="https://www.tiktok.com/tag/edit?refer=embed">#edit</a> <a title="sucker4green" target="_blank" href="https://www.tiktok.com/tag/sucker4green?refer=embed">#sucker4green</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a target="_blank" title="♬ SUCKER 4 GREEN (MONEY) - LIL TAY" href="https://www.tiktok.com/music/SUCKER-4-GREEN-MONEY-7284095435357095938?refer=embed">♬ SUCKER 4 GREEN (MONEY) - LIL TAY</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7340749763630894378" data-video-id="7340749763630894378" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> Exes - Tate McRae - HarmonyTunes Follow Us on Socials and join our Discord Community ;) <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="sound" target="_blank" href="https://www.tiktok.com/tag/sound?refer=embed">#sound</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - preppy - miaaxess" href="https://www.tiktok.com/music/original-sound-preppy-7247743262663641857?refer=embed">♬ original sound - preppy - miaaxess</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7339769870399081770" data-video-id="7339769870399081770" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> @Dan!k On Spotify! Follow us for more music each week, and join our discord community in the profile description. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a target="_blank" title="♬ Dream. - Dan!k" href="https://www.tiktok.com/music/Dream-7322348789938128898?refer=embed">♬ Dream. - Dan!k</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7343010577624747306" data-video-id="7343010577624747306" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> If this video gets 100 likes we will start uploading daily. If you have a song you want us to do next leave a comment. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypage" target="_blank" href="https://www.tiktok.com/tag/fypage?refer=embed">#fypage</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - HarmonyTunes" href="https://www.tiktok.com/music/original-sound-7343010650165087018?refer=embed">♬ original sound - HarmonyTunes</a> </section> </blockquote>`
     ];
 
     let userFavorites = [];
@@ -565,6 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isShuffle = false;
     let repeatMode = 0; // 0: none, 1: all, 2: one
     let activeLineIndex = -1;
+    // ⚡ Bolt: Cache DOM queries for lyrics to prevent O(N) DOM lookups on every timeupdate
+    let cachedLyricLines = [];
     let isAutoScrolling = true;
     let autoScrollTimeout = null;
     let isProgrammaticScroll = false;
@@ -590,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const containerTikToks = document.getElementById('container-tiktoks');
     const containerPlaylists = document.getElementById('container-playlists');
     const songListBody = document.getElementById('song-list-body');
+    const homeHistoryBtn = document.getElementById('home-history-btn');
     
     // Playlist Elements
     const playlistTitleEl = document.getElementById('playlist-title');
@@ -632,34 +167,63 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastIdx = data.indexOf(lastLine);
         
         const blockStart = firstLine.start;
-        const blockEnd = lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : (audioEl.duration || blockStart + 15));
+        const maxEndDur = audioEl.duration || blockStart + 15;
+        // Add 1.3 seconds to blockEnd to ensure the entire final lyric is captured when Mixxer is OFF
+        const blockEnd = (lastLine.end || (data[lastIdx + 1] ? data[lastIdx + 1].start : maxEndDur)) + 1.3;
         
-        // Identify up to 2 lines before and after to determine maximum safe crossfade padding
-        const startLineIdx = Math.max(0, firstIdx - 2);
-        const endLineIdx = Math.min(data.length - 1, lastIdx + 2);
+        // Calculate optimal fade based on BPM
+        const bpm = librarySongsMap.get(songId)?.bpm || 0;
+        const optimalFade = calculateOptimalCrossfade(bpm);
+        
+        // Dynamically find how many lines before we need to satisfy optimalFade (max 3 edge cases)
+        let startLineIdx = firstIdx;
+        let leadIn = 0;
+        while (startLineIdx > 0 && leadIn < optimalFade && (firstIdx - startLineIdx) < 3) {
+            startLineIdx--;
+            leadIn = blockStart - data[startLineIdx].start;
+        }
+        
+        // Dynamically find how many lines after we need to satisfy optimalFade (max 3 edge cases)
+        let endLineIdx = lastIdx;
+        let tailOut = 0;
+        while (endLineIdx < data.length - 1 && tailOut < optimalFade && (endLineIdx - lastIdx) < 3) {
+            endLineIdx++;
+            let currentEnd = data[endLineIdx].end || (data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEndDur);
+            tailOut = currentEnd - blockEnd;
+        }
         
         const maxLeadIn = blockStart - data[startLineIdx].start;
         
-        const maxEnd = audioEl.duration || blockEnd + 15;
-        let paddedEndVal = data[endLineIdx].end;
-        if (!paddedEndVal) {
-            paddedEndVal = data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEnd;
-        }
-        const maxTailOut = Math.max(0, Math.min(maxEnd, paddedEndVal) - blockEnd);
+        let paddedEndVal = data[endLineIdx].end || (data[endLineIdx + 1] ? data[endLineIdx + 1].start : maxEndDur);
+        const maxTailOut = Math.max(0, Math.min(maxEndDur, paddedEndVal) - blockEnd);
         
-        // Calculate optimal fade and cap it so we NEVER fade during the actual viral lyrics
-        const bpm = librarySongsMap.get(songId)?.bpm || 0;
-        const optimalFade = calculateOptimalCrossfade(bpm);
-        const actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
+        // Cap actualFadeDur to the dynamically found boundaries
+        let actualFadeDur = Math.max(0, Math.min(optimalFade, maxLeadIn, maxTailOut));
+        
+        // --- "NEURAL NETWORK" SHORT SONG RULE ---
+        const songDuration = audioEl.duration || 180;
+        const blockDuration = blockEnd - blockStart;
+        
+        // Never let the crossfade overlap be longer than 35% of the viral block itself
+        actualFadeDur = Math.min(actualFadeDur, blockDuration * 0.35);
+
+        // Scale down aggressively for short songs (preventing interfering overlap)
+        if (songDuration < 60) {
+            actualFadeDur = Math.min(actualFadeDur, 3);
+        } else if (songDuration < 120) {
+            actualFadeDur = Math.min(actualFadeDur, 7);
+        }
         
         // Only use the padding needed for the crossfade
-        const paddedStart = blockStart - actualFadeDur;
-        const paddedEnd = blockEnd + actualFadeDur;
+        const paddedStart = Math.max(0, blockStart - actualFadeDur);
+        const paddedEnd = Math.min(songDuration, blockEnd + actualFadeDur);
         
         return { blockStart, blockEnd, paddedStart, paddedEnd, actualFadeDur };
     };
 
     let crossfadeDuration = 15;
+    let crossfadeInterval = null;
+    let fadeIntervalCrossfade = null;
     let fadeInterval = null;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
@@ -736,49 +300,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(searchInput) {
+        let searchTimeout;
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.song-card');
-            cards.forEach(card => {
-                const titleEl = card.querySelector('.song-title');
-                const artistEl = card.querySelector('p:last-of-type');
-                if(!titleEl || !artistEl) return;
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase();
+                // ⚡ Bolt: Optimize search highlight logic to use a single compiled RegExp outside the loops
+                // and skip DOM updates if the state hasn't changed.
+                const queryRegex = query ? new RegExp(query, 'gi') : null;
+                const replaceFn = match => `<span class="search-highlight">${match}</span>`;
+
+                const cards = document.querySelectorAll('.song-card');
+                cards.forEach(card => {
+                    const titleEl = card.querySelector('.song-title');
+                    const artistEl = card.querySelector('p:last-of-type');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    const newDisplay = isMatch ? 'flex' : 'none';
+                    if (card.style.display !== newDisplay) {
+                        card.style.display = newDisplay;
+                    }
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                    } else {
+                        // Avoid unnecessary textContent assignments which trigger style recalculations
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
+                    }
+                });
                 
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                card.style.display = isMatch ? 'flex' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
-            
-            const rows = document.querySelectorAll('.song-table tbody tr');
-            rows.forEach(row => {
-                const titleEl = row.querySelector('.song-title');
-                const artistEl = row.querySelector('.song-artist');
-                if(!titleEl || !artistEl) return;
-                
-                const titleText = titleEl.textContent;
-                const artistText = artistEl.textContent;
-                const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-                
-                row.style.display = isMatch ? 'table-row' : 'none';
-                
-                if(query && isMatch) {
-                    titleEl.innerHTML = titleText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                    artistEl.innerHTML = artistText.replace(new RegExp(query, 'gi'), match => `<span class="search-highlight">${match}</span>`);
-                } else {
-                    titleEl.textContent = titleText;
-                    artistEl.textContent = artistText;
-                }
-            });
+                const rows = document.querySelectorAll('.song-table tbody tr');
+                rows.forEach(row => {
+                    const titleEl = row.querySelector('.song-title');
+                    const artistEl = row.querySelector('.song-artist');
+                    if(!titleEl || !artistEl) return;
+
+                    const titleText = titleEl.textContent;
+                    const artistText = artistEl.textContent;
+                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
+
+                    const newDisplay = isMatch ? 'table-row' : 'none';
+                    if (row.style.display !== newDisplay) {
+                        row.style.display = newDisplay;
+                    }
+
+                    if(query && isMatch) {
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                    } else {
+                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
+                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
+                    }
+                });
+            }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
         });
     }
 
@@ -855,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist:", error);
+            console.error("Error loading playlist - Manager info:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -871,16 +451,57 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
         containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
+        containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
+        document.getElementById('show-more-recommended').addEventListener('click', (e) => {
+            containerRecommended.classList.toggle('expanded');
+            e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
+        });
 
         // 3. TikToks
-        containerTikToks.innerHTML = tiktokData.map(tk => `
-            <div class="tiktok-card" data-url="${tk.url}">
-                <img src="${tk.img}" alt="${tk.title}">
-                <div class="tiktok-overlay">
-                    <div class="tiktok-title">${tk.title}</div>
-                </div>
-            </div>
-        `).join('');
+        containerTikToks.innerHTML = '';
+        const docFragment = document.createDocumentFragment();
+
+        tiktokEmbeds.forEach(embedHTML => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(embedHTML, 'text/html');
+            const blockquote = doc.querySelector('blockquote.tiktok-embed');
+
+            if (blockquote) {
+                // Extract only necessary attributes to safely reconstruct the DOM element
+                // instead of appending the unsanitized node which could contain inline event handlers
+                const videoId = blockquote.getAttribute('data-video-id');
+                const cite = blockquote.getAttribute('cite');
+
+                if (videoId && cite) {
+                    const card = document.createElement('div');
+                    card.className = 'tiktok-card';
+
+                    const newBlockquote = document.createElement('blockquote');
+                    newBlockquote.className = 'tiktok-embed';
+
+                    // Only use extracted text values, never raw unsanitized attributes
+                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
+                    newBlockquote.setAttribute('cite', cite);
+                    newBlockquote.style.maxWidth = '605px';
+                    newBlockquote.style.minWidth = '325px';
+
+                    // The inner section tags are not strictly required for the embed to work,
+                    // but we can add the @ tag if we wanted. For security, we omit them
+                    // since the embed.js will replace the blockquote content anyway.
+
+                    card.appendChild(newBlockquote);
+                    docFragment.appendChild(card);
+                }
+            }
+        });
+
+        containerTikToks.appendChild(docFragment);
+        
+        // Dynamically load TikTok script to render the embeds properly
+        const tiktokScript = document.createElement('script');
+        tiktokScript.src = "https://www.tiktok.com/embed.js";
+        tiktokScript.async = true;
+        document.body.appendChild(tiktokScript);
 
         // 4. Playlists
         const playlists = [
@@ -888,13 +509,13 @@ document.addEventListener('DOMContentLoaded', () => {
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card playlist-card" data-playlist-id="${pl.id}">
+            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${pl.title}">
-                    <button class="card-play-btn">▶</button>
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
-                <div class="card-title">${pl.title}</div>
-                <div class="card-desc">${pl.desc}</div>
+                <div class="card-title">${escapeHTML(pl.title)}</div>
+                <div class="card-desc">${escapeHTML(pl.desc)}</div>
             </div>
         `).join('');
 
@@ -920,12 +541,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = playBtn.closest('.music-card');
                 const songId = card.dataset.songId;
                 if (songId) {
-                    // ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
                     const song = librarySongsMap.get(songId);
                     if (song) playContext([song], 0);
                 }
                 return;
             }
+
+            const addQueueBtn = e.target.closest('.add-queue-btn');
+            if (addQueueBtn) {
+                e.stopPropagation();
+                const card = addQueueBtn.closest('.music-card');
+                const songId = card.dataset.songId;
+                if (songId) {
+                    const song = librarySongsMap.get(songId);
+                    if (song && typeof window.__addToUserQueue === 'function') {
+                        window.__addToUserQueue(song);
+                        // Brief success animation
+                        const originalText = addQueueBtn.innerHTML;
+                        addQueueBtn.innerHTML = '✓';
+                        setTimeout(() => addQueueBtn.innerHTML = originalText, 1000);
+                    }
+                }
+                return;
+            }
+
+            if (e.target.closest('.card-more-btn')) return;
 
             const musicCard = e.target.closest('.music-card[data-song-id]');
             if (musicCard) {
@@ -937,6 +577,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.playSongById = (id) => {
+        __recordHistory();
         const songIndex = librarySongs.findIndex(s => s.id === id);
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
@@ -963,12 +604,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
-                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${index + 1}</span>
+                    <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
                     <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
                 </td>
-                <td class="song-title">${song.title}</td>
-                <td>${song.artist}</td>
-                <td style="text-align: right;">${song.duration}</td>
+                <td class="song-title">${escapeHTML(song.title)}</td>
+                <td>${escapeHTML(song.artist)}</td>
+                <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
 
             row.addEventListener('click', () => {
@@ -982,7 +623,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- PLAYER LOGIC ---
+    function __recordHistory() {
+        if (currentSongIndex >= 0 && currentQueue[currentSongIndex]) {
+            if(typeof window.__pushToHistory === 'function') {
+                window.__pushToHistory(currentQueue[currentSongIndex]);
+            }
+        }
+    }
+
     function playContext(newQueue, startIndex) {
+        __recordHistory();
         currentQueue = [...newQueue];
         if (isShuffle) {
             const first = currentQueue[startIndex];
@@ -997,11 +647,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadSong(index) {
-        if (index < 0 || index >= currentQueue.length) return;
-        const song = currentQueue[index];
+        if(index < 0 || index >= currentQueue.length) return;
+
+        currentSongIndex = index;
+        const song = currentQueue[currentSongIndex];
         
+        activeAudio.removeAttribute('data-no-crossfade');
         isListening = false;
         if(mixerBtn) mixerBtn.classList.remove('analyzing');
+        if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
         activeAudio.src = song.src;
         playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
@@ -1020,6 +676,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(viewPlaylist.style.display !== 'none') {
             const showingFavs = playlistTitleEl.textContent === "Liked Songs";
             renderSongTable(showingFavs ? userFavorites : librarySongs);
+        }
+        
+        // Trigger Background Mixxer AI
+        if (typeof backgroundMixxerAI === 'function') {
+            backgroundMixxerAI();
         }
     }
 
@@ -1040,18 +701,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playSong() {
         if (fadeInterval) clearInterval(fadeInterval);
-        
+        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+        if (crossfadeInterval) clearInterval(crossfadeInterval);
+
+        isCrossfading = false;
+        mixerBtn.classList.remove('pulsing');
+        if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+        if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+
+        nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
+
         const targetVol = parseFloat(volumeSlider.value) || 1;
-        
-        if (isCrossfading) {
-            activeAudio.play().catch(e => console.error(e));
-            isPlaying = true;
-            playIcon.style.display = 'none';
-            pauseIcon.style.display = 'block';
-            if(fsPlayIcon) fsPlayIcon.style.display = 'none';
-            if(fsPauseIcon) fsPauseIcon.style.display = 'block';
-            return;
-        }
 
         activeAudio.volume = 0;
         activeAudio.play().then(() => {
@@ -1074,7 +735,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error(e));
+        }).catch(e => console.error("Manager info:", e));
     }
 
     function pauseSong() {
@@ -1128,6 +789,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 logPlaybackEvent('skip_through', songId, { skippedAt: currentTime, percentCompleted: (currentTime / duration) * 100 });
             }
         }
+
+        if(typeof window.__pullFromUserQueue === 'function') {
+            const nextUserSong = window.__pullFromUserQueue();
+            if(nextUserSong) {
+                currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                loadSong(currentSongIndex + 1);
+                playSong();
+                return;
+            }
+        }
+
+        __recordHistory();
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
             if (repeatMode === 1) nextIndex = 0;
@@ -1142,6 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeAudio.currentTime > 3) {
             activeAudio.currentTime = 0;
         } else {
+            __recordHistory();
             let prevIndex = currentSongIndex - 1;
             if (prevIndex < 0) {
                 if (repeatMode === 1) prevIndex = currentQueue.length - 1;
@@ -1234,11 +908,13 @@ document.addEventListener('DOMContentLoaded', () => {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(console.error);
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+            const mobMixerBtn = document.getElementById('mob-mixer-btn');
+            if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
         });
 
         volumeSlider.addEventListener('input', (e) => {
@@ -1258,22 +934,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
-            shuffleBtn.style.color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            const color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            shuffleBtn.style.color = color;
+            if(fsShuffleBtn) fsShuffleBtn.style.color = color;
+            const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
+            if(mobShuffleBtn) mobShuffleBtn.style.color = color;
         });
 
         repeatBtn.addEventListener('click', () => {
             repeatMode = (repeatMode + 1) % 3;
-            const indicator = repeatBtn.querySelector('.repeat-indicator'); const fsIndicator = document.getElementById('fs-repeat-indicator');
-            if (repeatMode === 0) {
-                repeatBtn.style.color = '#b3b3b3';
-                indicator.textContent = '';
-            } else if (repeatMode === 1) {
-                repeatBtn.style.color = 'var(--accent-green)';
-                indicator.textContent = '.';
-            } else {
-                repeatBtn.style.color = 'var(--accent-green)';
-                indicator.textContent = '1';
-            }
+            const updateRepeatVisuals = (btn, indicator) => {
+                if(!btn) return;
+                if (repeatMode === 0) {
+                    btn.style.color = '#b3b3b3';
+                    if(indicator) indicator.textContent = '';
+                } else if (repeatMode === 1) {
+                    btn.style.color = 'var(--accent-green)';
+                    if(indicator) indicator.textContent = '.';
+                } else {
+                    btn.style.color = 'var(--accent-green)';
+                    if(indicator) indicator.textContent = '1';
+                }
+            };
+            
+            updateRepeatVisuals(repeatBtn, repeatBtn.querySelector('.repeat-indicator'));
+            if(fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
+            const mobRepeatBtn = document.getElementById('mob-repeat-btn');
+            if(mobRepeatBtn) updateRepeatVisuals(mobRepeatBtn, null);
         });
 
         playerLikeBtn.addEventListener('click', () => {
@@ -1282,9 +969,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Viral Skip: Hold to Loop, Click to Skip
-        let viralPressTimer = null;
-        let viralDownTime = 0;
+        // Viral Skip: Double Tap to Loop, Single Tap to Skip
+        let viralLastTapTime = 0;
         const toggleViralLock = (forceUnlock = false) => {
             if (viralLocked || forceUnlock) {
                 viralLocked = false;
@@ -1296,66 +982,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
             }
         };
-        const handleViralDown = (e) => {
-            viralDownTime = Date.now();
-            viralPressTimer = setTimeout(() => {
-                if (!viralLocked) {
-                    toggleViralLock(); // Lock it
-                    // Jump to viral start immediately
-                    const song = currentQueue[currentSongIndex];
-                    if (song) {
-                        const block = getViralBlock(song.id, activeAudio);
-                        if (block) {
-                            activeAudio.currentTime = block.paddedStart;
-                            playSong();
-                        }
-                    }
-                }
-            }, 600); // 600ms hold required
-        };
-        const handleViralUp = (e) => {
-            clearTimeout(viralPressTimer);
-            const duration = Date.now() - viralDownTime;
-            if (duration < 600) {
-                // Short click
-                if (viralLocked) {
-                    toggleViralLock(true); // Unlock
-                } else {
-                    // Normal skip to viral part
-                    const song = currentQueue[currentSongIndex];
-                    if(song) {
-                        const block = getViralBlock(song.id, activeAudio);
-                        if (block) {
-                            activeAudio.currentTime = block.paddedStart;
-                            playSong();
-                        }
-                    }
+        const handleViralClick = (e) => {
+            if(e) e.preventDefault();
+            const now = Date.now();
+            if (now - viralLastTapTime < 5000 && viralLastTapTime !== 0) {
+                // Double tap detected (within 5 seconds)
+                toggleViralLock();
+                viralLastTapTime = 0; // reset
+            } else {
+                // Single tap detected
+                viralLastTapTime = now;
+                const song = currentQueue[currentSongIndex];
+                if (song && song.inmixPoint) {
+                    activeAudio.currentTime = song.inmixPoint;
+                    if (activeAudio.paused) playSong();
                 }
             }
         };
 
         [viralSkipBtn, fsViralSkipBtn].forEach(btn => {
             if (!btn) return;
-            btn.addEventListener('pointerdown', handleViralDown);
-            btn.addEventListener('pointerup', handleViralUp);
-            btn.addEventListener('pointerleave', () => clearTimeout(viralPressTimer));
-            btn.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent long press context menu
-            btn.addEventListener('click', (e) => e.preventDefault()); // Disable default click
+            btn.addEventListener('click', handleViralClick);
+            btn.addEventListener('contextmenu', (e) => e.preventDefault());
         });
 
-        // Lyrics Events
         lyricsBtn.addEventListener('click', () => {
+            const mobLyricsBtn = document.getElementById('mob-lyrics-btn');
             if (viewLyrics.style.display !== 'none' && !viewLyrics.classList.contains('slide-down-active')) {
                 viewLyrics.classList.remove('slide-up-active');
                 viewLyrics.classList.add('slide-down-active');
                 setTimeout(() => {
                     viewLyrics.style.display = 'none';
-                    viewLyrics.classList.remove('slide-down-active');
-                }, 400);
+                    lyricsBtn.style.color = '#b3b3b3';
+                    if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
+                    if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
+                }, 300);
             } else {
                 viewLyrics.classList.remove('slide-down-active');
                 viewLyrics.classList.add('slide-up-active');
                 viewLyrics.style.display = 'flex';
+                lyricsBtn.style.color = 'var(--accent-green)';
+                if(fsLyricsBtn) fsLyricsBtn.style.color = 'var(--accent-green)';
+                if(mobLyricsBtn) mobLyricsBtn.style.color = 'var(--accent-green)';
                 setTimeout(() => {
                     const activeLine = lyricsContent.querySelector('.lyric-line.active');
                     if (activeLine && isAutoScrolling) {
@@ -1425,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${artistName}</p>`;
+            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1439,15 +1107,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Global Search
+        let globalSearchTimeout;
         globalSearch.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
-                const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderSongTable(filtered);
-            } else if (viewHome.style.display !== 'none') {
-                const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                renderMusicGrid(filtered);
-            }
+            clearTimeout(globalSearchTimeout);
+            globalSearchTimeout = setTimeout(() => {
+                const query = e.target.value.toLowerCase().trim();
+                if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
+                    const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderSongTable(filtered);
+                } else if (viewHome.style.display !== 'none') {
+                    const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    renderMusicGrid(filtered);
+                }
+            }, 300); // ⚡ Bolt: Debounce global search to reduce unnecessary re-renders
         });
 
         // --- Mobile Overflow ("...") Button ---
@@ -1455,6 +1127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mobileOverflowBtn = document.getElementById('mobile-overflow-btn');
         if (mobileOverflowBtn && mobileOverlay) {
             mobileOverflowBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 mobileOverlay.classList.toggle('hidden');
             });
@@ -1463,20 +1136,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { triggerClick(mixerBtn); mobileOverlay.classList.add('hidden'); });
             document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { triggerClick(repeatBtn); mobileOverlay.classList.add('hidden'); });
             document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-queue-btn')?.addEventListener('click', () => { triggerClick(queueBtn); mobileOverlay.classList.add('hidden'); });
             
             // For Viral Skip
-            document.getElementById('mob-viral-btn')?.addEventListener('click', () => {
-                // Simulate a short click (skip to viral)
-                const song = currentQueue[currentSongIndex];
-                if(song) {
-                    const block = getViralBlock(song.id, activeAudio);
-                    if (block) {
-                        activeAudio.currentTime = block.paddedStart;
-                        playSong();
-                    }
-                }
-                mobileOverlay.classList.add('hidden');
-            });
+            const mobViralBtn = document.getElementById('mob-viral-btn');
+            if (mobViralBtn) {
+                mobViralBtn.addEventListener('click', (e) => {
+                    handleViralClick(e);
+                    // Overlay intentionally stays open for double tap
+                });
+            }
 
             // Close overlay when clicking outside
             document.addEventListener('click', (e) => {
@@ -1488,6 +1157,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- LYRICS RENDERING ---
+    // ⚡ Bolt: Cache DOM elements and timestamps to avoid O(N) queries on every frame
+    let cachedLyricsDOM = [];
+
     function renderLyrics(songId) {
         const data = lyricsData[songId];
         if (!data) {
@@ -1496,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         lyricsContent.innerHTML = data.map((line, lineIndex) => {
             const wordsHtml = line.words.map((word, wordIndex) => {
-                return `<span class="lyric-word" data-start="${word.start}">${word.text}</span>`;
+                return `<span class="lyric-word" data-start="${escapeHTML(word.start)}">${escapeHTML(word.text)}</span>`;
             }).join(' ');
             const trendingClass = line.trending ? ' trending-lyric' : '';
             
@@ -1505,12 +1177,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
-            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${line.start}" data-end="${line.end}">${wordsHtml}</div>`;
+            return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
         }).join('');
         
-        // Seek on click
+        // ⚡ Bolt: Cache DOM queries and parsed floats ahead of time
         const lines = lyricsContent.querySelectorAll('.lyric-line');
-        lines.forEach(line => {
+        cachedLyricLines = Array.from(lines).map(line => ({
+            el: line,
+            start: parseFloat(line.getAttribute('data-start')),
+            end: parseFloat(line.getAttribute('data-end')),
+            words: Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }))
+        }));
+
+        // Seek on click
+        cachedLyricLines.forEach(lineData => {
+            const line = lineData.el;
             line.addEventListener('click', () => {
                 const start = parseFloat(line.getAttribute('data-start'));
                 if (!isNaN(start)) {
@@ -1518,6 +1202,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     playSong();
                 }
             });
+        });
+
+        // Cache DOM and timestamps
+        cachedLyricsDOM = Array.from(lines).map(line => {
+            const words = Array.from(line.querySelectorAll('.lyric-word')).map(word => ({
+                el: word,
+                start: parseFloat(word.getAttribute('data-start'))
+            }));
+
+            return {
+                el: line,
+                start: parseFloat(line.getAttribute('data-start')),
+                end: parseFloat(line.getAttribute('data-end')),
+                words: words
+            };
         });
     }
 
@@ -1527,9 +1226,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(autoScrollTimeout);
         autoScrollTimeout = setTimeout(() => {
             isAutoScrolling = true;
-            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none') {
-                const lines = lyricsContent.querySelectorAll('.lyric-line');
-                const activeLine = lines[activeLineIndex];
+            if (activeLineIndex !== -1 && viewLyrics.style.display !== 'none' && cachedLyricsDOM.length > 0) {
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 if (activeLine) {
                     isProgrammaticScroll = true;
                     lyricsContainer.scrollTo({
@@ -1545,39 +1243,34 @@ document.addEventListener('DOMContentLoaded', () => {
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
     function syncLyrics() {
-        if (viewLyrics.style.display === 'none') return;
+        if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
-        const lines = lyricsContent.querySelectorAll('.lyric-line');
         
         let newActiveLineIndex = -1;
-        lines.forEach((line, index) => {
-            const start = parseFloat(line.getAttribute('data-start'));
-            const end = parseFloat(line.getAttribute('data-end'));
+        cachedLyricsDOM.forEach((lineCache, index) => {
+            const { el: lineEl, start, end, words } = lineCache;
             
             // Allow active line to persist slightly if it's the last one sung, 
             // but strict matching is better for beat-by-beat
             if (currentTime >= start && currentTime <= end) {
                 newActiveLineIndex = index;
-                line.classList.add('active');
+                lineEl.classList.add('active');
                 
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
-                    const wStart = parseFloat(word.getAttribute('data-start'));
-                    if (currentTime >= wStart) {
-                        word.classList.add('active-word');
+                words.forEach(wordCache => {
+                    if (currentTime >= wordCache.start) {
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             } else {
-                line.classList.remove('active');
+                lineEl.classList.remove('active');
                 // clear word highlights if passed
-                const words = line.querySelectorAll('.lyric-word');
-                words.forEach(word => {
+                words.forEach(wordCache => {
                     if (currentTime > end) {
-                        word.classList.add('active-word');
+                        wordCache.el.classList.add('active-word');
                     } else {
-                        word.classList.remove('active-word');
+                        wordCache.el.classList.remove('active-word');
                     }
                 });
             }
@@ -1586,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
             if (isAutoScrolling) {
-                const activeLine = lines[activeLineIndex];
+                const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 isProgrammaticScroll = true;
                 lyricsContainer.scrollTo({
                     top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
@@ -1606,10 +1299,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const remainingToViralEnd = block.paddedEnd - activeAudio.currentTime;
 
-        // If Mixxer is OFF, just do a hard cut
+        // If Mixxer is OFF, just do a hard cut exactly at the viral lyrics boundary
         if (!isMixerMode) {
-            if (activeAudio.currentTime >= block.paddedEnd) {
-                activeAudio.currentTime = block.paddedStart;
+            if (activeAudio.currentTime >= block.blockEnd) {
+                activeAudio.currentTime = block.blockStart;
             }
             return;
         }
@@ -1629,14 +1322,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
         }
 
         // "Crossfading" phase
         if (remainingToViralEnd > 0 && remainingToViralEnd <= fadeDur && !isCrossfading) {
             isListening = false;
             mixerBtn.classList.remove('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             isCrossfading = true;
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
+            if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
             // Swap players for intra-song crossfade
             const prevAudio = activeAudio;
@@ -1648,13 +1344,14 @@ document.addEventListener('DOMContentLoaded', () => {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -1668,6 +1365,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                    const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
             }, 50);
         }
@@ -1675,12 +1373,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkCrossfade() {
         if (!isMixerMode) return;
+        if (activeAudio.getAttribute('data-no-crossfade') === 'true') return;
         
         const remaining = activeAudio.duration - activeAudio.currentTime;
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
+            
+            // If there is no next song and repeat is off, auto-queue the best fit using AI
+            if (currentSongIndex + 1 >= currentQueue.length && repeatMode !== 1) {
+                if (typeof backgroundMixxerAI === 'function') {
+                    backgroundMixxerAI(); // Analyzes and adds the next song
+                }
+            }
             
             if (repeatMode !== 2 && currentQueue.length > 1) {
                 const currentMetadata = librarySongsMap.get(currentQueue[currentSongIndex].id);
@@ -1713,8 +1420,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
             isListening = false;
             mixerBtn.classList.remove('analyzing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             isCrossfading = true;
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
+            if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
@@ -1726,11 +1435,23 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
                 else {
-                    isCrossfading = false;
-                    mixerBtn.classList.remove('pulsing');
-                    nextAudio = activeAudio;
-                    activeAudio = prevAudio;
-                    return; 
+                    // Try one last time if it's still empty!
+                    if (typeof backgroundMixxerAI === 'function') {
+                        backgroundMixxerAI();
+                    }
+                    if (currentSongIndex + 1 < currentQueue.length) {
+                        nextIndex = currentSongIndex + 1;
+                    } else {
+                        // Utterly failed to find a song, abort crossfade completely
+                        isCrossfading = false;
+                        mixerBtn.classList.remove('pulsing');
+                        if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                        const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+                        nextAudio = activeAudio;
+                        activeAudio = prevAudio;
+                        activeAudio.setAttribute('data-no-crossfade', 'true');
+                        return; 
+                    }
                 }
             }
             currentSongIndex = nextIndex;
@@ -1758,13 +1479,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error(e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            const fadeIntervalCrossfade = setInterval(() => {
+            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
+            fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -1778,6 +1500,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing');
+                    if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                    const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
             }, 50);
         }
@@ -1839,7 +1563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error:", e);
+                console.error("Firebase error - Manager info:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -1874,17 +1598,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         isMixerMode = docSnap.data().mixerToggled;
                         mixerBtn.classList.toggle('active', isMixerMode);
                         if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+                        const mobMixerBtn = document.getElementById('mob-mixer-btn');
+                        if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
                     }
                     if(docSnap.data().musicFavorites) {
-                    const favIds = docSnap.data().musicFavorites;
-                    // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
-                    const favIdsSet = new Set(favIds);
-                    userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
-                    favoriteIds = new Set(favIds);
-                    userFavoritesIds = new Set(favIds);
+                        const favIds = docSnap.data().musicFavorites;
+                        // ⚡ Bolt: Convert to Set for O(1) lookup inside loop, improving performance for large library/favorites
+                        const favIdsSet = new Set(favIds);
+                        userFavorites = librarySongs.filter(song => favIdsSet.has(song.id));
+                        favoriteIds = new Set(favIds);
+                        userFavoritesIds = new Set(favIds);
+                    }
+                    if(docSnap.data().musicHistory) {
+                        const historyIds = docSnap.data().musicHistory;
+                        historyQueue = historyIds.map(id => librarySongsMap.get(id)).filter(s => s);
+                        if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Manager info:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -1916,17 +1647,483 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeWhatsNewBtn) closeWhatsNewBtn.addEventListener('click', closeWhatsNew);
     if(gotItBtn) gotItBtn.addEventListener('click', closeWhatsNew);
 
-});
+    // --- QUEUE & HISTORY STATE & LOGIC ---
+    let userQueue = [];
+    let historyQueue = [];
+    let currentTab = 'upnext';
+    let surveyTimeout = null;
+
+    const queuePanel = document.getElementById('queue-panel');
+    const queueBtn = document.getElementById('queue-btn');
+    const closeQueueBtn = document.getElementById('close-queue-btn');
+    const tabUpNext = document.getElementById('tab-up-next');
+    const tabHistory = document.getElementById('tab-history');
+    const queueContentArea = document.getElementById('queue-content-area');
+    
+    const mixxerSurvey = document.getElementById('mixxer-survey');
+    const surveyUp = document.getElementById('survey-up');
+    const surveyDown = document.getElementById('survey-down');
+
+    window.__addToUserQueue = (song) => {
+        userQueue.push(song);
+        if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+    };
+
+    window.__pullFromUserQueue = () => {
+        if(userQueue.length > 0) {
+            const song = userQueue.shift();
+            if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+            return song;
+        }
+        return null;
+    };
+
+    window.__pushToHistory = (song) => {
+        historyQueue.push(song);
+        if(historyQueue.length > 50) historyQueue.shift();
+        if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+        
+        // Push to Firebase
+        if(currentUser) {
+            const userRef = doc(db, "users", currentUser.uid);
+            const historyIds = historyQueue.map(s => s.id);
+            updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
+                if(e.code === 'not-found') {
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
+                } else {
+                    console.error("Firebase history update error - Manager info:", e);
+                }
+            });
+        }
+    };
+
+    // --- CONTEXT MENU LOGIC ---
+    const contextMenu = document.getElementById('song-context-menu');
+    let contextMenuTargetSongId = null;
+
+    document.addEventListener('click', (e) => {
+        const moreBtn = e.target.closest('.card-more-btn');
+        if (moreBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const card = moreBtn.closest('.music-card');
+            contextMenuTargetSongId = card.dataset.songId;
+            
+            // Position menu
+            const rect = moreBtn.getBoundingClientRect();
+            if (contextMenu) {
+                contextMenu.style.left = `${Math.min(rect.left, window.innerWidth - 220)}px`;
+                contextMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                contextMenu.classList.remove('hidden');
+            }
+            return;
+        }
+        
+        // Hide on outside click
+        if (contextMenu && !contextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu')) {
+            contextMenu.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('ctx-play-next')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) {
+                userQueue.unshift(song);
+                if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-play-last')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) window.__addToUserQueue(song);
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-favorite')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            if(typeof window.toggleFavorite === 'function') {
+                window.toggleFavorite(contextMenuTargetSongId);
+            } else if (typeof toggleFavorite === 'function') {
+                toggleFavorite(contextMenuTargetSongId);
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('ctx-view-artist')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            const song = librarySongsMap.get(contextMenuTargetSongId);
+            if(song) {
+                if (typeof window.openArtistProfile === 'function') {
+                    window.openArtistProfile(song.artist);
+                } else if (typeof openArtistProfile === 'function') {
+                    openArtistProfile(song.artist);
+                }
+            }
+        }
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    if(homeHistoryBtn) {
+        homeHistoryBtn.addEventListener('click', () => {
+            if (!queuePanel.classList.contains('open')) {
+                if(queueBtn) queueBtn.click();
+            }
+            const histTab = document.getElementById('tab-history');
+            if(histTab) histTab.click();
+        });
+    }
+
+    if(queueBtn) {
+        queueBtn.addEventListener('click', () => {
+            if (queuePanel.classList.contains('open')) {
+                queuePanel.classList.remove('open');
+            } else {
+                queuePanel.classList.remove('hidden');
+                setTimeout(() => queuePanel.classList.add('open'), 10);
+                renderQueue();
+            }
+        });
+    }
+    if(closeQueueBtn) {
+        closeQueueBtn.addEventListener('click', () => {
+            queuePanel.classList.remove('open');
+        });
+    }
+    
+    if(tabUpNext) {
+        tabUpNext.addEventListener('click', () => {
+            currentTab = 'upnext';
+            tabUpNext.classList.add('active');
+            tabHistory.classList.remove('active');
+            renderQueue();
+        });
+    }
+    if(tabHistory) {
+        tabHistory.addEventListener('click', () => {
+            currentTab = 'history';
+            tabHistory.classList.add('active');
+            tabUpNext.classList.remove('active');
+            renderQueue();
+        });
+    }
+
+let dragItem = null;
+    let dragStartY = 0;
+    let dragStartTop = 0;
+    let dragTimeout = null;
+    let isDragging = false;
+
+    document.addEventListener('pointermove', (e) => {
+        if (isDragging && dragItem) {
+            const deltaY = e.clientY - dragStartY;
+            dragItem.style.transform = `translateY(${deltaY}px)`;
+
+            // Visual Drop Indicator
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i] === dragItem) continue;
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                    if (e.clientY < rect.top + rect.height / 2) {
+                        items[i].style.borderTop = "2px solid rgba(255,255,255,0.3)";
+                    } else {
+                        items[i].style.borderBottom = "2px solid rgba(255,255,255,0.3)";
+                    }
+                    break;
+                }
+            }
+        }
+    });
+
+    document.addEventListener('pointerup', (e) => {
+        if (dragTimeout) clearTimeout(dragTimeout);
+        if (isDragging && dragItem) {
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const idx = itemsNodeList.indexOf(dragItem);
+
+            isDragging = false;
+
+            dragItem.style.position = '';
+            dragItem.style.zIndex = '';
+            dragItem.style.transform = '';
+            dragItem.classList.remove('dragging');
+            queueContentArea.style.cursor = '';
+
+            // Calculate drop index based on position
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            let droppedIdx = idx;
+            for (let i = 0; i < items.length; i++) {
+                const rect = items[i].getBoundingClientRect();
+                if (e.clientY < rect.top + rect.height / 2) {
+                    droppedIdx = i;
+                    break;
+                } else if (i === items.length - 1) {
+                    droppedIdx = items.length - 1;
+                }
+            }
+
+            if (droppedIdx !== idx) {
+                const movedSong = userQueue.splice(idx, 1)[0];
+                userQueue.splice(droppedIdx, 0, movedSong);
+            }
+            dragItem = null;
+            renderQueue();
+        }
+    });
+
+
+    function renderQueue() {
+        if(!queueContentArea) return;
+        queueContentArea.innerHTML = '';
+        
+        let displayList = [];
+        if (currentTab === 'upnext') {
+            displayList = [
+                ...userQueue.map(s => ({...s, isUserQueue: true})),
+                ...currentQueue.slice(currentSongIndex + 1).map(s => ({...s, isUserQueue: false}))
+            ];
+        } else {
+            displayList = [...historyQueue].reverse(); // Most recent first
+        }
+
+        if(displayList.length === 0) {
+            queueContentArea.innerHTML = `<p style="text-align: center; color: #b3b3b3; margin-top: 20px;">${currentTab === 'upnext' ? 'Queue is empty' : 'No history yet'}</p>`;
+            return;
+        }
+
+        // ⚡ Bolt: Use a DocumentFragment to batch DOM insertions for the queue items.
+        // This reduces synchronous layout reflows from O(N) to O(1), significantly
+        // speeding up render time and preventing main thread blocking, especially for long lists.
+        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows
+        const fragment = document.createDocumentFragment();
+
+        displayList.forEach((song, idx) => {
+            const item = document.createElement('div');
+            item.className = 'queue-item';
+            
+            const isDraggable = currentTab === 'upnext' && song.isUserQueue;
+            item.dataset.index = idx; // Maps 1:1 with userQueue index since userQueue is added first
+            item.dataset.songId = song.id;
+            
+            item.innerHTML = `
+                <img src="${song.art}" alt="${song.title}">
+                <div class="queue-item-info">
+                    <h4>${song.title}</h4>
+                    <p>${song.artist}</p>
+                </div>
+                ${isDraggable ? '<div class="queue-more-btn" title="Drag to move, click for options">...</div>' : ''}
+            `;
+            
+            if(isDraggable) {
+                const moreBtn = item.querySelector('.queue-more-btn');
+                
+                moreBtn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    isDragging = false;
+                    dragItem = item; // Track the clicked item for pointerup handling
+                    dragTimeout = setTimeout(() => {
+                        isDragging = true;
+                        dragStartY = e.clientY;
+                        dragStartTop = item.offsetTop;
+                        item.style.position = 'relative';
+                        item.style.zIndex = '100';
+                        item.classList.add('dragging');
+                        if(queueContentArea) queueContentArea.style.cursor = 'grabbing';
+                    }, 200); // 200ms hold to drag
+                });
+                
+                moreBtn.addEventListener('pointerup', (e) => {
+                    if (dragTimeout) clearTimeout(dragTimeout);
+                    if (!isDragging) {
+                        // It was just a tap/click! Open context menu
+                        let contextMenuIdx = idx;
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const currentItemIdx = items.indexOf(item);
+                        if (currentItemIdx !== -1) {
+                            contextMenuIdx = currentItemIdx;
+                        }
+                        openQueueContextMenu(e, song.id, contextMenuIdx);
+                    }
+                    if (!isDragging) {
+                        dragItem = null;
+                    }
+                });
+            }
+
+            fragment.appendChild(item);
+        });
+
+        queueContentArea.appendChild(fragment);
+    }
+
+    // Queue Context Menu
+    const queueContextMenu = document.createElement('div');
+    queueContextMenu.className = 'song-context-menu hidden glass-panel';
+    queueContextMenu.innerHTML = `
+        <button class="context-menu-item" id="qctx-play-next">Play Next</button>
+        <button class="context-menu-item" id="qctx-play-last">Play Last</button>
+        <button class="context-menu-item" id="qctx-favorite">Favorite</button>
+        <button class="context-menu-item" id="qctx-suggest-more">Suggest More by Mixxer</button>
+        <button class="context-menu-item" id="qctx-suggest-less">Suggest Less</button>
+        <button class="context-menu-item" id="qctx-remove" style="color: #ff4444;">Remove from Queue</button>
+    `;
+    queueContextMenu.style.zIndex = '3100';
+    document.body.appendChild(queueContextMenu);
+    
+    let qctxTargetId = null;
+    let qctxTargetIdx = null;
+
+    function openQueueContextMenu(e, songId, idx) {
+        e.preventDefault();
+        e.stopPropagation();
+        qctxTargetId = songId;
+        qctxTargetIdx = idx;
+        const rect = e.target.getBoundingClientRect();
+        queueContextMenu.style.left = `${Math.min(rect.left - 150, window.innerWidth - 220)}px`;
+        queueContextMenu.style.top = `${rect.bottom + window.scrollY + 5}px`;
+        queueContextMenu.classList.remove('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!queueContextMenu.classList.contains('hidden') && !e.target.closest('.song-context-menu') && !e.target.closest('.queue-more-btn')) {
+            queueContextMenu.classList.add('hidden');
+        }
+    });
+
+    document.getElementById('qctx-play-next')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
+            userQueue.unshift(movedSong);
+            renderQueue();
+            qctxTargetIdx = 0; // update index in case they click something else
+        }
+    });
+
+    document.getElementById('qctx-play-last')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            const movedSong = userQueue.splice(qctxTargetIdx, 1)[0];
+            userQueue.push(movedSong);
+            renderQueue();
+            qctxTargetIdx = userQueue.length - 1; // update index
+        }
+    });
+
+    document.getElementById('qctx-favorite')?.addEventListener('click', () => {
+        if (qctxTargetId && typeof toggleFavorite === 'function') toggleFavorite(qctxTargetId);
+    });
+
+    document.getElementById('qctx-remove')?.addEventListener('click', () => {
+        if (qctxTargetIdx !== null) {
+            userQueue.splice(qctxTargetIdx, 1);
+            renderQueue();
+        }
+        queueContextMenu.classList.add('hidden'); // explicitly hide when removing, since the target no longer exists
+    });
+    
+    document.getElementById('qctx-suggest-more')?.addEventListener('click', () => {
+        // Implement suggest more logic if needed
+    });
+    
+    document.getElementById('qctx-suggest-less')?.addEventListener('click', () => {
+        // Implement suggest less logic if needed
+    });
+
+    window.__triggerSurvey = () => {
+        if(!mixxerSurvey) return;
+        if(surveyTimeout) clearTimeout(surveyTimeout);
+        mixxerSurvey.classList.add('visible');
+        surveyTimeout = setTimeout(() => {
+            mixxerSurvey.classList.remove('visible');
+        }, 15000);
+    };
+    
+    [surveyUp, surveyDown].forEach(btn => {
+        if(!btn) return;
+        btn.addEventListener('click', () => {
+            mixxerSurvey.classList.remove('visible');
+            if(surveyTimeout) clearTimeout(surveyTimeout);
+        });
+    });
+
+    // --- BACKGROUND MIXXER AI ---
+    window.backgroundMixxerAI = async function() {
+        if (!activeAudio || !currentQueue[currentSongIndex]) return;
+        
+        // If we have plenty of songs queued, or user manually queued songs, do nothing
+        if (currentQueue.length - currentSongIndex > 3 || userQueue.length > 0) return;
+        
+        const currentSong = currentQueue[currentSongIndex];
+        const currentBpm = currentSong.bpm || 120;
+        
+        // Find songs in the library that match the BPM roughly, aren't recently played, and aren't already in queue
+        const historyIds = new Set(historyQueue.map(s => s.id));
+        const queueIds = new Set(currentQueue.map(s => s.id));
+        
+        const candidates = librarySongs.filter(song => {
+            if (historyIds.has(song.id) || queueIds.has(song.id)) return false;
+            const bpmDiff = Math.abs((song.bpm || 120) - currentBpm);
+            return bpmDiff < 15; // Within 15 BPM
+        });
+        
+        if (candidates.length > 0) {
+            // Pick a random compatible song
+            const nextSuggested = candidates[Math.floor(Math.random() * candidates.length)];
+            currentQueue.push(nextSuggested);
+            if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
+        } else {
+            // Fallback: just add a random unplayed song
+            const fallback = librarySongs.find(s => !historyIds.has(s.id) && !queueIds.has(s.id));
+            if (fallback) {
+                currentQueue.push(fallback);
+                if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
+            }
+        }
+    };
+    
+    const clearQueueBtn = document.getElementById('clear-queue-btn');
+    if (clearQueueBtn) {
+        clearQueueBtn.addEventListener('click', () => {
+            if (currentTab === 'upnext') {
+                userQueue = [];
+                renderQueue();
+            } else if (currentTab === 'history') {
+                historyQueue = [];
+                if(currentUser) {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
+                }
+                renderQueue();
+            }
+        });
+    }
+
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHarmonyTunes);
+} else {
+    initHarmonyTunes();
+}
 
 export function createSongCard(song) {
     return `
-        <div class="music-card" data-song-id="${song.id}">
+        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
-                <img src="${song.art}" alt="${song.title}">
-                <button class="card-play-btn">▶</button>
+                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
-            <div class="card-title">${song.title}</div>
-            <div class="card-desc">${song.artist}</div>
+            <div class="card-title">${escapeHTML(song.title)}</div>
+            <div class="card-desc">${escapeHTML(song.artist)}</div>
         </div>
     `;
 }

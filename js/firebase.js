@@ -1,8 +1,8 @@
 // js/firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-check.js";
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,14 +15,8 @@ const firebaseConfig = {
   measurementId: "G-ZN3YJPHVGX"
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-
-// Initialize App Check (Commented out to prevent ReCAPTCHA errors until a valid key is provided)
-// export const appCheck = initializeAppCheck(app, {
-//   provider: new ReCaptchaV3Provider('6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT'), // Replace with actual reCAPTCHA v3 site key
-//   isTokenAutoRefreshEnabled: true
-// });
+// Initialize Firebase safely to avoid duplicate app errors
+export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Auth
 export const auth = getAuth(app);
@@ -30,11 +24,12 @@ export const auth = getAuth(app);
 // Firebase Auth natively uses domain-specific local storage (IndexedDB/BrowserLocalPersistence).
 // Sharing auth state between subdomains cannot be done automatically without centralized login logic
 setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Auth persistence setup failed:", error);
+  console.error("Manager info: [Auth persistence setup failed:]", error);
 });
 
 // Initialize Firestore
 export const db = getFirestore(app);
+
 
 /**
  * Verify Connection Health
@@ -50,13 +45,12 @@ export async function verifyFirebaseConnection() {
     if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
-        console.log("Firebase connection healthy (backend reached, request blocked by rules).");
         return true;
     }
 
     // Any other error means the connection failed
-    console.error("Firebase connection dead:", error);
-    console.error("Code:", error.code, "Message:", error.message);
+    console.error("Manager info: [Firebase connection dead:]", error);
+    console.error("Manager info: [Code:]", error.code, "Message:", error.message);
 
     // Display error banner
     const banner = document.createElement('div');
@@ -84,6 +78,21 @@ export async function verifyFirebaseConnection() {
 
     return false;
   }
+}
+
+/**
+ * Shared Utility to fetch a collection's data
+ * @param {string} collectionName
+ * @param {boolean} includeId - If true, adds document id to data
+ */
+export async function fetchCollectionData(collectionName, includeId = false) {
+    try {
+        const querySnapshot = await getDocs(collection(db, collectionName));
+        return querySnapshot.docs.map(doc => includeId ? { id: doc.id, ...doc.data() } : doc.data());
+    } catch (e) {
+        console.error(`Manager info: Error fetching collection ${collectionName}`, e);
+        return [];
+    }
 }
 
 // Auto-run verification on load

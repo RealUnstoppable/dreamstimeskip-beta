@@ -88,6 +88,7 @@ describe('Newsletter Submission', () => {
 
   test('should not submit if email is empty', async () => {
     emailInput.value = '   ';
+    window.setDoc = jest.fn();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);

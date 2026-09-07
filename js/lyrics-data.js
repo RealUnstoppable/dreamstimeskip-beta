@@ -504,5 +504,138 @@ export const lyricsData = {
                 { text: "bro", start: 129.3, duration: 1.7 }
             ]
         }
+    ],
+    'kesha-blow': [
+        {
+            start: 0.0,
+            end: 5.0,
+            words: [{text: "(Intro)", start: 0.0, duration: 5.0}]
+        },
+        {
+            start: 5.0,
+            end: 10.0,
+            words: [{text: "Back door cracked, we don't need a key", start: 5.0, duration: 5.0}]
+        },
+        {
+            start: 10.0,
+            end: 15.0,
+            words: [{text: "We get in for free, no VIP sleaze", start: 10.0, duration: 5.0}]
+        },
+        {
+            start: 15.0,
+            end: 20.0,
+            words: [{text: "Drink that Kool-Aid, follow my lead", start: 15.0, duration: 5.0}]
+        },
+        {
+            start: 20.0,
+            end: 25.0,
+            words: [{text: "Now you're one of us, you're comin' with me", start: 20.0, duration: 5.0}]
+        },
+        {
+            start: 25.0,
+            end: 30.0,
+            words: [{text: "It's time to kill the lights and shut the DJ down", start: 25.0, duration: 5.0}]
+        },
+        {
+            start: 30.0,
+            end: 35.0,
+            words: [{text: "(This place about to—)", start: 30.0, duration: 5.0}]
+        },
+        {
+            start: 35.0,
+            end: 40.0,
+            words: [{text: "Tonight we're takin' over, no one's getting out", start: 35.0, duration: 5.0}]
+        },
+        {
+            start: 40.0,
+            end: 44.0,
+            trending: true,
+            words: [{text: "This place about to blow", start: 40.0, duration: 4.0}]
+        },
+        {
+            start: 44.0,
+            end: 48.0,
+            trending: true,
+            words: [{text: "Blow (Oh-oh-oh-oh-oh-oh-oh)", start: 44.0, duration: 4.0}]
+        },
+        {
+            start: 48.0,
+            end: 52.0,
+            trending: true,
+            words: [{text: "This place about to blow", start: 48.0, duration: 4.0}]
+        },
+        {
+            start: 52.0,
+            end: 56.0,
+            trending: true,
+            words: [{text: "Blow (Oh-oh-oh-oh-oh-oh-oh)", start: 52.0, duration: 4.0}]
+        },
+        {
+            start: 56.0,
+            end: 60.0,
+            words: [{text: "Now what? We're taking control", start: 56.0, duration: 4.0}]
+        }
+    ],
+    'no-pole-remix': [
+        {
+            start: 0.0,
+            end: 15.0,
+            words: [{text: "(Where Have You Been - Intro)", start: 0.0, duration: 15.0}]
+        },
+        {
+            start: 15.0,
+            end: 25.0,
+            words: [{text: "I've been everywhere, man, looking for someone", start: 15.0, duration: 10.0}]
+        },
+        {
+            start: 25.0,
+            end: 35.0,
+            words: [{text: "Someone who can please me, love me all night long", start: 25.0, duration: 10.0}]
+        },
+        {
+            start: 35.0,
+            end: 50.0,
+            trending: true,
+            words: [{text: "Where have you been all my life?", start: 35.0, duration: 15.0}]
+        },
+        {
+            start: 50.0,
+            end: 70.0,
+            trending: true,
+            words: [{text: "Where have you been all my li-i-i-i-i-i-i-i-ife", start: 50.0, duration: 20.0}]
+        },
+        {
+            start: 70.0,
+            end: 85.0,
+            words: [{text: "You can keep the pole, yeah", start: 70.0, duration: 15.0}]
+        },
+        {
+            start: 85.0,
+            end: 100.0,
+            words: [{text: "(Beat Drop)", start: 85.0, duration: 15.0}]
+        }
+    ],
+    'deorc-decuple': [
+        {
+            start: 0.0,
+            end: 20.0,
+            words: [{text: "[Instrumental Intro]", start: 0.0, duration: 20.0}]
+        },
+        {
+            start: 20.0,
+            end: 35.0,
+            words: [{text: "[Building Up]", start: 20.0, duration: 15.0}]
+        },
+        {
+            start: 35.0,
+            end: 65.0,
+            trending: true,
+            words: [{text: "[Beat Drops Heavy]", start: 35.0, duration: 30.0}]
+        },
+        {
+            start: 65.0,
+            end: 120.0,
+            words: [{text: "[Instrumental Outro]", start: 65.0, duration: 55.0}]
+        }
     ]
 }
