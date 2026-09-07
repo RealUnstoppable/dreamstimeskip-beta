@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
+import { getAverageRating } from './review-service.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -96,15 +97,41 @@ function renderProducts() {
 }
 
 async function updateAllProductRatings() {
-    for (const product of products) {
-        updateProductRatingDisplay(product.id);
+    try {
+        const q = query(collection(db, 'product_reviews'));
+        const querySnapshot = await getDocs(q);
+
+        const aggregations = {};
+        querySnapshot.forEach(doc => {
+            const data = doc.data();
+            const pId = data.productId;
+            if (pId && data.rating !== undefined) {
+                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
+                aggregations[pId].sum += data.rating;
+                aggregations[pId].count += 1;
+            }
+        });
+
+        // Now safe to call without N+1 query by passing precalculated data
+        for (const product of products) {
+            const agg = aggregations[product.id];
+            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
+            const count = agg ? agg.count : 0;
+
+            updateProductRatingDisplay(product.id, { average, count });
+        }
+    } catch (e) {
+        console.error("Manager info: [Error batch fetching ratings:]", e);
     }
 }
 
-async function updateProductRatingDisplay(productId) {
+async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
     const ratingEl = document.getElementById(`rating-${productId}`);
     if (ratingEl) {
-        const ratingInfo = await getAverageRating(productId);
+        let ratingInfo = precalculatedRatingInfo;
+        if (!ratingInfo) {
+            ratingInfo = await getAverageRating(productId);
+        }
         ratingEl.innerHTML = `<span class="star-display">★</span> ${ratingInfo.average} (${ratingInfo.count} reviews)`;
     }
 }
@@ -387,7 +414,6 @@ function setupEventListeners() {
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.add-to-cart-btn');
-            const wishlistBtn = e.target.closest('.wishlist-btn');
             const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title') || e.target.closest('.product-rating-summary');
 
             if (addBtn) {
