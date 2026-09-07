@@ -14,9 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/style.css?v=20260722">
+    <link rel="stylesheet" href="/css/style.css?v=20260810">
     <link rel="stylesheet" href="/css/themes.css?v=20260722">
-    <link rel="stylesheet" href="/css/chatbot.css?v=20260722">
+    <link rel="stylesheet" href="/css/chatbot.css?v=20260806_v3">
 
     <style>
         .siri-orb-wrapper {
@@ -179,7 +179,7 @@
 
     <div id="preregister-popup-overlay">
         <div class="popup-content">
-            <button class="popup-close-btn" aria-label="Close popup">&times;</button>
+            <button class="popup-close-btn" aria-label="Close popup" title="Close popup">&times;</button>
             <img src="/images/Pencil-1-logo-light.png" alt="A sleek, modern digital pencil">
             <h2>The last pencil you'll ever buy.</h2>
             <a href="sign in beta.html" class="popup-preregister-btn">Pre-register Now</a>
@@ -224,7 +224,7 @@
                         <span>All Systems</span>
                         <span class="status-indicator online">Operational</span>
                     </div>
-                    <p>Last check: Jan 31, 2026</p>
+                    <p>Last check: Aug 11, 2026</p>
                 </div>
                 <a href="#harmony" class="bento-card reveal" id="bento-harmony">
                     <div class="card-content">
@@ -258,9 +258,10 @@
         <div class="scroll-container">
             <section id="unstoppable" class="brand-section">
                 <div class="section-background" style="background-image: url('UnstoppableHoodieModel300x300.png');">
+                    <iframe src="https://www.youtube.com/embed/-MfSBwzapaU?autoplay=1&mute=1&loop=1&playlist=-MfSBwzapaU&controls=0&showinfo=0&rel=0&playsinline=1&enablejsapi=1" title="Unstoppable Channel Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="section-overlay"
-                    style="background: linear-gradient(0deg, rgba(139,0,0,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
+                    style="background: linear-gradient(0deg, rgba(80,80,80,0.4) 0%, rgba(20,20,20,0.6) 100%);"></div>
                 <div class="brand-content reveal">
                     <h2>Unstoppable</h2>
                     <p class="section-subtitle">The ultimate destination for high-tier gameplay, deep dives, and gaming
@@ -278,7 +279,7 @@
                     <h2>Dreams TimeSkip</h2>
                     <p class="section-subtitle">An epic Minecraft saga awaits. With a rich storyline, interactive NPCs,
                         and live events, this is a server unlike any other. Expected release: 2027.</p>
-                    <a href="https://discord.gg/aYuEdG9Gh7" class="cta-button">Join the Discord</a>
+                    <a href="dreamstimeskip.html" class="cta-button">Explore Dreams TimeSkip</a>
                 </div>
             </section>
 
@@ -290,7 +291,7 @@
                     <h2>HarmonyTunes</h2>
                     <p class="section-subtitle">Your daily dose of trending music. Follow us on TikTok for the most
                         popular songs, every single day. The official app is launching next year!</p>
-                    <a href="https://www.tiktok.com/@harmonytunesofficial" class="cta-button">Follow the Beat</a>
+                    <a href="harmonytunes.html" class="cta-button">Explore HarmonyTunes</a>
                 </div>
             </section>
         </div>
@@ -307,17 +308,17 @@
     <!-- Chatbot Overlay -->
     <div id="chatbot-window" class="chatbot-overlay">
         <div class="chatbot-header">
-            <h3>Lexi Assistant</h3>
+            <h3>Lexi</h3>
             <button id="chatbot-close" class="chatbot-close">&times;</button>
         </div>
         <div id="chatbot-messages" class="chatbot-messages">
             <div class="chat-msg siri">
-                <p>Hello! I'm Lexi. I can help you navigate the hub, recommend games, or answer questions about DreamsTimeskip.</p>
+                <p>Hello! I'm Lexi. I can help you navigate the Unstoppable Hub, recommend games, or answer questions about the Unstoppable ecosystem and Dreams TimeSkip.</p>
             </div>
         </div>
         <div class="chatbot-input-area">
             <input type="text" id="chatbot-input" placeholder="Ask Lexi..." autocomplete="off">
-            <button id="chatbot-send" disabled>
+            <button id="chatbot-send" aria-label="Send message" disabled>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
             </button>
         </div>
@@ -340,7 +341,7 @@
         import { auth, db } from './js/auth.js';
     </script>
     <script type="module" src="/js/script.js?v=20260722"></script>
-    <script type="module" src="/js/chatbot.js?v=20260722"></script>
+    <script type="module" src="/js/chatbot.js?v=20260806_v2"></script>
 
 
     <script>
