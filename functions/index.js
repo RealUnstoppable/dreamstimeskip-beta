@@ -31,7 +31,6 @@ async function authenticateRequest(req, res, adminInstance) {
     return null;
   }
 }
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
 // 🛡️ Shared Utils
@@ -39,33 +38,10 @@ function getUserDocRef(uid) {
   return admin.firestore().collection("users").doc(uid);
 }
 
-// 🛡️ Shared Auth Utility
-async function authenticateRequest(req, res) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).send("Unauthorized");
-    return null;
-  }
-
-  const token = authHeader.split("Bearer ")[1];
-  try {
-    return await admin.auth().verifyIdToken(token);
-  } catch (err) {
-    console.error("Auth Error - Manager info: [" + err.message + "]");
-    res.status(401).send("Unauthorized");
-    return null;
-  }
-}
-
-// 🔹 Create Checkout Session
-
 // 🛡️ Admin Action Proxy
 exports.adminAction = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
-
-    const decodedToken = await authenticateRequest(req, res);
     if (!decodedToken) return;
 
     try {
@@ -113,7 +89,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     const uid = decodedToken.uid;
@@ -275,7 +251,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     try {
