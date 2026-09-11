@@ -1,0 +1,496 @@
+--- a/firestore.rules
++++ b/firestore.rules
+@@ -19,6 +19,11 @@
+       // Assuming frontend creation for now based on 'userId' equality:
+       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+     }
++
++    match /product_reviews/{reviewId} {
++      allow read: if true;
++      allow create, update, delete: if request.auth != null && request.resource.data.userId == request.auth.uid;
++    }
+
+     // Support tickets collection
+     match /support_tickets/{ticketId} {
+
+--- a/firestore.indexes.json
++++ b/firestore.indexes.json
+@@ -7,6 +7,14 @@
+         { "fieldPath": "userId", "order": "ASCENDING" },
+         { "fieldPath": "orderDate", "order": "DESCENDING" }
+       ]
++    },
++    {
++      "collectionGroup": "product_reviews",
++      "queryScope": "COLLECTION",
++      "fields": [
++        { "fieldPath": "productId", "order": "ASCENDING" },
++        { "fieldPath": "createdAt", "order": "DESCENDING" }
++      ]
+     }
+   ],
+   "fieldOverrides": []
+
+--- a/shop.html
++++ b/shop.html
+@@ -51,6 +51,52 @@
+             </div>
+         </div>
+     </div>
++
++    <!-- Review Modal -->
++    <div id="review-modal" class="review-modal" style="display: none;">
++        <div class="review-modal-content">
++            <div class="review-modal-header">
++                <h2>Product Reviews</h2>
++                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews">&times;</button>
++            </div>
++
++            <div class="review-stats" id="review-stats">
++                <div class="avg-rating">
++                    <span id="avg-rating-value">0.0</span> <span class="star-rating">★</span>
++                </div>
++                <div class="total-reviews" id="total-reviews-count">0 reviews</div>
++            </div>
++
++            <div id="reviews-list-container" class="reviews-list-container">
++                <!-- Reviews will be injected here -->
++            </div>
++
++            <div id="write-review-section" class="write-review-section" style="display: none;">
++                <h3>Write a Review</h3>
++                <form id="write-review-form">
++                    <div class="rating-input">
++                        <label for="review-rating">Rating (1-5):</label>
++                        <select id="review-rating" required>
++                            <option value="5">5 Stars</option>
++                            <option value="4">4 Stars</option>
++                            <option value="3">3 Stars</option>
++                            <option value="2">2 Stars</option>
++                            <option value="1">1 Star</option>
++                        </select>
++                    </div>
++                    <div class="comment-input">
++                        <textarea id="review-comment" rows="4" placeholder="Share your thoughts about this product..." required></textarea>
++                    </div>
++                    <button type="submit" id="submit-review-btn" class="submit-review-btn">Submit Review</button>
++                    <div id="review-message" class="review-message"></div>
++                </form>
++            </div>
++            <div id="login-to-review-msg" class="login-to-review-msg" style="display: none;">
++                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
++            </div>
++        </div>
++    </div>
++
+     <footer class="main-footer"></footer>
+
+
+
+--- a/css/shop.css
++++ b/css/shop.css
+@@ -336,5 +336,176 @@
+     color: var(--text-secondary);
+     padding: 40px 0;
+ }
++
++/* Review Modal Styles */
++.review-modal {
++    position: fixed;
++    top: 0;
++    left: 0;
++    width: 100%;
++    height: 100%;
++    background-color: rgba(0, 0, 0, 0.75);
++    display: flex;
++    justify-content: center;
++    align-items: center;
++    z-index: 1000;
++}
++
++.review-modal-content {
++    background-color: var(--primary-card-color);
++    padding: 30px;
++    border-radius: 12px;
++    width: 90%;
++    max-width: 500px;
++    max-height: 80vh;
++    overflow-y: auto;
++    border: 1px solid var(--border-color);
++}
++
++.review-modal-header {
++    display: flex;
++    justify-content: space-between;
++    align-items: center;
++    margin-bottom: 20px;
++}
++
++.close-review-btn {
++    background: none;
++    border: none;
++    font-size: 1.5rem;
++    color: var(--text-secondary);
++    cursor: pointer;
++}
++
++.close-review-btn:hover {
++    color: white;
++}
++
++.review-stats {
++    display: flex;
++    align-items: center;
++    gap: 15px;
++    margin-bottom: 20px;
++}
++
++.avg-rating {
++    font-size: 1.5rem;
++    font-weight: 700;
++}
++
++.star-rating {
++    color: #FBBF24; /* Amber-400 */
++}
++
++.review-item {
++    border-bottom: 1px solid var(--border-color);
++    padding: 15px 0;
++}
++
++.review-item:last-child {
++    border-bottom: none;
++}
++
++.review-header {
++    display: flex;
++    justify-content: space-between;
++    margin-bottom: 5px;
++}
++
++.review-author {
++    font-weight: 600;
++}
++
++.review-date {
++    color: var(--text-secondary);
++    font-size: 0.85rem;
++}
++
++.write-review-section {
++    margin-top: 20px;
++    padding-top: 20px;
++    border-top: 1px solid var(--border-color);
++}
++
++.write-review-section h3 {
++    margin-bottom: 15px;
++}
++
++.write-review-form {
++    display: flex;
++    flex-direction: column;
++    gap: 15px;
++}
++
++.rating-input, .comment-input {
++    display: flex;
++    flex-direction: column;
++    gap: 5px;
++}
++
++.comment-input textarea {
++    background-color: #0A0A0A;
++    border: 1px solid var(--border-color);
++    color: white;
++    padding: 10px;
++    border-radius: 6px;
++    resize: vertical;
++}
++
++.submit-review-btn {
++    background-color: var(--accent-blue);
++    color: white;
++    border: none;
++    padding: 10px;
++    border-radius: 6px;
++    cursor: pointer;
++    font-weight: 600;
++    margin-top: 10px;
++}
++
++.submit-review-btn:hover {
++    background-color: #1D4ED8;
++}
++
++.review-message {
++    margin-top: 10px;
++    font-size: 0.9rem;
++}
++
++.login-to-review-msg {
++    margin-top: 20px;
++    padding: 15px;
++    background-color: rgba(255, 255, 255, 0.05);
++    border-radius: 8px;
++    text-align: center;
++}
++
++.login-to-review-msg a {
++    color: var(--accent-blue);
++    text-decoration: underline;
++}
++
++.view-reviews-btn {
++    background: none;
++    border: 1px solid var(--border-color);
++    color: var(--text-secondary);
++    padding: 5px 10px;
++    border-radius: 4px;
++    font-size: 0.85rem;
++    cursor: pointer;
++    margin-top: 10px;
++    width: 100%;
++}
++
++.view-reviews-btn:hover {
++    background-color: rgba(255,255,255,0.1);
++    color: white;
++}
++
++.product-rating-summary {
++    font-size: 0.9rem;
++    color: var(--text-secondary);
++    margin-top: 5px;
++}
+
+ /* --- End of shop.css --- */
+
+--- a/js/shop.js
++++ b/js/shop.js
+@@ -1,7 +1,7 @@
+ // shop.js
+ import { auth, db } from './auth.js';
+ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
++import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+ import { calculateCartSummary } from './cart-utils.js';
+ import { escapeHTML } from './utils.js';
+
+@@ -44,6 +44,8 @@
+ export let cart = {}; // { productId: quantity, ... }
+ export let wishlist = new Set(); // { productId, ... }
+ let currentUser = null;
++let currentReviewProductId = null;
++let cachedRatings = {}; // { productId: { avg: 0, count: 0 } }
+
+ // --- DOM ELEMENTS ---
+ const productGrid = document.getElementById('product-grid');
+@@ -56,6 +58,15 @@
+ const checkoutBtn = document.getElementById('checkout-btn');
+ const navCtaContainer = document.getElementById('nav-cta-container');
+
++// Review Modal Elements
++const reviewModal = document.getElementById('review-modal');
++const closeReviewBtn = document.getElementById('close-review-btn');
++const reviewsListContainer = document.getElementById('reviews-list-container');
++const writeReviewSection = document.getElementById('write-review-section');
++const loginToReviewMsg = document.getElementById('login-to-review-msg');
++const writeReviewForm = document.getElementById('write-review-form');
++const avgRatingValue = document.getElementById('avg-rating-value');
++const totalReviewsCount = document.getElementById('total-reviews-count');
+
+ // --- RENDER FUNCTIONS ---
+ function renderProducts() {
+@@ -64,6 +75,8 @@
+         const isWishlisted = wishlist.has(product.id);
+         const heartIcon = isWishlisted ? '❤️' : '🤍';
+         const activeClass = isWishlisted ? 'active' : '';
++        const ratingInfo = cachedRatings[product.id] || { avg: 0, count: 0 };
++        const ratingDisplay = ratingInfo.count > 0 ? `${ratingInfo.avg.toFixed(1)} ★ (${ratingInfo.count})` : 'No reviews';
+
+         return `
+             <div class="product-card">
+@@ -73,11 +86,13 @@
+                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" loading="lazy">
+                 <div class="product-info">
+                     <h3>${product.name}</h3>
++                    <div class="product-rating-summary">${ratingDisplay}</div>
+                     <p>${product.description}</p>
+                     <div class="product-footer">
+                         <span class="product-price">$${product.price.toFixed(2)}</span>
+                         <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                     </div>
++                    <button class="view-reviews-btn" data-id="${product.id}">View Reviews</button>
+                 </div>
+             </div>
+         `;
+@@ -252,6 +267,71 @@
+         navCtaContainer.innerHTML = `<a href="sign in beta.html" class="cta-button nav-cta">Sign In</a>`;
+     }
+ }
++
++// --- REVIEW LOGIC ---
++async function fetchProductReviews(productId) {
++    if (!reviewsListContainer) return;
++    try {
++        const reviewsRef = collection(db, 'product_reviews');
++        const q = query(reviewsRef, where('productId', '==', productId), orderBy('createdAt', 'desc'));
++        const querySnapshot = await getDocs(q);
++
++        let sum = 0;
++        let count = 0;
++        let html = '';
++
++        querySnapshot.forEach((docSnap) => {
++            const data = docSnap.data();
++            sum += data.rating;
++            count++;
++
++            const dateStr = data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Just now';
++            html += `
++                <div class="review-item">
++                    <div class="review-header">
++                        <span class="review-author">${escapeHTML(data.username)}</span>
++                        <span class="review-date">${dateStr}</span>
++                    </div>
++                    <div class="review-rating star-rating">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</div>
++                    <div class="review-comment">${escapeHTML(data.comment)}</div>
++                </div>
++            `;
++        });
++
++        if (count === 0) {
++            html = '<p class="empty-reviews-message">No reviews yet. Be the first to review!</p>';
++        }
++
++        reviewsListContainer.innerHTML = html;
++
++        const avg = count > 0 ? sum / count : 0;
++        if (avgRatingValue) avgRatingValue.textContent = avg.toFixed(1);
++        if (totalReviewsCount) totalReviewsCount.textContent = `${count} review${count !== 1 ? 's' : ''}`;
++
++        cachedRatings[productId] = { avg, count };
++        renderProducts();
++
++    } catch (error) {
++        console.error("Error fetching reviews:", error);
++        reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
++    }
++}
++
++async function handleViewReviews(productId) {
++    currentReviewProductId = productId;
++    if (reviewModal) reviewModal.style.display = 'flex';
++    if (reviewsListContainer) reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
++
++    if (currentUser) {
++        if (writeReviewSection) writeReviewSection.style.display = 'block';
++        if (loginToReviewMsg) loginToReviewMsg.style.display = 'none';
++    } else {
++        if (writeReviewSection) writeReviewSection.style.display = 'none';
++        if (loginToReviewMsg) loginToReviewMsg.style.display = 'block';
++    }
++
++    await fetchProductReviews(productId);
++}
+
+ // --- EVENT LISTENERS ---
+ function setupEventListeners() {
+@@ -261,19 +341,16 @@
+             if (e.target.classList.contains('add-to-cart-btn')) {
+                 const productId = e.target.dataset.id;
+                 handleAddToCart(productId);
++            } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
++                const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
++                const productId = btn.dataset.id;
++                toggleWishlist(productId);
++            } else if (e.target.classList.contains('view-reviews-btn')) {
++                const productId = e.target.dataset.id;
++                handleViewReviews(productId);
+             }
+         });
+     }
+-    productGrid.addEventListener('click', (e) => {
+-        if (e.target.classList.contains('add-to-cart-btn')) {
+-            const productId = e.target.dataset.id;
+-            handleAddToCart(productId);
+-        } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
+-            const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
+-            const productId = btn.dataset.id;
+-            toggleWishlist(productId);
+-        }
+-    });
+
+     // Cart modal listeners
+     if (cartButton && cartModal && closeCartBtn) {
+@@ -371,6 +448,70 @@
+             window.location.href = 'checkout.html';
+         });
+     }
++
++    if (closeReviewBtn && reviewModal) {
++        closeReviewBtn.addEventListener('click', () => reviewModal.style.display = 'none');
++        window.addEventListener('click', (e) => {
++            if (e.target === reviewModal) {
++                reviewModal.style.display = 'none';
++            }
++        });
++    }
++
++    if (writeReviewForm) {
++        writeReviewForm.addEventListener('submit', async (e) => {
++            e.preventDefault();
++            if (!currentUser || !currentReviewProductId) return;
++
++            const rating = parseInt(document.getElementById('review-rating').value, 10);
++            const comment = document.getElementById('review-comment').value;
++            const messageEl = document.getElementById('review-message');
++            const submitBtn = document.getElementById('submit-review-btn');
++
++            submitBtn.disabled = true;
++            submitBtn.textContent = 'Submitting...';
++
++            try {
++                // Fetch username
++                const cacheKey = `profile_${currentUser.uid}`;
++                const cachedProfile = sessionStorage.getItem(cacheKey);
++                let username = "User";
++                if (cachedProfile) {
++                    username = JSON.parse(cachedProfile).username;
++                } else {
++                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
++                    if (userDoc.exists()) username = userDoc.data().username || "User";
++                }
++
++                const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
++                const reviewRef = doc(db, 'product_reviews', reviewId);
++
++                await setDoc(reviewRef, {
++                    productId: currentReviewProductId,
++                    userId: currentUser.uid,
++                    username: username,
++                    rating: rating,
++                    comment: comment,
++                    createdAt: serverTimestamp()
++                });
++
++                writeReviewForm.reset();
++                messageEl.textContent = 'Review submitted successfully!';
++                messageEl.style.color = 'var(--accent-green)';
++
++                // Refresh reviews
++                await fetchProductReviews(currentReviewProductId);
++
++            } catch (error) {
++                console.error("Error submitting review:", error);
++                messageEl.textContent = 'Failed to submit review.';
++                messageEl.style.color = 'var(--accent-red)';
++            } finally {
++                submitBtn.disabled = false;
++                submitBtn.textContent = 'Submit Review';
++            }
++        });
++    }
+ }

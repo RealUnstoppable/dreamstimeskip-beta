@@ -1,62 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-     <script type="module" src="/js/theme-loader.js"></script>  
+    <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DreamsTimeskip Hub | The Unstoppable Ecosystem (Beta)</title>
-    <meta name="description" content="The central hub for Unstoppable, Dreams TimeSkip, HarmonyTunes, and more. Discover the projects of Catalin Andrian.">
-    
-     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <meta name="description"
+        content="The central hub for Unstoppable, Dreams TimeSkip, HarmonyTunes, and more. Discover the projects of Catalin Andrian.">
+
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/themes.css">
+
+    <link rel="stylesheet" href="/css/style.css?v=20260810">
+    <link rel="stylesheet" href="/css/themes.css?v=20260722">
+    <link rel="stylesheet" href="/css/chatbot.css?v=20260806_v3">
 
     <style>
-        #siri-orb {
+        .siri-orb-wrapper {
             position: fixed;
             bottom: 30px;
             left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        #siri-orb {
             width: 60px;
             height: 60px;
-            background: radial-gradient(circle, #6e45e2, #88d3ce);
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%),
+                linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%);
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            z-index: 1000;
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 0 20px rgba(110, 69, 226, 0.6);
-            animation: pulse 2.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: translateX(-50%) scale(0.95);
-                box-shadow: 0 0 0 0 rgba(110, 69, 226, 0.7);
-            }
-            70% {
-                transform: translateX(-50%) scale(1);
-                box-shadow: 0 0 0 12px rgba(110, 69, 226, 0);
-            }
-            100% {
-                transform: translateX(-50%) scale(0.95);
-                box-shadow: 0 0 0 0 rgba(110, 69, 226, 0);
-            }
+            box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4);
+            animation: blob-shape 12s ease-in-out infinite;
         }
 
         #siri-orb.expanded {
             width: 220px;
-            border-radius: 50px;
-            background: #000;
-            animation: none;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            transform: translateX(-50%);
+            border-radius: 50px !important;
+            background: #000 !important;
+            animation: rainbowPulse 4s infinite !important;
+        }
+
+        @keyframes rainbowPulse {
+            0% { box-shadow: 0 0 15px rgba(255,0,127,0.6), 0 0 25px rgba(127,0,255,0.4); }
+            33% { box-shadow: 0 0 15px rgba(0,127,255,0.6), 0 0 25px rgba(0,255,127,0.4); }
+            66% { box-shadow: 0 0 15px rgba(255,127,0,0.6), 0 0 25px rgba(255,0,127,0.4); }
+            100% { box-shadow: 0 0 15px rgba(255,0,127,0.6), 0 0 25px rgba(127,0,255,0.4); }
         }
 
         .orb-text {
@@ -86,7 +85,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 1001; /* Higher than the Siri orb */
+            z-index: 1001;
+            /* Higher than the Siri orb */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.4s ease, visibility 0.4s ease;
@@ -170,23 +170,23 @@
             color: #fff;
             transform: rotate(90deg);
         }
+
         /* --- END: Pre-register Popup Styles --- */
     </style>
 </head>
+
 <body>
 
     <div id="preregister-popup-overlay">
         <div class="popup-content">
-            <button class="popup-close-btn" aria-label="Close popup">&times;</button>
+            <button class="popup-close-btn" aria-label="Close popup" title="Close popup">&times;</button>
             <img src="/images/Pencil-1-logo-light.png" alt="A sleek, modern digital pencil">
             <h2>The last pencil you'll ever buy.</h2>
             <a href="sign in beta.html" class="popup-preregister-btn">Pre-register Now</a>
         </div>
     </div>
 
-    <header class="main-header">
-        <div id="navbar-placeholder"></div>
-    </header>
+    <header class="main-header"></header>
 
     <main>
         <section class="hero">
@@ -194,7 +194,8 @@
                 <div class="orb"></div>
                 <h1 class="reveal" id="dynamic-greeting">Good Afternoon.</h1>
                 <h2 class="reveal">All you want, all in one place.</h2>
-                <p class="section-subtitle reveal">Welcome to the central hub for the Unstoppable ecosystem. Explore our projects, get the latest updates, and join the community.</p>
+                <p class="section-subtitle reveal">Welcome to the central hub for the Unstoppable ecosystem. Explore our
+                    projects, get the latest updates, and join the community.</p>
                 <div class="powered-by reveal">
                     <span>Powered by Unstoppable AI</span>
                 </div>
@@ -211,11 +212,11 @@
                     <img src="/images/un-logo-1.png" alt="Unstoppable Logo" loading="lazy">
                 </a>
                 <a href="dreamstimeskip.html" class="bento-card reveal" id="bento-dts">
-                     <div class="card-content">
+                    <div class="card-content">
                         <h3>Dreams TimeSkip</h3>
                         <p>Season OG, Relive your childhood.</p>
                     </div>
-                     <img src="/images/dreams-lobby.jpg" alt="Dreams TimeSkip Lobby" loading="lazy">
+                    <img src="/images/dreams-lobby.jpg" alt="Dreams TimeSkip Lobby" loading="lazy">
                 </a>
                 <div class="bento-card reveal" id="bento-status">
                     <h4>Ecosystem Status</h4>
@@ -223,33 +224,29 @@
                         <span>All Systems</span>
                         <span class="status-indicator online">Operational</span>
                     </div>
-                    <div class="status-item">
-                        <span>FOTD | API</span>
-                        <span class="status-indicator down">Maintenance</span>
-                    </div>
-                    <p>Last check: Jan 31, 2026</p>
+                    <p>Last check: Aug 11, 2026</p>
                 </div>
                 <a href="#harmony" class="bento-card reveal" id="bento-harmony">
-                     <div class="card-content">
+                    <div class="card-content">
                         <h3>HarmonyTunes</h3>
                         <p>Your daily dose of trending music.</p>
                     </div>
                     <img src="/images/harmony-tunes-card.jpg" alt="HarmonyTunes Card" loading="lazy">
                 </a>
                 <a href="fotd.html" class="bento-card reveal" id="bento-fotd">
-                     <div class="card-content">
+                    <div class="card-content">
                         <h3>Fact of the Day</h3>
-                        <p>The heart of a blue whale is so big, a human could swim through its arteries.</p>
+                        <p id="homepage-fotd-text">Loading...</p>
                     </div>
                 </a>
                 <div class="bento-card reveal" id="bento-founder">
-                     <div class="card-content">
+                    <div class="card-content">
                         <h4>Founder's Note</h4>
                         <p>"We're building the future of digital entertainment, one project at a time." - Catalin A.</p>
                     </div>
                 </div>
-                 <a href="shop.html" class="bento-card reveal" id="bento-shop">
-                     <div class="card-content">
+                <a href="shop.html" class="bento-card reveal" id="bento-shop">
+                    <div class="card-content">
                         <h3>Unstoppable Collection</h3>
                         <p>New drops available now.</p>
                     </div>
@@ -259,85 +256,118 @@
         </section>
 
         <div class="scroll-container">
-            <section id="unstoppable" class="brand-section">
-                <div class="section-background" style="background-image: url('UnstoppableHoodieModel300x300.png');"></div>
-                <div class="section-overlay" style="background: linear-gradient(0deg, rgba(139,0,0,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
+            <section id="unstoppable" class="brand-section" style="height: auto; min-height: 100vh; padding: 100px 20px;">
+                <div class="section-background" style="background-image: url('UnstoppableHoodieModel300x300.png');">
+                    <iframe src="https://www.youtube.com/embed/-MfSBwzapaU?autoplay=1&mute=1&loop=1&playlist=-MfSBwzapaU&controls=0&showinfo=0&rel=0&playsinline=1&enablejsapi=1" title="Unstoppable Channel Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div class="section-overlay"
+                    style="background: linear-gradient(0deg, rgba(80,80,80,0.4) 0%, rgba(20,20,20,0.6) 100%);"></div>
                 <div class="brand-content reveal">
                     <h2>Unstoppable</h2>
-                    <p class="section-subtitle">The ultimate destination for high-tier gameplay, deep dives, and gaming culture. Join the action and witness top-level competitive play.</p>
-                    <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button">Watch on YouTube</a>
+                    <p class="section-subtitle" style="margin-bottom: 2rem;">The ultimate destination for high-tier gameplay, deep dives, and gaming culture.</p>
+                    
+                    <div class="youtube-container" style="display: flex; flex-direction: column; gap: 2rem; align-items: center; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                        <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed?listType=search&list=Unstoppab1e+gaming" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        
+                        <div class="youtube-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                            <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" target="_blank" class="cta-button" style="background: #FF0000; color: white; display: flex; align-items: center; gap: 8px;">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                                Subscribe to @Unstoppab1e
+                            </a>
+                            <a href="#" class="cta-button" style="background: #FF8C00; color: white;">Support Us / Donate</a>
+                        </div>
+
+                        <div class="coming-soon-videos" style="width: 100%; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                            <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: #FFD700;">Coming Soon</h3>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                    <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">Dreams OG Launch Trailer</h4>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">An exclusive look into the upcoming realm.</p>
+                                </div>
+                                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
+                                    <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">High-Tier Gameplay Montages</h4>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">Witness competitive play at its finest.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <section id="dts" class="brand-section">
                 <div class="section-background" style="background-image: url('DreamsTimeSkipModel300x300.jpg');"></div>
-                 <div class="section-overlay" style="background: linear-gradient(0deg, rgba(48,25,52,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
+                <div class="section-overlay"
+                    style="background: linear-gradient(0deg, rgba(48,25,52,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
                 <div class="brand-content reveal">
                     <h2>Dreams TimeSkip</h2>
-                    <p class="section-subtitle">An epic Minecraft saga awaits. With a rich storyline, interactive NPCs, and live events, this is a server unlike any other. Expected release: 2027.</p>
-                    <a href="https://discord.gg/aYuEdG9Gh7" class="cta-button">Join the Discord</a>
+                    <p class="section-subtitle">An epic Minecraft saga awaits. With a rich storyline, interactive NPCs,
+                        and live events, this is a server unlike any other. Expected release: 2027.</p>
+                    <a href="dreamstimeskip.html" class="cta-button">Explore Dreams TimeSkip</a>
                 </div>
             </section>
-            
+
             <section id="harmony" class="brand-section">
                 <div class="section-background" style="background-image: url('HarmonyTunesModel300x300.png');"></div>
-                <div class="section-overlay" style="background: linear-gradient(0deg, rgba(0,113,227,0.6) 0%, rgba(20,20,20,0.8) 100%);"></div>
+                <div class="section-overlay"
+                    style="background: linear-gradient(0deg, rgba(0,113,227,0.6) 0%, rgba(20,20,20,0.8) 100%);"></div>
                 <div class="brand-content reveal">
                     <h2>HarmonyTunes</h2>
-                    <p class="section-subtitle">Your daily dose of trending music. Follow us on TikTok for the most popular songs, every single day. The official app is launching next year!</p>
-                    <a href="https://www.tiktok.com/@harmonytunesofficial" class="cta-button">Follow the Beat</a>
+                    <p class="section-subtitle">Your daily dose of trending music. Follow us on TikTok for the most
+                        popular songs, every single day. The official app is launching next year!</p>
+                    <a href="harmonytunes.html" class="cta-button">Explore HarmonyTunes</a>
                 </div>
             </section>
         </div>
     </main>
 
-<footer class="main-footer"></footer> 
+    <footer class="main-footer"></footer>
 
-    <div id="siri-orb">
-        <a href="https://www.dreamstimeskip.com/" class="orb-text">Return Home?</a>
+    <div class="siri-orb-wrapper">
+        <div id="siri-orb">
+            <a href="#" class="orb-text">Talk with Lexi.</a>
+        </div>
     </div>
 
-   <script type="module">
-        import { loadNavbar } from './js/navbar.js';
-        import { loadFooter } from './js/footer.js'; // Add this line
+    <!-- Chatbot Overlay -->
+    <div id="chatbot-window" class="chatbot-overlay">
+        <div class="chatbot-header">
+            <h3>Lexi</h3>
+            <button id="chatbot-close" class="chatbot-close" aria-label="Close chat" title="Close chat">&times;</button>
+        </div>
+        <div id="chatbot-messages" class="chatbot-messages">
+            <div class="chat-msg siri">
+                <p>Hello! I'm Lexi. I can help you navigate the Unstoppable Hub, recommend games, or answer questions about the Unstoppable ecosystem and Dreams TimeSkip.</p>
+            </div>
+        </div>
+        <div class="chatbot-input-area">
+            <input type="text" id="chatbot-input" placeholder="Ask Lexi..." autocomplete="off" aria-label="Chat input">
+            <button id="chatbot-send" aria-label="Send message" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722'; 
+        import { getFactForToday } from './js/fotd-data.js';
+
+        loadNavbar();
+        loadFooter();
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadNavbar();
-            loadFooter(); // Add this line
-        });
+        const fotdEl = document.querySelector('#bento-fotd p');
+        if (fotdEl) fotdEl.textContent = getFactForToday();
     </script>
-    
-  <script src="/js/script.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const siriOrb = document.getElementById('siri-orb');
-            let inactivityTimeout;
-
-            const collapseOrb = () => siriOrb.classList.remove('expanded');
-
-            const startInactivityTimer = () => {
-                clearTimeout(inactivityTimeout);
-                inactivityTimeout = setTimeout(collapseOrb, 5000);
-            };
-
-            siriOrb.addEventListener('click', (event) => {
-                if (event.target.tagName === 'A') return;
-                
-                if (!siriOrb.classList.contains('expanded')) {
-                    siriOrb.classList.add('expanded');
-                    startInactivityTimer();
-                } else {
-                    startInactivityTimer();
-                }
-            });
-        });
+    <script type="module" src="/js/auth.js?v=20260722"></script>
+    <script type="module">
+        import { auth, db } from './js/auth.js';
     </script>
-    
-   <script type="module">
-      import { auth, db } from './js/auth.js';
-</script>
-    
+    <script type="module" src="/js/script.js?v=20260722"></script>
+    <script type="module" src="/js/chatbot.js?v=20260806_v2"></script>
+
 
     <script>
         // --- START: Pre-register Popup Script ---
@@ -380,6 +410,20 @@
         });
         // --- END: Pre-register Popup Script ---
     </script>
-  
+
+    <script type="module">
+        import { getFactForDate, getLocalDateString } from './js/fotd-data.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const fotdTextEl = document.getElementById('homepage-fotd-text');
+            if (fotdTextEl) {
+                const today = new Date();
+                const dateString = getLocalDateString(today);
+                const fact = getFactForDate(dateString);
+                fotdTextEl.textContent = fact;
+            }
+        });
+    </script>
 </body>
+
 </html>
