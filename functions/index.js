@@ -38,11 +38,15 @@ function getUserDocRef(uid) {
   return admin.firestore().collection("users").doc(uid);
 }
 
+
+// 🔹 Create Checkout Session
+
 // 🛡️ Admin Action Proxy
 exports.adminAction = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
+
 
     try {
       const adminDoc = await getUserDocRef(decodedToken.uid).get();
@@ -56,7 +60,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
       }
 
       // Allowed collections for admin actions via this endpoint
-      const allowedCollections = ["users", "bookings", "quotes", "feature_requests"];
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets"];
       if (!allowedCollections.includes(collection)) {
         return res.status(400).send("Invalid collection");
       }
