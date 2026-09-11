@@ -2080,7 +2080,14 @@ let dragItem = null;
             if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
         } else {
             // Fallback: just add a random unplayed song
-            const fallback = librarySongs.find(s => !historyIds.has(s.id) && !queueIds.has(s.id));
+                        // ⚡ Bolt: Use a generator/loop for fallback to avoid Array.find in a hot path
+            let fallback = null;
+            for (const s of librarySongs) {
+                if (!historyIds.has(s.id) && !queueIds.has(s.id)) {
+                    fallback = s;
+                    break;
+                }
+            }
             if (fallback) {
                 currentQueue.push(fallback);
                 if(queuePanel && !queuePanel.classList.contains('hidden')) renderQueue();
