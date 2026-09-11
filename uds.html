@@ -150,20 +150,10 @@
     </style>
 </head>
 <body>
+    <header class="main-header"></header>
 
-    <nav>
-        <a href="#" class="logo">UNSTOPPABLE</a>
-        <div class="menu-toggle" id="mobile-menu-btn">☰</div>
-        <div class="nav-links" id="nav-links">
-            <a href="#process" onclick="closeMenu()">Process</a>
-            <a href="#pricing" onclick="closeMenu()">Pricing</a>
-            <a href="#gallery" onclick="closeMenu()">Gallery</a>
-            <a href="#reviews" onclick="closeMenu()">Reviews</a>
-            <a href="#contact" onclick="closeMenu()">Contact</a>
-            <a href="booking.html">Book Now</a>
-            <a href="sign in beta.html" class="auth-btn" id="nav-auth-btn">Sign In</a>
-        </div>
-    </nav>
+
+
 
     <header class="hero">
         <div>
@@ -231,10 +221,10 @@
         <h2>Recent Work</h2>
         <p style="text-align: center; color: var(--text-muted); margin-top: -30px; margin-bottom: 30px; font-size: 0.9rem;">(Spot the shop cat inspecting the hood in the first shot!)</p>
         <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?q=80&w=600" alt="Polished Porsche"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=600" alt="Mercedes Interior"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1503376713356-20d6cb25c945?q=80&w=600" alt="G-Wagon Wash"></div>
-            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1619682817481-e994891cd1f5?q=80&w=600" alt="Sprinter Detail"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1542362567-b07e54358753?q=80&w=600" alt="Polished Porsche" loading="lazy"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=600" alt="Mercedes Interior" loading="lazy"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1503376713356-20d6cb25c945?q=80&w=600" alt="G-Wagon Wash" loading="lazy"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1619682817481-e994891cd1f5?q=80&w=600" alt="Sprinter Detail" loading="lazy"></div>
         </div>
     </section>
 
@@ -258,57 +248,45 @@
         <h2>Stay Unstoppable</h2>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Join our newsletter for detailing tips and 10% off your first wash.</p>
         <div class="newsletter" id="newsletter-form">
-            <input type="email" id="news-email" placeholder="Enter your email address" required>
-            <button onclick="subscribeNewsletter()">Subscribe</button>
+            <input type="email" id="news-email" placeholder="Enter your email address" required aria-label="Email address for newsletter">
+            <button id="news-submit-btn" onclick="subscribeNewsletter()">Subscribe</button>
         </div>
         <p id="news-msg" style="font-size: 0.85rem; margin-top: 15px; font-weight: 600;"></p>
         
-        <div class="socials">
-            <a href="#">Instagram</a> | <a href="#">Facebook</a> | <a href="#">YouTube</a>
+        <div class="footer-links">
+            <a href="https://instagram.com">Instagram</a> | <a href="https://facebook.com">Facebook</a> | <a href="https://www.youtube.com/@Unstoppab1e">YouTube</a>
         </div>
         <p style="color: #666; margin-top: 40px; font-size: 0.8rem;">&copy; 2026 Unstoppable Detailing Services. Buford, GA.</p>
     </footer>
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-        // Mobile Menu Toggle Logic
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const navLinks = document.getElementById('nav-links');
-        
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
-        });
-
-        window.closeMenu = () => {
-            if(window.innerWidth < 768) {
-                navLinks.classList.remove('active');
-                menuBtn.textContent = '☰';
-            }
-        };
-
-        // Update Nav based on Auth Status
-        onAuthStateChanged(auth, (user) => {
-            const authBtn = document.getElementById('nav-auth-btn');
-            if (user) {
-                authBtn.textContent = "My Account";
-                authBtn.href = "account.html";
-            }
-        });
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        // Removed hardcoded mobile menu logic and auth state nav update since navbar.js handles this
 
         // Newsletter Logic
         window.subscribeNewsletter = async () => {
             const email = document.getElementById('news-email').value;
             const msg = document.getElementById('news-msg');
+            const submitBtn = document.getElementById('news-submit-btn');
+
             if(!email) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Please enter an email address.";
                 return;
             }
+
+            const originalBtnText = submitBtn ? submitBtn.innerText : 'Subscribe';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Subscribing...';
+            }
             
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
             try {
                 await setDoc(doc(db, "newsletterSubscribers", email), {
                     email: email,
@@ -320,8 +298,20 @@
             } catch(e) {
                 msg.style.color = "#ef4444";
                 msg.textContent = "Error subscribing. Please try again.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         };
+    </script>
+    <footer class="main-footer"></footer>
+
+    <script type="module">
+        import { loadUdsNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
+        
+        if (typeof loadNavbar === 'function') loadUdsNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>
