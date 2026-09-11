@@ -39,23 +39,6 @@ function getUserDocRef(uid) {
   return admin.firestore().collection("users").doc(uid);
 }
 
-// 🛡️ Shared Auth Utility
-async function authenticateRequest(req, res) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).send("Unauthorized");
-    return null;
-  }
-
-  const token = authHeader.split("Bearer ")[1];
-  try {
-    return await admin.auth().verifyIdToken(token);
-  } catch (err) {
-    console.error("Auth Error - Manager info: [" + err.message + "]");
-    res.status(401).send("Unauthorized");
-    return null;
-  }
-}
 
 // 🔹 Create Checkout Session
 
@@ -65,8 +48,6 @@ exports.adminAction = functions.https.onRequest((req, res) => {
     const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
-    const decodedToken = await authenticateRequest(req, res);
-    if (!decodedToken) return;
 
     try {
       const adminDoc = await getUserDocRef(decodedToken.uid).get();
@@ -80,7 +61,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
       }
 
       // Allowed collections for admin actions via this endpoint
-      const allowedCollections = ["users", "bookings", "quotes", "feature_requests"];
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets"];
       if (!allowedCollections.includes(collection)) {
         return res.status(400).send("Invalid collection");
       }
@@ -113,7 +94,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     const uid = decodedToken.uid;
@@ -275,7 +256,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     try {
