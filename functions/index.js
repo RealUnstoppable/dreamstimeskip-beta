@@ -31,7 +31,6 @@ async function authenticateRequest(req, res, adminInstance) {
     return null;
   }
 }
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
 const stripe = require("stripe")(stripeKey);
 
 // 🛡️ Shared Utils
