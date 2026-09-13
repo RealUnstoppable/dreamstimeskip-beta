@@ -41,24 +41,6 @@ export async function createTicket(userId, userEmail, subject, message) {
     }
 }
 
-async function fetchAndSortTickets(q) {
-    try {
-        const querySnapshot = await getDocs(q);
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
-
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
-    } catch (error) {
-        console.error("Error fetching and sorting tickets - Manager info: [" + error.message + "]");
-        throw error;
-    }
-}
 
 /**
  * Retrieves all tickets for a specific user

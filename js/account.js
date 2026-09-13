@@ -15,23 +15,31 @@ const ordersList = document.getElementById('orders-list');
 // Render Profile
 async function renderProfile(user) {
     try {
-        const userRef = doc(db, 'users', user.uid);
-        let userDoc = await getDoc(userRef);
-
         let userData;
-        if (!userDoc.exists()) {
-            // Graceful instantiation if user doc is missing
-            userData = {
-                email: user.email,
-                username: user.email.split('@')[0],
-                membershipLevel: 'free',
-                isAdmin: false,
-                isBanned: false,
-                signupDate: new Date()
-            };
-            await setDoc(userRef, userData, { merge: true });
+        const cacheKey = `profile_${user.uid}`;
+        const cachedProfile = sessionStorage.getItem(cacheKey);
+
+        if (cachedProfile) {
+            userData = JSON.parse(cachedProfile);
         } else {
-            userData = userDoc.data();
+            const userRef = doc(db, 'users', user.uid);
+            let userDoc = await getDoc(userRef);
+
+            if (!userDoc.exists()) {
+                // Graceful instantiation if user doc is missing
+                userData = {
+                    email: user.email,
+                    username: user.email.split('@')[0],
+                    membershipLevel: 'free',
+                    isAdmin: false,
+                    isBanned: false,
+                    signupDate: new Date()
+                };
+                await setDoc(userRef, userData, { merge: true });
+            } else {
+                userData = userDoc.data();
+                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            }
         }
 
         profileDetails.innerHTML = `
