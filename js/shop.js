@@ -92,37 +92,12 @@ function renderProducts() {
         `;
     }).join('');
 
-    // Fetch and update ratings asynchronously without blocking UI render
-    updateAllProductRatings();
+    // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
 }
 
 async function updateAllProductRatings() {
-    try {
-        const q = query(collection(db, 'product_reviews'));
-        const querySnapshot = await getDocs(q);
-
-        const aggregations = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const pId = data.productId;
-            if (pId && data.rating !== undefined) {
-                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
-                aggregations[pId].sum += data.rating;
-                aggregations[pId].count += 1;
-            }
-        });
-
-        // Now safe to call without N+1 query by passing precalculated data
-        for (const product of products) {
-            const agg = aggregations[product.id];
-            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
-            const count = agg ? agg.count : 0;
-
-            updateProductRatingDisplay(product.id, { average, count });
-        }
-    } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
-    }
+    // ⚡ Bolt: Removed massive clientside aggregation that loaded the entire reviews collection.
+    // Relies on pre-computed product_stats loaded via loadProductStats() on init instead.
 }
 
 async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
