@@ -72,6 +72,9 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         if (typeof data !== "object" || data === null) {
           return res.status(400).send("Invalid update data");
         }
+        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
         await docRef.update(data);
       } else if (action === "delete") {
         await docRef.delete();
