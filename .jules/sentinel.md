@@ -71,3 +71,8 @@
 **Vulnerability:** The client-side application directly called `updateDoc()` to modify `support_tickets` in Firestore (e.g., closing tickets, saving admin replies) within the `js/ticket-service.js` file.
 **Learning:** Performing database modifications directly on the client for administrative tasks, relying only on basic Firestore rules, allows anyone to intercept and modify these queries to bypass restrictions if rules are misconfigured.
 **Prevention:** Always migrate administrative operations (like modifying support tickets, deleting users, or changing configurations) to a secure Cloud Function backend, and invoke it via an authenticated HTTP request using a Bearer token.
+
+## 2024-05-18 - [Fix DOM-based XSS in Checkout Summary]
+**Vulnerability:** The `renderCheckoutPage` function in `js/checkout.js` directly injected `product.name` into the DOM using template literals assigned to `innerHTML` without sanitization. If an attacker had manipulated the product catalog to include malicious script tags in a product's name, it would execute when the user visited the checkout page.
+**Learning:** Data from the database, even seemingly benign fields like product names, should never be blindly trusted when constructing raw HTML strings, as it creates vectors for Stored XSS if the database is ever compromised or manipulated.
+**Prevention:** Always sanitize dynamically rendered text properties from the database using an HTML entity encoding function like `escapeHTML` before interpolating them into HTML strings for DOM injection.
