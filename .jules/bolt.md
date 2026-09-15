@@ -31,3 +31,6 @@
 ## 2024-11-20 - N+1 Query in Product Ratings Update
 **Learning:** Wrapping individual N queries (e.g., getting average ratings per product) in `Promise.all` only makes them concurrent; it still executes N separate network requests against Firestore which is inefficient. Furthermore, retrieving the entire `reviews` collection to aggregate clientside is a massive memory/bandwidth regression. The correct approach is a single query to a dedicated pre-computed aggregation collection (e.g. `product_stats`) or chunked `in` queries.
 **Action:** When asked to solve an N+1 query issue, verify if an aggregation collection exists (like `product_stats`) and use it to execute a single batch query, then cache the result locally for synchronous UI updates.
+## 2026-09-15 - Caching DOM queries in drag-and-drop
+**Learning:** Executing `querySelectorAll` inside high-frequency event listeners like `pointermove` without caching creates a performance bottleneck (O(N) operations per frame) leading to severe UI lag during dragging operations.
+**Action:** Always cache the list of DOM elements when the drag operation begins (e.g., inside the initial `isDragging = true` block) and clear the cache when the operation ends (e.g., in `pointerup`), referencing the cached array instead of repeatedly querying the DOM during `pointermove`.

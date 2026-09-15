@@ -1818,6 +1818,7 @@ let dragItem = null;
     let dragStartTop = 0;
     let dragTimeout = null;
     let isDragging = false;
+    let cachedDragItems = null;
 
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
@@ -1825,7 +1826,7 @@ let dragItem = null;
             dragItem.style.transform = `translateY(${deltaY}px)`;
 
             // Visual Drop Indicator
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
 
             for (let i = 0; i < items.length; i++) {
@@ -1846,7 +1847,7 @@ let dragItem = null;
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
-            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const itemsNodeList = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             const idx = itemsNodeList.indexOf(dragItem);
 
             isDragging = false;
@@ -1858,9 +1859,10 @@ let dragItem = null;
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = itemsNodeList;
             let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
+                if (i === items.length - 1) cachedDragItems = null;
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
                     droppedIdx = i;
@@ -1931,6 +1933,7 @@ let dragItem = null;
                     dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
+                        cachedDragItems = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -1945,7 +1948,7 @@ let dragItem = null;
                     if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         let contextMenuIdx = idx;
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         const currentItemIdx = items.indexOf(item);
                         if (currentItemIdx !== -1) {
                             contextMenuIdx = currentItemIdx;
