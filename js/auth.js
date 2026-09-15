@@ -16,24 +16,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        const cacheKey = `profile_${user.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
-        let userData = null;
-
-        if (cachedProfile) {
-            userData = JSON.parse(cachedProfile);
-        } else {
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                }
-            } catch (error) {
-                console.error("Manager info: Error fetching user profile during auth state change:", error);
-            }
-        }
+        let userData = await getCachedUserProfile(user.uid);
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
@@ -165,4 +148,25 @@ export function getFirebaseErrorMessage(error) {
         default:
             return 'An unexpected error occurred. Please try again.';
     }
+}
+
+export async function getCachedUserProfile(uid) {
+    if (!uid) return null;
+    const cacheKey = `profile_${uid}`;
+    const cachedProfile = sessionStorage.getItem(cacheKey);
+    if (cachedProfile) {
+        return JSON.parse(cachedProfile);
+    }
+    try {
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            return userData;
+        }
+    } catch (error) {
+        console.error("Manager info: Error fetching user profile:", error);
+    }
+    return null;
 }
