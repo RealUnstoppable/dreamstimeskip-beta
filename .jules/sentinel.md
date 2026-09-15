@@ -71,3 +71,7 @@
 **Vulnerability:** The client-side application directly called `updateDoc()` to modify `support_tickets` in Firestore (e.g., closing tickets, saving admin replies) within the `js/ticket-service.js` file.
 **Learning:** Performing database modifications directly on the client for administrative tasks, relying only on basic Firestore rules, allows anyone to intercept and modify these queries to bypass restrictions if rules are misconfigured.
 **Prevention:** Always migrate administrative operations (like modifying support tickets, deleting users, or changing configurations) to a secure Cloud Function backend, and invoke it via an authenticated HTTP request using a Bearer token.
+## 2024-05-18 - [Fix Firestore Rating Validation Bypass on Update]
+**Vulnerability:** The Firestore rules for the `reviews` and `product_reviews` collections failed to validate the `rating` field on `update` operations (and on `create` for `reviews`). This allowed authenticated users to bypass the 1-5 rating constraints by either creating an unvalidated review or updating an existing review with an out-of-bounds rating, manipulating aggregated product scores.
+**Learning:** Firestore validation rules must be consistently applied across both `create` and `update` operations. Attackers can exploit permissive `update` rules to bypass validation logic implemented solely on the `create` operation.
+**Prevention:** Always mirror or extract data validation conditions (like numeric bounds) to ensure they are enforced regardless of the operation type (create vs. update).
