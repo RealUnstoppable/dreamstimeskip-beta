@@ -1,4 +1,4 @@
-import { db } from './auth.js';
+import { db, auth } from './auth.js';
 import { mapCollectionData } from './utils.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
@@ -111,12 +111,25 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
     }
 
     try {
-        const ticketRef = doc(db, TICKETS_COLLECTION, ticketId);
-        await updateDoc(ticketRef, {
-            adminReply,
-            status,
-            updatedAt: serverTimestamp()
+        const user = auth.currentUser;
+        if (!user) throw new Error("Not authenticated");
+        const idToken = await user.getIdToken();
+        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                action: 'update',
+                collection: 'support_tickets',
+                docId: ticketId,
+                data: { adminReply, status, updatedAt: new Date().toISOString() }
+            })
         });
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
         return { success: true };
     } catch (error) {
         console.error('Error replying to ticket - Manager info: [' + error.message + ']');
