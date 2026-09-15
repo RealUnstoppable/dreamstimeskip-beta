@@ -31,3 +31,6 @@
 ## 2024-11-20 - N+1 Query in Product Ratings Update
 **Learning:** Wrapping individual N queries (e.g., getting average ratings per product) in `Promise.all` only makes them concurrent; it still executes N separate network requests against Firestore which is inefficient. Furthermore, retrieving the entire `reviews` collection to aggregate clientside is a massive memory/bandwidth regression. The correct approach is a single query to a dedicated pre-computed aggregation collection (e.g. `product_stats`) or chunked `in` queries.
 **Action:** When asked to solve an N+1 query issue, verify if an aggregation collection exists (like `product_stats`) and use it to execute a single batch query, then cache the result locally for synchronous UI updates.
+## 2024-11-20 - O(log N) syncLyrics optimization
+**Learning:** O(N) arrays traversals over thousands of DOM elements within a `timeupdate` or `requestAnimationFrame` loop cause severe main thread blocking and frame drops.
+**Action:** When searching for an element correlated with continuous monotonically increasing data (like time), use a binary search to locate the active element in `O(log N)` instead of an `O(N)` linear search, and maintain a state to only apply expensive DOM operations when that active element changes.
