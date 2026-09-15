@@ -5,7 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
-import { getAverageRating } from './review-service.js';
+
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -55,8 +55,7 @@ function renderProducts() {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
-        const ratingInfo = cachedRatings[product.id] || { avg: 0, count: 0 };
-        const ratingDisplay = ratingInfo.count > 0 ? `${ratingInfo.avg.toFixed(1)} ★ (${ratingInfo.count})` : 'No reviews';
+
 
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
@@ -70,7 +69,7 @@ function renderProducts() {
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <div class="product-rating-summary">${ratingDisplay}</div>
+
                     <p>${product.description}</p>
                     <div class="product-stars-container">
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
@@ -92,48 +91,8 @@ function renderProducts() {
         `;
     }).join('');
 
-    // Fetch and update ratings asynchronously without blocking UI render
-    updateAllProductRatings();
-}
-
-async function updateAllProductRatings() {
-    try {
-        const q = query(collection(db, 'product_reviews'));
-        const querySnapshot = await getDocs(q);
-
-        const aggregations = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const pId = data.productId;
-            if (pId && data.rating !== undefined) {
-                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
-                aggregations[pId].sum += data.rating;
-                aggregations[pId].count += 1;
-            }
-        });
-
-        // Now safe to call without N+1 query by passing precalculated data
-        for (const product of products) {
-            const agg = aggregations[product.id];
-            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
-            const count = agg ? agg.count : 0;
-
-            updateProductRatingDisplay(product.id, { average, count });
-        }
-    } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
-    }
-}
-
-async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
-    const ratingEl = document.getElementById(`rating-${productId}`);
-    if (ratingEl) {
-        let ratingInfo = precalculatedRatingInfo;
-        if (!ratingInfo) {
-            ratingInfo = await getAverageRating(productId);
-        }
-        ratingEl.innerHTML = `<span class="star-display">★</span> ${ratingInfo.average} (${ratingInfo.count} reviews)`;
-    }
+    // ⚡ Bolt: Removed manual N+1 / collection scan for ratings
+    // The productStatsMap already handles aggregations efficiently via loadProductStats()
 }
 
 async function loadProductStats() {
@@ -823,8 +782,15 @@ async function handleReviewSubmit(e) {
             reviewForm.reset();
             // Refresh reviews list
             await openReviewsModal(currentReviewProductId);
-            // Refresh specific product rating without full re-render
-            updateProductRatingDisplay(currentReviewProductId);
+            // ⚡ Bolt: Optimistic update
+            const stats = productStatsMap.get(currentReviewProductId) || { averageRating: 0, reviewCount: 0 };
+            const newCount = stats.reviewCount + 1;
+            const newTotal = (stats.averageRating * stats.reviewCount) + rating;
+            productStatsMap.set(currentReviewProductId, {
+                averageRating: newTotal / newCount,
+                reviewCount: newCount
+            });
+            renderProducts();
         } else {
             reviewStatusMessage.textContent = result.error || 'Failed to submit review.';
             reviewStatusMessage.style.color = 'red';
