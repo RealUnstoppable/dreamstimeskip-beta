@@ -43,7 +43,7 @@ onAuthStateChanged(auth, async (user) => {
                 }
             }
         } catch (error) {
-            console.error("Error loading theme from Firestore - Manager info:", error.message);
+            console.error("Error loading theme from Firestore:", error.message);
             applyTheme('dark', 'blue');
         }
     } else {

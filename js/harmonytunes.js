@@ -435,7 +435,7 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist - Manager info:", error);
+            console.error("Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -735,7 +735,7 @@ function initHarmonyTunes() {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error("Manager info:", e));
+        }).catch(e => console.error("Action error:", e));
     }
 
     function pauseSong() {
@@ -908,7 +908,7 @@ function initHarmonyTunes() {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Action error:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
@@ -1344,7 +1344,7 @@ function initHarmonyTunes() {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Action error:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1479,7 +1479,7 @@ function initHarmonyTunes() {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Action error:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -1563,7 +1563,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Firebase error:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -1615,7 +1615,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Action error:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -1689,9 +1689,9 @@ function initHarmonyTunes() {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Action error:", e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Firebase history update error:", e);
                 }
             });
         }
@@ -2105,7 +2105,7 @@ let dragItem = null;
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Action error:", e));
                 }
                 renderQueue();
             }

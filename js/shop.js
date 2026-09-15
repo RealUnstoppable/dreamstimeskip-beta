@@ -121,7 +121,7 @@ async function updateAllProductRatings() {
             updateProductRatingDisplay(product.id, { average, count });
         }
     } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
+        console.error("Error batch fetching ratings:", e);
     }
 }
 
@@ -143,7 +143,7 @@ async function loadProductStats() {
             productStatsMap.set(doc.id, doc.data());
         });
     } catch (error) {
-        console.error("Error loading product stats - Manager info:", error);
+        console.error("Error loading product stats:", error);
     } finally {
         renderProducts();
     }
@@ -242,7 +242,7 @@ export async function handleAddToCart(productId, event) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart - Manager info:', error.message);
+        console.error('Failed to add to cart:', error.message);
     }
 }
 
@@ -291,7 +291,7 @@ export async function toggleWishlist(productId) {
     try {
         await saveWishlist();
     } catch (error) {
-        console.error('Failed to update wishlist - Manager info:', error.message);
+        console.error('Failed to update wishlist:', error.message);
     }
 }
 
@@ -312,7 +312,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore - Manager info:", error.message);
+                console.error("Error saving wishlist to Firestore:", error.message);
                 reject(error);
             }
         }, 500);
@@ -334,7 +334,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore - Manager info:", error.message);
+                    console.error("Error saving cart to Firestore:", error.message);
                 }
             } else {
                 // Save cart to localStorage for logged-out users
@@ -402,7 +402,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Manager info: [Error fetching reviews:]", error);
+        console.error("Error fetching reviews:", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -612,7 +612,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Manager info: [Error submitting review:]", error);
+                console.error("Error submitting review:", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -688,7 +688,7 @@ async function loadReviews(productId) {
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Error loading reviews - Manager info:", error.message);
+        console.error("Error loading reviews:", error.message);
         reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
     }
 }
@@ -756,7 +756,7 @@ async function handleReviewSubmit(e) {
         await openReviewsModal(currentReviewProductId); // Refresh modal
 
     } catch (error) {
-        console.error("Error submitting review - Manager info:", error.message);
+        console.error("Error submitting review:", error.message);
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;

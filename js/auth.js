@@ -31,7 +31,7 @@ onAuthStateChanged(auth, async (user) => {
                     sessionStorage.setItem(cacheKey, JSON.stringify(userData));
                 }
             } catch (error) {
-                console.error("Manager info: Error fetching user profile during auth state change:", error);
+                console.error("Error fetching user profile during auth state change:", error);
             }
         }
 
@@ -138,7 +138,7 @@ if (document.getElementById('auth-form')) {
                 }
             }
         } catch (error) {
-            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error - Manager info:`, error.message);
+            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
             showMessage(getFirebaseErrorMessage(error));
         } finally {
             submitBtn.disabled = false;

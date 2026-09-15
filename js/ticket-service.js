@@ -36,7 +36,7 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error creating ticket - Manager info: [' + error.message + ']');
+        console.error('Error creating ticket: [' + error.message + ']');
         throw error;
     }
 }
@@ -55,7 +55,7 @@ async function fetchAndSortTickets(q) {
              return timeB - timeA;
         });
     } catch (error) {
-        console.error("Error fetching and sorting tickets - Manager info: [" + error.message + "]");
+        console.error("Error fetching and sorting tickets: [" + error.message + "]");
         throw error;
     }
 }
@@ -79,7 +79,7 @@ export async function getUserTickets(userId) {
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching user tickets - Manager info: [' + error.message + ']');
+        console.error('Error fetching user tickets: [' + error.message + ']');
         throw error;
     }
 }
@@ -94,7 +94,7 @@ export async function getAllTickets() {
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching all tickets - Manager info: [' + error.message + ']');
+        console.error('Error fetching all tickets: [' + error.message + ']');
         throw error;
     }
 }
@@ -119,7 +119,7 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
         });
         return { success: true };
     } catch (error) {
-        console.error('Error replying to ticket - Manager info: [' + error.message + ']');
+        console.error('Error replying to ticket: [' + error.message + ']');
         throw error;
     }
 }
