@@ -39,7 +39,7 @@ export function loadNavbar() {
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
@@ -71,7 +71,7 @@ export function loadUdsNavbar() {
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
