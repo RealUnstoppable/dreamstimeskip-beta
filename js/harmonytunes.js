@@ -1242,51 +1242,137 @@ function initHarmonyTunes() {
 
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
+    let lastActiveWordIndex = -1;
+
+    // ⚡ Bolt: Optimized syncLyrics to use state-tracking and binary search for O(1) contiguous updates and O(log N) seeking.
+    // This eliminates O(N) DOM thrashing on every frame by only applying class changes when state transitions occur.
     function syncLyrics() {
         if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
         
-        let newActiveLineIndex = -1;
-        cachedLyricsDOM.forEach((lineCache, index) => {
-            const { el: lineEl, start, end, words } = lineCache;
+        let newActiveLineIndex = activeLineIndex;
+        let isSeeking = false;
+
+        // Check if we need to find a new line
+        if (activeLineIndex === -1 || currentTime < cachedLyricsDOM[activeLineIndex].start || currentTime > cachedLyricsDOM[activeLineIndex].end) {
+            // Out of bounds. Determine if we can just step forward/backward or if we need binary search (seeking)
             
-            // Allow active line to persist slightly if it's the last one sung, 
-            // but strict matching is better for beat-by-beat
-            if (currentTime >= start && currentTime <= end) {
-                newActiveLineIndex = index;
-                lineEl.classList.add('active');
-                
-                words.forEach(wordCache => {
-                    if (currentTime >= wordCache.start) {
-                        wordCache.el.classList.add('active-word');
-                    } else {
-                        wordCache.el.classList.remove('active-word');
-                    }
-                });
+            // Fast path for contiguous forward playback
+            if (activeLineIndex >= 0 && activeLineIndex < cachedLyricsDOM.length - 1 &&
+                currentTime >= cachedLyricsDOM[activeLineIndex + 1].start &&
+                currentTime <= cachedLyricsDOM[activeLineIndex + 1].end) {
+                newActiveLineIndex = activeLineIndex + 1;
             } else {
-                lineEl.classList.remove('active');
-                // clear word highlights if passed
-                words.forEach(wordCache => {
-                    if (currentTime > end) {
-                        wordCache.el.classList.add('active-word');
+                // Non-contiguous jump (seek)
+                isSeeking = true;
+
+                // Binary search for seek
+                let low = 0;
+                let high = cachedLyricsDOM.length - 1;
+                newActiveLineIndex = -1;
+
+                while (low <= high) {
+                    let mid = Math.floor((low + high) / 2);
+                    let line = cachedLyricsDOM[mid];
+
+                    if (currentTime >= line.start && currentTime <= line.end) {
+                        newActiveLineIndex = mid;
+                        break;
+                    } else if (currentTime < line.start) {
+                        high = mid - 1;
                     } else {
-                        wordCache.el.classList.remove('active-word');
+                        low = mid + 1;
+                    }
+                }
+            }
+        }
+
+        // Handle full global sweep on seek to fix stale state
+        if (isSeeking) {
+            cachedLyricsDOM.forEach((lineCache, index) => {
+                if (index === newActiveLineIndex) return; // Will handle new line below
+                if (lineCache.el.classList.contains('active')) lineCache.el.classList.remove('active');
+                
+                lineCache.words.forEach(w => {
+                    if (currentTime > lineCache.end) {
+                        if (!w.el.classList.contains('active-word')) w.el.classList.add('active-word');
+                    } else {
+                        if (w.el.classList.contains('active-word')) w.el.classList.remove('active-word');
+                    }
+                });
+            });
+            activeLineIndex = -1; // Force clean transition
+        }
+
+        // Handle line transition
+        if (newActiveLineIndex !== activeLineIndex) {
+            if (activeLineIndex !== -1 && cachedLyricsDOM[activeLineIndex]) {
+                const oldLine = cachedLyricsDOM[activeLineIndex];
+                if (oldLine.el.classList.contains('active')) oldLine.el.classList.remove('active');
+
+                // If moving forward, all words in old line become active. If backward, inactive.
+                const isForward = newActiveLineIndex > activeLineIndex || newActiveLineIndex === -1;
+                oldLine.words.forEach(w => {
+                    if (isForward && currentTime > oldLine.end) {
+                        if (!w.el.classList.contains('active-word')) w.el.classList.add('active-word');
+                    } else {
+                        if (w.el.classList.contains('active-word')) w.el.classList.remove('active-word');
                     }
                 });
             }
-        });
-        
-        if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
+
             activeLineIndex = newActiveLineIndex;
-            if (isAutoScrolling) {
+            lastActiveWordIndex = -1; // Reset word index on new line
+
+            if (activeLineIndex !== -1) {
                 const activeLine = cachedLyricsDOM[activeLineIndex].el;
-                isProgrammaticScroll = true;
-                lyricsContainer.scrollTo({
-                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
-                    behavior: 'smooth'
-                });
-                setTimeout(() => isProgrammaticScroll = false, 800);
+                if (!activeLine.classList.contains('active')) activeLine.classList.add('active');
+
+                // On a backward seek, ensure future words in this line are cleared.
+                if (isSeeking) {
+                    activeLine.words.forEach(w => {
+                         if (w.start > currentTime && w.el.classList.contains('active-word')) {
+                             w.el.classList.remove('active-word');
+                         }
+                    });
+                }
+
+                if (isAutoScrolling) {
+                    isProgrammaticScroll = true;
+                    lyricsContainer.scrollTo({
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                        behavior: 'smooth'
+                    });
+                    setTimeout(() => isProgrammaticScroll = false, 800);
+                }
             }
+        }
+
+        // Handle words within the active line
+        if (activeLineIndex !== -1) {
+            const currentLine = cachedLyricsDOM[activeLineIndex];
+            const words = currentLine.words;
+
+            // Fast forward words contiguous check
+            let currentWordIndex = lastActiveWordIndex;
+
+            // Advance active word index
+            while(currentWordIndex + 1 < words.length && currentTime >= words[currentWordIndex + 1].start) {
+                currentWordIndex++;
+                if (!words[currentWordIndex].el.classList.contains('active-word')) {
+                     words[currentWordIndex].el.classList.add('active-word');
+                }
+            }
+
+            // Handle backwards seek within same line (rare, but possible)
+            while(currentWordIndex >= 0 && currentTime < words[currentWordIndex].start) {
+                if (words[currentWordIndex].el.classList.contains('active-word')) {
+                     words[currentWordIndex].el.classList.remove('active-word');
+                }
+                currentWordIndex--;
+            }
+
+            lastActiveWordIndex = currentWordIndex;
         }
     }
 
