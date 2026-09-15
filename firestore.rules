@@ -14,12 +14,12 @@ service cloud.firestore {
          && request.resource.data.get('isAdmin', false) == false
          && request.resource.data.get('isBanned', false) == false
          && request.resource.data.get('membershipLevel', 'free') == 'free'
-         && !request.resource.data.keys().hasAny(['plan', 'subscription']))
+         && !request.resource.data.keys().hasAny(['plan', 'subscription', 'loyaltyPoints']))
         || isAdmin()
       );
       allow update: if request.auth != null && (
         (request.auth.uid == userId
-         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription']))
+         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints']))
         || isAdmin()
       );
       allow delete: if isAdmin();
@@ -36,6 +36,12 @@ service cloud.firestore {
     }
 
     // Orders collection: Users can read their own orders and create new ones
+    // Loyalty transactions
+    match /loyalty_transactions/{transactionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend writes
+    }
+
     match /orders/{orderId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       // Depending on checkout implementation, orders are created by user or backend.
