@@ -55,10 +55,9 @@ function renderProducts() {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
-        const ratingInfo = cachedRatings[product.id] || { avg: 0, count: 0 };
-        const ratingDisplay = ratingInfo.count > 0 ? `${ratingInfo.avg.toFixed(1)} ★ (${ratingInfo.count})` : 'No reviews';
-
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
+        const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
+
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
@@ -97,32 +96,7 @@ function renderProducts() {
 }
 
 async function updateAllProductRatings() {
-    try {
-        const q = query(collection(db, 'product_reviews'));
-        const querySnapshot = await getDocs(q);
-
-        const aggregations = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const pId = data.productId;
-            if (pId && data.rating !== undefined) {
-                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
-                aggregations[pId].sum += data.rating;
-                aggregations[pId].count += 1;
-            }
-        });
-
-        // Now safe to call without N+1 query by passing precalculated data
-        for (const product of products) {
-            const agg = aggregations[product.id];
-            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
-            const count = agg ? agg.count : 0;
-
-            updateProductRatingDisplay(product.id, { average, count });
-        }
-    } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
-    }
+    // Rely on productStatsMap loaded from product_stats collection instead of fetching all reviews manually.
 }
 
 async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
@@ -389,7 +363,6 @@ async function fetchProductReviews(productId) {
         if (avgRatingValue) avgRatingValue.textContent = avg.toFixed(1);
         if (totalReviewsCount) totalReviewsCount.textContent = `${count} review${count !== 1 ? 's' : ''}`;
 
-        cachedRatings[productId] = { avg, count };
         renderProducts();
 
     } catch (error) {
@@ -751,6 +724,8 @@ async function handleReviewSubmit(e) {
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
+    }
+}
         submitReviewBtn.textContent = originalText;
     }
 }
@@ -778,221 +753,3 @@ async function openReviewsModal(productId) {
 
     if (reviews.length === 0) {
         reviewsList.innerHTML = '<p class="empty-cart-message">No reviews yet. Be the first to review!</p>';
-    } else {
-        reviewsList.innerHTML = reviews.map(review => `
-            <div class="review-item">
-                <div class="review-header">
-                    <strong>${escapeHTML(review.userEmail.split('@')[0])}</strong>
-                    <span class="review-date">${review.createdAtDate}</span>
-                </div>
-                <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
-                <p class="review-text">${escapeHTML(review.reviewText)}</p>
-            </div>
-        `).join('');
-    }
-}
-
-// Make accessible to testing via window
-window.openReviewsModal = openReviewsModal;
-
-
-async function handleReviewSubmit(e) {
-    e.preventDefault();
-    if (!currentUser || !currentReviewProductId) return;
-
-    const ratingInput = document.querySelector('input[name="rating"]:checked');
-    const reviewText = document.getElementById('review-text').value;
-
-    if (!ratingInput || !reviewText.trim()) {
-        reviewStatusMessage.textContent = 'Please provide both a rating and a review.';
-        reviewStatusMessage.style.color = 'red';
-        return;
-    }
-
-    const rating = parseInt(ratingInput.value, 10);
-    submitReviewBtn.disabled = true;
-    submitReviewBtn.textContent = 'Submitting...';
-    reviewStatusMessage.textContent = '';
-
-    try {
-        const result = await submitReview(currentReviewProductId, currentUser.uid, currentUser.email, rating, reviewText.trim());
-
-        if (result.success) {
-            reviewStatusMessage.textContent = 'Review submitted successfully!';
-            reviewStatusMessage.style.color = 'green';
-            reviewForm.reset();
-            // Refresh reviews list
-            await openReviewsModal(currentReviewProductId);
-            // Refresh specific product rating without full re-render
-            updateProductRatingDisplay(currentReviewProductId);
-        } else {
-            reviewStatusMessage.textContent = result.error || 'Failed to submit review.';
-            reviewStatusMessage.style.color = 'red';
-        }
-    } catch (error) {
-        console.error('Manager info: [Submit review error:]', error);
-        reviewStatusMessage.textContent = 'An error occurred. Please try again.';
-        reviewStatusMessage.style.color = 'red';
-    } finally {
-        submitReviewBtn.disabled = false;
-        submitReviewBtn.textContent = 'Submit Review';
-    }
-}
-
-// --- INITIALIZATION ---
-loadProductStats();
-setupEventListeners();
-
-// **MODIFIED**: Reworked auth state change to handle local cart
-onAuthStateChanged(auth, async (user) => {
-        currentUser = user;
-        const localCartData = localStorage.getItem('localCart');
-        const localCart = localCartData ? JSON.parse(localCartData) : {};
-
-        if (user) {
-            // User is signed in
-
-            // Load Wishlist
-            try {
-                const userWishlistRef = doc(db, 'wishlists', user.uid);
-                const wishlistSnap = await getDoc(userWishlistRef);
-                if (wishlistSnap.exists() && wishlistSnap.data().items) {
-                    wishlist = new Set(wishlistSnap.data().items);
-                } else {
-                    wishlist = new Set();
-                }
-            } catch (error) {
-                console.error("Error loading wishlist - Manager info:", error.message);
-            }
-
-            const userCartRef = doc(db, 'carts', user.uid);
-            const docSnap = await getDoc(userCartRef);
-            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
-
-            // Merge local and firestore carts
-            const mergedCart = { ...firestoreCart };
-            let hasLocalItems = false;
-            for (const [productId, quantity] of Object.entries(localCart)) {
-                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
-                hasLocalItems = true;
-            }
-            
-            cart = mergedCart;
-            // Only trigger backend write if we actually merged local items into it
-            if (hasLocalItems) {
-                await saveCart();
-                localStorage.removeItem('localCart'); // Clear local cart after merging
-            }
-        } else {
-            // User is signed out, load from localStorage
-            cart = localCart;
-        }
-
-        updateUserNav(user);
-        renderCart(); // Render the final cart state
-    });// --- REVIEWS LOGIC ---
-const reviewsModal = document.getElementById('reviews-modal');
-const closeReviewsBtn = document.getElementById('close-reviews-btn');
-const reviewsListContainer = document.getElementById('reviews-list-container');
-const reviewSubmitForm = document.getElementById('review-submit-form');
-const reviewProductIdInput = document.getElementById('review-product-id');
-const reviewAuthMessage = document.getElementById('review-auth-message');
-
-async function openReviewsModal(productId) {
-    if (!reviewsModal) return;
-    reviewProductIdInput.value = productId;
-    reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
-    reviewsModal.style.display = 'block';
-
-    if (!currentUser) {
-        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'none';
-        reviewAuthMessage.style.display = 'block';
-    } else {
-        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'block';
-        reviewAuthMessage.style.display = 'none';
-    }
-
-    try {
-        const q = query(collection(db, 'product_reviews'), where('productId', '==', productId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            reviewsListContainer.innerHTML = '<p>No reviews yet. Be the first!</p>';
-            return;
-        }
-
-        reviewsListContainer.innerHTML = '';
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const date = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Just now';
-            reviewsListContainer.innerHTML += `
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <strong>${escapeHTML(data.authorName || 'Anonymous')}</strong>
-                        <span style="color: #fbbf24;">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</span>
-                    </div>
-                    <p style="margin: 0; font-size: 0.9em; color: var(--text-secondary);">${escapeHTML(data.text)}</p>
-                    <small style="color: #666;">${date}</small>
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error("Manager info: Error loading reviews", error);
-        reviewsListContainer.innerHTML = '<p>Error loading reviews.</p>';
-    }
-}
-
-if (reviewSubmitForm) {
-    reviewSubmitForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-
-        const productId = reviewProductIdInput.value;
-        const rating = parseInt(document.getElementById('review-rating').value, 10);
-        const text = document.getElementById('review-text').value;
-        const submitBtn = reviewSubmitForm.querySelector('button[type="submit"]');
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-
-        try {
-            await addDoc(collection(db, 'product_reviews'), {
-                productId,
-                userId: currentUser.uid,
-                authorName: (currentUser.email ? currentUser.email.split("@")[0] : "Anonymous"), // Safe fallback
-                rating,
-                text,
-                createdAt: new Date().toISOString()
-            });
-            reviewSubmitForm.reset();
-            await openReviewsModal(productId); // Reload reviews
-            await renderProducts(); // Refresh stats on grid
-        } catch (error) {
-            console.error("Manager info: Error submitting review", error);
-            alert('Error submitting review.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Review';
-        }
-    });
-}
-
-if (closeReviewsBtn) {
-    closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
-}
-window.addEventListener('click', (e) => {
-    if (e.target === reviewsModal) reviewsModal.style.display = 'none';
-});
-
-// Add event delegation for the new "Reviews" button
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.getElementById('product-grid');
-    if (grid) {
-        grid.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-reviews-btn')) {
-                const productId = e.target.dataset.id;
-                openReviewsModal(productId);
-            }
-        });
-    }
-});
