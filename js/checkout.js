@@ -49,6 +49,9 @@ function renderCheckoutPage() {
         document.getElementById('summary-discount-row').style.display = discount > 0 ? 'flex' : 'none';
         document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
         document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+        const points = Math.floor(subtotal * 10);
+        document.getElementById('summary-points').textContent = `✨ You will earn ${points} Unstoppable Points with this order!`;
+
     };
 
     const { subtotal, discountAmount, tax, total } = renderSummary();
@@ -127,7 +130,10 @@ function renderCheckoutPage() {
                     <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
                     <div class="summary-item" id="summary-discount-row" style="display: none; color: var(--accent-green);"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
                     <div class="summary-item"><span>Tax</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
-                    <div class="summary-total"><span>Total</span> <span id="summary-total">$${total.toFixed(2)}</span></div>
+
+                    <div class="summary-total"><span>Total</span> <span id="summary-total">${total.toFixed(2)}</span></div>
+                    <div style="margin-top: 15px; font-size: 0.9rem; color: var(--accent-blue); text-align: center; font-weight: 500;" id="summary-points">✨ You will earn ${Math.floor(subtotal * 10)} Unstoppable Points with this order!</div>
+
                 </div>
             </div>
         </div>

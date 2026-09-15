@@ -289,12 +289,14 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 // ⭐️ Update Product Stats on New Review
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
+
+// ⭐️ Update Points on New Review
 exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
   const snap = event.data;
-  const context = event;
   const newReview = snap.data();
   const productId = newReview.productId;
   const rating = newReview.rating;
+  const userId = newReview.userId;
 
   // Validate rating
   if (typeof rating !== "number" || rating < 1 || rating > 5) {
@@ -302,10 +304,14 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
     return null;
   }
 
-  const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
+  const db = admin.firestore();
+  const productStatsRef = db.collection("product_stats").doc(productId);
+  const userRef = db.collection("users").doc(userId);
+  const transactionRef = db.collection("reward_transactions").doc();
 
   try {
-    return await admin.firestore().runTransaction(async (transaction) => {
+    return await db.runTransaction(async (transaction) => {
+      // 1. Update Product Stats
       const statsDoc = await transaction.get(productStatsRef);
       let reviewCount = 0;
       let averageRating = 0;
@@ -323,9 +329,73 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
         reviewCount: newReviewCount,
         averageRating: newAverageRating,
       }, {merge: true});
+
+      // 2. Award Points
+      if (userId) {
+        const pointsToAward = 50;
+        const userDoc = await transaction.get(userRef);
+        let currentPoints = 0;
+        if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
+          currentPoints = userDoc.data().pointsBalance;
+        }
+
+        transaction.set(userRef, {
+          pointsBalance: currentPoints + pointsToAward
+        }, { merge: true });
+
+        transaction.set(transactionRef, {
+          userId: userId,
+          amount: pointsToAward,
+          reason: "Product Review",
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
     });
   } catch (error) {
-    console.error("Error updating product stats - Manager info: [" + error.message + "]");
+    console.error("Error updating product stats or awarding points - Manager info: [" + error.message + "]");
+    return null;
+  }
+});
+
+// 🛍️ Award Points on Order Creation
+exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => {
+  const snap = event.data;
+  const newOrder = snap.data();
+  const userId = newOrder.userId;
+  const subtotal = newOrder.subtotal || 0;
+
+  if (!userId || subtotal <= 0) return null;
+
+  const db = admin.firestore();
+  const userRef = db.collection("users").doc(userId);
+  const transactionRef = db.collection("reward_transactions").doc();
+
+  // 10 points per $1 spent
+  const pointsToAward = Math.floor(subtotal * 10);
+
+  if (pointsToAward <= 0) return null;
+
+  try {
+    return await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      let currentPoints = 0;
+      if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
+        currentPoints = userDoc.data().pointsBalance;
+      }
+
+      transaction.set(userRef, {
+        pointsBalance: currentPoints + pointsToAward
+      }, { merge: true });
+
+      transaction.set(transactionRef, {
+        userId: userId,
+        amount: pointsToAward,
+        reason: "Purchase Reward",
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+  } catch (error) {
+    console.error("Error awarding points for order - Manager info: [" + error.message + "]");
     return null;
   }
 });

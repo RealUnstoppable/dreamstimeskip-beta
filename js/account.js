@@ -137,7 +137,65 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         renderProfile(user);
         renderOrders(user);
+        renderRewards(user);
     } else {
         window.location.replace('/sign in beta.html');
     }
 });
+
+async function renderRewards(user) {
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        const balance = userDoc.exists() && typeof userDoc.data().pointsBalance === 'number'
+            ? userDoc.data().pointsBalance
+            : 0;
+
+        document.getElementById('points-balance-display').textContent = balance;
+
+        const transRef = collection(db, 'reward_transactions');
+        const q = query(
+            transRef,
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+        );
+
+        const snap = await getDocs(q);
+        const container = document.getElementById('reward-transactions-list');
+
+        if (snap.empty) {
+            container.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        snap.forEach(docSnap => {
+            const data = docSnap.data();
+            const dateStr = formatDate(data.createdAt);
+            const el = document.createElement('div');
+            el.style.cssText = "display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 5px 0; font-size: 0.9rem;";
+
+            const amountColor = data.amount > 0 ? "var(--accent-green)" : "var(--text-color)";
+            const amountPrefix = data.amount > 0 ? "+" : "";
+
+            el.innerHTML = `
+                <div>
+                    <span style="display: block; font-weight: bold;">${escapeHTML(data.reason || 'Reward')}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${dateStr}</span>
+                </div>
+                <div style="color: ${amountColor}; font-weight: bold;">
+                    ${amountPrefix}${data.amount}
+                </div>
+            `;
+            fragment.appendChild(el);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(fragment);
+
+    } catch (e) {
+        console.error("Manager info: Error fetching rewards:", e);
+        document.getElementById('points-balance-display').textContent = 'Error';
+        document.getElementById('reward-transactions-list').innerHTML = '<p style="color: var(--accent-red);">Failed to load rewards.</p>';
+    }
+}
