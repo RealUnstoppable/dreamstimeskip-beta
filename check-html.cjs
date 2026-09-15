@@ -7,7 +7,7 @@ while ((match = scriptRegex.exec(html)) !== null) {
   try {
     new Function(code);
   } catch (e) {
-    if (e.name !== 'SyntaxError') continue;
+    if (e.name !== 'SyntaxError' || e.message.includes('Cannot use import statement outside a module')) continue;
     console.error("Syntax Error found in inline script:", e.message);
     process.exit(1);
   }

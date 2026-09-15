@@ -1095,17 +1095,6 @@
                         if (document.querySelector('.view-section.active').id === 'view-auth') window.navTo('tracker');
                     } else {
                         window.navTo('setup');
-
-                db.collection("users").doc(user.uid).get().then(doc => {
-                    if (doc.exists) {
-                        currentUserData = doc.data();
-                        loadProfileUI(currentUserData);
-                        loadCustomPresets();
-                        calculatePerformance();
-                        syncDraftFromServer();
-                        if (document.querySelector('.view-section.active').id === 'view-auth') navTo('tracker');
-                    } else {
-                        navTo('setup');
                     }
                 });
             } else {
@@ -1171,11 +1160,6 @@
                 const userDocRef = doc(db, "users", cred.user.uid);
                 getDoc(userDocRef).then(docSnap => {
                     if(!docSnap.exists()) window.navTo('setup');
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then(cred => {
-                db.collection("users").doc(cred.user.uid).get().then(doc => {
-                    if (!doc.exists) navTo('setup');
                 });
             }).catch(err => alert(err.message));
         }
@@ -1205,11 +1189,6 @@
                 btn.textContent = originalText;
                 return alert("Name is required.");
             }
-
-            const btn = document.getElementById('finishSetupBtn');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
 
             if (btn) {
                 btn.disabled = true;
@@ -1471,9 +1450,6 @@
                 container.innerHTML = "";
                 const history = (docSnap.exists() ? docSnap.data().shiftHistory || [] : []).reverse();
                 if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
-                
-                const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
-                if (history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
 
                 history.slice(0, 20).forEach(data => {
                     const div = document.createElement('div');
@@ -1497,9 +1473,6 @@
         window.loadHistoryShift = function(id) {
             if(!currentUser) return;
             if(!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
-        function loadHistoryShift(id) {
-            if (!currentUser) return;
-            if (!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
 
             const userDocRef = doc(db, 'users', currentUser.uid);
             getDoc(userDocRef).then(docSnap => {
@@ -1558,9 +1531,6 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             getDoc(userDocRef).then(docSnap => {
                 const history = docSnap.exists() ? docSnap.data().shiftHistory || [] : [];
-            if (!currentUser) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const history = doc.exists ? doc.data().shiftHistory || [] : [];
                 document.getElementById('statShifts').innerText = history.length;
 
                 let totalRoutines = 0; let checkedRoutines = 0;
