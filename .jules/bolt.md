@@ -34,3 +34,6 @@
 ## 2026-09-12 - Refactor duplicated logic and state management
 **Learning:** Functions like `fetchAndSortTickets` can create duplicated logic and increase bundle size, while repeated Firestore `getDoc` calls without caching can cause unnecessary latency and backend reads.
 **Action:** Always extract common map/sort functionality into utility modules (like `mapCollectionData`) and utilize `sessionStorage` caching (like `profile_${uid}`) to minimize unnecessary database reads on subsequent renders.
+## 2024-11-20 - Redundant Code execution
+**Learning:** Having many places fetch profile data from firestore and duplicate caching and error handling creates redundancy and causes regressions when modifying the process.
+**Action:** Extract user profile caching out into a utility function `getCachedUserProfile(uid)`.

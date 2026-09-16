@@ -8,6 +8,26 @@ import { escapeHTML } from './utils.js';
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
+export async function getCachedUserProfile(uid) {
+    const cacheKey = `profile_${uid}`;
+    const cachedProfile = sessionStorage.getItem(cacheKey);
+    if (cachedProfile) return JSON.parse(cachedProfile);
+
+    try {
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            return userData;
+        }
+    } catch (error) {
+        console.error("Manager info: Error fetching profile:", error);
+    }
+    return null;
+}
+
+
 
 
 onAuthStateChanged(auth, async (user) => {
@@ -16,24 +36,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        const cacheKey = `profile_${user.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
-        let userData = null;
-
-        if (cachedProfile) {
-            userData = JSON.parse(cachedProfile);
-        } else {
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                }
-            } catch (error) {
-                console.error("Manager info: Error fetching user profile during auth state change:", error);
-            }
-        }
+        const userData = await getCachedUserProfile(user.uid);
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';

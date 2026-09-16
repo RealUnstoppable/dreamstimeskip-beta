@@ -1,4 +1,4 @@
-import { auth, db } from './auth.js?v=1784516229';
+import { auth, db, getCachedUserProfile } from './auth.js?v=1784516229';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
@@ -110,19 +110,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const cacheKey = `profile_${user.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let userData = null;
-
-                if (cachedProfile) {
-                    userData = JSON.parse(cachedProfile);
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        userData = userDoc.data();
-                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                    }
-                }
+                const userData = await getCachedUserProfile(user.uid);
 
 
                 // Fetch notifications

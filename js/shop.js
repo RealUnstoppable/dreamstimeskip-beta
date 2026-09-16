@@ -1,5 +1,5 @@
 // shop.js
-import { auth, db } from './auth.js';
+import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
@@ -557,15 +557,8 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const cacheKey = `profile_${currentUser.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let username = "User";
-                if (cachedProfile) {
-                    username = JSON.parse(cachedProfile).username;
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if (userDoc.exists()) username = userDoc.data().username || "User";
-                }
+                const userData = await getCachedUserProfile(currentUser.uid);
+                let username = (userData && userData.username) ? userData.username : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
@@ -685,19 +678,8 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        const cacheKey = `profile_${currentUser.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
-        let authorName = currentUser.displayName || 'Anonymous';
-
-        if (cachedProfile) {
-            const userData = JSON.parse(cachedProfile);
-            if (userData.username) authorName = userData.username;
-        } else {
-             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-             if (userDoc.exists() && userDoc.data().username) {
-                 authorName = userDoc.data().username;
-             }
-        }
+        const userData = await getCachedUserProfile(currentUser.uid);
+        let authorName = (userData && userData.username) ? userData.username : (currentUser.displayName || 'Anonymous');
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,

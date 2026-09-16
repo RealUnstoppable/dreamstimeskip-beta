@@ -1,4 +1,4 @@
-import { auth, db } from './auth.js';
+import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
@@ -15,31 +15,21 @@ const ordersList = document.getElementById('orders-list');
 // Render Profile
 async function renderProfile(user) {
     try {
-        let userData;
-        const cacheKey = `profile_${user.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
+        let userData = await getCachedUserProfile(user.uid);
 
-        if (cachedProfile) {
-            userData = JSON.parse(cachedProfile);
-        } else {
+        if (!userData) {
+            // Graceful instantiation if user doc is missing
+            userData = {
+                email: user.email,
+                username: user.email.split('@')[0],
+                membershipLevel: 'free',
+                isAdmin: false,
+                isBanned: false,
+                signupDate: new Date()
+            };
             const userRef = doc(db, 'users', user.uid);
-            let userDoc = await getDoc(userRef);
-
-            if (!userDoc.exists()) {
-                // Graceful instantiation if user doc is missing
-                userData = {
-                    email: user.email,
-                    username: user.email.split('@')[0],
-                    membershipLevel: 'free',
-                    isAdmin: false,
-                    isBanned: false,
-                    signupDate: new Date()
-                };
-                await setDoc(userRef, userData, { merge: true });
-            } else {
-                userData = userDoc.data();
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-            }
+            await setDoc(userRef, userData, { merge: true });
+            sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
         }
 
         profileDetails.innerHTML = `
