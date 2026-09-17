@@ -1,11 +1,12 @@
 // shop.js
-import { auth, db } from './auth.js';
+import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
+import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -55,6 +56,8 @@ function renderProducts() {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
+
+
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
         const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
 
@@ -63,13 +66,13 @@ function renderProducts() {
 
         return `
             <div class="product-card">
-                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <div class="product-rating-summary">${ratingDisplay}</div>
+
                     <p>${product.description}</p>
                     <div class="product-stars-container">
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
@@ -91,12 +94,12 @@ function renderProducts() {
         `;
     }).join('');
 
-    // Fetch and update ratings asynchronously without blocking UI render
-    updateAllProductRatings();
+    // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
 }
 
 async function updateAllProductRatings() {
-    // Rely on productStatsMap loaded from product_stats collection instead of fetching all reviews manually.
+    // ⚡ Bolt: Removed massive clientside aggregation that loaded the entire reviews collection.
+    // Relies on pre-computed product_stats loaded via loadProductStats() on init instead.
 }
 
 async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
@@ -117,7 +120,7 @@ async function loadProductStats() {
             productStatsMap.set(doc.id, doc.data());
         });
     } catch (error) {
-        console.error("Error loading product stats - Manager info:", error);
+        console.error("Error loading product stats:", error);
     } finally {
         renderProducts();
     }
@@ -127,7 +130,7 @@ function renderCart() {
     if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
         if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.title = 'Your cart is empty'; }
     } else {
         if (cartItemsContainer) {
             cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
@@ -142,14 +145,14 @@ function renderCart() {
                             <p>${product.price === 0 ? '<span style="color: var(--accent-green); font-weight: bold;">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" aria-label="Quantity for ${product.name}">
-                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
+                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
-        if (checkoutBtn) checkoutBtn.disabled = false;
+        if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
     }
     updateCartSummary();
 }
@@ -216,17 +219,26 @@ export async function handleAddToCart(productId, event) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart - Manager info:', error.message);
+        console.error('Failed to add to cart:', error.message);
     }
 }
 
 export async function handleUpdateQuantity(productId, quantity) {
-    if (quantity <= 0) {
-        await handleRemoveFromCart(productId);
-    } else {
-        cart[productId] = parseInt(quantity, 10);
-        await saveCart();
-        renderCart();
+    if (!productMap.has(productId)) {
+        console.error(`Product not found: ${productId}`);
+        return;
+    }
+
+    try {
+        if (quantity <= 0) {
+            await handleRemoveFromCart(productId);
+        } else {
+            cart[productId] = parseInt(quantity, 10);
+            await saveCart();
+            renderCart();
+        }
+    } catch (error) {
+        console.error('Failed to update quantity - Manager info:', error);
     }
 }
 
@@ -256,7 +268,7 @@ export async function toggleWishlist(productId) {
     try {
         await saveWishlist();
     } catch (error) {
-        console.error('Failed to update wishlist - Manager info:', error.message);
+        console.error('Failed to update wishlist:', error.message);
     }
 }
 
@@ -277,7 +289,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore - Manager info:", error.message);
+                console.error("Error saving wishlist to Firestore:", error.message);
                 reject(error);
             }
         }, 500);
@@ -299,7 +311,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore - Manager info:", error.message);
+                    console.error("Error saving cart to Firestore:", error.message);
                 }
             } else {
                 // Save cart to localStorage for logged-out users
@@ -366,7 +378,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Manager info: [Error fetching reviews:]", error);
+        console.error("Error fetching reviews:", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -546,15 +558,8 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const cacheKey = `profile_${currentUser.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let username = "User";
-                if (cachedProfile) {
-                    username = JSON.parse(cachedProfile).username;
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if (userDoc.exists()) username = userDoc.data().username || "User";
-                }
+                const userData = await getCachedUserProfile(currentUser.uid);
+                let username = userData ? (userData.username || "User") : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
@@ -576,7 +581,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Manager info: [Error submitting review:]", error);
+                console.error("Error submitting review:", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -652,7 +657,7 @@ async function loadReviews(productId) {
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Error loading reviews - Manager info:", error.message);
+        console.error("Error loading reviews:", error.message);
         reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
     }
 }
@@ -674,19 +679,9 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        const cacheKey = `profile_${currentUser.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
         let authorName = currentUser.displayName || 'Anonymous';
-
-        if (cachedProfile) {
-            const userData = JSON.parse(cachedProfile);
-            if (userData.username) authorName = userData.username;
-        } else {
-             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-             if (userDoc.exists() && userDoc.data().username) {
-                 authorName = userDoc.data().username;
-             }
-        }
+        const userData = await getCachedUserProfile(currentUser.uid);
+        if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,
@@ -720,7 +715,7 @@ async function handleReviewSubmit(e) {
         await openReviewsModal(currentReviewProductId); // Refresh modal
 
     } catch (error) {
-        console.error("Error submitting review - Manager info:", error.message);
+        console.error("Error submitting review:", error.message);
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
@@ -729,27 +724,3 @@ async function handleReviewSubmit(e) {
         submitReviewBtn.textContent = originalText;
     }
 }
-
-// --- REVIEW LOGIC ---
-async function openReviewsModal(productId) {
-    if (!reviewsModal) return;
-
-    currentReviewProductId = productId;
-    const product = productMap.get(productId);
-    document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
-
-    reviewsModal.style.display = 'block';
-    reviewsList.innerHTML = '<div style="text-align: center; padding: 20px;">Loading reviews...</div>';
-
-    if (currentUser) {
-        reviewFormContainer.style.display = 'block';
-        reviewLoginPrompt.style.display = 'none';
-    } else {
-        reviewFormContainer.style.display = 'none';
-        reviewLoginPrompt.style.display = 'block';
-    }
-
-    const reviews = await getProductReviews(productId);
-
-    if (reviews.length === 0) {
-        reviewsList.innerHTML = '<p class="empty-cart-message">No reviews yet. Be the first to review!</p>';

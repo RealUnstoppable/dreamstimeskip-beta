@@ -31,7 +31,10 @@
 ## 2024-11-20 - N+1 Query in Product Ratings Update
 **Learning:** Wrapping individual N queries (e.g., getting average ratings per product) in `Promise.all` only makes them concurrent; it still executes N separate network requests against Firestore which is inefficient. Furthermore, retrieving the entire `reviews` collection to aggregate clientside is a massive memory/bandwidth regression. The correct approach is a single query to a dedicated pre-computed aggregation collection (e.g. `product_stats`) or chunked `in` queries.
 **Action:** When asked to solve an N+1 query issue, verify if an aggregation collection exists (like `product_stats`) and use it to execute a single batch query, then cache the result locally for synchronous UI updates.
+## 2026-09-12 - Refactor duplicated logic and state management
+**Learning:** Functions like `fetchAndSortTickets` can create duplicated logic and increase bundle size, while repeated Firestore `getDoc` calls without caching can cause unnecessary latency and backend reads.
+**Action:** Always extract common map/sort functionality into utility modules (like `mapCollectionData`) and utilize `sessionStorage` caching (like `profile_${uid}`) to minimize unnecessary database reads on subsequent renders.
 
-## 2024-11-20 - N+1 Query in Product Ratings Update
-**Learning:** Wrapping individual N queries (e.g., getting average ratings per product) in `Promise.all` only makes them concurrent; it still executes N separate network requests against Firestore which is inefficient. Furthermore, retrieving the entire `reviews` collection to aggregate clientside is a massive memory/bandwidth regression. The correct approach is a single query to a dedicated pre-computed aggregation collection (e.g. `product_stats`) or chunked `in` queries.
-**Action:** When asked to solve an N+1 query issue, verify if an aggregation collection exists (like `product_stats`) and use it to execute a single batch query, then cache the result locally for synchronous UI updates.
+## 2026-09-15 - DocumentFragment DOM Batching with Global DOM Queries
+**Learning:** When batching DOM insertions using `DocumentFragment` to improve rendering performance, elements within the fragment are detached from the main DOM. Subsequent function calls that query the global `document` (e.g., `lucide.createIcons()` or functions firing global custom events relying on the elements' presence) will fail to find these new elements.
+**Action:** Always ensure that libraries or functions relying on global DOM queries are invoked only *after* the fully constructed `DocumentFragment` has been appended to the main document.
