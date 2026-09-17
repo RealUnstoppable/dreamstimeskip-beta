@@ -56,8 +56,7 @@ function renderProducts() {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
-        const ratingInfo = cachedRatings[product.id] || { avg: 0, count: 0 };
-        const ratingDisplay = ratingInfo.count > 0 ? `${ratingInfo.avg.toFixed(1)} ★ (${ratingInfo.count})` : 'No reviews';
+
 
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
@@ -71,7 +70,7 @@ function renderProducts() {
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <div class="product-rating-summary">${ratingDisplay}</div>
+
                     <p>${product.description}</p>
                     <div class="product-stars-container">
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
