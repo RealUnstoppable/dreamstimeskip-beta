@@ -104,7 +104,16 @@
             <section id="wishlist" class="content-section">
                 <h3>My Wishlist</h3>
                 <div class="card">
-                    <h4>Saved Items</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Saved Items</h4>
+                        <button id="share-wishlist-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 5px 10px; display: none;">Share Wishlist</button>
+                    </div>
+                    <div id="share-link-container" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <span style="font-size: 0.9rem; margin-right: 10px;">Your link:</span>
+                        <input type="text" id="share-link-input" readonly style="background: var(--bg-color); color: white; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; width: 250px;" />
+                        <button id="copy-share-link-btn" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">Copy</button>
+                        <button id="disable-share-btn" class="btn" style="padding: 5px 10px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--accent-red); color: var(--accent-red); margin-left: 5px;">Make Private</button>
+                    </div>
                     <div id="wishlist-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
                         <p style="color: var(--text-secondary);">Loading your wishlist...</p>
                     </div>
@@ -393,6 +402,71 @@
             try {
                 const wishlistRef = doc(db, 'wishlists', userId);
                 const wishlistSnap = await getDoc(wishlistRef);
+
+
+                // Share Wishlist Logic
+                const shareBtn = document.getElementById('share-wishlist-btn');
+                const linkContainer = document.getElementById('share-link-container');
+                const linkInput = document.getElementById('share-link-input');
+                const copyBtn = document.getElementById('copy-share-link-btn');
+                const disableBtn = document.getElementById('disable-share-btn');
+
+                if (wishlistSnap.exists()) {
+                    const data = wishlistSnap.data();
+                    if (data.items && data.items.length > 0) {
+                        if (data.isPublic && data.sharedId) {
+                            linkContainer.style.display = 'block';
+                            linkInput.value = window.location.origin + '/shared-wishlist.html?id=' + data.sharedId;
+                            shareBtn.style.display = 'none';
+                        } else {
+                            shareBtn.style.display = 'inline-block';
+                            linkContainer.style.display = 'none';
+                        }
+                    } else {
+                         shareBtn.style.display = 'none';
+                         linkContainer.style.display = 'none';
+                    }
+                }
+
+                if(shareBtn) {
+                    shareBtn.onclick = async () => {
+                        try {
+                            const sharedId = Math.random().toString(36).substring(2, 15);
+                            await updateDoc(wishlistRef, {
+                                isPublic: true,
+                                sharedId: sharedId
+                            });
+                            linkContainer.style.display = 'block';
+                            linkInput.value = window.location.origin + '/shared-wishlist.html?id=' + sharedId;
+                            shareBtn.style.display = 'none';
+                        } catch(e) {
+                            console.error("Error making wishlist public:", e);
+                        }
+                    };
+                }
+
+                if(copyBtn) {
+                    copyBtn.onclick = () => {
+                        linkInput.select();
+                        document.execCommand('copy');
+                        copyBtn.innerText = 'Copied!';
+                        setTimeout(() => copyBtn.innerText = 'Copy', 2000);
+                    };
+                }
+
+                if(disableBtn) {
+                    disableBtn.onclick = async () => {
+                        try {
+                            await updateDoc(wishlistRef, {
+                                isPublic: false
+                            });
+                            linkContainer.style.display = 'none';
+                            shareBtn.style.display = 'inline-block';
+                        } catch(e) {
+                            console.error("Error making wishlist private:", e);
+                        }
+                    };
+                }
 
                 if (!wishlistSnap.exists() || !wishlistSnap.data().items || wishlistSnap.data().items.length === 0) {
                     container.innerHTML = '<p style="color: var(--text-secondary); width: 100%;">Your wishlist is empty.</p>';
