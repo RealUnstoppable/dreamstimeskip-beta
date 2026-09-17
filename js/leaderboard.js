@@ -11,6 +11,12 @@ const BOTS = [
     { username: 'Noob123', score: 110 }
 ];
 
+function mergeAndSortScores(scores) {
+    BOTS.forEach(bot => scores.push(bot));
+    scores.sort((a, b) => b.score - a.score);
+    return scores.slice(0, 10);
+}
+
 export async function saveScore(score) {
     const username = getLocalUsername();
     if (!username) return; // Don't save if no username
@@ -36,20 +42,12 @@ export async function getTopScores() {
             scores.push(doc.data());
         });
         
-        // Inject bots
-        BOTS.forEach(bot => {
-            scores.push(bot);
-        });
-        
-        // Sort again and take top 10
-        scores.sort((a, b) => b.score - a.score);
-        return scores.slice(0, 10);
+        return mergeAndSortScores(scores);
     } catch (e) {
         console.error("Error fetching leaderboard, falling back to bots - Manager info:", e);
         // Fallback to just bots if offline or permission denied (e.g. strict rules)
-        let scores = [...BOTS];
-        scores.sort((a, b) => b.score - a.score);
-        return scores.slice(0, 10);
+        let scores = [];
+        return mergeAndSortScores(scores);
     }
 }
 
