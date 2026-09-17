@@ -128,6 +128,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Reward Transactions collection
+    match /reward_transactions/{transactionId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend can write
+    }
+
     // Deny all other access by default
         // Promo codes collection: Anyone can read, only admin can write
     match /promo_codes/{codeId} {
@@ -136,14 +142,6 @@ service cloud.firestore {
     }
     match /{document=**} {
       allow read, write: if false;
-    }
-    match /orders/{orderId} {
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-    }
-    match /product_stats/{productId} {
-      allow read: if true;
-      allow write: if false;
     }
   }
 }
