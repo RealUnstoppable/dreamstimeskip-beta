@@ -36,6 +36,7 @@ export function loadNavbar() {
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
+            <li><a href="feature-requests.html">Feature Requests</a></li>
             <li><a href="portfolio.html">About Me</a></li>
             <li><a href="uds.html">UDS</a></li>
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
