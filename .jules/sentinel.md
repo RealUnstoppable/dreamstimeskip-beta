@@ -80,3 +80,7 @@
 **Vulnerability:** DOM-based XSS vulnerability in `js/harmonytunes.js` where unescaped user-supplied text from `textContent` was injected into the DOM via `innerHTML` during search term highlighting.
 **Learning:** When building search highlight features, applying a regex replacement to wrap search terms in HTML tags (e.g., `<span>`) and injecting the result via `innerHTML` requires the base string to be fully sanitized first. Only escaping the matched substring still leaves the rest of the string vulnerable.
 **Prevention:** Always parse and escape the entire untrusted string (e.g., using `escapeHTML()`) *before* applying HTML markup replacements for highlighting, ensuring the resulting string is safe for `innerHTML`.
+## 2026-10-27 - [Fix Undefined Stripe Webhook Secret]
+**Vulnerability:** The Stripe webhook initialization in `functions/index.js` referenced an undefined `endpointSecret` variable, causing `stripe.webhooks.constructEvent` to throw a ReferenceError. This prevented all checkout sessions from being processed and resulted in a complete disruption of payment fulfillment.
+**Learning:** Referencing undefined variables for critical secrets not only breaks the intended functionality but bypasses signature validation, leading to silent failures when webhook events are received.
+**Prevention:** Always ensure that all secrets required for third-party integrations (like `STRIPE_WEBHOOK_SECRET`) are explicitly defined and securely retrieved from environment variables before use.
