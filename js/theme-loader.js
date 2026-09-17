@@ -2,6 +2,7 @@
 import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getCachedUserProfile } from './auth.js';
 
 (function() {
     const localTheme = localStorage.getItem('userTheme');
@@ -28,7 +29,6 @@ onAuthStateChanged(auth, async (user) => {
             if (userData) {
                 applyTheme(userData.theme, userData.accentColor);
             } else {
-                // Fallback for new users or data not found
                 applyTheme('dark', 'blue');
             }
         } catch (error) {

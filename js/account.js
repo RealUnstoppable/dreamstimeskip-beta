@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
 import { escapeHTML, formatDate } from './utils.js';
+import { getCachedUserProfile } from './auth.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
@@ -12,11 +13,15 @@ const ordersList = document.getElementById('orders-list');
 
 
 
+
+// State Caches
+let currentProfileCache = null;
+let currentOrdersCache = null;
+
 // Render Profile
 async function renderProfile(user) {
     try {
         let userData = await getCachedUserProfile(user.uid);
-
         if (!userData) {
             // Graceful instantiation if user doc is missing
             userData = {
@@ -29,8 +34,12 @@ async function renderProfile(user) {
             };
             const userRef = doc(db, 'users', user.uid);
             await setDoc(userRef, userData, { merge: true });
-            sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
         }
+
+        // Memoization check
+        const serializedData = JSON.stringify(userData);
+        if (serializedData === currentProfileCache) return;
+        currentProfileCache = serializedData;
 
         profileDetails.innerHTML = `
             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
@@ -63,6 +72,11 @@ async function renderOrders(user) {
         );
 
         const querySnapshot = await getDocs(q);
+
+        // Memoization check
+        const serializedOrders = JSON.stringify(querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+        if (serializedOrders === currentOrdersCache) return;
+        currentOrdersCache = serializedOrders;
 
         if (querySnapshot.empty) {
             ordersList.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;

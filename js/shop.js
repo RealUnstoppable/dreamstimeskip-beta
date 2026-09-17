@@ -6,6 +6,7 @@ import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
+import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -128,7 +129,7 @@ function renderCart() {
     if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
         if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.title = 'Your cart is empty'; }
     } else {
         if (cartItemsContainer) {
             cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
@@ -150,7 +151,7 @@ function renderCart() {
                 `;
             }).join('');
         }
-        if (checkoutBtn) checkoutBtn.disabled = false;
+        if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
     }
     updateCartSummary();
 }
@@ -236,7 +237,7 @@ export async function handleUpdateQuantity(productId, quantity) {
             renderCart();
         }
     } catch (error) {
-        console.error('Failed to update quantity:', error);
+        console.error('Failed to update quantity - Manager info:', error);
     }
 }
 
@@ -558,7 +559,7 @@ function setupEventListeners() {
             try {
                 // Fetch username
                 const userData = await getCachedUserProfile(currentUser.uid);
-                let username = (userData && userData.username) ? userData.username : "User";
+                let username = userData ? (userData.username || "User") : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
@@ -678,8 +679,9 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
+        let authorName = currentUser.displayName || 'Anonymous';
         const userData = await getCachedUserProfile(currentUser.uid);
-        let authorName = (userData && userData.username) ? userData.username : (currentUser.displayName || 'Anonymous');
+        if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,
