@@ -87,7 +87,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
 
       res.status(200).json({ success: true });
     } catch (err) {
-      console.error("Admin Action Error - Manager info: [" + err.message + "]");
+      console.error("Admin Action Error: [" + err.message + "]");
       res.status(500).json({ error: err.message });
     }
   });
@@ -131,8 +131,8 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error - Manager info: [" + err.message + "]");
-      res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
+      console.error("Checkout Error: [" + err.message + "]");
+      res.status(500).json({error: `Checkout Error. [${err.message}]`});
     }
   });
 });
@@ -156,7 +156,7 @@ exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", 
         type: "ticket_reply",
       });
     } catch (error) {
-      console.error("Error creating notification - Manager info: [" + error.message + "]");
+      console.error("Error creating notification: [" + error.message + "]");
     }
   }
 });
@@ -192,7 +192,7 @@ exports.onReviewWrite = functions.firestore
 
         return null;
       } catch (error) {
-        console.error("Error aggregating ratings - Manager info: [" + error.message + "]");
+        console.error("Error aggregating ratings: [" + error.message + "]");
         return null;
       }
     });
@@ -205,7 +205,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error - Manager info: [" + err.message + "]");
+    console.error("Webhook Error: [" + err.message + "]");
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -225,7 +225,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
           },
         }, {merge: true});
       } catch (error) {
-        console.error("Error processing checkout.session.completed - Manager info: [" + error.message + "]");
+        console.error("Error processing checkout.session.completed: [" + error.message + "]");
       }
     }
   }
@@ -247,7 +247,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       );
       await Promise.all(updates);
     } catch (error) {
-      console.error("Error processing customer.subscription.deleted - Manager info: [" + error.message + "]");
+      console.error("Error processing customer.subscription.deleted: [" + error.message + "]");
     }
   }
 
@@ -287,7 +287,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error - Manager info: [" + err.message + "]");
+      console.error("Cancel Error: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
   });
@@ -331,7 +331,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       }, {merge: true});
     });
   } catch (error) {
-    console.error("Error updating product stats - Manager info: [" + error.message + "]");
+    console.error("Error updating product stats: [" + error.message + "]");
     return null;
   }
 });

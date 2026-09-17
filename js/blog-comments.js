@@ -14,7 +14,7 @@ export function initBlogComments() {
 
     const postId = commentsSection.dataset.postId;
     if (!postId) {
-        console.error("Manager info: Missing data-post-id on comments section");
+        console.error("Missing data-post-id on comments section");
         return;
     }
 
@@ -97,7 +97,7 @@ async function addComment(postId, content) {
         // Reload comments
         await loadComments(postId);
     } catch (error) {
-        console.error('Manager info: Error posting comment:', error);
+        console.error('Error posting comment:', error);
         showNotification(notificationEl, 'Failed to post comment. Please try again.', 'error');
     } finally {
         submitBtn.disabled = false;
@@ -157,7 +157,7 @@ async function loadComments(postId) {
                         await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
                         await loadComments(postId); // Refresh
                     } catch (err) {
-                        console.error('Manager info: Error deleting comment', err);
+                        console.error('Error deleting comment', err);
                         alert('Failed to delete comment.');
                         e.target.disabled = false;
                         e.target.textContent = 'Delete';
@@ -167,7 +167,7 @@ async function loadComments(postId) {
         });
 
     } catch (error) {
-        console.error('Manager info: Error loading comments:', error);
+        console.error('Error loading comments:', error);
         listContainer.innerHTML = '<div style="color: var(--accent-red);">Failed to load comments.</div>';
     }
 }
