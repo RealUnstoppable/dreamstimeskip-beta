@@ -192,7 +192,7 @@ exports.onReviewWrite = functions.firestore
 
         return null;
       } catch (error) {
-        console.error("Error aggregating ratings: [" + error.message + "]");
+        console.error("Manager info: Error aggregating ratings: [" + error.message + "]");
         return null;
       }
     });
@@ -205,7 +205,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error: [" + err.message + "]");
+    console.error("Manager info: Webhook Error: [" + err.message + "]");
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -225,7 +225,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
           },
         }, {merge: true});
       } catch (error) {
-        console.error("Error processing checkout.session.completed: [" + error.message + "]");
+        console.error("Manager info: Error processing checkout.session.completed: [" + error.message + "]");
       }
     }
   }
@@ -247,7 +247,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       );
       await Promise.all(updates);
     } catch (error) {
-      console.error("Error processing customer.subscription.deleted: [" + error.message + "]");
+      console.error("Manager info: Error processing customer.subscription.deleted: [" + error.message + "]");
     }
   }
 
@@ -287,7 +287,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error: [" + err.message + "]");
+      console.error("Manager info: Cancel Error: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
   });
@@ -363,99 +363,79 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
   }
 });
 
-// 🛍️ Award Points on Order Creation
-exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => {
-  const snap = event.data;
-  const newOrder = snap.data();
-  const userId = newOrder.userId;
-  const subtotal = newOrder.subtotal || 0;
-
-  if (!userId || subtotal <= 0) return null;
-
-  const db = admin.firestore();
-  const userRef = db.collection("users").doc(userId);
-  const transactionRef = db.collection("reward_transactions").doc();
-
-  // 10 points per $1 spent
-  const pointsToAward = Math.floor(subtotal * 10);
-
-  if (pointsToAward <= 0) return null;
-
-  try {
-    return await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-      let currentPoints = 0;
-      if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
-        currentPoints = userDoc.data().pointsBalance;
-      }
-
-      transaction.set(userRef, {
-        pointsBalance: currentPoints + pointsToAward
-      }, { merge: true });
-
-      transaction.set(transactionRef, {
-        userId: userId,
-        amount: pointsToAward,
-        reason: "Purchase Reward",
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-    });
-  } catch (error) {
-    console.error("Error updating product stats: [" + error.message + "]");
-    return null;
-  }
-});
-
-
-// 🎁 Loyalty Points on Order Creation
+// 🛍️ Award Points and 🎁 Loyalty Points on Order Creation
 exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => {
   const snap = event.data;
   if (!snap) return null;
   const newOrder = snap.data();
   const userId = newOrder.userId;
+  const subtotal = newOrder.subtotal || 0;
   const items = newOrder.items;
 
-  if (!userId || !items) return null;
+  if (!userId) return null;
 
-  // Calculate points (e.g., 10 points per item quantity)
-  let pointsEarned = 0;
-  for (const item of Object.values(items)) {
-    const quantity = typeof item === 'object' && item.quantity !== undefined ? item.quantity : item;
-    pointsEarned += (parseInt(quantity) || 0) * 10;
+  const db = admin.firestore();
+
+  // 10 points per $1 spent
+  const rewardPointsToAward = subtotal > 0 ? Math.floor(subtotal * 10) : 0;
+
+  // 10 loyalty points per item quantity
+  let loyaltyPointsEarned = 0;
+  if (items) {
+    for (const item of Object.values(items)) {
+      const quantity = typeof item === 'object' && item.quantity !== undefined ? item.quantity : item;
+      loyaltyPointsEarned += (parseInt(quantity) || 0) * 10;
+    }
   }
 
-  if (pointsEarned <= 0) return null;
+  if (rewardPointsToAward <= 0 && loyaltyPointsEarned <= 0) return null;
 
-  const userRef = admin.firestore().collection("users").doc(userId);
-  const transactionRef = admin.firestore().collection("loyalty_transactions").doc();
+  const userRef = db.collection("users").doc(userId);
 
   try {
-    return await admin.firestore().runTransaction(async (transaction) => {
+    return await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
-      let currentPoints = 0;
+
+      let currentRewardPoints = 0;
+      let currentLoyaltyPoints = 0;
 
       if (userDoc.exists) {
-        currentPoints = userDoc.data().loyaltyPoints || 0;
+        const data = userDoc.data();
+        if (typeof data.pointsBalance === 'number') currentRewardPoints = data.pointsBalance;
+        if (typeof data.loyaltyPoints === 'number') currentLoyaltyPoints = data.loyaltyPoints;
       }
 
-      const newPoints = currentPoints + pointsEarned;
+      const updateData = {};
 
-      // Update user points
-      transaction.set(userRef, {
-        loyaltyPoints: newPoints,
-      }, {merge: true});
+      if (rewardPointsToAward > 0) {
+        updateData.pointsBalance = currentRewardPoints + rewardPointsToAward;
+        const rewardTxRef = db.collection("reward_transactions").doc();
+        transaction.set(rewardTxRef, {
+          userId: userId,
+          amount: rewardPointsToAward,
+          reason: "Purchase Reward",
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
 
-      // Record transaction
-      transaction.set(transactionRef, {
-        userId: userId,
-        points: pointsEarned,
-        orderId: event.params.orderId,
-        description: `Earned points from Order #${event.params.orderId.split('_')[1] || event.params.orderId}`,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      if (loyaltyPointsEarned > 0) {
+        updateData.loyaltyPoints = currentLoyaltyPoints + loyaltyPointsEarned;
+        const loyaltyTxRef = db.collection("loyalty_transactions").doc();
+        transaction.set(loyaltyTxRef, {
+          userId: userId,
+          points: loyaltyPointsEarned,
+          orderId: event.params.orderId,
+          description: `Earned points from Order #${event.params.orderId.split('_')[1] || event.params.orderId}`,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+
+      if (Object.keys(updateData).length > 0) {
+          transaction.set(userRef, updateData, { merge: true });
+      }
     });
   } catch (error) {
-    console.error("Error updating loyalty points - Manager info: [" + error.message + "]");
+    console.error("Manager info: Error updating order points: [" + error.message + "]");
     return null;
   }
 });

@@ -3,29 +3,12 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
 
-import { escapeHTML } from './utils.js';
+import { escapeHTML, getCachedUserProfile } from './utils.js';
 
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
-export async function getCachedUserProfile(uid) {
-    const cacheKey = `profile_${uid}`;
-    const cachedProfile = sessionStorage.getItem(cacheKey);
-    if (cachedProfile) return JSON.parse(cachedProfile);
 
-    try {
-        const userDocRef = doc(db, "users", uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-            return userData;
-        }
-    } catch (error) {
-        console.error("Manager info: Error fetching profile:", error);
-    }
-    return null;
-}
 
 
 
@@ -141,7 +124,7 @@ if (document.getElementById('auth-form')) {
                 }
             }
         } catch (error) {
-            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
+            console.error(`Manager info: ${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
             showMessage(getFirebaseErrorMessage(error));
         } finally {
             submitBtn.disabled = false;
@@ -170,23 +153,3 @@ export function getFirebaseErrorMessage(error) {
     }
 }
 
-export async function getCachedUserProfile(uid) {
-    if (!uid) return null;
-    const cacheKey = `profile_${uid}`;
-    const cachedProfile = sessionStorage.getItem(cacheKey);
-    if (cachedProfile) {
-        return JSON.parse(cachedProfile);
-    }
-    try {
-        const userDocRef = doc(db, "users", uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-            return userData;
-        }
-    } catch (error) {
-        console.error("Manager info: Error fetching user profile:", error);
-    }
-    return null;
-}

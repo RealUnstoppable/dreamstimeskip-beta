@@ -2,8 +2,7 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
-import { escapeHTML, formatDate } from './utils.js';
-import { getCachedUserProfile } from './auth.js';
+import { escapeHTML, formatDate, getCachedUserProfile } from './utils.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
@@ -56,7 +55,7 @@ async function renderProfile(user) {
             </div>
         `;
     } catch (error) {
-        console.error("Error rendering profile:", error);
+        console.error("Manager info: Error rendering profile:", error);
         profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
     }
 }
@@ -139,83 +138,23 @@ async function renderOrders(user) {
         ordersList.appendChild(fragment);
 
     } catch (error) {
-        console.error("Error rendering orders:", error);
+        console.error("Manager info: Error rendering orders:", error);
         ordersList.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
     }
 }
 
 
 // Rewards Logic
-async function renderRewards(user, userData) {
-    const pointsEl = document.getElementById('user-loyalty-points');
-    const historyList = document.getElementById('rewards-history-list');
-    const msgEl = document.getElementById('no-rewards-msg');
-
-    if (pointsEl && userData) {
-        pointsEl.textContent = userData.loyaltyPoints || 0;
-    }
-
-    if (historyList) {
-        try {
-            const q = query(
-                collection(db, 'loyalty_transactions'),
-                where("userId", "==", user.uid),
-                orderBy("createdAt", "desc")
-            );
-
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                msgEl.textContent = "You haven't earned any rewards yet.";
-                msgEl.style.display = 'block';
-                historyList.innerHTML = '';
-                return;
-            }
-
-            msgEl.style.display = 'none';
-            let html = '';
-
-            querySnapshot.forEach(docSnap => {
-                const data = docSnap.data();
-                const dateStr = formatDate(data.createdAt);
-
-                html += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
-                        <div>
-                            <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
-                        </div>
-                        <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
-                    </div>
-                `;
-            });
-
-            historyList.innerHTML = html;
-        } catch (error) {
-            console.error("Manager info: Error rendering rewards:", error);
-            msgEl.textContent = "Failed to load rewards history.";
-            msgEl.style.display = 'block';
-        }
-    }
-}
+// Rewards merged function below
 
 // Authentication State Listener
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         let userData = null;
         try {
-            const cacheKey = `profile_${user.uid}`;
-            const cachedData = sessionStorage.getItem(cacheKey);
-            if (cachedData) {
-                userData = JSON.parse(cachedData);
-            } else {
-                const docSnap = await getDoc(doc(db, 'users', user.uid));
-                if (docSnap.exists()) {
-                    userData = docSnap.data();
-                }
-            }
+            userData = await getCachedUserProfile(user.uid);
         } catch (e) {
-            console.error(e);
+            console.error("Manager info: Error fetching user profile:", e);
         }
 
         renderProfile(user);
@@ -228,59 +167,121 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-async function renderRewards(user) {
+let currentRewardsCache = null;
+
+async function renderRewards(user, userData) {
     try {
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
-        const balance = userDoc.exists() && typeof userDoc.data().pointsBalance === 'number'
-            ? userDoc.data().pointsBalance
-            : 0;
+        const pointsEl = document.getElementById('user-loyalty-points');
+        const historyList = document.getElementById('rewards-history-list');
+        const msgEl = document.getElementById('no-rewards-msg');
 
-        document.getElementById('points-balance-display').textContent = balance;
+        if (pointsEl && userData) {
+            pointsEl.textContent = userData.loyaltyPoints || 0;
+        }
 
-        const transRef = collection(db, 'reward_transactions');
-        const q = query(
-            transRef,
+        const balanceEl = document.getElementById('points-balance-display');
+        const container = document.getElementById('reward-transactions-list');
+
+        let balance = 0;
+        if (userData && typeof userData.pointsBalance === 'number') {
+            balance = userData.pointsBalance;
+        } else {
+             const userRef = doc(db, 'users', user.uid);
+             const userDoc = await getDoc(userRef);
+             balance = userDoc.exists() && typeof userDoc.data().pointsBalance === 'number'
+                ? userDoc.data().pointsBalance
+                : 0;
+        }
+
+        if (balanceEl) {
+             balanceEl.textContent = balance;
+        }
+
+        const loyaltyQ = query(
+            collection(db, 'loyalty_transactions'),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+        );
+        const rewardQ = query(
+            collection(db, 'reward_transactions'),
             where("userId", "==", user.uid),
             orderBy("createdAt", "desc")
         );
 
-        const snap = await getDocs(q);
-        const container = document.getElementById('reward-transactions-list');
+        const [loyaltySnap, rewardSnap] = await Promise.all([getDocs(loyaltyQ), getDocs(rewardQ)]);
 
-        if (snap.empty) {
-            container.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
-            return;
-        }
-
-        const fragment = document.createDocumentFragment();
-        snap.forEach(docSnap => {
-            const data = docSnap.data();
-            const dateStr = formatDate(data.createdAt);
-            const el = document.createElement('div');
-            el.style.cssText = "display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 5px 0; font-size: 0.9rem;";
-
-            const amountColor = data.amount > 0 ? "var(--accent-green)" : "var(--text-color)";
-            const amountPrefix = data.amount > 0 ? "+" : "";
-
-            el.innerHTML = `
-                <div>
-                    <span style="display: block; font-weight: bold;">${escapeHTML(data.reason || 'Reward')}</span>
-                    <span style="font-size: 0.8rem; color: var(--text-secondary);">${dateStr}</span>
-                </div>
-                <div style="color: ${amountColor}; font-weight: bold;">
-                    ${amountPrefix}${data.amount}
-                </div>
-            `;
-            fragment.appendChild(el);
+        const serializedRewards = JSON.stringify({
+            loyalty: loyaltySnap.docs.map(d => ({id: d.id, ...d.data()})),
+            rewards: rewardSnap.docs.map(d => ({id: d.id, ...d.data()}))
         });
 
-        container.innerHTML = '';
-        container.appendChild(fragment);
+        if (serializedRewards === currentRewardsCache) return;
+        currentRewardsCache = serializedRewards;
+
+        if (historyList) {
+            if (loyaltySnap.empty) {
+                if(msgEl) {
+                    msgEl.textContent = "You haven't earned any rewards yet.";
+                    msgEl.style.display = 'block';
+                }
+                historyList.innerHTML = '';
+            } else {
+                if(msgEl) msgEl.style.display = 'none';
+                let html = '';
+                loyaltySnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const dateStr = formatDate(data.createdAt);
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
+                            </div>
+                            <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
+                        </div>
+                    `;
+                });
+                historyList.innerHTML = html;
+            }
+        }
+
+        if (container) {
+            if (rewardSnap.empty) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
+            } else {
+                const fragment = document.createDocumentFragment();
+                rewardSnap.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const dateStr = formatDate(data.createdAt);
+                    const el = document.createElement('div');
+                    el.style.cssText = "display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 5px 0; font-size: 0.9rem;";
+
+                    const amountColor = data.amount > 0 ? "var(--accent-green)" : "var(--text-color)";
+                    const amountPrefix = data.amount > 0 ? "+" : "";
+
+                    el.innerHTML = `
+                        <div>
+                            <span style="display: block; font-weight: bold;">${escapeHTML(data.reason || 'Reward')}</span>
+                            <span style="font-size: 0.8rem; color: var(--text-secondary);">${dateStr}</span>
+                        </div>
+                        <div style="color: ${amountColor}; font-weight: bold;">
+                            ${amountPrefix}${data.amount}
+                        </div>
+                    `;
+                    fragment.appendChild(el);
+                });
+                container.innerHTML = '';
+                container.appendChild(fragment);
+            }
+        }
 
     } catch (e) {
         console.error("Manager info: Error fetching rewards:", e);
-        document.getElementById('points-balance-display').textContent = 'Error';
-        document.getElementById('reward-transactions-list').innerHTML = '<p style="color: var(--accent-red);">Failed to load rewards.</p>';
+        if(document.getElementById('points-balance-display')) document.getElementById('points-balance-display').textContent = 'Error';
+        if(document.getElementById('reward-transactions-list')) document.getElementById('reward-transactions-list').innerHTML = '<p style="color: var(--accent-red);">Failed to load rewards.</p>';
+        if(document.getElementById('no-rewards-msg')) {
+             document.getElementById('no-rewards-msg').textContent = "Failed to load rewards history.";
+             document.getElementById('no-rewards-msg').style.display = 'block';
+        }
     }
 }
