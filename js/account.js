@@ -2,7 +2,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
-import { escapeHTML, formatDate } from './utils.js';
+import { escapeHTML, formatDate, getCachedUserProfile } from './utils.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
@@ -15,31 +15,19 @@ const ordersList = document.getElementById('orders-list');
 // Render Profile
 async function renderProfile(user) {
     try {
-        let userData;
-        const cacheKey = `profile_${user.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
+        let userData = await getCachedUserProfile(user);
 
-        if (cachedProfile) {
-            userData = JSON.parse(cachedProfile);
-        } else {
+        if (!userData) {
+            userData = {
+                email: user.email,
+                username: user.email.split('@')[0],
+                membershipLevel: 'free',
+                isAdmin: false,
+                isBanned: false,
+                signupDate: new Date()
+            };
             const userRef = doc(db, 'users', user.uid);
-            let userDoc = await getDoc(userRef);
-
-            if (!userDoc.exists()) {
-                // Graceful instantiation if user doc is missing
-                userData = {
-                    email: user.email,
-                    username: user.email.split('@')[0],
-                    membershipLevel: 'free',
-                    isAdmin: false,
-                    isBanned: false,
-                    signupDate: new Date()
-                };
-                await setDoc(userRef, userData, { merge: true });
-            } else {
-                userData = userDoc.data();
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-            }
+            await setDoc(userRef, userData, { merge: true });
         }
 
         profileDetails.innerHTML = `
@@ -73,6 +61,10 @@ async function renderOrders(user) {
         );
 
         const querySnapshot = await getDocs(q);
+
+        // Clear previous state to prevent duplicates in case of re-renders
+        ordersList.innerHTML = '';
+
 
         if (querySnapshot.empty) {
             ordersList.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;

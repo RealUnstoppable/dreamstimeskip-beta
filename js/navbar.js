@@ -110,19 +110,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const cacheKey = `profile_${user.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let userData = null;
-
-                if (cachedProfile) {
-                    userData = JSON.parse(cachedProfile);
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        userData = userDoc.data();
-                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                    }
-                }
+                const userData = await getCachedUserProfile(user);
 
 
                 // Fetch notifications
