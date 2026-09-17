@@ -1251,42 +1251,66 @@ function initHarmonyTunes() {
         
         let newActiveLineIndex = -1;
 
-        // ⚡ Bolt: Use binary search to find the active line in O(log N) instead of O(N) traversal on every frame
-        let left = 0;
-        let right = cachedLyricsDOM.length - 1;
-        while (left <= right) {
-            const mid = Math.floor((left + right) / 2);
-            const line = cachedLyricsDOM[mid];
-            if (currentTime >= line.start && currentTime <= line.end) {
-                newActiveLineIndex = mid;
-                break;
-            } else if (currentTime < line.start) {
-                right = mid - 1;
-            } else {
-                left = mid + 1;
+        // ⚡ Bolt: Use binary search to find the active line in O(log N) ONLY when seeking, otherwise step adjacent lines.
+        const isSeek = Math.abs(currentTime - lastTime) > 1;
+
+        if (isSeek || activeLineIndex === -1) {
+            let left = 0;
+            let right = cachedLyricsDOM.length - 1;
+            while (left <= right) {
+                const mid = Math.floor((left + right) / 2);
+                const line = cachedLyricsDOM[mid];
+                if (currentTime >= line.start && currentTime <= line.end) {
+                    newActiveLineIndex = mid;
+                    break;
+                } else if (currentTime < line.start) {
+                    right = mid - 1;
+                } else {
+                    left = mid + 1;
+                }
+            }
+        } else {
+            newActiveLineIndex = activeLineIndex;
+            // Linear scan adjacent if we didn't seek
+            while (newActiveLineIndex < cachedLyricsDOM.length && currentTime > cachedLyricsDOM[newActiveLineIndex].end) {
+                newActiveLineIndex++;
+            }
+            while (newActiveLineIndex > 0 && newActiveLineIndex < cachedLyricsDOM.length && currentTime < cachedLyricsDOM[newActiveLineIndex].start) {
+                newActiveLineIndex--;
+            }
+            if (newActiveLineIndex >= cachedLyricsDOM.length || newActiveLineIndex < 0 || currentTime < cachedLyricsDOM[newActiveLineIndex].start || currentTime > cachedLyricsDOM[newActiveLineIndex].end) {
+                newActiveLineIndex = -1; // Between lines or out of bounds
             }
         }
         
         // Force state reconciliation if we jumped a significant amount of time (e.g., seeking)
-        const isSeek = Math.abs(currentTime - lastTime) > 1;
         lastTime = currentTime;
 
         if (newActiveLineIndex !== activeLineIndex || isSeek) {
             // Reconcile state for all lines on line change or seek
-            for (let i = 0; i < cachedLyricsDOM.length; i++) {
-                const lineCache = cachedLyricsDOM[i];
-                if (i === newActiveLineIndex) {
-                    lineCache.el.classList.add('active');
-                } else {
-                    lineCache.el.classList.remove('active');
-                    // Ensure past lines have all words active, future lines have none
-                    lineCache.words.forEach(wordCache => {
-                        if (currentTime > lineCache.end) {
-                            wordCache.el.classList.add('active-word');
-                        } else {
-                            wordCache.el.classList.remove('active-word');
-                        }
-                    });
+            if (activeLineIndex !== -1 && activeLineIndex !== newActiveLineIndex) {
+                const oldLine = cachedLyricsDOM[activeLineIndex];
+                if (oldLine) oldLine.el.classList.remove('active');
+            }
+            if (newActiveLineIndex !== -1) {
+                const newLine = cachedLyricsDOM[newActiveLineIndex];
+                if (newLine) newLine.el.classList.add('active');
+            }
+
+            // ⚡ Bolt: Instead of iterating all N lines, only update the words if it's a seek
+            // or rely on the word-level check below for normal playback.
+            if (isSeek) {
+                for (let i = 0; i < cachedLyricsDOM.length; i++) {
+                    const lineCache = cachedLyricsDOM[i];
+                    if (i !== newActiveLineIndex) {
+                        lineCache.words.forEach(wordCache => {
+                            if (currentTime > lineCache.end) {
+                                wordCache.el.classList.add('active-word');
+                            } else {
+                                wordCache.el.classList.remove('active-word');
+                            }
+                        });
+                    }
                 }
             }
             activeLineIndex = newActiveLineIndex;
@@ -1317,18 +1341,13 @@ function initHarmonyTunes() {
 
         if (activeLineIndex !== -1) {
             const currentLine = cachedLyricsDOM[activeLineIndex];
-            // ⚡ Bolt: Use binary search for words within the active line
-            let wordLeft = 0;
-            let wordRight = currentLine.words.length - 1;
+            // ⚡ Bolt: Linear scan for word is fine since words array is very small (often < 10)
             let activeWordIndex = -1;
-
-            while (wordLeft <= wordRight) {
-                const mid = Math.floor((wordLeft + wordRight) / 2);
-                if (currentTime >= currentLine.words[mid].start) {
-                    activeWordIndex = mid;
-                    wordLeft = mid + 1;
+            for (let j = 0; j < currentLine.words.length; j++) {
+                if (currentTime >= currentLine.words[j].start) {
+                    activeWordIndex = j;
                 } else {
-                    wordRight = mid - 1;
+                    break;
                 }
             }
 

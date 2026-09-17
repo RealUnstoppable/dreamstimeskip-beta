@@ -3,6 +3,7 @@ import { auth, db, safeRedirect } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
+import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from "./utils.js";
 
 let currentUser = null;
@@ -30,10 +31,7 @@ function renderCheckoutPage() {
     let appliedPromo = '';
 
     const renderSummary = () => {
-        const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
-            const product = productMap.get(productId);
-            return sum + (product.price * quantity);
-        }, 0);
+        const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
         
         const discountAmount = subtotal * discount;
         const discountedSubtotal = subtotal - discountAmount;
