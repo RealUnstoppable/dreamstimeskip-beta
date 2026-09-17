@@ -2,6 +2,7 @@ import { auth, db } from './auth.js';
 import { escapeHTML } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getCachedUserProfile } from './auth.js';
 
 const COMMENTS_COLLECTION = 'blog_comments';
 let currentUser = null;
@@ -66,20 +67,7 @@ function updateCommentFormUI(container) {
     }
 }
 
-async function getCachedUsername(uid) {
-    try {
-        const cacheKey = \`profile_\${uid}\`;
-        const cachedData = sessionStorage.getItem(cacheKey);
-        if (cachedData) {
-            const userData = JSON.parse(cachedData);
-            return userData.username;
-        }
-        return "User"; // Fallback if not in cache (could fetch from DB if needed)
-    } catch (e) {
-        console.error("Manager info: Error getting username", e);
-        return "User";
-    }
-}
+
 
 async function addComment(postId, content) {
     if (!currentUser) return;
@@ -92,7 +80,8 @@ async function addComment(postId, content) {
     submitBtn.textContent = 'Posting...';
 
     try {
-        const username = await getCachedUsername(currentUser.uid);
+        const userData = await getCachedUserProfile(currentUser.uid);
+        const username = userData ? userData.username : "User";
 
         await addDoc(collection(db, COMMENTS_COLLECTION), {
             postId: postId,

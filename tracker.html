@@ -1095,17 +1095,6 @@
                         if (document.querySelector('.view-section.active').id === 'view-auth') window.navTo('tracker');
                     } else {
                         window.navTo('setup');
-
-                db.collection("users").doc(user.uid).get().then(doc => {
-                    if (doc.exists) {
-                        currentUserData = doc.data();
-                        loadProfileUI(currentUserData);
-                        loadCustomPresets();
-                        calculatePerformance();
-                        syncDraftFromServer();
-                        if (document.querySelector('.view-section.active').id === 'view-auth') navTo('tracker');
-                    } else {
-                        navTo('setup');
                     }
                 });
             } else {
@@ -1171,11 +1160,6 @@
                 const userDocRef = doc(db, "users", cred.user.uid);
                 getDoc(userDocRef).then(docSnap => {
                     if(!docSnap.exists()) window.navTo('setup');
-        function signInWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then(cred => {
-                db.collection("users").doc(cred.user.uid).get().then(doc => {
-                    if (!doc.exists) navTo('setup');
                 });
             }).catch(err => alert(err.message));
         }
@@ -1292,10 +1276,9 @@
                 <input type="text" readonly class="drawer-res text-xs font-bold opacity-70" style="flex: 1.5; border:none; background:transparent;" aria-label="Drawer Result">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 p-2" aria-label="Remove drawer" title="Remove drawer"><i data-lucide="x" class="w-4"></i></button>
             `;
-            document.getElementById('drawersContainer').appendChild(div);
+            if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('drawersContainer').appendChild(div);
             calcDrawer(div.querySelector('.drawer-val'));
-            lucide.createIcons();
-            triggerDraftSync();
+            if (!window.trackerCurrentFragment) { lucide.createIcons(); triggerDraftSync(); }
         }
 
         function calcDrawer(input) {
@@ -1315,9 +1298,8 @@
                 <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit" title="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
-            document.getElementById('depositsContainer').appendChild(div);
-            lucide.createIcons();
-            triggerDraftSync();
+            if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('depositsContainer').appendChild(div);
+            if (!window.trackerCurrentFragment) { lucide.createIcons(); triggerDraftSync(); }
         }
 
         function addRoutineTask(name = "", isChecked = false) {
@@ -1330,10 +1312,9 @@
                 <span class="routine-name flex-1 font-semibold text-sm">${escapeHTML(taskName)}</span>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-slate-300 hover:text-red-400" aria-label="Remove task" title="Remove task"><i data-lucide="trash-2" class="w-4"></i></button>
             `;
-            document.getElementById('routineContainer').appendChild(div);
+            if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('routineContainer').appendChild(div);
             document.getElementById('newRoutineTask').value = "";
-            lucide.createIcons();
-            triggerDraftSync();
+            if (!window.trackerCurrentFragment) { lucide.createIcons(); triggerDraftSync(); }
         }
 
         function addInventoryItem(name = "", bl = "", cl = "", fr = "") {
@@ -1346,9 +1327,8 @@
                 <input type="text" placeholder="Freezer" class="inv-freezer" value="${escapeHTML(fr)}" onchange="triggerDraftSync()">
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400 text-right" aria-label="Remove inventory item" title="Remove inventory item"><i data-lucide="minus-circle" class="w-5"></i></button>
             `;
-            document.getElementById('inventoryContainer').appendChild(div);
-            lucide.createIcons();
-            triggerDraftSync();
+            if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('inventoryContainer').appendChild(div);
+            if (!window.trackerCurrentFragment) { lucide.createIcons(); triggerDraftSync(); }
         }
 
         function getTrackerState() {
@@ -1416,29 +1396,31 @@
                     const addDrawer = window.addDrawerItem || addDrawerItem;
                     const addDeposit = window.addDepositItem || addDepositItem;
 
-                    document.getElementById('routineContainer').innerHTML = '';
-                    if(draft.routines) draft.routines.forEach(r => addRoutine(r.name, r.checked));
-                    
-                    document.getElementById('inventoryContainer').innerHTML = '';
-                    if(draft.inventory) draft.inventory.forEach(i => addInv(i.name, i.bl, i.cl, i.fr));
-                    
-                    document.getElementById('drawersContainer').innerHTML = '';
-                    if(draft.drawers) draft.drawers.forEach(d => addDrawer(d.val, d.name));
+                    try {
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('routineContainer').innerHTML = '';
+                        if (draft.routines) draft.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                        document.getElementById('routineContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('depositsContainer').innerHTML = '';
-                    if(draft.deposits) draft.deposits.forEach(d => addDeposit(d.val));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('inventoryContainer').innerHTML = '';
+                        if (draft.inventory) draft.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
+                        document.getElementById('inventoryContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('routineContainer').innerHTML = '';
-                    if (draft.routines) draft.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('drawersContainer').innerHTML = '';
+                        if (draft.drawers) draft.drawers.forEach(d => addDrawerItem(d.val, d.name));
+                        document.getElementById('drawersContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('inventoryContainer').innerHTML = '';
-                    if (draft.inventory) draft.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
-
-                    document.getElementById('drawersContainer').innerHTML = '';
-                    if (draft.drawers) draft.drawers.forEach(d => addDrawerItem(d.val, d.name));
-
-                    document.getElementById('depositsContainer').innerHTML = '';
-                    if (draft.deposits) draft.deposits.forEach(d => addDepositItem(d.val));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('depositsContainer').innerHTML = '';
+                        if (draft.deposits) draft.deposits.forEach(d => addDepositItem(d.val));
+                        document.getElementById('depositsContainer').appendChild(window.trackerCurrentFragment);
+                        lucide.createIcons();
+                        triggerDraftSync();
+                    } finally {
+                        window.trackerCurrentFragment = null;
+                    }
                 } else {
                     if (typeof window.initDefaults === 'function') {
                         window.initDefaults();
@@ -1471,9 +1453,6 @@
                 container.innerHTML = "";
                 const history = (docSnap.exists() ? docSnap.data().shiftHistory || [] : []).reverse();
                 if(history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
-                
-                const history = (doc.exists ? doc.data().shiftHistory || [] : []).reverse();
-                if (history.length === 0) { container.innerHTML = "<p class='text-center py-20 opacity-40'>No logs found.</p>"; return; }
 
                 history.slice(0, 20).forEach(data => {
                     const div = document.createElement('div');
@@ -1497,9 +1476,6 @@
         window.loadHistoryShift = function(id) {
             if(!currentUser) return;
             if(!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
-        function loadHistoryShift(id) {
-            if (!currentUser) return;
-            if (!confirm("Loading this shift will overwrite your current draft tracker. Continue?")) return;
 
             const userDocRef = doc(db, 'users', currentUser.uid);
             getDoc(userDocRef).then(docSnap => {
@@ -1522,29 +1498,30 @@
                     const addDrawer = window.addDrawerItem || addDrawerItem;
                     const addDeposit = window.addDepositItem || addDepositItem;
 
-                    document.getElementById('routineContainer').innerHTML = '';
-                    if(shift.routines) shift.routines.forEach(r => addRoutine(r.name, r.checked));
-                    
-                    document.getElementById('inventoryContainer').innerHTML = '';
-                    if(shift.inventory) shift.inventory.forEach(i => addInv(i.name, i.bl, i.cl, i.fr));
-                    
-                    document.getElementById('drawersContainer').innerHTML = '';
-                    if(shift.drawers) shift.drawers.forEach(d => addDrawer(d.val, d.name));
+                    try {
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('routineContainer').innerHTML = '';
+                        if (shift.routines) shift.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                        document.getElementById('routineContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('depositsContainer').innerHTML = '';
-                    if(shift.deposits) shift.deposits.forEach(d => addDeposit(d.val));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('inventoryContainer').innerHTML = '';
+                        if (shift.inventory) shift.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
+                        document.getElementById('inventoryContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('routineContainer').innerHTML = '';
-                    if (shift.routines) shift.routines.forEach(r => addRoutineTask(r.name, r.checked));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('drawersContainer').innerHTML = '';
+                        if (shift.drawers) shift.drawers.forEach(d => addDrawerItem(d.val, d.name));
+                        document.getElementById('drawersContainer').appendChild(window.trackerCurrentFragment);
 
-                    document.getElementById('inventoryContainer').innerHTML = '';
-                    if (shift.inventory) shift.inventory.forEach(i => addInventoryItem(i.name, i.bl, i.cl, i.fr));
-
-                    document.getElementById('drawersContainer').innerHTML = '';
-                    if (shift.drawers) shift.drawers.forEach(d => addDrawerItem(d.val, d.name));
-
-                    document.getElementById('depositsContainer').innerHTML = '';
-                    if (shift.deposits) shift.deposits.forEach(d => addDepositItem(d.val));
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('depositsContainer').innerHTML = '';
+                        if (shift.deposits) shift.deposits.forEach(d => addDepositItem(d.val));
+                        document.getElementById('depositsContainer').appendChild(window.trackerCurrentFragment);
+                        lucide.createIcons();
+                    } finally {
+                        window.trackerCurrentFragment = null;
+                    }
 
                     window.navTo('tracker');
                     window.triggerDraftSync();
@@ -1558,9 +1535,6 @@
             const userDocRef = doc(db, 'users', currentUser.uid);
             getDoc(userDocRef).then(docSnap => {
                 const history = docSnap.exists() ? docSnap.data().shiftHistory || [] : [];
-            if (!currentUser) return;
-            db.collection('users').doc(currentUser.uid).get().then(doc => {
-                const history = doc.exists ? doc.data().shiftHistory || [] : [];
                 document.getElementById('statShifts').innerText = history.length;
 
                 let totalRoutines = 0; let checkedRoutines = 0;
@@ -1656,14 +1630,21 @@
                 const preset = (docSnap.data().customPresets || []).find(p => p.id == id);
                 if(preset) {
                     const addInv = window.addInventoryItem || addInventoryItem;
-                    document.getElementById('inventoryContainer').innerHTML = '';
-                    preset.items.forEach(i => {
-                        if (typeof i === 'string') {
-                            addInv(i);
-                        } else {
-                            addInv(i.name, i.bl, i.cl, i.fr);
-                        }
-                    });
+                    try {
+                        window.trackerCurrentFragment = document.createDocumentFragment();
+                        document.getElementById('inventoryContainer').innerHTML = '';
+                        preset.items.forEach(i => {
+                            if (typeof i === 'string') {
+                                addInv(i);
+                            } else {
+                                addInv(i.name, i.bl, i.cl, i.fr);
+                            }
+                        });
+                        document.getElementById('inventoryContainer').appendChild(window.trackerCurrentFragment);
+                        lucide.createIcons();
+                    } finally {
+                        window.trackerCurrentFragment = null;
+                    }
                     window.navTo('tracker');
                     window.triggerDraftSync();
                 }
