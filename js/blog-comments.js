@@ -130,7 +130,7 @@ async function loadComments(postId) {
 
             // Allow deletion if the current user is the author (admin delete would require extra logic or just be done via console for now)
             const canDelete = currentUser && currentUser.uid === comment.userId;
-            const deleteBtnHtml = canDelete ? \`<button class="delete-comment-btn" data-id="\${docSnap.id}" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>\` : '';
+            const deleteBtnHtml = canDelete ? \`<button class="delete-comment-btn" data-id="\${docSnap.id}" title="Delete comment" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>\` : '';
 
             html += \`
                 <div class="comment-item" style="padding: 15px; border-radius: 8px; background: var(--primary-card-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">

@@ -65,7 +65,7 @@ function renderProducts() {
 
         return `
             <div class="product-card">
-                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
@@ -144,8 +144,8 @@ function renderCart() {
                             <p>${product.price === 0 ? '<span style="color: var(--accent-green); font-weight: bold;">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" aria-label="Quantity for ${product.name}">
-                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
+                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
                         </div>
                     </div>
                 `;
