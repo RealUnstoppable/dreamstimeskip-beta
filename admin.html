@@ -943,29 +943,48 @@
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
 
             // Account Settings
-            document.getElementById('admin-change-password-btn')?.addEventListener('click', async () => {
+            document.getElementById('admin-change-password-btn')?.addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
                 const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
                 const email = auth.currentUser?.email;
                 if (email) {
                     try {
                         await sendPasswordResetEmail(auth, email);
                         alert('Password reset email sent. Check your inbox.');
-                    } catch (e) {
-                        alert('Error sending email: ' + e.message);
+                    } catch (error) {
+                        alert('Error sending email: ' + error.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
-            document.getElementById('admin-delete-account-btn')?.addEventListener('click', async () => {
+            document.getElementById('admin-delete-account-btn')?.addEventListener('click', async (e) => {
                 if(confirm("Are you absolutely sure you want to delete your admin account? This action cannot be undone.")) {
+                    const btn = e.currentTarget;
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Deleting...';
                     const user = auth.currentUser;
                     if(user) {
                         try {
                             await performAdminAction("delete", "users", user.uid);
                             await user.delete();
                             window.location.replace('index.html');
-                        } catch(e) {
-                            alert('Error deleting account: ' + e.message);
+                        } catch(error) {
+                            alert('Error deleting account: ' + error.message);
+                            btn.disabled = false;
+                            btn.innerText = originalText;
                         }
+                    } else {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
                 }
             });
