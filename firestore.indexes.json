@@ -43,16 +43,16 @@
       ]
     },
     {
-      "collectionGroup": "wishlists",
+      "collectionGroup": "loyalty_transactions",
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "sharedId",
+          "fieldPath": "userId",
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "isPublic",
-          "order": "ASCENDING"
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
         }
       ]
     }
