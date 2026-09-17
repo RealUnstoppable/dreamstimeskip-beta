@@ -1,4 +1,4 @@
-import { auth, db } from './auth.js?v=1784516229';
+import { auth, db, getCachedUserProfile } from './auth.js?v=1784516229';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
