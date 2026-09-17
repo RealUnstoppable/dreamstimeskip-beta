@@ -8,7 +8,8 @@ let notificationUnsubscribe = null;
 
 function escapeHTML(str) {
     if (str == null) return '';
-    return String(str)
+    if (typeof str !== 'string') str = String(str);
+    return str
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
