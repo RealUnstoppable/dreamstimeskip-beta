@@ -38,6 +38,7 @@
   "dependencies": {
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "playright": "^0.0.22",
     "stripe": "^22.1.1"
   }
 }

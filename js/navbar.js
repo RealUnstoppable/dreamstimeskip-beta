@@ -1,7 +1,8 @@
-import { auth, db } from './auth.js?v=1784516229';
+import { auth, db, getCachedUserProfile } from './auth.js?v=1784516229';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
+import { getCachedUserProfile } from './auth.js';
 
 let notificationUnsubscribe = null;
 
@@ -40,7 +41,7 @@ export function loadNavbar() {
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
@@ -72,7 +73,7 @@ export function loadUdsNavbar() {
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
@@ -111,19 +112,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const cacheKey = `profile_${user.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let userData = null;
-
-                if (cachedProfile) {
-                    userData = JSON.parse(cachedProfile);
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        userData = userDoc.data();
-                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                    }
-                }
+                let userData = await getCachedUserProfile(user.uid);
 
 
                 // Fetch notifications
@@ -162,7 +151,7 @@ function updateAuthLink() {
                                             try {
                                                 await markAsRead(id);
                                             } catch (err) {
-                                                console.error('Failed to mark as read', err);
+                                                console.error('Failed to mark as read - Manager info:', err);
                                             }
                                         }
                                         if (link && link !== 'undefined' && link !== 'null') window.location.href = link;
@@ -171,13 +160,13 @@ function updateAuthLink() {
                             }
                         }
                     });
-                } catch(err) { console.error('Notification error', err); }
+                } catch(err) { console.error('Notification error - Manager info:', err); }
 
                 const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {
-                console.error("Nav Error - Manager info: [" + e.message + "]", e);
+                console.error("Nav Error: [" + e.message + "]", e);
             }
         } else {
             authLink.href = 'sign in beta.html';
