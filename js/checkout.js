@@ -140,7 +140,9 @@ function renderCheckoutPage() {
         </div>
     `;
 
-    document.getElementById('apply-promo-btn').addEventListener('click', async () => {
+    document.getElementById('apply-promo-btn').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
         const code = document.getElementById('promo-code').value.trim().toUpperCase();
         const msgEl = document.getElementById('promo-message');
         if (!code) {
@@ -153,6 +155,10 @@ function renderCheckoutPage() {
         }
         msgEl.textContent = 'Applying...';
         msgEl.style.color = 'var(--text-secondary)';
+
+        btn.disabled = true;
+        btn.textContent = 'Applying...';
+
         try {
             const promoRef = doc(db, 'promo_codes', code);
             const promoSnap = await getDoc(promoRef);
@@ -181,6 +187,9 @@ function renderCheckoutPage() {
             appliedPromo = '';
             msgEl.textContent = 'Error applying promo code.';
             msgEl.style.color = 'var(--accent-red)';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
         updateSummaryUI();
     });
