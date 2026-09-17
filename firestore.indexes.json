@@ -43,7 +43,7 @@
       ]
     },
     {
-      "collectionGroup": "reward_transactions",
+      "collectionGroup": "loyalty_transactions",
       "queryScope": "COLLECTION",
       "fields": [
         {

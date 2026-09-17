@@ -140,6 +140,7 @@
                     <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="#support-tickets" class="nav-link">Support Tickets</a></li>
+                    <li><a href="#promo-codes" class="nav-link">Promo Codes</a></li>
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
@@ -312,7 +313,20 @@
                     </div>
                 </div>
             </section>
-        </main>
+
+        <section id="promo-codes" class="content-section" style="display: none;">
+            <h3>Promo Codes</h3>
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <h4 style="margin-top: 0;">Create New Promo Code</h4>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="new-promo-code" placeholder="Code (e.g. SUMMER20)" style="flex: 1; padding: 8px;">
+                    <input type="number" id="new-promo-discount" placeholder="Discount %" style="width: 100px; padding: 8px;" min="1" max="100">
+                    <button id="create-promo-btn" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+            <div id="promo-codes-list">Loading promo codes...</div>
+        </section>
+    </main>
     </div>
 
    <script type="module">
@@ -324,6 +338,81 @@
 
         let performanceChart;
 
+
+        async function loadPromoCodes() {
+            const listEl = document.getElementById('promo-codes-list');
+            try {
+                const snapshot = await getDocs(collection(db, 'promo_codes'));
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<p>No promo codes found.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Code</th><th>Discount (%)</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const code = docSnap.id;
+                    html += `
+                        <tr>
+                            <td><strong>${escapeHTML(code)}</strong></td>
+                            <td>${escapeHTML(data.discount)}%</td>
+                            <td><span class="status-badge ${data.active ? 'status-active' : 'status-pending'}">${data.active ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="togglePromoCode('${escapeHTML(code)}', ${!data.active})" style="padding: 4px 8px; font-size: 0.8rem;">${data.active ? 'Deactivate' : 'Activate'}</button>
+                                <button class="btn" onclick="deletePromoCode('${escapeHTML(code)}')" style="padding: 4px 8px; font-size: 0.8rem; border: 1px solid var(--accent-red); color: var(--accent-red); background: transparent;">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                listEl.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading promo codes:', error);
+                listEl.innerHTML = '<p style="color: var(--accent-red);">Error loading promo codes.</p>';
+            }
+        }
+        window.togglePromoCode = async function(code, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} promo code ${code}?`)) return;
+            try {
+                await performAdminAction('update', 'promo_codes', code, { active: newStatus });
+                showNotification(document.getElementById('security-notification'), 'Promo code status updated', 'success');
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        };
+        window.deletePromoCode = async function(code) {
+            if (!confirm(`Are you sure you want to delete promo code ${code}?`)) return;
+            try {
+                await performAdminAction('delete', 'promo_codes', code, {});
+                showNotification(document.getElementById('security-notification'), 'Promo code deleted', 'success');
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        };
+
+        document.getElementById('create-promo-btn').addEventListener('click', async () => {
+            const codeInput = document.getElementById('new-promo-code');
+            const discountInput = document.getElementById('new-promo-discount');
+            const code = codeInput.value.trim().toUpperCase();
+            const discount = parseInt(discountInput.value.trim(), 10);
+
+            if (!code || isNaN(discount) || discount < 1 || discount > 100) {
+                showNotification(document.getElementById('security-notification'), 'Invalid code or discount', 'error');
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'promo_codes', code), { discount, active: true, createdAt: serverTimestamp() });
+                showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
+                codeInput.value = '';
+                discountInput.value = '';
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        });
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
@@ -332,6 +421,7 @@
                 if (userDoc.exists() && userDoc.data().isAdmin) {
                     document.body.style.display = 'flex';
                     initializeAdminPage(user);
+                    loadPromoCodes();
                 } else {
                     if (!window.location.pathname.includes('account.html')) {
                         window.location.replace('account.html');
