@@ -48,7 +48,7 @@ service cloud.firestore {
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow read: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      allow write: if isAdmin();
+      allow update, delete: if isAdmin();
     }
 
     // Blog Comments Collection

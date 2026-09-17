@@ -46,7 +46,7 @@ jest.mock("firebase-admin", () => {
       verifyIdToken: mockVerifyIdToken,
     }),
     _mockVerifyIdToken: mockVerifyIdToken, // Export for tests to access
-    firestore: jest.fn().mockReturnValue({
+    firestore: Object.assign(jest.fn().mockReturnValue({
       collection: jest.fn().mockReturnValue({
         doc: jest.fn().mockReturnValue({
           get: jest.fn(),
@@ -57,6 +57,10 @@ jest.mock("firebase-admin", () => {
           get: jest.fn(),
         }),
       }),
+    }), {
+      FieldValue: {
+        serverTimestamp: jest.fn().mockReturnValue(new Date('2026-09-15T11:08:03.745Z')),
+      },
     }),
   };
 });
@@ -400,7 +404,9 @@ describe("adminAction", () => {
       adminAction(req, res);
     });
 
-    expect(mockUpdateDoc).toHaveBeenCalledWith({ isBanned: true });
+    expect(mockUpdateDoc).toHaveBeenCalledWith(
+        expect.objectContaining({ isBanned: true })
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ success: true });
   });
