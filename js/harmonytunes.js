@@ -1,3 +1,4 @@
+import { escapeHTML } from "./utils.js";
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
@@ -326,8 +327,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         // Avoid unnecessary textContent assignments which trigger style recalculations
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
@@ -351,8 +352,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
                         if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
@@ -1242,89 +1243,55 @@ function initHarmonyTunes() {
 
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
-    let lastActiveWordIndex = -1;
+    let lastTime = 0;
 
-    // ⚡ Bolt: Optimized syncLyrics to use state-tracking and binary search for O(1) contiguous updates and O(log N) seeking.
-    // This eliminates O(N) DOM thrashing on every frame by only applying class changes when state transitions occur.
     function syncLyrics() {
         if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
         
-        let newActiveLineIndex = activeLineIndex;
-        let isSeeking = false;
+        let newActiveLineIndex = -1;
 
-        // Check if we need to find a new line
-        if (activeLineIndex === -1 || currentTime < cachedLyricsDOM[activeLineIndex].start || currentTime > cachedLyricsDOM[activeLineIndex].end) {
-            // Out of bounds. Determine if we can just step forward/backward or if we need binary search (seeking)
-            
-            // Fast path for contiguous forward playback
-            if (activeLineIndex >= 0 && activeLineIndex < cachedLyricsDOM.length - 1 &&
-                currentTime >= cachedLyricsDOM[activeLineIndex + 1].start &&
-                currentTime <= cachedLyricsDOM[activeLineIndex + 1].end) {
-                newActiveLineIndex = activeLineIndex + 1;
+        // ⚡ Bolt: Use binary search to find the active line in O(log N) instead of O(N) traversal on every frame
+        let left = 0;
+        let right = cachedLyricsDOM.length - 1;
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+            const line = cachedLyricsDOM[mid];
+            if (currentTime >= line.start && currentTime <= line.end) {
+                newActiveLineIndex = mid;
+                break;
+            } else if (currentTime < line.start) {
+                right = mid - 1;
             } else {
-                // Non-contiguous jump (seek)
-                isSeeking = true;
+                left = mid + 1;
+            }
+        }
+        
+        // Force state reconciliation if we jumped a significant amount of time (e.g., seeking)
+        const isSeek = Math.abs(currentTime - lastTime) > 1;
+        lastTime = currentTime;
 
-                // Binary search for seek
-                let low = 0;
-                let high = cachedLyricsDOM.length - 1;
-                newActiveLineIndex = -1;
-
-                while (low <= high) {
-                    let mid = Math.floor((low + high) / 2);
-                    let line = cachedLyricsDOM[mid];
-
-                    if (currentTime >= line.start && currentTime <= line.end) {
-                        newActiveLineIndex = mid;
-                        break;
-                    } else if (currentTime < line.start) {
-                        high = mid - 1;
-                    } else {
-                        low = mid + 1;
-                    }
+        if (newActiveLineIndex !== activeLineIndex || isSeek) {
+            // Reconcile state for all lines on line change or seek
+            for (let i = 0; i < cachedLyricsDOM.length; i++) {
+                const lineCache = cachedLyricsDOM[i];
+                if (i === newActiveLineIndex) {
+                    lineCache.el.classList.add('active');
+                } else {
+                    lineCache.el.classList.remove('active');
+                    // Ensure past lines have all words active, future lines have none
+                    lineCache.words.forEach(wordCache => {
+                        if (currentTime > lineCache.end) {
+                            wordCache.el.classList.add('active-word');
+                        } else {
+                            wordCache.el.classList.remove('active-word');
+                        }
+                    });
                 }
             }
-        }
-
-        // Handle full global sweep on seek to fix stale state
-        if (isSeeking) {
-            cachedLyricsDOM.forEach((lineCache, index) => {
-                if (index === newActiveLineIndex) return; // Will handle new line below
-                if (lineCache.el.classList.contains('active')) lineCache.el.classList.remove('active');
-                
-                lineCache.words.forEach(w => {
-                    if (currentTime > lineCache.end) {
-                        if (!w.el.classList.contains('active-word')) w.el.classList.add('active-word');
-                    } else {
-                        if (w.el.classList.contains('active-word')) w.el.classList.remove('active-word');
-                    }
-                });
-            });
-            activeLineIndex = -1; // Force clean transition
-        }
-
-        // Handle line transition
-        if (newActiveLineIndex !== activeLineIndex) {
-            if (activeLineIndex !== -1 && cachedLyricsDOM[activeLineIndex]) {
-                const oldLine = cachedLyricsDOM[activeLineIndex];
-                if (oldLine.el.classList.contains('active')) oldLine.el.classList.remove('active');
-
-                // If moving forward, all words in old line become active. If backward, inactive.
-                const isForward = newActiveLineIndex > activeLineIndex || newActiveLineIndex === -1;
-                oldLine.words.forEach(w => {
-                    if (isForward && currentTime > oldLine.end) {
-                        if (!w.el.classList.contains('active-word')) w.el.classList.add('active-word');
-                    } else {
-                        if (w.el.classList.contains('active-word')) w.el.classList.remove('active-word');
-                    }
-                });
-            }
-
             activeLineIndex = newActiveLineIndex;
-            lastActiveWordIndex = -1; // Reset word index on new line
 
-            if (activeLineIndex !== -1) {
+            if (isAutoScrolling && activeLineIndex !== -1) {
                 const activeLine = cachedLyricsDOM[activeLineIndex].el;
                 if (!activeLine.classList.contains('active')) activeLine.classList.add('active');
 
@@ -1348,31 +1315,30 @@ function initHarmonyTunes() {
             }
         }
 
-        // Handle words within the active line
         if (activeLineIndex !== -1) {
             const currentLine = cachedLyricsDOM[activeLineIndex];
-            const words = currentLine.words;
+            // ⚡ Bolt: Use binary search for words within the active line
+            let wordLeft = 0;
+            let wordRight = currentLine.words.length - 1;
+            let activeWordIndex = -1;
 
-            // Fast forward words contiguous check
-            let currentWordIndex = lastActiveWordIndex;
-
-            // Advance active word index
-            while(currentWordIndex + 1 < words.length && currentTime >= words[currentWordIndex + 1].start) {
-                currentWordIndex++;
-                if (!words[currentWordIndex].el.classList.contains('active-word')) {
-                     words[currentWordIndex].el.classList.add('active-word');
+            while (wordLeft <= wordRight) {
+                const mid = Math.floor((wordLeft + wordRight) / 2);
+                if (currentTime >= currentLine.words[mid].start) {
+                    activeWordIndex = mid;
+                    wordLeft = mid + 1;
+                } else {
+                    wordRight = mid - 1;
                 }
             }
 
-            // Handle backwards seek within same line (rare, but possible)
-            while(currentWordIndex >= 0 && currentTime < words[currentWordIndex].start) {
-                if (words[currentWordIndex].el.classList.contains('active-word')) {
-                     words[currentWordIndex].el.classList.remove('active-word');
+            for (let i = 0; i < currentLine.words.length; i++) {
+                if (i <= activeWordIndex) {
+                    currentLine.words[i].el.classList.add('active-word');
+                } else {
+                    currentLine.words[i].el.classList.remove('active-word');
                 }
-                currentWordIndex--;
             }
-
-            lastActiveWordIndex = currentWordIndex;
         }
     }
 
@@ -1904,6 +1870,7 @@ let dragItem = null;
     let dragStartTop = 0;
     let dragTimeout = null;
     let isDragging = false;
+    let cachedDragItems = null;
 
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
@@ -1911,7 +1878,7 @@ let dragItem = null;
             dragItem.style.transform = `translateY(${deltaY}px)`;
 
             // Visual Drop Indicator
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
 
             for (let i = 0; i < items.length; i++) {
@@ -1932,7 +1899,7 @@ let dragItem = null;
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
-            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const itemsNodeList = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             const idx = itemsNodeList.indexOf(dragItem);
 
             isDragging = false;
@@ -1944,9 +1911,10 @@ let dragItem = null;
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = itemsNodeList;
             let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
+                if (i === items.length - 1) cachedDragItems = null;
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
                     droppedIdx = i;
@@ -2017,6 +1985,7 @@ let dragItem = null;
                     dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
+                        cachedDragItems = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -2031,7 +2000,7 @@ let dragItem = null;
                     if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         let contextMenuIdx = idx;
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         const currentItemIdx = items.indexOf(item);
                         if (currentItemIdx !== -1) {
                             contextMenuIdx = currentItemIdx;
