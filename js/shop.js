@@ -6,6 +6,7 @@ import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
+import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -92,37 +93,12 @@ function renderProducts() {
         `;
     }).join('');
 
-    // Fetch and update ratings asynchronously without blocking UI render
-    updateAllProductRatings();
+    // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
 }
 
 async function updateAllProductRatings() {
-    try {
-        const q = query(collection(db, 'product_reviews'));
-        const querySnapshot = await getDocs(q);
-
-        const aggregations = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const pId = data.productId;
-            if (pId && data.rating !== undefined) {
-                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
-                aggregations[pId].sum += data.rating;
-                aggregations[pId].count += 1;
-            }
-        });
-
-        // Now safe to call without N+1 query by passing precalculated data
-        for (const product of products) {
-            const agg = aggregations[product.id];
-            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
-            const count = agg ? agg.count : 0;
-
-            updateProductRatingDisplay(product.id, { average, count });
-        }
-    } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
-    }
+    // ⚡ Bolt: Removed massive clientside aggregation that loaded the entire reviews collection.
+    // Relies on pre-computed product_stats loaded via loadProductStats() on init instead.
 }
 
 async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
@@ -153,7 +129,7 @@ function renderCart() {
     if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
         if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.title = 'Your cart is empty'; }
     } else {
         if (cartItemsContainer) {
             cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
@@ -175,7 +151,7 @@ function renderCart() {
                 `;
             }).join('');
         }
-        if (checkoutBtn) checkoutBtn.disabled = false;
+        if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
     }
     updateCartSummary();
 }
@@ -261,7 +237,7 @@ export async function handleUpdateQuantity(productId, quantity) {
             renderCart();
         }
     } catch (error) {
-        console.error('Failed to update quantity:', error);
+        console.error('Failed to update quantity - Manager info:', error);
     }
 }
 
@@ -582,15 +558,8 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const cacheKey = `profile_${currentUser.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let username = "User";
-                if (cachedProfile) {
-                    username = JSON.parse(cachedProfile).username;
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if (userDoc.exists()) username = userDoc.data().username || "User";
-                }
+                const userData = await getCachedUserProfile(currentUser.uid);
+                let username = userData ? (userData.username || "User") : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
@@ -710,19 +679,9 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        const cacheKey = `profile_${currentUser.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
         let authorName = currentUser.displayName || 'Anonymous';
-
-        if (cachedProfile) {
-            const userData = JSON.parse(cachedProfile);
-            if (userData.username) authorName = userData.username;
-        } else {
-             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-             if (userDoc.exists() && userDoc.data().username) {
-                 authorName = userDoc.data().username;
-             }
-        }
+        const userData = await getCachedUserProfile(currentUser.uid);
+        if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,

@@ -1,3 +1,4 @@
+import { escapeHTML } from "./utils.js";
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
@@ -326,8 +327,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         // Avoid unnecessary textContent assignments which trigger style recalculations
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
@@ -351,8 +352,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
                         if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;

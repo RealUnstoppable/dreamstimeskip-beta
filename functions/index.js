@@ -60,7 +60,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
       }
 
       // Allowed collections for admin actions via this endpoint
-      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets"];
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets", "promo_codes"];
       if (!allowedCollections.includes(collection)) {
         return res.status(400).send("Invalid collection");
       }
@@ -72,7 +72,13 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         if (typeof data !== "object" || data === null) {
           return res.status(400).send("Invalid update data");
         }
-        await docRef.update(data);
+        if (data.createdAt === 'SERVER_TIMESTAMP') {
+          data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await docRef.set(data, { merge: true });
       } else if (action === "delete") {
         await docRef.delete();
       } else {
