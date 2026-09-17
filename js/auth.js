@@ -3,7 +3,7 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
 
-import { escapeHTML } from './utils.js';
+import { escapeHTML, getCachedUserProfile } from './utils.js';
 
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };

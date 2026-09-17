@@ -1,5 +1,5 @@
 import { auth, db } from './auth.js';
-import { escapeHTML } from './utils.js';
+import { escapeHTML, getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { getCachedUserProfile } from './auth.js';

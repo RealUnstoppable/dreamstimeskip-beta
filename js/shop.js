@@ -3,7 +3,7 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
-import { escapeHTML } from './utils.js';
+import { escapeHTML, getCachedUserProfile, fetchCollectionData } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
 import { getCachedUserProfile } from './auth.js';
@@ -121,10 +121,8 @@ async function updateProductRatingDisplay(productId, precalculatedRatingInfo = n
 
 async function loadProductStats() {
     try {
-        const statsSnapshot = await getDocs(collection(db, 'product_stats'));
-        statsSnapshot.forEach(doc => {
-            productStatsMap.set(doc.id, doc.data());
-        });
+        const stats = await fetchCollectionData(db, getDocs, collection, 'product_stats', true);
+        stats.forEach(s => productStatsMap.set(s.id, s));
     } catch (error) {
         console.error("Error loading product stats:", error);
     } finally {
