@@ -59,6 +59,8 @@ function renderProducts() {
 
 
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
+        const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
+
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
@@ -373,7 +375,6 @@ async function fetchProductReviews(productId) {
         if (avgRatingValue) avgRatingValue.textContent = avg.toFixed(1);
         if (totalReviewsCount) totalReviewsCount.textContent = `${count} review${count !== 1 ? 's' : ''}`;
 
-        cachedRatings[productId] = { avg, count };
         renderProducts();
 
     } catch (error) {
@@ -718,6 +719,8 @@ async function handleReviewSubmit(e) {
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
+    }
+}
         submitReviewBtn.textContent = originalText;
     }
 }
