@@ -26,7 +26,6 @@ let fpsInterval = 1000 / 60;
 // Audio
 const bgmMusic = document.getElementById('bgm-music');
 const bgmMenu = document.getElementById('bgm-menu');
-let fpsLimit = 60;
 let lastDrawTime = 0;
 
 // Game State
@@ -34,7 +33,6 @@ let isPlaying = false;
 let isPaused = false;
 let animationFrameId;
 let lastTime = 0;
-let lastDrawTime = 0;
 let spawnTimer = 0;
 let spawnInterval = 1200;
 let blobs = [];
