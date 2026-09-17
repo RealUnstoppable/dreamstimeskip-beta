@@ -296,6 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function escapeHTML(str) {
+        if (str == null) return "";
+        if (typeof str !== 'string') str = String(str);
         return str.replace(/[&<>'"]/g, 
             tag => ({
                 '&': '&amp;',

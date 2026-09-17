@@ -34,7 +34,6 @@ document.body.innerHTML = `
     <div id="lyrics-container"></div>
 `;
 
-import { jest } from '@jest/globals';
 
 // Import the script as ES module
 await import('../js/harmonytunes.js');
