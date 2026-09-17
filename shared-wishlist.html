@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Wishlist | DTS HUB</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+</head>
+<body>
+    <header class="main-header"></header>
+    <main style="max-width: 1200px; margin: 120px auto 60px; padding: 0 20px;">
+        <h1 id="wishlist-title" style="text-align: center; margin-bottom: 40px;">Loading Wishlist...</h1>
+        <div id="shared-wishlist-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px;">
+        </div>
+    </main>
+    <footer class="main-footer"></footer>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+        import { handleAddToCart } from './js/shop.js';
+        import { productMap } from './js/products-data.js';
+        import { db } from './js/firebase.js';
+        import { collection, query, where, limit, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+
+        async function init() {
+            const params = new URLSearchParams(window.location.search);
+            const sharedId = params.get('id');
+            const container = document.getElementById('shared-wishlist-container');
+            const title = document.getElementById('wishlist-title');
+
+            if (!sharedId) {
+                title.textContent = 'Invalid Wishlist Link';
+                return;
+            }
+
+            try {
+                // Fetch directly from Firestore using the updated rules
+                const q = query(collection(db, "wishlists"), where("sharedId", "==", sharedId), where("isPublic", "==", true), limit(1));
+                const snapshot = await getDocs(q);
+
+                if (snapshot.empty) throw new Error('Wishlist not found');
+
+                const wishlistDoc = snapshot.docs[0];
+                const items = wishlistDoc.data().items || [];
+                const userId = wishlistDoc.id;
+
+                let username = "A User";
+                try {
+                     const userDocRef = doc(db, "users", userId);
+                     const userDoc = await getDoc(userDocRef);
+                     if (userDoc.exists() && userDoc.data().username) {
+                         username = userDoc.data().username;
+                     }
+                } catch (e) {
+                     console.warn("Could not fetch user info");
+                }
+
+                title.textContent = username + "'s Wishlist";
+
+                if (items.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; grid-column: 1 / -1; color: var(--text-secondary);">This wishlist is empty.</p>';
+                    return;
+                }
+
+                container.innerHTML = items.map(productId => {
+                    const product = productMap.get(productId);
+                    if (!product) return '';
+                    return `
+                        <div class="product-card" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;">
+                            <img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 250px; object-fit: cover; background: #000;">
+                            <div style="padding: 20px; flex-grow: 1;">
+                                <h3 style="margin: 0 0 10px;">${product.name}</h3>
+                                <p style="font-size: 1.25rem; font-weight: bold; margin: 0 0 15px;">$${product.price.toFixed(2)}</p>
+                                <button class="btn btn-primary" onclick="window.addToCart('${product.id}', this)" style="width: 100%;">Add to Cart</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error(error);
+                title.textContent = 'Wishlist not found or private';
+            }
+        }
+
+        window.addToCart = async function(productId, btnElement) {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = 'Adding...';
+            btnElement.disabled = true;
+            await handleAddToCart(productId);
+            btnElement.innerText = 'Added!';
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.disabled = false;
+            }, 2000);
+        };
+
+        // Wait a tick for products-data to load if needed, but it's bundled
+        setTimeout(init, 500);
+    </script>
+</body>
+</html>
