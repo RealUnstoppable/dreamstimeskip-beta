@@ -1,8 +1,8 @@
 // js/theme-loader.js
-import { auth, db } from './auth.js';
+import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-import { getCachedUserProfile } from './utils.js';
+import { getCachedUserProfile } from './auth.js';
 
 (function() {
     const localTheme = localStorage.getItem('userTheme');
@@ -25,14 +25,14 @@ const applyTheme = (theme, accentColor) => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userData = await getCachedUserProfile(user);
+            const userData = await getCachedUserProfile(user.uid);
             if (userData) {
                 applyTheme(userData.theme, userData.accentColor);
             } else {
                 applyTheme('dark', 'blue');
             }
         } catch (error) {
-            console.error("Error loading theme from Firestore - Manager info:", error.message);
+            console.error("Error loading theme from Firestore:", error.message);
             applyTheme('dark', 'blue');
         }
     } else {

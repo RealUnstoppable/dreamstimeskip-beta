@@ -8,6 +8,26 @@ import { escapeHTML, getCachedUserProfile } from './utils.js';
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
 
+export async function getCachedUserProfile(uid) {
+    const cacheKey = `profile_${uid}`;
+    const cachedProfile = sessionStorage.getItem(cacheKey);
+    if (cachedProfile) return JSON.parse(cachedProfile);
+
+    try {
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            return userData;
+        }
+    } catch (error) {
+        console.error("Manager info: Error fetching profile:", error);
+    }
+    return null;
+}
+
+
 
 
 onAuthStateChanged(auth, async (user) => {
@@ -16,7 +36,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        let userData = await getCachedUserProfile(user);
+        let userData = await getCachedUserProfile(user.uid);
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
@@ -121,7 +141,7 @@ if (document.getElementById('auth-form')) {
                 }
             }
         } catch (error) {
-            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error - Manager info:`, error.message);
+            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
             showMessage(getFirebaseErrorMessage(error));
         } finally {
             submitBtn.disabled = false;
@@ -148,4 +168,25 @@ export function getFirebaseErrorMessage(error) {
         default:
             return 'An unexpected error occurred. Please try again.';
     }
+}
+
+export async function getCachedUserProfile(uid) {
+    if (!uid) return null;
+    const cacheKey = `profile_${uid}`;
+    const cachedProfile = sessionStorage.getItem(cacheKey);
+    if (cachedProfile) {
+        return JSON.parse(cachedProfile);
+    }
+    try {
+        const userDocRef = doc(db, "users", uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+            return userData;
+        }
+    } catch (error) {
+        console.error("Manager info: Error fetching user profile:", error);
+    }
+    return null;
 }
