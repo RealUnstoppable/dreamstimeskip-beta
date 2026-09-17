@@ -48,10 +48,16 @@ function generateStarsHtml(rating) {
     return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
 }
 
-function renderProducts() {
+function renderProducts(searchQuery = '') {
     if (!productGrid) return;
+    const query = searchQuery.toLowerCase();
 
-    productGrid.innerHTML = products.map(product => {
+    productGrid.innerHTML = products.filter(product => {
+        if (!query) return true;
+        const nameMatch = product.name.toLowerCase().includes(query);
+        const descMatch = product.description.toLowerCase().includes(query);
+        return nameMatch || descMatch;
+    }).map(product => {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
