@@ -2,6 +2,7 @@ import { auth, db } from './auth.js';
 import { escapeHTML } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getCachedUserProfile } from './auth.js';
 
 const COMMENTS_COLLECTION = 'blog_comments';
 let currentUser = null;
@@ -13,7 +14,7 @@ export function initBlogComments() {
 
     const postId = commentsSection.dataset.postId;
     if (!postId) {
-        console.error("Manager info: Missing data-post-id on comments section");
+        console.error("Missing data-post-id on comments section");
         return;
     }
 
@@ -66,20 +67,7 @@ function updateCommentFormUI(container) {
     }
 }
 
-async function getCachedUsername(uid) {
-    try {
-        const cacheKey = \`profile_\${uid}\`;
-        const cachedData = sessionStorage.getItem(cacheKey);
-        if (cachedData) {
-            const userData = JSON.parse(cachedData);
-            return userData.username;
-        }
-        return "User"; // Fallback if not in cache (could fetch from DB if needed)
-    } catch (e) {
-        console.error("Manager info: Error getting username", e);
-        return "User";
-    }
-}
+
 
 async function addComment(postId, content) {
     if (!currentUser) return;
@@ -92,7 +80,8 @@ async function addComment(postId, content) {
     submitBtn.textContent = 'Posting...';
 
     try {
-        const username = await getCachedUsername(currentUser.uid);
+        const userData = await getCachedUserProfile(currentUser.uid);
+        const username = userData ? userData.username : "User";
 
         await addDoc(collection(db, COMMENTS_COLLECTION), {
             postId: postId,
@@ -108,7 +97,7 @@ async function addComment(postId, content) {
         // Reload comments
         await loadComments(postId);
     } catch (error) {
-        console.error('Manager info: Error posting comment:', error);
+        console.error('Error posting comment:', error);
         showNotification(notificationEl, 'Failed to post comment. Please try again.', 'error');
     } finally {
         submitBtn.disabled = false;
@@ -141,7 +130,7 @@ async function loadComments(postId) {
 
             // Allow deletion if the current user is the author (admin delete would require extra logic or just be done via console for now)
             const canDelete = currentUser && currentUser.uid === comment.userId;
-            const deleteBtnHtml = canDelete ? \`<button class="delete-comment-btn" data-id="\${docSnap.id}" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>\` : '';
+            const deleteBtnHtml = canDelete ? \`<button class="delete-comment-btn" data-id="\${docSnap.id}" title="Delete comment" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>\` : '';
 
             html += \`
                 <div class="comment-item" style="padding: 15px; border-radius: 8px; background: var(--primary-card-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">
@@ -168,7 +157,7 @@ async function loadComments(postId) {
                         await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
                         await loadComments(postId); // Refresh
                     } catch (err) {
-                        console.error('Manager info: Error deleting comment', err);
+                        console.error('Error deleting comment', err);
                         alert('Failed to delete comment.');
                         e.target.disabled = false;
                         e.target.textContent = 'Delete';
@@ -178,7 +167,7 @@ async function loadComments(postId) {
         });
 
     } catch (error) {
-        console.error('Manager info: Error loading comments:', error);
+        console.error('Error loading comments:', error);
         listContainer.innerHTML = '<div style="color: var(--accent-red);">Failed to load comments.</div>';
     }
 }

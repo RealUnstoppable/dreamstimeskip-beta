@@ -1,11 +1,12 @@
 // shop.js
-import { auth, db } from './auth.js';
+import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
+import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -55,22 +56,23 @@ function renderProducts() {
         const isWishlisted = wishlist.has(product.id);
         const heartIcon = isWishlisted ? '❤️' : '🤍';
         const activeClass = isWishlisted ? 'active' : '';
-        const ratingInfo = cachedRatings[product.id] || { avg: 0, count: 0 };
-        const ratingDisplay = ratingInfo.count > 0 ? `${ratingInfo.avg.toFixed(1)} ★ (${ratingInfo.count})` : 'No reviews';
+
 
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
+        const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
+
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
 
         return `
             <div class="product-card">
-                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" aria-label="Toggle Wishlist">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
                 <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <div class="product-rating-summary">${ratingDisplay}</div>
+
                     <p>${product.description}</p>
                     <div class="product-stars-container">
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
@@ -92,37 +94,12 @@ function renderProducts() {
         `;
     }).join('');
 
-    // Fetch and update ratings asynchronously without blocking UI render
-    updateAllProductRatings();
+    // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
 }
 
 async function updateAllProductRatings() {
-    try {
-        const q = query(collection(db, 'product_reviews'));
-        const querySnapshot = await getDocs(q);
-
-        const aggregations = {};
-        querySnapshot.forEach(doc => {
-            const data = doc.data();
-            const pId = data.productId;
-            if (pId && data.rating !== undefined) {
-                if (!aggregations[pId]) aggregations[pId] = { sum: 0, count: 0 };
-                aggregations[pId].sum += data.rating;
-                aggregations[pId].count += 1;
-            }
-        });
-
-        // Now safe to call without N+1 query by passing precalculated data
-        for (const product of products) {
-            const agg = aggregations[product.id];
-            const average = agg && agg.count > 0 ? parseFloat((agg.sum / agg.count).toFixed(1)) : 0;
-            const count = agg ? agg.count : 0;
-
-            updateProductRatingDisplay(product.id, { average, count });
-        }
-    } catch (e) {
-        console.error("Manager info: [Error batch fetching ratings:]", e);
-    }
+    // ⚡ Bolt: Removed massive clientside aggregation that loaded the entire reviews collection.
+    // Relies on pre-computed product_stats loaded via loadProductStats() on init instead.
 }
 
 async function updateProductRatingDisplay(productId, precalculatedRatingInfo = null) {
@@ -143,7 +120,7 @@ async function loadProductStats() {
             productStatsMap.set(doc.id, doc.data());
         });
     } catch (error) {
-        console.error("Error loading product stats - Manager info:", error);
+        console.error("Error loading product stats:", error);
     } finally {
         renderProducts();
     }
@@ -153,7 +130,7 @@ function renderCart() {
     if (!cartItemsContainer || !checkoutBtn) return;
     if (Object.keys(cart).length === 0) {
         if (cartItemsContainer) cartItemsContainer.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
-        if (checkoutBtn) checkoutBtn.disabled = true;
+        if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.title = 'Your cart is empty'; }
     } else {
         if (cartItemsContainer) {
             cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
@@ -168,14 +145,14 @@ function renderCart() {
                             <p>${product.price === 0 ? '<span style="color: var(--accent-green); font-weight: bold;">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" aria-label="Quantity for ${product.name}">
-                            <button class="remove-item-btn" data-id="${productId}" aria-label="Remove item">&#128465;</button>
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
+                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
-        if (checkoutBtn) checkoutBtn.disabled = false;
+        if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
     }
     updateCartSummary();
 }
@@ -242,17 +219,26 @@ export async function handleAddToCart(productId, event) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart - Manager info:', error.message);
+        console.error('Failed to add to cart:', error.message);
     }
 }
 
 export async function handleUpdateQuantity(productId, quantity) {
-    if (quantity <= 0) {
-        await handleRemoveFromCart(productId);
-    } else {
-        cart[productId] = parseInt(quantity, 10);
-        await saveCart();
-        renderCart();
+    if (!productMap.has(productId)) {
+        console.error(`Product not found: ${productId}`);
+        return;
+    }
+
+    try {
+        if (quantity <= 0) {
+            await handleRemoveFromCart(productId);
+        } else {
+            cart[productId] = parseInt(quantity, 10);
+            await saveCart();
+            renderCart();
+        }
+    } catch (error) {
+        console.error('Failed to update quantity - Manager info:', error);
     }
 }
 
@@ -282,7 +268,7 @@ export async function toggleWishlist(productId) {
     try {
         await saveWishlist();
     } catch (error) {
-        console.error('Failed to update wishlist - Manager info:', error.message);
+        console.error('Failed to update wishlist:', error.message);
     }
 }
 
@@ -303,7 +289,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore - Manager info:", error.message);
+                console.error("Error saving wishlist to Firestore:", error.message);
                 reject(error);
             }
         }, 500);
@@ -325,7 +311,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore - Manager info:", error.message);
+                    console.error("Error saving cart to Firestore:", error.message);
                 }
             } else {
                 // Save cart to localStorage for logged-out users
@@ -389,11 +375,10 @@ async function fetchProductReviews(productId) {
         if (avgRatingValue) avgRatingValue.textContent = avg.toFixed(1);
         if (totalReviewsCount) totalReviewsCount.textContent = `${count} review${count !== 1 ? 's' : ''}`;
 
-        cachedRatings[productId] = { avg, count };
         renderProducts();
 
     } catch (error) {
-        console.error("Manager info: [Error fetching reviews:]", error);
+        console.error("Error fetching reviews:", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -573,15 +558,8 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const cacheKey = `profile_${currentUser.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let username = "User";
-                if (cachedProfile) {
-                    username = JSON.parse(cachedProfile).username;
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                    if (userDoc.exists()) username = userDoc.data().username || "User";
-                }
+                const userData = await getCachedUserProfile(currentUser.uid);
+                let username = userData ? (userData.username || "User") : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
@@ -603,7 +581,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Manager info: [Error submitting review:]", error);
+                console.error("Error submitting review:", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -679,7 +657,7 @@ async function loadReviews(productId) {
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Error loading reviews - Manager info:", error.message);
+        console.error("Error loading reviews:", error.message);
         reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
     }
 }
@@ -701,19 +679,9 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        const cacheKey = `profile_${currentUser.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
         let authorName = currentUser.displayName || 'Anonymous';
-
-        if (cachedProfile) {
-            const userData = JSON.parse(cachedProfile);
-            if (userData.username) authorName = userData.username;
-        } else {
-             const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-             if (userDoc.exists() && userDoc.data().username) {
-                 authorName = userDoc.data().username;
-             }
-        }
+        const userData = await getCachedUserProfile(currentUser.uid);
+        if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,
@@ -747,168 +715,12 @@ async function handleReviewSubmit(e) {
         await openReviewsModal(currentReviewProductId); // Refresh modal
 
     } catch (error) {
-        console.error("Error submitting review - Manager info:", error.message);
+        console.error("Error submitting review:", error.message);
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
+    }
+}
         submitReviewBtn.textContent = originalText;
     }
 }
-
-// --- INITIALIZATION ---
-loadProductStats();
-setupEventListeners();
-
-// **MODIFIED**: Reworked auth state change to handle local cart
-onAuthStateChanged(auth, async (user) => {
-        currentUser = user;
-        const localCartData = localStorage.getItem('localCart');
-        const localCart = localCartData ? JSON.parse(localCartData) : {};
-
-        if (user) {
-            // User is signed in
-
-            // Load Wishlist
-            try {
-                const userWishlistRef = doc(db, 'wishlists', user.uid);
-                const wishlistSnap = await getDoc(userWishlistRef);
-                if (wishlistSnap.exists() && wishlistSnap.data().items) {
-                    wishlist = new Set(wishlistSnap.data().items);
-                } else {
-                    wishlist = new Set();
-                }
-            } catch (error) {
-                console.error("Error loading wishlist - Manager info:", error.message);
-            }
-
-            const userCartRef = doc(db, 'carts', user.uid);
-            const docSnap = await getDoc(userCartRef);
-            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
-
-            // Merge local and firestore carts
-            const mergedCart = { ...firestoreCart };
-            let hasLocalItems = false;
-            for (const [productId, quantity] of Object.entries(localCart)) {
-                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
-                hasLocalItems = true;
-            }
-            
-            cart = mergedCart;
-            // Only trigger backend write if we actually merged local items into it
-            if (hasLocalItems) {
-                await saveCart();
-                localStorage.removeItem('localCart'); // Clear local cart after merging
-            }
-        } else {
-            // User is signed out, load from localStorage
-            cart = localCart;
-        }
-
-        updateUserNav(user);
-        renderCart(); // Render the final cart state
-    });// --- REVIEWS LOGIC ---
-const reviewsModal = document.getElementById('reviews-modal');
-const closeReviewsBtn = document.getElementById('close-reviews-btn');
-const reviewsListContainer = document.getElementById('reviews-list-container');
-const reviewSubmitForm = document.getElementById('review-submit-form');
-const reviewProductIdInput = document.getElementById('review-product-id');
-const reviewAuthMessage = document.getElementById('review-auth-message');
-
-async function openReviewsModal(productId) {
-    if (!reviewsModal) return;
-    reviewProductIdInput.value = productId;
-    reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
-    reviewsModal.style.display = 'block';
-
-    if (!currentUser) {
-        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'none';
-        reviewAuthMessage.style.display = 'block';
-    } else {
-        reviewSubmitForm.querySelector('button[type="submit"]').style.display = 'block';
-        reviewAuthMessage.style.display = 'none';
-    }
-
-    try {
-        const q = query(collection(db, 'product_reviews'), where('productId', '==', productId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-            reviewsListContainer.innerHTML = '<p>No reviews yet. Be the first!</p>';
-            return;
-        }
-
-        reviewsListContainer.innerHTML = '';
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const date = data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Just now';
-            reviewsListContainer.innerHTML += `
-                <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <strong>${escapeHTML(data.authorName || 'Anonymous')}</strong>
-                        <span style="color: #fbbf24;">${'★'.repeat(data.rating)}${'☆'.repeat(5 - data.rating)}</span>
-                    </div>
-                    <p style="margin: 0; font-size: 0.9em; color: var(--text-secondary);">${escapeHTML(data.text)}</p>
-                    <small style="color: #666;">${date}</small>
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error("Manager info: Error loading reviews", error);
-        reviewsListContainer.innerHTML = '<p>Error loading reviews.</p>';
-    }
-}
-
-if (reviewSubmitForm) {
-    reviewSubmitForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!currentUser) return;
-
-        const productId = reviewProductIdInput.value;
-        const rating = parseInt(document.getElementById('review-rating').value, 10);
-        const text = document.getElementById('review-text').value;
-        const submitBtn = reviewSubmitForm.querySelector('button[type="submit"]');
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-
-        try {
-            await addDoc(collection(db, 'product_reviews'), {
-                productId,
-                userId: currentUser.uid,
-                authorName: (currentUser.email ? currentUser.email.split("@")[0] : "Anonymous"), // Safe fallback
-                rating,
-                text,
-                createdAt: new Date().toISOString()
-            });
-            reviewSubmitForm.reset();
-            await openReviewsModal(productId); // Reload reviews
-            await renderProducts(); // Refresh stats on grid
-        } catch (error) {
-            console.error("Manager info: Error submitting review", error);
-            alert('Error submitting review.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Review';
-        }
-    });
-}
-
-if (closeReviewsBtn) {
-    closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
-}
-window.addEventListener('click', (e) => {
-    if (e.target === reviewsModal) reviewsModal.style.display = 'none';
-});
-
-// Add event delegation for the new "Reviews" button
-document.addEventListener('DOMContentLoaded', () => {
-    const grid = document.getElementById('product-grid');
-    if (grid) {
-        grid.addEventListener('click', (e) => {
-            if (e.target.classList.contains('view-reviews-btn')) {
-                const productId = e.target.dataset.id;
-                openReviewsModal(productId);
-            }
-        });
-    }
-});
