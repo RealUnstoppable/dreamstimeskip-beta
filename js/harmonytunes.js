@@ -1,3 +1,4 @@
+import { escapeHTML } from "./utils.js";
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
@@ -326,8 +327,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         // Avoid unnecessary textContent assignments which trigger style recalculations
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
@@ -351,8 +352,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
                     } else {
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
                         if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
@@ -435,7 +436,7 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist - Manager info:", error);
+            console.error("Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) {}
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
@@ -512,7 +513,7 @@ function initHarmonyTunes() {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
+                    <button class="card-play-btn" title="Play ${escapeHTML(pl.title)} playlist" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -735,7 +736,7 @@ function initHarmonyTunes() {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error("Manager info:", e));
+        }).catch(e => console.error("Action error:", e));
     }
 
     function pauseSong() {
@@ -908,7 +909,7 @@ function initHarmonyTunes() {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Action error:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
@@ -1242,50 +1243,101 @@ function initHarmonyTunes() {
 
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
+    let lastTime = 0;
+
     function syncLyrics() {
         if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
         
         let newActiveLineIndex = -1;
-        cachedLyricsDOM.forEach((lineCache, index) => {
-            const { el: lineEl, start, end, words } = lineCache;
-            
-            // Allow active line to persist slightly if it's the last one sung, 
-            // but strict matching is better for beat-by-beat
-            if (currentTime >= start && currentTime <= end) {
-                newActiveLineIndex = index;
-                lineEl.classList.add('active');
-                
-                words.forEach(wordCache => {
-                    if (currentTime >= wordCache.start) {
-                        wordCache.el.classList.add('active-word');
-                    } else {
-                        wordCache.el.classList.remove('active-word');
-                    }
-                });
+
+        // ⚡ Bolt: Use binary search to find the active line in O(log N) instead of O(N) traversal on every frame
+        let left = 0;
+        let right = cachedLyricsDOM.length - 1;
+        while (left <= right) {
+            const mid = Math.floor((left + right) / 2);
+            const line = cachedLyricsDOM[mid];
+            if (currentTime >= line.start && currentTime <= line.end) {
+                newActiveLineIndex = mid;
+                break;
+            } else if (currentTime < line.start) {
+                right = mid - 1;
             } else {
-                lineEl.classList.remove('active');
-                // clear word highlights if passed
-                words.forEach(wordCache => {
-                    if (currentTime > end) {
-                        wordCache.el.classList.add('active-word');
-                    } else {
-                        wordCache.el.classList.remove('active-word');
-                    }
-                });
+                left = mid + 1;
             }
-        });
+        }
         
-        if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
+        // Force state reconciliation if we jumped a significant amount of time (e.g., seeking)
+        const isSeek = Math.abs(currentTime - lastTime) > 1;
+        lastTime = currentTime;
+
+        if (newActiveLineIndex !== activeLineIndex || isSeek) {
+            // Reconcile state for all lines on line change or seek
+            for (let i = 0; i < cachedLyricsDOM.length; i++) {
+                const lineCache = cachedLyricsDOM[i];
+                if (i === newActiveLineIndex) {
+                    lineCache.el.classList.add('active');
+                } else {
+                    lineCache.el.classList.remove('active');
+                    // Ensure past lines have all words active, future lines have none
+                    lineCache.words.forEach(wordCache => {
+                        if (currentTime > lineCache.end) {
+                            wordCache.el.classList.add('active-word');
+                        } else {
+                            wordCache.el.classList.remove('active-word');
+                        }
+                    });
+                }
+            }
             activeLineIndex = newActiveLineIndex;
-            if (isAutoScrolling) {
+
+            if (isAutoScrolling && activeLineIndex !== -1) {
                 const activeLine = cachedLyricsDOM[activeLineIndex].el;
-                isProgrammaticScroll = true;
-                lyricsContainer.scrollTo({
-                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
-                    behavior: 'smooth'
-                });
-                setTimeout(() => isProgrammaticScroll = false, 800);
+                if (!activeLine.classList.contains('active')) activeLine.classList.add('active');
+
+                // On a backward seek, ensure future words in this line are cleared.
+                if (isSeeking) {
+                    activeLine.words.forEach(w => {
+                         if (w.start > currentTime && w.el.classList.contains('active-word')) {
+                             w.el.classList.remove('active-word');
+                         }
+                    });
+                }
+
+                if (isAutoScrolling) {
+                    isProgrammaticScroll = true;
+                    lyricsContainer.scrollTo({
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                        behavior: 'smooth'
+                    });
+                    setTimeout(() => isProgrammaticScroll = false, 800);
+                }
+            }
+        }
+
+        if (activeLineIndex !== -1) {
+            const currentLine = cachedLyricsDOM[activeLineIndex];
+            // ⚡ Bolt: Use binary search for words within the active line
+            let wordLeft = 0;
+            let wordRight = currentLine.words.length - 1;
+            let activeWordIndex = -1;
+
+            while (wordLeft <= wordRight) {
+                const mid = Math.floor((wordLeft + wordRight) / 2);
+                if (currentTime >= currentLine.words[mid].start) {
+                    activeWordIndex = mid;
+                    wordLeft = mid + 1;
+                } else {
+                    wordRight = mid - 1;
+                }
+            }
+
+            for (let i = 0; i < currentLine.words.length; i++) {
+                if (i <= activeWordIndex) {
+                    currentLine.words[i].el.classList.add('active-word');
+                } else {
+                    currentLine.words[i].el.classList.remove('active-word');
+                }
             }
         }
     }
@@ -1344,7 +1396,7 @@ function initHarmonyTunes() {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Action error:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1479,7 +1531,7 @@ function initHarmonyTunes() {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Action error:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -1563,7 +1615,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Firebase error:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -1615,7 +1667,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Action error:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -1689,9 +1741,9 @@ function initHarmonyTunes() {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Action error:", e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Firebase history update error:", e);
                 }
             });
         }
@@ -1818,6 +1870,7 @@ let dragItem = null;
     let dragStartTop = 0;
     let dragTimeout = null;
     let isDragging = false;
+    let cachedDragItems = null;
 
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
@@ -1825,7 +1878,7 @@ let dragItem = null;
             dragItem.style.transform = `translateY(${deltaY}px)`;
 
             // Visual Drop Indicator
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
 
             for (let i = 0; i < items.length; i++) {
@@ -1846,7 +1899,7 @@ let dragItem = null;
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
-            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const itemsNodeList = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             const idx = itemsNodeList.indexOf(dragItem);
 
             isDragging = false;
@@ -1858,9 +1911,10 @@ let dragItem = null;
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
-            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = itemsNodeList;
             let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
+                if (i === items.length - 1) cachedDragItems = null;
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
                     droppedIdx = i;
@@ -1931,6 +1985,7 @@ let dragItem = null;
                     dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
+                        cachedDragItems = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -1945,7 +2000,7 @@ let dragItem = null;
                     if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         let contextMenuIdx = idx;
-                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         const currentItemIdx = items.indexOf(item);
                         if (currentItemIdx !== -1) {
                             contextMenuIdx = currentItemIdx;
@@ -2105,7 +2160,7 @@ let dragItem = null;
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Action error:", e));
                 }
                 renderQueue();
             }
@@ -2125,7 +2180,7 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="card-play-btn" title="Play ${escapeHTML(song.title)}" aria-label="Play ${escapeHTML(song.title)}">▶</button>
                 <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
                 <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>
