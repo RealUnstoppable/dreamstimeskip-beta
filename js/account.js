@@ -144,11 +144,85 @@ async function renderOrders(user) {
     }
 }
 
+
+// Rewards Logic
+async function renderRewards(user, userData) {
+    const pointsEl = document.getElementById('user-loyalty-points');
+    const historyList = document.getElementById('rewards-history-list');
+    const msgEl = document.getElementById('no-rewards-msg');
+
+    if (pointsEl && userData) {
+        pointsEl.textContent = userData.loyaltyPoints || 0;
+    }
+
+    if (historyList) {
+        try {
+            const q = query(
+                collection(db, 'loyalty_transactions'),
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc")
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                msgEl.textContent = "You haven't earned any rewards yet.";
+                msgEl.style.display = 'block';
+                historyList.innerHTML = '';
+                return;
+            }
+
+            msgEl.style.display = 'none';
+            let html = '';
+
+            querySnapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const dateStr = formatDate(data.createdAt);
+
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
+                        </div>
+                        <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
+                    </div>
+                `;
+            });
+
+            historyList.innerHTML = html;
+        } catch (error) {
+            console.error("Manager info: Error rendering rewards:", error);
+            msgEl.textContent = "Failed to load rewards history.";
+            msgEl.style.display = 'block';
+        }
+    }
+}
+
 // Authentication State Listener
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
+        let userData = null;
+        try {
+            const cacheKey = `profile_${user.uid}`;
+            const cachedData = sessionStorage.getItem(cacheKey);
+            if (cachedData) {
+                userData = JSON.parse(cachedData);
+            } else {
+                const docSnap = await getDoc(doc(db, 'users', user.uid));
+                if (docSnap.exists()) {
+                    userData = docSnap.data();
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+
         renderProfile(user);
         renderOrders(user);
+        if (userData) {
+            renderRewards(user, userData);
+        }
     } else {
         window.location.replace('/sign in beta.html');
     }
