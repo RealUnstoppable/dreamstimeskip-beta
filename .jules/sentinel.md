@@ -55,7 +55,7 @@
 **Vulnerability:** The `admin.html` and `account.html` pages directly interpolated the `ticket.status` field into the DOM via inline style templates without utilizing the available `escapeHTML` utility. Because standard user creation rules did not restrict the length or content of string status fields created via API or manual updates, an attacker could inject an XSS payload via a manipulated status string.
 **Learning:** Even internal tracking fields like `status` that are typically manipulated via trusted backend logic can be vectors for Stored XSS if the underlying database rules do not restrict arbitrary string modifications on the client side.
 **Prevention:** Always sanitize every dynamically rendered string value from a database response, regardless of whether the field is expected to only contain constrained enum values like "open" or "closed".
-## $(date +%Y-%m-%d) - Fix Stored XSS in Harmony Tunes Lyrics Renderer
+## 2026-09-12 - Fix Stored XSS in Harmony Tunes Lyrics Renderer
 **Vulnerability:** Unescaped strings (`word.text`, `word.start`, `line.start`, `line.end`) from a potentially untrusted lyrics data source were directly interpolated into HTML strings and injected into the DOM via `lyricsContent.innerHTML`, leading to a Stored Cross-Site Scripting (XSS) vulnerability.
 **Learning:** Even when mapping over seemingly structured JSON data (like lyrics), properties intended for DOM injection must be treated as untrusted user input, especially if the data could be maliciously altered in the backend or via API interception.
 **Prevention:** Always wrap dynamically interpolated values in an HTML entity encoding function (like `escapeHTML`) when constructing HTML strings for `innerHTML` injection, or prefer safe DOM APIs like `textContent`.
@@ -63,7 +63,20 @@
 **Vulnerability:** The `admin.html` dashboard performed sensitive database operations (banning users, updating feature requests, modifying bookings, handling quotes) directly from the client-side using `updateDoc` and `deleteDoc`. Relying entirely on client-side constraints and basic Firestore rules for administrative tasks exposes the application to unauthorized data manipulation if the rules are misconfigured or bypassed.
 **Learning:** Administrative database operations should never occur directly on the client. They must be routed through a secure, authenticated backend environment (like Firebase Cloud Functions) that explicitly validates the user's administrative privileges and the payload.
 **Prevention:** Implement administrative operations as Cloud Functions. Ensure the function verifies the caller's identity via `authenticateRequest`, explicitly checks for an `isAdmin` flag using the Admin SDK, and rigorously validates all input parameters (e.g., restricting operations to a specific whitelist of collections).
-## $(date +%Y-%m-%d) - [Fix Insecure Access Control for Support Tickets]
+## 2026-09-12 - [Fix Insecure Access Control for Support Tickets]
 **Vulnerability:** The client-side application directly called `updateDoc()` to modify `support_tickets` in Firestore (e.g., closing tickets, saving admin replies) within the `admin.html` file.
 **Learning:** Performing database modifications directly on the client for administrative tasks, relying only on basic Firestore rules, allows anyone to intercept and modify these queries to bypass restrictions if rules are misconfigured.
 **Prevention:** Always migrate administrative operations (like modifying support tickets, deleting users, or changing configurations) to a secure Cloud Function backend, and invoke it via an authenticated HTTP request using a Bearer token.
+## 2026-09-12 - [Fix Insecure Access Control for Support Tickets]
+**Vulnerability:** The client-side application directly called `updateDoc()` to modify `support_tickets` in Firestore (e.g., closing tickets, saving admin replies) within the `js/ticket-service.js` file.
+**Learning:** Performing database modifications directly on the client for administrative tasks, relying only on basic Firestore rules, allows anyone to intercept and modify these queries to bypass restrictions if rules are misconfigured.
+**Prevention:** Always migrate administrative operations (like modifying support tickets, deleting users, or changing configurations) to a secure Cloud Function backend, and invoke it via an authenticated HTTP request using a Bearer token.
+
+## 2024-05-18 - [Fix DOM-based XSS in Checkout Summary]
+**Vulnerability:** The `renderCheckoutPage` function in `js/checkout.js` directly injected `product.name` into the DOM using template literals assigned to `innerHTML` without sanitization. If an attacker had manipulated the product catalog to include malicious script tags in a product's name, it would execute when the user visited the checkout page.
+**Learning:** Data from the database, even seemingly benign fields like product names, should never be blindly trusted when constructing raw HTML strings, as it creates vectors for Stored XSS if the database is ever compromised or manipulated.
+**Prevention:** Always sanitize dynamically rendered text properties from the database using an HTML entity encoding function like `escapeHTML` before interpolating them into HTML strings for DOM injection.
+## 2024-05-27 - Fix XSS in Search Highlighting
+**Vulnerability:** DOM-based XSS vulnerability in `js/harmonytunes.js` where unescaped user-supplied text from `textContent` was injected into the DOM via `innerHTML` during search term highlighting.
+**Learning:** When building search highlight features, applying a regex replacement to wrap search terms in HTML tags (e.g., `<span>`) and injecting the result via `innerHTML` requires the base string to be fully sanitized first. Only escaping the matched substring still leaves the rest of the string vulnerable.
+**Prevention:** Always parse and escape the entire untrusted string (e.g., using `escapeHTML()`) *before* applying HTML markup replacements for highlighting, ensuring the resulting string is safe for `innerHTML`.

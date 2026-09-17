@@ -1,4 +1,4 @@
-import { db } from './auth.js';
+import { db, auth } from './auth.js';
 import { mapCollectionData } from './utils.js';
 import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
@@ -41,24 +41,6 @@ export async function createTicket(userId, userEmail, subject, message) {
     }
 }
 
-async function fetchAndSortTickets(q) {
-    try {
-        const querySnapshot = await getDocs(q);
-        const tickets = [];
-        querySnapshot.forEach((doc) => {
-            tickets.push({ id: doc.id, ...doc.data() });
-        });
-
-        return tickets.sort((a, b) => {
-             const timeA = a.createdAt?.toMillis() || 0;
-             const timeB = b.createdAt?.toMillis() || 0;
-             return timeB - timeA;
-        });
-    } catch (error) {
-        console.error("Error fetching and sorting tickets: [" + error.message + "]");
-        throw error;
-    }
-}
 
 /**
  * Retrieves all tickets for a specific user
@@ -111,12 +93,30 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
     }
 
     try {
-        const ticketRef = doc(db, TICKETS_COLLECTION, ticketId);
-        await updateDoc(ticketRef, {
-            adminReply,
-            status,
-            updatedAt: serverTimestamp()
+        const user = auth.currentUser;
+        if (!user) throw new Error("Not authenticated");
+        const idToken = await user.getIdToken();
+        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                action: 'update',
+                collection: TICKETS_COLLECTION,
+                docId: ticketId,
+                data: {
+                    adminReply,
+                    status,
+                    updatedAt: 'SERVER_TIMESTAMP'
+                }
+            })
         });
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || "Admin action failed");
+        }
         return { success: true };
     } catch (error) {
         console.error('Error replying to ticket: [' + error.message + ']');
