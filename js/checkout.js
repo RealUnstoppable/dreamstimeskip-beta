@@ -134,22 +134,49 @@ function renderCheckoutPage() {
         </div>
     `;
 
-    document.getElementById('apply-promo-btn').addEventListener('click', () => {
+    document.getElementById('apply-promo-btn').addEventListener('click', async () => {
         const code = document.getElementById('promo-code').value.trim().toUpperCase();
         const msgEl = document.getElementById('promo-message');
-        if (code === 'DTS10') {
-            discount = 0.10;
-            appliedPromo = 'DTS10';
-            msgEl.textContent = '10% discount applied!';
-            msgEl.style.color = 'var(--accent-green)';
-            updateSummaryUI();
-        } else {
+        if (!code) {
+            msgEl.textContent = 'Please enter a promo code.';
+            msgEl.style.color = 'var(--accent-red)';
             discount = 0;
             appliedPromo = '';
-            msgEl.textContent = 'Invalid promo code.';
-            msgEl.style.color = 'var(--accent-red)';
             updateSummaryUI();
+            return;
         }
+        msgEl.textContent = 'Applying...';
+        msgEl.style.color = 'var(--text-secondary)';
+        try {
+            const promoRef = doc(db, 'promo_codes', code);
+            const promoSnap = await getDoc(promoRef);
+            if (promoSnap.exists()) {
+                const promoData = promoSnap.data();
+                if (promoData.active) {
+                    discount = promoData.discount / 100;
+                    appliedPromo = code;
+                    msgEl.textContent = `${promoData.discount}% discount applied!`;
+                    msgEl.style.color = 'var(--accent-green)';
+                } else {
+                    discount = 0;
+                    appliedPromo = '';
+                    msgEl.textContent = 'Promo code is inactive.';
+                    msgEl.style.color = 'var(--accent-red)';
+                }
+            } else {
+                discount = 0;
+                appliedPromo = '';
+                msgEl.textContent = 'Invalid promo code.';
+                msgEl.style.color = 'var(--accent-red)';
+            }
+        } catch (error) {
+            console.error('Error applying promo code:', error);
+            discount = 0;
+            appliedPromo = '';
+            msgEl.textContent = 'Error applying promo code.';
+            msgEl.style.color = 'var(--accent-red)';
+        }
+        updateSummaryUI();
     });
 
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
