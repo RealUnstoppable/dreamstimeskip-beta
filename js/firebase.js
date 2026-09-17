@@ -24,7 +24,7 @@ export const auth = getAuth(app);
 // Firebase Auth natively uses domain-specific local storage (IndexedDB/BrowserLocalPersistence).
 // Sharing auth state between subdomains cannot be done automatically without centralized login logic
 setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Manager info: [Auth persistence setup failed:]", error);
+  console.error("Auth persistence setup failed:", error);
 });
 
 // Initialize Firestore
@@ -49,8 +49,8 @@ export async function verifyFirebaseConnection() {
     }
 
     // Any other error means the connection failed
-    console.error("Manager info: [Firebase connection dead:]", error);
-    console.error("Manager info: [Code:]", error.code, "Message:", error.message);
+    console.error("Firebase connection dead:", error);
+    console.error("Code:", error.code, "Message:", error.message);
 
     // Display error banner
     const banner = document.createElement('div');
@@ -90,7 +90,7 @@ export async function fetchCollectionData(collectionName, includeId = false) {
         const querySnapshot = await getDocs(collection(db, collectionName));
         return querySnapshot.docs.map(doc => includeId ? { id: doc.id, ...doc.data() } : doc.data());
     } catch (e) {
-        console.error(`Manager info: Error fetching collection ${collectionName}`, e);
+        console.error(`Error fetching collection ${collectionName}`, e);
         return [];
     }
 }
