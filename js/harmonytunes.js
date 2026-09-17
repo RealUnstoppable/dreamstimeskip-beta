@@ -1293,12 +1293,25 @@ function initHarmonyTunes() {
 
             if (isAutoScrolling && activeLineIndex !== -1) {
                 const activeLine = cachedLyricsDOM[activeLineIndex].el;
-                isProgrammaticScroll = true;
-                lyricsContainer.scrollTo({
-                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
-                    behavior: 'smooth'
-                });
-                setTimeout(() => isProgrammaticScroll = false, 800);
+                if (!activeLine.classList.contains('active')) activeLine.classList.add('active');
+
+                // On a backward seek, ensure future words in this line are cleared.
+                if (isSeeking) {
+                    activeLine.words.forEach(w => {
+                         if (w.start > currentTime && w.el.classList.contains('active-word')) {
+                             w.el.classList.remove('active-word');
+                         }
+                    });
+                }
+
+                if (isAutoScrolling) {
+                    isProgrammaticScroll = true;
+                    lyricsContainer.scrollTo({
+                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                        behavior: 'smooth'
+                    });
+                    setTimeout(() => isProgrammaticScroll = false, 800);
+                }
             }
         }
 
