@@ -29,6 +29,7 @@ function renderCheckoutPage() {
 
     let discount = 0;
     let appliedPromo = '';
+let pointsToRedeem = 0;
 
     const renderSummary = () => {
         const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
@@ -116,6 +117,7 @@ function renderCheckoutPage() {
                     }).join('')}
                 </div>
                 
+                
                 <div class="form-group" style="margin-top: 20px;">
                     <label for="promo-code" style="font-size: 0.9rem;">Promo Code</label>
                     <div style="display: flex; gap: 10px;">
@@ -124,6 +126,19 @@ function renderCheckoutPage() {
                     </div>
                     <small id="promo-message" style="display: block; margin-top: 5px;"></small>
                 </div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="points-slider" style="font-size: 0.9rem; display: flex; justify-content: space-between;">
+                        <span>Loyalty Points</span>
+                        <span>Available: <strong id="points-available">${window.userPointsBalance}</strong></span>
+                    </label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="range" id="points-slider" min="0" max="${window.userPointsBalance}" step="100" value="0" style="flex: 1;">
+                        <span style="font-weight: bold;" id="points-to-redeem-display">0</span>
+                    </div>
+                    <small id="points-message" style="display: block; margin-top: 5px; color: var(--accent-green);">100 points = $1.00 off</small>
+                </div>
+
 
                 <div class="summary-calculation">
                     <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
@@ -192,42 +207,75 @@ function renderCheckoutPage() {
         updateSummaryUI();
     });
 
+    
+    const pointsSlider = document.getElementById('points-slider');
+    if (pointsSlider) {
+        pointsSlider.addEventListener('input', (e) => {
+            pointsToRedeem = parseInt(e.target.value, 10) || 0;
+            document.getElementById('points-to-redeem-display').textContent = pointsToRedeem;
+            updateSummaryUI();
+        });
+    }
+
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
 }
 
+
+function updateSummaryUI() {
+    let subtotal = 0;
+    Object.entries(userCart).forEach(([productId, quantity]) => {
+        const product = productMap.get(productId);
+        if (product) subtotal += product.price * quantity;
+    });
+
+    const promoDiscountAmount = subtotal * discount;
+    const pointsDiscountAmount = pointsToRedeem / 100;
+    const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
+    
+    let subtotalAfterDiscount = subtotal - totalDiscount;
+    if (subtotalAfterDiscount < 0) subtotalAfterDiscount = 0;
+    
+    const tax = subtotalAfterDiscount * 0.08;
+    const total = subtotalAfterDiscount + tax;
+
+    document.getElementById('summary-subtotal').textContent = `${subtotal.toFixed(2)}`;
+    
+    const discountRow = document.getElementById('summary-discount-row');
+    if (totalDiscount > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('summary-discount').textContent = `-${totalDiscount.toFixed(2)}`;
+    } else {
+        discountRow.style.display = 'none';
+    }
+    
+    document.getElementById('summary-tax').textContent = `${tax.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `${total.toFixed(2)}`;
+    document.getElementById('summary-points').textContent = `✨ You will earn ${Math.floor(subtotalAfterDiscount * 10)} Unstoppable Points with this order!`;
+}
+
+
 export async function processOrderTransaction(uid, cart, orderDetails) {
     try {
-        await runTransaction(db, async (transaction) => {
-            const productIds = Object.keys(cart);
-            const statRefs = productIds.map(id => doc(db, 'product_stats', id));
-            const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
+        const token = await currentUser.getIdToken();
+        const cloudFunctionUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5001/dts-hub-website/us-central1/processOrderTransaction' 
+            : 'https://us-central1-dts-hub-website.cloudfunctions.net/processOrderTransaction';
 
-            const currentStats = {};
-            statDocs.forEach((statDoc, index) => {
-                const productId = productIds[index];
-                currentStats[productId] = statDoc;
-            });
-
-            const newOrderRef = doc(db, 'orders', `${uid}_${Date.now()}`);
-            transaction.set(newOrderRef, orderDetails);
-
-            for (const [productId, quantity] of Object.entries(cart)) {
-                const productStatRef = doc(db, 'product_stats', productId);
-                const statDoc = currentStats[productId];
-
-                if (!statDoc.exists()) {
-                    transaction.set(productStatRef, { orderedCount: quantity });
-                } else {
-                    const newCount = statDoc.data().orderedCount + quantity;
-                    transaction.update(productStatRef, { orderedCount: newCount });
-                }
-            }
-
-            const userCartRef = doc(db, 'carts', uid);
-            transaction.update(userCartRef, { items: {} });
+        const response = await fetch(cloudFunctionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cart, orderDetails, pointsToRedeem })
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Server Error');
+        }
     } catch (error) {
-        console.error('Error processing order transaction:', error);
+        console.error('Error processing order transaction - Manager info: [' + error.message + ']');
         throw error;
     }
 }
@@ -282,6 +330,11 @@ onAuthStateChanged(auth, async (user) => {
         const userCartRef = doc(db, 'carts', user.uid);
         const docSnap = await getDoc(userCartRef);
         userCart = docSnap.exists() ? docSnap.data().items : {};
+        
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        window.userPointsBalance = userSnap.exists() ? (userSnap.data().pointsBalance || 0) : 0;
+        
         renderCheckoutPage();
     } else {
         safeRedirect('/sign in beta.html');
