@@ -93,7 +93,10 @@ export function stopPullSound() {
         try {
             oscToStop.stop();
             oscToStop.disconnect();
-        } catch (e) {}
+        } catch (e) {
+            // Ignore errors if the oscillator is already stopped or disconnected
+            console.error("Manager info: Error stopping oscillator:", e);
+        }
     }, 100);
     
     pullOsc = null;
