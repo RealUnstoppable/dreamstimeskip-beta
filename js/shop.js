@@ -3,10 +3,9 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
-import { escapeHTML, getCachedUserProfile, fetchCollectionData } from './utils.js';
+import { escapeHTML, fetchCollectionData } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
-import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -120,12 +119,12 @@ async function updateProductRatingDisplay(productId, precalculatedRatingInfo = n
     }
 }
 
-async function loadProductStats() {
+export async function loadProductStats() {
     try {
         const stats = await fetchCollectionData(db, getDocs, collection, 'product_stats', true);
         stats.forEach(s => productStatsMap.set(s.id, s));
     } catch (error) {
-        console.error("Error loading product stats:", error);
+        console.error("Error loading product stats - Manager info:", error);
     } finally {
         renderProducts();
     }
@@ -747,8 +746,6 @@ async function handleReviewSubmit(e) {
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
-    }
-}
         submitReviewBtn.textContent = originalText;
     }
 }
