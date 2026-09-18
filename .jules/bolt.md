@@ -38,3 +38,7 @@
 ## 2026-09-15 - DocumentFragment DOM Batching with Global DOM Queries
 **Learning:** When batching DOM insertions using `DocumentFragment` to improve rendering performance, elements within the fragment are detached from the main DOM. Subsequent function calls that query the global `document` (e.g., `lucide.createIcons()` or functions firing global custom events relying on the elements' presence) will fail to find these new elements.
 **Action:** Always ensure that libraries or functions relying on global DOM queries are invoked only *after* the fully constructed `DocumentFragment` has been appended to the main document.
+
+## 2024-11-20 - Optimizing Continuous Data Streams
+**Learning:** Performing O(log N) binary searches on every `requestAnimationFrame` tick (such as syncing lyrics to a `timeupdate` event) is unnecessary and wasteful during normal, continuous playback.
+**Action:** Always track the active index and use an O(1) amortized linear scan (checking adjacent elements) for continuous progression. Reserve O(log N) binary searches strictly for random seeks or large state changes.

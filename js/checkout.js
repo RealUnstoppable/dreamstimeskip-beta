@@ -3,6 +3,7 @@ import { auth, db, safeRedirect } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
+import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML } from "./utils.js";
 
 let currentUser = null;
@@ -30,10 +31,7 @@ function renderCheckoutPage() {
     let appliedPromo = '';
 
     const renderSummary = () => {
-        const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
-            const product = productMap.get(productId);
-            return sum + (product.price * quantity);
-        }, 0);
+        const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
         
         const discountAmount = subtotal * discount;
         const discountedSubtotal = subtotal - discountAmount;
@@ -140,7 +138,9 @@ function renderCheckoutPage() {
         </div>
     `;
 
-    document.getElementById('apply-promo-btn').addEventListener('click', async () => {
+    document.getElementById('apply-promo-btn').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
         const code = document.getElementById('promo-code').value.trim().toUpperCase();
         const msgEl = document.getElementById('promo-message');
         if (!code) {
@@ -153,6 +153,10 @@ function renderCheckoutPage() {
         }
         msgEl.textContent = 'Applying...';
         msgEl.style.color = 'var(--text-secondary)';
+
+        btn.disabled = true;
+        btn.textContent = 'Applying...';
+
         try {
             const promoRef = doc(db, 'promo_codes', code);
             const promoSnap = await getDoc(promoRef);
@@ -181,6 +185,9 @@ function renderCheckoutPage() {
             appliedPromo = '';
             msgEl.textContent = 'Error applying promo code.';
             msgEl.style.color = 'var(--accent-red)';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
         updateSummaryUI();
     });

@@ -9,6 +9,7 @@ admin.initializeApp();
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_test_placeholder";
 
 async function authenticateRequest(req, res, adminInstance) {
   if (req.method !== "POST") {
