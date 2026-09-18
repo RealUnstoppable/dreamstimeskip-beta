@@ -36,7 +36,7 @@ export async function createTicket(userId, userEmail, subject, message) {
         });
         return { success: true, id: docRef.id };
     } catch (error) {
-        console.error('Error creating ticket - Manager info: [' + error.message + ']');
+        console.error('Error creating ticket: [' + error.message + ']');
         throw error;
     }
 }
@@ -61,7 +61,7 @@ export async function getUserTickets(userId) {
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching user tickets - Manager info: [' + error.message + ']');
+        console.error('Error fetching user tickets: [' + error.message + ']');
         throw error;
     }
 }
@@ -76,7 +76,7 @@ export async function getAllTickets() {
 
         return sortTicketsByDateDesc(tickets);
     } catch (error) {
-        console.error('Error fetching all tickets - Manager info: [' + error.message + ']');
+        console.error('Error fetching all tickets: [' + error.message + ']');
         throw error;
     }
 }
@@ -93,10 +93,9 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
     }
 
     try {
-        const authModule = await import('./auth.js');
-        const idToken = await authModule.auth.currentUser?.getIdToken();
-        if (!idToken) throw new Error("Not authenticated");
-
+        const user = auth.currentUser;
+        if (!user) throw new Error("Not authenticated");
+        const idToken = await user.getIdToken();
         const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
             method: 'POST',
             headers: {
@@ -109,18 +108,18 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
                 docId: ticketId,
                 data: {
                     adminReply,
-                    status
+                    status,
+                    updatedAt: 'SERVER_TIMESTAMP'
                 }
             })
         });
-
         if (!response.ok) {
-             throw new Error('Failed to update ticket via admin endpoint');
+            const text = await response.text();
+            throw new Error(text || "Admin action failed");
         }
-
         return { success: true };
     } catch (error) {
-        console.error('Error replying to ticket - Manager info: [' + error.message + ']');
+        console.error('Error replying to ticket: [' + error.message + ']');
         throw error;
     }
 }

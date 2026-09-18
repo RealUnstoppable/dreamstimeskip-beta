@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals';
 // Set up minimal DOM before requiring the script
 document.body.innerHTML = `
     <div id="view-home"></div>
@@ -34,7 +34,6 @@ document.body.innerHTML = `
     <div id="lyrics-container"></div>
 `;
 
-import { jest } from '@jest/globals';
 
 // Import the script as ES module
 await import('../js/harmonytunes.js');

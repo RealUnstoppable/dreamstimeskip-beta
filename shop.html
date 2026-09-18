@@ -25,6 +25,14 @@
             <p>High-quality gear for the dedicated fan. Log in to save your cart.</p>
         </section>
 
+
+    <!-- Product Search Section -->
+    <div class="search-container" style="max-width: 1200px; margin: 20px auto; padding: 0 20px;">
+        <input type="text" id="product-search" placeholder="Search products by name or description..."
+               style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--card-bg); color: var(--text-color);"
+               aria-label="Search products">
+    </div>
+
         <section id="product-grid" class="product-grid">
         </section>
     </main>
@@ -55,14 +63,14 @@
             <div id="review-submission-section" class="review-submission-section" style="display: none;">
                 <h3>Write a Review</h3>
                 <form id="review-form">
-                    <div class="star-rating-input" id="star-rating-input" role="radiogroup" aria-label="Rating">
+                    <div class="star-rating-input" id="star-rating-input" role="radiogroup" title="Rating" aria-label="Rating">
                         <span class="star-input" data-value="1" role="radio" aria-checked="false" tabindex="0">★</span>
                         <span class="star-input" data-value="2" role="radio" aria-checked="false" tabindex="0">★</span>
                         <span class="star-input" data-value="3" role="radio" aria-checked="false" tabindex="0">★</span>
                         <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
                         <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
                     </div>
-                    <textarea id="review-text" placeholder="Share your thoughts about this product..." required aria-label="Review text"></textarea>
+                    <textarea id="review-text" placeholder="Share your thoughts about this product..." required title="Review text" aria-label="Review text"></textarea>
                     <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
                     <div id="review-notification" class="notification"></div>
                 </form>

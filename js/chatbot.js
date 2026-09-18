@@ -52,7 +52,7 @@ try {
         history: [] // Start with empty history
     });
 } catch (error) {
-    console.error("Manager info: [AI Model Initialization Failed]", error);
+    console.error("AI Model Initialization Failed", error);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             removeElement(typingId);
             addMessage(responseText, 'siri');
         } catch (error) {
-            console.error("Chat Error:", error);
+            console.error("Chat Error - Manager info:", error);
             removeElement(typingId);
             addMessage(`I'm sorry, my neural link is experiencing interference: ${error.message || error}. Please try again later.`, 'siri');
         } finally {
@@ -296,6 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function escapeHTML(str) {
+        if (str == null) return "";
+        if (typeof str !== 'string') str = String(str);
         return str.replace(/[&<>'"]/g, 
             tag => ({
                 '&': '&amp;',
