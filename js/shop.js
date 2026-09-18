@@ -3,10 +3,9 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
-import { escapeHTML, getCachedUserProfile, fetchCollectionData } from './utils.js';
+import { escapeHTML, fetchCollectionData } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
-import { getCachedUserProfile } from './auth.js';
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -75,7 +74,7 @@ function renderProducts(searchQuery = '') {
                 <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
-                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" >
                 <div class="product-info">
                     <h3>${product.name}</h3>
 
@@ -84,13 +83,13 @@ function renderProducts(searchQuery = '') {
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
                         <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
                     </div>
-                    <div class="product-footer" style="align-items: center;">
+                    <div class="product-footer" >
                         <div>
-                            ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-secondary); margin-right: 8px; font-size: 0.9em;">$${product.originalPrice.toFixed(2)}</span>` : ''}
-                            <span class="product-price" style="${product.price === 0 ? 'color: var(--accent-green); font-weight: bold;' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
+                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>` : ''}
+                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="view-reviews-btn" style="background-color: #4b5563; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.2s;" data-id="${product.id}">Reviews</button>
+                        <div class="action-buttons-container">
+                            <button class="view-reviews-btn" data-id="${product.id}">Reviews</button>
                             <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                         </div>
                     </div>
@@ -146,7 +145,7 @@ function renderCart() {
                         <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
                         <div class="cart-item-info">
                             <h4>${product.name}</h4>
-                            <p>${product.price === 0 ? '<span style="color: var(--accent-green); font-weight: bold;">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
+                            <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
                             <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
@@ -603,7 +602,7 @@ async function openReviewsModal(productId) {
     const product = productMap.get(productId);
 
     document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
-    reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>';
+    reviewsListContainer.innerHTML = '<p class="review-message loading">Loading reviews...</p>';
 
     // Reset Form
     currentRating = 0;
@@ -639,7 +638,7 @@ async function loadReviews(productId) {
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
-            reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first!</p>';
+            reviewsListContainer.innerHTML = '<p class="review-message loading">No reviews yet. Be the first!</p>';
             return;
         }
 
@@ -662,7 +661,7 @@ async function loadReviews(productId) {
 
     } catch (error) {
         console.error("Error loading reviews:", error.message);
-        reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
+        reviewsListContainer.innerHTML = '<p class="review-message error">Error loading reviews.</p>';
     }
 }
 
@@ -671,7 +670,7 @@ async function handleReviewSubmit(e) {
     if (!currentUser || !currentReviewProductId) return;
 
     if (currentRating === 0) {
-        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Please select a star rating.</span>';
+        reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
         return;
     }
 
@@ -712,7 +711,7 @@ async function handleReviewSubmit(e) {
             s.setAttribute('aria-checked', 'false');
         });
 
-        reviewNotification.innerHTML = '<span style="color: var(--accent-green);">Review submitted successfully!</span>';
+        reviewNotification.innerHTML = '<span class="review-message success">Review submitted successfully!</span>';
         setTimeout(() => reviewNotification.innerHTML = '', 3000);
 
         renderProducts(); // Update stars on grid
@@ -720,7 +719,7 @@ async function handleReviewSubmit(e) {
 
     } catch (error) {
         console.error("Error submitting review:", error.message);
-        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
+        reviewNotification.innerHTML = '<span class="review-message error">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
     }
