@@ -8,8 +8,11 @@ admin.initializeApp();
 
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
-const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_test_placeholder";
+const stripeKey = process.env.STRIPE_SECRET;
+if (!stripeKey) {
+  console.warn("STRIPE_SECRET environment variable is missing.");
+}
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 async function authenticateRequest(req, res, adminInstance = admin) {
   if (req.method !== "POST") {
@@ -32,7 +35,7 @@ async function authenticateRequest(req, res, adminInstance = admin) {
     return null;
   }
 }
-const stripe = require("stripe")(stripeKey);
+const stripe = stripeKey ? require("stripe")(stripeKey) : null;
 
 // 🛡️ Shared Utils
 function getUserDocRef(uid) {
@@ -113,6 +116,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
 
     try {
+      if (!stripe) throw new Error("Stripe is not configured.");
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
@@ -204,6 +208,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event;
 
   try {
+    if (!stripe) throw new Error("Stripe is not configured.");
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
     console.error("Manager info: Webhook Error: [" + err.message + "]");
@@ -281,6 +286,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
         return res.status(400).send("No active subscription found");
       }
 
+      if (!stripe) throw new Error("Stripe is not configured.");
       const subs = await stripe.subscriptions.list({customer: customerId});
       const cancelPromises = subs.data.map((sub) =>
         stripe.subscriptions.cancel(sub.id),
