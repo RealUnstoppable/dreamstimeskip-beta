@@ -440,3 +440,82 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
     return null;
   }
 });
+
+exports.processOrderTransaction = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    try {
+      const decodedToken = await authenticateRequest(req, res, admin);
+      if (!decodedToken) return;
+
+      const uid = decodedToken.uid;
+      const { cart, orderDetails, pointsToRedeem = 0 } = req.body;
+
+      if (!cart || !orderDetails) {
+        return res.status(400).send("Missing cart or orderDetails");
+      }
+
+      const db = admin.firestore();
+
+      await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await transaction.get(userRef);
+
+        let currentPoints = 0;
+        if (userDoc.exists) {
+          currentPoints = userDoc.data().pointsBalance || 0;
+        }
+
+        if (pointsToRedeem > currentPoints) {
+          throw new Error(`Not enough points. You have ${currentPoints} but tried to redeem ${pointsToRedeem}`);
+        }
+
+        const productIds = Object.keys(cart);
+        const statRefs = productIds.map(id => db.collection('product_stats').doc(id));
+        const statDocs = await Promise.all(statRefs.map(ref => transaction.get(ref)));
+
+        const currentStats = {};
+        statDocs.forEach((statDoc, index) => {
+          const productId = productIds[index];
+          currentStats[productId] = statDoc;
+        });
+
+        const newOrderRef = db.collection('orders').doc(`${uid}_${Date.now()}`);
+        transaction.set(newOrderRef, orderDetails);
+
+        for (const [productId, quantity] of Object.entries(cart)) {
+          const productStatRef = db.collection('product_stats').doc(productId);
+          const statDoc = currentStats[productId];
+
+          if (!statDoc.exists) {
+            transaction.set(productStatRef, { orderedCount: quantity });
+          } else {
+            const newCount = (statDoc.data().orderedCount || 0) + quantity;
+            transaction.update(productStatRef, { orderedCount: newCount });
+          }
+        }
+
+        const userCartRef = db.collection('carts').doc(uid);
+        transaction.update(userCartRef, { items: {} });
+
+        // Deduct points
+        if (pointsToRedeem > 0) {
+          transaction.update(userRef, { pointsBalance: currentPoints - pointsToRedeem });
+          
+          const rewardTxRef = db.collection('reward_transactions').doc();
+          transaction.set(rewardTxRef, {
+            userId: uid,
+            points: -pointsToRedeem,
+            reason: 'Redeemed points at checkout',
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            orderId: newOrderRef.id
+          });
+        }
+      });
+
+      res.status(200).send({ success: true });
+    } catch (error) {
+      console.error("Error processing order transaction - Manager info: [" + error.message + "]");
+      res.status(500).send("Internal Server Error");
+    }
+  });
+});
