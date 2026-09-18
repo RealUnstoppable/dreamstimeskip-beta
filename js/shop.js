@@ -14,6 +14,7 @@ export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
 let currentReviewProductId = null;
 let productStatsMap = new Map();
+const reviewsCache = new Map();
 
 // --- DOM ELEMENTS ---
 const productGrid = document.getElementById('product-grid');
@@ -343,16 +344,24 @@ function updateUserNav(user) {
 async function fetchProductReviews(productId) {
     if (!reviewsListContainer) return;
     try {
-        const reviewsRef = collection(db, 'product_reviews');
-        const q = query(reviewsRef, where('productId', '==', productId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
+        let reviews = [];
+        if (reviewsCache.has(productId + '_product_reviews')) {
+            reviews = reviewsCache.get(productId + '_product_reviews');
+        } else {
+            const reviewsRef = collection(db, 'product_reviews');
+            const q = query(reviewsRef, where('productId', '==', productId), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(docSnap => {
+                reviews.push(docSnap.data());
+            });
+            reviewsCache.set(productId + '_product_reviews', reviews);
+        }
 
         let sum = 0;
         let count = 0;
         let html = '';
 
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
+        reviews.forEach((data) => {
             sum += data.rating;
             count++;
 
@@ -581,6 +590,9 @@ function setupEventListeners() {
                 messageEl.textContent = 'Review submitted successfully!';
                 messageEl.style.color = 'var(--accent-green)';
 
+                // ⚡ Bolt: Invalidate cache for this product
+                reviewsCache.delete(currentReviewProductId + '_product_reviews');
+
                 // Refresh reviews
                 await fetchProductReviews(currentReviewProductId);
 
@@ -635,17 +647,26 @@ async function openReviewsModal(productId) {
 
 async function loadReviews(productId) {
     try {
-        const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+        let reviews = [];
+        if (reviewsCache.has(productId)) {
+            reviews = reviewsCache.get(productId);
+        } else {
+            const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
 
-        if (snapshot.empty) {
+            snapshot.forEach(doc => {
+                reviews.push(doc.data());
+            });
+            reviewsCache.set(productId, reviews);
+        }
+
+        if (reviews.length === 0) {
             reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first!</p>';
             return;
         }
 
         let html = '';
-        snapshot.forEach(doc => {
-            const review = doc.data();
+        reviews.forEach(review => {
             const date = review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now';
             html += `
                 <div class="review-item">
@@ -714,6 +735,9 @@ async function handleReviewSubmit(e) {
 
         reviewNotification.innerHTML = '<span style="color: var(--accent-green);">Review submitted successfully!</span>';
         setTimeout(() => reviewNotification.innerHTML = '', 3000);
+
+        // ⚡ Bolt: Invalidate cache for this product so the new review is fetched
+        reviewsCache.delete(currentReviewProductId);
 
         renderProducts(); // Update stars on grid
         await openReviewsModal(currentReviewProductId); // Refresh modal
