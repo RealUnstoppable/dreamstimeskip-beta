@@ -124,7 +124,7 @@ let pointsToRedeem = 0;
                         <input type="text" id="promo-code" placeholder="e.g. DTS10" style="flex: 1; padding: 8px;">
                         <button type="button" id="apply-promo-btn" style="padding: 8px 15px; background: var(--text-secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Apply</button>
                     </div>
-                    <small id="promo-message" style="display: block; margin-top: 5px;"></small>
+                    <small id="promo-message" class="promo-message-text"></small>
                 </div>
 
                 <div class="form-group" style="margin-top: 20px;">
@@ -142,7 +142,7 @@ let pointsToRedeem = 0;
 
                 <div class="summary-calculation">
                     <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
-                    <div class="summary-item" id="summary-discount-row" style="display: none; color: var(--accent-green);"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
+                    <div class="summary-item discount-row" id="summary-discount-row"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
                     <div class="summary-item"><span>Tax</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
 
                     <div class="summary-total"><span>Total</span> <span id="summary-total">${total.toFixed(2)}</span></div>
