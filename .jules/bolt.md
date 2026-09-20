@@ -1,4 +1,3 @@
-
 ## 2024-05-01 - Concurrent API Calls
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
 **Action:** Always prefer batching or Promise.all() for iterative async operations to minimize function execution time and avoid premature termination.
