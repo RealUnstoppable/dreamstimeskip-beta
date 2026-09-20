@@ -41,7 +41,9 @@
 ## 2024-11-20 - Optimizing Continuous Data Streams
 **Learning:** Performing O(log N) binary searches on every `requestAnimationFrame` tick (such as syncing lyrics to a `timeupdate` event) is unnecessary and wasteful during normal, continuous playback.
 **Action:** Always track the active index and use an O(1) amortized linear scan (checking adjacent elements) for continuous progression. Reserve O(log N) binary searches strictly for random seeks or large state changes.
-
-## 2024-11-20 - Preloading Hero Images for LCP
-**Learning:** The Largest Contentful Paint (LCP) is delayed when the browser discovers large above-the-fold images late in the critical rendering path (e.g. when nested deep in DOM).
-**Action:** Always add `<link rel="preload" as="image" href="...">` in the `<head>` for hero images to accelerate their fetch and improve Core Web Vitals.
+## 2026-09-17 - Unnecessary user read on checkout
+**Learning:** Replaced individual  calls for fetching user balance in `checkout.js` with centralized `getCachedUserProfile`. It saves unnecessary DB reads and improves performance by utilizing sessionStorage cache.
+**Action:** Always use `getCachedUserProfile` to access user data like points balance instead of raw Firestore calls.
+## 2026-09-17 - Unnecessary user read on checkout
+**Learning:** Replaced individual getDoc calls for fetching user balance in checkout.js with centralized getCachedUserProfile. It saves unnecessary DB reads and improves performance by utilizing sessionStorage cache.
+**Action:** Always use getCachedUserProfile to access user data like points balance instead of raw Firestore calls.

@@ -333,7 +333,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
 
   // Validate rating
   if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    console.error("Invalid rating:", rating);
+    console.error("Manager info: Invalid rating:", rating);
     return null;
   }
 
@@ -379,7 +379,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       }
     });
   } catch (error) {
-    console.error("Error updating product stats or awarding points - Manager info: [" + error.message + "]");
+    console.error("Manager info: Error updating product stats or awarding points [" + error.message + "]");
     return null;
   }
 });
@@ -462,6 +462,11 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
         return res.status(400).send("Missing cart or orderDetails");
       }
 
+      if (orderDetails.userId !== uid) {
+        orderDetails.userId = uid;
+      }
+      orderDetails.orderDate = admin.firestore.FieldValue.serverTimestamp();
+
       const db = admin.firestore();
 
       await db.runTransaction(async (transaction) => {
@@ -522,8 +527,60 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 
       res.status(200).send({ success: true });
     } catch (error) {
-      console.error("Error processing order transaction - Manager info: [" + error.message + "]");
+      console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
+    }
+  });
+});
+
+
+// 👍 Toggle Feature Upvote
+exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+    const uid = decodedToken.uid;
+    const { requestId } = req.body;
+
+    if (!requestId) {
+      return res.status(400).send("Missing requestId");
+    }
+
+    const db = admin.firestore();
+    const requestRef = db.collection("feature_requests").doc(requestId);
+    const upvoteRef = requestRef.collection("upvotes").doc(uid);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const upvoteDoc = await transaction.get(upvoteRef);
+        const requestDoc = await transaction.get(requestRef);
+
+        if (!requestDoc.exists) {
+          throw new Error("Feature request not found");
+        }
+
+        const currentUpvotes = requestDoc.data().upvotes || 0;
+
+        if (upvoteDoc.exists) {
+          // User already upvoted, remove it
+          transaction.delete(upvoteRef);
+          transaction.update(requestRef, { upvotes: currentUpvotes - 1 });
+        } else {
+          // Add upvote
+          transaction.set(upvoteRef, { createdAt: admin.firestore.FieldValue.serverTimestamp() });
+          transaction.update(requestRef, { upvotes: currentUpvotes + 1 });
+        }
+      });
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Manager info: Toggle Upvote Error: [" + error.message + "]");
+      res.status(500).json({ error: error.message });
     }
   });
 });

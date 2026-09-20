@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
-import { escapeHTML } from "./utils.js";
+import { escapeHTML, getCachedUserProfile } from "./utils.js";
 
 let currentUser = null;
 let userCart = {};
@@ -171,6 +171,7 @@ let pointsToRedeem = 0;
 
         btn.disabled = true;
         btn.textContent = 'Applying...';
+        btn.title = 'Processing your request...';
 
         try {
             const promoRef = doc(db, 'promo_codes', code);
@@ -203,6 +204,7 @@ let pointsToRedeem = 0;
         } finally {
             btn.disabled = false;
             btn.textContent = originalText;
+            btn.removeAttribute('title');
         }
         updateSummaryUI();
     });
@@ -275,7 +277,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
             throw new Error(errorText || 'Server Error');
         }
     } catch (error) {
-        console.error('Error processing order transaction - Manager info: [' + error.message + ']');
+        console.error('Manager info: Error processing order transaction [' + error.message + ']');
         throw error;
     }
 }
@@ -331,9 +333,8 @@ onAuthStateChanged(auth, async (user) => {
         const docSnap = await getDoc(userCartRef);
         userCart = docSnap.exists() ? docSnap.data().items : {};
         
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        window.userPointsBalance = userSnap.exists() ? (userSnap.data().pointsBalance || 0) : 0;
+        const userData = await getCachedUserProfile(user);
+        window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
         
         renderCheckoutPage();
     } else {

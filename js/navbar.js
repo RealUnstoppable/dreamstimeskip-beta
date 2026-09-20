@@ -113,7 +113,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                let userData = await getCachedUserProfile(user.uid);
+                let userData = await getCachedUserProfile({uid: user.uid});
 
 
                 // Fetch notifications
@@ -152,7 +152,7 @@ function updateAuthLink() {
                                             try {
                                                 await markAsRead(id);
                                             } catch (err) {
-                                                console.error('Failed to mark as read - Manager info:', err);
+                                                console.error('Manager info: Failed to mark as read ', err);
                                             }
                                         }
                                         if (link && link !== 'undefined' && link !== 'null') window.location.href = link;
@@ -161,13 +161,13 @@ function updateAuthLink() {
                             }
                         }
                     });
-                } catch(err) { console.error('Notification error - Manager info:', err); }
+                } catch(err) { console.error('Manager info: Notification error ', err); }
 
                 const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {
-                console.error("Nav Error: [" + e.message + "]", e);
+                console.error("Manager info: Nav Error: [" + e.message + "]", e);
             }
         } else {
             authLink.href = 'sign in beta.html';

@@ -19,7 +19,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = await getCachedUserProfile({uid: user.uid});
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
@@ -93,6 +93,7 @@ if (document.getElementById('auth-form')) {
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
+        submitBtn.title = 'Processing your request...';
 
         try {
             if (isSignUp) {
@@ -129,6 +130,7 @@ if (document.getElementById('auth-form')) {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
+            submitBtn.removeAttribute('title');
         }
     });
 

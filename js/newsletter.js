@@ -38,7 +38,7 @@ document.addEventListener('submit', async (e) => {
             alert("You've successfully subscribed to the newsletter!");
             emailInput.value = ''; // Clear the input
         } catch (error) {
-            console.error("Error submitting email: [" + error.message + "]", error);
+            console.error("Manager info: Error submitting email: [" + error.message + "]", error);
             alert("There was an error subscribing. Please try again later.");
         } finally {
             if (submitBtn) {
