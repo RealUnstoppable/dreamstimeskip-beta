@@ -303,6 +303,26 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
 
+
+
+// 🏆 Shared Utility: Get Points Update Data
+function getPointsUpdateData(userDoc, rewardPoints, loyaltyPoints) {
+  let currentRewardPoints = 0;
+  let currentLoyaltyPoints = 0;
+
+  if (userDoc.exists) {
+    const data = userDoc.data();
+    if (typeof data.pointsBalance === 'number') currentRewardPoints = data.pointsBalance;
+    if (typeof data.loyaltyPoints === 'number') currentLoyaltyPoints = data.loyaltyPoints;
+  }
+
+  const updateData = {};
+  if (rewardPoints > 0) updateData.pointsBalance = currentRewardPoints + rewardPoints;
+  if (loyaltyPoints > 0) updateData.loyaltyPoints = currentLoyaltyPoints + loyaltyPoints;
+
+  return updateData;
+}
+
 // ⭐️ Update Points on New Review
 exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
   const snap = event.data;
@@ -347,14 +367,8 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       if (userId) {
         const pointsToAward = 50;
         const userDoc = await transaction.get(userRef);
-        let currentPoints = 0;
-        if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
-          currentPoints = userDoc.data().pointsBalance;
-        }
-
-        transaction.set(userRef, {
-          pointsBalance: currentPoints + pointsToAward
-        }, { merge: true });
+        const updateData = getPointsUpdateData(userDoc, pointsToAward, 0);
+        transaction.set(userRef, updateData, { merge: true });
 
         transaction.set(transactionRef, {
           userId: userId,
@@ -402,20 +416,9 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
   try {
     return await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
-
-      let currentRewardPoints = 0;
-      let currentLoyaltyPoints = 0;
-
-      if (userDoc.exists) {
-        const data = userDoc.data();
-        if (typeof data.pointsBalance === 'number') currentRewardPoints = data.pointsBalance;
-        if (typeof data.loyaltyPoints === 'number') currentLoyaltyPoints = data.loyaltyPoints;
-      }
-
-      const updateData = {};
+      const updateData = getPointsUpdateData(userDoc, rewardPointsToAward, loyaltyPointsEarned);
 
       if (rewardPointsToAward > 0) {
-        updateData.pointsBalance = currentRewardPoints + rewardPointsToAward;
         const rewardTxRef = db.collection("reward_transactions").doc();
         transaction.set(rewardTxRef, {
           userId: userId,
@@ -426,7 +429,6 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
       }
 
       if (loyaltyPointsEarned > 0) {
-        updateData.loyaltyPoints = currentLoyaltyPoints + loyaltyPointsEarned;
         const loyaltyTxRef = db.collection("loyalty_transactions").doc();
         transaction.set(loyaltyTxRef, {
           userId: userId,
@@ -459,6 +461,11 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
       if (!cart || !orderDetails) {
         return res.status(400).send("Missing cart or orderDetails");
       }
+
+      if (orderDetails.userId !== uid) {
+        orderDetails.userId = uid;
+      }
+      orderDetails.orderDate = admin.firestore.FieldValue.serverTimestamp();
 
       const db = admin.firestore();
 
@@ -522,6 +529,58 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
     } catch (error) {
       console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
+    }
+  });
+});
+
+
+// 👍 Toggle Feature Upvote
+exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+    const uid = decodedToken.uid;
+    const { requestId } = req.body;
+
+    if (!requestId) {
+      return res.status(400).send("Missing requestId");
+    }
+
+    const db = admin.firestore();
+    const requestRef = db.collection("feature_requests").doc(requestId);
+    const upvoteRef = requestRef.collection("upvotes").doc(uid);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const upvoteDoc = await transaction.get(upvoteRef);
+        const requestDoc = await transaction.get(requestRef);
+
+        if (!requestDoc.exists) {
+          throw new Error("Feature request not found");
+        }
+
+        const currentUpvotes = requestDoc.data().upvotes || 0;
+
+        if (upvoteDoc.exists) {
+          // User already upvoted, remove it
+          transaction.delete(upvoteRef);
+          transaction.update(requestRef, { upvotes: currentUpvotes - 1 });
+        } else {
+          // Add upvote
+          transaction.set(upvoteRef, { createdAt: admin.firestore.FieldValue.serverTimestamp() });
+          transaction.update(requestRef, { upvotes: currentUpvotes + 1 });
+        }
+      });
+
+      res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Manager info: Toggle Upvote Error: [" + error.message + "]");
+      res.status(500).json({ error: error.message });
     }
   });
 });

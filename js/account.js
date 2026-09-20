@@ -18,9 +18,9 @@ let currentProfileCache = null;
 let currentOrdersCache = null;
 
 // Render Profile
-async function renderProfile(user) {
+async function renderProfile(user, userDataParam = null) {
     try {
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = userDataParam || await getCachedUserProfile(user.uid);
         if (!userData) {
             // Graceful instantiation if user doc is missing
             userData = {
@@ -152,12 +152,12 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         let userData = null;
         try {
-            userData = await getCachedUserProfile(user.uid);
+            userData = await getCachedUserProfile(user);
         } catch (e) {
             console.error("Manager info: Error fetching user profile:", e);
         }
 
-        renderProfile(user);
+        renderProfile(user, userData);
         renderOrders(user);
         if (userData) {
             renderRewards(user, userData);

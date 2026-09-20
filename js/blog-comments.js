@@ -80,7 +80,7 @@ async function addComment(postId, content) {
     submitBtn.textContent = 'Posting...';
 
     try {
-        const userData = await getCachedUserProfile(currentUser.uid);
+        const userData = await getCachedUserProfile({uid: currentUser.uid});
         const username = userData ? userData.username : "User";
 
         await addDoc(collection(db, COMMENTS_COLLECTION), {

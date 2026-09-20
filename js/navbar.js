@@ -113,7 +113,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                let userData = await getCachedUserProfile(user.uid);
+                let userData = await getCachedUserProfile({uid: user.uid});
 
 
                 // Fetch notifications
