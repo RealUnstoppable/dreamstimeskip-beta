@@ -115,10 +115,7 @@
         <button id="close-lyrics-btn" class="close-lyrics-btn" aria-label="Close Lyrics">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
-        <div class="lyrics-header">
-            <h2 id="lyrics-title">...</h2>
-            <p id="lyrics-artist">...</p>
-        </div>
+        
         <div class="lyrics-container" id="lyrics-container">
             <div id="lyrics-content">
                 <!-- Lyrics injected via JS -->
@@ -139,6 +136,7 @@
             <h2 id="fullscreen-artist">Artist</h2>
             <div class="fullscreen-player-ui">
                 <!-- Top Row: Player Options -->
+                
                 <div class="fs-player-options">
                     <button class="control-button" id="fs-lyrics-btn" title="Lyrics" aria-label="Toggle Lyrics">
                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -147,20 +145,17 @@
                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     </button>
                     <button class="like-btn-player fs-heart" id="fs-like-btn" aria-label="Like song">♡</button>
-                                        <button class="control-button" id="fs-mixer-btn" title="Mixxer" aria-label="Toggle Mixer">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"></circle><path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path><rect x="3" y="12" width="2" height="6" rx="1"></rect><rect x="19" y="12" width="2" height="6" rx="1"></rect></svg>
-                    </button>
-                    <button class="control-button" id="fs-shuffle-btn" title="Shuffle" aria-label="Toggle Shuffle">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-                    </button>
-                    <button class="control-button" id="fs-repeat-btn" title="Repeat" aria-label="Toggle Repeat">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
-                         <span class="repeat-indicator" id="fs-repeat-indicator"></span>
-                    </button>
                 </div>
 
                 <!-- Middle Row: Controls -->
-                <div class="fullscreen-controls">
+
+                <div class="fullscreen-controls" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+                    <button class="control-button" id="fs-shuffle-btn" title="Shuffle" aria-label="Toggle Shuffle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                    </button>
+                    <button class="control-button" id="fs-mixer-btn" title="Mixxer" aria-label="Toggle Mixer">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="5"></circle><path d="M5 14 C 5 5, 11 3, 12 8 C 13 3, 19 5, 19 14"></path><rect x="3" y="12" width="2" height="6" rx="1"></rect><rect x="19" y="12" width="2" height="6" rx="1"></rect></svg>
+                    </button>
                     <button class="control-button" id="fs-prev-btn" aria-label="Previous">
                         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5" stroke-width="2" stroke="currentColor"></line></svg>
                     </button>
@@ -170,6 +165,10 @@
                     </button>
                     <button class="control-button" id="fs-next-btn" aria-label="Next">
                         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19" stroke-width="2" stroke="currentColor"></line></svg>
+                    </button>
+                    <button class="control-button" id="fs-repeat-btn" title="Repeat" aria-label="Toggle Repeat">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                         <span class="repeat-indicator" id="fs-repeat-indicator"></span>
                     </button>
                 </div>
 
@@ -387,7 +386,7 @@
         loadFooter();
     </script>
     
-    <script type="module" src="/js/harmonytunes.js?v=1789908018977"></script>
+    <script type="module" src="/js/harmonytunes.js?v=1789908621920"></script>
     
 </body>
 </html>

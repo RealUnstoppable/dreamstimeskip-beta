@@ -1076,6 +1076,12 @@ function initHarmonyTunes() {
             fsArt.src = song.art;
             fsBg.style.backgroundImage = `url(${song.art})`;
             fsTitle.textContent = song.title;
+            const viewLyrics = document.getElementById('view-lyrics');
+            if (viewLyrics) {
+                viewLyrics.style.backgroundImage = `linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 70%, transparent) 0%, color-mix(in srgb, var(--theme-color) 90%, transparent) 100%), url(${song.art})`;
+                viewLyrics.style.backgroundSize = 'cover';
+                viewLyrics.style.backgroundPosition = 'center';
+            }
             fsArtist.textContent = song.artist;
             // Sync state into fullscreen buttons
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
@@ -1556,6 +1562,10 @@ function initHarmonyTunes() {
                         window._lastPaintBeat = currentBeat;
                         const effects = document.querySelectorAll('.paint-spill-effect');
                         effects.forEach(effect => {
+                            const rx = Math.floor(Math.random() * 80) + 10;
+                            const ry = Math.floor(Math.random() * 80) + 10;
+                            effect.style.background = `radial-gradient(circle at ${rx}% ${ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%), radial-gradient(circle at ${100-rx}% ${100-ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%)`;
+                            
                             effect.classList.remove('beat');
                             void effect.offsetWidth; // trigger reflow
                             effect.classList.add('beat');
