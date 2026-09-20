@@ -1,5 +1,3 @@
-import json
-
 lyrics = """See u so excited 
 U got him locked down 
 Ur moving like I did 
@@ -68,51 +66,9 @@ Anyway
 You can have him anyway 
 Anyway"""
 
+lines = lyrics.strip().split('\n')
 blocks = lyrics.strip().split('\n\n')
-all_lines = []
-for i, block in enumerate(blocks):
-    for line in block.split('\n'):
-        if line.strip():
-            # mark whether this line is the start of the second half (Block 3)
-            # which is right after the first Chorus.
-            is_start_of_second_half = False
-            if i == 3 and line == block.split('\n')[0]:
-                is_start_of_second_half = True
-            all_lines.append((line.strip(), is_start_of_second_half))
 
-start_time = 13.0
-end_time = 158.0
-gap_duration = 1.0
-
-# Total duration for lyrics text
-text_duration = (end_time - start_time) - gap_duration
-time_per_line = text_duration / len(all_lines)
-
-result = []
-current_time = start_time
-
-for line_text, is_gap_start in all_lines:
-    if is_gap_start:
-        current_time += gap_duration
-        
-    words = line_text.split()
-    word_duration = time_per_line / len(words)
-    word_objs = []
-    
-    word_time = current_time
-    for word in words:
-        word_objs.append({
-            "text": word,
-            "start": round(word_time, 2),
-            "duration": round(word_duration, 2)
-        })
-        word_time += word_duration
-        
-    result.append({
-        "start": round(current_time, 2),
-        "end": round(current_time + time_per_line, 2),
-        "words": word_objs
-    })
-    current_time += time_per_line
-
-print(json.dumps(result, indent=4))
+print(f"Total blocks: {len(blocks)}")
+for i, b in enumerate(blocks):
+    print(f"Block {i} lines: {len(b.split(chr(10)))}")
