@@ -169,7 +169,7 @@ async function fetchAndRenderRequests() {
         });
 
     } catch (error) {
-        if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Error fetching feature requests:", error); }
+        if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Manager info: Error fetching feature requests:", error); }
         requestsList.innerHTML = '<p style="text-align: center; color: var(--accent-red);">Failed to load feature requests. Please try again later.</p>';
     }
 }
@@ -237,7 +237,7 @@ if (requestForm) {
             }, 3000);
 
         } catch (error) {
-            console.error("Error submitting feature request:", error);
+            console.error("Manager info: Error submitting feature request:", error);
             formMessage.textContent = 'Failed to submit request. Please try again.';
             formMessage.style.color = 'var(--accent-red)';
         } finally {

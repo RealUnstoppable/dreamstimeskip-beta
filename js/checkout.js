@@ -275,7 +275,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
             throw new Error(errorText || 'Server Error');
         }
     } catch (error) {
-        console.error('Error processing order transaction - Manager info: [' + error.message + ']');
+        console.error('Manager info: Error processing order transaction [' + error.message + ']');
         throw error;
     }
 }

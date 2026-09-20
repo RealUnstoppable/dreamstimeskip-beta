@@ -333,7 +333,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
 
   // Validate rating
   if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    console.error("Invalid rating:", rating);
+    console.error("Manager info: Invalid rating:", rating);
     return null;
   }
 
@@ -379,7 +379,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       }
     });
   } catch (error) {
-    console.error("Error updating product stats or awarding points - Manager info: [" + error.message + "]");
+    console.error("Manager info: Error updating product stats or awarding points [" + error.message + "]");
     return null;
   }
 });
@@ -527,7 +527,7 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 
       res.status(200).send({ success: true });
     } catch (error) {
-      console.error("Error processing order transaction - Manager info: [" + error.message + "]");
+      console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
     }
   });

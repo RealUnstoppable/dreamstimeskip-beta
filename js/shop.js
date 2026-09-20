@@ -124,7 +124,7 @@ export async function loadProductStats() {
         const stats = await fetchCollectionData(db, getDocs, collection, 'product_stats', true);
         stats.forEach(s => productStatsMap.set(s.id, s));
     } catch (error) {
-        console.error("Error loading product stats - Manager info:", error);
+        console.error("Manager info: Error loading product stats ", error);
     } finally {
         renderProducts();
     }
@@ -229,7 +229,7 @@ export async function handleAddToCart(productId, event) {
 
 export async function handleUpdateQuantity(productId, quantity) {
     if (!productMap.has(productId)) {
-        console.error(`Product not found: ${productId}`);
+        console.error(`Manager info: Product not found: ${productId}`);
         return;
     }
 
@@ -242,7 +242,7 @@ export async function handleUpdateQuantity(productId, quantity) {
             renderCart();
         }
     } catch (error) {
-        console.error('Failed to update quantity - Manager info:', error);
+        console.error('Manager info: Failed to update quantity ', error);
     }
 }
 
