@@ -19,7 +19,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = await getCachedUserProfile({uid: user.uid});
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';

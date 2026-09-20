@@ -27,6 +27,16 @@ export async function load(url, context, defaultLoad) {
         export const updateDoc = () => {};
         export const arrayUnion = () => {};
         export const arrayRemove = () => {};
+        export const getVertexAI = () => {};
+        export const getGenerativeModel = () => {};
+        export const initializeAppCheck = () => {};
+        export const ReCaptchaV3Provider = () => {};
+        export const collection = () => {};
+        export const getDocs = () => {};
+        export const setPersistence = () => Promise.resolve();
+        export const browserLocalPersistence = {};
+        export const getApps = () => [];
+        export const getApp = () => {};
       `
     };
   }

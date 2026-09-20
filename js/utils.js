@@ -5,7 +5,7 @@ export async function fetchCollectionData(db, getDocs, collection, collectionNam
         const snapshot = await getDocs(collection(db, collectionName));
         return snapshot.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
     } catch (error) {
-        console.error(`Error fetching ${collectionName}:`, error.message);
+        console.error(`Manager info: Error fetching ${collectionName}:`, error.message);
         return [];
     }
 }
@@ -36,7 +36,8 @@ export function formatDate(timestamp) {
 
 export async function getCachedUserProfile(user) {
     if (!user) return null;
-    const cacheKey = `profile_${user.uid}`;
+    const uid = typeof user === 'string' ? user : user.uid;
+    const cacheKey = `profile_${uid}`;
     const cachedProfile = sessionStorage.getItem(cacheKey);
 
     if (cachedProfile) {
@@ -44,7 +45,7 @@ export async function getCachedUserProfile(user) {
     }
 
     try {
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "users", uid);
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
             const userData = userDoc.data();
