@@ -124,6 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let expandedAt = 0;
     let inactivityTimeout;
 
+    siriOrb.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            siriOrb.click();
+        }
+    });
+
     siriOrb.addEventListener('click', (e) => {
         const isCartClick = e.target.closest('#lexi-view-cart');
         const isAskClick = e.target.closest('#lexi-ask');
@@ -136,8 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Render the options
             siriOrb.innerHTML = `
                 <div class="lexi-pill-options">
-                    <button id="lexi-view-cart" class="lexi-pill-btn"><span class="material-icons">shopping_cart</span> View Cart</button>
-                    <button id="lexi-ask" class="lexi-pill-btn"><span class="material-icons">chat</span> Ask Lexi</button>
+                    <button id="lexi-view-cart" class="lexi-pill-btn" aria-label="View Cart"><span class="material-icons">shopping_cart</span> View Cart</button>
+                    <button id="lexi-ask" class="lexi-pill-btn" aria-label="Ask Lexi"><span class="material-icons">chat</span> Ask Lexi</button>
                 </div>
             `;
             

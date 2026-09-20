@@ -93,6 +93,7 @@ if (document.getElementById('auth-form')) {
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
+        submitBtn.title = 'Processing your request...';
 
         try {
             if (isSignUp) {
@@ -129,6 +130,7 @@ if (document.getElementById('auth-form')) {
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
+            submitBtn.removeAttribute('title');
         }
     });
 
