@@ -87,8 +87,8 @@ function initHarmonyTunes() {
         'pixy-legacy': '#5c4a3d',      // Warm Brown
         'deorc-decuple': '#1d3036',    // Dark Teal Grey
         'no-pole-remix': '#a11f8b',    // Neon Magenta
-        'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
-        'astrophage': '#2a0c3b' // Synthwave Dark Purple
+        'tate-mcrae-its-okay-im-okay': '#1a2b4c', // Deep Pink
+        'astrophage': '#2a0c3b', // Synthwave Dark Purple
         'kesha-blow': '#e63995' // Neon Pink
     };
 
