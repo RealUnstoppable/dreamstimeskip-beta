@@ -1,13 +1,33 @@
-import { escapeHTML } from "./utils.js";
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
+// Utility to prevent DOM-based and Stored XSS
+function escapeHTML(str) {
+    if (str == null) return "";
+    if (typeof str !== 'string') str = String(str);
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 function initHarmonyTunes() {
     // --- STATE ---
     const librarySongs = [
+        {
+            id: 'tate-mcrae-its-okay-im-okay',
+            title: "It's ok I'm ok",
+            artist: "Tate McRae",
+            duration: "3:02",
+            src: "/music/tate_mcrae_its_okay_im_okay.mp3",
+            art: "/images/harmony-tunes-card.jpg",
+            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            tags: ['pop', 'upbeat']
+        },
         {
             id: 'astrophage',
             title: "Astrophage",
@@ -66,7 +86,8 @@ function initHarmonyTunes() {
     const songColors = {
         'pixy-legacy': '#19548a',      // Dim Blue
         'deorc-decuple': '#8a196e',    // Dim Pink
-        'no-pole-remix': '#2e8a19'     // Dim Green
+        'no-pole-remix': '#2e8a19',    // Dim Green
+        'tate-mcrae-its-okay-im-okay': '#ff1493' // Deep Pink
     };
 
     const tiktokEmbeds = [
@@ -316,8 +337,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
                         // Avoid unnecessary textContent assignments which trigger style recalculations
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
@@ -341,8 +362,8 @@ function initHarmonyTunes() {
                     }
 
                     if(query && isMatch) {
-                        titleEl.innerHTML = escapeHTML(titleText).replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = escapeHTML(artistText).replace(queryRegex, replaceFn);
+                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
+                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
                     } else {
                         if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
                         if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
@@ -425,11 +446,11 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Manager info: Error loading playlist:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) { console.error("Manager info: Unhandled error in async operation:", e); }
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { console.error("Manager info: Unhandled error in async operation:", e); }
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { console.error("Manager info: Unhandled error in async operation:", e); }
-            try { playlistPlayBtn.onclick = null; } catch (e) { console.error("Manager info: Unhandled error in async operation:", e); }
+            console.error("Error loading playlist - Manager info:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
+            try { playlistPlayBtn.onclick = null; } catch (e) {}
         }
     }
 
@@ -502,7 +523,7 @@ function initHarmonyTunes() {
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
                     <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn" title="Play ${escapeHTML(pl.title)} playlist" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
                 <div class="card-desc">${escapeHTML(pl.desc)}</div>
@@ -654,6 +675,17 @@ function initHarmonyTunes() {
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
         document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
+        
+        const paintSpillEffect = document.getElementById('paint-spill-effect');
+        if (paintSpillEffect) {
+            if (song.id === 'tate-mcrae-its-okay-im-okay') {
+                paintSpillEffect.classList.remove('hidden');
+                setTimeout(() => paintSpillEffect.classList.add('active'), 50);
+            } else {
+                paintSpillEffect.classList.remove('active');
+                setTimeout(() => paintSpillEffect.classList.add('hidden'), 500);
+            }
+        }
 
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
@@ -725,7 +757,7 @@ function initHarmonyTunes() {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error("Manager info: Action error:", e));
+        }).catch(e => console.error("Manager info:", e));
     }
 
     function pauseSong() {
@@ -898,7 +930,7 @@ function initHarmonyTunes() {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info: Action error:", e));
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
             }
             // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
@@ -1232,120 +1264,50 @@ function initHarmonyTunes() {
 
     lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
-    let lastTime = 0;
-
     function syncLyrics() {
         if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
         const currentTime = activeAudio.currentTime;
         
         let newActiveLineIndex = -1;
-
-        // ⚡ Bolt: Use binary search to find the active line in O(log N) ONLY when seeking, otherwise step adjacent lines.
-        const isSeek = Math.abs(currentTime - lastTime) > 1;
-
-        if (isSeek || activeLineIndex === -1) {
-            let left = 0;
-            let right = cachedLyricsDOM.length - 1;
-            while (left <= right) {
-                const mid = Math.floor((left + right) / 2);
-                const line = cachedLyricsDOM[mid];
-                if (currentTime >= line.start && currentTime <= line.end) {
-                    newActiveLineIndex = mid;
-                    break;
-                } else if (currentTime < line.start) {
-                    right = mid - 1;
-                } else {
-                    left = mid + 1;
-                }
-            }
-        } else {
-            newActiveLineIndex = activeLineIndex;
-            // Linear scan adjacent if we didn't seek
-            while (newActiveLineIndex < cachedLyricsDOM.length && currentTime > cachedLyricsDOM[newActiveLineIndex].end) {
-                newActiveLineIndex++;
-            }
-            while (newActiveLineIndex > 0 && newActiveLineIndex < cachedLyricsDOM.length && currentTime < cachedLyricsDOM[newActiveLineIndex].start) {
-                newActiveLineIndex--;
-            }
-            if (newActiveLineIndex >= cachedLyricsDOM.length || newActiveLineIndex < 0 || currentTime < cachedLyricsDOM[newActiveLineIndex].start || currentTime > cachedLyricsDOM[newActiveLineIndex].end) {
-                newActiveLineIndex = -1; // Between lines or out of bounds
-            }
-        }
-        
-        // Force state reconciliation if we jumped a significant amount of time (e.g., seeking)
-        lastTime = currentTime;
-
-        if (newActiveLineIndex !== activeLineIndex || isSeek) {
-            // Reconcile state for all lines on line change or seek
-            if (activeLineIndex !== -1 && activeLineIndex !== newActiveLineIndex) {
-                const oldLine = cachedLyricsDOM[activeLineIndex];
-                if (oldLine) oldLine.el.classList.remove('active');
-            }
-            if (newActiveLineIndex !== -1) {
-                const newLine = cachedLyricsDOM[newActiveLineIndex];
-                if (newLine) newLine.el.classList.add('active');
-            }
-
-            // ⚡ Bolt: Instead of iterating all N lines, only update the words if it's a seek
-            // or rely on the word-level check below for normal playback.
-            if (isSeek) {
-                for (let i = 0; i < cachedLyricsDOM.length; i++) {
-                    const lineCache = cachedLyricsDOM[i];
-                    if (i !== newActiveLineIndex) {
-                        lineCache.words.forEach(wordCache => {
-                            if (currentTime > lineCache.end) {
-                                wordCache.el.classList.add('active-word');
-                            } else {
-                                wordCache.el.classList.remove('active-word');
-                            }
-                        });
+        cachedLyricsDOM.forEach((lineCache, index) => {
+            const { el: lineEl, start, end, words } = lineCache;
+            
+            // Allow active line to persist slightly if it's the last one sung, 
+            // but strict matching is better for beat-by-beat
+            if (currentTime >= start && currentTime <= end) {
+                newActiveLineIndex = index;
+                lineEl.classList.add('active');
+                
+                words.forEach(wordCache => {
+                    if (currentTime >= wordCache.start) {
+                        wordCache.el.classList.add('active-word');
+                    } else {
+                        wordCache.el.classList.remove('active-word');
                     }
-                }
+                });
+            } else {
+                lineEl.classList.remove('active');
+                // clear word highlights if passed
+                words.forEach(wordCache => {
+                    if (currentTime > end) {
+                        wordCache.el.classList.add('active-word');
+                    } else {
+                        wordCache.el.classList.remove('active-word');
+                    }
+                });
             }
+        });
+        
+        if (newActiveLineIndex !== -1 && newActiveLineIndex !== activeLineIndex) {
             activeLineIndex = newActiveLineIndex;
-
-            if (isAutoScrolling && activeLineIndex !== -1) {
+            if (isAutoScrolling) {
                 const activeLine = cachedLyricsDOM[activeLineIndex].el;
-                if (!activeLine.classList.contains('active')) activeLine.classList.add('active');
-
-                // On a backward seek, ensure future words in this line are cleared.
-                if (isSeeking) {
-                    activeLine.words.forEach(w => {
-                         if (w.start > currentTime && w.el.classList.contains('active-word')) {
-                             w.el.classList.remove('active-word');
-                         }
-                    });
-                }
-
-                if (isAutoScrolling) {
-                    isProgrammaticScroll = true;
-                    lyricsContainer.scrollTo({
-                        top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
-                        behavior: 'smooth'
-                    });
-                    setTimeout(() => isProgrammaticScroll = false, 800);
-                }
-            }
-        }
-
-        if (activeLineIndex !== -1) {
-            const currentLine = cachedLyricsDOM[activeLineIndex];
-            // ⚡ Bolt: Linear scan for word is fine since words array is very small (often < 10)
-            let activeWordIndex = -1;
-            for (let j = 0; j < currentLine.words.length; j++) {
-                if (currentTime >= currentLine.words[j].start) {
-                    activeWordIndex = j;
-                } else {
-                    break;
-                }
-            }
-
-            for (let i = 0; i < currentLine.words.length; i++) {
-                if (i <= activeWordIndex) {
-                    currentLine.words[i].el.classList.add('active-word');
-                } else {
-                    currentLine.words[i].el.classList.remove('active-word');
-                }
+                isProgrammaticScroll = true;
+                lyricsContainer.scrollTo({
+                    top: activeLine.offsetTop - lyricsContainer.clientHeight / 2,
+                    behavior: 'smooth'
+                });
+                setTimeout(() => isProgrammaticScroll = false, 800);
             }
         }
     }
@@ -1404,7 +1366,7 @@ function initHarmonyTunes() {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info: Action error:", e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1539,7 +1501,7 @@ function initHarmonyTunes() {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info: Action error:", e));
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -1585,6 +1547,22 @@ function initHarmonyTunes() {
                     totalTimeEl.textContent = showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration);
                 }
                 syncLyrics();
+                
+                // Beat reaction for Tate McRae song
+                if (currentQueue[currentSongIndex]?.id === 'tate-mcrae-its-okay-im-okay' && !activeAudio.paused) {
+                    const beatInterval = 60 / 120; // 120 BPM
+                    const currentBeat = Math.floor(currentTime / beatInterval);
+                    if (window._lastPaintBeat !== currentBeat) {
+                        window._lastPaintBeat = currentBeat;
+                        const effect = document.getElementById('paint-spill-effect');
+                        if (effect) {
+                            effect.classList.remove('beat');
+                            void effect.offsetWidth; // trigger reflow
+                            effect.classList.add('beat');
+                        }
+                    }
+                }
+                
                 isUpdatingProgress = false;
             });
             isUpdatingProgress = true;
@@ -1623,7 +1601,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Manager info: Firebase error:", e);
+                console.error("Firebase error - Manager info:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -1675,7 +1653,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info: Action error:", e); }
+            } catch (e) { console.error("Manager info:", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -1749,9 +1727,9 @@ function initHarmonyTunes() {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info: Action error:", e));
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Manager info: Firebase history update error:", e);
+                    console.error("Firebase history update error - Manager info:", e);
                 }
             });
         }
@@ -1878,7 +1856,6 @@ let dragItem = null;
     let dragStartTop = 0;
     let dragTimeout = null;
     let isDragging = false;
-    let cachedDragItems = null;
 
     document.addEventListener('pointermove', (e) => {
         if (isDragging && dragItem) {
@@ -1886,7 +1863,7 @@ let dragItem = null;
             dragItem.style.transform = `translateY(${deltaY}px)`;
 
             // Visual Drop Indicator
-            const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             items.forEach(el => { el.style.borderTop = ''; el.style.borderBottom = ''; });
 
             for (let i = 0; i < items.length; i++) {
@@ -1907,7 +1884,7 @@ let dragItem = null;
     document.addEventListener('pointerup', (e) => {
         if (dragTimeout) clearTimeout(dragTimeout);
         if (isDragging && dragItem) {
-            const itemsNodeList = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+            const itemsNodeList = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             const idx = itemsNodeList.indexOf(dragItem);
 
             isDragging = false;
@@ -1919,10 +1896,9 @@ let dragItem = null;
             queueContentArea.style.cursor = '';
 
             // Calculate drop index based on position
-            const items = itemsNodeList;
+            const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
             let droppedIdx = idx;
             for (let i = 0; i < items.length; i++) {
-                if (i === items.length - 1) cachedDragItems = null;
                 const rect = items[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
                     droppedIdx = i;
@@ -1993,7 +1969,6 @@ let dragItem = null;
                     dragItem = item; // Track the clicked item for pointerup handling
                     dragTimeout = setTimeout(() => {
                         isDragging = true;
-                        cachedDragItems = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         dragStartY = e.clientY;
                         dragStartTop = item.offsetTop;
                         item.style.position = 'relative';
@@ -2008,7 +1983,7 @@ let dragItem = null;
                     if (!isDragging) {
                         // It was just a tap/click! Open context menu
                         let contextMenuIdx = idx;
-                        const items = cachedDragItems || Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
+                        const items = Array.from(queueContentArea.querySelectorAll('.queue-item')).filter(el => el.querySelector('.queue-more-btn'));
                         const currentItemIdx = items.indexOf(item);
                         if (currentItemIdx !== -1) {
                             contextMenuIdx = currentItemIdx;
@@ -2168,7 +2143,7 @@ let dragItem = null;
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info: Action error:", e));
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
                 }
                 renderQueue();
             }
@@ -2188,7 +2163,7 @@ export function createSongCard(song) {
         <div class="music-card" data-song-id="${escapeHTML(song.id)}">
             <div class="card-img-wrapper">
                 <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn" title="Play ${escapeHTML(song.title)}" aria-label="Play ${escapeHTML(song.title)}">▶</button>
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
                 <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
                 <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
             </div>

@@ -1,5 +1,5 @@
 import { db } from './auth.js';
-import { collection, doc, onSnapshot, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, doc, onSnapshot, updateDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { mapCollectionData } from './utils.js';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';

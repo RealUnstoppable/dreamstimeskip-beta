@@ -1,7 +1,7 @@
 // js/checkout.js
 import { auth, db, safeRedirect } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
