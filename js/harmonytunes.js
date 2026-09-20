@@ -24,7 +24,7 @@ function initHarmonyTunes() {
             artist: "Tate McRae",
             duration: "3:02",
             src: "/music/tate_mcrae_its_okay_im_okay.mp3",
-            art: "/images/harmony-tunes-card.jpg",
+            art: "/images/tate_mcrae_its_okay_im_okay.png",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 24,
             tags: ['pop', 'upbeat']
         },
@@ -33,7 +33,7 @@ function initHarmonyTunes() {
             title: "Astrophage",
             artist: "Lupus Nocte",
             duration: "3:10",
-            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Astrophage - Lupus Nocte.mp3",
+            src: "/music/Astrophage.mp3",
             art: "/images/harmony-tunes-card.jpg",
             bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['electronic', 'synth', 'energetic']
@@ -43,7 +43,7 @@ function initHarmonyTunes() {
             title: "PIXY - LEGACY", 
             artist: "Catalin", 
             duration: "2:17", 
-            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/PIXY - LEGACY.mp3", 
+            src: "/music/PIXY - LEGACY.mp3", 
             art: "/images/dreams-lobby.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
@@ -53,7 +53,7 @@ function initHarmonyTunes() {
             title: "Blow", 
             artist: "Kesha", 
             duration: "3:40", 
-            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/Blow - Kesha.mp3", 
+            src: "/music/Blow - Kesha.mp3", 
             art: "/images/un-logo.png",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
@@ -63,7 +63,7 @@ function initHarmonyTunes() {
             title: "Deorc Decuple", 
             artist: "FormantX", 
             duration: "3:45", 
-            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/ES_Deorc Decuple - FormantX.mp3", 
+            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
             art: "/images/Unstoppable Collection Logo.png",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
@@ -73,7 +73,7 @@ function initHarmonyTunes() {
             title: "No Pole x Where Have You Been", 
             artist: "Remix", 
             duration: "2:30", 
-            src: "/Volumes/Catalin SD/Catalin BKP/Downloads/Music&SFX/No Pole x Where Have You Been (Remix).mp3", 
+            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
             art: "/images/MugAllBrands300x300.png",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
