@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { collection, addDoc, query, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { collection, addDoc, query, orderBy, getDocs, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { escapeHTML, formatDate } from './utils.js';
 
 const requestForm = document.getElementById('feature-request-form');
@@ -30,7 +30,7 @@ async function fetchAndRenderRequests() {
     if (!requestsList) return;
 
     try {
-        const q = collection(db, 'feature_requests');
+        const q = query(collection(db, 'feature_requests'));
         const snapshot = await getDocs(q);
 
         if (snapshot.empty) {
@@ -38,26 +38,135 @@ async function fetchAndRenderRequests() {
             return;
         }
 
-        let html = '';
+        let requestsData = [];
         snapshot.forEach(doc => {
-            const data = doc.data();
+            requestsData.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Sort requests locally: by upvotes descending, then by createdAt descending
+        requestsData.sort((a, b) => {
+            const upvotesA = a.upvotes || 0;
+            const upvotesB = b.upvotes || 0;
+            if (upvotesB !== upvotesA) {
+                return upvotesB - upvotesA;
+            }
+            const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+            const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+            return timeB - timeA;
+        });
+
+        // Determine upvoted status if user is logged in
+        let userUpvotes = new Set();
+        if (currentUser) {
+             const upvotePromises = requestsData.map(async (reqData) => {
+                 try {
+                     const upvoteRef = doc(db, 'feature_requests', reqData.id, 'upvotes', currentUser.uid);
+                     const upvoteSnap = await getDoc(upvoteRef);
+                     if (upvoteSnap.exists()) {
+                         return reqData.id;
+                     }
+                 } catch (e) {
+                     // ignore if can't read
+                 }
+                 return null;
+             });
+
+             const results = await Promise.all(upvotePromises);
+             results.forEach(id => {
+                 if (id) userUpvotes.add(id);
+             });
+        }
+
+        let html = '';
+        for (const data of requestsData) {
             const dateStr = data.createdAt ? formatDate(data.createdAt.toDate()) : 'Recently';
+            const upvotes = data.upvotes || 0;
+            const hasUpvoted = userUpvotes.has(data.id);
+            const upvoteClass = hasUpvoted ? 'upvoted' : '';
+            const upvoteText = hasUpvoted ? 'Upvoted' : 'Upvote';
+            const disableUpvote = !currentUser ? 'disabled title="Sign in to upvote"' : '';
 
             html += `
                 <div class="request-card">
-                    <div class="request-header">
-                        <h4 class="request-title">${escapeHTML(data.title)}</h4>
-                        ${renderStatus(data.status)}
+                    <div class="request-header" style="align-items: flex-start;">
+                        <div style="flex: 1; padding-right: 15px;">
+                            <h4 class="request-title">${escapeHTML(data.title)}</h4>
+                            <div class="request-meta" style="margin-top: 5px;">
+                                Submitted by ${escapeHTML(data.userEmail ? data.userEmail.split('@')[0] : 'Anonymous')} on ${dateStr}
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                            ${renderStatus(data.status)}
+                            <button class="upvote-btn ${upvoteClass}" data-id="${escapeHTML(data.id)}" ${disableUpvote} style="display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); cursor: pointer; color: var(--text-color); font-weight: 600; font-size: 0.9rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${hasUpvoted ? 'filled' : ''}"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                                <span class="upvote-count">${upvotes}</span>
+                            </button>
+                        </div>
                     </div>
-                    <p style="margin: 0; line-height: 1.5; color: var(--text-color);">${escapeHTML(data.description).replace(/\n/g, '<br>')}</p>
-                    <div class="request-meta">
-                        Submitted by ${escapeHTML(data.userEmail ? data.userEmail.split('@')[0] : 'Anonymous')} on ${dateStr}
-                    </div>
+                    <p style="margin: 10px 0 0 0; line-height: 1.5; color: var(--text-color);">${escapeHTML(data.description).replace(/\n/g, '<br>')}</p>
                 </div>
             `;
-        });
+        }
 
         requestsList.innerHTML = html;
+
+        // Attach event listeners to upvote buttons
+        document.querySelectorAll('.upvote-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                if (!currentUser) return;
+
+                const button = e.currentTarget;
+                if (button.disabled) return;
+
+                const requestId = button.getAttribute('data-id');
+                const countSpan = button.querySelector('.upvote-count');
+                const svg = button.querySelector('svg');
+                let count = parseInt(countSpan.textContent, 10);
+                const isCurrentlyUpvoted = button.classList.contains('upvoted');
+
+                // Optimistic UI Update
+                button.disabled = true;
+                if (isCurrentlyUpvoted) {
+                    button.classList.remove('upvoted');
+                    svg.classList.remove('filled');
+                    countSpan.textContent = count - 1;
+                } else {
+                    button.classList.add('upvoted');
+                    svg.classList.add('filled');
+                    countSpan.textContent = count + 1;
+                }
+
+                try {
+                    const token = await currentUser.getIdToken();
+                    const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/toggleFeatureUpvote', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({ requestId })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to toggle upvote');
+                    }
+                } catch (err) {
+                    console.error("Manager info: Upvote error:", err);
+                    // Revert optimistic update
+                    if (isCurrentlyUpvoted) {
+                        button.classList.add('upvoted');
+                        svg.classList.add('filled');
+                        countSpan.textContent = count;
+                    } else {
+                        button.classList.remove('upvoted');
+                        svg.classList.remove('filled');
+                        countSpan.textContent = count;
+                    }
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
 
     } catch (error) {
         if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Error fetching feature requests:", error); }
