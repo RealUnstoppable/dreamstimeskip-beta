@@ -13,6 +13,7 @@ export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
 let currentReviewProductId = null;
 let productStatsMap = new Map();
+const reviewsCache = new Map();
 
 // --- DOM ELEMENTS ---
 const productGrid = document.getElementById('product-grid');
@@ -118,12 +119,12 @@ async function updateProductRatingDisplay(productId, precalculatedRatingInfo = n
     }
 }
 
-async function loadProductStats() {
+export async function loadProductStats() {
     try {
         const stats = await fetchCollectionData(db, getDocs, collection, 'product_stats', true);
         stats.forEach(s => productStatsMap.set(s.id, s));
     } catch (error) {
-        console.error("Error loading product stats:", error);
+        console.error("Error loading product stats - Manager info:", error);
     } finally {
         renderProducts();
     }
@@ -222,7 +223,7 @@ export async function handleAddToCart(productId, event) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error.message);
+        console.error('Manager info: Failed to add to cart:', error.message);
     }
 }
 
@@ -271,7 +272,7 @@ export async function toggleWishlist(productId) {
     try {
         await saveWishlist();
     } catch (error) {
-        console.error('Failed to update wishlist:', error.message);
+        console.error('Manager info: Failed to update wishlist:', error.message);
     }
 }
 
@@ -292,7 +293,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore:", error.message);
+                console.error("Manager info: Error saving wishlist to Firestore:", error.message);
                 reject(error);
             }
         }, 500);
@@ -314,7 +315,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore:", error.message);
+                    console.error("Manager info: Error saving cart to Firestore:", error.message);
                 }
             } else {
                 // Save cart to localStorage for logged-out users
@@ -342,16 +343,24 @@ function updateUserNav(user) {
 async function fetchProductReviews(productId) {
     if (!reviewsListContainer) return;
     try {
-        const reviewsRef = collection(db, 'product_reviews');
-        const q = query(reviewsRef, where('productId', '==', productId), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
+        let reviews = [];
+        if (reviewsCache.has(productId + '_product_reviews')) {
+            reviews = reviewsCache.get(productId + '_product_reviews');
+        } else {
+            const reviewsRef = collection(db, 'product_reviews');
+            const q = query(reviewsRef, where('productId', '==', productId), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach(docSnap => {
+                reviews.push(docSnap.data());
+            });
+            reviewsCache.set(productId + '_product_reviews', reviews);
+        }
 
         let sum = 0;
         let count = 0;
         let html = '';
 
-        querySnapshot.forEach((docSnap) => {
-            const data = docSnap.data();
+        reviews.forEach((data) => {
             sum += data.rating;
             count++;
 
@@ -381,7 +390,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("Manager info: Error fetching reviews:", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -580,11 +589,14 @@ function setupEventListeners() {
                 messageEl.textContent = 'Review submitted successfully!';
                 messageEl.style.color = 'var(--accent-green)';
 
+                // ⚡ Bolt: Invalidate cache for this product
+                reviewsCache.delete(currentReviewProductId + '_product_reviews');
+
                 // Refresh reviews
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Error submitting review:", error);
+                console.error("Manager info: Error submitting review:", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -634,17 +646,26 @@ async function openReviewsModal(productId) {
 
 async function loadReviews(productId) {
     try {
-        const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+        let reviews = [];
+        if (reviewsCache.has(productId)) {
+            reviews = reviewsCache.get(productId);
+        } else {
+            const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
 
-        if (snapshot.empty) {
-            reviewsListContainer.innerHTML = '<p class="review-message loading">No reviews yet. Be the first!</p>';
+            snapshot.forEach(doc => {
+                reviews.push(doc.data());
+            });
+            reviewsCache.set(productId, reviews);
+        }
+
+        if (reviews.length === 0) {
+            reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first!</p>';
             return;
         }
 
         let html = '';
-        snapshot.forEach(doc => {
-            const review = doc.data();
+        reviews.forEach(review => {
             const date = review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now';
             html += `
                 <div class="review-item">
@@ -660,8 +681,8 @@ async function loadReviews(productId) {
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Error loading reviews:", error.message);
-        reviewsListContainer.innerHTML = '<p class="review-message error">Error loading reviews.</p>';
+        console.error("Manager info: Error loading reviews:", error.message);
+        reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
     }
 }
 
@@ -714,16 +735,17 @@ async function handleReviewSubmit(e) {
         reviewNotification.innerHTML = '<span class="review-message success">Review submitted successfully!</span>';
         setTimeout(() => reviewNotification.innerHTML = '', 3000);
 
+        // ⚡ Bolt: Invalidate cache for this product so the new review is fetched
+        reviewsCache.delete(currentReviewProductId);
+
         renderProducts(); // Update stars on grid
         await openReviewsModal(currentReviewProductId); // Refresh modal
 
     } catch (error) {
-        console.error("Error submitting review:", error.message);
-        reviewNotification.innerHTML = '<span class="review-message error">Failed to submit review.</span>';
+        console.error("Manager info: Error submitting review:", error.message);
+        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
-    }
-}
         submitReviewBtn.textContent = originalText;
     }
 }

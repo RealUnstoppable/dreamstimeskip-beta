@@ -8,8 +8,11 @@ admin.initializeApp();
 
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
-const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_test_placeholder";
+const stripeKey = process.env.STRIPE_SECRET;
+if (!stripeKey) {
+  console.warn("STRIPE_SECRET environment variable is missing.");
+}
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 async function authenticateRequest(req, res, adminInstance = admin) {
   if (req.method !== "POST") {
@@ -27,12 +30,12 @@ async function authenticateRequest(req, res, adminInstance = admin) {
   try {
     return await adminInstance.auth().verifyIdToken(token);
   } catch (err) {
-    console.error("Auth Error:", err);
+    console.error("Manager info: Auth Error:", err);
     res.status(401).send("Unauthorized");
     return null;
   }
 }
-const stripe = require("stripe")(stripeKey);
+const stripe = stripeKey ? require("stripe")(stripeKey) : null;
 
 // 🛡️ Shared Utils
 function getUserDocRef(uid) {
@@ -88,7 +91,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
 
       res.status(200).json({ success: true });
     } catch (err) {
-      console.error("Admin Action Error: [" + err.message + "]");
+      console.error("Manager info: Admin Action Error: [" + err.message + "]");
       res.status(500).json({ error: err.message });
     }
   });
@@ -113,6 +116,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
 
     try {
+      if (!stripe) throw new Error("Stripe is not configured.");
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
         payment_method_types: ["card"],
@@ -132,7 +136,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error: [" + err.message + "]");
+      console.error("Manager info: Checkout Error: [" + err.message + "]");
       res.status(500).json({error: `Checkout Error. [${err.message}]`});
     }
   });
@@ -157,7 +161,7 @@ exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", 
         type: "ticket_reply",
       });
     } catch (error) {
-      console.error("Error creating notification: [" + error.message + "]");
+      console.error("Manager info: Error creating notification: [" + error.message + "]");
     }
   }
 });
@@ -204,6 +208,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event;
 
   try {
+    if (!stripe) throw new Error("Stripe is not configured.");
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
     console.error("Manager info: Webhook Error: [" + err.message + "]");
@@ -281,6 +286,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
         return res.status(400).send("No active subscription found");
       }
 
+      if (!stripe) throw new Error("Stripe is not configured.");
       const subs = await stripe.subscriptions.list({customer: customerId});
       const cancelPromises = subs.data.map((sub) =>
         stripe.subscriptions.cancel(sub.id),
@@ -296,6 +302,26 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 // ⭐️ Update Product Stats on New Review
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
+
+
+
+// 🏆 Shared Utility: Get Points Update Data
+function getPointsUpdateData(userDoc, rewardPoints, loyaltyPoints) {
+  let currentRewardPoints = 0;
+  let currentLoyaltyPoints = 0;
+
+  if (userDoc.exists) {
+    const data = userDoc.data();
+    if (typeof data.pointsBalance === 'number') currentRewardPoints = data.pointsBalance;
+    if (typeof data.loyaltyPoints === 'number') currentLoyaltyPoints = data.loyaltyPoints;
+  }
+
+  const updateData = {};
+  if (rewardPoints > 0) updateData.pointsBalance = currentRewardPoints + rewardPoints;
+  if (loyaltyPoints > 0) updateData.loyaltyPoints = currentLoyaltyPoints + loyaltyPoints;
+
+  return updateData;
+}
 
 // ⭐️ Update Points on New Review
 exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
@@ -341,14 +367,8 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       if (userId) {
         const pointsToAward = 50;
         const userDoc = await transaction.get(userRef);
-        let currentPoints = 0;
-        if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
-          currentPoints = userDoc.data().pointsBalance;
-        }
-
-        transaction.set(userRef, {
-          pointsBalance: currentPoints + pointsToAward
-        }, { merge: true });
+        const updateData = getPointsUpdateData(userDoc, pointsToAward, 0);
+        transaction.set(userRef, updateData, { merge: true });
 
         transaction.set(transactionRef, {
           userId: userId,
@@ -396,20 +416,9 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
   try {
     return await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
-
-      let currentRewardPoints = 0;
-      let currentLoyaltyPoints = 0;
-
-      if (userDoc.exists) {
-        const data = userDoc.data();
-        if (typeof data.pointsBalance === 'number') currentRewardPoints = data.pointsBalance;
-        if (typeof data.loyaltyPoints === 'number') currentLoyaltyPoints = data.loyaltyPoints;
-      }
-
-      const updateData = {};
+      const updateData = getPointsUpdateData(userDoc, rewardPointsToAward, loyaltyPointsEarned);
 
       if (rewardPointsToAward > 0) {
-        updateData.pointsBalance = currentRewardPoints + rewardPointsToAward;
         const rewardTxRef = db.collection("reward_transactions").doc();
         transaction.set(rewardTxRef, {
           userId: userId,
@@ -420,7 +429,6 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
       }
 
       if (loyaltyPointsEarned > 0) {
-        updateData.loyaltyPoints = currentLoyaltyPoints + loyaltyPointsEarned;
         const loyaltyTxRef = db.collection("loyalty_transactions").doc();
         transaction.set(loyaltyTxRef, {
           userId: userId,

@@ -18,9 +18,9 @@ let currentProfileCache = null;
 let currentOrdersCache = null;
 
 // Render Profile
-async function renderProfile(user) {
+async function renderProfile(user, userDataParam = null) {
     try {
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = userDataParam || await getCachedUserProfile(user.uid);
         if (!userData) {
             // Graceful instantiation if user doc is missing
             userData = {
@@ -78,7 +78,7 @@ async function renderOrders(user) {
         currentOrdersCache = serializedOrders;
 
         if (querySnapshot.empty) {
-            ordersList.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
+            ordersList.innerHTML = `<p class="empty-message" style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
             return;
         }
 
@@ -95,7 +95,7 @@ async function renderOrders(user) {
                 for (const [productId, quantity] of Object.entries(order.items)) {
                     const product = productMap.get(productId) || { name: productId, price: 0 };
                     totalCost += product.price * quantity;
-                    itemsHtml += `<div style="font-size: 0.9rem; color: var(--text-secondary);">• ${quantity}x ${escapeHTML(product.name)}</div>`;
+                    itemsHtml += `<div class="order-item">• ${quantity}x ${escapeHTML(product.name)}</div>`;
                 }
             }
 
@@ -105,27 +105,27 @@ async function renderOrders(user) {
             const finalTotal = subtotal + tax;
 
             const orderCard = document.createElement('div');
-            orderCard.style.cssText = "background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
+            orderCard.className = 'order-card';
             orderCard.innerHTML = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <div class="order-card-header">
                     <div>
                         <strong>Order #${escapeHTML(orderId.split('_')[1] || orderId)}</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${formatDate(order.orderDate)}</div>
+                        <div class="order-date">${formatDate(order.orderDate)}</div>
                     </div>
-                    <div style="text-align: right;">
-                        <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; background: rgba(136, 211, 206, 0.2); color: var(--accent-green); font-weight: bold;">
+                    <div class="order-status-container">
+                        <span class="order-status-badge">
                             ${escapeHTML(order.status || 'Processing')}
                         </span>
-                        <div style="font-weight: bold; margin-top: 5px;">$${finalTotal.toFixed(2)}</div>
+                        <div class="order-total">$${finalTotal.toFixed(2)}</div>
                     </div>
                 </div>
                 <div>
                     <strong>Items:</strong>
-                    <div style="margin-top: 5px; margin-bottom: 15px;">
-                        ${itemsHtml || '<div style="font-size: 0.9rem; color: var(--text-secondary);">No items found.</div>'}
+                    <div class="order-items-list">
+                        ${itemsHtml || '<div class="order-item">No items found.</div>'}
                     </div>
                     ${order.shippingInfo ? `
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                    <div class="order-shipping-info">
                         <strong>Shipping To:</strong> ${escapeHTML(order.shippingInfo.name)} - ${escapeHTML(order.shippingInfo.city)}
                     </div>
                     ` : ''}
@@ -152,12 +152,12 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         let userData = null;
         try {
-            userData = await getCachedUserProfile(user.uid);
+            userData = await getCachedUserProfile(user);
         } catch (e) {
             console.error("Manager info: Error fetching user profile:", e);
         }
 
-        renderProfile(user);
+        renderProfile(user, userData);
         renderOrders(user);
         if (userData) {
             renderRewards(user, userData);

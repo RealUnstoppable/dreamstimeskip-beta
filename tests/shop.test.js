@@ -83,3 +83,28 @@ describe('handleUpdateQuantity', () => {
         consoleErrorSpy.mockRestore();
     });
 });
+
+describe('loadProductStats', () => {
+    let loadProductStats;
+
+    beforeAll(async () => {
+        // Just rely on the missing firebase config throwing an error naturally
+        const module = await import('../js/shop.js');
+        loadProductStats = module.loadProductStats;
+    });
+
+    test('logs error when getDocs fails', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        await loadProductStats();
+
+        // Since the environment isn't fully mocked, getDocs should fail on its own
+        // We just need to check if the error is caught and logged correctly.
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+            'Error loading product stats - Manager info:',
+            expect.any(Error)
+        );
+
+        consoleErrorSpy.mockRestore();
+    });
+});
