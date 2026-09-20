@@ -1485,3 +1485,28 @@ body {
 .paint-spill-effect.hidden {
     display: none;
 }
+
+
+.title-marquee {
+    width: 150px;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+.title-marquee p {
+    display: inline-block;
+    min-width: 100%;
+    animation: scroll-left 8s linear infinite;
+}
+
+@keyframes scroll-left {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}

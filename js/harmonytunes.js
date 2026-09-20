@@ -24,7 +24,7 @@ function initHarmonyTunes() {
             artist: "Tate McRae",
             duration: "3:02",
             src: "/music/tate_mcrae_its_okay_im_okay.mp3",
-            art: "/images/tate_mcrae_its_okay_im_okay.png",
+            art: "/images/tate_mcrae_cover_v2.png",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 29,
             tags: ['pop', 'upbeat']
         },
