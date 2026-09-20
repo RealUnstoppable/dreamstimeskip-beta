@@ -2,7 +2,7 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
-import { escapeHTML, formatDate, getCachedUserProfile } from './utils.js';
+import { escapeHTML, formatDate, fetchQueryData } from './utils.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
@@ -70,23 +70,22 @@ async function renderOrders(user) {
             orderBy("orderDate", "desc")
         );
 
-        const querySnapshot = await getDocs(q);
+        const ordersData = await fetchQueryData(getDocs, q);
 
         // Memoization check
-        const serializedOrders = JSON.stringify(querySnapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+        const serializedOrders = JSON.stringify(ordersData);
         if (serializedOrders === currentOrdersCache) return;
         currentOrdersCache = serializedOrders;
 
-        if (querySnapshot.empty) {
+        if (ordersData.length === 0) {
             ordersList.innerHTML = `<p class="empty-message" style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
             return;
         }
 
         const fragment = document.createDocumentFragment();
 
-        querySnapshot.forEach((docSnap) => {
-            const order = docSnap.data();
-            const orderId = docSnap.id;
+        ordersData.forEach((order) => {
+            const orderId = order.id;
 
             let totalCost = 0;
             let itemsHtml = '';
@@ -208,18 +207,21 @@ async function renderRewards(user, userData) {
             orderBy("createdAt", "desc")
         );
 
-        const [loyaltySnap, rewardSnap] = await Promise.all([getDocs(loyaltyQ), getDocs(rewardQ)]);
+        const [loyaltyData, rewardData] = await Promise.all([
+            fetchQueryData(getDocs, loyaltyQ),
+            fetchQueryData(getDocs, rewardQ)
+        ]);
 
         const serializedRewards = JSON.stringify({
-            loyalty: loyaltySnap.docs.map(d => ({id: d.id, ...d.data()})),
-            rewards: rewardSnap.docs.map(d => ({id: d.id, ...d.data()}))
+            loyalty: loyaltyData,
+            rewards: rewardData
         });
 
         if (serializedRewards === currentRewardsCache) return;
         currentRewardsCache = serializedRewards;
 
         if (historyList) {
-            if (loyaltySnap.empty) {
+            if (loyaltyData.length === 0) {
                 if(msgEl) {
                     msgEl.textContent = "You haven't earned any rewards yet.";
                     msgEl.style.display = 'block';
@@ -228,8 +230,7 @@ async function renderRewards(user, userData) {
             } else {
                 if(msgEl) msgEl.style.display = 'none';
                 let html = '';
-                loyaltySnap.forEach(docSnap => {
-                    const data = docSnap.data();
+                loyaltyData.forEach(data => {
                     const dateStr = formatDate(data.createdAt);
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
@@ -246,12 +247,11 @@ async function renderRewards(user, userData) {
         }
 
         if (container) {
-            if (rewardSnap.empty) {
+            if (rewardData.length === 0) {
                 container.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
             } else {
                 const fragment = document.createDocumentFragment();
-                rewardSnap.forEach(docSnap => {
-                    const data = docSnap.data();
+                rewardData.forEach(data => {
                     const dateStr = formatDate(data.createdAt);
                     const el = document.createElement('div');
                     el.style.cssText = "display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding: 5px 0; font-size: 0.9rem;";
