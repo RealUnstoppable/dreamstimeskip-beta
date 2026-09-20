@@ -171,6 +171,7 @@ let pointsToRedeem = 0;
 
         btn.disabled = true;
         btn.textContent = 'Applying...';
+        btn.title = 'Processing your request...';
 
         try {
             const promoRef = doc(db, 'promo_codes', code);
@@ -203,6 +204,7 @@ let pointsToRedeem = 0;
         } finally {
             btn.disabled = false;
             btn.textContent = originalText;
+            btn.removeAttribute('title');
         }
         updateSummaryUI();
     });
