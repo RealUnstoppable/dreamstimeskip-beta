@@ -1814,1886 +1814,1872 @@ export const lyricsData = {
     ],
     "tate-mcrae-its-okay-im-okay": [
         {
-            "start": 19,
-            "end": 21.89,
-            "trending": false,
+            "start": 14,
+            "end": 16.4,
             "words": [
                 {
                     "text": "See",
-                    "start": 19,
-                    "duration": 0.72
+                    "start": 14,
+                    "duration": 0.6
                 },
                 {
                     "text": "u",
-                    "start": 19.72,
-                    "duration": 0.72
+                    "start": 14.6,
+                    "duration": 0.6
                 },
                 {
                     "text": "so",
-                    "start": 20.45,
-                    "duration": 0.72
+                    "start": 15.2,
+                    "duration": 0.6
                 },
                 {
                     "text": "excited",
-                    "start": 21.17,
-                    "duration": 0.72
+                    "start": 15.8,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 21.89,
-            "end": 24.79,
-            "trending": false,
+            "start": 16.4,
+            "end": 18.8,
             "words": [
                 {
                     "text": "U",
-                    "start": 21.89,
-                    "duration": 0.58
+                    "start": 16.4,
+                    "duration": 0.48
                 },
                 {
                     "text": "got",
-                    "start": 22.47,
-                    "duration": 0.58
+                    "start": 16.88,
+                    "duration": 0.48
                 },
                 {
                     "text": "him",
-                    "start": 23.05,
-                    "duration": 0.58
+                    "start": 17.36,
+                    "duration": 0.48
                 },
                 {
                     "text": "locked",
-                    "start": 23.630000000000003,
-                    "duration": 0.58
+                    "start": 17.84,
+                    "duration": 0.48
                 },
                 {
                     "text": "down",
-                    "start": 24.21,
-                    "duration": 0.58
+                    "start": 18.32,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 24.79,
-            "end": 27.68,
-            "trending": false,
+            "start": 18.8,
+            "end": 21.2,
             "words": [
                 {
                     "text": "Ur",
-                    "start": 24.79,
-                    "duration": 0.58
+                    "start": 18.8,
+                    "duration": 0.48
                 },
                 {
                     "text": "moving",
-                    "start": 25.369999999999997,
-                    "duration": 0.58
+                    "start": 19.28,
+                    "duration": 0.48
                 },
                 {
                     "text": "like",
-                    "start": 25.95,
-                    "duration": 0.58
+                    "start": 19.76,
+                    "duration": 0.48
                 },
                 {
                     "text": "I",
-                    "start": 26.53,
-                    "duration": 0.58
+                    "start": 20.24,
+                    "duration": 0.48
                 },
                 {
                     "text": "did",
-                    "start": 27.11,
-                    "duration": 0.58
+                    "start": 20.72,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 27.68,
-            "end": 30.58,
-            "trending": false,
+            "start": 21.2,
+            "end": 23.6,
             "words": [
                 {
                     "text": "Before",
-                    "start": 27.68,
-                    "duration": 0.72
+                    "start": 21.2,
+                    "duration": 0.6
                 },
                 {
                     "text": "I",
-                    "start": 28.41,
-                    "duration": 0.72
+                    "start": 21.8,
+                    "duration": 0.6
                 },
                 {
                     "text": "found",
-                    "start": 29.130000000000003,
-                    "duration": 0.72
+                    "start": 22.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "out",
-                    "start": 29.86,
-                    "duration": 0.72
+                    "start": 23,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 30.58,
-            "end": 33.47,
-            "trending": false,
+            "start": 23.6,
+            "end": 26,
             "words": [
                 {
                     "text": "He",
-                    "start": 30.58,
-                    "duration": 0.41
+                    "start": 23.6,
+                    "duration": 0.34
                 },
                 {
                     "text": "ain’t",
-                    "start": 30.99,
-                    "duration": 0.41
+                    "start": 23.94,
+                    "duration": 0.34
                 },
                 {
                     "text": "just",
-                    "start": 31.41,
-                    "duration": 0.41
+                    "start": 24.29,
+                    "duration": 0.34
                 },
                 {
                     "text": "a",
-                    "start": 31.82,
-                    "duration": 0.41
+                    "start": 24.63,
+                    "duration": 0.34
                 },
                 {
                     "text": "pretty",
-                    "start": 32.230000000000004,
-                    "duration": 0.41
+                    "start": 24.97,
+                    "duration": 0.34
                 },
                 {
                     "text": "faced",
-                    "start": 32.65,
-                    "duration": 0.41
+                    "start": 25.31,
+                    "duration": 0.34
                 },
                 {
                     "text": "talker",
-                    "start": 33.06,
-                    "duration": 0.41
+                    "start": 25.66,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 33.47,
-            "end": 36.370000000000005,
-            "trending": false,
+            "start": 26,
+            "end": 28.4,
             "words": [
                 {
                     "text": "Good",
-                    "start": 33.47,
-                    "duration": 0.72
+                    "start": 26,
+                    "duration": 0.6
                 },
                 {
                     "text": "with",
-                    "start": 34.2,
-                    "duration": 0.72
+                    "start": 26.6,
+                    "duration": 0.6
                 },
                 {
                     "text": "his",
-                    "start": 34.92,
-                    "duration": 0.72
+                    "start": 27.2,
+                    "duration": 0.6
                 },
                 {
                     "text": "money",
-                    "start": 35.64,
-                    "duration": 0.72
+                    "start": 27.8,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 36.370000000000005,
-            "end": 39.260000000000005,
-            "trending": false,
+            "start": 28.4,
+            "end": 30.8,
             "words": [
                 {
                     "text": "Close",
-                    "start": 36.370000000000005,
-                    "duration": 0.72
+                    "start": 28.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "to",
-                    "start": 37.09,
-                    "duration": 0.72
+                    "start": 29,
+                    "duration": 0.6
                 },
                 {
                     "text": "his",
-                    "start": 37.82,
-                    "duration": 0.72
+                    "start": 29.6,
+                    "duration": 0.6
                 },
                 {
                     "text": "mother",
-                    "start": 38.54,
-                    "duration": 0.72
+                    "start": 30.2,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 39.260000000000005,
-            "end": 42.16,
-            "trending": false,
+            "start": 30.8,
+            "end": 33.2,
             "words": [
                 {
                     "text": "Ur",
-                    "start": 39.260000000000005,
-                    "duration": 0.96
+                    "start": 30.8,
+                    "duration": 0.8
                 },
                 {
                     "text": "seeing",
-                    "start": 40.230000000000004,
-                    "duration": 0.96
+                    "start": 31.6,
+                    "duration": 0.8
                 },
                 {
                     "text": "one-sided",
-                    "start": 41.19,
-                    "duration": 0.96
+                    "start": 32.4,
+                    "duration": 0.8
                 }
             ]
         },
         {
-            "start": 42.16,
-            "end": 45.05,
-            "trending": false,
+            "start": 33.2,
+            "end": 35.6,
             "words": [
                 {
                     "text": "U",
-                    "start": 42.16,
-                    "duration": 0.58
+                    "start": 33.2,
+                    "duration": 0.48
                 },
                 {
                     "text": "got",
-                    "start": 42.739999999999995,
-                    "duration": 0.58
+                    "start": 33.68,
+                    "duration": 0.48
                 },
                 {
                     "text": "him",
-                    "start": 43.32,
-                    "duration": 0.58
+                    "start": 34.16,
+                    "duration": 0.48
                 },
                 {
                     "text": "right",
-                    "start": 43.89,
-                    "duration": 0.58
+                    "start": 34.64,
+                    "duration": 0.48
                 },
                 {
                     "text": "now",
-                    "start": 44.47,
-                    "duration": 0.58
+                    "start": 35.12,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 45.05,
-            "end": 47.95,
-            "trending": false,
+            "start": 35.6,
+            "end": 38,
             "words": [
                 {
                     "text": "And",
-                    "start": 45.05,
-                    "duration": 0.41
+                    "start": 35.6,
+                    "duration": 0.34
                 },
                 {
                     "text": "she",
-                    "start": 45.47,
-                    "duration": 0.41
+                    "start": 35.94,
+                    "duration": 0.34
                 },
                 {
                     "text": "be",
-                    "start": 45.879999999999995,
-                    "duration": 0.41
+                    "start": 36.29,
+                    "duration": 0.34
                 },
                 {
                     "text": "like",
-                    "start": 46.29,
-                    "duration": 0.41
+                    "start": 36.63,
+                    "duration": 0.34
                 },
                 {
                     "text": "he’s",
-                    "start": 46.71,
-                    "duration": 0.41
+                    "start": 36.97,
+                    "duration": 0.34
                 },
                 {
                     "text": "so",
-                    "start": 47.12,
-                    "duration": 0.41
+                    "start": 37.31,
+                    "duration": 0.34
                 },
                 {
                     "text": "perfect",
-                    "start": 47.53,
-                    "duration": 0.41
+                    "start": 37.66,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 47.95,
-            "end": 50.84,
-            "trending": false,
+            "start": 38,
+            "end": 40.4,
             "words": [
                 {
                     "text": "I",
-                    "start": 47.95,
-                    "duration": 0.41
+                    "start": 38,
+                    "duration": 0.34
                 },
                 {
                     "text": "be",
-                    "start": 48.36,
-                    "duration": 0.41
+                    "start": 38.34,
+                    "duration": 0.34
                 },
                 {
                     "text": "like",
-                    "start": 48.77,
-                    "duration": 0.41
+                    "start": 38.69,
+                    "duration": 0.34
                 },
                 {
                     "text": "oh,",
-                    "start": 49.19,
-                    "duration": 0.41
+                    "start": 39.03,
+                    "duration": 0.34
                 },
                 {
                     "text": "what",
-                    "start": 49.6,
-                    "duration": 0.41
+                    "start": 39.37,
+                    "duration": 0.34
                 },
                 {
                     "text": "version",
-                    "start": 50.02,
-                    "duration": 0.41
+                    "start": 39.71,
+                    "duration": 0.34
                 },
                 {
                     "text": "?",
-                    "start": 50.43,
-                    "duration": 0.41
+                    "start": 40.06,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 50.84,
-            "end": 53.74,
-            "trending": false,
+            "start": 40.4,
+            "end": 42.8,
             "words": [
                 {
                     "text": "Ain’t",
-                    "start": 50.84,
-                    "duration": 0.48
+                    "start": 40.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "nobody",
-                    "start": 51.32,
-                    "duration": 0.48
+                    "start": 40.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "got",
-                    "start": 51.81,
-                    "duration": 0.48
+                    "start": 41.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "me",
-                    "start": 52.29,
-                    "duration": 0.48
+                    "start": 41.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "this",
-                    "start": 52.77,
-                    "duration": 0.48
+                    "start": 42,
+                    "duration": 0.4
                 },
                 {
                     "text": "nervous",
-                    "start": 53.25,
-                    "duration": 0.48
+                    "start": 42.4,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 53.74,
-            "end": 56.63,
-            "trending": false,
+            "start": 42.8,
+            "end": 45.2,
             "words": [
                 {
                     "text": "Oh",
-                    "start": 53.74,
-                    "duration": 0.58
+                    "start": 42.8,
+                    "duration": 0.48
                 },
                 {
                     "text": "baby",
-                    "start": 54.32,
-                    "duration": 0.58
+                    "start": 43.28,
+                    "duration": 0.48
                 },
                 {
                     "text": "I",
-                    "start": 54.89,
-                    "duration": 0.58
+                    "start": 43.76,
+                    "duration": 0.48
                 },
                 {
                     "text": "been",
-                    "start": 55.47,
-                    "duration": 0.58
+                    "start": 44.24,
+                    "duration": 0.48
                 },
                 {
                     "text": "there",
-                    "start": 56.05,
-                    "duration": 0.58
+                    "start": 44.72,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 56.63,
-            "end": 59.53,
-            "trending": false,
+            "start": 45.2,
+            "end": 47.6,
             "words": [
                 {
                     "text": "And",
-                    "start": 56.63,
-                    "duration": 0.48
+                    "start": 45.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "right",
-                    "start": 57.11,
-                    "duration": 0.48
+                    "start": 45.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "in",
-                    "start": 57.6,
-                    "duration": 0.48
+                    "start": 46,
+                    "duration": 0.4
                 },
                 {
                     "text": "that",
-                    "start": 58.08,
-                    "duration": 0.48
+                    "start": 46.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "same",
-                    "start": 58.56,
-                    "duration": 0.48
+                    "start": 46.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "position",
-                    "start": 59.04,
-                    "duration": 0.48
+                    "start": 47.2,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 59.53,
-            "end": 62.42,
-            "trending": false,
+            "start": 47.6,
+            "end": 50,
             "words": [
                 {
                     "text": "So",
-                    "start": 59.53,
-                    "duration": 0.48
+                    "start": 47.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "baby",
-                    "start": 60.01,
-                    "duration": 0.48
+                    "start": 48,
+                    "duration": 0.4
                 },
                 {
                     "text": "don’t",
-                    "start": 60.49,
-                    "duration": 0.48
+                    "start": 48.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "get",
-                    "start": 60.97,
-                    "duration": 0.48
+                    "start": 48.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "this",
-                    "start": 61.46,
-                    "duration": 0.48
+                    "start": 49.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "twisted",
-                    "start": 61.94,
-                    "duration": 0.48
+                    "start": 49.6,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 62.42,
-            "end": 65.32,
-            "trending": false,
+            "start": 50,
+            "end": 52.4,
             "words": [
                 {
                     "text": "No,",
-                    "start": 62.42,
-                    "duration": 0.41
+                    "start": 50,
+                    "duration": 0.34
                 },
                 {
                     "text": "nothing",
-                    "start": 62.83,
-                    "duration": 0.41
+                    "start": 50.34,
+                    "duration": 0.34
                 },
                 {
                     "text": "could",
-                    "start": 63.25,
-                    "duration": 0.41
+                    "start": 50.69,
+                    "duration": 0.34
                 },
                 {
                     "text": "make",
-                    "start": 63.66,
-                    "duration": 0.41
+                    "start": 51.03,
+                    "duration": 0.34
                 },
                 {
                     "text": "me",
-                    "start": 64.08,
-                    "duration": 0.41
+                    "start": 51.37,
+                    "duration": 0.34
                 },
                 {
                     "text": "miss",
-                    "start": 64.49000000000001,
-                    "duration": 0.41
+                    "start": 51.71,
+                    "duration": 0.34
                 },
                 {
                     "text": "it",
-                    "start": 64.9,
-                    "duration": 0.41
+                    "start": 52.06,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 65.32,
-            "end": 68.21000000000001,
-            "trending": false,
+            "start": 52.4,
+            "end": 54.8,
             "words": [
                 {
                     "text": "Take",
-                    "start": 65.32,
-                    "duration": 0.72
+                    "start": 52.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "him",
-                    "start": 66.03999999999999,
-                    "duration": 0.72
+                    "start": 53,
+                    "duration": 0.6
                 },
                 {
                     "text": "he’s",
-                    "start": 66.75999999999999,
-                    "duration": 0.72
+                    "start": 53.6,
+                    "duration": 0.6
                 },
                 {
                     "text": "yours",
-                    "start": 67.49000000000001,
-                    "duration": 0.72
+                    "start": 54.2,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 68.21000000000001,
-            "end": 71.11,
-            "trending": false,
+            "start": 54.8,
+            "end": 57.2,
             "words": [
                 {
                     "text": "It’s",
-                    "start": 68.21000000000001,
-                    "duration": 0.72
+                    "start": 54.8,
+                    "duration": 0.6
                 },
                 {
                     "text": "ok",
-                    "start": 68.93,
-                    "duration": 0.72
+                    "start": 55.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "I’m",
-                    "start": 69.66,
-                    "duration": 0.72
+                    "start": 56,
+                    "duration": 0.6
                 },
                 {
                     "text": "ok",
-                    "start": 70.38,
-                    "duration": 0.72
+                    "start": 56.6,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 71.11,
-            "end": 74,
-            "trending": false,
+            "start": 57.2,
+            "end": 59.6,
             "words": [
                 {
                     "text": "Had",
-                    "start": 71.11,
+                    "start": 57.2,
+                    "duration": 0.4
+                },
+                {
+                    "text": "him",
+                    "start": 57.6,
+                    "duration": 0.4
+                },
+                {
+                    "text": "in",
+                    "start": 58,
+                    "duration": 0.4
+                },
+                {
+                    "text": "the",
+                    "start": 58.4,
+                    "duration": 0.4
+                },
+                {
+                    "text": "1st",
+                    "start": 58.8,
+                    "duration": 0.4
+                },
+                {
+                    "text": "place",
+                    "start": 59.2,
+                    "duration": 0.4
+                }
+            ]
+        },
+        {
+            "start": 59.6,
+            "end": 62,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 59.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 60.2,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 60.8,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 61.4,
+                    "duration": 0.6
+                }
+            ]
+        },
+        {
+            "start": 62,
+            "end": 64.4,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 62,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 62.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 63.2,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 63.8,
+                    "duration": 0.6
+                }
+            ]
+        },
+        {
+            "start": 64.4,
+            "end": 66.8,
+            "words": [
+                {
+                    "text": "I",
+                    "start": 64.4,
+                    "duration": 0.34
+                },
+                {
+                    "text": "don’t",
+                    "start": 64.74,
+                    "duration": 0.34
+                },
+                {
+                    "text": "rlly",
+                    "start": 65.09,
+                    "duration": 0.34
+                },
+                {
+                    "text": "gotta",
+                    "start": 65.43,
+                    "duration": 0.34
+                },
+                {
+                    "text": "say",
+                    "start": 65.77,
+                    "duration": 0.34
+                },
+                {
+                    "text": "it’s",
+                    "start": 66.11,
+                    "duration": 0.34
+                },
+                {
+                    "text": "ok",
+                    "start": 66.46,
+                    "duration": 0.34
+                }
+            ]
+        },
+        {
+            "start": 66.8,
+            "end": 69.2,
+            "words": [
+                {
+                    "text": "You",
+                    "start": 66.8,
+                    "duration": 0.48
+                },
+                {
+                    "text": "can",
+                    "start": 67.28,
+                    "duration": 0.48
+                },
+                {
+                    "text": "have",
+                    "start": 67.76,
                     "duration": 0.48
                 },
                 {
                     "text": "him",
-                    "start": 71.59,
+                    "start": 68.24,
                     "duration": 0.48
                 },
                 {
-                    "text": "in",
-                    "start": 72.07,
+                    "text": "anyway",
+                    "start": 68.72,
+                    "duration": 0.48
+                }
+            ]
+        },
+        {
+            "start": 69.2,
+            "end": 71.6,
+            "words": [
+                {
+                    "text": "Anyway",
+                    "start": 69.2,
+                    "duration": 2.4
+                }
+            ]
+        },
+        {
+            "start": 71.6,
+            "end": 74,
+            "words": [
+                {
+                    "text": "You",
+                    "start": 71.6,
                     "duration": 0.48
                 },
                 {
-                    "text": "the",
-                    "start": 72.55,
+                    "text": "can",
+                    "start": 72.08,
                     "duration": 0.48
                 },
                 {
-                    "text": "1st",
-                    "start": 73.03999999999999,
+                    "text": "have",
+                    "start": 72.56,
                     "duration": 0.48
                 },
                 {
-                    "text": "place",
-                    "start": 73.52000000000001,
+                    "text": "him",
+                    "start": 73.04,
+                    "duration": 0.48
+                },
+                {
+                    "text": "anyway",
+                    "start": 73.52,
                     "duration": 0.48
                 }
             ]
         },
         {
             "start": 74,
-            "end": 76.89,
-            "trending": false,
+            "end": 76.4,
             "words": [
                 {
-                    "text": "It’s",
+                    "text": "Anyway",
                     "start": 74,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 74.72,
-                    "duration": 0.72
-                },
-                {
-                    "text": "I’m",
-                    "start": 75.45,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 76.17,
-                    "duration": 0.72
+                    "duration": 2.4
                 }
             ]
         },
         {
-            "start": 76.89,
-            "end": 79.79,
-            "trending": false,
-            "words": [
-                {
-                    "text": "It’s",
-                    "start": 76.89,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 77.62,
-                    "duration": 0.72
-                },
-                {
-                    "text": "I’m",
-                    "start": 78.34,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 79.07,
-                    "duration": 0.72
-                }
-            ]
-        },
-        {
-            "start": 79.79,
-            "end": 82.68,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 79.79,
-                    "duration": 0.41
-                },
-                {
-                    "text": "don’t",
-                    "start": 80.2,
-                    "duration": 0.41
-                },
-                {
-                    "text": "rlly",
-                    "start": 80.62,
-                    "duration": 0.41
-                },
-                {
-                    "text": "gotta",
-                    "start": 81.03,
-                    "duration": 0.41
-                },
-                {
-                    "text": "say",
-                    "start": 81.44,
-                    "duration": 0.41
-                },
-                {
-                    "text": "it’s",
-                    "start": 81.86,
-                    "duration": 0.41
-                },
-                {
-                    "text": "ok",
-                    "start": 82.27,
-                    "duration": 0.41
-                }
-            ]
-        },
-        {
-            "start": 82.68,
-            "end": 85.58,
-            "trending": false,
-            "words": [
-                {
-                    "text": "You",
-                    "start": 82.68,
-                    "duration": 0.58
-                },
-                {
-                    "text": "can",
-                    "start": 83.26,
-                    "duration": 0.58
-                },
-                {
-                    "text": "have",
-                    "start": 83.84,
-                    "duration": 0.58
-                },
-                {
-                    "text": "him",
-                    "start": 84.42,
-                    "duration": 0.58
-                },
-                {
-                    "text": "anyway",
-                    "start": 85,
-                    "duration": 0.58
-                }
-            ]
-        },
-        {
-            "start": 85.58,
-            "end": 88.47,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Anyway",
-                    "start": 85.58,
-                    "duration": 2.89
-                }
-            ]
-        },
-        {
-            "start": 88.47,
-            "end": 91.37,
-            "trending": false,
-            "words": [
-                {
-                    "text": "You",
-                    "start": 88.47,
-                    "duration": 0.58
-                },
-                {
-                    "text": "can",
-                    "start": 89.05,
-                    "duration": 0.58
-                },
-                {
-                    "text": "have",
-                    "start": 89.63,
-                    "duration": 0.58
-                },
-                {
-                    "text": "him",
-                    "start": 90.21,
-                    "duration": 0.58
-                },
-                {
-                    "text": "anyway",
-                    "start": 90.79,
-                    "duration": 0.58
-                }
-            ]
-        },
-        {
-            "start": 91.37,
-            "end": 94.26,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Anyway",
-                    "start": 91.37,
-                    "duration": 2.89
-                }
-            ]
-        },
-        {
-            "start": 94.26,
-            "end": 97.16,
-            "trending": false,
+            "start": 76.4,
+            "end": 78.8,
             "words": [
                 {
                     "text": "Was",
-                    "start": 94.26,
-                    "duration": 0.72
+                    "start": 76.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "such",
-                    "start": 94.99,
-                    "duration": 0.72
+                    "start": 77,
+                    "duration": 0.6
                 },
                 {
                     "text": "a",
-                    "start": 95.71,
-                    "duration": 0.72
+                    "start": 77.6,
+                    "duration": 0.6
                 },
                 {
                     "text": "romantic",
-                    "start": 96.43,
-                    "duration": 0.72
+                    "start": 78.2,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 97.16,
-            "end": 100.05,
-            "trending": false,
+            "start": 78.8,
+            "end": 81.2,
             "words": [
                 {
                     "text": "U",
-                    "start": 97.16,
-                    "duration": 0.48
+                    "start": 78.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "got",
-                    "start": 97.64,
-                    "duration": 0.48
+                    "start": 79.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "me",
-                    "start": 98.12,
-                    "duration": 0.48
+                    "start": 79.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "like",
-                    "start": 98.61,
-                    "duration": 0.48
+                    "start": 80,
+                    "duration": 0.4
                 },
                 {
                     "text": "fuck",
-                    "start": 99.09,
-                    "duration": 0.48
+                    "start": 80.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "that",
-                    "start": 99.57,
-                    "duration": 0.48
+                    "start": 80.8,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 100.05,
-            "end": 102.95,
-            "trending": false,
+            "start": 81.2,
+            "end": 83.6,
             "words": [
                 {
                     "text": "Some",
-                    "start": 100.05,
-                    "duration": 0.48
+                    "start": 81.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "months",
-                    "start": 100.54,
-                    "duration": 0.48
+                    "start": 81.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "and",
-                    "start": 101.02,
-                    "duration": 0.48
+                    "start": 82,
+                    "duration": 0.4
                 },
                 {
                     "text": "some",
-                    "start": 101.5,
-                    "duration": 0.48
+                    "start": 82.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "long",
-                    "start": 101.98,
-                    "duration": 0.48
+                    "start": 82.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "flights",
-                    "start": 102.46,
-                    "duration": 0.48
+                    "start": 83.2,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 102.95,
-            "end": 105.84,
-            "trending": false,
+            "start": 83.6,
+            "end": 86,
             "words": [
                 {
                     "text": "Now",
-                    "start": 102.95,
-                    "duration": 0.48
+                    "start": 83.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "I",
-                    "start": 103.43,
-                    "duration": 0.48
+                    "start": 84,
+                    "duration": 0.4
                 },
                 {
                     "text": "can’t",
-                    "start": 103.91,
-                    "duration": 0.48
+                    "start": 84.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "go",
-                    "start": 104.39,
-                    "duration": 0.48
+                    "start": 84.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "near",
-                    "start": 104.88,
-                    "duration": 0.48
+                    "start": 85.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "that",
-                    "start": 105.36,
-                    "duration": 0.48
+                    "start": 85.6,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 105.84,
-            "end": 108.74,
-            "trending": false,
+            "start": 86,
+            "end": 88.4,
             "words": [
                 {
                     "text": "And",
-                    "start": 105.84,
-                    "duration": 0.41
+                    "start": 86,
+                    "duration": 0.34
                 },
                 {
                     "text": "she",
-                    "start": 106.26,
-                    "duration": 0.41
+                    "start": 86.34,
+                    "duration": 0.34
                 },
                 {
                     "text": "be",
-                    "start": 106.67,
-                    "duration": 0.41
+                    "start": 86.69,
+                    "duration": 0.34
                 },
                 {
                     "text": "like",
-                    "start": 107.08,
-                    "duration": 0.41
+                    "start": 87.03,
+                    "duration": 0.34
                 },
                 {
                     "text": "he’s",
-                    "start": 107.5,
-                    "duration": 0.41
+                    "start": 87.37,
+                    "duration": 0.34
                 },
                 {
                     "text": "so",
-                    "start": 107.91,
-                    "duration": 0.41
+                    "start": 87.71,
+                    "duration": 0.34
                 },
                 {
                     "text": "perfect",
-                    "start": 108.32,
-                    "duration": 0.41
+                    "start": 88.06,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 108.74,
-            "end": 111.63,
-            "trending": false,
+            "start": 88.4,
+            "end": 90.8,
             "words": [
                 {
                     "text": "I",
-                    "start": 108.74,
-                    "duration": 0.41
+                    "start": 88.4,
+                    "duration": 0.34
                 },
                 {
                     "text": "be",
-                    "start": 109.15,
-                    "duration": 0.41
+                    "start": 88.74,
+                    "duration": 0.34
                 },
                 {
                     "text": "like",
-                    "start": 109.56,
-                    "duration": 0.41
+                    "start": 89.09,
+                    "duration": 0.34
                 },
                 {
                     "text": "oh,",
-                    "start": 109.98,
-                    "duration": 0.41
+                    "start": 89.43,
+                    "duration": 0.34
                 },
                 {
                     "text": "what",
-                    "start": 110.39,
-                    "duration": 0.41
+                    "start": 89.77,
+                    "duration": 0.34
                 },
                 {
                     "text": "version",
-                    "start": 110.8,
-                    "duration": 0.41
+                    "start": 90.11,
+                    "duration": 0.34
                 },
                 {
                     "text": "?",
-                    "start": 111.22,
-                    "duration": 0.41
+                    "start": 90.46,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 111.63,
-            "end": 114.53,
-            "trending": false,
+            "start": 90.8,
+            "end": 93.2,
             "words": [
                 {
                     "text": "Ain’t",
-                    "start": 111.63,
-                    "duration": 0.48
+                    "start": 90.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "nobody",
-                    "start": 112.11,
-                    "duration": 0.48
+                    "start": 91.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "got",
-                    "start": 112.6,
-                    "duration": 0.48
+                    "start": 91.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "me",
-                    "start": 113.08,
-                    "duration": 0.48
+                    "start": 92,
+                    "duration": 0.4
                 },
                 {
                     "text": "this",
-                    "start": 113.56,
-                    "duration": 0.48
+                    "start": 92.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "nervous",
-                    "start": 114.04,
-                    "duration": 0.48
+                    "start": 92.8,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 114.53,
-            "end": 117.42,
-            "trending": false,
+            "start": 93.2,
+            "end": 95.6,
             "words": [
                 {
                     "text": "Oh",
-                    "start": 114.53,
-                    "duration": 0.58
+                    "start": 93.2,
+                    "duration": 0.48
                 },
                 {
                     "text": "baby",
-                    "start": 115.11,
-                    "duration": 0.58
+                    "start": 93.68,
+                    "duration": 0.48
                 },
                 {
                     "text": "I",
-                    "start": 115.68,
-                    "duration": 0.58
+                    "start": 94.16,
+                    "duration": 0.48
                 },
                 {
                     "text": "been",
-                    "start": 116.26,
-                    "duration": 0.58
+                    "start": 94.64,
+                    "duration": 0.48
                 },
                 {
                     "text": "there",
-                    "start": 116.84,
-                    "duration": 0.58
+                    "start": 95.12,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 117.42,
-            "end": 120.32,
-            "trending": false,
+            "start": 95.6,
+            "end": 98,
             "words": [
                 {
                     "text": "And",
-                    "start": 117.42,
-                    "duration": 0.48
+                    "start": 95.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "right",
-                    "start": 117.9,
-                    "duration": 0.48
+                    "start": 96,
+                    "duration": 0.4
                 },
                 {
                     "text": "in",
-                    "start": 118.39,
-                    "duration": 0.48
+                    "start": 96.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "that",
-                    "start": 118.87,
-                    "duration": 0.48
+                    "start": 96.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "same",
-                    "start": 119.35,
-                    "duration": 0.48
+                    "start": 97.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "position",
-                    "start": 119.83,
-                    "duration": 0.48
+                    "start": 97.6,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 120.32,
-            "end": 123.21,
-            "trending": false,
+            "start": 98,
+            "end": 100.4,
             "words": [
                 {
                     "text": "So",
-                    "start": 120.32,
-                    "duration": 0.48
+                    "start": 98,
+                    "duration": 0.4
                 },
                 {
                     "text": "baby",
-                    "start": 120.8,
-                    "duration": 0.48
+                    "start": 98.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "don’t",
-                    "start": 121.28,
-                    "duration": 0.48
+                    "start": 98.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "get",
-                    "start": 121.76,
-                    "duration": 0.48
+                    "start": 99.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "this",
-                    "start": 122.25,
-                    "duration": 0.48
+                    "start": 99.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "twisted",
-                    "start": 122.73,
-                    "duration": 0.48
+                    "start": 100,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 123.21,
-            "end": 126.11,
-            "trending": false,
+            "start": 100.4,
+            "end": 102.8,
             "words": [
                 {
                     "text": "No,",
-                    "start": 123.21,
-                    "duration": 0.41
+                    "start": 100.4,
+                    "duration": 0.34
                 },
                 {
                     "text": "nothing",
-                    "start": 123.62,
-                    "duration": 0.41
+                    "start": 100.74,
+                    "duration": 0.34
                 },
                 {
                     "text": "could",
-                    "start": 124.04,
-                    "duration": 0.41
+                    "start": 101.09,
+                    "duration": 0.34
                 },
                 {
                     "text": "make",
-                    "start": 124.45,
-                    "duration": 0.41
+                    "start": 101.43,
+                    "duration": 0.34
                 },
                 {
                     "text": "me",
-                    "start": 124.86,
-                    "duration": 0.41
+                    "start": 101.77,
+                    "duration": 0.34
                 },
                 {
                     "text": "miss",
-                    "start": 125.28,
-                    "duration": 0.41
+                    "start": 102.11,
+                    "duration": 0.34
                 },
                 {
                     "text": "it",
-                    "start": 125.69,
-                    "duration": 0.41
+                    "start": 102.46,
+                    "duration": 0.34
                 }
             ]
         },
         {
-            "start": 126.11,
-            "end": 129,
-            "trending": false,
+            "start": 102.8,
+            "end": 105.2,
             "words": [
                 {
                     "text": "Take",
-                    "start": 126.11,
-                    "duration": 0.72
+                    "start": 102.8,
+                    "duration": 0.6
                 },
                 {
                     "text": "him",
-                    "start": 126.83,
-                    "duration": 0.72
+                    "start": 103.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "he’s",
-                    "start": 127.55,
-                    "duration": 0.72
+                    "start": 104,
+                    "duration": 0.6
                 },
                 {
                     "text": "yours",
-                    "start": 128.28,
-                    "duration": 0.72
+                    "start": 104.6,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 129,
-            "end": 131.89,
-            "trending": false,
+            "start": 105.2,
+            "end": 107.6,
             "words": [
                 {
                     "text": "It’s",
-                    "start": 129,
-                    "duration": 0.72
+                    "start": 105.2,
+                    "duration": 0.6
                 },
                 {
                     "text": "ok",
-                    "start": 129.72,
-                    "duration": 0.72
+                    "start": 105.8,
+                    "duration": 0.6
                 },
                 {
                     "text": "I’m",
-                    "start": 130.45,
-                    "duration": 0.72
+                    "start": 106.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "ok",
-                    "start": 131.17000000000002,
-                    "duration": 0.72
+                    "start": 107,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 131.89,
-            "end": 134.79000000000002,
-            "trending": false,
+            "start": 107.6,
+            "end": 110,
             "words": [
                 {
                     "text": "Had",
-                    "start": 131.89,
-                    "duration": 0.48
+                    "start": 107.6,
+                    "duration": 0.4
                 },
                 {
                     "text": "him",
-                    "start": 132.38,
-                    "duration": 0.48
+                    "start": 108,
+                    "duration": 0.4
                 },
                 {
                     "text": "in",
-                    "start": 132.86,
-                    "duration": 0.48
+                    "start": 108.4,
+                    "duration": 0.4
                 },
                 {
                     "text": "the",
-                    "start": 133.34,
-                    "duration": 0.48
+                    "start": 108.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "1st",
-                    "start": 133.82,
-                    "duration": 0.48
+                    "start": 109.2,
+                    "duration": 0.4
                 },
                 {
                     "text": "place",
-                    "start": 134.31,
+                    "start": 109.6,
+                    "duration": 0.4
+                }
+            ]
+        },
+        {
+            "start": 110,
+            "end": 112.4,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 110,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 110.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 111.2,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 111.8,
+                    "duration": 0.6
+                }
+            ]
+        },
+        {
+            "start": 112.4,
+            "end": 114.8,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 112.4,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 113,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 113.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 114.2,
+                    "duration": 0.6
+                }
+            ]
+        },
+        {
+            "start": 114.8,
+            "end": 117.2,
+            "words": [
+                {
+                    "text": "I",
+                    "start": 114.8,
+                    "duration": 0.34
+                },
+                {
+                    "text": "don’t",
+                    "start": 115.14,
+                    "duration": 0.34
+                },
+                {
+                    "text": "rlly",
+                    "start": 115.49,
+                    "duration": 0.34
+                },
+                {
+                    "text": "gotta",
+                    "start": 115.83,
+                    "duration": 0.34
+                },
+                {
+                    "text": "say",
+                    "start": 116.17,
+                    "duration": 0.34
+                },
+                {
+                    "text": "it’s",
+                    "start": 116.51,
+                    "duration": 0.34
+                },
+                {
+                    "text": "ok",
+                    "start": 116.86,
+                    "duration": 0.34
+                }
+            ]
+        },
+        {
+            "start": 117.2,
+            "end": 119.6,
+            "words": [
+                {
+                    "text": "You",
+                    "start": 117.2,
+                    "duration": 0.48
+                },
+                {
+                    "text": "can",
+                    "start": 117.68,
+                    "duration": 0.48
+                },
+                {
+                    "text": "have",
+                    "start": 118.16,
+                    "duration": 0.48
+                },
+                {
+                    "text": "him",
+                    "start": 118.64,
+                    "duration": 0.48
+                },
+                {
+                    "text": "anyway",
+                    "start": 119.12,
                     "duration": 0.48
                 }
             ]
         },
         {
-            "start": 134.79000000000002,
-            "end": 137.68,
-            "trending": false,
+            "start": 119.6,
+            "end": 122,
             "words": [
                 {
-                    "text": "It’s",
-                    "start": 134.79000000000002,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 135.51,
-                    "duration": 0.72
-                },
-                {
-                    "text": "I’m",
-                    "start": 136.24,
-                    "duration": 0.72
-                },
-                {
-                    "text": "ok",
-                    "start": 136.95999999999998,
-                    "duration": 0.72
+                    "text": "Anyway",
+                    "start": 119.6,
+                    "duration": 2.4
                 }
             ]
         },
         {
-            "start": 137.68,
-            "end": 140.57999999999998,
-            "trending": false,
+            "start": 122,
+            "end": 124.4,
             "words": [
                 {
-                    "text": "It’s",
-                    "start": 137.68,
-                    "duration": 0.72
+                    "text": "You",
+                    "start": 122,
+                    "duration": 0.48
                 },
                 {
-                    "text": "ok",
-                    "start": 138.41,
-                    "duration": 0.72
+                    "text": "can",
+                    "start": 122.48,
+                    "duration": 0.48
                 },
                 {
-                    "text": "I’m",
-                    "start": 139.13,
-                    "duration": 0.72
+                    "text": "have",
+                    "start": 122.96,
+                    "duration": 0.48
                 },
                 {
-                    "text": "ok",
-                    "start": 139.86,
-                    "duration": 0.72
+                    "text": "him",
+                    "start": 123.44,
+                    "duration": 0.48
+                },
+                {
+                    "text": "anyway",
+                    "start": 123.92,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 140.57999999999998,
-            "end": 143.47,
-            "trending": false,
+            "start": 124.4,
+            "end": 126.8,
             "words": [
                 {
-                    "text": "I",
-                    "start": 140.57999999999998,
-                    "duration": 0.41
+                    "text": "Anyway",
+                    "start": 124.4,
+                    "duration": 2.4
+                }
+            ]
+        },
+        {
+            "start": 126.8,
+            "end": 129.2,
+            "words": [
+                {
+                    "text": "When",
+                    "start": 126.8,
+                    "duration": 0.34
                 },
                 {
-                    "text": "don’t",
-                    "start": 140.99,
-                    "duration": 0.41
+                    "text": "he",
+                    "start": 127.14,
+                    "duration": 0.34
                 },
                 {
-                    "text": "rlly",
-                    "start": 141.41,
-                    "duration": 0.41
+                    "text": "leaves",
+                    "start": 127.49,
+                    "duration": 0.34
                 },
                 {
-                    "text": "gotta",
-                    "start": 141.82,
-                    "duration": 0.41
+                    "text": "u",
+                    "start": 127.83,
+                    "duration": 0.34
+                },
+                {
+                    "text": "in",
+                    "start": 128.17,
+                    "duration": 0.34
+                },
+                {
+                    "text": "the",
+                    "start": 128.51,
+                    "duration": 0.34
+                },
+                {
+                    "text": "dirt",
+                    "start": 128.86,
+                    "duration": 0.34
+                }
+            ]
+        },
+        {
+            "start": 129.2,
+            "end": 131.6,
+            "words": [
+                {
+                    "text": "Don’t",
+                    "start": 129.2,
+                    "duration": 0.24
+                },
+                {
+                    "text": "tell",
+                    "start": 129.44,
+                    "duration": 0.24
+                },
+                {
+                    "text": "me",
+                    "start": 129.68,
+                    "duration": 0.24
+                },
+                {
+                    "text": "u",
+                    "start": 129.92,
+                    "duration": 0.24
+                },
+                {
+                    "text": "didn’t",
+                    "start": 130.16,
+                    "duration": 0.24
+                },
+                {
+                    "text": "hear",
+                    "start": 130.4,
+                    "duration": 0.24
+                },
+                {
+                    "text": "it",
+                    "start": 130.64,
+                    "duration": 0.24
+                },
+                {
+                    "text": "from",
+                    "start": 130.88,
+                    "duration": 0.24
+                },
+                {
+                    "text": "me",
+                    "start": 131.12,
+                    "duration": 0.24
+                },
+                {
+                    "text": "first",
+                    "start": 131.36,
+                    "duration": 0.24
+                }
+            ]
+        },
+        {
+            "start": 131.6,
+            "end": 134,
+            "words": [
+                {
+                    "text": "When",
+                    "start": 131.6,
+                    "duration": 0.4
+                },
+                {
+                    "text": "u",
+                    "start": 132,
+                    "duration": 0.4
+                },
+                {
+                    "text": "realize",
+                    "start": 132.4,
+                    "duration": 0.4
+                },
+                {
+                    "text": "he’s",
+                    "start": 132.8,
+                    "duration": 0.4
+                },
+                {
+                    "text": "a",
+                    "start": 133.2,
+                    "duration": 0.4
+                },
+                {
+                    "text": "flirt",
+                    "start": 133.6,
+                    "duration": 0.4
+                }
+            ]
+        },
+        {
+            "start": 134,
+            "end": 136.4,
+            "words": [
+                {
+                    "text": "Don’t",
+                    "start": 134,
+                    "duration": 0.27
                 },
                 {
                     "text": "say",
-                    "start": 142.23,
-                    "duration": 0.41
+                    "start": 134.27,
+                    "duration": 0.27
                 },
                 {
-                    "text": "it’s",
-                    "start": 142.65,
-                    "duration": 0.41
+                    "text": "I",
+                    "start": 134.53,
+                    "duration": 0.27
+                },
+                {
+                    "text": "didn’t",
+                    "start": 134.8,
+                    "duration": 0.27
+                },
+                {
+                    "text": "warn",
+                    "start": 135.07,
+                    "duration": 0.27
+                },
+                {
+                    "text": "u",
+                    "start": 135.33,
+                    "duration": 0.27
+                },
+                {
+                    "text": "cause",
+                    "start": 135.6,
+                    "duration": 0.27
+                },
+                {
+                    "text": "it",
+                    "start": 135.87,
+                    "duration": 0.27
+                },
+                {
+                    "text": "hurts",
+                    "start": 136.13,
+                    "duration": 0.27
+                }
+            ]
+        },
+        {
+            "start": 136.4,
+            "end": 138.8,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 136.4,
+                    "duration": 0.6
                 },
                 {
                     "text": "ok",
-                    "start": 143.06,
-                    "duration": 0.41
+                    "start": 137,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 137.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 138.2,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 143.47,
-            "end": 146.37,
-            "trending": false,
+            "start": 138.8,
+            "end": 141.2,
             "words": [
                 {
-                    "text": "You",
-                    "start": 143.47,
-                    "duration": 0.58
-                },
-                {
-                    "text": "can",
-                    "start": 144.05,
-                    "duration": 0.58
-                },
-                {
-                    "text": "have",
-                    "start": 144.63,
-                    "duration": 0.58
+                    "text": "Had",
+                    "start": 138.8,
+                    "duration": 0.4
                 },
                 {
                     "text": "him",
-                    "start": 145.21,
-                    "duration": 0.58
+                    "start": 139.2,
+                    "duration": 0.4
                 },
                 {
-                    "text": "anyway",
-                    "start": 145.79,
-                    "duration": 0.58
+                    "text": "in",
+                    "start": 139.6,
+                    "duration": 0.4
+                },
+                {
+                    "text": "the",
+                    "start": 140,
+                    "duration": 0.4
+                },
+                {
+                    "text": "1st",
+                    "start": 140.4,
+                    "duration": 0.4
+                },
+                {
+                    "text": "place",
+                    "start": 140.8,
+                    "duration": 0.4
                 }
             ]
         },
         {
-            "start": 146.37,
-            "end": 149.26,
-            "trending": true,
+            "start": 141.2,
+            "end": 143.6,
             "words": [
                 {
-                    "text": "Anyway",
-                    "start": 146.37,
-                    "duration": 2.89
+                    "text": "It’s",
+                    "start": 141.2,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 141.8,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 142.4,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 143,
+                    "duration": 0.6
                 }
             ]
         },
         {
-            "start": 149.26,
-            "end": 152.16,
-            "trending": false,
+            "start": 143.6,
+            "end": 146,
+            "words": [
+                {
+                    "text": "It’s",
+                    "start": 143.6,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 144.2,
+                    "duration": 0.6
+                },
+                {
+                    "text": "I’m",
+                    "start": 144.8,
+                    "duration": 0.6
+                },
+                {
+                    "text": "ok",
+                    "start": 145.4,
+                    "duration": 0.6
+                }
+            ]
+        },
+        {
+            "start": 146,
+            "end": 148.4,
+            "words": [
+                {
+                    "text": "I",
+                    "start": 146,
+                    "duration": 0.34
+                },
+                {
+                    "text": "don’t",
+                    "start": 146.34,
+                    "duration": 0.34
+                },
+                {
+                    "text": "rlly",
+                    "start": 146.69,
+                    "duration": 0.34
+                },
+                {
+                    "text": "gotta",
+                    "start": 147.03,
+                    "duration": 0.34
+                },
+                {
+                    "text": "say",
+                    "start": 147.37,
+                    "duration": 0.34
+                },
+                {
+                    "text": "it’s",
+                    "start": 147.71,
+                    "duration": 0.34
+                },
+                {
+                    "text": "ok",
+                    "start": 148.06,
+                    "duration": 0.34
+                }
+            ]
+        },
+        {
+            "start": 148.4,
+            "end": 150.8,
             "words": [
                 {
                     "text": "You",
-                    "start": 149.26,
-                    "duration": 0.58
+                    "start": 148.4,
+                    "duration": 0.48
                 },
                 {
                     "text": "can",
+                    "start": 148.88,
+                    "duration": 0.48
+                },
+                {
+                    "text": "have",
+                    "start": 149.36,
+                    "duration": 0.48
+                },
+                {
+                    "text": "him",
                     "start": 149.84,
-                    "duration": 0.58
-                },
-                {
-                    "text": "have",
-                    "start": 150.42,
-                    "duration": 0.58
-                },
-                {
-                    "text": "him",
-                    "start": 151,
-                    "duration": 0.58
+                    "duration": 0.48
                 },
                 {
                     "text": "anyway",
-                    "start": 151.58,
-                    "duration": 0.58
+                    "start": 150.32,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 152.16,
-            "end": 155.05,
-            "trending": true,
+            "start": 150.8,
+            "end": 153.2,
             "words": [
                 {
                     "text": "Anyway",
-                    "start": 152.16,
-                    "duration": 2.89
+                    "start": 150.8,
+                    "duration": 2.4
                 }
             ]
         },
         {
-            "start": 155.05,
-            "end": 157.95,
-            "trending": false,
+            "start": 153.2,
+            "end": 155.6,
             "words": [
                 {
-                    "text": "I",
-                    "start": 155.05,
-                    "duration": 0.36
+                    "text": "You",
+                    "start": 153.2,
+                    "duration": 0.48
                 },
                 {
-                    "text": "don’t",
-                    "start": 155.41,
-                    "duration": 0.36
+                    "text": "can",
+                    "start": 153.68,
+                    "duration": 0.48
                 },
                 {
-                    "text": "want",
-                    "start": 155.78,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 156.14,
-                    "duration": 0.36
-                },
-                {
-                    "text": "anyway,",
-                    "start": 156.5,
-                    "duration": 0.36
-                },
-                {
-                    "text": "girl",
-                    "start": 156.86,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 157.22,
-                    "duration": 0.36
+                    "text": "have",
+                    "start": 154.16,
+                    "duration": 0.48
                 },
                 {
                     "text": "him",
-                    "start": 157.59,
-                    "duration": 0.36
+                    "start": 154.64,
+                    "duration": 0.48
+                },
+                {
+                    "text": "anyway",
+                    "start": 155.12,
+                    "duration": 0.48
                 }
             ]
         },
         {
-            "start": 157.95,
-            "end": 160.84,
-            "trending": false,
+            "start": 155.6,
+            "end": 158,
             "words": [
                 {
-                    "text": "I",
-                    "start": 157.95,
-                    "duration": 0.36
-                },
-                {
-                    "text": "don’t",
-                    "start": 158.31,
-                    "duration": 0.36
-                },
-                {
-                    "text": "want",
-                    "start": 158.67,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 159.03,
-                    "duration": 0.36
-                },
-                {
-                    "text": "anyway,",
-                    "start": 159.39,
-                    "duration": 0.36
-                },
-                {
-                    "text": "girl",
-                    "start": 159.76,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 160.12,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 160.48,
-                    "duration": 0.36
-                }
-            ]
-        },
-        {
-            "start": 160.84,
-            "end": 163.74,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 160.84,
-                    "duration": 0.36
-                },
-                {
-                    "text": "don’t",
-                    "start": 161.2,
-                    "duration": 0.36
-                },
-                {
-                    "text": "want",
-                    "start": 161.57,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 161.93,
-                    "duration": 0.36
-                },
-                {
-                    "text": "anyway,",
-                    "start": 162.29,
-                    "duration": 0.36
-                },
-                {
-                    "text": "girl",
-                    "start": 162.65,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 163.01,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 163.37,
-                    "duration": 0.36
-                }
-            ]
-        },
-        {
-            "start": 163.74,
-            "end": 166.63,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 163.74,
-                    "duration": 0.72
-                },
-                {
-                    "text": "don’t",
-                    "start": 164.46,
-                    "duration": 0.72
-                },
-                {
-                    "text": "want",
-                    "start": 165.18,
-                    "duration": 0.72
-                },
-                {
-                    "text": "him",
-                    "start": 165.91,
-                    "duration": 0.72
-                }
-            ]
-        },
-        {
-            "start": 166.63,
-            "end": 169.53,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 166.63,
-                    "duration": 0.72
-                },
-                {
-                    "text": "don’t",
-                    "start": 167.36,
-                    "duration": 0.72
-                },
-                {
-                    "text": "want",
-                    "start": 168.08,
-                    "duration": 0.72
-                },
-                {
-                    "text": "him",
-                    "start": 168.8,
-                    "duration": 0.72
-                }
-            ]
-        },
-        {
-            "start": 169.53,
-            "end": 172.42,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 169.53,
-                    "duration": 0.36
-                },
-                {
-                    "text": "don’t",
-                    "start": 169.89,
-                    "duration": 0.36
-                },
-                {
-                    "text": "want",
-                    "start": 170.25,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 170.61,
-                    "duration": 0.36
-                },
-                {
-                    "text": "anyway,",
-                    "start": 170.97,
-                    "duration": 0.36
-                },
-                {
-                    "text": "girl",
-                    "start": 171.34,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 171.7,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 172.06,
-                    "duration": 0.36
-                }
-            ]
-        },
-        {
-            "start": 172.42,
-            "end": 175.32,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 172.42,
-                    "duration": 0.36
-                },
-                {
-                    "text": "don’t",
-                    "start": 172.78,
-                    "duration": 0.36
-                },
-                {
-                    "text": "want",
-                    "start": 173.14,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 173.51,
-                    "duration": 0.36
-                },
-                {
-                    "text": "anyway,",
-                    "start": 173.87,
-                    "duration": 0.36
-                },
-                {
-                    "text": "girl",
-                    "start": 174.23,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 174.59,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 174.95,
-                    "duration": 0.36
-                }
-            ]
-        },
-        {
-            "start": 175.32,
-            "end": 178.21,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 175.32,
-                    "duration": 0.36
-                },
-                {
-                    "text": "don’t,",
-                    "start": 175.68,
-                    "duration": 0.36
-                },
-                {
-                    "text": "it’s",
-                    "start": 176.04,
-                    "duration": 0.36
-                },
-                {
-                    "text": "ok,",
-                    "start": 176.4,
-                    "duration": 0.36
-                },
-                {
-                    "text": "it’s",
-                    "start": 176.76,
-                    "duration": 0.36
-                },
-                {
-                    "text": "ok,",
-                    "start": 177.12,
-                    "duration": 0.36
-                },
-                {
-                    "text": "take",
-                    "start": 177.49,
-                    "duration": 0.36
-                },
-                {
-                    "text": "him",
-                    "start": 177.85,
-                    "duration": 0.36
-                }
-            ]
-        },
-        {
-            "start": 178.21,
-            "end": 181.11,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 178.21,
-                    "duration": 0.72
-                },
-                {
-                    "text": "don’t",
-                    "start": 178.93,
-                    "duration": 0.72
-                },
-                {
-                    "text": "want",
-                    "start": 179.66,
-                    "duration": 0.72
-                },
-                {
-                    "text": "him",
-                    "start": 180.38,
-                    "duration": 0.72
-                }
-            ]
-        },
-        {
-            "start": 181.11,
-            "end": 184,
-            "trending": false,
-            "words": [
-                {
-                    "text": "I",
-                    "start": 181.11,
-                    "duration": 0.72
-                },
-                {
-                    "text": "don’t",
-                    "start": 181.83,
-                    "duration": 0.72
-                },
-                {
-                    "text": "want",
-                    "start": 182.55,
-                    "duration": 0.72
-                },
-                {
-                    "text": "him",
-                    "start": 183.28,
-                    "duration": 0.72
+                    "text": "Anyway",
+                    "start": 155.6,
+                    "duration": 2.4
                 }
             ]
         }

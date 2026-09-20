@@ -25,7 +25,7 @@ function initHarmonyTunes() {
             duration: "3:02",
             src: "/music/tate_mcrae_its_okay_im_okay.mp3",
             art: "/images/harmony-tunes-card.jpg",
-            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
+            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 24,
             tags: ['pop', 'upbeat']
         },
         {
