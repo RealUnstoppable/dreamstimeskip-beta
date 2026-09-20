@@ -1142,19 +1142,13 @@ function initHarmonyTunes() {
             }, 400);
         });
 
-        // Fullscreen Player
+        // Fullscreen Player — slide-up open/close
         function openFullscreen() {
             const song = currentQueue[currentSongIndex];
             if(!song) return;
             fsArt.src = song.art;
             fsBg.style.backgroundImage = `url(${song.art})`;
             fsTitle.textContent = song.title;
-            const viewLyrics = document.getElementById('view-lyrics');
-            if (viewLyrics) {
-                viewLyrics.style.backgroundImage = `linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 30%, transparent) 0%, color-mix(in srgb, var(--theme-color) 40%, transparent) 100%), url(${song.art})`;
-                viewLyrics.style.backgroundSize = 'cover';
-                viewLyrics.style.backgroundPosition = 'center';
-            }
             fsArtist.textContent = song.artist;
             // Sync state into fullscreen buttons
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
@@ -1164,7 +1158,13 @@ function initHarmonyTunes() {
             if(fsProgress && activeAudio.duration) {
                 fsProgress.style.width = `${(activeAudio.currentTime / activeAudio.duration) * 100}%`;
             }
+            // Show with slide-up animation
             fsPlayer.style.display = 'flex';
+            // Force reflow so transition fires
+            fsPlayer.offsetHeight;
+            fsPlayer.classList.remove('fs-hiding');
+            fsPlayer.classList.add('fs-visible');
+
             if (isPlaying) {
                 if(fsPlayIcon) fsPlayIcon.style.display = 'none';
                 if(fsPauseIcon) fsPauseIcon.style.display = 'block';
@@ -1174,7 +1174,16 @@ function initHarmonyTunes() {
             }
         }
         function closeFullscreen() {
-            fsPlayer.style.display = 'none';
+            fsPlayer.classList.remove('fs-visible');
+            fsPlayer.classList.add('fs-hiding');
+            setTimeout(() => {
+                fsPlayer.style.display = 'none';
+                fsPlayer.classList.remove('fs-hiding');
+                // Also collapse lyrics side panel
+                const fsContent = document.getElementById('fullscreen-content');
+                if (fsContent) fsContent.classList.remove('lyrics-open');
+                if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
+            }, 420);
         }
 
         playerArt.addEventListener('click', openFullscreen);
@@ -1189,7 +1198,36 @@ function initHarmonyTunes() {
         if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
         if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
 
-        
+        // Fullscreen lyrics button → side panel (not the old full-screen lyrics view)
+        if (fsLyricsBtn) {
+            fsLyricsBtn.addEventListener('click', () => {
+                const fsContent = document.getElementById('fullscreen-content');
+                const fsSidePanel = document.getElementById('fs-lyrics-side-panel');
+                if (!fsContent || !fsSidePanel) return;
+
+                const isOpen = fsContent.classList.toggle('lyrics-open');
+                fsLyricsBtn.style.color = isOpen ? 'var(--accent-green)' : '#b3b3b3';
+
+                if (isOpen) {
+                    // Mirror the current lyrics content into the side panel
+                    const lyricsSource = document.getElementById('lyrics-content');
+                    if (lyricsSource) {
+                        fsSidePanel.innerHTML = lyricsSource.innerHTML;
+                        // Scroll to active line
+                        setTimeout(() => {
+                            const activeLine = fsSidePanel.querySelector('.lyric-line.active');
+                            if (activeLine) {
+                                activeLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                            }
+                        }, 380);
+                    } else {
+                        fsSidePanel.innerHTML = '<p style="color:rgba(255,255,255,0.4);padding:20px;text-align:center;">No lyrics available.</p>';
+                    }
+                }
+            });
+        }
+
+
         // Artist Profile
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
@@ -1406,6 +1444,20 @@ function initHarmonyTunes() {
                     behavior: 'smooth'
                 });
                 setTimeout(() => isProgrammaticScroll = false, 800);
+            }
+
+            // Mirror active line into the fs-lyrics-side-panel if open
+            const fsSidePanel = document.getElementById('fs-lyrics-side-panel');
+            const fsContent = document.getElementById('fullscreen-content');
+            if (fsSidePanel && fsContent && fsContent.classList.contains('lyrics-open')) {
+                const sideLines = fsSidePanel.querySelectorAll('.lyric-line');
+                sideLines.forEach((el, i) => {
+                    el.classList.toggle('active', i === activeLineIndex);
+                });
+                const sideActiveLine = sideLines[activeLineIndex];
+                if (sideActiveLine) {
+                    sideActiveLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
             }
         }
     }
