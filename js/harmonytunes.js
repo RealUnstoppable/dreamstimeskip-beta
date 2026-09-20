@@ -3,6 +3,8 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js?v=1789909119';
 
+import { librarySongs, songColors, getSongById } from './song-data.js?v=20260920';
+
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
     if (str == null) return "";
@@ -17,88 +19,17 @@ function escapeHTML(str) {
 
 function initHarmonyTunes() {
     // --- STATE ---
-    const librarySongs = [
-        {
-            id: 'tate-mcrae-its-okay-im-okay',
-            title: "It's ok I'm ok",
-            artist: "Tate McRae",
-            duration: "3:02",
-            src: "/music/tate_mcrae_its_okay_im_okay.mp3",
-            art: "/images/tate_mcrae_cover_v2.png",
-            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 29,
-            tags: ['pop', 'upbeat']
-        },
-        {
-            id: 'astrophage',
-            title: "Astrophage",
-            artist: "Lupus Nocte",
-            duration: "3:10",
-            src: "/music/Astrophage.mp3",
-            art: "/images/astrophage_cover.jpg",
-            bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
-            tags: ['electronic', 'synth', 'energetic']
-        },
-        { 
-            id: 'pixy-legacy',
-            title: "PIXY - LEGACY", 
-            artist: "Catalin", 
-            duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/legacy_cover.jpg",
-            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
-            tags: ['dark', 'electronic', 'intense']
-        },
-        { 
-            id: 'kesha-blow',
-            title: "Blow", 
-            artist: "Kesha", 
-            duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
-            art: "/images/blow_cover.jpg",
-            bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
-            tags: ['pop', 'party', 'electronic']
-        },
-        { 
-            id: 'deorc-decuple',
-            title: "Deorc Decuple", 
-            artist: "FormantX", 
-            duration: "3:45", 
-            src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/deorc_cover.jpg",
-            bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
-            tags: ['chill', 'lo-fi', 'relaxed']
-        },
-        { 
-            id: 'no-pole-remix',
-            title: "No Pole x Where Have You Been", 
-            artist: "Remix", 
-            duration: "2:30", 
-            src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/nopole_cover.jpg",
-            bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
-            tags: ['upbeat', 'pop', 'happy']
-        },
-    ];
-
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
 
-    const songColors = {
-        'pixy-legacy': '#5c4a3d',      // Warm Brown
-        'deorc-decuple': '#1d3036',    // Dark Teal Grey
-        'no-pole-remix': '#a11f8b',    // Neon Magenta
-        'tate-mcrae-its-okay-im-okay': '#1a2b4c', // Deep Pink
-        'astrophage': '#2a0c3b', // Synthwave Dark Purple
-        'kesha-blow': '#e63995' // Neon Pink
-    };
-
-    const tiktokEmbeds = [
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7361214658742652206" data-video-id="7361214658742652206" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> if you read this u have to follow <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a target="_blank" title="♬ Silence 1 Minute - silence moments" href="https://www.tiktok.com/music/Silence-1-Minute-6736021306824738817?refer=embed">♬ Silence 1 Minute - silence moments</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7286740931238317342" data-video-id="7286740931238317342" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> New songs every week! Follow us for the latest popular hits, delivered straight to your feed. We&#39;re the best place to discover new music and stay ahead of the trends. Plus, we&#39;re always up for a good time, so expect plenty of fun videos. <a title="liltay" target="_blank" href="https://www.tiktok.com/tag/liltay?refer=embed">#liltay</a> <a title="edit" target="_blank" href="https://www.tiktok.com/tag/edit?refer=embed">#edit</a> <a title="sucker4green" target="_blank" href="https://www.tiktok.com/tag/sucker4green?refer=embed">#sucker4green</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a target="_blank" title="♬ SUCKER 4 GREEN (MONEY) - LIL TAY" href="https://www.tiktok.com/music/SUCKER-4-GREEN-MONEY-7284095435357095938?refer=embed">♬ SUCKER 4 GREEN (MONEY) - LIL TAY</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7340749763630894378" data-video-id="7340749763630894378" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> Exes - Tate McRae - HarmonyTunes Follow Us on Socials and join our Discord Community ;) <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="sound" target="_blank" href="https://www.tiktok.com/tag/sound?refer=embed">#sound</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - preppy - miaaxess" href="https://www.tiktok.com/music/original-sound-preppy-7247743262663641857?refer=embed">♬ original sound - preppy - miaaxess</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7339769870399081770" data-video-id="7339769870399081770" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> @Dan!k On Spotify! Follow us for more music each week, and join our discord community in the profile description. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a target="_blank" title="♬ Dream. - Dan!k" href="https://www.tiktok.com/music/Dream-7322348789938128898?refer=embed">♬ Dream. - Dan!k</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7343010577624747306" data-video-id="7343010577624747306" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> If this video gets 100 likes we will start uploading daily. If you have a song you want us to do next leave a comment. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypage" target="_blank" href="https://www.tiktok.com/tag/fypage?refer=embed">#fypage</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - HarmonyTunes" href="https://www.tiktok.com/music/original-sound-7343010650165087018?refer=embed">♬ original sound - HarmonyTunes</a> </section> </blockquote>`
+    // TikTok videos — using direct iframe embed (no embed.js needed, always works after dynamic injection)
+    const tiktokVideos = [
+        { id: '7361214658742652206', caption: 'if you read this u have to follow #fyp #viral #music' },
+        { id: '7343010577624747306', caption: 'If this video gets 100 likes we will start uploading daily #fyp #music #viral' },
+        { id: '7340749763630894378', caption: 'Exes - Tate McRae - HarmonyTunes #fyp #viral #music' },
+        { id: '7286740931238317342', caption: 'New songs every week! #liltay #fyp #viral' },
     ];
+
 
     let userFavorites = [];
     let favoriteIds = new Set();
@@ -399,10 +330,44 @@ function initHarmonyTunes() {
         setupNavigation();
         setupPlayerEvents();
         
-        // Initialize the queue so the player bar (and favorites) work before pressing play
-        currentQueue = [...librarySongs];
-        currentSongIndex = 0;
-        loadSong(0);
+        let restored = false;
+        try {
+            const savedRaw = localStorage.getItem('dts_music_state');
+            if (savedRaw) {
+                const saved = JSON.parse(savedRaw);
+                if (Array.isArray(saved.queue) && saved.queue.length) {
+                    const mapped = saved.queue.map(id => librarySongsMap.get(id)).filter(Boolean);
+                    if (mapped.length) currentQueue = mapped;
+                } else {
+                    currentQueue = [...librarySongs];
+                }
+
+                currentSongIndex = typeof saved.queueIndex === 'number' && saved.queueIndex < currentQueue.length ? saved.queueIndex : 0;
+                loadSong(currentSongIndex);
+
+                const elapsed = Math.max(0, (Date.now() - (saved.timestamp || Date.now())) / 1000);
+                if (saved.isPlaying && elapsed < 20) {
+                    const targetTime = (saved.currentTime || 0) + elapsed;
+                    activeAudio.addEventListener('loadedmetadata', () => {
+                        activeAudio.currentTime = targetTime;
+                        playSong();
+                    }, { once: true });
+                    if (activeAudio.readyState >= 1) {
+                        activeAudio.currentTime = targetTime;
+                        playSong();
+                    }
+                } else if (saved.currentTime) {
+                    activeAudio.currentTime = saved.currentTime;
+                }
+                restored = true;
+            }
+        } catch (_) {}
+
+        if (!restored) {
+            currentQueue = [...librarySongs];
+            currentSongIndex = 0;
+            loadSong(0);
+        }
     }
 
     // --- NAVIGATION ---
@@ -622,51 +587,10 @@ function initHarmonyTunes() {
             e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
         });
 
-        // 3. TikToks
-        containerTikToks.innerHTML = '';
-        const docFragment = document.createDocumentFragment();
-
-        tiktokEmbeds.forEach(embedHTML => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(embedHTML, 'text/html');
-            const blockquote = doc.querySelector('blockquote.tiktok-embed');
-
-            if (blockquote) {
-                // Extract only necessary attributes to safely reconstruct the DOM element
-                // instead of appending the unsanitized node which could contain inline event handlers
-                const videoId = blockquote.getAttribute('data-video-id');
-                const cite = blockquote.getAttribute('cite');
-
-                if (videoId && cite) {
-                    const card = document.createElement('div');
-                    card.className = 'tiktok-card';
-
-                    const newBlockquote = document.createElement('blockquote');
-                    newBlockquote.className = 'tiktok-embed';
-
-                    // Only use extracted text values, never raw unsanitized attributes
-                    newBlockquote.setAttribute('data-video-id', videoId); // setAttribute handles raw strings safely
-                    newBlockquote.setAttribute('cite', cite);
-                    newBlockquote.style.maxWidth = '605px';
-                    newBlockquote.style.minWidth = '325px';
-
-                    // The inner section tags are not strictly required for the embed to work,
-                    // but we can add the @ tag if we wanted. For security, we omit them
-                    // since the embed.js will replace the blockquote content anyway.
-
-                    card.appendChild(newBlockquote);
-                    docFragment.appendChild(card);
-                }
-            }
-        });
-
-        containerTikToks.appendChild(docFragment);
-        
-        // Dynamically load TikTok script to render the embeds properly
-        const tiktokScript = document.createElement('script');
-        tiktokScript.src = "https://www.tiktok.com/embed.js";
-        tiktokScript.async = true;
-        document.body.appendChild(tiktokScript);
+        // 3. TikToks — preserve the 4 official blockquotes embedded directly in HTML for embed.js
+        if (containerTikToks && containerTikToks.children.length === 0) {
+            // Keep container clean if already loaded
+        }
 
         // 4. Playlists
         const playlists = [
@@ -873,6 +797,21 @@ function initHarmonyTunes() {
                 }
             }, 50);
         });
+    function saveSitewideMusicState(extra = {}) {
+        const currentSong = currentQueue[currentSongIndex] || librarySongs[0];
+        try {
+            const state = {
+                songId: currentSong ? currentSong.id : librarySongs[0].id,
+                isPlaying: isPlaying,
+                currentTime: activeAudio ? activeAudio.currentTime : 0,
+                queue: currentQueue.map(s => s.id),
+                queueIndex: currentSongIndex,
+                timestamp: Date.now(),
+                volume: activeAudio ? activeAudio.volume : 1,
+                ...extra
+            };
+            localStorage.setItem('dts_music_state', JSON.stringify(state));
+        } catch (_) {}
     }
 
     function playSong() {
@@ -893,6 +832,7 @@ function initHarmonyTunes() {
         activeAudio.volume = 0;
         activeAudio.play().then(() => {
             isPlaying = true;
+            saveSitewideMusicState({ isPlaying: true });
             playIcon.style.display = 'none';
             pauseIcon.style.display = 'block';
             if(fsPlayIcon) fsPlayIcon.style.display = 'none';
@@ -918,6 +858,7 @@ function initHarmonyTunes() {
         if (fadeInterval) clearInterval(fadeInterval);
         
         isPlaying = false;
+        saveSitewideMusicState({ isPlaying: false });
         playIcon.style.display = 'block';
         pauseIcon.style.display = 'none';
         if(fsPlayIcon) fsPlayIcon.style.display = 'block';
@@ -1056,6 +997,7 @@ function initHarmonyTunes() {
         playPauseBtn.addEventListener('click', togglePlayPause);
         nextBtn.addEventListener('click', nextSong);
         prevBtn.addEventListener('click', prevSong);
+        let lastStateSaveTime = 0;
         [audioPlayer1, audioPlayer2].forEach(player => {
             player.addEventListener('timeupdate', (e) => {
                 if (e.target === activeAudio) {
@@ -1064,6 +1006,12 @@ function initHarmonyTunes() {
                         checkViralCrossfade();
                     } else {
                         checkCrossfade();
+                    }
+
+                    const now = Date.now();
+                    if (now - lastStateSaveTime > 1000) {
+                        lastStateSaveTime = now;
+                        saveSitewideMusicState();
                     }
                 }
             });
@@ -1078,6 +1026,10 @@ function initHarmonyTunes() {
                     }
                 }
             });
+        });
+
+        window.addEventListener('beforeunload', () => {
+            saveSitewideMusicState({ isPlaying: !activeAudio.paused });
         });
 
         mixerBtn.addEventListener('click', () => {

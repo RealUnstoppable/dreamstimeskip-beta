@@ -143,8 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Render the options
             siriOrb.innerHTML = `
                 <div class="lexi-pill-options">
-                    <button id="lexi-view-cart" class="lexi-pill-btn" aria-label="View Cart"><span class="material-icons">shopping_cart</span> View Cart</button>
-                    <button id="lexi-ask" class="lexi-pill-btn" aria-label="Ask Lexi"><span class="material-icons">chat</span> Ask Lexi</button>
+                    <button id="lexi-view-cart" class="lexi-pill-btn" aria-label="View Cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+                        <span>View Cart</span>
+                    </button>
+                    <button id="lexi-ask" class="lexi-pill-btn" aria-label="Ask Lexi">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><path d="m14 8 1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="currentColor" stroke="none"></path></svg>
+                        <span>Ask Lexi</span>
+                    </button>
                 </div>
             `;
             

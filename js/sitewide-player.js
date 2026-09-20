@@ -1,0 +1,553 @@
+// js/sitewide-player.js
+// Sitewide music engine and Lexi floating mini-playerhead
+
+import { librarySongs, getSongById } from './song-data.js?v=20260920';
+
+const STORAGE_KEY = 'dts_music_state';
+
+// High-quality SVGs for Lexi and playerhead
+export const ICONS = {
+    cart: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lexi-glyph-icon"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>`,
+    chat: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lexi-glyph-icon"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><path d="m14 8 1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="currentColor" stroke="none"></path></svg>`,
+    play: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+    pause: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
+    next: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>`
+};
+
+class SitewideMusicEngine {
+    constructor() {
+        this.isHarmonyTunesPage = window.location.pathname.includes('harmonytunes.html');
+        this.audio = null;
+        this.state = this.loadState();
+        this.listeners = new Set();
+        this.inactivityTimeout = null;
+
+        if (!this.isHarmonyTunesPage) {
+            this.initBackgroundAudio();
+        }
+
+        this.initLexiOrb();
+        this.attachGlobalLinkHandlers();
+    }
+
+    loadState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                return {
+                    songId: parsed.songId || librarySongs[0].id,
+                    isPlaying: !!parsed.isPlaying,
+                    currentTime: typeof parsed.currentTime === 'number' ? parsed.currentTime : 0,
+                    queue: Array.isArray(parsed.queue) && parsed.queue.length ? parsed.queue : librarySongs.map(s => s.id),
+                    queueIndex: typeof parsed.queueIndex === 'number' ? parsed.queueIndex : 0,
+                    timestamp: parsed.timestamp || Date.now(),
+                    volume: typeof parsed.volume === 'number' ? parsed.volume : 0.8
+                };
+            }
+        } catch (_) {}
+
+        return {
+            songId: librarySongs[0].id,
+            isPlaying: false,
+            currentTime: 0,
+            queue: librarySongs.map(s => s.id),
+            queueIndex: 0,
+            timestamp: Date.now(),
+            volume: 0.8
+        };
+    }
+
+    saveState(updates = {}) {
+        this.state = { ...this.state, ...updates, timestamp: Date.now() };
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        } catch (_) {}
+        this.notifyListeners();
+    }
+
+    getCurrentSong() {
+        return getSongById(this.state.songId) || librarySongs[0];
+    }
+
+    notifyListeners() {
+        this.updateLexiUI();
+        this.listeners.forEach(fn => {
+            try { fn(this.state); } catch (err) { console.error(err); }
+        });
+    }
+
+    onStateChange(fn) {
+        this.listeners.add(fn);
+        return () => this.listeners.delete(fn);
+    }
+
+    initBackgroundAudio() {
+        if (this.isHarmonyTunesPage) return;
+
+        const song = this.getCurrentSong();
+        this.audio = new Audio();
+        this.audio.preload = 'auto';
+        this.audio.src = song.src;
+        this.audio.volume = this.state.volume;
+
+        // Calculate elapsed seconds since navigation started
+        const elapsed = Math.max(0, (Date.now() - this.state.timestamp) / 1000);
+
+        if (this.state.isPlaying && elapsed < 20) {
+            const targetTime = this.state.currentTime + elapsed;
+            this.audio.addEventListener('loadedmetadata', () => {
+                if (targetTime < this.audio.duration) {
+                    this.audio.currentTime = targetTime;
+                }
+            }, { once: true });
+
+            // Autoplay after user interaction in previous page
+            this.audio.play().then(() => {
+                this.saveState({ isPlaying: true });
+            }).catch(() => {
+                // Browser prevented unmuted autoplay without new gesture on this document
+                // Lexi will show play state and resume on first click
+                const resumeOnInteract = () => {
+                    if (this.state.isPlaying && this.audio.paused) {
+                        this.audio.play().catch(() => {});
+                    }
+                    document.removeEventListener('click', resumeOnInteract);
+                    document.removeEventListener('keydown', resumeOnInteract);
+                };
+                document.addEventListener('click', resumeOnInteract, { once: true });
+                document.addEventListener('keydown', resumeOnInteract, { once: true });
+            });
+        }
+
+        // Time updates
+        let lastThrottle = 0;
+        this.audio.addEventListener('timeupdate', () => {
+            const now = Date.now();
+            if (now - lastThrottle > 1000) {
+                lastThrottle = now;
+                this.saveState({ currentTime: this.audio.currentTime });
+            }
+            this.updateProgressBar();
+        });
+
+        // Auto advance to next song when finished
+        this.audio.addEventListener('ended', () => {
+            this.next();
+        });
+
+        // Unload sync
+        window.addEventListener('beforeunload', () => {
+            if (this.audio) {
+                this.saveState({
+                    currentTime: this.audio.currentTime,
+                    isPlaying: !this.audio.paused
+                });
+            }
+        });
+
+        // Cross-tab / cross-window storage sync
+        window.addEventListener('storage', (e) => {
+            if (e.key === STORAGE_KEY) {
+                const newState = this.loadState();
+                this.state = newState;
+                if (!this.isHarmonyTunesPage && this.audio) {
+                    const activeSong = this.getCurrentSong();
+                    if (this.audio.src !== location.origin + activeSong.src && !this.audio.src.endsWith(activeSong.src)) {
+                        this.audio.src = activeSong.src;
+                        this.audio.currentTime = newState.currentTime;
+                    }
+                    if (newState.isPlaying && this.audio.paused) {
+                        this.audio.play().catch(() => {});
+                    } else if (!newState.isPlaying && !this.audio.paused) {
+                        this.audio.pause();
+                    }
+                }
+                this.notifyListeners();
+            }
+        });
+    }
+
+    play() {
+        if (this.isHarmonyTunesPage) {
+            if (window.playSong) window.playSong(this.state.songId);
+            return;
+        }
+        if (!this.audio) this.initBackgroundAudio();
+        const song = this.getCurrentSong();
+        if (!this.audio.src || (!this.audio.src.endsWith(song.src) && this.audio.src !== song.src)) {
+            this.audio.src = song.src;
+            this.audio.currentTime = this.state.currentTime || 0;
+        }
+        this.audio.play().then(() => {
+            this.saveState({ isPlaying: true });
+        }).catch(err => console.warn("Audio play prevented:", err));
+    }
+
+    pause() {
+        if (this.isHarmonyTunesPage) {
+            if (window.activeAudio) window.activeAudio.pause();
+            this.saveState({ isPlaying: false });
+            return;
+        }
+        if (this.audio) {
+            this.audio.pause();
+            this.saveState({ isPlaying: false, currentTime: this.audio.currentTime });
+        }
+    }
+
+    togglePlay() {
+        if (this.isHarmonyTunesPage) {
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            if (playPauseBtn) {
+                playPauseBtn.click();
+            } else {
+                this.state.isPlaying ? this.pause() : this.play();
+            }
+            return;
+        }
+        if (this.audio && !this.audio.paused) {
+            this.pause();
+        } else {
+            this.play();
+        }
+    }
+
+    next() {
+        let newIdx = this.state.queueIndex + 1;
+        if (newIdx >= this.state.queue.length) newIdx = 0;
+        const nextSongId = this.state.queue[newIdx] || librarySongs[0].id;
+
+        this.saveState({
+            songId: nextSongId,
+            queueIndex: newIdx,
+            currentTime: 0,
+            isPlaying: true
+        });
+
+        if (this.isHarmonyTunesPage) {
+            const nextBtn = document.getElementById('next-btn');
+            if (nextBtn) nextBtn.click();
+            return;
+        }
+
+        const song = getSongById(nextSongId);
+        if (song && this.audio) {
+            this.audio.src = song.src;
+            this.audio.currentTime = 0;
+            this.audio.play().catch(() => {});
+        }
+    }
+
+    prev() {
+        let newIdx = this.state.queueIndex - 1;
+        if (newIdx < 0) newIdx = this.state.queue.length - 1;
+        const prevSongId = this.state.queue[newIdx] || librarySongs[0].id;
+
+        this.saveState({
+            songId: prevSongId,
+            queueIndex: newIdx,
+            currentTime: 0,
+            isPlaying: true
+        });
+
+        if (this.isHarmonyTunesPage) {
+            const prevBtn = document.getElementById('prev-btn');
+            if (prevBtn) prevBtn.click();
+            return;
+        }
+
+        const song = getSongById(prevSongId);
+        if (song && this.audio) {
+            this.audio.src = song.src;
+            this.audio.currentTime = 0;
+            this.audio.play().catch(() => {});
+        }
+    }
+
+    // Attach click handlers to internal site navigation links to guarantee zero-gap transitions
+    attachGlobalLinkHandlers() {
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link || !link.href) return;
+            const url = new URL(link.href, window.location.href);
+
+            // Internal same-origin page navigation
+            if (url.origin === window.location.origin && url.pathname.endsWith('.html')) {
+                if (this.audio && !this.audio.paused) {
+                    this.saveState({
+                        currentTime: this.audio.currentTime,
+                        isPlaying: true,
+                        timestamp: Date.now()
+                    });
+                }
+            }
+        });
+    }
+
+    // Initialize or bind to Lexi Orb
+    initLexiOrb() {
+        // On HarmonyTunes page, don't overlay a second orb since it has full playerhead at bottom
+        if (this.isHarmonyTunesPage) return;
+
+        let orbWrapper = document.querySelector('.siri-orb-wrapper');
+        let orb = document.getElementById('siri-orb');
+
+        if (!orbWrapper || !orb) {
+            // Create sitewide Lexi Orb
+            orbWrapper = document.createElement('div');
+            orbWrapper.className = 'siri-orb-wrapper sitewide-lexi-wrapper';
+            orbWrapper.innerHTML = `
+                <div id="siri-orb" class="sitewide-lexi-orb" role="button" tabindex="0" aria-label="Lexi Assistant & Player">
+                    <span class="orb-text"></span>
+                </div>
+            `;
+            document.body.appendChild(orbWrapper);
+            orb = document.getElementById('siri-orb');
+        }
+
+        // Add soundwave badge to orb
+        if (!orb.querySelector('.lexi-soundwave-badge')) {
+            const badge = document.createElement('div');
+            badge.className = 'lexi-soundwave-badge';
+            badge.innerHTML = `<span></span><span></span><span></span>`;
+            orb.appendChild(badge);
+        }
+
+        // Add cart count badge
+        if (!orb.querySelector('#lexi-cart-badge')) {
+            const cartBadge = document.createElement('div');
+            cartBadge.id = 'lexi-cart-badge';
+            cartBadge.className = 'lexi-cart-badge hidden';
+            cartBadge.textContent = '0';
+            orb.appendChild(cartBadge);
+        }
+
+        // Sync initial cart count if available
+        try {
+            const count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+            if (count > 0) {
+                const b = orb.querySelector('#lexi-cart-badge');
+                if (b) {
+                    b.textContent = count;
+                    b.classList.remove('hidden');
+                }
+            }
+        } catch (_) {}
+
+        // Bind click/tap on Lexi Orb
+        orb.addEventListener('click', (e) => {
+            // If click was inside child button, let child handler execute
+            if (e.target.closest('#lexi-play-pause-btn') || 
+                e.target.closest('#lexi-next-btn') || 
+                e.target.closest('#lexi-view-cart') || 
+                e.target.closest('#lexi-ask') ||
+                e.target.closest('.lexi-song-info')) {
+                return;
+            }
+
+            if (!orb.classList.contains('expanded')) {
+                this.expandLexi(orb);
+            } else {
+                this.collapseLexi(orb);
+            }
+        });
+
+        orb.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                if (e.target === orb) {
+                    e.preventDefault();
+                    orb.click();
+                }
+            }
+        });
+
+        this.updateLexiUI();
+    }
+
+    expandLexi(orb) {
+        orb.classList.add('expanded');
+        orb.classList.add('lexi-player-expanded');
+
+        const song = this.getCurrentSong();
+        const isPlaying = this.state.isPlaying;
+
+        orb.innerHTML = `
+            <div class="lexi-expanded-panel">
+                <!-- Mini Playerhead Component -->
+                <div class="lexi-playerhead">
+                    <img src="${song.art}" alt="${song.title}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
+                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
+                        <div class="lexi-song-title">${song.title}</div>
+                        <div class="lexi-song-artist">${song.artist}</div>
+                    </div>
+                    <div class="lexi-player-controls">
+                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="${isPlaying ? 'Pause' : 'Play'}">
+                            ${isPlaying ? ICONS.pause : ICONS.play}
+                        </button>
+                        <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
+                            ${ICONS.next}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Glyphs / Buttons -->
+                <div class="lexi-actions-row">
+                    <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                        ${ICONS.chat}
+                        <span>Ask Lexi</span>
+                    </button>
+                    <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                        ${ICONS.cart}
+                        <span>View Cart</span>
+                        <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Update pill cart count
+        try {
+            const count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+            const badge = orb.querySelector('#lexi-pill-cart-count');
+            if (badge && count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline-block';
+            }
+        } catch (_) {}
+
+        // Wire play/pause
+        const playBtn = orb.querySelector('#lexi-play-pause-btn');
+        if (playBtn) {
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.togglePlay();
+                playBtn.innerHTML = this.state.isPlaying ? ICONS.pause : ICONS.play;
+                const art = orb.querySelector('.lexi-player-art');
+                if (art) art.classList.toggle('spinning', this.state.isPlaying);
+            });
+        }
+
+        // Wire next
+        const nextBtn = orb.querySelector('#lexi-next-btn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.next();
+                const newSong = this.getCurrentSong();
+                const title = orb.querySelector('.lexi-song-title');
+                const artist = orb.querySelector('.lexi-song-artist');
+                const art = orb.querySelector('.lexi-player-art');
+                if (title) title.textContent = newSong.title;
+                if (artist) artist.textContent = newSong.artist;
+                if (art) art.src = newSong.art;
+            });
+        }
+
+        // Wire Ask Lexi
+        const askBtn = orb.querySelector('#lexi-ask');
+        if (askBtn) {
+            askBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.collapseLexi(orb);
+                const chatWindow = document.getElementById('chatbot-window');
+                if (chatWindow) {
+                    chatWindow.classList.add('active');
+                } else {
+                    // Navigate to home with chat open or open modal
+                    window.location.href = 'index.html#chat';
+                }
+            });
+        }
+
+        // Wire View Cart
+        const cartBtn = orb.querySelector('#lexi-view-cart');
+        if (cartBtn) {
+            cartBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.collapseLexi(orb);
+                const cartModal = document.getElementById('cart-modal');
+                if (cartModal) {
+                    cartModal.style.display = 'flex';
+                } else {
+                    window.location.href = 'shop.html';
+                }
+            });
+        }
+
+        // Auto collapse after inactivity
+        clearTimeout(this.inactivityTimeout);
+        this.inactivityTimeout = setTimeout(() => {
+            this.collapseLexi(orb);
+        }, 10000);
+    }
+
+    collapseLexi(orb) {
+        orb.classList.remove('expanded');
+        orb.classList.remove('lexi-player-expanded');
+        orb.innerHTML = `
+            <span class="orb-text"></span>
+            <div class="lexi-soundwave-badge"><span></span><span></span><span></span></div>
+            <div id="lexi-cart-badge" class="lexi-cart-badge hidden">0</div>
+        `;
+        clearTimeout(this.inactivityTimeout);
+        this.updateLexiUI();
+    }
+
+    updateLexiUI() {
+        const orb = document.getElementById('siri-orb');
+        if (!orb) return;
+
+        const isPlaying = this.state.isPlaying;
+        orb.classList.toggle('has-music', isPlaying);
+
+        const badge = orb.querySelector('.lexi-soundwave-badge');
+        if (badge) {
+            badge.style.display = isPlaying ? 'flex' : 'none';
+        }
+
+        // If expanded, update current elements
+        if (orb.classList.contains('expanded')) {
+            const playBtn = orb.querySelector('#lexi-play-pause-btn');
+            if (playBtn) playBtn.innerHTML = isPlaying ? ICONS.pause : ICONS.play;
+
+            const art = orb.querySelector('.lexi-player-art');
+            if (art) art.classList.toggle('spinning', isPlaying);
+        }
+    }
+
+    updateProgressBar() {
+        // Optional subtle progress indicator inside Lexi
+    }
+}
+
+// Global Singleton
+export const sitewidePlayer = new SitewideMusicEngine();
+window.DTSMusic = sitewidePlayer;
+
+// Global helper to update cart count in Lexi across all pages
+window.updateLexiCartCount = function(count) {
+    try {
+        localStorage.setItem('cartItemCount', String(count));
+    } catch (_) {}
+
+    const badge = document.getElementById('lexi-cart-badge');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
+
+    const pillCount = document.getElementById('lexi-pill-cart-count');
+    if (pillCount) {
+        if (count > 0) {
+            pillCount.textContent = count;
+            pillCount.style.display = 'inline-block';
+        } else {
+            pillCount.style.display = 'none';
+        }
+    }
+};

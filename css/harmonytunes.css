@@ -1862,26 +1862,35 @@ body {
     font-weight: 600;
 }
 
-/* TikTok scaling for mobile */
+/* TikTok scaling for mobile and desktop */
 .tiktok-card {
-    flex: 0 0 250px;
-    transform-origin: top left;
-    height: 400px;
+    flex: 0 0 325px;
+    max-width: 325px;
+    min-width: 325px;
+    border-radius: 12px;
     overflow: hidden;
-    border-radius: 8px;
+    background: #0f0f0f;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
+}
+.tiktok-card:hover {
+    transform: translateY(-2px);
 }
 .tiktok-embed {
     margin: 0 !important;
-    transform: scale(0.85);
-    transform-origin: top center;
+    min-width: 325px !important;
+    max-width: 325px !important;
 }
 @media (max-width: 599px) {
     .tiktok-card {
-        flex: 0 0 200px;
-        height: 350px;
+        flex: 0 0 285px;
+        max-width: 285px;
+        min-width: 285px;
     }
     .tiktok-embed {
-        transform: scale(0.7);
+        transform: scale(0.875);
+        transform-origin: top left;
+        width: 325px !important;
     }
 }
 
