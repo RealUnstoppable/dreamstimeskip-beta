@@ -14,12 +14,12 @@ service cloud.firestore {
          && request.resource.data.get('isAdmin', false) == false
          && request.resource.data.get('isBanned', false) == false
          && request.resource.data.get('membershipLevel', 'free') == 'free'
-         && !request.resource.data.keys().hasAny(['plan', 'subscription', 'loyaltyPoints']))
+         && !request.resource.data.keys().hasAny(['plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
         || isAdmin()
       );
       allow update: if request.auth != null && (
         (request.auth.uid == userId
-         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints']))
+         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
         || isAdmin()
       );
       allow delete: if isAdmin();
