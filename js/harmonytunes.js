@@ -1,7 +1,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { lyricsData } from './lyrics-data.js';
+import { lyricsData } from './lyrics-data.js?v=1789909119';
 
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
