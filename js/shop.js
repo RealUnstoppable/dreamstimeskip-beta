@@ -746,6 +746,5 @@ async function handleReviewSubmit(e) {
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;
-        submitReviewBtn.textContent = originalText;
     }
 }

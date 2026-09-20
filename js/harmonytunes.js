@@ -4,17 +4,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js';
 
-// Utility to prevent DOM-based and Stored XSS
-function escapeHTML(str) {
-    if (str == null) return "";
-    if (typeof str !== 'string') str = String(str);
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
 
 function initHarmonyTunes() {
     // --- STATE ---
