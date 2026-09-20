@@ -29,7 +29,7 @@ export async function saveScore(score) {
             timestamp: Date.now()
         });
     } catch (e) {
-        console.error("Error saving score to leaderboard - Manager info:", e);
+        console.error("Manager info: Error saving score to leaderboard ", e);
     }
 }
 
@@ -44,7 +44,7 @@ export async function getTopScores() {
         
         return mergeAndSortScores(scores);
     } catch (e) {
-        console.error("Error fetching leaderboard, falling back to bots - Manager info:", e);
+        console.error("Manager info: Error fetching leaderboard, falling back to bots ", e);
         // Fallback to just bots if offline or permission denied (e.g. strict rules)
         let scores = [];
         return mergeAndSortScores(scores);

@@ -30,7 +30,7 @@ async function authenticateRequest(req, res, adminInstance = admin) {
   try {
     return await adminInstance.auth().verifyIdToken(token);
   } catch (err) {
-    console.error("Auth Error:", err);
+    console.error("Manager info: Auth Error:", err);
     res.status(401).send("Unauthorized");
     return null;
   }
@@ -91,7 +91,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
 
       res.status(200).json({ success: true });
     } catch (err) {
-      console.error("Admin Action Error: [" + err.message + "]");
+      console.error("Manager info: Admin Action Error: [" + err.message + "]");
       res.status(500).json({ error: err.message });
     }
   });
@@ -136,7 +136,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error: [" + err.message + "]");
+      console.error("Manager info: Checkout Error: [" + err.message + "]");
       res.status(500).json({error: `Checkout Error. [${err.message}]`});
     }
   });
@@ -161,7 +161,7 @@ exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", 
         type: "ticket_reply",
       });
     } catch (error) {
-      console.error("Error creating notification: [" + error.message + "]");
+      console.error("Manager info: Error creating notification: [" + error.message + "]");
     }
   }
 });
@@ -313,7 +313,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
 
   // Validate rating
   if (typeof rating !== "number" || rating < 1 || rating > 5) {
-    console.error("Invalid rating:", rating);
+    console.error("Manager info: Invalid rating:", rating);
     return null;
   }
 
@@ -365,7 +365,7 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
       }
     });
   } catch (error) {
-    console.error("Error updating product stats or awarding points - Manager info: [" + error.message + "]");
+    console.error("Manager info: Error updating product stats or awarding points [" + error.message + "]");
     return null;
   }
 });
@@ -520,7 +520,7 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 
       res.status(200).send({ success: true });
     } catch (error) {
-      console.error("Error processing order transaction - Manager info: [" + error.message + "]");
+      console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
     }
   });
