@@ -296,84 +296,103 @@ function initHarmonyTunes() {
     const fsTotalTime = document.querySelector('.fs-total-time');
 
 
-    // Global Search
-    const globalSearch = document.getElementById('global-search');
+    // ===== Spotlight Search =====
+    const spotlightOverlay = document.getElementById('spotlight-overlay');
+    const spotlightInput   = document.getElementById('global-search');
+    const spotlightResults = document.getElementById('spotlight-results');
+
+    function openSpotlight() {
+        if (!spotlightOverlay) return;
+        spotlightOverlay.classList.remove('hidden');
+        spotlightInput.value = '';
+        spotlightResults.innerHTML = '';
+        spotlightInput.focus();
+    }
+
+    function closeSpotlight() {
+        if (!spotlightOverlay) return;
+        spotlightOverlay.classList.add('hidden');
+        spotlightInput.value = '';
+        spotlightResults.innerHTML = '';
+    }
+
+    function highlightMatch(text, query) {
+        if (!query) return escapeHTML(text);
+        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`(${escaped})`, 'gi');
+        return escapeHTML(text).replace(re, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
+    }
+
+    function runSpotlightSearch(query) {
+        if (!spotlightResults) return;
+        const q = query.trim().toLowerCase();
+
+        if (!q) {
+            spotlightResults.innerHTML = '';
+            return;
+        }
+
+        const matches = librarySongs.filter(s =>
+            s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)
+        );
+
+        if (matches.length === 0) {
+            spotlightResults.innerHTML = `<div class="spotlight-no-results">No results for "<strong>${escapeHTML(query)}</strong>"</div>`;
+            return;
+        }
+
+        spotlightResults.innerHTML = matches.map(song => `
+            <div class="spotlight-result-row" tabindex="0" data-song-id="${escapeHTML(song.id)}" role="button" aria-label="Play ${escapeHTML(song.title)}">
+                <img class="spotlight-result-art" src="${escapeHTML(song.art)}" alt="" loading="lazy">
+                <div class="spotlight-result-info">
+                    <div class="spotlight-result-title">${highlightMatch(song.title, query)}</div>
+                    <div class="spotlight-result-artist">${highlightMatch(song.artist, query)}</div>
+                </div>
+                <span class="spotlight-result-play">▶</span>
+            </div>
+        `).join('');
+
+        spotlightResults.querySelectorAll('.spotlight-result-row').forEach(row => {
+            const activateFn = () => {
+                const songId = row.dataset.songId;
+                const idx = librarySongs.findIndex(s => s.id === songId);
+                if (idx !== -1) {
+                    currentQueue = [...librarySongs];
+                    currentSongIndex = idx;
+                    loadSong(idx);
+                    if (!isPlaying) togglePlayPause();
+                }
+                closeSpotlight();
+            };
+            row.addEventListener('click', activateFn);
+            row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateFn(); }});
+        });
+    }
+
+    // Wire up input
+    if (spotlightInput) {
+        let searchTimeout;
+        spotlightInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => runSpotlightSearch(e.target.value), 150);
+        });
+    }
+
+    // Close on ESC or backdrop click
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && spotlightOverlay && !spotlightOverlay.classList.contains('hidden')) {
+            closeSpotlight();
+        }
+    });
+    if (spotlightOverlay) {
+        spotlightOverlay.addEventListener('click', (e) => {
+            if (e.target === spotlightOverlay) closeSpotlight();
+        });
+    }
+    // ESC hint button
+    document.querySelector('.spotlight-esc-hint')?.addEventListener('click', closeSpotlight);
 
     // --- INITIALIZATION ---
-    
-    const searchInput = document.getElementById('global-search');
-    const searchContainer = document.getElementById('search-container');
-    const navSearchBtn = document.getElementById('nav-search');
-
-    if(navSearchBtn) {
-        navSearchBtn.addEventListener('click', () => {
-            searchContainer.style.display = searchContainer.style.display === 'none' ? 'flex' : 'none';
-            if(searchContainer.style.display === 'flex') searchInput.focus();
-        });
-    }
-
-    if(searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const query = e.target.value.toLowerCase();
-                // ⚡ Bolt: Optimize search highlight logic to use a single compiled RegExp outside the loops
-                // and skip DOM updates if the state hasn't changed.
-                const queryRegex = query ? new RegExp(query, 'gi') : null;
-                const replaceFn = match => `<span class="search-highlight">${match}</span>`;
-
-                const cards = document.querySelectorAll('.song-card');
-                cards.forEach(card => {
-                    const titleEl = card.querySelector('.song-title');
-                    const artistEl = card.querySelector('p:last-of-type');
-                    if(!titleEl || !artistEl) return;
-
-                    const titleText = titleEl.textContent;
-                    const artistText = artistEl.textContent;
-                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-
-                    const newDisplay = isMatch ? 'flex' : 'none';
-                    if (card.style.display !== newDisplay) {
-                        card.style.display = newDisplay;
-                    }
-
-                    if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
-                    } else {
-                        // Avoid unnecessary textContent assignments which trigger style recalculations
-                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
-                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
-                    }
-                });
-                
-                const rows = document.querySelectorAll('.song-table tbody tr');
-                rows.forEach(row => {
-                    const titleEl = row.querySelector('.song-title');
-                    const artistEl = row.querySelector('.song-artist');
-                    if(!titleEl || !artistEl) return;
-
-                    const titleText = titleEl.textContent;
-                    const artistText = artistEl.textContent;
-                    const isMatch = titleText.toLowerCase().includes(query) || artistText.toLowerCase().includes(query);
-
-                    const newDisplay = isMatch ? 'table-row' : 'none';
-                    if (row.style.display !== newDisplay) {
-                        row.style.display = newDisplay;
-                    }
-
-                    if(query && isMatch) {
-                        titleEl.innerHTML = titleText.replace(queryRegex, replaceFn);
-                        artistEl.innerHTML = artistText.replace(queryRegex, replaceFn);
-                    } else {
-                        if (titleEl.innerHTML !== titleText) titleEl.textContent = titleText;
-                        if (artistEl.innerHTML !== artistText) artistEl.textContent = artistText;
-                    }
-                });
-            }, 300); // ⚡ Bolt: Debounce search input to prevent layout thrashing
-        });
-    }
 
     function init() {
         renderHome();
@@ -405,11 +424,10 @@ function initHarmonyTunes() {
                     showHome();
                     containerPlaylists.scrollIntoView({ behavior: 'smooth' });
                 } else if (id === 'nav-search') {
-                    const searchContainer = document.querySelector('.search-container');
-                    searchContainer.classList.toggle('active');
-                    if (searchContainer.classList.contains('active')) {
-                        globalSearch.focus();
-                    }
+                    openSpotlight();
+                    // Deselect the pill so it doesn't look "stuck"
+                    pill.classList.remove('active');
+                    document.getElementById('nav-home')?.classList.add('active');
                 }
             });
         });
