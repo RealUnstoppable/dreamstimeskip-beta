@@ -2347,6 +2347,7 @@ export const lyricsData = {
         {
             "start": 45.74,
             "end": 47.81,
+            "trending": true,
             "words": [
                 {
                     "text": "It's",
@@ -2403,6 +2404,7 @@ export const lyricsData = {
         {
             "start": 47.81,
             "end": 49.87,
+            "trending": true,
             "words": [
                 {
                     "text": "It's",
@@ -2449,6 +2451,7 @@ export const lyricsData = {
         {
             "start": 49.87,
             "end": 51.92,
+            "trending": true,
             "words": [
                 {
                     "text": "It's",
@@ -2500,6 +2503,7 @@ export const lyricsData = {
         {
             "start": 51.92,
             "end": 53.02,
+            "trending": true,
             "words": [
                 {
                     "text": "It's",
@@ -2516,6 +2520,7 @@ export const lyricsData = {
         {
             "start": 53.02,
             "end": 55.94,
+            "trending": true,
             "words": [
                 {
                     "text": "You",
@@ -2547,6 +2552,7 @@ export const lyricsData = {
         {
             "start": 55.94,
             "end": 57.25,
+            "trending": true,
             "words": [
                 {
                     "text": "Anyway",
@@ -2558,6 +2564,7 @@ export const lyricsData = {
         {
             "start": 57.25,
             "end": 60.02,
+            "trending": true,
             "words": [
                 {
                     "text": "You",
@@ -2589,6 +2596,7 @@ export const lyricsData = {
         {
             "start": 60.02,
             "end": 62.86,
+            "trending": true,
             "words": [
                 {
                     "text": "Anyway",

@@ -93,11 +93,11 @@ function initHarmonyTunes() {
     };
 
     const tiktokEmbeds = [
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7361214658742652206" data-video-id="7361214658742652206" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> if you read this u have to follow <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a target="_blank" title="♬ Silence 1 Minute - silence moments" href="https://www.tiktok.com/music/Silence-1-Minute-6736021306824738817?refer=embed">♬ Silence 1 Minute - silence moments</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7286740931238317342" data-video-id="7286740931238317342" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> New songs every week! Follow us for the latest popular hits, delivered straight to your feed. We&#39;re the best place to discover new music and stay ahead of the trends. Plus, we&#39;re always up for a good time, so expect plenty of fun videos. <a title="liltay" target="_blank" href="https://www.tiktok.com/tag/liltay?refer=embed">#liltay</a> <a title="edit" target="_blank" href="https://www.tiktok.com/tag/edit?refer=embed">#edit</a> <a title="sucker4green" target="_blank" href="https://www.tiktok.com/tag/sucker4green?refer=embed">#sucker4green</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a target="_blank" title="♬ SUCKER 4 GREEN (MONEY) - LIL TAY" href="https://www.tiktok.com/music/SUCKER-4-GREEN-MONEY-7284095435357095938?refer=embed">♬ SUCKER 4 GREEN (MONEY) - LIL TAY</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7340749763630894378" data-video-id="7340749763630894378" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> Exes - Tate McRae - HarmonyTunes Follow Us on Socials and join our Discord Community ;) <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="sound" target="_blank" href="https://www.tiktok.com/tag/sound?refer=embed">#sound</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - preppy - miaaxess" href="https://www.tiktok.com/music/original-sound-preppy-7247743262663641857?refer=embed">♬ original sound - preppy - miaaxess</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7339769870399081770" data-video-id="7339769870399081770" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> @Dan!k On Spotify! Follow us for more music each week, and join our discord community in the profile description. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a target="_blank" title="♬ Dream. - Dan!k" href="https://www.tiktok.com/music/Dream-7322348789938128898?refer=embed">♬ Dream. - Dan!k</a> </section> </blockquote>`,
-        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7343010577624747306" data-video-id="7343010577624747306" style="max-width: 605px;min-width: 325px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> If this video gets 100 likes we will start uploading daily. If you have a song you want us to do next leave a comment. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypage" target="_blank" href="https://www.tiktok.com/tag/fypage?refer=embed">#fypage</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - HarmonyTunes" href="https://www.tiktok.com/music/original-sound-7343010650165087018?refer=embed">♬ original sound - HarmonyTunes</a> </section> </blockquote>`
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7361214658742652206" data-video-id="7361214658742652206" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> if you read this u have to follow <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a target="_blank" title="♬ Silence 1 Minute - silence moments" href="https://www.tiktok.com/music/Silence-1-Minute-6736021306824738817?refer=embed">♬ Silence 1 Minute - silence moments</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7286740931238317342" data-video-id="7286740931238317342" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> New songs every week! Follow us for the latest popular hits, delivered straight to your feed. We&#39;re the best place to discover new music and stay ahead of the trends. Plus, we&#39;re always up for a good time, so expect plenty of fun videos. <a title="liltay" target="_blank" href="https://www.tiktok.com/tag/liltay?refer=embed">#liltay</a> <a title="edit" target="_blank" href="https://www.tiktok.com/tag/edit?refer=embed">#edit</a> <a title="sucker4green" target="_blank" href="https://www.tiktok.com/tag/sucker4green?refer=embed">#sucker4green</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a target="_blank" title="♬ SUCKER 4 GREEN (MONEY) - LIL TAY" href="https://www.tiktok.com/music/SUCKER-4-GREEN-MONEY-7284095435357095938?refer=embed">♬ SUCKER 4 GREEN (MONEY) - LIL TAY</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7340749763630894378" data-video-id="7340749763630894378" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> Exes - Tate McRae - HarmonyTunes Follow Us on Socials and join our Discord Community ;) <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="sound" target="_blank" href="https://www.tiktok.com/tag/sound?refer=embed">#sound</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - preppy - miaaxess" href="https://www.tiktok.com/music/original-sound-preppy-7247743262663641857?refer=embed">♬ original sound - preppy - miaaxess</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7339769870399081770" data-video-id="7339769870399081770" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> @Dan!k On Spotify! Follow us for more music each week, and join our discord community in the profile description. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="fyppage" target="_blank" href="https://www.tiktok.com/tag/fyppage?refer=embed">#fyppage</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="musictok" target="_blank" href="https://www.tiktok.com/tag/musictok?refer=embed">#musictok</a> <a target="_blank" title="♬ Dream. - Dan!k" href="https://www.tiktok.com/music/Dream-7322348789938128898?refer=embed">♬ Dream. - Dan!k</a> </section> </blockquote>`,
+        `<blockquote class="tiktok-embed" cite="https://www.tiktok.com/@harmonytunesofficial/video/7343010577624747306" data-video-id="7343010577624747306" style="max-width: 250px;min-width: 250px;" > <section> <a target="_blank" title="@harmonytunesofficial" href="https://www.tiktok.com/@harmonytunesofficial?refer=embed">@harmonytunesofficial</a> If this video gets 100 likes we will start uploading daily. If you have a song you want us to do next leave a comment. <a title="fyp" target="_blank" href="https://www.tiktok.com/tag/fyp?refer=embed">#fyp</a> <a title="fypage" target="_blank" href="https://www.tiktok.com/tag/fypage?refer=embed">#fypage</a> <a title="music" target="_blank" href="https://www.tiktok.com/tag/music?refer=embed">#music</a> <a title="viral" target="_blank" href="https://www.tiktok.com/tag/viral?refer=embed">#viral</a> <a title="fypシ" target="_blank" href="https://www.tiktok.com/tag/fyp%E3%82%B7?refer=embed">#fypシ</a> <a title="soundtok" target="_blank" href="https://www.tiktok.com/tag/soundtok?refer=embed">#soundtok</a> <a title="viraltiktok" target="_blank" href="https://www.tiktok.com/tag/viraltiktok?refer=embed">#viraltiktok</a> <a target="_blank" title="♬ original sound - HarmonyTunes" href="https://www.tiktok.com/music/original-sound-7343010650165087018?refer=embed">♬ original sound - HarmonyTunes</a> </section> </blockquote>`
     ];
 
     let userFavorites = [];
@@ -460,6 +460,59 @@ function initHarmonyTunes() {
     function renderHome() {
         // 1. Jump Back In
         containerJumpBack.innerHTML = librarySongs.slice(0, 2).map(song => createSongCard(song)).join('');
+
+        
+        // Viral Now
+        const containerViralNow = document.getElementById('container-viral-now');
+        if (containerViralNow) {
+            // Re-order library for leaderboard
+            let viralSongs = [...librarySongs];
+            
+            // Move Tate McRae to #1, PIXY to #2
+            const tate = viralSongs.find(s => s.id === 'tate-mcrae-its-okay-im-okay');
+            const pixy = viralSongs.find(s => s.id === 'pixy-legacy');
+            
+            viralSongs = viralSongs.filter(s => s.id !== 'tate-mcrae-its-okay-im-okay' && s.id !== 'pixy-legacy');
+            
+            if (pixy) viralSongs.unshift(pixy);
+            if (tate) viralSongs.unshift(tate);
+            
+            // Mock views and trends
+            const mockViews = ['14.2M', '11.8M', '9.4M', '6.1M', '3.8M', '1.2M', '800K', '400K'];
+            const mockTrends = ['up', 'up', 'down', 'up', 'down', 'flat', 'down', 'up'];
+            
+            const renderLeaderboard = (limit) => {
+                containerViralNow.innerHTML = viralSongs.slice(0, limit).map((song, idx) => {
+                    const trend = mockTrends[idx] || 'flat';
+                    const trendIcon = trend === 'up' ? '▲' : (trend === 'down' ? '▼' : '-');
+                    const trendClass = trend === 'up' ? 'trend-up' : (trend === 'down' ? 'trend-down' : 'trend-flat');
+                    return `
+                        <div class="leaderboard-item" onclick="playSong('${song.id}')">
+                            <div class="leaderboard-rank">${idx + 1}</div>
+                            <div class="leaderboard-trend ${trendClass}">${trendIcon}</div>
+                            <img class="leaderboard-art" src="${song.art}" alt="Art">
+                            <div class="leaderboard-info">
+                                <div class="leaderboard-title">${escapeHTML(song.title)}</div>
+                                <div class="leaderboard-artist">${escapeHTML(song.artist)}</div>
+                            </div>
+                            <div class="leaderboard-views">${mockViews[idx] || '1M'}</div>
+                        </div>
+                    `;
+                }).join('');
+            };
+            
+            renderLeaderboard(3); // initially show 3
+            
+            const showMoreBtn = document.getElementById('show-more-viral');
+            let viralExpanded = false;
+            if (showMoreBtn) {
+                showMoreBtn.addEventListener('click', () => {
+                    viralExpanded = !viralExpanded;
+                    renderLeaderboard(viralExpanded ? viralSongs.length : 3);
+                    showMoreBtn.textContent = viralExpanded ? 'Show Less' : 'Show More';
+                });
+            }
+        }
 
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
@@ -1122,8 +1175,27 @@ function initHarmonyTunes() {
         // Artist Profile
         const openArtistProfile = (artistName) => {
             document.getElementById('artist-name').textContent = artistName;
+            
+            // Find songs by artist
+            const artistSongs = librarySongs.filter(s => s.artist === artistName);
+            
+            const avatarDiv = document.getElementById('artist-avatar');
+            if (avatarDiv && artistSongs.length > 0) {
+                avatarDiv.style.backgroundImage = `url("${escapeHTML(artistSongs[0].art)}")`;
+                avatarDiv.style.backgroundSize = 'cover';
+                avatarDiv.style.backgroundPosition = 'center';
+            } else if (avatarDiv) {
+                avatarDiv.style.backgroundImage = 'none';
+            }
+            
+            if (artistSongs.length > 0) {
+                const trackListHTML = artistSongs.map(song => createSongCard(song)).join('');
+                document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
+            } else {
+                document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
+            }
+            
             artistProfile.style.display = 'block';
-            document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
         };
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
@@ -1204,7 +1276,7 @@ function initHarmonyTunes() {
             
             let badgeHtml = '';
             if (line.trending && (!data[lineIndex - 1] || !data[lineIndex - 1].trending)) {
-                badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #b854f5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
+                badgeHtml = `<div style="font-size: 0.8rem; font-weight: bold; color: #00BFFF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>Viral</div>`;
             }
             
             return `${badgeHtml}<div class="lyric-line${trendingClass}" data-start="${escapeHTML(line.start)}" data-end="${escapeHTML(line.end)}">${wordsHtml}</div>`;
