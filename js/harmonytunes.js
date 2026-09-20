@@ -1078,7 +1078,7 @@ function initHarmonyTunes() {
             fsTitle.textContent = song.title;
             const viewLyrics = document.getElementById('view-lyrics');
             if (viewLyrics) {
-                viewLyrics.style.backgroundImage = `linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 70%, transparent) 0%, color-mix(in srgb, var(--theme-color) 90%, transparent) 100%), url(${song.art})`;
+                viewLyrics.style.backgroundImage = `linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 30%, transparent) 0%, color-mix(in srgb, var(--theme-color) 40%, transparent) 100%), url(${song.art})`;
                 viewLyrics.style.backgroundSize = 'cover';
                 viewLyrics.style.backgroundPosition = 'center';
             }
@@ -1564,7 +1564,7 @@ function initHarmonyTunes() {
                         effects.forEach(effect => {
                             const rx = Math.floor(Math.random() * 80) + 10;
                             const ry = Math.floor(Math.random() * 80) + 10;
-                            effect.style.background = `radial-gradient(circle at ${rx}% ${ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%), radial-gradient(circle at ${100-rx}% ${100-ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%)`;
+                            effect.style.background = `radial-gradient(circle at ${rx}% ${ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%), radial-gradient(circle at ${100-rx}% ${100-ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%)`;
                             
                             effect.classList.remove('beat');
                             void effect.offsetWidth; // trigger reflow
