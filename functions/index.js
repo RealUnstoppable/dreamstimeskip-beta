@@ -462,6 +462,11 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
         return res.status(400).send("Missing cart or orderDetails");
       }
 
+      if (orderDetails.userId !== uid) {
+        orderDetails.userId = uid;
+      }
+      orderDetails.orderDate = admin.firestore.FieldValue.serverTimestamp();
+
       const db = admin.firestore();
 
       await db.runTransaction(async (transaction) => {

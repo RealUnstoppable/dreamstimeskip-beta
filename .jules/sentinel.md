@@ -88,3 +88,7 @@
 **Vulnerability:** The `promo_codes` collection had `allow read: if true;`, permitting unauthenticated users to query/list all available promo codes.
 **Learning:** Common misconfiguration in Firebase rules where `read` is used instead of the more granular `get` and `list`. This exposes the entire collection to anyone who knows the project ID.
 **Prevention:** For secret or promotional items intended to be fetched by ID only, use `allow get: if true;` and `allow list: if isAdmin();` or similar restrictive conditions instead of a blanket `read`.
+## 2026-10-27 - [Fix Insecure Data Trust in processOrderTransaction]
+**Vulnerability:** The `processOrderTransaction` Cloud Function implicitly trusted the `orderDetails.userId` provided by the client, allowing an attacker to submit orders for arbitrary users by modifying the request body. Additionally, it trusted client-side timestamps which cannot be serialized over JSON properly.
+**Learning:** Cloud Functions acting as API endpoints must independently verify that submitted data correctly aligns with the caller's authenticated identity (`uid`), rather than trusting the payload blindly.
+**Prevention:** Always enforce constraints in backend handlers by forcefully overwriting sensitive fields (like `userId`) with the authenticated caller's identity and assigning server-side timestamps rather than accepting them from the client.
