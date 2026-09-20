@@ -1,4 +1,3 @@
-
 ## 2024-05-01 - Concurrent API Calls
 **Learning:** Replaced sequential awaits in loops with Promise.all() for concurrent execution in Cloud Functions. This significantly speeds up operations involving multiple external API calls or database updates.
 **Action:** Always prefer batching or Promise.all() for iterative async operations to minimize function execution time and avoid premature termination.
@@ -42,3 +41,7 @@
 ## 2024-11-20 - Optimizing Continuous Data Streams
 **Learning:** Performing O(log N) binary searches on every `requestAnimationFrame` tick (such as syncing lyrics to a `timeupdate` event) is unnecessary and wasteful during normal, continuous playback.
 **Action:** Always track the active index and use an O(1) amortized linear scan (checking adjacent elements) for continuous progression. Reserve O(log N) binary searches strictly for random seeks or large state changes.
+
+## 2024-11-20 - Preloading Hero Images for LCP
+**Learning:** The Largest Contentful Paint (LCP) is delayed when the browser discovers large above-the-fold images late in the critical rendering path (e.g. when nested deep in DOM).
+**Action:** Always add `<link rel="preload" as="image" href="...">` in the `<head>` for hero images to accelerate their fetch and improve Core Web Vitals.
