@@ -50,11 +50,7 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #ec4899, #f472b6, #fbcfe8, #f472b6, #ec4899);
-    background-size: 200% auto;
-    color: transparent;
-    -webkit-background-clip: text;
-    background-clip: text;
+    color: var(--text-color, #ffffff);
     animation: calmPinkWave 4s ease-in-out infinite;
     letter-spacing: 0.5px;
 }
