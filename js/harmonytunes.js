@@ -54,7 +54,7 @@ function initHarmonyTunes() {
             artist: "Kesha", 
             duration: "3:40", 
             src: "/music/Blow - Kesha.mp3", 
-            art: "/images/un-logo.png",
+            art: "/images/blow_cover.jpg",
             bpm: 120, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['pop', 'party', 'electronic']
         },
@@ -89,6 +89,7 @@ function initHarmonyTunes() {
         'no-pole-remix': '#2e8a19',    // Dim Green
         'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
         'astrophage': '#2a0c3b' // Synthwave Dark Purple
+        'kesha-blow': '#e63995' // Neon Pink
     };
 
     const tiktokEmbeds = [
