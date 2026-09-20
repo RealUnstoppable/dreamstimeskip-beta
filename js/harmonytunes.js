@@ -676,8 +676,8 @@ function initHarmonyTunes() {
         playerArt.src = song.art;
         document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
         
-        const paintSpillEffect = document.getElementById('paint-spill-effect');
-        if (paintSpillEffect) {
+        const paintSpillEffects = document.querySelectorAll('.paint-spill-effect');
+        paintSpillEffects.forEach(paintSpillEffect => {
             if (song.id === 'tate-mcrae-its-okay-im-okay') {
                 paintSpillEffect.classList.remove('hidden');
                 setTimeout(() => paintSpillEffect.classList.add('active'), 50);
@@ -685,7 +685,7 @@ function initHarmonyTunes() {
                 paintSpillEffect.classList.remove('active');
                 setTimeout(() => paintSpillEffect.classList.add('hidden'), 500);
             }
-        }
+        });
 
         // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.some()
         const isFav = userFavoritesIds.has(song.id);
@@ -1554,12 +1554,12 @@ function initHarmonyTunes() {
                     const currentBeat = Math.floor(currentTime / beatInterval);
                     if (window._lastPaintBeat !== currentBeat) {
                         window._lastPaintBeat = currentBeat;
-                        const effect = document.getElementById('paint-spill-effect');
-                        if (effect) {
+                        const effects = document.querySelectorAll('.paint-spill-effect');
+                        effects.forEach(effect => {
                             effect.classList.remove('beat');
                             void effect.offsetWidth; // trigger reflow
                             effect.classList.add('beat');
-                        }
+                        });
                     }
                 }
                 
