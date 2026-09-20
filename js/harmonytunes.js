@@ -44,7 +44,7 @@ function initHarmonyTunes() {
             artist: "Catalin", 
             duration: "2:17", 
             src: "/music/PIXY - LEGACY.mp3", 
-            art: "/images/dreams-lobby.jpg",
+            art: "/images/legacy_cover.jpg",
             bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 15,
             tags: ['dark', 'electronic', 'intense']
         },
@@ -84,7 +84,7 @@ function initHarmonyTunes() {
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
 
     const songColors = {
-        'pixy-legacy': '#19548a',      // Dim Blue
+        'pixy-legacy': '#5c4a3d',      // Warm Brown
         'deorc-decuple': '#8a196e',    // Dim Pink
         'no-pole-remix': '#2e8a19',    // Dim Green
         'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
