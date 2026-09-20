@@ -1510,3 +1510,14 @@ body {
         transform: translateX(-100%);
     }
 }
+.fullscreen-marquee {
+    width: 80%;
+    max-width: 300px;
+    margin: 0 auto;
+}
+.fullscreen-marquee h1 {
+    display: inline-block;
+    min-width: 100%;
+    animation: scroll-left 12s linear infinite;
+    white-space: nowrap;
+}
