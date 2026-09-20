@@ -570,7 +570,7 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const userData = await getCachedUserProfile(currentUser.uid);
+                const userData = await getCachedUserProfile({uid: currentUser.uid});
                 let username = userData ? (userData.username || "User") : "User";
 
                 const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
@@ -704,7 +704,7 @@ async function handleReviewSubmit(e) {
 
     try {
         let authorName = currentUser.displayName || 'Anonymous';
-        const userData = await getCachedUserProfile(currentUser.uid);
+        const userData = await getCachedUserProfile({uid: currentUser.uid});
         if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
