@@ -195,7 +195,7 @@ let pointsToRedeem = 0;
                 msgEl.style.color = 'var(--accent-red)';
             }
         } catch (error) {
-            console.error('Error applying promo code:', error);
+            console.error('Manager info: Error applying promo code:', error);
             discount = 0;
             appliedPromo = '';
             msgEl.textContent = 'Error applying promo code.';
@@ -316,7 +316,7 @@ export async function handlePlaceOrder(e) {
         messageEl.style.color = 'var(--accent-green)';
         setTimeout(() => safeRedirect('./account.html'), 3000);
     } catch (error) {
-        console.error("Error placing order:", error.message);
+        console.error("Manager info: Error placing order:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;
