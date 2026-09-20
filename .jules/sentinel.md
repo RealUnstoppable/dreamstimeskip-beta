@@ -84,3 +84,7 @@
 **Vulnerability:** The Stripe webhook initialization in `functions/index.js` referenced an undefined `endpointSecret` variable, causing `stripe.webhooks.constructEvent` to throw a ReferenceError. This prevented all checkout sessions from being processed and resulted in a complete disruption of payment fulfillment.
 **Learning:** Referencing undefined variables for critical secrets not only breaks the intended functionality but bypasses signature validation, leading to silent failures when webhook events are received.
 **Prevention:** Always ensure that all secrets required for third-party integrations (like `STRIPE_WEBHOOK_SECRET`) are explicitly defined and securely retrieved from environment variables before use.
+## 2025-02-25 - Fix unauthorized listing of promo_codes
+**Vulnerability:** The `promo_codes` collection had `allow read: if true;`, permitting unauthenticated users to query/list all available promo codes.
+**Learning:** Common misconfiguration in Firebase rules where `read` is used instead of the more granular `get` and `list`. This exposes the entire collection to anyone who knows the project ID.
+**Prevention:** For secret or promotional items intended to be fetched by ID only, use `allow get: if true;` and `allow list: if isAdmin();` or similar restrictive conditions instead of a blanket `read`.

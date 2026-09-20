@@ -75,7 +75,7 @@ function renderProducts(searchQuery = '') {
                 <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
                     ${heartIcon}
                 </button>
-                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" style="cursor: pointer;">
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" >
                 <div class="product-info">
                     <h3>${product.name}</h3>
 
@@ -84,13 +84,13 @@ function renderProducts(searchQuery = '') {
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
                         <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
                     </div>
-                    <div class="product-footer" style="align-items: center;">
+                    <div class="product-footer" >
                         <div>
-                            ${product.originalPrice ? `<span style="text-decoration: line-through; color: var(--text-secondary); margin-right: 8px; font-size: 0.9em;">$${product.originalPrice.toFixed(2)}</span>` : ''}
-                            <span class="product-price" style="${product.price === 0 ? 'color: var(--accent-green); font-weight: bold;' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
+                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>` : ''}
+                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="view-reviews-btn" style="background-color: #4b5563; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background-color 0.2s;" data-id="${product.id}">Reviews</button>
+                        <div class="action-buttons-container">
+                            <button class="view-reviews-btn" data-id="${product.id}">Reviews</button>
                             <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
                         </div>
                     </div>
@@ -146,7 +146,7 @@ function renderCart() {
                         <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
                         <div class="cart-item-info">
                             <h4>${product.name}</h4>
-                            <p>${product.price === 0 ? '<span style="color: var(--accent-green); font-weight: bold;">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
+                            <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                         </div>
                         <div class="cart-item-actions">
                             <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
@@ -223,7 +223,7 @@ export async function handleAddToCart(productId, event) {
         await saveCart();
         renderCart();
     } catch (error) {
-        console.error('Failed to add to cart:', error.message);
+        console.error('Manager info: Failed to add to cart:', error.message);
     }
 }
 
@@ -272,7 +272,7 @@ export async function toggleWishlist(productId) {
     try {
         await saveWishlist();
     } catch (error) {
-        console.error('Failed to update wishlist:', error.message);
+        console.error('Manager info: Failed to update wishlist:', error.message);
     }
 }
 
@@ -293,7 +293,7 @@ async function saveWishlist() {
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
-                console.error("Error saving wishlist to Firestore:", error.message);
+                console.error("Manager info: Error saving wishlist to Firestore:", error.message);
                 reject(error);
             }
         }, 500);
@@ -315,7 +315,7 @@ async function saveCart() {
                     const userCartRef = doc(db, 'carts', currentUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
-                    console.error("Error saving cart to Firestore:", error.message);
+                    console.error("Manager info: Error saving cart to Firestore:", error.message);
                 }
             } else {
                 // Save cart to localStorage for logged-out users
@@ -390,7 +390,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("Manager info: Error fetching reviews:", error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -596,7 +596,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Error submitting review:", error);
+                console.error("Manager info: Error submitting review:", error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -614,7 +614,7 @@ async function openReviewsModal(productId) {
     const product = productMap.get(productId);
 
     document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
-    reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>';
+    reviewsListContainer.innerHTML = '<p class="review-message loading">Loading reviews...</p>';
 
     // Reset Form
     currentRating = 0;
@@ -681,7 +681,7 @@ async function loadReviews(productId) {
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Error loading reviews:", error.message);
+        console.error("Manager info: Error loading reviews:", error.message);
         reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
     }
 }
@@ -691,7 +691,7 @@ async function handleReviewSubmit(e) {
     if (!currentUser || !currentReviewProductId) return;
 
     if (currentRating === 0) {
-        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Please select a star rating.</span>';
+        reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
         return;
     }
 
@@ -732,7 +732,7 @@ async function handleReviewSubmit(e) {
             s.setAttribute('aria-checked', 'false');
         });
 
-        reviewNotification.innerHTML = '<span style="color: var(--accent-green);">Review submitted successfully!</span>';
+        reviewNotification.innerHTML = '<span class="review-message success">Review submitted successfully!</span>';
         setTimeout(() => reviewNotification.innerHTML = '', 3000);
 
         // ⚡ Bolt: Invalidate cache for this product so the new review is fetched
@@ -742,7 +742,7 @@ async function handleReviewSubmit(e) {
         await openReviewsModal(currentReviewProductId); // Refresh modal
 
     } catch (error) {
-        console.error("Error submitting review:", error.message);
+        console.error("Manager info: Error submitting review:", error.message);
         reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
     } finally {
         submitReviewBtn.disabled = false;

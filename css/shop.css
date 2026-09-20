@@ -280,6 +280,7 @@ textarea#review-text:focus {
     height: 320px;
     object-fit: cover;
     background-color: #000;
+    cursor: pointer;
 }
 
 .product-info {
@@ -725,15 +726,16 @@ textarea#review-text:focus {
 }
 
 .view-reviews-btn {
-    background: none;
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
+    background-color: #4b5563;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 10px;
+    font-weight: 600;
+    transition: background-color 0.2s;
     width: 100%;
+    margin-top: 10px;
 }
 
 .view-reviews-btn:hover {
@@ -748,3 +750,36 @@ textarea#review-text:focus {
 }
 
 /* --- End of shop.css --- */
+.free-badge {
+    color: var(--accent-green);
+    font-weight: bold;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+    margin-right: 8px;
+    font-size: 0.9em;
+}
+
+.review-message {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.review-message.loading {
+    color: var(--text-secondary);
+}
+
+.review-message.error {
+    color: var(--accent-red);
+}
+
+.review-message.success {
+    color: var(--accent-green);
+}
+
+.action-buttons-container {
+    display: flex;
+    gap: 10px;
+}
