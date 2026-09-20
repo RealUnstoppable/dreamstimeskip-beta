@@ -74,7 +74,7 @@ function initHarmonyTunes() {
             artist: "Remix", 
             duration: "2:30", 
             src: "/music/No Pole x Where Have You Been (Remix).mp3", 
-            art: "/images/MugAllBrands300x300.png",
+            art: "/images/nopole_cover.jpg",
             bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['upbeat', 'pop', 'happy']
         },
@@ -86,7 +86,7 @@ function initHarmonyTunes() {
     const songColors = {
         'pixy-legacy': '#5c4a3d',      // Warm Brown
         'deorc-decuple': '#8a196e',    // Dim Pink
-        'no-pole-remix': '#2e8a19',    // Dim Green
+        'no-pole-remix': '#a11f8b',    // Neon Magenta
         'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
         'astrophage': '#2a0c3b' // Synthwave Dark Purple
         'kesha-blow': '#e63995' // Neon Pink
