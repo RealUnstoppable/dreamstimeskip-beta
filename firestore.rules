@@ -123,6 +123,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Feature requests collection
+    match /feature_requests/{requestId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // Upvotes subcollection
+      match /upvotes/{userId} {
+        allow read: if true;
+      }
+    }
+
     match /newsletterSubscribers/{email} {
       allow read: if isAdmin();
       allow create: if true;
