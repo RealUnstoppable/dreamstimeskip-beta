@@ -499,13 +499,17 @@ function initHarmonyTunes() {
             const mockViews = ['14.2M', '11.8M', '9.4M', '6.1M', '3.8M', '1.2M', '800K', '400K'];
             const mockTrends = ['up', 'up', 'down', 'up', 'down', 'flat', 'down', 'up'];
             
+            // Mock per-song extra stats
+            const mockPeakRanks = ['#1', '#2', '#1', '#3', '#5', '#4', '#7', '#6'];
+            const mockWeeks     = ['8 wks', '6 wks', '4 wks', '3 wks', '2 wks', '2 wks', '1 wk', '1 wk'];
+
             const renderLeaderboard = (limit) => {
                 containerViralNow.innerHTML = viralSongs.slice(0, limit).map((song, idx) => {
                     const trend = mockTrends[idx] || 'flat';
-                    const trendIcon = trend === 'up' ? '▲' : (trend === 'down' ? '▼' : '-');
+                    const trendIcon = trend === 'up' ? '▲' : (trend === 'down' ? '▼' : '–');
                     const trendClass = trend === 'up' ? 'trend-up' : (trend === 'down' ? 'trend-down' : 'trend-flat');
                     return `
-                        <div class="leaderboard-item" onclick="playSong('${song.id}')">
+                        <div class="leaderboard-item" data-viral-idx="${idx}" style="cursor:pointer;">
                             <div class="leaderboard-rank">${idx + 1}</div>
                             <div class="leaderboard-trend ${trendClass}">${trendIcon}</div>
                             <img class="leaderboard-art" src="${song.art}" alt="Art">
@@ -517,10 +521,87 @@ function initHarmonyTunes() {
                         </div>
                     `;
                 }).join('');
+
+                // Wire up click → stats popup
+                containerViralNow.querySelectorAll('.leaderboard-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const idx = parseInt(item.dataset.viralIdx, 10);
+                        openViralStats(idx);
+                    });
+                });
             };
-            
+
+            // ===== Viral Stats Popup =====
+            const viralOverlay  = document.getElementById('viral-stats-overlay');
+            const viralBg       = document.getElementById('viral-stats-bg');
+            const viralArt      = document.getElementById('viral-stats-art');
+            const viralRank     = document.getElementById('viral-stats-rank');
+            const viralTitle    = document.getElementById('viral-stats-title');
+            const viralArtist   = document.getElementById('viral-stats-artist');
+            const viralViews    = document.getElementById('vstats-views');
+            const viralTrend    = document.getElementById('vstats-trend');
+            const viralPeak     = document.getElementById('vstats-peak');
+            const viralWeeks    = document.getElementById('vstats-weeks');
+            const viralPlayBtn  = document.getElementById('viral-stats-play-btn');
+            const viralClose    = document.getElementById('viral-stats-close');
+
+            let viralTargetSongId = null;
+
+            function openViralStats(idx) {
+                const song = viralSongs[idx];
+                if (!song || !viralOverlay) return;
+
+                viralTargetSongId = song.id;
+
+                // Populate
+                viralBg.style.backgroundImage   = `url(${song.art})`;
+                viralArt.src                     = song.art;
+                viralRank.textContent            = `#${idx + 1}`;
+                viralTitle.textContent           = song.title;
+                viralArtist.textContent          = song.artist;
+                viralViews.textContent           = mockViews[idx] || '1M';
+                const trend = mockTrends[idx] || 'flat';
+                const trendLabel = trend === 'up' ? '▲ Rising' : (trend === 'down' ? '▼ Falling' : '– Stable');
+                viralTrend.textContent           = trendLabel;
+                viralTrend.style.color           = trend === 'up' ? '#1db954' : (trend === 'down' ? '#ff4d4d' : '#888');
+                viralPeak.textContent            = mockPeakRanks[idx] || '#1';
+                viralWeeks.textContent           = mockWeeks[idx] || '1 wk';
+
+                viralOverlay.classList.remove('hidden');
+            }
+
+            function closeViralStats() {
+                if (viralOverlay) viralOverlay.classList.add('hidden');
+                viralTargetSongId = null;
+            }
+
+            if (viralClose) viralClose.addEventListener('click', closeViralStats);
+            if (viralOverlay) {
+                viralOverlay.addEventListener('click', (e) => {
+                    if (e.target === viralOverlay) closeViralStats();
+                });
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && viralOverlay && !viralOverlay.classList.contains('hidden')) {
+                    closeViralStats();
+                }
+            });
+            if (viralPlayBtn) {
+                viralPlayBtn.addEventListener('click', () => {
+                    if (!viralTargetSongId) return;
+                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
+                    if (songIdx !== -1) {
+                        currentQueue = [...librarySongs];
+                        currentSongIndex = songIdx;
+                        loadSong(songIdx);
+                        if (!isPlaying) togglePlayPause();
+                    }
+                    closeViralStats();
+                });
+            }
+
             renderLeaderboard(3); // initially show 3
-            
+
             const showMoreBtn = document.getElementById('show-more-viral');
             let viralExpanded = false;
             if (showMoreBtn) {

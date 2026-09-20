@@ -1890,3 +1890,182 @@ body {
         gap: 8px !important;
     }
 }
+
+/* ===== Viral Song Stats Popup ===== */
+.viral-stats-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 20px;
+}
+.viral-stats-overlay.hidden { display: none; }
+
+@keyframes viralPopIn {
+    from { opacity: 0; transform: scale(0.88) translateY(20px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+.viral-stats-popup {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(16, 16, 16, 0.85);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04);
+    animation: viralPopIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Blurred album-art background */
+.viral-stats-bg {
+    position: absolute;
+    inset: -10%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(30px) brightness(0.25) saturate(1.4);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Close button */
+.viral-stats-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 10;
+    background: rgba(255,255,255,0.08);
+    border: none;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.viral-stats-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* Header: art + meta */
+.viral-stats-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 28px 24px 20px;
+}
+.viral-stats-art {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    object-fit: cover;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    flex-shrink: 0;
+}
+.viral-stats-meta { flex: 1; min-width: 0; }
+.viral-stats-rank-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #1db954, #00d4aa);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+}
+.viral-stats-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.viral-stats-artist {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 3px;
+}
+
+/* Divider */
+.viral-stats-popup::after {
+    content: '';
+    display: block;
+    position: relative;
+    z-index: 2;
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 24px;
+}
+
+/* Stats grid */
+.viral-stats-grid {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255,255,255,0.05);
+    margin: 0 24px 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.viral-stat-card {
+    background: rgba(255,255,255,0.03);
+    padding: 14px 16px;
+    text-align: center;
+    transition: background 0.15s;
+}
+.viral-stat-card:hover { background: rgba(255,255,255,0.07); }
+.viral-stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+}
+.viral-stat-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Play button */
+.viral-stats-play-btn {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: calc(100% - 48px);
+    margin: 0 24px 24px;
+    padding: 14px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, #1db954, #00d4aa);
+    color: #000;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(29,185,84,0.4);
+}
+.viral-stats-play-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 28px rgba(29,185,84,0.6);
+}
+.viral-stats-play-btn:active { transform: scale(0.97); }

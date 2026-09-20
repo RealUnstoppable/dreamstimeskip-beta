@@ -417,5 +417,50 @@
         </div>
     </div>
 
+    <!-- ===== Viral Song Stats Popup ===== -->
+    <div id="viral-stats-overlay" class="viral-stats-overlay hidden" aria-modal="true" role="dialog">
+        <div class="viral-stats-popup" id="viral-stats-popup">
+            <!-- Blurred BG -->
+            <div class="viral-stats-bg" id="viral-stats-bg"></div>
+            <!-- Close -->
+            <button class="viral-stats-close" id="viral-stats-close" aria-label="Close">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <!-- Header -->
+            <div class="viral-stats-header">
+                <img id="viral-stats-art" src="" alt="" class="viral-stats-art">
+                <div class="viral-stats-meta">
+                    <div class="viral-stats-rank-badge" id="viral-stats-rank">#1</div>
+                    <div class="viral-stats-title" id="viral-stats-title">Song Title</div>
+                    <div class="viral-stats-artist" id="viral-stats-artist">Artist</div>
+                </div>
+            </div>
+            <!-- Stats Grid -->
+            <div class="viral-stats-grid">
+                <div class="viral-stat-card">
+                    <div class="viral-stat-value" id="vstats-views">—</div>
+                    <div class="viral-stat-label">Total Views</div>
+                </div>
+                <div class="viral-stat-card">
+                    <div class="viral-stat-value" id="vstats-trend">—</div>
+                    <div class="viral-stat-label">Trend</div>
+                </div>
+                <div class="viral-stat-card">
+                    <div class="viral-stat-value" id="vstats-peak">—</div>
+                    <div class="viral-stat-label">Peak Rank</div>
+                </div>
+                <div class="viral-stat-card">
+                    <div class="viral-stat-value" id="vstats-weeks">—</div>
+                    <div class="viral-stat-label">Weeks on Chart</div>
+                </div>
+            </div>
+            <!-- Play Button -->
+            <button class="viral-stats-play-btn" id="viral-stats-play-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Play Now
+            </button>
+        </div>
+    </div>
+
 </body>
 </html>
