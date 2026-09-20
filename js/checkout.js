@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/fi
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
-import { escapeHTML } from "./utils.js";
+import { escapeHTML, getCachedUserProfile } from "./utils.js";
 
 let currentUser = null;
 let userCart = {};
@@ -331,9 +331,8 @@ onAuthStateChanged(auth, async (user) => {
         const docSnap = await getDoc(userCartRef);
         userCart = docSnap.exists() ? docSnap.data().items : {};
         
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        window.userPointsBalance = userSnap.exists() ? (userSnap.data().pointsBalance || 0) : 0;
+        const userData = await getCachedUserProfile(user);
+        window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
         
         renderCheckoutPage();
     } else {

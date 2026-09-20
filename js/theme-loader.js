@@ -25,7 +25,7 @@ const applyTheme = (theme, accentColor) => {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         try {
-            const userData = await getCachedUserProfile(user.uid);
+            const userData = await getCachedUserProfile({uid: user.uid});
             if (userData) {
                 applyTheme(userData.theme, userData.accentColor);
             } else {
