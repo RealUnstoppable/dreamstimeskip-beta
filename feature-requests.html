@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Requests | DreamsTimeskip Hub</title>
+    <meta name="description" content="Submit and view feature requests for the Unstoppable Ecosystem and Dreams TimeSkip.">
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <style>
+        .requests-container {
+            max-width: 800px;
+            margin: 40px auto;
+            text-align: left;
+        }
+
+        .request-form {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .request-card {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .request-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .request-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .request-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background-color: #f59e0b; color: white; }
+        .status-in_progress { background-color: #3b82f6; color: white; }
+        .status-completed { background-color: #10b981; color: white; }
+
+        #login-prompt {
+            background-color: var(--surface-color);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header"></header>
+
+    <main style="padding: 120px 20px; text-align: center; min-height: 80vh;">
+        <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 20px;">Feature Requests</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 40px;">
+            Help shape the future of the Unstoppable Ecosystem. Submit your ideas below!
+        </p>
+
+        <div class="requests-container">
+            <!-- Login Prompt -->
+            <div id="login-prompt" style="display: none;">
+                <h3>Want to submit a feature request?</h3>
+                <p style="color: var(--text-secondary); margin: 15px 0 25px;">Sign in to share your ideas with the community and development team.</p>
+                <a href="sign in beta.html" class="cta-button">Sign In / Sign Up</a>
+            </div>
+
+            <!-- Submission Form -->
+            <form id="feature-request-form" class="request-form" style="display: none;">
+                <h3 style="margin-top: 0; margin-bottom: 20px;">Submit a New Idea</h3>
+                <div class="form-group">
+                    <label for="request-title">Title</label>
+                    <input type="text" id="request-title" required placeholder="e.g. Add dark mode to the shop">
+                </div>
+                <div class="form-group">
+                    <label for="request-description">Description</label>
+                    <textarea id="request-description" rows="5" required placeholder="Describe your idea in detail. How will it help users?"></textarea>
+                </div>
+                <button type="submit" class="cta-button" id="submit-request-btn" style="width: 100%;">Submit Request</button>
+                <p id="form-message" style="margin-top: 15px; font-weight: 500;"></p>
+            </form>
+
+            <!-- Requests List -->
+            <div style="text-align: left; margin-bottom: 20px;">
+                <h3 style="font-size: 1.5rem;">Community Ideas</h3>
+            </div>
+            <div id="requests-list">
+                <p style="text-align: center; color: var(--text-secondary);">Loading requests...</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer"></footer>
+
+    <script src="/js/script.js"></script>
+    <script type="module" src="/js/feature-requests.js"></script>
+
+</body>
+</html>

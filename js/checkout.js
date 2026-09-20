@@ -3,6 +3,8 @@ import { auth, db, safeRedirect } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
+import { calculateCartSummary } from './cart-utils.js';
+import { escapeHTML } from "./utils.js";
 
 let currentUser = null;
 let userCart = {};
@@ -29,10 +31,7 @@ function renderCheckoutPage() {
     let appliedPromo = '';
 
     const renderSummary = () => {
-        const subtotal = Object.entries(userCart).reduce((sum, [productId, quantity]) => {
-            const product = productMap.get(productId);
-            return sum + (product.price * quantity);
-        }, 0);
+        const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
         
         const discountAmount = subtotal * discount;
         const discountedSubtotal = subtotal - discountAmount;
@@ -49,6 +48,9 @@ function renderCheckoutPage() {
         document.getElementById('summary-discount-row').style.display = discount > 0 ? 'flex' : 'none';
         document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
         document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+        const points = Math.floor(subtotal * 10);
+        document.getElementById('summary-points').textContent = `✨ You will earn ${points} Unstoppable Points with this order!`;
+
     };
 
     const { subtotal, discountAmount, tax, total } = renderSummary();
@@ -110,7 +112,7 @@ function renderCheckoutPage() {
                 <div id="summary-items">
                     ${Object.entries(userCart).map(([productId, quantity]) => {
                         const product = productMap.get(productId);
-                        return `<div class="summary-item"><span>${quantity}x ${product.name}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
+                        return `<div class="summary-item"><span>${quantity}x ${escapeHTML(product.name)}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
                     }).join('')}
                 </div>
                 
@@ -127,28 +129,67 @@ function renderCheckoutPage() {
                     <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
                     <div class="summary-item" id="summary-discount-row" style="display: none; color: var(--accent-green);"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
                     <div class="summary-item"><span>Tax</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
-                    <div class="summary-total"><span>Total</span> <span id="summary-total">$${total.toFixed(2)}</span></div>
+
+                    <div class="summary-total"><span>Total</span> <span id="summary-total">${total.toFixed(2)}</span></div>
+                    <div style="margin-top: 15px; font-size: 0.9rem; color: var(--accent-blue); text-align: center; font-weight: 500;" id="summary-points">✨ You will earn ${Math.floor(subtotal * 10)} Unstoppable Points with this order!</div>
+
                 </div>
             </div>
         </div>
     `;
 
-    document.getElementById('apply-promo-btn').addEventListener('click', () => {
+    document.getElementById('apply-promo-btn').addEventListener('click', async (e) => {
+        const btn = e.currentTarget;
+        const originalText = btn.textContent;
         const code = document.getElementById('promo-code').value.trim().toUpperCase();
         const msgEl = document.getElementById('promo-message');
-        if (code === 'DTS10') {
-            discount = 0.10;
-            appliedPromo = 'DTS10';
-            msgEl.textContent = '10% discount applied!';
-            msgEl.style.color = 'var(--accent-green)';
-            updateSummaryUI();
-        } else {
+        if (!code) {
+            msgEl.textContent = 'Please enter a promo code.';
+            msgEl.style.color = 'var(--accent-red)';
             discount = 0;
             appliedPromo = '';
-            msgEl.textContent = 'Invalid promo code.';
-            msgEl.style.color = 'var(--accent-red)';
             updateSummaryUI();
+            return;
         }
+        msgEl.textContent = 'Applying...';
+        msgEl.style.color = 'var(--text-secondary)';
+
+        btn.disabled = true;
+        btn.textContent = 'Applying...';
+
+        try {
+            const promoRef = doc(db, 'promo_codes', code);
+            const promoSnap = await getDoc(promoRef);
+            if (promoSnap.exists()) {
+                const promoData = promoSnap.data();
+                if (promoData.active) {
+                    discount = promoData.discount / 100;
+                    appliedPromo = code;
+                    msgEl.textContent = `${promoData.discount}% discount applied!`;
+                    msgEl.style.color = 'var(--accent-green)';
+                } else {
+                    discount = 0;
+                    appliedPromo = '';
+                    msgEl.textContent = 'Promo code is inactive.';
+                    msgEl.style.color = 'var(--accent-red)';
+                }
+            } else {
+                discount = 0;
+                appliedPromo = '';
+                msgEl.textContent = 'Invalid promo code.';
+                msgEl.style.color = 'var(--accent-red)';
+            }
+        } catch (error) {
+            console.error('Error applying promo code:', error);
+            discount = 0;
+            appliedPromo = '';
+            msgEl.textContent = 'Error applying promo code.';
+            msgEl.style.color = 'var(--accent-red)';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
+        }
+        updateSummaryUI();
     });
 
     document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
@@ -186,7 +227,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
             transaction.update(userCartRef, { items: {} });
         });
     } catch (error) {
-        console.error('Manager info: Error processing order transaction:', error);
+        console.error('Error processing order transaction:', error);
         throw error;
     }
 }
@@ -227,7 +268,7 @@ export async function handlePlaceOrder(e) {
         messageEl.style.color = 'var(--accent-green)';
         setTimeout(() => safeRedirect('./account.html'), 3000);
     } catch (error) {
-        console.error("Error placing order - Manager info:", error.message);
+        console.error("Error placing order:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
         messageEl.style.color = 'var(--accent-red)';
         placeOrderBtn.disabled = false;

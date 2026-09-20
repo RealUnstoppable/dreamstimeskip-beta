@@ -9,16 +9,14 @@ admin.initializeApp();
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET || "sk_test_placeholder";
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_placeholder";
-const stripe = require("stripe")(stripeKey);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "whsec_test_placeholder";
 
-// 🛡️ Shared Utils
-function getUserDocRef(uid) {
-  return admin.firestore().collection("users").doc(uid);
-}
+async function authenticateRequest(req, res, adminInstance) {
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return null;
+  }
 
-// 🛡️ Shared Auth Utility
-async function authenticateRequest(req, res) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     res.status(401).send("Unauthorized");
@@ -27,22 +25,82 @@ async function authenticateRequest(req, res) {
 
   const token = authHeader.split("Bearer ")[1];
   try {
-    return await admin.auth().verifyIdToken(token);
+    return await adminInstance.auth().verifyIdToken(token);
   } catch (err) {
-    console.error("Auth Error - Manager info: [" + err.message + "]");
+    console.error("Auth Error:", err);
     res.status(401).send("Unauthorized");
     return null;
   }
 }
+const stripe = require("stripe")(stripeKey);
+
+// 🛡️ Shared Utils
+function getUserDocRef(uid) {
+  return admin.firestore().collection("users").doc(uid);
+}
+
 
 // 🔹 Create Checkout Session
+
+// 🛡️ Admin Action Proxy
+exports.adminAction = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+
+    try {
+      const adminDoc = await getUserDocRef(decodedToken.uid).get();
+      if (!adminDoc.exists || !adminDoc.data().isAdmin) {
+        return res.status(403).send("Forbidden: Admins only");
+      }
+
+      const { action, collection, docId, data } = req.body;
+      if (!action || !collection || !docId) {
+        return res.status(400).send("Missing required fields");
+      }
+
+      // Allowed collections for admin actions via this endpoint
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets", "promo_codes"];
+      if (!allowedCollections.includes(collection)) {
+        return res.status(400).send("Invalid collection");
+      }
+
+      const db = admin.firestore();
+      const docRef = db.collection(collection).doc(docId);
+
+      if (action === "update") {
+        if (typeof data !== "object" || data === null) {
+          return res.status(400).send("Invalid update data");
+        }
+        if (data.createdAt === 'SERVER_TIMESTAMP') {
+          data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await docRef.set(data, { merge: true });
+      } else if (action === "delete") {
+        await docRef.delete();
+      } else {
+        return res.status(400).send("Invalid action");
+      }
+
+      res.status(200).json({ success: true });
+    } catch (err) {
+      console.error("Admin Action Error: [" + err.message + "]");
+      res.status(500).json({ error: err.message });
+    }
+  });
+});
+
 exports.createCheckoutSession = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     const uid = decodedToken.uid;
@@ -74,8 +132,8 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
       res.status(200).json({url: session.url});
     } catch (err) {
-      console.error("Checkout Error - Manager info: [" + err.message + "]");
-      res.status(500).json({error: `Checkout Error. Manager info: [${err.message}]`});
+      console.error("Checkout Error: [" + err.message + "]");
+      res.status(500).json({error: `Checkout Error. [${err.message}]`});
     }
   });
 });
@@ -99,7 +157,7 @@ exports.onSupportTicketUpdate = onDocumentUpdated("support_tickets/{ticketId}", 
         type: "ticket_reply",
       });
     } catch (error) {
-      console.error("Error creating notification - Manager info: [" + error.message + "]");
+      console.error("Error creating notification: [" + error.message + "]");
     }
   }
 });
@@ -135,7 +193,7 @@ exports.onReviewWrite = functions.firestore
 
         return null;
       } catch (error) {
-        console.error("Error aggregating ratings - Manager info: [" + error.message + "]");
+        console.error("Error aggregating ratings: [" + error.message + "]");
         return null;
       }
     });
@@ -148,7 +206,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   try {
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
-    console.error("Webhook Error - Manager info: [" + err.message + "]");
+    console.error("Webhook Error: [" + err.message + "]");
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -159,13 +217,17 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const planName = session.metadata.planName || "Pro";
 
     if (uid && uid !== "unknown") {
-      await getUserDocRef(uid).set({
-        plan: planName, // Updates the frontend to unlock pro features
-        subscription: {
-          status: "active",
-          customerId: session.customer,
-        },
-      }, {merge: true});
+      try {
+        await getUserDocRef(uid).set({
+          plan: planName, // Updates the frontend to unlock pro features
+          subscription: {
+            status: "active",
+            customerId: session.customer,
+          },
+        }, {merge: true});
+      } catch (error) {
+        console.error("Error processing checkout.session.completed: [" + error.message + "]");
+      }
     }
   }
 
@@ -186,7 +248,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
       );
       await Promise.all(updates);
     } catch (error) {
-      console.error("Error processing customer.subscription.deleted - Manager info: [" + error.message + "]");
+      console.error("Error processing customer.subscription.deleted: [" + error.message + "]");
     }
   }
 
@@ -200,7 +262,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res);
+    const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
 
     try {
@@ -226,7 +288,7 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       await Promise.all(cancelPromises);
       res.status(200).json({success: true});
     } catch (err) {
-      console.error("Cancel Error - Manager info: [" + err.message + "]");
+      console.error("Cancel Error: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
   });
@@ -234,12 +296,14 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
 // ⭐️ Update Product Stats on New Review
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
+
+// ⭐️ Update Points on New Review
 exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async (event) => {
   const snap = event.data;
-  const context = event;
   const newReview = snap.data();
   const productId = newReview.productId;
   const rating = newReview.rating;
+  const userId = newReview.userId;
 
   // Validate rating
   if (typeof rating !== "number" || rating < 1 || rating > 5) {
@@ -247,25 +311,152 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
     return null;
   }
 
-  const productStatsRef = admin.firestore().collection("product_stats").doc(productId);
+  const db = admin.firestore();
+  const productStatsRef = db.collection("product_stats").doc(productId);
+  const userRef = db.collection("users").doc(userId);
+  const transactionRef = db.collection("reward_transactions").doc();
 
-  return admin.firestore().runTransaction(async (transaction) => {
-    const statsDoc = await transaction.get(productStatsRef);
-    let reviewCount = 0;
-    let averageRating = 0;
+  try {
+    return await db.runTransaction(async (transaction) => {
+      // 1. Update Product Stats
+      const statsDoc = await transaction.get(productStatsRef);
+      let reviewCount = 0;
+      let averageRating = 0;
 
-    if (statsDoc.exists) {
-      const data = statsDoc.data();
-      reviewCount = data.reviewCount || 0;
-      averageRating = data.averageRating || 0;
-    }
+      if (statsDoc.exists) {
+        const data = statsDoc.data();
+        reviewCount = data.reviewCount || 0;
+        averageRating = data.averageRating || 0;
+      }
 
-    const newReviewCount = reviewCount + 1;
-    const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
+      const newReviewCount = reviewCount + 1;
+      const newAverageRating = ((averageRating * reviewCount) + rating) / newReviewCount;
 
-    transaction.set(productStatsRef, {
-      reviewCount: newReviewCount,
-      averageRating: newAverageRating,
-    }, {merge: true});
-  });
+      transaction.set(productStatsRef, {
+        reviewCount: newReviewCount,
+        averageRating: newAverageRating,
+      }, {merge: true});
+
+      // 2. Award Points
+      if (userId) {
+        const pointsToAward = 50;
+        const userDoc = await transaction.get(userRef);
+        let currentPoints = 0;
+        if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
+          currentPoints = userDoc.data().pointsBalance;
+        }
+
+        transaction.set(userRef, {
+          pointsBalance: currentPoints + pointsToAward
+        }, { merge: true });
+
+        transaction.set(transactionRef, {
+          userId: userId,
+          amount: pointsToAward,
+          reason: "Product Review",
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+    });
+  } catch (error) {
+    console.error("Error updating product stats or awarding points - Manager info: [" + error.message + "]");
+    return null;
+  }
+});
+
+// 🛍️ Award Points on Order Creation
+exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => {
+  const snap = event.data;
+  const newOrder = snap.data();
+  const userId = newOrder.userId;
+  const subtotal = newOrder.subtotal || 0;
+
+  if (!userId || subtotal <= 0) return null;
+
+  const db = admin.firestore();
+  const userRef = db.collection("users").doc(userId);
+  const transactionRef = db.collection("reward_transactions").doc();
+
+  // 10 points per $1 spent
+  const pointsToAward = Math.floor(subtotal * 10);
+
+  if (pointsToAward <= 0) return null;
+
+  try {
+    return await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      let currentPoints = 0;
+      if (userDoc.exists && typeof userDoc.data().pointsBalance === 'number') {
+        currentPoints = userDoc.data().pointsBalance;
+      }
+
+      transaction.set(userRef, {
+        pointsBalance: currentPoints + pointsToAward
+      }, { merge: true });
+
+      transaction.set(transactionRef, {
+        userId: userId,
+        amount: pointsToAward,
+        reason: "Purchase Reward",
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    });
+  } catch (error) {
+    console.error("Error updating product stats: [" + error.message + "]");
+    return null;
+  }
+});
+
+
+// 🎁 Loyalty Points on Order Creation
+exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => {
+  const snap = event.data;
+  if (!snap) return null;
+  const newOrder = snap.data();
+  const userId = newOrder.userId;
+  const items = newOrder.items;
+
+  if (!userId || !items) return null;
+
+  // Calculate points (e.g., 10 points per item quantity)
+  let pointsEarned = 0;
+  for (const item of Object.values(items)) {
+    const quantity = typeof item === 'object' && item.quantity !== undefined ? item.quantity : item;
+    pointsEarned += (parseInt(quantity) || 0) * 10;
+  }
+
+  if (pointsEarned <= 0) return null;
+
+  const userRef = admin.firestore().collection("users").doc(userId);
+  const transactionRef = admin.firestore().collection("loyalty_transactions").doc();
+
+  try {
+    return await admin.firestore().runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      let currentPoints = 0;
+
+      if (userDoc.exists) {
+        currentPoints = userDoc.data().loyaltyPoints || 0;
+      }
+
+      const newPoints = currentPoints + pointsEarned;
+
+      // Update user points
+      transaction.set(userRef, {
+        loyaltyPoints: newPoints,
+      }, {merge: true});
+
+      // Record transaction
+      transaction.set(transactionRef, {
+        userId: userId,
+        points: pointsEarned,
+        orderId: event.params.orderId,
+        description: `Earned points from Order #${event.params.orderId.split('_')[1] || event.params.orderId}`,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+  } catch (error) {
+    console.error("Error updating loyalty points - Manager info: [" + error.message + "]");
+    return null;
+  }
 });

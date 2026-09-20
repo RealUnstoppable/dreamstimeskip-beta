@@ -91,8 +91,27 @@
                 position: fixed; top: 0; left: -100%; height: 100vh; z-index: 1000;
                 background-color: var(--bg-color); width: 80%; max-width: 300px;
                 padding: 20px; border-right: 1px solid var(--border-color);
+                overflow-y: auto;
             }
             .sidebar.open { transform: translateX(100%); }
+
+            /* Mobile Dropdown Nav */
+            .mobile-nav-dropdown {
+                width: 100%;
+                padding: 10px;
+                background: var(--primary-card-color);
+                color: var(--text-primary);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                font-size: 1rem;
+                margin-bottom: 20px;
+                display: none;
+            }
+            @media (max-width: 768px) {
+                .mobile-nav-dropdown { display: block; }
+                .mobile-header { flex-direction: column; align-items: flex-start; }
+                .hamburger-btn { display: none; }
+            }
         }
     </style>
 </head>
@@ -101,13 +120,13 @@
  
     <div class="mobile-header">
         <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
-        <button class="hamburger-btn" aria-label="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <button class="hamburger-btn" aria-label="Open sidebar" title="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
     </div>
 
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
             <div class="mobile-header" style="justify-content: flex-end;">
-                <button class="hamburger-btn" aria-label="Close sidebar" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
+                <button class="hamburger-btn" aria-label="Close sidebar" title="Close sidebar" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
             </div>
             <div class="sidebar-header">
                 <h2>Admin Panel</h2>
@@ -121,6 +140,7 @@
                     <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="#support-tickets" class="nav-link">Support Tickets</a></li>
+                    <li><a href="#promo-codes" class="nav-link">Promo Codes</a></li>
                     <li><a href="#featurerequests" class="nav-link">Feature Requests</a></li>
                     <li><a href="#downloads" class="nav-link">Downloads</a></li>
                     <li><a href="#newsletter" class="nav-link">Newsletter</a></li>
@@ -293,17 +313,105 @@
                     </div>
                 </div>
             </section>
-        </main>
+
+        <section id="promo-codes" class="content-section" style="display: none;">
+            <h3>Promo Codes</h3>
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+                <h4 style="margin-top: 0;">Create New Promo Code</h4>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="new-promo-code" placeholder="Code (e.g. SUMMER20)" style="flex: 1; padding: 8px;">
+                    <input type="number" id="new-promo-discount" placeholder="Discount %" style="width: 100px; padding: 8px;" min="1" max="100">
+                    <button id="create-promo-btn" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+            <div id="promo-codes-list">Loading promo codes...</div>
+        </section>
+    </main>
     </div>
 
    <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { doc, getDoc, collection, getDocs, Timestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { doc, getDoc, collection, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
         import { fetchCollectionData, escapeHTML } from '/js/utils.js';
 
         let performanceChart;
+
+
+        async function loadPromoCodes() {
+            const listEl = document.getElementById('promo-codes-list');
+            try {
+                const snapshot = await getDocs(collection(db, 'promo_codes'));
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<p>No promo codes found.</p>';
+                    return;
+                }
+                let html = '<table class="admin-table"><thead><tr><th>Code</th><th>Discount (%)</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const code = docSnap.id;
+                    html += `
+                        <tr>
+                            <td><strong>${escapeHTML(code)}</strong></td>
+                            <td>${escapeHTML(data.discount)}%</td>
+                            <td><span class="status-badge ${data.active ? 'status-active' : 'status-pending'}">${data.active ? 'Active' : 'Inactive'}</span></td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="togglePromoCode('${escapeHTML(code)}', ${!data.active})" style="padding: 4px 8px; font-size: 0.8rem;">${data.active ? 'Deactivate' : 'Activate'}</button>
+                                <button class="btn" onclick="deletePromoCode('${escapeHTML(code)}')" style="padding: 4px 8px; font-size: 0.8rem; border: 1px solid var(--accent-red); color: var(--accent-red); background: transparent;">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+                listEl.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading promo codes:', error);
+                listEl.innerHTML = '<p style="color: var(--accent-red);">Error loading promo codes.</p>';
+            }
+        }
+        window.togglePromoCode = async function(code, newStatus) {
+            if (!confirm(`Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} promo code ${code}?`)) return;
+            try {
+                await performAdminAction('update', 'promo_codes', code, { active: newStatus });
+                showNotification(document.getElementById('security-notification'), 'Promo code status updated', 'success');
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        };
+        window.deletePromoCode = async function(code) {
+            if (!confirm(`Are you sure you want to delete promo code ${code}?`)) return;
+            try {
+                await performAdminAction('delete', 'promo_codes', code, {});
+                showNotification(document.getElementById('security-notification'), 'Promo code deleted', 'success');
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        };
+
+        document.getElementById('create-promo-btn').addEventListener('click', async () => {
+            const codeInput = document.getElementById('new-promo-code');
+            const discountInput = document.getElementById('new-promo-discount');
+            const code = codeInput.value.trim().toUpperCase();
+            const discount = parseInt(discountInput.value.trim(), 10);
+
+            if (!code || isNaN(discount) || discount < 1 || discount > 100) {
+                showNotification(document.getElementById('security-notification'), 'Invalid code or discount', 'error');
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, 'promo_codes', code), { discount, active: true, createdAt: serverTimestamp() });
+                showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
+                codeInput.value = '';
+                discountInput.value = '';
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            }
+        });
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -313,6 +421,7 @@
                 if (userDoc.exists() && userDoc.data().isAdmin) {
                     document.body.style.display = 'flex';
                     initializeAdminPage(user);
+                    loadPromoCodes();
                 } else {
                     if (!window.location.pathname.includes('account.html')) {
                         window.location.replace('account.html');
@@ -648,6 +757,26 @@
             };
         }
     
+
+        async function performAdminAction(action, collectionName, docId, data = null) {
+            const user = auth.currentUser;
+            if (!user) throw new Error("Not authenticated");
+            const idToken = await user.getIdToken();
+            const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({ action, collection: collectionName, docId, data })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || "Admin action failed");
+            }
+            return await response.json();
+        }
+
         function setupEventListeners() {
             // User Ban Toggle
             document.getElementById('user-list-body').addEventListener('click', async (e) => {
@@ -663,7 +792,7 @@
 
                 if (confirm(`Are you sure you want to ${shouldBeBanned ? 'ban' : 'unban'} this user?`)) {
                   try {
-                    await updateDoc(doc(db, "users", userId), { isBanned: shouldBeBanned });
+                    await performAdminAction("update", "users", userId, { isBanned: shouldBeBanned });
                     if (shouldBeBanned) {
                         e.target.textContent = 'Unban';
                         e.target.classList.remove('btn-ban');
@@ -710,7 +839,7 @@
                 if (!reqId || !btn.classList.contains('mark-complete-btn')) return;
                 if (confirm(`Mark this feature request as complete?`)) {
                   try {
-                    await updateDoc(doc(db, "feature_requests", reqId), { status: 'completed' });
+                    await performAdminAction("update", "feature_requests", reqId, { status: 'completed' });
                     e.target.closest('tr').querySelector('td:nth-child(4) span').className = 'status-badge active';
                     e.target.closest('tr').querySelector('td:nth-child(4) span').textContent = 'completed';
                     e.target.remove();
@@ -729,7 +858,7 @@
                 const tr = btn.closest('tr');
                 if (action === 'cancel' && confirm("Cancel this booking?")) {
                   try {
-                    await updateDoc(doc(db, "bookings", id), { status: 'cancelled' });
+                    await performAdminAction("update", "bookings", id, { status: 'cancelled' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge cancelled';
                         tr.querySelector('td:nth-child(5) span').textContent = 'cancelled';
@@ -740,7 +869,7 @@
                   }
                 } else if (action === 'complete') {
                   try {
-                    await updateDoc(doc(db, "bookings", id), { status: 'completed' });
+                    await performAdminAction("update", "bookings", id, { status: 'completed' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
                         tr.querySelector('td:nth-child(5) span').textContent = 'completed';
@@ -762,7 +891,7 @@
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await updateDoc(doc(db, "quotes", id), { status: 'responded' });
+                    await performAdminAction("update", "quotes", id, { status: 'responded' });
                     if(tr) {
                         tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
                         tr.querySelector('td:nth-child(5) span').textContent = 'responded';
@@ -772,7 +901,7 @@
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await deleteDoc(doc(db, "quotes", id));
+                    await performAdminAction("delete", "quotes", id);
                     if (tr) tr.remove();
                 }
             });
@@ -787,35 +916,75 @@
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                     if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); }
                 });
+                });
             });
 
+            const mobileNavSelect = document.getElementById('mobile-nav-select');
+            if (mobileNavSelect) {
+                mobileNavSelect.addEventListener('change', (e) => {
+                    const val = e.target.value;
+                    if (val.startsWith('#')) {
+                        document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
+                        const targetSection = document.querySelector(val);
+                        if(targetSection) targetSection.classList.add('active');
+
+                        const correspondingLink = document.querySelector(`.sidebar-nav a[href="${val}"]`);
+                        if(correspondingLink) correspondingLink.classList.add('active');
+                    } else if (val === 'signout') {
+                        signOut(auth);
+                    } else {
+                        window.location.href = val;
+                    }
+                });
+            }
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
 
             // Account Settings
-            document.getElementById('admin-change-password-btn')?.addEventListener('click', async () => {
+            document.getElementById('admin-change-password-btn')?.addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                const originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
                 const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
                 const email = auth.currentUser?.email;
                 if (email) {
                     try {
                         await sendPasswordResetEmail(auth, email);
                         alert('Password reset email sent. Check your inbox.');
-                    } catch (e) {
-                        alert('Error sending email: ' + e.message);
+                    } catch (error) {
+                        alert('Error sending email: ' + error.message);
+                    } finally {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
                 }
             });
-            document.getElementById('admin-delete-account-btn')?.addEventListener('click', async () => {
+            document.getElementById('admin-delete-account-btn')?.addEventListener('click', async (e) => {
                 if(confirm("Are you absolutely sure you want to delete your admin account? This action cannot be undone.")) {
+                    const btn = e.currentTarget;
+                    const originalText = btn.innerText;
+                    btn.disabled = true;
+                    btn.innerText = 'Deleting...';
                     const user = auth.currentUser;
                     if(user) {
                         try {
-                            await deleteDoc(doc(db, "users", user.uid));
+                            await performAdminAction("delete", "users", user.uid);
                             await user.delete();
                             window.location.replace('index.html');
-                        } catch(e) {
-                            alert('Error deleting account: ' + e.message);
+                        } catch(error) {
+                            alert('Error deleting account: ' + error.message);
+                            btn.disabled = false;
+                            btn.innerText = originalText;
                         }
+                    } else {
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
                 }
             });

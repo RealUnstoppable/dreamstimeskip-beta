@@ -19,7 +19,7 @@
 
 <body>
     <!-- Navigation back to hub -->
-    <a href="index.html" class="back-btn" aria-label="Back to Hub">
+    <a href="index.html" class="back-btn" title="Back to Hub" aria-label="Back to Hub">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         Hub
     </a>
@@ -32,7 +32,7 @@
         </div>
         <div class="hud-right" style="display: flex; gap: 10px; align-items: center;">
             <div class="misses-display">Misses: <span id="misses-val">0</span>/5</div>
-            <button id="btn-pause" class="icon-btn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white; pointer-events: auto;" aria-label="Pause">⏸</button>
+            <button id="btn-pause" class="icon-btn" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: white; pointer-events: auto;" aria-label="Pause" title="Pause">⏸</button>
         </div>
     </div>
 
@@ -98,12 +98,25 @@
             </div>
 
             <div class="option-group">
-                <label>Audio</label>
-                <div class="checkbox-row">
-                    <input type="checkbox" id="toggle-sfx" checked> <label for="toggle-sfx">ASMR SFX</label>
+                <label>FPS Limit</label>
+                <div class="toggle-group" id="fps-toggles">
+                    <button class="toggle-btn fps-btn" data-val="30">30</button>
+                    <button class="toggle-btn fps-btn active" data-val="60">60</button>
+                    <button class="toggle-btn fps-btn" data-val="120">120</button>
                 </div>
-                <div class="checkbox-row">
-                    <input type="checkbox" id="toggle-music" checked> <label for="toggle-music">Music</label>
+            </div>
+
+            <div class="option-group">
+                <label>Audio Volume</label>
+                <div class="slider-row" style="display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">
+                    <div>
+                        <label for="sfx-vol" style="font-size: 0.9em; display: block; margin-bottom: 5px;">SFX</label>
+                        <input type="range" id="sfx-vol" min="0" max="1" step="0.05" value="1" style="width: 100%;">
+                    </div>
+                    <div>
+                        <label for="music-vol" style="font-size: 0.9em; display: block; margin-bottom: 5px;">Music</label>
+                        <input type="range" id="music-vol" min="0" max="1" step="0.05" value="0.5" style="width: 100%;">
+                    </div>
                 </div>
             </div>
 
@@ -160,6 +173,7 @@
 
     <!-- Audio Elements -->
     <audio id="bgm-music" preload="auto" loop></audio>
+    <audio id="bgm-menu" src="/music/Astrophage.mp3" preload="auto" loop></audio>
 
     <!-- Scripts -->
     <!-- Use module so we can import Firebase -->

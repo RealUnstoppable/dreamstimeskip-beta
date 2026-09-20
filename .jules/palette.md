@@ -16,3 +16,11 @@
 ## 2026-05-27 - Missing ARIA Labels on Dynamically Rendered Components
 **Learning:** Icon-only buttons generated dynamically via template literals (e.g., `createSongCard` in `js/harmonytunes.js`) often miss crucial `aria-label`s because they aren't caught by static HTML linting.
 **Action:** Always verify that dynamically injected UI components with icon-only controls include descriptive `aria-label`s, utilizing interpolated data (like song titles) to maximize screen reader context.
+
+## 2024-05-18 - Missing ARIA Labels on Icon-only Close Buttons
+**Learning:** Icon-only close buttons (using HTML entity `&times;`) sometimes miss `aria-label` and `title` attributes, which makes them inaccessible to screen readers and limits their discoverability via hover tooltips for sighted users.
+**Action:** Always verify that icon-only buttons include an appropriate `aria-label` (e.g., "Close popup" or "Close chatbot") and a matching `title` attribute.
+
+## 2026-05-28 - Async Promo Code Application Loading States
+**Learning:** Found an async promo code application (`apply-promo-btn` in `js/checkout.js`) where the button was not disabled during the request, which could lead to users spamming the button while waiting for network validation. The event listener also used `e.target` to reference the button, which is prone to bugs if child elements are added later.
+**Action:** Always temporarily disable interactive buttons during async validation requests, providing visual text feedback (e.g., 'Applying...'), and prefer using `e.currentTarget` to safely reference the bound element within event listeners.

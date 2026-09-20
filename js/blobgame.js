@@ -25,13 +25,14 @@ let fpsInterval = 1000 / 60;
 
 // Audio
 const bgmMusic = document.getElementById('bgm-music');
+const bgmMenu = document.getElementById('bgm-menu');
+let lastDrawTime = 0;
 
 // Game State
 let isPlaying = false;
 let isPaused = false;
 let animationFrameId;
 let lastTime = 0;
-let lastDrawTime = 0;
 let spawnTimer = 0;
 let spawnInterval = 1200;
 let blobs = [];
@@ -140,6 +141,12 @@ function showMenu(menuEl) {
     if (mPause) allMenus.push(mPause);
     allMenus.forEach(m => m.classList.add('hidden'));
     menuEl.classList.remove('hidden');
+
+    // Crossfade to menu music
+    if (musicEnabled) {
+        bgmMusic.pause();
+        bgmMenu.play().catch(() => {});
+    }
 }
 
 // --- Game Logic ---
@@ -187,6 +194,8 @@ function startGame() {
     lastDrawTime = performance.now();
     
     if (musicEnabled) {
+        // Crossfade to game music
+        bgmMenu.pause();
         bgmMusic.currentTime = 0;
         bgmMusic.play().catch(e => console.log('Audio play blocked:', e));
     }
@@ -252,14 +261,17 @@ function gameLoop(currentTime) {
     const height = window.innerHeight;
     for (let i = blobs.length - 1; i >= 0; i--) {
         const blob = blobs[i];
-        blob.y += blob.vy * (dt / 16); // Normalize speed to 60fps
+        const effectiveVy = blob.isStretching ? blob.vy * 0.75 : blob.vy; // 25% slowdown
+        blob.y += effectiveVy * (dt / 16); // Normalize speed to 60fps
         blob.el.style.transform = `translate(${blob.x}px, ${blob.y}px)`;
 
         // Check if fell off screen
         if (blob.y > height + blob.size) {
             blob.el.remove();
             blobs.splice(i, 1);
-            stopPullSound(); // Stop any pull sound if it falls while dragging
+            if (blob.isStretching) {
+                stopPullSound(); // Stop any pull sound if it falls while dragging
+            }
             missBlob();
         }
     }
@@ -363,6 +375,30 @@ function popBlob(blobObj) {
         score += 10 * combo;
         combo++;
         updateHUD();
+
+        // Fortnite-style floating combo text
+        if (combo > 2) {
+            const floatText = document.createElement('div');
+            floatText.textContent = `x${combo - 1}!`;
+            floatText.style.position = 'absolute';
+            floatText.style.left = `${blobObj.x + blobObj.size/2}px`;
+            floatText.style.top = `${blobObj.y}px`;
+            floatText.style.color = '#fff';
+            floatText.style.fontWeight = '900';
+            floatText.style.fontSize = '24px';
+            floatText.style.textShadow = '0 0 5px #00ffcc, 0 0 10px #00ffcc';
+            floatText.style.pointerEvents = 'none';
+            floatText.style.transform = 'translate(-50%, -50%)';
+            floatText.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+            floatText.style.zIndex = '100';
+            gameContainer.appendChild(floatText);
+
+            requestAnimationFrame(() => {
+                floatText.style.transform = 'translate(-50%, -150%) scale(1.5)';
+                floatText.style.opacity = '0';
+            });
+            setTimeout(() => floatText.remove(), 800);
+        }
     }
 }
 
@@ -373,10 +409,27 @@ function missBlob() {
     } else {
         // Not in a combo, this is a real miss
         misses++;
+
+        // Red glow effect on bottom only for real misses
+        const glow = document.createElement('div');
+        glow.style.position = 'absolute';
+        glow.style.bottom = '0';
+        glow.style.left = '0';
+        glow.style.width = '100%';
+        glow.style.height = '100px';
+        glow.style.background = 'linear-gradient(to top, rgba(255, 0, 0, 0.6), transparent)';
+        glow.style.pointerEvents = 'none';
+        glow.style.transition = 'opacity 0.3s ease-out';
+        gameContainer.appendChild(glow);
+
+        requestAnimationFrame(() => {
+            glow.style.opacity = '0';
+            setTimeout(() => glow.remove(), 300);
+        });
     }
     
     updateHUD();
-    
+
     if (misses >= 5) {
         gameOver();
     }
@@ -392,6 +445,8 @@ function spawnExplosion(x, y, size) {
     const numParticles = Math.floor(baseParticles * multiplier);
     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     for (let i = 0; i < numParticles; i++) {
         const particle = document.createElement('div');
         particle.classList.add('game-particle');
@@ -418,9 +473,10 @@ function spawnExplosion(x, y, size) {
         const duration = 0.8 + Math.random() * 0.5;
         particle.style.animationDuration = `${duration}s`;
         
-        gameContainer.appendChild(particle);
+        fragment.appendChild(particle);
         setTimeout(() => particle.remove(), duration * 1000);
     }
+    gameContainer.appendChild(fragment);
 }
 
 // --- Leaderboard UI ---
@@ -434,6 +490,8 @@ async function loadLeaderboard() {
     const scores = await getTopScores();
     loadingEl.style.display = 'none';
 
+    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    const fragment = document.createDocumentFragment();
     scores.forEach((entry, i) => {
         const li = document.createElement('li');
         
@@ -452,8 +510,9 @@ async function loadLeaderboard() {
         li.appendChild(rank);
         li.appendChild(name);
         li.appendChild(scoreVal);
-        listEl.appendChild(li);
+        fragment.appendChild(li);
     });
+    listEl.appendChild(fragment);
 }
 
 // Init

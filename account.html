@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="/css/themes.css">
     <link rel="stylesheet" href="/css/shop.css">
     <style>
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
         .glass-card {
             background: rgba(25, 25, 25, 0.6);
             backdrop-filter: blur(12px);
@@ -44,7 +50,7 @@
 <body>
     <header class="main-header"></header>
     <!-- Spinner removed -->
-    <div class="account-layout" id="account-layout-container" style="display: none;">
+    <div class="account-layout" id="account-layout-container" >
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
             <div class="sidebar-header">
@@ -56,6 +62,7 @@
                     <li><a href="index.html">&#8592; Return to Home</a></li>
                     <li><a href="#dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="#orders" class="nav-link">Order History</a></li>
+                    <li><a href="#rewards" class="nav-link">Rewards</a></li>
                     <li><a href="#wishlist" class="nav-link">My Wishlist</a></li>
                     <li><a href="#billing" class="nav-link">Billing & Plans</a></li>
                     <li><a href="#settings" class="nav-link">Settings</a></li>
@@ -72,20 +79,41 @@
                     <h4>Quick Overview</h4>
                     <p>Welcome to your personal hub. Navigate the sidebar to manage your subscriptions, orders, and themes.</p>
                 </div>
+                <div class="card" style="margin-top: 20px;">
+                    <h4>Loyalty Rewards</h4>
+                    <p style="font-size: 1.5rem; font-weight: bold; margin: 10px 0; color: var(--accent-blue);">
+                        ✨ <span id="points-balance-display">Loading...</span> Points
+                    </p>
+                    <p style="color: var(--text-secondary); margin-bottom: 15px;">Earn points by completing purchases and leaving reviews!</p>
+                    <h5>Recent Activity</h5>
+                    <div id="reward-transactions-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+                        <p style="color: var(--text-secondary);">Loading activity...</p>
+                    </div>
+                </div>
             </section>
 
             <section id="orders" class="content-section">
                 <h3>Order History</h3>
-                <div class="card">
+                <div class="card" id="orders-container">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);">You have no recent orders.</p>
+                    <p style="color: var(--text-secondary);" id="no-orders-msg">Loading orders...</p>
+                    <div id="orders-list"></div>
                 </div>
             </section>
 
             <section id="wishlist" class="content-section">
                 <h3>My Wishlist</h3>
                 <div class="card">
-                    <h4>Saved Items</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4>Saved Items</h4>
+                        <button id="share-wishlist-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 5px 10px; display: none;">Share Wishlist</button>
+                    </div>
+                    <div id="share-link-container" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <span style="font-size: 0.9rem; margin-right: 10px;">Your link:</span>
+                        <input type="text" id="share-link-input" readonly style="background: var(--bg-color); color: white; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; width: 250px;" />
+                        <button id="copy-share-link-btn" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">Copy</button>
+                        <button id="disable-share-btn" class="btn" style="padding: 5px 10px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--accent-red); color: var(--accent-red); margin-left: 5px;">Make Private</button>
+                    </div>
                     <div id="wishlist-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
                         <p style="color: var(--text-secondary);">Loading your wishlist...</p>
                     </div>
@@ -109,8 +137,8 @@
                     <form id="security-settings-form">
                         <button type="button" id="change-password-btn" class="btn btn-primary" style="margin-bottom: 20px;">Send Password Reset Email</button>
                         <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                            <label style="margin: 0;">Enable Two-Factor Authentication (2FA)</label>
-                            <label class="toggle-switch">
+                            <label for="toggle-2fa" style="margin: 0;">Enable Two-Factor Authentication (2FA)</label>
+                            <label class="toggle-switch" for="toggle-2fa">
                                 <input type="checkbox" id="toggle-2fa">
                                 <span class="slider"></span>
                             </label>
@@ -135,35 +163,40 @@
                 </div>
 
                 <div class="card">
-                    <h4>Display Settings</h4>
+                    <h4>Appearance & Themes</h4>
                     <form id="theme-settings-form">
                         <div class="form-group">
-                            <label for="theme-select">Theme</label>
+                            <label for="theme-select">Theme Preset</label>
                             <select id="theme-select">
-                                <option value="dark">Dark</option>
-                                <option value="light">Light</option>
-                                <option value="midnight">Midnight</option>
-                                <option value="forest">Forest</option>
+                                <option value="system">System Default</option>
+                                <option value="black">Deep Black</option>
+                                <option value="white">Silk White</option>
+                                <option value="pink">Lotus Pink (Premium)</option>
+                                <option value="forest">Rainforest (Premium)</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Accent Color</label>
-                            <div class="accent-options">
-                                <label><input type="radio" name="accent-color" value="blue"> Blue</label>
-                                <label><input type="radio" name="accent-color" value="red"> Red</label>
-                                <label><input type="radio" name="accent-color" value="green"> Green</label>
-                                <label><input type="radio" name="accent-color" value="purple"> Purple</label>
-                            </div>
+                        <div class="form-group" id="premium-hex-container">
+                            <label for="custom-hex-color">Custom Hex Color (Premium)</label>
+                            <input type="color" id="custom-hex-color" value="#00ffcc" disabled title="Requires Premium">
                         </div>
-                        <button type="submit" class="btn btn-primary">Save Theme</button>
+                        <button type="submit" id="save-theme-btn" class="btn btn-primary">Save Theme</button>
                         <div id="theme-notification" class="notification"></div>
                     </form>
                 </div>
 
+                <div class="card" id="security-card">
+                    <h4>Security & 2FA</h4>
+                    <button class="btn btn-primary" id="change-password-btn">Send Password Reset Email</button>
+                    <p style="margin-top: 15px;">Enable Two-Factor Authentication</p>
+                    <button class="btn btn-secondary" id="enable-2fa-email-btn">Setup Email 2FA</button>
+                    <button class="btn btn-secondary" id="enable-2fa-sms-btn" style="margin-left: 10px;">Setup SMS 2FA</button>
+                    <div id="security-notification" class="notification"></div>
+                </div>
+
                 <div class="card" id="delete-account-card">
                     <h4>Delete Account</h4>
-                    <p>This action is permanent and cannot be undone. All your data will be removed.</p>
-                    <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+                    <p>This action will soft-delete your account for 90 days. During this time, you can recover it by logging in and contacting support. After 90 days, all your data will be permanently removed.</p>
+                    <button class="btn btn-danger" id="delete-account-btn">Deactivate My Account</button>
                 </div>
             </section>
             
@@ -192,12 +225,33 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Rewards Section -->
+            <section id="rewards" class="content-section" >
+                <h3>Loyalty Rewards</h3>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 20px; background: rgba(37, 99, 235, 0.1); border: 1px solid var(--accent-blue); border-radius: 8px;">
+                        <div>
+                            <h4 style="margin: 0; color: var(--text-primary);">Total Points</h4>
+                            <p style="margin: 5px 0 0; color: var(--text-secondary); font-size: 0.9rem;">Earn 10 points for every item purchased!</p>
+                        </div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--accent-blue);" id="user-loyalty-points">0</div>
+                    </div>
+
+                    <h4>Rewards History</h4>
+                    <div id="rewards-history-container">
+                        <p style="color: var(--text-secondary);" id="no-rewards-msg">Loading history...</p>
+                        <div id="rewards-history-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
     <script type="module">
         import { auth, db } from '/js/auth.js';
-        import { onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
         import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
@@ -337,7 +391,8 @@
         }
 
         function escapeHTML(str) {
-            if (!str) return '';
+            if (str == null) return '';
+            if (typeof str !== 'string') str = String(str);
             return str.replace(/[&<>'"]/g, tag => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
             }[tag]));
@@ -348,6 +403,71 @@
             try {
                 const wishlistRef = doc(db, 'wishlists', userId);
                 const wishlistSnap = await getDoc(wishlistRef);
+
+
+                // Share Wishlist Logic
+                const shareBtn = document.getElementById('share-wishlist-btn');
+                const linkContainer = document.getElementById('share-link-container');
+                const linkInput = document.getElementById('share-link-input');
+                const copyBtn = document.getElementById('copy-share-link-btn');
+                const disableBtn = document.getElementById('disable-share-btn');
+
+                if (wishlistSnap.exists()) {
+                    const data = wishlistSnap.data();
+                    if (data.items && data.items.length > 0) {
+                        if (data.isPublic && data.sharedId) {
+                            linkContainer.style.display = 'block';
+                            linkInput.value = window.location.origin + '/shared-wishlist.html?id=' + data.sharedId;
+                            shareBtn.style.display = 'none';
+                        } else {
+                            shareBtn.style.display = 'inline-block';
+                            linkContainer.style.display = 'none';
+                        }
+                    } else {
+                         shareBtn.style.display = 'none';
+                         linkContainer.style.display = 'none';
+                    }
+                }
+
+                if(shareBtn) {
+                    shareBtn.onclick = async () => {
+                        try {
+                            const sharedId = Math.random().toString(36).substring(2, 15);
+                            await updateDoc(wishlistRef, {
+                                isPublic: true,
+                                sharedId: sharedId
+                            });
+                            linkContainer.style.display = 'block';
+                            linkInput.value = window.location.origin + '/shared-wishlist.html?id=' + sharedId;
+                            shareBtn.style.display = 'none';
+                        } catch(e) {
+                            console.error("Error making wishlist public:", e);
+                        }
+                    };
+                }
+
+                if(copyBtn) {
+                    copyBtn.onclick = () => {
+                        linkInput.select();
+                        document.execCommand('copy');
+                        copyBtn.innerText = 'Copied!';
+                        setTimeout(() => copyBtn.innerText = 'Copy', 2000);
+                    };
+                }
+
+                if(disableBtn) {
+                    disableBtn.onclick = async () => {
+                        try {
+                            await updateDoc(wishlistRef, {
+                                isPublic: false
+                            });
+                            linkContainer.style.display = 'none';
+                            shareBtn.style.display = 'inline-block';
+                        } catch(e) {
+                            console.error("Error making wishlist private:", e);
+                        }
+                    };
+                }
 
                 if (!wishlistSnap.exists() || !wishlistSnap.data().items || wishlistSnap.data().items.length === 0) {
                     container.innerHTML = '<p style="color: var(--text-secondary); width: 100%;">Your wishlist is empty.</p>';
@@ -425,10 +545,21 @@
             document.getElementById('update-username').value = userData.username;
             document.getElementById('update-email').value = user.email;
 
-            document.getElementById('theme-select').value = userData.theme || 'dark';
-            const currentAccent = userData.accentColor || 'blue';
-            const accentRadio = document.querySelector(`input[name="accent-color"][value="${currentAccent}"]`);
-            if (accentRadio) accentRadio.checked = true;
+            document.getElementById('theme-select').value = userData.theme || 'system';
+
+            const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+            const customHex = document.getElementById('custom-hex-color');
+            if (isPremium) {
+                customHex.disabled = false;
+                customHex.title = 'Select custom accent color';
+            } else {
+                customHex.disabled = true;
+                customHex.title = 'Requires Premium';
+            }
+            if (userData.accentColor && userData.accentColor.startsWith('#')) {
+                customHex.value = userData.accentColor;
+            }
+            // Ensure the UI matches the current user data state for accent radio buttons if they existed
         }
 
         function setupEventListeners(user) {
@@ -493,8 +624,21 @@
 
             document.getElementById('theme-settings-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                const userData = cachedData ? JSON.parse(cachedData) : {};
+
                 const theme = document.getElementById('theme-select').value;
-                const accentColor = document.querySelector('input[name="accent-color"]:checked').value;
+                const customHex = document.getElementById('custom-hex-color').value;
+
+                const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
+                if (!isPremium && (theme === 'pink' || theme === 'forest')) {
+                    showNotification(document.getElementById('theme-notification'), 'Error: Lotus Pink and Rainforest themes require Premium.', 'error');
+                    return;
+                }
+
+                const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
+
                 const notificationEl = document.getElementById('theme-notification');
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalText = submitBtn.innerText;
@@ -502,18 +646,23 @@
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Saving...';
 
+                const submitBtn = e.submitter || document.getElementById('save-theme-btn');
+                const originalText = submitBtn ? submitBtn.innerText : 'Save Theme';
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = 'Saving...';
+                }
+
                 try {
                     await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                     showNotification(notificationEl, 'Theme updated successfully!', 'success');
                     document.body.dataset.theme = theme;
-                    document.body.dataset.accent = accentColor;
+                    document.documentElement.style.setProperty('--accent-color', accentColor);
                     localStorage.setItem('userTheme', theme);
                     localStorage.setItem('userAccent', accentColor);
 
-                    const cacheKey = `profile_${user.uid}`;
-                    const cachedData = sessionStorage.getItem(cacheKey);
                     if (cachedData) {
-                        const userData = JSON.parse(cachedData);
                         userData.theme = theme;
                         userData.accentColor = accentColor;
                         sessionStorage.setItem(cacheKey, JSON.stringify(userData));
@@ -526,12 +675,35 @@
                 }
             });
 
+            document.getElementById('change-password-btn').addEventListener('click', async (e) => {
+                const btn = e.currentTarget;
+                btn.disabled = true;
+                btn.innerText = 'Sending...';
+                try {
+                    await sendPasswordResetEmail(auth, user.email);
+                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                } catch (error) {
+                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerText = 'Send Password Reset Email';
+                }
+            });
+
+            document.getElementById('enable-2fa-email-btn').addEventListener('click', () => {
+                alert('Email 2FA setup flow is currently under construction. Please check back later.');
+            });
+
+            document.getElementById('enable-2fa-sms-btn').addEventListener('click', () => {
+                alert('SMS 2FA setup flow is currently under construction. Note: standard SMS rates may apply.');
+            });
+
             document.getElementById('delete-account-btn').addEventListener('click', async (e) => {
-                if (!confirm('DANGER: This will permanently delete your account and all its data. Are you sure?')) return;
+                if (!confirm('WARNING: Your account will be soft-deleted and permanently removed after 90 days. Are you sure you want to deactivate?')) return;
                 const btn = e.currentTarget;
                 const originalText = btn.innerText;
                 btn.disabled = true;
-                btn.innerText = 'Deleting...';
+                btn.innerText = 'Deactivating...';
                 try {
                     const userId = user.uid;
                     await deleteDoc(doc(db, "users", userId));
@@ -539,7 +711,7 @@
                     alert('Your account has been permanently deleted.');
                     window.location.replace('index.html');
                 } catch (error) {
-                    alert('Error: Please sign out, sign back in, and try again.');
+                    alert('Error: Please try again or contact support.');
                     btn.disabled = false;
                     btn.innerText = originalText;
                 }

@@ -392,6 +392,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
                     const numParticles = 100; // 100 particles at 10 taps
                     
+                    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+                    const fragment = document.createDocumentFragment();
                     for (let i = 0; i < numParticles; i++) {
                         const particle = document.createElement('div');
                         particle.classList.add('orb-particle');
@@ -417,9 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const duration = 1.5 + Math.random() * 0.5;
                         particle.style.animationDuration = `${duration}s`;
                         
-                        document.body.appendChild(particle);
+                        fragment.appendChild(particle);
                         setTimeout(() => particle.remove(), duration * 1000);
                     }
+                    document.body.appendChild(fragment);
                 } else {
                     // Particles effect & outline charge
                     if (tapCount > 5) {
@@ -434,6 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         numParticles = 50; // Medium burst halfway
                     }
                     
+                    // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+                    const fragment = document.createDocumentFragment();
                     for (let i = 0; i < numParticles; i++) {
                         const particle = document.createElement('div');
                         particle.classList.add('orb-particle');
@@ -461,9 +466,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const duration = 0.8 + Math.random() * 0.5;
                         particle.style.animationDuration = `${duration}s`;
                         
-                        document.body.appendChild(particle);
+                        fragment.appendChild(particle);
                         setTimeout(() => particle.remove(), duration * 1000);
                     }
+                    document.body.appendChild(fragment);
                 }
         });
     });

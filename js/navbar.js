@@ -1,13 +1,15 @@
-import { auth, db } from './auth.js?v=1784516229';
+import { auth, db, getCachedUserProfile } from './auth.js?v=1784516229';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
+import { getCachedUserProfile } from './auth.js';
 
 let notificationUnsubscribe = null;
 
 function escapeHTML(str) {
     if (str == null) return '';
-    return String(str)
+    if (typeof str !== 'string') str = String(str);
+    return str
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -21,17 +23,26 @@ export function loadNavbar() {
         <a href="index.html" class="nav-logo">un<span></span></a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
-            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+            <li class="nav-dropdown-wrapper">
+                <a href="#" style="cursor: default;">Dreams TimeSkip ▾</a>
+                <div class="nav-dropdown">
+                    <a href="dreamstimeskip.html">Dreams TimeSkip Main</a>
+                    <a href="new-dts.html">New DTS Experience</a>
+                    <a href="dreams-timeskip-first-look.html">First Look</a>
+                    <a href="fotd.html">Flavor of the Day</a>
+                </div>
+            </li>
             <li><a href="harmonytunes.html">HarmonyTunes</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
+            <li><a href="feature-requests.html">Feature Requests</a></li>
             <li><a href="portfolio.html">About Me</a></li>
             <li><a href="uds.html">UDS</a></li>
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
@@ -63,7 +74,7 @@ export function loadUdsNavbar() {
             <li><div class="notification-wrapper"><span class="notification-bell">🔔<span class="notification-badge" style="display:none;" id="notification-badge">0</span></span><div class="notification-dropdown" id="notification-dropdown"></div></div></li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </button>
     </nav>`;
@@ -102,19 +113,7 @@ function updateAuthLink() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                const cacheKey = `profile_${user.uid}`;
-                const cachedProfile = sessionStorage.getItem(cacheKey);
-                let userData = null;
-
-                if (cachedProfile) {
-                    userData = JSON.parse(cachedProfile);
-                } else {
-                    const userDoc = await getDoc(doc(db, "users", user.uid));
-                    if (userDoc.exists()) {
-                        userData = userDoc.data();
-                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                    }
-                }
+                let userData = await getCachedUserProfile(user.uid);
 
 
                 // Fetch notifications
@@ -153,7 +152,7 @@ function updateAuthLink() {
                                             try {
                                                 await markAsRead(id);
                                             } catch (err) {
-                                                console.error('Failed to mark as read', err);
+                                                console.error('Failed to mark as read - Manager info:', err);
                                             }
                                         }
                                         if (link && link !== 'undefined' && link !== 'null') window.location.href = link;
@@ -162,13 +161,13 @@ function updateAuthLink() {
                             }
                         }
                     });
-                } catch(err) { console.error('Notification error', err); }
+                } catch(err) { console.error('Notification error - Manager info:', err); }
 
                 const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
                 authLink.textContent = "My Account";
             } catch (e) {
-                console.error("Nav Error - Manager info: [" + e.message + "]", e);
+                console.error("Nav Error: [" + e.message + "]", e);
             }
         } else {
             authLink.href = 'sign in beta.html';

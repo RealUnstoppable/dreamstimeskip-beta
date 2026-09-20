@@ -3,10 +3,11 @@ import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndP
 import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { app, auth, db } from "./firebase.js";
 
-import { escapeHTML } from './utils.js';
+import { escapeHTML, getCachedUserProfile } from './utils.js';
 
 // Re-export instances for scripts that import from auth.js
 export { app, auth, db };
+
 
 
 
@@ -16,24 +17,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // User is signed in
-        const cacheKey = `profile_${user.uid}`;
-        const cachedProfile = sessionStorage.getItem(cacheKey);
-        let userData = null;
-
-        if (cachedProfile) {
-            userData = JSON.parse(cachedProfile);
-        } else {
-            try {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
-                }
-            } catch (error) {
-                console.error("Manager info: Error fetching user profile during auth state change:", error);
-            }
-        }
+        let userData = await getCachedUserProfile(user.uid);
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
@@ -138,7 +122,7 @@ if (document.getElementById('auth-form')) {
                 }
             }
         } catch (error) {
-            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error - Manager info:`, error.message);
+            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
             showMessage(getFirebaseErrorMessage(error));
         } finally {
             submitBtn.disabled = false;
