@@ -1,7 +1,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { collection, addDoc, query, orderBy, getDocs, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { escapeHTML, formatDate } from './utils.js';
+import { escapeHTML, formatDate, fetchQueryData } from './utils.js';
 
 const requestForm = document.getElementById('feature-request-form');
 const loginPrompt = document.getElementById('login-prompt');
@@ -10,6 +10,7 @@ const submitBtn = document.getElementById('submit-request-btn');
 const formMessage = document.getElementById('form-message');
 
 let currentUser = null;
+let currentRequestsCache = null;
 
 function renderStatus(status) {
     let displayStatus = 'Pending';
@@ -31,17 +32,12 @@ async function fetchAndRenderRequests() {
 
     try {
         const q = query(collection(db, 'feature_requests'));
-        const snapshot = await getDocs(q);
+        let requestsData = await fetchQueryData(getDocs, q);
 
-        if (snapshot.empty) {
+        if (requestsData.length === 0) {
             requestsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No feature requests yet. Be the first to submit one!</p>';
             return;
         }
-
-        let requestsData = [];
-        snapshot.forEach(doc => {
-            requestsData.push({ id: doc.id, ...doc.data() });
-        });
 
         // Sort requests locally: by upvotes descending, then by createdAt descending
         requestsData.sort((a, b) => {
@@ -66,7 +62,7 @@ async function fetchAndRenderRequests() {
                          return reqData.id;
                      }
                  } catch (e) {
-                     // ignore if can't read
+                     /* ignore permission errors */
                  }
                  return null;
              });
@@ -76,6 +72,13 @@ async function fetchAndRenderRequests() {
                  if (id) userUpvotes.add(id);
              });
         }
+
+        const serializedRequests = JSON.stringify({
+            requests: requestsData,
+            upvotes: Array.from(userUpvotes)
+        });
+        if (serializedRequests === currentRequestsCache) return;
+        currentRequestsCache = serializedRequests;
 
         let html = '';
         for (const data of requestsData) {

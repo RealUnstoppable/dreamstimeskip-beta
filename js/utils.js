@@ -10,6 +10,16 @@ export async function fetchCollectionData(db, getDocs, collection, collectionNam
     }
 }
 
+export async function fetchQueryData(getDocs, query, isMapWithId = true) {
+    try {
+        const snapshot = await getDocs(query);
+        return snapshot.docs.map(d => isMapWithId ? { id: d.id, ...d.data() } : d.data());
+    } catch (error) {
+        console.error("Manager info: Error fetching query data:", error.message);
+        return [];
+    }
+}
+
 export function escapeHTML(str) {
     if (str == null) return "";
     if (typeof str !== 'string') str = String(str);

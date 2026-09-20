@@ -223,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 100}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3}) rotate(${-currentAngle}rad)`;
             } catch (e) {
+                console.error("Manager info: Error in physics loop:", e);
                 orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 50}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3})`;
             }
             
