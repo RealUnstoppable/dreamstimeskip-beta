@@ -138,7 +138,8 @@ service cloud.firestore {
     // Deny all other access by default
         // Promo codes collection: Anyone can read, only admin can write
     match /promo_codes/{codeId} {
-      allow read: if true;
+      allow get: if true;
+      allow list: if isAdmin();
       allow write: if isAdmin();
     }
     match /{document=**} {
