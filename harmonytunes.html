@@ -32,11 +32,8 @@
                     <button class="nav-pill" id="nav-favorites">Favorites</button>
                 </nav>
 
-            <!-- Global Search -->
-            <div class="search-container" id="search-container" style="display: none; width: 90%; max-width: 600px; margin: 15px auto;">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3b3b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="global-search" class="search-input" placeholder="Search songs, artists, moods..." aria-label="Search">
-            </div>
+
+            <!-- Search handled by Spotlight overlay below -->
 
                 <div class="greet-section">
                     <h1 id="greeting">Welcome Back</h1>
@@ -398,5 +395,18 @@
     
     <script type="module" src="/js/harmonytunes.js?v=1789908621920"></script>
     
+    <!-- ===== Spotlight Search Overlay ===== -->
+    <div id="spotlight-overlay" class="spotlight-overlay hidden" role="dialog" aria-modal="true" aria-label="Search">
+        <div class="spotlight-panel">
+            <div class="spotlight-input-row">
+                <svg class="spotlight-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="global-search" class="spotlight-input" placeholder="Search songs or artists…" aria-label="Search" autocomplete="off" spellcheck="false">
+                <kbd class="spotlight-esc-hint">ESC</kbd>
+            </div>
+            <div class="spotlight-results" id="spotlight-results"></div>
+            <div class="spotlight-fade-bottom"></div>
+        </div>
+    </div>
+
 </body>
 </html>
