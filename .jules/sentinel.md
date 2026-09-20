@@ -92,3 +92,8 @@
 **Vulnerability:** The `processOrderTransaction` Cloud Function implicitly trusted the `orderDetails.userId` provided by the client, allowing an attacker to submit orders for arbitrary users by modifying the request body. Additionally, it trusted client-side timestamps which cannot be serialized over JSON properly.
 **Learning:** Cloud Functions acting as API endpoints must independently verify that submitted data correctly aligns with the caller's authenticated identity (`uid`), rather than trusting the payload blindly.
 **Prevention:** Always enforce constraints in backend handlers by forcefully overwriting sensitive fields (like `userId`) with the authenticated caller's identity and assigning server-side timestamps rather than accepting them from the client.
+
+## 2024-03-24 - [Fix user's pointsBalance manipulation]
+**Vulnerability:** A malicious user could update their own user profile in Firestore and arbitrarily set their `pointsBalance` to a very high amount because the `firestore.rules` file did not restrict modifications to `pointsBalance`.
+**Learning:** Security rules on user profile collections must explicitly deny client-side modification of monetary or reward-related fields (like `pointsBalance` and `loyaltyPoints`) which should only be managed server-side. While `loyaltyPoints` was restricted, `pointsBalance` was missed.
+**Prevention:** Always verify that all fields which shouldn't be manipulated by the client (specifically any fields managed by Cloud Functions or Admin endpoints) are added to the `.hasAny([])` affected keys deny list in Firestore Security rules for `create` and `update` actions.
