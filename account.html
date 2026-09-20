@@ -147,6 +147,22 @@
                 </div>
 
                 <div class="card glass-card">
+                    <h4>Profile Picture</h4>
+                    <div style="display:flex; align-items:center; gap:20px; margin-bottom:16px;">
+                        <img id="pfp-preview" src="" alt="Profile Picture" style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2px solid var(--border-color); display:none;">
+                        <div id="pfp-placeholder" style="width:72px; height:72px; border-radius:50%; background:var(--primary-card-color); border:2px dashed var(--border-color); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--text-secondary);">👤</div>
+                    </div>
+                    <form id="pfp-upload-form" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="pfp-file-input">Upload a photo</label>
+                            <input type="file" id="pfp-file-input" accept="image/*" style="padding:6px 0;">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Profile Picture</button>
+                        <div id="pfp-notification" class="notification" style="margin-top:10px;"></div>
+                    </form>
+                </div>
+
+                <div class="card glass-card">
                     <h4>Update Profile</h4>
                     <form id="update-profile-form">
                         <div class="form-group">
@@ -160,6 +176,12 @@
                         <button type="submit" class="btn btn-primary">Save Changes</button>
                         <div id="profile-notification" class="notification"></div>
                     </form>
+                </div>
+
+                <div class="card glass-card">
+                    <h4>Feature Requests</h4>
+                    <p style="margin-bottom:12px; color:var(--text-secondary);">Have an idea? Submit a feature request and help shape the future of the platform.</p>
+                    <a href="feature-requests.html" class="btn btn-primary" style="display:inline-block;">Go to Feature Requests →</a>
                 </div>
 
                 <div class="card">
@@ -776,6 +798,110 @@
                     e.currentTarget.classList.add('active');
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                 });
+            });
+
+            // ===== Profile Pic Upload =====
+            const pfpForm = document.getElementById('pfp-upload-form');
+            const pfpFileInput = document.getElementById('pfp-file-input');
+            const pfpPreview = document.getElementById('pfp-preview');
+            const pfpPlaceholder = document.getElementById('pfp-placeholder');
+            const pfpNotification = document.getElementById('pfp-notification');
+
+            // Load existing pfp if available
+            const loadExistingPfp = async () => {
+                try {
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    const userData = cachedData ? JSON.parse(cachedData) : await getCachedUserProfile(user);
+                    const photoURL = (userData && userData.photoURL) ? userData.photoURL : user.photoURL;
+                    if (photoURL && pfpPreview && pfpPlaceholder) {
+                        pfpPreview.src = photoURL;
+                        pfpPreview.style.display = 'block';
+                        pfpPlaceholder.style.display = 'none';
+                    }
+                } catch (_) {}
+            };
+            loadExistingPfp();
+
+            // Preview selected image immediately
+            pfpFileInput?.addEventListener('change', () => {
+                const file = pfpFileInput.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    pfpPreview.src = e.target.result;
+                    pfpPreview.style.display = 'block';
+                    pfpPlaceholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            });
+
+            pfpForm?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const file = pfpFileInput.files[0];
+                if (!file) {
+                    showNotification(pfpNotification, 'Please select an image file.', 'error');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification(pfpNotification, 'File too large. Maximum size is 5MB.', 'error');
+                    return;
+                }
+
+                const submitBtn = pfpForm.querySelector('button[type="submit"]');
+                const origText = submitBtn.innerText;
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Uploading...';
+
+                try {
+                    // Try Firebase Storage if available
+                    let photoURL = null;
+                    try {
+                        const { getStorage, ref, uploadBytes, getDownloadURL } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js");
+                        const storage = getStorage();
+                        const storageRef = ref(storage, `profile_pictures/${user.uid}`);
+                        await uploadBytes(storageRef, file);
+                        photoURL = await getDownloadURL(storageRef);
+                    } catch (storageErr) {
+                        // Fallback: store as base64 data URL in Firestore (small images only)
+                        if (file.size <= 500 * 1024) {
+                            photoURL = await new Promise((resolve) => {
+                                const r = new FileReader();
+                                r.onload = (ev) => resolve(ev.target.result);
+                                r.readAsDataURL(file);
+                            });
+                        } else {
+                            throw new Error('Firebase Storage unavailable. Please use an image under 500KB.');
+                        }
+                    }
+
+                    // Save photoURL to Firestore
+                    const { updateDoc } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+                    await updateDoc(doc(db, "users", user.uid), { photoURL });
+
+                    // Update session cache
+                    const cacheKey = `profile_${user.uid}`;
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        const userData = JSON.parse(cachedData);
+                        userData.photoURL = photoURL;
+                        sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    }
+
+                    showNotification(pfpNotification, 'Profile picture updated!', 'success');
+
+                    // Update navbar avatar live if present
+                    const navAuthLink = document.getElementById('auth-link');
+                    if (navAuthLink) {
+                        navAuthLink.innerHTML = `<img src="${photoURL}" alt="My Account" class="nav-pfp-avatar" title="My Account">`;
+                        navAuthLink.classList.add('nav-pfp-link');
+                    }
+                } catch (err) {
+                    showNotification(pfpNotification, `Error: ${err.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = origText;
+                }
             });
 
             const showNotification = (element, message, type) => {
