@@ -819,7 +819,8 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.1), rgba(0,0,0,0.85));
+    background: radial-gradient(circle at -10% 50%, color-mix(in srgb, var(--theme-color, #1a2b4c) 80%, transparent) 0%, transparent 50%),
+                radial-gradient(circle at 110% 50%, color-mix(in srgb, var(--theme-color, #1a2b4c) 80%, transparent) 0%, transparent 50%);
     filter: blur(80px);
     z-index: 0;
     animation: slowSpin 30s linear infinite;
@@ -1457,8 +1458,19 @@ body {
     0% {
         transform: scale(1);
         filter: blur(20px) contrast(1.5) brightness(1);
-        opacity: 0.8;
+        opacity: 0.6;
     }
+    30% {
+        transform: scale(1.15);
+        filter: blur(10px) contrast(2.5) brightness(2.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        filter: blur(20px) contrast(1.5) brightness(1);
+        opacity: 0.6;
+    }
+}
     50% {
         transform: scale(1.05);
         filter: blur(10px) contrast(2) brightness(1.5);

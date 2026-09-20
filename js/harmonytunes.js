@@ -25,7 +25,7 @@ function initHarmonyTunes() {
             duration: "3:02",
             src: "/music/tate_mcrae_its_okay_im_okay.mp3",
             art: "/images/tate_mcrae_its_okay_im_okay.png",
-            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 24,
+            bpm: 120, energy: 0.8, inmixPoint: 15, outmixPoint: 29,
             tags: ['pop', 'upbeat']
         },
         {
@@ -87,7 +87,7 @@ function initHarmonyTunes() {
         'pixy-legacy': '#19548a',      // Dim Blue
         'deorc-decuple': '#8a196e',    // Dim Pink
         'no-pole-remix': '#2e8a19',    // Dim Green
-        'tate-mcrae-its-okay-im-okay': '#ff1493' // Deep Pink
+        'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
     };
 
     const tiktokEmbeds = [
