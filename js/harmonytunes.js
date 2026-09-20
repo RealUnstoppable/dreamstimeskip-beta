@@ -34,7 +34,7 @@ function initHarmonyTunes() {
             artist: "Lupus Nocte",
             duration: "3:10",
             src: "/music/Astrophage.mp3",
-            art: "/images/harmony-tunes-card.jpg",
+            art: "/images/astrophage_cover.jpg",
             bpm: 125, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
             tags: ['electronic', 'synth', 'energetic']
         },
@@ -88,6 +88,7 @@ function initHarmonyTunes() {
         'deorc-decuple': '#8a196e',    // Dim Pink
         'no-pole-remix': '#2e8a19',    // Dim Green
         'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
+        'astrophage': '#2a0c3b' // Synthwave Dark Purple
     };
 
     const tiktokEmbeds = [
