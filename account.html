@@ -546,7 +546,7 @@
             document.getElementById('update-email').value = user.email;
 
             document.getElementById('theme-select').value = userData.theme || 'system';
-
+            
             const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
             const customHex = document.getElementById('custom-hex-color');
             if (isPremium) {
@@ -577,6 +577,7 @@
 
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Saving...';
+                submitBtn.title = 'Processing your request...';
 
                 try {
                     await updateDoc(doc(db, "users", user.uid), { username: newUsername });
@@ -595,6 +596,7 @@
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerText = originalText;
+                    submitBtn.removeAttribute('title');
                 }
             });
 
@@ -608,6 +610,7 @@
 
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'Submitting...';
+                submitBtn.title = 'Processing your request...';
 
                 try {
                     await createTicket(user.uid, user.email, subject, message);
@@ -627,10 +630,10 @@
                 const cacheKey = `profile_${user.uid}`;
                 const cachedData = sessionStorage.getItem(cacheKey);
                 const userData = cachedData ? JSON.parse(cachedData) : {};
-
+                
                 const theme = document.getElementById('theme-select').value;
                 const customHex = document.getElementById('custom-hex-color').value;
-
+                
                 const isPremium = userData.membershipLevel === 'premium' || userData.isAdmin;
                 if (!isPremium && (theme === 'pink' || theme === 'forest')) {
                     showNotification(document.getElementById('theme-notification'), 'Error: Lotus Pink and Rainforest themes require Premium.', 'error');
@@ -638,7 +641,7 @@
                 }
 
                 const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
-
+                
                 const notificationEl = document.getElementById('theme-notification');
                 const submitBtn = e.target.querySelector('button[type="submit"]');
                 const originalText = submitBtn.innerText;
@@ -679,6 +682,7 @@
                 const btn = e.currentTarget;
                 btn.disabled = true;
                 btn.innerText = 'Sending...';
+                btn.title = 'Processing your request...';
                 try {
                     await sendPasswordResetEmail(auth, user.email);
                     showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
@@ -687,6 +691,7 @@
                 } finally {
                     btn.disabled = false;
                     btn.innerText = 'Send Password Reset Email';
+                    btn.removeAttribute('title');
                 }
             });
 
@@ -704,6 +709,7 @@
                 const originalText = btn.innerText;
                 btn.disabled = true;
                 btn.innerText = 'Deactivating...';
+                btn.title = 'Processing your request...';
                 try {
                     const userId = user.uid;
                     await deleteDoc(doc(db, "users", userId));
@@ -714,6 +720,7 @@
                     alert('Error: Please try again or contact support.');
                     btn.disabled = false;
                     btn.innerText = originalText;
+                    btn.removeAttribute('title');
                 }
             });
 

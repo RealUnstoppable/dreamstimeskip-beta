@@ -1,3 +1,6 @@
+
+process.env.STRIPE_SECRET = "sk_test_mock";
+process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_mock";
 const testEnv = require("firebase-functions-test")();
 
 // Mock Stripe BEFORE importing index.js
@@ -46,7 +49,7 @@ jest.mock("firebase-admin", () => {
       verifyIdToken: mockVerifyIdToken,
     }),
     _mockVerifyIdToken: mockVerifyIdToken, // Export for tests to access
-    firestore: jest.fn().mockReturnValue({
+    firestore: Object.assign(jest.fn().mockReturnValue({
       collection: jest.fn().mockReturnValue({
         doc: jest.fn().mockReturnValue({
           get: jest.fn(),
@@ -57,6 +60,10 @@ jest.mock("firebase-admin", () => {
           get: jest.fn(),
         }),
       }),
+    }), {
+      FieldValue: {
+        serverTimestamp: jest.fn().mockReturnValue(new Date('2026-09-15T11:08:03.745Z')),
+      },
     }),
   };
 });
@@ -238,7 +245,7 @@ describe("createCheckoutSession", () => {
     });
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({error: "Checkout Error. Manager info: [Stripe API Error]"});
+    expect(res.json).toHaveBeenCalledWith({error: "Checkout Error. [Stripe API Error]"});
 
     console.error.mockRestore();
   });
@@ -291,6 +298,8 @@ describe("createCheckoutSession", () => {
 
 
 describe("adminAction", () => {
+  const mockSetDoc = jest.fn();
+
   let mockGetDoc;
   let mockUpdateDoc;
   let mockDeleteDoc;
@@ -305,7 +314,8 @@ describe("adminAction", () => {
     require("firebase-admin").firestore().collection().doc.mockReturnValue({
       get: mockGetDoc,
       update: mockUpdateDoc,
-      delete: mockDeleteDoc,
+        set: mockSetDoc,
+        delete: mockDeleteDoc,
     });
 
     require("firebase-admin")._mockVerifyIdToken.mockResolvedValue({
@@ -400,7 +410,9 @@ describe("adminAction", () => {
       adminAction(req, res);
     });
 
-    expect(mockUpdateDoc).toHaveBeenCalledWith({ isBanned: true });
+    expect(mockSetDoc).toHaveBeenCalledWith(
+        expect.objectContaining({ isBanned: true }), { merge: true }
+    );
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ success: true });
   });

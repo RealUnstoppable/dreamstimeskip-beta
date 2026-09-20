@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.animateItemToLexi = function(startX, startY) {
         if (!siriOrb) return;
-
+        
         const orbRect = siriOrb.getBoundingClientRect();
         const endX = orbRect.left + orbRect.width / 2;
         const endY = orbRect.top + orbRect.height / 2;
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         particle.className = 'fly-to-cart';
         particle.style.left = `${startX}px`;
         particle.style.top = `${startY}px`;
-
+        
         document.body.appendChild(particle);
 
         // Force reflow
@@ -124,6 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let expandedAt = 0;
     let inactivityTimeout;
 
+    siriOrb.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            siriOrb.click();
+        }
+    });
+
     siriOrb.addEventListener('click', (e) => {
         const isCartClick = e.target.closest('#lexi-view-cart');
         const isAskClick = e.target.closest('#lexi-ask');
@@ -136,11 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Render the options
             siriOrb.innerHTML = `
                 <div class="lexi-pill-options">
-                    <button id="lexi-view-cart" class="lexi-pill-btn"><span class="material-icons">shopping_cart</span> View Cart</button>
-                    <button id="lexi-ask" class="lexi-pill-btn"><span class="material-icons">chat</span> Ask Lexi</button>
+                    <button id="lexi-view-cart" class="lexi-pill-btn" aria-label="View Cart"><span class="material-icons">shopping_cart</span> View Cart</button>
+                    <button id="lexi-ask" class="lexi-pill-btn" aria-label="Ask Lexi"><span class="material-icons">chat</span> Ask Lexi</button>
                 </div>
             `;
-
+            
             clearTimeout(inactivityTimeout);
             inactivityTimeout = setTimeout(() => {
                 siriOrb.classList.remove('expanded');
@@ -203,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             removeElement(typingId);
             addMessage(responseText, 'siri');
         } catch (error) {
-            console.error("Chat Error - Manager info:", error);
+            console.error("Manager info: Chat Error ", error);
             removeElement(typingId);
             addMessage(`I'm sorry, my neural link is experiencing interference: ${error.message || error}. Please try again later.`, 'siri');
         } finally {

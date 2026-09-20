@@ -1,0 +1,6 @@
+🧹 Code Health: Extract inline styles to CSS in shop
+
+🎯 **What:** Removed inline styles in `js/shop.js` (including `<span style="...">FREE (Beta)</span>`, `.product-image`, `.product-footer`, `.view-reviews-btn`, `.original-price`, and review messages) and replaced them with corresponding CSS classes defined in `css/shop.css`.
+💡 **Why:** Applying styles via CSS classes instead of inline strings separates concerns and makes styles much easier to maintain, read, and update.
+✅ **Verification:** Ran `pnpm test` and ensured that UI components visually map correctly without changing any functional logic. Replaced all raw style references using `grep` confirmation.
+✨ **Result:** A cleaner JavaScript file with no raw CSS formatting string artifacts, shifting responsibility back to the external stylesheet.

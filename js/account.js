@@ -2,7 +2,7 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { productMap } from './products.js';
-import { escapeHTML, formatDate } from './utils.js';
+import { escapeHTML, formatDate, getCachedUserProfile } from './utils.js';
 
 // DOM Elements
 const profileDetails = document.getElementById('profile-details');
@@ -18,9 +18,9 @@ let currentProfileCache = null;
 let currentOrdersCache = null;
 
 // Render Profile
-async function renderProfile(user) {
+async function renderProfile(user, userDataParam = null) {
     try {
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = userDataParam || await getCachedUserProfile(user.uid);
         if (!userData) {
             // Graceful instantiation if user doc is missing
             userData = {
@@ -78,7 +78,7 @@ async function renderOrders(user) {
         currentOrdersCache = serializedOrders;
 
         if (querySnapshot.empty) {
-            ordersList.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
+            ordersList.innerHTML = `<p class="empty-message" style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
             return;
         }
 
@@ -95,7 +95,7 @@ async function renderOrders(user) {
                 for (const [productId, quantity] of Object.entries(order.items)) {
                     const product = productMap.get(productId) || { name: productId, price: 0 };
                     totalCost += product.price * quantity;
-                    itemsHtml += `<div style="font-size: 0.9rem; color: var(--text-secondary);">• ${quantity}x ${escapeHTML(product.name)}</div>`;
+                    itemsHtml += `<div class="order-item">• ${quantity}x ${escapeHTML(product.name)}</div>`;
                 }
             }
 
@@ -105,27 +105,27 @@ async function renderOrders(user) {
             const finalTotal = subtotal + tax;
 
             const orderCard = document.createElement('div');
-            orderCard.style.cssText = "background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);";
+            orderCard.className = 'order-card';
             orderCard.innerHTML = `
-                <div style="display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <div class="order-card-header">
                     <div>
                         <strong>Order #${escapeHTML(orderId.split('_')[1] || orderId)}</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary);">${formatDate(order.orderDate)}</div>
+                        <div class="order-date">${formatDate(order.orderDate)}</div>
                     </div>
-                    <div style="text-align: right;">
-                        <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; background: rgba(136, 211, 206, 0.2); color: var(--accent-green); font-weight: bold;">
+                    <div class="order-status-container">
+                        <span class="order-status-badge">
                             ${escapeHTML(order.status || 'Processing')}
                         </span>
-                        <div style="font-weight: bold; margin-top: 5px;">$${finalTotal.toFixed(2)}</div>
+                        <div class="order-total">$${finalTotal.toFixed(2)}</div>
                     </div>
                 </div>
                 <div>
                     <strong>Items:</strong>
-                    <div style="margin-top: 5px; margin-bottom: 15px;">
-                        ${itemsHtml || '<div style="font-size: 0.9rem; color: var(--text-secondary);">No items found.</div>'}
+                    <div class="order-items-list">
+                        ${itemsHtml || '<div class="order-item">No items found.</div>'}
                     </div>
                     ${order.shippingInfo ? `
-                    <div style="font-size: 0.85rem; color: var(--text-secondary); border-top: 1px dashed var(--border-color); padding-top: 10px;">
+                    <div class="order-shipping-info">
                         <strong>Shipping To:</strong> ${escapeHTML(order.shippingInfo.name)} - ${escapeHTML(order.shippingInfo.city)}
                     </div>
                     ` : ''}
@@ -145,34 +145,81 @@ async function renderOrders(user) {
 
 
 // Rewards Logic
-async function renderRewards(user, userData) {
-    const pointsEl = document.getElementById('user-loyalty-points');
-    const historyList = document.getElementById('rewards-history-list');
-    const msgEl = document.getElementById('no-rewards-msg');
+// Rewards merged function below
 
-    const balanceDisplay = document.getElementById('points-balance-display');
-    const transactionsList = document.getElementById('reward-transactions-list');
-
-    const balance = userData?.pointsBalance ?? userData?.loyaltyPoints ?? 0;
-
-    if (pointsEl) {
-        pointsEl.textContent = balance;
-    }
-    if (balanceDisplay) {
-        balanceDisplay.textContent = balance;
-    }
-
-    if (historyList) {
+// Authentication State Listener
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        let userData = null;
         try {
-            const q = query(
-                collection(db, 'loyalty_transactions'),
-                where("userId", "==", user.uid),
-                orderBy("createdAt", "desc")
-            );
+            userData = await getCachedUserProfile(user);
+        } catch (e) {
+            console.error("Manager info: Error fetching user profile:", e);
+        }
 
-            const querySnapshot = await getDocs(q);
+        renderProfile(user, userData);
+        renderOrders(user);
+        if (userData) {
+            renderRewards(user, userData);
+        }
+    } else {
+        window.location.replace('/sign in beta.html');
+    }
+});
 
-            if (querySnapshot.empty) {
+let currentRewardsCache = null;
+
+async function renderRewards(user, userData) {
+    try {
+        const pointsEl = document.getElementById('user-loyalty-points');
+        const historyList = document.getElementById('rewards-history-list');
+        const msgEl = document.getElementById('no-rewards-msg');
+
+        if (pointsEl && userData) {
+            pointsEl.textContent = userData.loyaltyPoints || 0;
+        }
+
+        const balanceEl = document.getElementById('points-balance-display');
+        const container = document.getElementById('reward-transactions-list');
+
+        let balance = 0;
+        if (userData && typeof userData.pointsBalance === 'number') {
+            balance = userData.pointsBalance;
+        } else {
+             const userRef = doc(db, 'users', user.uid);
+             const userDoc = await getDoc(userRef);
+             balance = userDoc.exists() && typeof userDoc.data().pointsBalance === 'number'
+                ? userDoc.data().pointsBalance
+                : 0;
+        }
+
+        if (balanceEl) {
+             balanceEl.textContent = balance;
+        }
+
+        const loyaltyQ = query(
+            collection(db, 'loyalty_transactions'),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+        );
+        const rewardQ = query(
+            collection(db, 'reward_transactions'),
+            where("userId", "==", user.uid),
+            orderBy("createdAt", "desc")
+        );
+
+        const [loyaltySnap, rewardSnap] = await Promise.all([getDocs(loyaltyQ), getDocs(rewardQ)]);
+
+        const serializedRewards = JSON.stringify({
+            loyalty: loyaltySnap.docs.map(d => ({id: d.id, ...d.data()})),
+            rewards: rewardSnap.docs.map(d => ({id: d.id, ...d.data()}))
+        });
+
+        if (serializedRewards === currentRewardsCache) return;
+        currentRewardsCache = serializedRewards;
+
+        if (historyList) {
+            if (loyaltySnap.empty) {
                 if(msgEl) {
                     msgEl.textContent = "You haven't earned any rewards yet.";
                     msgEl.style.display = 'block';
@@ -180,53 +227,30 @@ async function renderRewards(user, userData) {
                 historyList.innerHTML = '';
             } else {
                 if(msgEl) msgEl.style.display = 'none';
-
-                const fragment = document.createDocumentFragment();
-
-                querySnapshot.forEach(docSnap => {
+                let html = '';
+                loyaltySnap.forEach(docSnap => {
                     const data = docSnap.data();
                     const dateStr = formatDate(data.createdAt);
-
-                    const div = document.createElement('div');
-                    div.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);";
-                    div.innerHTML = `
-                        <div>
-                            <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
-                            <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
+                    html += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                            <div>
+                                <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
+                                <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
+                            </div>
+                            <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
                         </div>
-                        <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
                     `;
-                    fragment.appendChild(div);
                 });
-
-                historyList.innerHTML = '';
-                historyList.appendChild(fragment);
-            }
-        } catch (error) {
-            console.error("Manager info: Error rendering rewards:", error);
-            if(msgEl) {
-                msgEl.textContent = "Failed to load rewards history.";
-                msgEl.style.display = 'block';
+                historyList.innerHTML = html;
             }
         }
-    }
 
-    if (transactionsList) {
-        try {
-            const transRef = collection(db, 'reward_transactions');
-            const q = query(
-                transRef,
-                where("userId", "==", user.uid),
-                orderBy("createdAt", "desc")
-            );
-
-            const snap = await getDocs(q);
-
-            if (snap.empty) {
-                transactionsList.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
+        if (container) {
+            if (rewardSnap.empty) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">No reward activity yet.</p>';
             } else {
                 const fragment = document.createDocumentFragment();
-                snap.forEach(docSnap => {
+                rewardSnap.forEach(docSnap => {
                     const data = docSnap.data();
                     const dateStr = formatDate(data.createdAt);
                     const el = document.createElement('div');
@@ -246,43 +270,18 @@ async function renderRewards(user, userData) {
                     `;
                     fragment.appendChild(el);
                 });
-
-                transactionsList.innerHTML = '';
-                transactionsList.appendChild(fragment);
+                container.innerHTML = '';
+                container.appendChild(fragment);
             }
-        } catch (e) {
-            console.error("Manager info: Error fetching rewards:", e);
-            if (balanceDisplay) balanceDisplay.textContent = 'Error';
-            transactionsList.innerHTML = '<p style="color: var(--accent-red);">Failed to load rewards.</p>';
+        }
+
+    } catch (e) {
+        console.error("Manager info: Error fetching rewards:", e);
+        if(document.getElementById('points-balance-display')) document.getElementById('points-balance-display').textContent = 'Error';
+        if(document.getElementById('reward-transactions-list')) document.getElementById('reward-transactions-list').innerHTML = '<p style="color: var(--accent-red);">Failed to load rewards.</p>';
+        if(document.getElementById('no-rewards-msg')) {
+             document.getElementById('no-rewards-msg').textContent = "Failed to load rewards history.";
+             document.getElementById('no-rewards-msg').style.display = 'block';
         }
     }
 }
-
-// Authentication State Listener
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        let userData = null;
-        try {
-            const cacheKey = `profile_${user.uid}`;
-            const cachedData = sessionStorage.getItem(cacheKey);
-            if (cachedData) {
-                userData = JSON.parse(cachedData);
-            } else {
-                const docSnap = await getDoc(doc(db, 'users', user.uid));
-                if (docSnap.exists()) {
-                    userData = docSnap.data();
-                }
-            }
-        } catch (e) {
-            console.error(e);
-        }
-
-        renderProfile(user);
-        renderOrders(user);
-        if (userData) {
-            renderRewards(user, userData);
-        }
-    } else {
-        window.location.replace('/sign in beta.html');
-    }
-});

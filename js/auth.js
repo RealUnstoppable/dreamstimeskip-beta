@@ -11,13 +11,15 @@ export { app, auth, db };
 
 
 
+
+
 onAuthStateChanged(auth, async (user) => {
     const authLink = document.getElementById('auth-link');
     const membershipStatusContainer = document.getElementById('membership-status-container');
 
     if (user) {
         // User is signed in
-        let userData = await getCachedUserProfile(user.uid);
+        let userData = await getCachedUserProfile({uid: user.uid});
 
         if (userData) {
             const destination = userData.isAdmin ? 'admin.html' : 'account.html';
@@ -91,6 +93,7 @@ if (document.getElementById('auth-form')) {
         const originalBtnText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
+        submitBtn.title = 'Processing your request...';
 
         try {
             if (isSignUp) {
@@ -122,11 +125,12 @@ if (document.getElementById('auth-form')) {
                 }
             }
         } catch (error) {
-            console.error(`${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
+            console.error(`Manager info: ${isSignUp ? 'Signup' : 'Signin'} Error:`, error.message);
             showMessage(getFirebaseErrorMessage(error));
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
+            submitBtn.removeAttribute('title');
         }
     });
 
@@ -150,3 +154,4 @@ export function getFirebaseErrorMessage(error) {
             return 'An unexpected error occurred. Please try again.';
     }
 }
+

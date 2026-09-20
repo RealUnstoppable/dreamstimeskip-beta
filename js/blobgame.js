@@ -141,7 +141,7 @@ function showMenu(menuEl) {
     if (mPause) allMenus.push(mPause);
     allMenus.forEach(m => m.classList.add('hidden'));
     menuEl.classList.remove('hidden');
-
+    
     // Crossfade to menu music
     if (musicEnabled) {
         bgmMusic.pause();
@@ -392,7 +392,7 @@ function popBlob(blobObj) {
             floatText.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
             floatText.style.zIndex = '100';
             gameContainer.appendChild(floatText);
-
+            
             requestAnimationFrame(() => {
                 floatText.style.transform = 'translate(-50%, -150%) scale(1.5)';
                 floatText.style.opacity = '0';
@@ -409,7 +409,7 @@ function missBlob() {
     } else {
         // Not in a combo, this is a real miss
         misses++;
-
+        
         // Red glow effect on bottom only for real misses
         const glow = document.createElement('div');
         glow.style.position = 'absolute';
@@ -421,7 +421,7 @@ function missBlob() {
         glow.style.pointerEvents = 'none';
         glow.style.transition = 'opacity 0.3s ease-out';
         gameContainer.appendChild(glow);
-
+        
         requestAnimationFrame(() => {
             glow.style.opacity = '0';
             setTimeout(() => glow.remove(), 300);
