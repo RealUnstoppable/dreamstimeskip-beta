@@ -64,7 +64,7 @@ function initHarmonyTunes() {
             artist: "FormantX", 
             duration: "3:45", 
             src: "/music/ES_Deorc Decuple - FormantX.mp3", 
-            art: "/images/Unstoppable Collection Logo.png",
+            art: "/images/deorc_cover.jpg",
             bpm: 118, energy: 0.7, inmixPoint: 15, outmixPoint: 15,
             tags: ['chill', 'lo-fi', 'relaxed']
         },
@@ -85,7 +85,7 @@ function initHarmonyTunes() {
 
     const songColors = {
         'pixy-legacy': '#5c4a3d',      // Warm Brown
-        'deorc-decuple': '#8a196e',    // Dim Pink
+        'deorc-decuple': '#1d3036',    // Dark Teal Grey
         'no-pole-remix': '#a11f8b',    // Neon Magenta
         'tate-mcrae-its-okay-im-okay': '#1a2b4c' // Deep Pink
         'astrophage': '#2a0c3b' // Synthwave Dark Purple
