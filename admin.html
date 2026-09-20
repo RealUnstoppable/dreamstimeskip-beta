@@ -113,9 +113,72 @@
                 .hamburger-btn { display: none; }
             }
         }
+    <style>
+        /* ===== Admin Loading Screen ===== */
+        #admin-loading-screen {
+            position: fixed; inset: 0;
+            background: var(--bg-color, #0f0f0f);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        #admin-loading-screen.fade-out {
+            opacity: 0; pointer-events: none;
+        }
+        .admin-loader-ring {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #2563EB;
+            border-radius: 50%;
+            animation: adminSpin 0.8s linear infinite;
+        }
+        @keyframes adminSpin { to { transform: rotate(360deg); } }
+        .admin-loader-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Error state shown inside loading screen */
+        #admin-auth-error {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+            padding: 0 24px;
+        }
+        #admin-auth-error .error-icon { font-size: 2.5rem; }
+        #admin-auth-error h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+        #admin-auth-error p { margin: 0; color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+        #admin-auth-error a {
+            margin-top: 4px;
+            padding: 10px 28px;
+            background: #2563EB;
+            color: #fff; border-radius: 8px;
+            text-decoration: none; font-weight: 600;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
-<body style="display: none;">
+<body style="display: block;">
+
+    <!-- Loading screen — always visible until auth resolves -->
+    <div id="admin-loading-screen">
+        <div id="admin-loader-spinner">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                <div class="admin-loader-ring"></div>
+                <div class="admin-loader-text">Verifying access…</div>
+            </div>
+        </div>
+        <div id="admin-auth-error">
+            <div class="error-icon">🔒</div>
+            <h3 id="admin-error-title">Access Denied</h3>
+            <p id="admin-error-msg">You don't have permission to view this page.</p>
+            <a href="account.html" id="admin-error-link">Go to Account</a>
+        </div>
+    </div>
+
     <header class="main-header"></header>
  
     <div class="mobile-header">
@@ -413,24 +476,84 @@
             }
         });
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
+        // ===== Admin Auth Guard =====
+        const loadingScreen  = document.getElementById('admin-loading-screen');
+        const loaderSpinner  = document.getElementById('admin-loader-spinner');
+        const authError      = document.getElementById('admin-auth-error');
+        const errorTitle     = document.getElementById('admin-error-title');
+        const errorMsg       = document.getElementById('admin-error-msg');
+        const errorLink      = document.getElementById('admin-error-link');
 
-                if (userDoc.exists() && userDoc.data().isAdmin) {
-                    document.body.style.display = 'flex';
+        function showAdminContent() {
+            // Fade out + remove loading screen to reveal dashboard
+            if (loadingScreen) {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => { loadingScreen.remove(); }, 320);
+            }
+        }
+
+        function showAuthError(title, msg, linkText = 'Go to Sign In', linkHref = 'sign in beta.html') {
+            if (!loadingScreen) return;
+            if (loaderSpinner) loaderSpinner.style.display = 'none';
+            if (authError) {
+                authError.style.display = 'flex';
+                errorTitle.textContent = title;
+                errorMsg.textContent   = msg;
+                errorLink.textContent  = linkText;
+                errorLink.href         = linkHref;
+            }
+        }
+
+        // Hard timeout — if auth takes > 10s, show an error instead of blank
+        const authTimeout = setTimeout(() => {
+            showAuthError(
+                'Taking too long…',
+                'Firebase is not responding. Check your connection and try again.',
+                'Retry', ''
+            );
+            document.getElementById('admin-error-link').addEventListener('click', (e) => {
+                e.preventDefault(); window.location.reload();
+            });
+        }, 10000);
+
+        onAuthStateChanged(auth, async (user) => {
+            clearTimeout(authTimeout);
+
+            if (!user) {
+                // Not signed in at all
+                showAuthError(
+                    'Not Signed In',
+                    'Please sign in to access the admin dashboard.',
+                    'Sign In', 'sign in beta.html'
+                );
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc    = await getDoc(userDocRef);
+
+                if (userDoc.exists() && userDoc.data().isAdmin === true) {
+                    showAdminContent();
                     initializeAdminPage(user);
                     loadPromoCodes();
                 } else {
-                    if (!window.location.pathname.includes('account.html')) {
-                        window.location.replace('account.html');
-                    }
+                    showAuthError(
+                        'Access Denied',
+                        'Your account does not have admin privileges.',
+                        'Go to Account', 'account.html'
+                    );
                 }
-            } else {
-                if (!window.location.pathname.includes('sign in beta.html')) {
-                    window.location.replace('sign in beta.html');
-                }
+            } catch (err) {
+                console.error('Admin auth check failed:', err);
+                showAuthError(
+                    'Verification Failed',
+                    `Could not verify your permissions: ${err.message}`,
+                    'Try Again', ''
+                );
+                document.getElementById('admin-error-link').addEventListener('click', (e) => {
+                    e.preventDefault(); window.location.reload();
+                });
             }
         });
 
