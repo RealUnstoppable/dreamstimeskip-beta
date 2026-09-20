@@ -51,9 +51,8 @@ const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
 export function loadNavbar() {
     const headerHTML = `
     <nav class="navbar">
-        <a href="index.html" class="nav-logo">
-            <img src="/images/un250-flag.png" alt="UN" class="nav-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-            <span class="nav-logo-fallback">un</span>
+        <a href="index.html" class="nav-logo un-text-logo">
+            <span class="un-letters">UN</span><span class="un-250">250</span>
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
@@ -98,9 +97,8 @@ export function loadNavbar() {
 export function loadUdsNavbar() {
     const headerHTML = `
     <nav class="navbar">
-        <a href="index.html" class="nav-logo">
-            <img src="/images/un250-flag.png" alt="UN 250" class="nav-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-            <span class="nav-logo-fallback">un</span>
+        <a href="index.html" class="nav-logo un-text-logo">
+            <span class="un-letters">UN</span><span class="un-250">250</span>
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>

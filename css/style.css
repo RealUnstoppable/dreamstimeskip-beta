@@ -868,14 +868,49 @@ textarea:focus-visible {
     flex-shrink: 0;
 }
 
-/* ===== Nav Logo Image (UN 250 Flag) ===== */
-.nav-logo-img {
-    height: 32px;
-    width: auto;
-    vertical-align: middle;
-    object-fit: contain;
+
+/* ===== UN 250 Text Logo ===== */
+.un-text-logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    text-decoration: none;
+    line-height: 1;
 }
+
+/* "UN" — plain white, bold */
+.un-letters {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    font-family: 'Inter', sans-serif;
+}
+
+/* "250" — italic, USA flag clipped to the text */
+.un-250 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: -0.01em;
+    font-family: 'Inter', sans-serif;
+    /* Flag as text fill */
+    background-image: url('/images/un250-flag.png');
+    background-size: cover;
+    background-position: center;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    /* Subtle outline so it reads on any bg */
+    filter: drop-shadow(0 0 1px rgba(255,255,255,0.4));
+}
+
+/* Fallback hidden — no longer used */
+.nav-logo-img { display: none; }
 .nav-logo-fallback { display: none; }
+
+
 
 /* ===== Profile Pic Avatar in Navbar ===== */
 .nav-pfp-link { display: inline-flex; align-items: center; text-decoration: none; }
