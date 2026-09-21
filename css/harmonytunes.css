@@ -408,17 +408,20 @@ body {
 .tiktok-grid::-webkit-scrollbar { display: none; }
 
 .tiktok-card {
-    background-color: transparent;
-    border-radius: 8px;
+    flex: 0 0 325px;
+    width: 325px;
+    max-width: 325px;
+    min-width: 325px;
+    border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s;
-    width: 325px; /* updated for embeds */
-    flex-shrink: 0;
+    background: #0f0f0f;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
     scroll-snap-align: start;
     position: relative;
 }
 
-.tiktok-card:hover { transform: scale(1.02); }
+.tiktok-card:hover { transform: translateY(-2px); }
 
 .tiktok-card img {
     width: 100%;
