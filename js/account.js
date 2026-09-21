@@ -40,28 +40,34 @@ async function renderProfile(user, userDataParam = null) {
         if (serializedData === currentProfileCache) return;
         currentProfileCache = serializedData;
 
-        profileDetails.innerHTML = `
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                <strong>Username:</strong> <span>${escapeHTML(userData.username || 'User')}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                <strong>Email:</strong> <span>${escapeHTML(userData.email || user.email)}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
-                <strong>Membership:</strong> <span class="membership-status ${escapeHTML(userData.membershipLevel)}">${escapeHTML(userData.membershipLevel).toUpperCase()}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <strong>Joined:</strong> <span>${formatDate(userData.signupDate)}</span>
-            </div>
-        `;
+        if (profileDetails) {
+            profileDetails.innerHTML = `
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong>Username:</strong> <span>${escapeHTML(userData.username || 'User')}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong>Email:</strong> <span>${escapeHTML(userData.email || user.email)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                    <strong>Membership:</strong> <span class="membership-status ${escapeHTML(userData.membershipLevel)}">${escapeHTML(userData.membershipLevel).toUpperCase()}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <strong>Joined:</strong> <span>${formatDate(userData.signupDate)}</span>
+                </div>
+            `;
+        }
     } catch (error) {
         console.error("Error rendering profile:", error);
-        profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
+        if (profileDetails) {
+            profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
+        }
     }
 }
 
 // Render Orders
 async function renderOrders(user) {
+    const listEl = document.getElementById('orders-list');
+    if (!listEl) return;
     try {
         const ordersRef = collection(db, 'orders');
         const q = query(
@@ -78,7 +84,7 @@ async function renderOrders(user) {
         currentOrdersCache = serializedOrders;
 
         if (ordersData.length === 0) {
-            ordersList.innerHTML = `<p class="empty-message" style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
+            listEl.innerHTML = `<p class="empty-message" style="color: var(--text-secondary); text-align: center; padding: 20px;">You haven't placed any orders yet.</p>`;
             return;
         }
 
@@ -133,12 +139,12 @@ async function renderOrders(user) {
             fragment.appendChild(orderCard);
         });
 
-        ordersList.innerHTML = ''; // Clear loading text
-        ordersList.appendChild(fragment);
+        listEl.innerHTML = ''; // Clear loading text
+        listEl.appendChild(fragment);
 
     } catch (error) {
         console.error("Error rendering orders:", error);
-        ordersList.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
+        listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
     }
 }
 
@@ -285,3 +291,5 @@ async function renderRewards(user, userData) {
         }
     }
 }
+
+export { renderProfile, renderOrders, renderRewards };

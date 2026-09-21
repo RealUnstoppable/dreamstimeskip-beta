@@ -6,46 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account | DTS Hub</title>
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
     <link rel="stylesheet" href="/css/shop.css">
-    <style>
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .glass-card {
-            background: rgba(25, 25, 25, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        
-        /* Toggle Switch CSS */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #333; transition: .4s; border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: var(--accent-blue, #2563EB); }
-        input:checked + .slider:before { transform: translateX(26px); }
-    </style>
+    <link rel="stylesheet" href="/css/account.css">
 </head>
 <body>
     <header class="main-header"></header>
@@ -277,6 +244,7 @@
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
         import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
+        import { renderOrders, renderRewards } from '/js/account.js';
         
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -550,6 +518,8 @@
         function initializePage(user, userData) {
             loadUserTickets(user.uid);
             loadUserWishlist(user.uid);
+            renderOrders(user);
+            renderRewards(user, userData);
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
@@ -665,13 +635,7 @@
                 const accentColor = isPremium ? customHex : '#00ffcc'; // Fallback to default if not premium
                 
                 const notificationEl = document.getElementById('theme-notification');
-                const submitBtn = e.target.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerText;
-
-                submitBtn.disabled = true;
-                submitBtn.innerText = 'Saving...';
-
-                const submitBtn = e.submitter || document.getElementById('save-theme-btn');
+                const submitBtn = e.submitter || e.target.querySelector('button[type="submit"]') || document.getElementById('save-theme-btn');
                 const originalText = submitBtn ? submitBtn.innerText : 'Save Theme';
 
                 if (submitBtn) {
@@ -700,21 +664,24 @@
                 }
             });
 
-            document.getElementById('change-password-btn').addEventListener('click', async (e) => {
-                const btn = e.currentTarget;
-                btn.disabled = true;
-                btn.innerText = 'Sending...';
-                btn.title = 'Processing your request...';
-                try {
-                    await sendPasswordResetEmail(auth, user.email);
-                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
-                } catch (error) {
-                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerText = 'Send Password Reset Email';
-                    btn.removeAttribute('title');
-                }
+            document.querySelectorAll('#change-password-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const buttonEl = e.currentTarget;
+                    const originalText = buttonEl.innerText;
+                    buttonEl.disabled = true;
+                    buttonEl.innerText = 'Sending...';
+                    buttonEl.title = 'Processing your request...';
+                    try {
+                        await sendPasswordResetEmail(auth, user.email);
+                        showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
+                    } catch (error) {
+                        showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
+                    } finally {
+                        buttonEl.disabled = false;
+                        buttonEl.innerText = originalText;
+                        buttonEl.removeAttribute('title');
+                    }
+                });
             });
 
             document.getElementById('enable-2fa-email-btn').addEventListener('click', () => {
@@ -743,24 +710,6 @@
                     btn.disabled = false;
                     btn.innerText = originalText;
                     btn.removeAttribute('title');
-                }
-            });
-
-            // Security Settings
-            document.getElementById('change-password-btn')?.addEventListener('click', async (e) => {
-                const btn = e.currentTarget;
-                const originalText = btn.innerText;
-                btn.disabled = true;
-                btn.innerText = 'Sending...';
-                try {
-                    const { sendPasswordResetEmail } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js");
-                    await sendPasswordResetEmail(auth, user.email);
-                    showNotification(document.getElementById('security-notification'), 'Password reset email sent!', 'success');
-                } catch (error) {
-                    showNotification(document.getElementById('security-notification'), `Error: ${error.message}`, 'error');
-                } finally {
-                    btn.disabled = false;
-                    btn.innerText = originalText;
                 }
             });
 
