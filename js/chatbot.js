@@ -65,20 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!siriOrb || !chatbotWindow) return;
 
-    // Inject Cart Glyph and Badge into Siri Orb
-    const cartGlyph = document.createElement('span');
-    cartGlyph.className = 'material-icons lexi-cart-glyph';
-    cartGlyph.textContent = 'shopping_cart';
-    siriOrb.appendChild(cartGlyph);
-
-    const cartBadge = document.createElement('div');
-    cartBadge.className = 'lexi-cart-badge hidden';
-    cartBadge.id = 'lexi-cart-badge';
-    cartBadge.textContent = '0';
-    siriOrb.appendChild(cartBadge);
-
     // Global Functions for Cart Integration
     window.updateLexiCartCount = function(count) {
+        const cartBadge = document.getElementById('lexi-cart-badge') || document.querySelector('.lexi-cart-badge');
         if (!cartBadge) return;
         if (count > 0) {
             cartBadge.textContent = count;
@@ -88,10 +77,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    window.openLexiChat = function() {
+        if (chatbotWindow) {
+            chatbotWindow.classList.add('active');
+            if (chatInput) chatInput.focus();
+        }
+    };
+
     window.animateItemToLexi = function(startX, startY) {
-        if (!siriOrb) return;
+        const targetOrb = document.getElementById('siri-orb');
+        if (!targetOrb) return;
         
-        const orbRect = siriOrb.getBoundingClientRect();
+        const orbRect = targetOrb.getBoundingClientRect();
         const endX = orbRect.left + orbRect.width / 2;
         const endY = orbRect.top + orbRect.height / 2;
 
@@ -112,83 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             particle.remove();
-            // Slight pop effect on the badge
-            cartBadge.style.transform = 'scale(1.3)';
-            setTimeout(() => {
-                cartBadge.style.transform = 'scale(1)';
-            }, 150);
+            const badge = document.getElementById('lexi-cart-badge') || document.querySelector('.lexi-cart-badge');
+            if (badge) {
+                badge.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    badge.style.transform = 'scale(1)';
+                }, 150);
+            }
         }, 800);
     };
-
-    // 2-Stage Toggle Chat Window Logic
-    let expandedAt = 0;
-    let inactivityTimeout;
-
-    siriOrb.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            siriOrb.click();
-        }
-    });
-
-    siriOrb.addEventListener('click', (e) => {
-        const isCartClick = e.target.closest('#lexi-view-cart');
-        const isAskClick = e.target.closest('#lexi-ask');
-        
-        if (!siriOrb.classList.contains('expanded')) {
-            // Stage 1: Expand into pill
-            siriOrb.classList.add('expanded');
-            expandedAt = Date.now();
-            
-            // Render the options
-            siriOrb.innerHTML = `
-                <div class="lexi-pill-options">
-                    <button id="lexi-view-cart" class="lexi-pill-btn" aria-label="View Cart">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
-                        <span>View Cart</span>
-                    </button>
-                    <button id="lexi-ask" class="lexi-pill-btn" aria-label="Ask Lexi">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><path d="m14 8 1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="currentColor" stroke="none"></path></svg>
-                        <span>Ask Lexi</span>
-                    </button>
-                </div>
-            `;
-            
-            clearTimeout(inactivityTimeout);
-            inactivityTimeout = setTimeout(() => {
-                siriOrb.classList.remove('expanded');
-                siriOrb.innerHTML = ''; // reset to default orb look
-            }, 5000);
-        } else {
-            if (isCartClick) {
-                // Open the cart modal
-                const cartModal = document.getElementById('cart-modal');
-                if (cartModal) {
-                    cartModal.style.display = 'block';
-                } else {
-                    window.location.href = '/checkout.html';
-                }
-                siriOrb.classList.remove('expanded');
-                siriOrb.innerHTML = '';
-            } else if (isAskClick) {
-                if (Date.now() - expandedAt < 500) {
-                    return; // Prevent accidental double click instantly
-                }
-                // Stage 2: Open Chat Overlay
-                siriOrb.classList.remove('expanded');
-                siriOrb.innerHTML = '';
-                chatbotWindow.classList.add('active');
-                chatInput.focus();
-            } else {
-                // Clicked elsewhere on the pill, keep it open longer
-                clearTimeout(inactivityTimeout);
-                inactivityTimeout = setTimeout(() => {
-                    siriOrb.classList.remove('expanded');
-                    siriOrb.innerHTML = '';
-                }, 5000);
-            }
-        }
-    });
 
     closeBtn.addEventListener('click', () => {
         chatbotWindow.classList.remove('active');

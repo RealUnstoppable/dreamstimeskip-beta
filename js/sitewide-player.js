@@ -306,34 +306,7 @@ class SitewideMusicEngine {
             orb = document.getElementById('siri-orb');
         }
 
-        // Add soundwave badge to orb
-        if (!orb.querySelector('.lexi-soundwave-badge')) {
-            const badge = document.createElement('div');
-            badge.className = 'lexi-soundwave-badge';
-            badge.innerHTML = `<span></span><span></span><span></span>`;
-            orb.appendChild(badge);
-        }
-
-        // Add cart count badge
-        if (!orb.querySelector('#lexi-cart-badge')) {
-            const cartBadge = document.createElement('div');
-            cartBadge.id = 'lexi-cart-badge';
-            cartBadge.className = 'lexi-cart-badge hidden';
-            cartBadge.textContent = '0';
-            orb.appendChild(cartBadge);
-        }
-
-        // Sync initial cart count if available
-        try {
-            const count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-            if (count > 0) {
-                const b = orb.querySelector('#lexi-cart-badge');
-                if (b) {
-                    b.textContent = count;
-                    b.classList.remove('hidden');
-                }
-            }
-        } catch (_) {}
+        this.renderCollapsedOrb(orb);
 
         // Bind click/tap on Lexi Orb
         orb.addEventListener('click', (e) => {
@@ -362,49 +335,110 @@ class SitewideMusicEngine {
             }
         });
 
+        // Close on clicking outside
+        document.addEventListener('click', (e) => {
+            if (orb && orb.classList.contains('expanded') && !orb.contains(e.target)) {
+                this.collapseLexi(orb);
+            }
+        });
+
+        // Listen for global cart updates
+        window.addEventListener('cartUpdated', () => this.updateLexiUI());
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'cartItemCount' || e.key === 'localCart') {
+                this.updateLexiUI();
+            }
+        });
+
         this.updateLexiUI();
     }
 
+    renderCollapsedOrb(orb) {
+        if (!orb) return;
+        const isPlaying = this.state.isPlaying;
+        const song = this.getCurrentSong();
+        let count = 0;
+        try {
+            count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+        } catch (_) {}
+
+        orb.innerHTML = `
+            <span class="orb-text"></span>
+            <div class="lexi-orb-disc ${isPlaying ? 'spinning' : 'paused'}">
+                <img src="${song.art}" alt="Now Playing" class="lexi-orb-disc-art">
+                <div class="lexi-orb-disc-grooves"></div>
+                <div class="lexi-orb-disc-center"></div>
+            </div>
+            <div class="lexi-soundwave-badge" style="display: ${isPlaying ? 'flex' : 'none'};">
+                <span></span><span></span><span></span>
+            </div>
+            <div id="lexi-cart-badge" class="lexi-cart-badge ${count > 0 ? '' : 'hidden'}">${count}</div>
+        `;
+    }
+
     expandLexi(orb) {
+        orb.classList.remove('closing');
         orb.classList.add('expanded');
         orb.classList.add('lexi-player-expanded');
 
         const song = this.getCurrentSong();
         const isPlaying = this.state.isPlaying;
 
-        orb.innerHTML = `
-            <div class="lexi-expanded-panel">
-                <!-- Mini Playerhead Component -->
-                <div class="lexi-playerhead">
-                    <img src="${song.art}" alt="${song.title}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
-                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
-                        <div class="lexi-song-title">${song.title}</div>
-                        <div class="lexi-song-artist">${song.artist}</div>
-                    </div>
-                    <div class="lexi-player-controls">
-                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="${isPlaying ? 'Pause' : 'Play'}">
-                            ${isPlaying ? ICONS.pause : ICONS.play}
+        // If nothing is playing, the song feature disappears! Only Cart and Chat.
+        if (!isPlaying) {
+            orb.classList.add('idle-mode');
+            orb.innerHTML = `
+                <div class="lexi-expanded-panel">
+                    <!-- Action Glyphs: Ask Lexi & View Cart -->
+                    <div class="lexi-actions-row">
+                        <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                            ${ICONS.chat}
+                            <span>Ask Lexi</span>
                         </button>
-                        <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
-                            ${ICONS.next}
+                        <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                            ${ICONS.cart}
+                            <span>View Cart</span>
+                            <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
                         </button>
                     </div>
                 </div>
+            `;
+        } else {
+            orb.classList.remove('idle-mode');
+            orb.innerHTML = `
+                <div class="lexi-expanded-panel">
+                    <!-- Mini Playerhead Component -->
+                    <div class="lexi-playerhead">
+                        <img src="${song.art}" alt="${song.title}" class="lexi-player-art spinning">
+                        <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
+                            <div class="lexi-song-title">${song.title}</div>
+                            <div class="lexi-song-artist">${song.artist}</div>
+                        </div>
+                        <div class="lexi-player-controls">
+                            <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="Pause">
+                                ${ICONS.pause}
+                            </button>
+                            <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
+                                ${ICONS.next}
+                            </button>
+                        </div>
+                    </div>
 
-                <!-- Action Glyphs / Buttons -->
-                <div class="lexi-actions-row">
-                    <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
-                        ${ICONS.chat}
-                        <span>Ask Lexi</span>
-                    </button>
-                    <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
-                        ${ICONS.cart}
-                        <span>View Cart</span>
-                        <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
-                    </button>
+                    <!-- Action Glyphs / Buttons -->
+                    <div class="lexi-actions-row">
+                        <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                            ${ICONS.chat}
+                            <span>Ask Lexi</span>
+                        </button>
+                        <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                            ${ICONS.cart}
+                            <span>View Cart</span>
+                            <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
 
         // Update pill cart count
         try {
@@ -416,7 +450,7 @@ class SitewideMusicEngine {
             }
         } catch (_) {}
 
-        // Wire play/pause
+        // Wire play/pause if present
         const playBtn = orb.querySelector('#lexi-play-pause-btn');
         if (playBtn) {
             playBtn.addEventListener('click', (e) => {
@@ -428,7 +462,7 @@ class SitewideMusicEngine {
             });
         }
 
-        // Wire next
+        // Wire next if present
         const nextBtn = orb.querySelector('#lexi-next-btn');
         if (nextBtn) {
             nextBtn.addEventListener('click', (e) => {
@@ -450,11 +484,14 @@ class SitewideMusicEngine {
             askBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.collapseLexi(orb);
+                if (typeof window.openLexiChat === 'function') {
+                    window.openLexiChat();
+                    return;
+                }
                 const chatWindow = document.getElementById('chatbot-window');
                 if (chatWindow) {
                     chatWindow.classList.add('active');
                 } else {
-                    // Navigate to home with chat open or open modal
                     window.location.href = 'index.html#chat';
                 }
             });
@@ -468,7 +505,7 @@ class SitewideMusicEngine {
                 this.collapseLexi(orb);
                 const cartModal = document.getElementById('cart-modal');
                 if (cartModal) {
-                    cartModal.style.display = 'flex';
+                    cartModal.style.display = 'block';
                 } else {
                     window.location.href = 'shop.html';
                 }
@@ -483,15 +520,19 @@ class SitewideMusicEngine {
     }
 
     collapseLexi(orb) {
-        orb.classList.remove('expanded');
-        orb.classList.remove('lexi-player-expanded');
-        orb.innerHTML = `
-            <span class="orb-text"></span>
-            <div class="lexi-soundwave-badge"><span></span><span></span><span></span></div>
-            <div id="lexi-cart-badge" class="lexi-cart-badge hidden">0</div>
-        `;
+        if (!orb || !orb.classList.contains('expanded')) return;
         clearTimeout(this.inactivityTimeout);
-        this.updateLexiUI();
+
+        // Smooth closing: fade out content, smoothly collapse dimensions back to orb
+        orb.classList.add('closing');
+        setTimeout(() => {
+            orb.classList.remove('expanded');
+            orb.classList.remove('lexi-player-expanded');
+            orb.classList.remove('idle-mode');
+            orb.classList.remove('closing');
+            this.renderCollapsedOrb(orb);
+            this.updateLexiUI();
+        }, 200);
     }
 
     updateLexiUI() {
@@ -499,20 +540,46 @@ class SitewideMusicEngine {
         if (!orb) return;
 
         const isPlaying = this.state.isPlaying;
+        const song = this.getCurrentSong();
         orb.classList.toggle('has-music', isPlaying);
+
+        const disc = orb.querySelector('.lexi-orb-disc');
+        if (disc) {
+            disc.classList.toggle('spinning', isPlaying);
+            disc.classList.toggle('paused', !isPlaying);
+            const discArt = disc.querySelector('.lexi-orb-disc-art');
+            if (discArt && song) discArt.src = song.art;
+        }
 
         const badge = orb.querySelector('.lexi-soundwave-badge');
         if (badge) {
             badge.style.display = isPlaying ? 'flex' : 'none';
         }
 
-        // If expanded, update current elements
+        // Update cart badge
+        let count = 0;
+        try {
+            count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+        } catch (_) {}
+        const cartBadge = orb.querySelector('#lexi-cart-badge');
+        if (cartBadge) {
+            cartBadge.textContent = count;
+            cartBadge.classList.toggle('hidden', count <= 0);
+        }
+
+        // If expanded, update controls
         if (orb.classList.contains('expanded')) {
             const playBtn = orb.querySelector('#lexi-play-pause-btn');
             if (playBtn) playBtn.innerHTML = isPlaying ? ICONS.pause : ICONS.play;
 
             const art = orb.querySelector('.lexi-player-art');
             if (art) art.classList.toggle('spinning', isPlaying);
+
+            const pillCount = orb.querySelector('#lexi-pill-cart-count');
+            if (pillCount) {
+                pillCount.textContent = count;
+                pillCount.style.display = count > 0 ? 'inline-block' : 'none';
+            }
         }
     }
 

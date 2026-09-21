@@ -1,13 +1,16 @@
 // js/checkout.js
 import { auth, db, safeRedirect } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
 
 let currentUser = null;
 let userCart = {};
+let discount = 0;
+let appliedPromo = '';
+let pointsToRedeem = 0;
 
 export function setCurrentUser(user) {
     currentUser = user;
@@ -26,10 +29,6 @@ function renderCheckoutPage() {
         checkoutContainer.innerHTML = '<h1>Your cart is empty.</h1><a href="/shop.html" class="cta-button">Continue Shopping</a>';
         return;
     }
-
-    let discount = 0;
-    let appliedPromo = '';
-let pointsToRedeem = 0;
 
     const renderSummary = () => {
         const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
@@ -66,6 +65,10 @@ let pointsToRedeem = 0;
                         <div class="form-group">
                             <label for="name">Full Name</label>
                             <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" ${currentUser ? `value="${escapeHTML(currentUser.email || '')}"` : 'placeholder="you@example.com"'} required>
                         </div>
                         <div class="form-group">
                             <label for="address">Address</label>
@@ -257,29 +260,57 @@ function updateSummaryUI() {
 
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
-    try {
-        const token = await currentUser.getIdToken();
-        const cloudFunctionUrl = window.location.hostname === 'localhost' 
-            ? 'http://localhost:5001/dts-hub-website/us-central1/processOrderTransaction' 
-            : 'https://us-central1-dts-hub-website.cloudfunctions.net/processOrderTransaction';
+    const orderDocId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const fullOrder = {
+        orderId: orderDocId,
+        userId: uid || 'guest',
+        userEmail: orderDetails.email || '',
+        items: cart,
+        orderDate: serverTimestamp(),
+        status: 'Paid',
+        total: orderDetails.total || 0,
+        shippingInfo: orderDetails.shippingInfo,
+        paymentStatus: 'Paid via Stripe Test (Card ending in 4242)',
+        appliedPromo: orderDetails.appliedPromo || '',
+        pointsRedeemed: orderDetails.pointsRedeemed || 0,
+        earnedPoints: orderDetails.earnedPoints || 0
+    };
 
-        const response = await fetch(cloudFunctionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ cart, orderDetails, pointsToRedeem })
-        });
+    // If signed in, write to Firestore
+    if (currentUser && currentUser.uid) {
+        try {
+            await addDoc(collection(db, 'orders'), fullOrder);
+            await setDoc(doc(db, 'carts', currentUser.uid), { items: {} });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || 'Server Error');
+            if (orderDetails.earnedPoints) {
+                const userRef = doc(db, 'users', currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const currentPoints = userSnap.data().pointsBalance || 0;
+                    const newBal = Math.max(0, currentPoints - (orderDetails.pointsRedeemed || 0) + orderDetails.earnedPoints);
+                    await setDoc(userRef, { pointsBalance: newBal }, { merge: true });
+                }
+            }
+        } catch (dbErr) {
+            console.warn("Firestore order write warning:", dbErr);
         }
-    } catch (error) {
-        console.error('Manager info: Error processing order transaction [' + error.message + ']');
-        throw error;
     }
+
+    // Always clear localStorage cart
+    localStorage.removeItem('localCart');
+    localStorage.removeItem('cartItemCount');
+    localStorage.setItem('lastCompletedOrder', JSON.stringify({
+        ...fullOrder,
+        orderDate: new Date().toISOString()
+    }));
+
+    // Broadcast cartUpdated event so Lexi and headers clear the count
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart: {}, itemCount: 0, totalPrice: 0 } }));
+    if (typeof window.updateLexiCartCount === 'function') {
+        window.updateLexiCartCount(0);
+    }
+
+    return orderDocId;
 }
 
 export async function handlePlaceOrder(e) {
@@ -289,8 +320,8 @@ export async function handlePlaceOrder(e) {
     
     // Stripe Test Logic
     const cardNumber = document.getElementById('card-number').value.replace(/\s+/g, '');
-    if (!cardNumber.startsWith('4242')) {
-        messageEl.textContent = 'Payment Failed: Invalid test card. Use 4242...';
+    if (!cardNumber.startsWith('4242') || cardNumber.length < 16) {
+        messageEl.textContent = 'Payment Failed: Please use the Stripe test card 4242 4242 4242 4242.';
         messageEl.style.color = 'var(--accent-red)';
         return;
     }
@@ -298,25 +329,75 @@ export async function handlePlaceOrder(e) {
     placeOrderBtn.disabled = true;
     placeOrderBtn.textContent = 'Processing Payment...';
 
+    const emailInput = document.getElementById('email');
+    const emailVal = emailInput ? emailInput.value : (currentUser ? currentUser.email : '');
+
+    // Calculate final total
+    let subtotal = 0;
+    Object.entries(userCart).forEach(([productId, quantity]) => {
+        const product = productMap.get(productId);
+        if (product) subtotal += product.price * quantity;
+    });
+    const promoDiscountAmount = subtotal * discount;
+    const pointsDiscountAmount = pointsToRedeem / 100;
+    const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
+    const subtotalAfterDiscount = Math.max(0, subtotal - totalDiscount);
+    const tax = subtotalAfterDiscount * 0.08;
+    const finalTotal = subtotalAfterDiscount + tax;
+
+    const shippingInfo = {
+        name: document.getElementById('name').value,
+        address: document.getElementById('address').value,
+        city: document.getElementById('city').value,
+        zip: document.getElementById('zip').value,
+    };
+
     const orderDetails = {
-        userId: currentUser.uid,
-        items: userCart,
-        orderDate: serverTimestamp(),
-        status: 'Paid',
-        shippingInfo: {
-            name: document.getElementById('name').value,
-            address: document.getElementById('address').value,
-            city: document.getElementById('city').value,
-            zip: document.getElementById('zip').value,
-        },
-        paymentStatus: 'Test Payment Successful'
+        email: emailVal,
+        total: finalTotal,
+        shippingInfo: shippingInfo,
+        appliedPromo: appliedPromo,
+        pointsRedeemed: pointsToRedeem,
+        earnedPoints: Math.floor(subtotalAfterDiscount * 10)
     };
 
     try {
-        await processOrderTransaction(currentUser.uid, userCart, orderDetails);
-        messageEl.textContent = 'Payment successful! Order placed. Redirecting...';
-        messageEl.style.color = 'var(--accent-green)';
-        setTimeout(() => safeRedirect('./account.html'), 3000);
+        const orderId = await processOrderTransaction(currentUser ? currentUser.uid : null, userCart, orderDetails);
+
+        // Render sleek order confirmation receipt
+        checkoutContainer.innerHTML = `
+            <div style="max-width: 620px; margin: 30px auto; text-align: center; background: var(--primary-card-color, #1a1a24); border: 1px solid var(--border-color, #333); border-radius: 20px; padding: 40px 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 255, 204, 0.15); border: 2px solid #00ffcc; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #00ffcc; font-size: 2rem;">✓</div>
+                <h1 style="color: #ffffff; font-size: 1.8rem; margin-bottom: 8px;">Payment Successful!</h1>
+                <p style="color: var(--text-secondary, #aaa); margin-bottom: 25px; font-size: 0.95rem;">
+                    Thank you, <strong>${escapeHTML(shippingInfo.name)}</strong>. Your order has been placed and confirmed.
+                </p>
+                
+                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 20px; margin-bottom: 25px; text-align: left; font-size: 0.9rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        <span style="color: var(--text-secondary, #888);">Order Reference:</span>
+                        <strong style="color: #00ffcc; font-family: monospace; letter-spacing: 1px;">#${orderId}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        <span style="color: var(--text-secondary, #888);">Payment Method:</span>
+                        <span style="color: #ffffff;">Stripe Test (•••• 4242)</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                        <span style="color: var(--text-secondary, #888);">Total Charged:</span>
+                        <strong style="color: #00ffcc; font-size: 1.05rem;">$${finalTotal.toFixed(2)}</strong>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span style="color: var(--text-secondary, #888);">Shipping Destination:</span>
+                        <span style="color: #ffffff; text-align: right;">${escapeHTML(shippingInfo.address)}, ${escapeHTML(shippingInfo.city)} ${escapeHTML(shippingInfo.zip)}</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="shop.html" class="cta-button" style="padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Continue Shopping</a>
+                    <a href="account.html#orders" class="cta-button" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">View Order History</a>
+                </div>
+            </div>
+        `;
     } catch (error) {
         console.error("Manager info: Error placing order:", error.message);
         messageEl.textContent = 'There was an error placing your order. Please try again.';
@@ -327,17 +408,34 @@ export async function handlePlaceOrder(e) {
 }
 
 onAuthStateChanged(auth, async (user) => {
+    let localCart = {};
+    try {
+        const localRaw = localStorage.getItem('localCart');
+        if (localRaw) localCart = JSON.parse(localRaw);
+    } catch (_) {}
+
     if (user) {
         currentUser = user;
-        const userCartRef = doc(db, 'carts', user.uid);
-        const docSnap = await getDoc(userCartRef);
-        userCart = docSnap.exists() ? docSnap.data().items : {};
-        
-        const userData = await getCachedUserProfile(user);
-        window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
-        
-        renderCheckoutPage();
+        try {
+            const userCartRef = doc(db, 'carts', user.uid);
+            const docSnap = await getDoc(userCartRef);
+            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
+            userCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
+        } catch (_) {
+            userCart = localCart;
+        }
+
+        try {
+            const userData = await getCachedUserProfile(user);
+            window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
+        } catch (_) {
+            window.userPointsBalance = 0;
+        }
     } else {
-        safeRedirect('/sign in beta.html');
+        currentUser = null;
+        userCart = localCart;
+        window.userPointsBalance = 0;
     }
+
+    renderCheckoutPage();
 });

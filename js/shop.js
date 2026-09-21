@@ -167,10 +167,18 @@ function updateCartSummary() {
     if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
     
+    // Sync to localStorage
+    try {
+        localStorage.setItem('cartItemCount', itemCount.toString());
+        localStorage.setItem('localCart', JSON.stringify(cart));
+    } catch (_) {}
+
     // Update Lexi cart badge if window.updateLexiCartCount exists
     if (window.updateLexiCartCount) {
         window.updateLexiCartCount(itemCount);
     }
+
+    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart, itemCount, totalPrice } }));
 }
 
 // --- CART LOGIC ---
@@ -434,6 +442,14 @@ function setupEventListeners() {
                     openReviewsModal(productId);
                 }
             }
+        });
+    }
+
+    // Product search input
+    const productSearchInput = document.getElementById('product-search');
+    if (productSearchInput) {
+        productSearchInput.addEventListener('input', (e) => {
+            renderProducts(e.target.value);
         });
     }
 
@@ -748,3 +764,71 @@ async function handleReviewSubmit(e) {
         submitReviewBtn.disabled = false;
     }
 }
+
+// --- INITIALIZATION ---
+// Render products immediately from local array
+renderProducts();
+setupEventListeners();
+loadProductStats();
+
+// Initial localCart load
+try {
+    const localCartData = localStorage.getItem('localCart');
+    if (localCartData) {
+        cart = JSON.parse(localCartData);
+        renderCart();
+    }
+} catch (_) {}
+
+// Auth and Cart state synchronization
+onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    let localCart = {};
+    try {
+        const localCartData = localStorage.getItem('localCart');
+        if (localCartData) localCart = JSON.parse(localCartData);
+    } catch (_) {}
+
+    if (user) {
+        // Load Wishlist
+        try {
+            const userWishlistRef = doc(db, 'wishlists', user.uid);
+            const wishlistSnap = await getDoc(userWishlistRef);
+            if (wishlistSnap.exists() && wishlistSnap.data().items) {
+                wishlist = new Set(wishlistSnap.data().items);
+            } else {
+                wishlist = new Set();
+            }
+        } catch (error) {
+            console.error("Error loading wishlist:", error);
+        }
+
+        try {
+            const userCartRef = doc(db, 'carts', user.uid);
+            const docSnap = await getDoc(userCartRef);
+            const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
+
+            const mergedCart = { ...firestoreCart };
+            let hasLocalItems = false;
+            for (const [productId, quantity] of Object.entries(localCart)) {
+                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
+                hasLocalItems = true;
+            }
+
+            cart = mergedCart;
+            if (hasLocalItems) {
+                await saveCart();
+                localStorage.removeItem('localCart');
+            }
+        } catch (error) {
+            console.error("Error loading cart from firestore:", error);
+            cart = localCart;
+        }
+    } else {
+        cart = localCart;
+    }
+
+    updateUserNav(user);
+    renderCart();
+    renderProducts();
+});
