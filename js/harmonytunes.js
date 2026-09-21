@@ -325,7 +325,13 @@ function initHarmonyTunes() {
 
     // --- INITIALIZATION ---
 
+    let hasInitialized = false;
     function init() {
+        if (hasInitialized) {
+            renderHome();
+            return;
+        }
+        hasInitialized = true;
         renderHome();
         setupNavigation();
         setupPlayerEvents();
@@ -799,6 +805,8 @@ function initHarmonyTunes() {
                 }
             }, 50);
         });
+    }
+
     function saveSitewideMusicState(extra = {}) {
         const currentSong = currentQueue[currentSongIndex] || librarySongs[0];
         try {
@@ -2346,6 +2354,9 @@ let dragItem = null;
             }
         });
     }
+
+    // Initialize immediately without waiting for auth resolution
+    init();
 
 }
 
