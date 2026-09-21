@@ -3856,5 +3856,2210 @@ export const lyricsData = {
                 }
             ]
         }
-    ]
+    ],
+    "isabel-larosa-dont-make-them-like-me": [
+    {
+        "start": 0.8,
+        "end": 3.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 0.8,
+                "duration": 0.9
+            },
+            {
+                "text": "ah-ah,",
+                "start": 1.7,
+                "duration": 0.9
+            },
+            {
+                "text": "ah",
+                "start": 2.6,
+                "duration": 0.9
+            }
+        ]
+    },
+    {
+        "start": 3.8,
+        "end": 6.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 3.8,
+                "duration": 0.9
+            },
+            {
+                "text": "ah-ah,",
+                "start": 4.7,
+                "duration": 0.9
+            },
+            {
+                "text": "ah",
+                "start": 5.6,
+                "duration": 0.9
+            }
+        ]
+    },
+    {
+        "start": 6.8,
+        "end": 10.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 6.8,
+                "duration": 1.23
+            },
+            {
+                "text": "ah-ah,",
+                "start": 8.03,
+                "duration": 1.23
+            },
+            {
+                "text": "ah",
+                "start": 9.27,
+                "duration": 1.23
+            }
+        ]
+    },
+    {
+        "start": 11.5,
+        "end": 13.8,
+        "words": [
+            {
+                "text": "Thought",
+                "start": 11.5,
+                "duration": 0.58
+            },
+            {
+                "text": "it",
+                "start": 12.07,
+                "duration": 0.58
+            },
+            {
+                "text": "was",
+                "start": 12.65,
+                "duration": 0.58
+            },
+            {
+                "text": "enough",
+                "start": 13.23,
+                "duration": 0.58
+            }
+        ]
+    },
+    {
+        "start": 14,
+        "end": 16.5,
+        "words": [
+            {
+                "text": "Thought",
+                "start": 14,
+                "duration": 0.5
+            },
+            {
+                "text": "I",
+                "start": 14.5,
+                "duration": 0.5
+            },
+            {
+                "text": "closed",
+                "start": 15,
+                "duration": 0.5
+            },
+            {
+                "text": "the",
+                "start": 15.5,
+                "duration": 0.5
+            },
+            {
+                "text": "door",
+                "start": 16,
+                "duration": 0.5
+            }
+        ]
+    },
+    {
+        "start": 16.7,
+        "end": 21,
+        "words": [
+            {
+                "text": "But",
+                "start": 16.7,
+                "duration": 0.61
+            },
+            {
+                "text": "you",
+                "start": 17.31,
+                "duration": 0.61
+            },
+            {
+                "text": "left",
+                "start": 17.93,
+                "duration": 0.61
+            },
+            {
+                "text": "some",
+                "start": 18.54,
+                "duration": 0.61
+            },
+            {
+                "text": "windows",
+                "start": 19.16,
+                "duration": 0.61
+            },
+            {
+                "text": "open,",
+                "start": 19.77,
+                "duration": 0.61
+            },
+            {
+                "text": "you",
+                "start": 20.39,
+                "duration": 0.61
+            }
+        ]
+    },
+    {
+        "start": 22,
+        "end": 24.3,
+        "words": [
+            {
+                "text": "You",
+                "start": 22,
+                "duration": 0.46
+            },
+            {
+                "text": "might",
+                "start": 22.46,
+                "duration": 0.46
+            },
+            {
+                "text": "call",
+                "start": 22.92,
+                "duration": 0.46
+            },
+            {
+                "text": "it",
+                "start": 23.38,
+                "duration": 0.46
+            },
+            {
+                "text": "love",
+                "start": 23.84,
+                "duration": 0.46
+            }
+        ]
+    },
+    {
+        "start": 24.5,
+        "end": 26.8,
+        "words": [
+            {
+                "text": "Somethin'",
+                "start": 24.5,
+                "duration": 0.58
+            },
+            {
+                "text": "in",
+                "start": 25.07,
+                "duration": 0.58
+            },
+            {
+                "text": "your",
+                "start": 25.65,
+                "duration": 0.58
+            },
+            {
+                "text": "cup",
+                "start": 26.23,
+                "duration": 0.58
+            }
+        ]
+    },
+    {
+        "start": 27,
+        "end": 30.5,
+        "words": [
+            {
+                "text": "It's",
+                "start": 27,
+                "duration": 0.88
+            },
+            {
+                "text": "not",
+                "start": 27.88,
+                "duration": 0.88
+            },
+            {
+                "text": "as",
+                "start": 28.75,
+                "duration": 0.88
+            },
+            {
+                "text": "intoxicating",
+                "start": 29.63,
+                "duration": 0.88
+            }
+        ]
+    },
+    {
+        "start": 31,
+        "end": 34,
+        "words": [
+            {
+                "text": "Had",
+                "start": 31,
+                "duration": 0.38
+            },
+            {
+                "text": "to",
+                "start": 31.38,
+                "duration": 0.38
+            },
+            {
+                "text": "tell",
+                "start": 31.75,
+                "duration": 0.38
+            },
+            {
+                "text": "me",
+                "start": 32.13,
+                "duration": 0.38
+            },
+            {
+                "text": "you",
+                "start": 32.5,
+                "duration": 0.38
+            },
+            {
+                "text": "found",
+                "start": 32.88,
+                "duration": 0.38
+            },
+            {
+                "text": "somebody",
+                "start": 33.25,
+                "duration": 0.38
+            },
+            {
+                "text": "new",
+                "start": 33.63,
+                "duration": 0.38
+            }
+        ]
+    },
+    {
+        "start": 34.2,
+        "end": 38,
+        "words": [
+            {
+                "text": "But",
+                "start": 34.2,
+                "duration": 0.38
+            },
+            {
+                "text": "the",
+                "start": 34.58,
+                "duration": 0.38
+            },
+            {
+                "text": "pictures",
+                "start": 34.96,
+                "duration": 0.38
+            },
+            {
+                "text": "are",
+                "start": 35.34,
+                "duration": 0.38
+            },
+            {
+                "text": "down",
+                "start": 35.72,
+                "duration": 0.38
+            },
+            {
+                "text": "when",
+                "start": 36.1,
+                "duration": 0.38
+            },
+            {
+                "text": "she's",
+                "start": 36.48,
+                "duration": 0.38
+            },
+            {
+                "text": "in",
+                "start": 36.86,
+                "duration": 0.38
+            },
+            {
+                "text": "your",
+                "start": 37.24,
+                "duration": 0.38
+            },
+            {
+                "text": "room",
+                "start": 37.62,
+                "duration": 0.38
+            }
+        ]
+    },
+    {
+        "start": 38.5,
+        "end": 42.5,
+        "words": [
+            {
+                "text": "When",
+                "start": 38.5,
+                "duration": 0.57
+            },
+            {
+                "text": "you",
+                "start": 39.07,
+                "duration": 0.57
+            },
+            {
+                "text": "kiss",
+                "start": 39.64,
+                "duration": 0.57
+            },
+            {
+                "text": "her,",
+                "start": 40.21,
+                "duration": 0.57
+            },
+            {
+                "text": "kiss",
+                "start": 40.79,
+                "duration": 0.57
+            },
+            {
+                "text": "her",
+                "start": 41.36,
+                "duration": 0.57
+            },
+            {
+                "text": "softly",
+                "start": 41.93,
+                "duration": 0.57
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 42.7,
+        "end": 45.5,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 42.7,
+                "duration": 0.7
+            },
+            {
+                "text": "down",
+                "start": 43.4,
+                "duration": 0.7
+            },
+            {
+                "text": "her",
+                "start": 44.1,
+                "duration": 0.7
+            },
+            {
+                "text": "body",
+                "start": 44.8,
+                "duration": 0.7
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 45.7,
+        "end": 50.5,
+        "words": [
+            {
+                "text": "Boy,",
+                "start": 45.7,
+                "duration": 0.44
+            },
+            {
+                "text": "don't",
+                "start": 46.14,
+                "duration": 0.44
+            },
+            {
+                "text": "waste",
+                "start": 46.57,
+                "duration": 0.44
+            },
+            {
+                "text": "your",
+                "start": 47.01,
+                "duration": 0.44
+            },
+            {
+                "text": "time",
+                "start": 47.45,
+                "duration": 0.44
+            },
+            {
+                "text": "because",
+                "start": 47.88,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 48.32,
+                "duration": 0.44
+            },
+            {
+                "text": "know",
+                "start": 48.75,
+                "duration": 0.44
+            },
+            {
+                "text": "what",
+                "start": 49.19,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 49.63,
+                "duration": 0.44
+            },
+            {
+                "text": "need",
+                "start": 50.06,
+                "duration": 0.44
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 50.7,
+        "end": 53,
+        "words": [
+            {
+                "text": "Kiss",
+                "start": 50.7,
+                "duration": 0.46
+            },
+            {
+                "text": "her,",
+                "start": 51.16,
+                "duration": 0.46
+            },
+            {
+                "text": "kiss",
+                "start": 51.62,
+                "duration": 0.46
+            },
+            {
+                "text": "her",
+                "start": 52.08,
+                "duration": 0.46
+            },
+            {
+                "text": "softly",
+                "start": 52.54,
+                "duration": 0.46
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 53.2,
+        "end": 55.8,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 53.2,
+                "duration": 0.65
+            },
+            {
+                "text": "for",
+                "start": 53.85,
+                "duration": 0.65
+            },
+            {
+                "text": "my",
+                "start": 54.5,
+                "duration": 0.65
+            },
+            {
+                "text": "copy",
+                "start": 55.15,
+                "duration": 0.65
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 56,
+        "end": 60.5,
+        "words": [
+            {
+                "text": "Yeah,",
+                "start": 56,
+                "duration": 0.38
+            },
+            {
+                "text": "she",
+                "start": 56.38,
+                "duration": 0.38
+            },
+            {
+                "text": "might",
+                "start": 56.75,
+                "duration": 0.38
+            },
+            {
+                "text": "come",
+                "start": 57.13,
+                "duration": 0.38
+            },
+            {
+                "text": "close,",
+                "start": 57.5,
+                "duration": 0.38
+            },
+            {
+                "text": "but",
+                "start": 57.88,
+                "duration": 0.38
+            },
+            {
+                "text": "they",
+                "start": 58.25,
+                "duration": 0.38
+            },
+            {
+                "text": "don't",
+                "start": 58.63,
+                "duration": 0.38
+            },
+            {
+                "text": "make",
+                "start": 59,
+                "duration": 0.38
+            },
+            {
+                "text": "'em",
+                "start": 59.38,
+                "duration": 0.38
+            },
+            {
+                "text": "like",
+                "start": 59.75,
+                "duration": 0.38
+            },
+            {
+                "text": "me",
+                "start": 60.13,
+                "duration": 0.38
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 60.7,
+        "end": 62.5,
+        "words": [
+            {
+                "text": "Make",
+                "start": 60.7,
+                "duration": 0.6
+            },
+            {
+                "text": "'em",
+                "start": 61.3,
+                "duration": 0.6
+            },
+            {
+                "text": "like—",
+                "start": 61.9,
+                "duration": 0.6
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 63,
+        "end": 65.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 63,
+                "duration": 0.83
+            },
+            {
+                "text": "ah-ah,",
+                "start": 63.83,
+                "duration": 0.83
+            },
+            {
+                "text": "ah",
+                "start": 64.67,
+                "duration": 0.83
+            }
+        ]
+    },
+    {
+        "start": 65.7,
+        "end": 68.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 65.7,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah,",
+                "start": 66.63,
+                "duration": 0.93
+            },
+            {
+                "text": "ah",
+                "start": 67.57,
+                "duration": 0.93
+            }
+        ]
+    },
+    {
+        "start": 68.7,
+        "end": 71.5,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 68.7,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah,",
+                "start": 69.63,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah",
+                "start": 70.57,
+                "duration": 0.93
+            }
+        ]
+    },
+    {
+        "start": 71.7,
+        "end": 73,
+        "words": [
+            {
+                "text": "Make",
+                "start": 71.7,
+                "duration": 0.43
+            },
+            {
+                "text": "'em",
+                "start": 72.13,
+                "duration": 0.43
+            },
+            {
+                "text": "like—",
+                "start": 72.57,
+                "duration": 0.43
+            }
+        ]
+    },
+    {
+        "start": 73.2,
+        "end": 75.8,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 73.2,
+                "duration": 0.87
+            },
+            {
+                "text": "ah-ah,",
+                "start": 74.07,
+                "duration": 0.87
+            },
+            {
+                "text": "ah",
+                "start": 74.93,
+                "duration": 0.87
+            }
+        ]
+    },
+    {
+        "start": 76,
+        "end": 78.8,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 76,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah,",
+                "start": 76.93,
+                "duration": 0.93
+            },
+            {
+                "text": "ah",
+                "start": 77.87,
+                "duration": 0.93
+            }
+        ]
+    },
+    {
+        "start": 79,
+        "end": 83,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 79,
+                "duration": 1.33
+            },
+            {
+                "text": "ah-ah,",
+                "start": 80.33,
+                "duration": 1.33
+            },
+            {
+                "text": "ah-ah",
+                "start": 81.67,
+                "duration": 1.33
+            }
+        ]
+    },
+    {
+        "start": 83.5,
+        "end": 86.5,
+        "words": [
+            {
+                "text": "Now",
+                "start": 83.5,
+                "duration": 0.5
+            },
+            {
+                "text": "he's,",
+                "start": 84,
+                "duration": 0.5
+            },
+            {
+                "text": "he's",
+                "start": 84.5,
+                "duration": 0.5
+            },
+            {
+                "text": "drivin'",
+                "start": 85,
+                "duration": 0.5
+            },
+            {
+                "text": "me",
+                "start": 85.5,
+                "duration": 0.5
+            },
+            {
+                "text": "home",
+                "start": 86,
+                "duration": 0.5
+            }
+        ]
+    },
+    {
+        "start": 86.7,
+        "end": 89.5,
+        "words": [
+            {
+                "text": "Smells",
+                "start": 86.7,
+                "duration": 0.7
+            },
+            {
+                "text": "like",
+                "start": 87.4,
+                "duration": 0.7
+            },
+            {
+                "text": "his",
+                "start": 88.1,
+                "duration": 0.7
+            },
+            {
+                "text": "cologne",
+                "start": 88.8,
+                "duration": 0.7
+            }
+        ]
+    },
+    {
+        "start": 89.7,
+        "end": 93,
+        "words": [
+            {
+                "text": "But",
+                "start": 89.7,
+                "duration": 0.47
+            },
+            {
+                "text": "he",
+                "start": 90.17,
+                "duration": 0.47
+            },
+            {
+                "text": "doesn't",
+                "start": 90.64,
+                "duration": 0.47
+            },
+            {
+                "text": "laugh",
+                "start": 91.11,
+                "duration": 0.47
+            },
+            {
+                "text": "the",
+                "start": 91.59,
+                "duration": 0.47
+            },
+            {
+                "text": "same",
+                "start": 92.06,
+                "duration": 0.47
+            },
+            {
+                "text": "way",
+                "start": 92.53,
+                "duration": 0.47
+            }
+        ]
+    },
+    {
+        "start": 93.2,
+        "end": 96.5,
+        "words": [
+            {
+                "text": "I",
+                "start": 93.2,
+                "duration": 0.66
+            },
+            {
+                "text": "look",
+                "start": 93.86,
+                "duration": 0.66
+            },
+            {
+                "text": "into",
+                "start": 94.52,
+                "duration": 0.66
+            },
+            {
+                "text": "his",
+                "start": 95.18,
+                "duration": 0.66
+            },
+            {
+                "text": "eyes",
+                "start": 95.84,
+                "duration": 0.66
+            }
+        ]
+    },
+    {
+        "start": 96.7,
+        "end": 99.8,
+        "words": [
+            {
+                "text": "Hand",
+                "start": 96.7,
+                "duration": 0.77
+            },
+            {
+                "text": "over",
+                "start": 97.47,
+                "duration": 0.77
+            },
+            {
+                "text": "my",
+                "start": 98.25,
+                "duration": 0.77
+            },
+            {
+                "text": "thigh",
+                "start": 99.03,
+                "duration": 0.77
+            }
+        ]
+    },
+    {
+        "start": 100,
+        "end": 103.5,
+        "words": [
+            {
+                "text": "Wonder",
+                "start": 100,
+                "duration": 0.58
+            },
+            {
+                "text": "why",
+                "start": 100.58,
+                "duration": 0.58
+            },
+            {
+                "text": "I",
+                "start": 101.17,
+                "duration": 0.58
+            },
+            {
+                "text": "feel",
+                "start": 101.75,
+                "duration": 0.58
+            },
+            {
+                "text": "so",
+                "start": 102.33,
+                "duration": 0.58
+            },
+            {
+                "text": "lonely",
+                "start": 102.92,
+                "duration": 0.58
+            }
+        ]
+    },
+    {
+        "start": 104,
+        "end": 107,
+        "words": [
+            {
+                "text": "Had",
+                "start": 104,
+                "duration": 0.38
+            },
+            {
+                "text": "to",
+                "start": 104.38,
+                "duration": 0.38
+            },
+            {
+                "text": "tell",
+                "start": 104.75,
+                "duration": 0.38
+            },
+            {
+                "text": "me",
+                "start": 105.13,
+                "duration": 0.38
+            },
+            {
+                "text": "you",
+                "start": 105.5,
+                "duration": 0.38
+            },
+            {
+                "text": "found",
+                "start": 105.88,
+                "duration": 0.38
+            },
+            {
+                "text": "somebody",
+                "start": 106.25,
+                "duration": 0.38
+            },
+            {
+                "text": "new",
+                "start": 106.63,
+                "duration": 0.38
+            }
+        ]
+    },
+    {
+        "start": 107.2,
+        "end": 111,
+        "words": [
+            {
+                "text": "But",
+                "start": 107.2,
+                "duration": 0.38
+            },
+            {
+                "text": "the",
+                "start": 107.58,
+                "duration": 0.38
+            },
+            {
+                "text": "pictures",
+                "start": 107.96,
+                "duration": 0.38
+            },
+            {
+                "text": "are",
+                "start": 108.34,
+                "duration": 0.38
+            },
+            {
+                "text": "down",
+                "start": 108.72,
+                "duration": 0.38
+            },
+            {
+                "text": "when",
+                "start": 109.1,
+                "duration": 0.38
+            },
+            {
+                "text": "she's",
+                "start": 109.48,
+                "duration": 0.38
+            },
+            {
+                "text": "in",
+                "start": 109.86,
+                "duration": 0.38
+            },
+            {
+                "text": "your",
+                "start": 110.24,
+                "duration": 0.38
+            },
+            {
+                "text": "room",
+                "start": 110.62,
+                "duration": 0.38
+            }
+        ]
+    },
+    {
+        "start": 111.5,
+        "end": 115.5,
+        "words": [
+            {
+                "text": "When",
+                "start": 111.5,
+                "duration": 0.57
+            },
+            {
+                "text": "you",
+                "start": 112.07,
+                "duration": 0.57
+            },
+            {
+                "text": "kiss",
+                "start": 112.64,
+                "duration": 0.57
+            },
+            {
+                "text": "her,",
+                "start": 113.21,
+                "duration": 0.57
+            },
+            {
+                "text": "kiss",
+                "start": 113.79,
+                "duration": 0.57
+            },
+            {
+                "text": "her",
+                "start": 114.36,
+                "duration": 0.57
+            },
+            {
+                "text": "softly",
+                "start": 114.93,
+                "duration": 0.57
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 115.7,
+        "end": 118.5,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 115.7,
+                "duration": 0.7
+            },
+            {
+                "text": "down",
+                "start": 116.4,
+                "duration": 0.7
+            },
+            {
+                "text": "her",
+                "start": 117.1,
+                "duration": 0.7
+            },
+            {
+                "text": "body",
+                "start": 117.8,
+                "duration": 0.7
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 118.7,
+        "end": 123.5,
+        "words": [
+            {
+                "text": "Boy,",
+                "start": 118.7,
+                "duration": 0.44
+            },
+            {
+                "text": "don't",
+                "start": 119.14,
+                "duration": 0.44
+            },
+            {
+                "text": "waste",
+                "start": 119.57,
+                "duration": 0.44
+            },
+            {
+                "text": "your",
+                "start": 120.01,
+                "duration": 0.44
+            },
+            {
+                "text": "time",
+                "start": 120.45,
+                "duration": 0.44
+            },
+            {
+                "text": "because",
+                "start": 120.88,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 121.32,
+                "duration": 0.44
+            },
+            {
+                "text": "know",
+                "start": 121.75,
+                "duration": 0.44
+            },
+            {
+                "text": "what",
+                "start": 122.19,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 122.63,
+                "duration": 0.44
+            },
+            {
+                "text": "need",
+                "start": 123.06,
+                "duration": 0.44
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 123.7,
+        "end": 126,
+        "words": [
+            {
+                "text": "Kiss",
+                "start": 123.7,
+                "duration": 0.46
+            },
+            {
+                "text": "her,",
+                "start": 124.16,
+                "duration": 0.46
+            },
+            {
+                "text": "kiss",
+                "start": 124.62,
+                "duration": 0.46
+            },
+            {
+                "text": "her",
+                "start": 125.08,
+                "duration": 0.46
+            },
+            {
+                "text": "softly",
+                "start": 125.54,
+                "duration": 0.46
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 126.2,
+        "end": 128.8,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 126.2,
+                "duration": 0.65
+            },
+            {
+                "text": "for",
+                "start": 126.85,
+                "duration": 0.65
+            },
+            {
+                "text": "my",
+                "start": 127.5,
+                "duration": 0.65
+            },
+            {
+                "text": "copy",
+                "start": 128.15,
+                "duration": 0.65
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 129,
+        "end": 133.5,
+        "words": [
+            {
+                "text": "Yeah,",
+                "start": 129,
+                "duration": 0.38
+            },
+            {
+                "text": "she",
+                "start": 129.38,
+                "duration": 0.38
+            },
+            {
+                "text": "might",
+                "start": 129.75,
+                "duration": 0.38
+            },
+            {
+                "text": "come",
+                "start": 130.13,
+                "duration": 0.38
+            },
+            {
+                "text": "close,",
+                "start": 130.5,
+                "duration": 0.38
+            },
+            {
+                "text": "but",
+                "start": 130.88,
+                "duration": 0.38
+            },
+            {
+                "text": "they",
+                "start": 131.25,
+                "duration": 0.38
+            },
+            {
+                "text": "don't",
+                "start": 131.63,
+                "duration": 0.38
+            },
+            {
+                "text": "make",
+                "start": 132,
+                "duration": 0.38
+            },
+            {
+                "text": "'em",
+                "start": 132.38,
+                "duration": 0.38
+            },
+            {
+                "text": "like",
+                "start": 132.75,
+                "duration": 0.38
+            },
+            {
+                "text": "me",
+                "start": 133.13,
+                "duration": 0.38
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 133.7,
+        "end": 135.5,
+        "words": [
+            {
+                "text": "Make",
+                "start": 133.7,
+                "duration": 0.6
+            },
+            {
+                "text": "'em",
+                "start": 134.3,
+                "duration": 0.6
+            },
+            {
+                "text": "like—",
+                "start": 134.9,
+                "duration": 0.6
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 135.8,
+        "end": 138.2,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 135.8,
+                "duration": 0.8
+            },
+            {
+                "text": "ah-ah,",
+                "start": 136.6,
+                "duration": 0.8
+            },
+            {
+                "text": "ah",
+                "start": 137.4,
+                "duration": 0.8
+            }
+        ]
+    },
+    {
+        "start": 138.4,
+        "end": 141,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 138.4,
+                "duration": 0.87
+            },
+            {
+                "text": "ah-ah,",
+                "start": 139.27,
+                "duration": 0.87
+            },
+            {
+                "text": "ah",
+                "start": 140.13,
+                "duration": 0.87
+            }
+        ]
+    },
+    {
+        "start": 141.2,
+        "end": 144,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 141.2,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah,",
+                "start": 142.13,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah",
+                "start": 143.07,
+                "duration": 0.93
+            }
+        ]
+    },
+    {
+        "start": 144.2,
+        "end": 145.5,
+        "words": [
+            {
+                "text": "Make",
+                "start": 144.2,
+                "duration": 0.43
+            },
+            {
+                "text": "'em",
+                "start": 144.63,
+                "duration": 0.43
+            },
+            {
+                "text": "like—",
+                "start": 145.07,
+                "duration": 0.43
+            }
+        ]
+    },
+    {
+        "start": 145.7,
+        "end": 148.2,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 145.7,
+                "duration": 0.83
+            },
+            {
+                "text": "ah-ah,",
+                "start": 146.53,
+                "duration": 0.83
+            },
+            {
+                "text": "ah",
+                "start": 147.37,
+                "duration": 0.83
+            }
+        ]
+    },
+    {
+        "start": 148.4,
+        "end": 151,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 148.4,
+                "duration": 0.87
+            },
+            {
+                "text": "ah-ah,",
+                "start": 149.27,
+                "duration": 0.87
+            },
+            {
+                "text": "ah",
+                "start": 150.13,
+                "duration": 0.87
+            }
+        ]
+    },
+    {
+        "start": 151.2,
+        "end": 155,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 151.2,
+                "duration": 1.27
+            },
+            {
+                "text": "ah-ah,",
+                "start": 152.47,
+                "duration": 1.27
+            },
+            {
+                "text": "ah-ah",
+                "start": 153.73,
+                "duration": 1.27
+            }
+        ]
+    },
+    {
+        "start": 155.5,
+        "end": 158.5,
+        "words": [
+            {
+                "text": "Girl,",
+                "start": 155.5,
+                "duration": 0.33
+            },
+            {
+                "text": "do",
+                "start": 155.83,
+                "duration": 0.33
+            },
+            {
+                "text": "you",
+                "start": 156.17,
+                "duration": 0.33
+            },
+            {
+                "text": "taste",
+                "start": 156.5,
+                "duration": 0.33
+            },
+            {
+                "text": "me",
+                "start": 156.83,
+                "duration": 0.33
+            },
+            {
+                "text": "when",
+                "start": 157.17,
+                "duration": 0.33
+            },
+            {
+                "text": "you",
+                "start": 157.5,
+                "duration": 0.33
+            },
+            {
+                "text": "kiss",
+                "start": 157.83,
+                "duration": 0.33
+            },
+            {
+                "text": "him?",
+                "start": 158.17,
+                "duration": 0.33
+            }
+        ]
+    },
+    {
+        "start": 158.7,
+        "end": 161.5,
+        "words": [
+            {
+                "text": "I'd",
+                "start": 158.7,
+                "duration": 0.4
+            },
+            {
+                "text": "warn",
+                "start": 159.1,
+                "duration": 0.4
+            },
+            {
+                "text": "you,",
+                "start": 159.5,
+                "duration": 0.4
+            },
+            {
+                "text": "but",
+                "start": 159.9,
+                "duration": 0.4
+            },
+            {
+                "text": "you'd",
+                "start": 160.3,
+                "duration": 0.4
+            },
+            {
+                "text": "never",
+                "start": 160.7,
+                "duration": 0.4
+            },
+            {
+                "text": "listen",
+                "start": 161.1,
+                "duration": 0.4
+            }
+        ]
+    },
+    {
+        "start": 161.7,
+        "end": 165.5,
+        "words": [
+            {
+                "text": "Everythin'",
+                "start": 161.7,
+                "duration": 0.48
+            },
+            {
+                "text": "that",
+                "start": 162.17,
+                "duration": 0.48
+            },
+            {
+                "text": "he",
+                "start": 162.65,
+                "duration": 0.48
+            },
+            {
+                "text": "tells",
+                "start": 163.13,
+                "duration": 0.48
+            },
+            {
+                "text": "you,",
+                "start": 163.6,
+                "duration": 0.48
+            },
+            {
+                "text": "it's",
+                "start": 164.07,
+                "duration": 0.48
+            },
+            {
+                "text": "a",
+                "start": 164.55,
+                "duration": 0.48
+            },
+            {
+                "text": "lie",
+                "start": 165.03,
+                "duration": 0.48
+            }
+        ]
+    },
+    {
+        "start": 165.7,
+        "end": 168.5,
+        "words": [
+            {
+                "text": "Girl,",
+                "start": 165.7,
+                "duration": 0.31
+            },
+            {
+                "text": "do",
+                "start": 166.01,
+                "duration": 0.31
+            },
+            {
+                "text": "you",
+                "start": 166.32,
+                "duration": 0.31
+            },
+            {
+                "text": "think",
+                "start": 166.63,
+                "duration": 0.31
+            },
+            {
+                "text": "that",
+                "start": 166.94,
+                "duration": 0.31
+            },
+            {
+                "text": "you",
+                "start": 167.26,
+                "duration": 0.31
+            },
+            {
+                "text": "can",
+                "start": 167.57,
+                "duration": 0.31
+            },
+            {
+                "text": "fix",
+                "start": 167.88,
+                "duration": 0.31
+            },
+            {
+                "text": "him?",
+                "start": 168.19,
+                "duration": 0.31
+            }
+        ]
+    },
+    {
+        "start": 168.7,
+        "end": 171.5,
+        "words": [
+            {
+                "text": "He",
+                "start": 168.7,
+                "duration": 0.4
+            },
+            {
+                "text": "makes",
+                "start": 169.1,
+                "duration": 0.4
+            },
+            {
+                "text": "the",
+                "start": 169.5,
+                "duration": 0.4
+            },
+            {
+                "text": "pain",
+                "start": 169.9,
+                "duration": 0.4
+            },
+            {
+                "text": "feel",
+                "start": 170.3,
+                "duration": 0.4
+            },
+            {
+                "text": "so",
+                "start": 170.7,
+                "duration": 0.4
+            },
+            {
+                "text": "addicting",
+                "start": 171.1,
+                "duration": 0.4
+            }
+        ]
+    },
+    {
+        "start": 171.7,
+        "end": 176,
+        "words": [
+            {
+                "text": "Somehow,",
+                "start": 171.7,
+                "duration": 0.48
+            },
+            {
+                "text": "I",
+                "start": 172.18,
+                "duration": 0.48
+            },
+            {
+                "text": "still",
+                "start": 172.66,
+                "duration": 0.48
+            },
+            {
+                "text": "wish",
+                "start": 173.13,
+                "duration": 0.48
+            },
+            {
+                "text": "I",
+                "start": 173.61,
+                "duration": 0.48
+            },
+            {
+                "text": "can",
+                "start": 174.09,
+                "duration": 0.48
+            },
+            {
+                "text": "say",
+                "start": 174.57,
+                "duration": 0.48
+            },
+            {
+                "text": "he's",
+                "start": 175.04,
+                "duration": 0.48
+            },
+            {
+                "text": "mine",
+                "start": 175.52,
+                "duration": 0.48
+            }
+        ]
+    },
+    {
+        "start": 176.5,
+        "end": 179.5,
+        "words": [
+            {
+                "text": "Kiss",
+                "start": 176.5,
+                "duration": 0.6
+            },
+            {
+                "text": "her,",
+                "start": 177.1,
+                "duration": 0.6
+            },
+            {
+                "text": "kiss",
+                "start": 177.7,
+                "duration": 0.6
+            },
+            {
+                "text": "her",
+                "start": 178.3,
+                "duration": 0.6
+            },
+            {
+                "text": "softly",
+                "start": 178.9,
+                "duration": 0.6
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 179.7,
+        "end": 182.5,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 179.7,
+                "duration": 0.7
+            },
+            {
+                "text": "down",
+                "start": 180.4,
+                "duration": 0.7
+            },
+            {
+                "text": "her",
+                "start": 181.1,
+                "duration": 0.7
+            },
+            {
+                "text": "body",
+                "start": 181.8,
+                "duration": 0.7
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 182.7,
+        "end": 187.5,
+        "words": [
+            {
+                "text": "Boy,",
+                "start": 182.7,
+                "duration": 0.44
+            },
+            {
+                "text": "don't",
+                "start": 183.14,
+                "duration": 0.44
+            },
+            {
+                "text": "waste",
+                "start": 183.57,
+                "duration": 0.44
+            },
+            {
+                "text": "your",
+                "start": 184.01,
+                "duration": 0.44
+            },
+            {
+                "text": "time",
+                "start": 184.45,
+                "duration": 0.44
+            },
+            {
+                "text": "because",
+                "start": 184.88,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 185.32,
+                "duration": 0.44
+            },
+            {
+                "text": "know",
+                "start": 185.75,
+                "duration": 0.44
+            },
+            {
+                "text": "what",
+                "start": 186.19,
+                "duration": 0.44
+            },
+            {
+                "text": "you",
+                "start": 186.63,
+                "duration": 0.44
+            },
+            {
+                "text": "need",
+                "start": 187.06,
+                "duration": 0.44
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 187.7,
+        "end": 190,
+        "words": [
+            {
+                "text": "Kiss",
+                "start": 187.7,
+                "duration": 0.46
+            },
+            {
+                "text": "her,",
+                "start": 188.16,
+                "duration": 0.46
+            },
+            {
+                "text": "kiss",
+                "start": 188.62,
+                "duration": 0.46
+            },
+            {
+                "text": "her",
+                "start": 189.08,
+                "duration": 0.46
+            },
+            {
+                "text": "softly",
+                "start": 189.54,
+                "duration": 0.46
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 190.2,
+        "end": 192.8,
+        "words": [
+            {
+                "text": "Searchin'",
+                "start": 190.2,
+                "duration": 0.65
+            },
+            {
+                "text": "for",
+                "start": 190.85,
+                "duration": 0.65
+            },
+            {
+                "text": "my",
+                "start": 191.5,
+                "duration": 0.65
+            },
+            {
+                "text": "copy",
+                "start": 192.15,
+                "duration": 0.65
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 193,
+        "end": 197.5,
+        "words": [
+            {
+                "text": "Yeah,",
+                "start": 193,
+                "duration": 0.38
+            },
+            {
+                "text": "she",
+                "start": 193.38,
+                "duration": 0.38
+            },
+            {
+                "text": "might",
+                "start": 193.75,
+                "duration": 0.38
+            },
+            {
+                "text": "come",
+                "start": 194.13,
+                "duration": 0.38
+            },
+            {
+                "text": "close,",
+                "start": 194.5,
+                "duration": 0.38
+            },
+            {
+                "text": "but",
+                "start": 194.88,
+                "duration": 0.38
+            },
+            {
+                "text": "they",
+                "start": 195.25,
+                "duration": 0.38
+            },
+            {
+                "text": "don't",
+                "start": 195.63,
+                "duration": 0.38
+            },
+            {
+                "text": "make",
+                "start": 196,
+                "duration": 0.38
+            },
+            {
+                "text": "'em",
+                "start": 196.38,
+                "duration": 0.38
+            },
+            {
+                "text": "like",
+                "start": 196.75,
+                "duration": 0.38
+            },
+            {
+                "text": "me",
+                "start": 197.13,
+                "duration": 0.38
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 197.7,
+        "end": 199.5,
+        "words": [
+            {
+                "text": "Make",
+                "start": 197.7,
+                "duration": 0.6
+            },
+            {
+                "text": "'em",
+                "start": 198.3,
+                "duration": 0.6
+            },
+            {
+                "text": "like—",
+                "start": 198.9,
+                "duration": 0.6
+            }
+        ],
+        "trending": true
+    },
+    {
+        "start": 199.8,
+        "end": 202.2,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 199.8,
+                "duration": 0.8
+            },
+            {
+                "text": "ah-ah,",
+                "start": 200.6,
+                "duration": 0.8
+            },
+            {
+                "text": "ah",
+                "start": 201.4,
+                "duration": 0.8
+            }
+        ]
+    },
+    {
+        "start": 202.4,
+        "end": 205,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 202.4,
+                "duration": 0.87
+            },
+            {
+                "text": "ah-ah,",
+                "start": 203.27,
+                "duration": 0.87
+            },
+            {
+                "text": "ah",
+                "start": 204.13,
+                "duration": 0.87
+            }
+        ]
+    },
+    {
+        "start": 205.2,
+        "end": 208,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 205.2,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah,",
+                "start": 206.13,
+                "duration": 0.93
+            },
+            {
+                "text": "ah-ah",
+                "start": 207.07,
+                "duration": 0.93
+            }
+        ]
+    },
+    {
+        "start": 208.2,
+        "end": 209.5,
+        "words": [
+            {
+                "text": "Make",
+                "start": 208.2,
+                "duration": 0.43
+            },
+            {
+                "text": "'em",
+                "start": 208.63,
+                "duration": 0.43
+            },
+            {
+                "text": "like—",
+                "start": 209.07,
+                "duration": 0.43
+            }
+        ]
+    },
+    {
+        "start": 209.7,
+        "end": 212.2,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 209.7,
+                "duration": 0.83
+            },
+            {
+                "text": "ah-ah,",
+                "start": 210.53,
+                "duration": 0.83
+            },
+            {
+                "text": "ah",
+                "start": 211.37,
+                "duration": 0.83
+            }
+        ]
+    },
+    {
+        "start": 212.4,
+        "end": 215,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 212.4,
+                "duration": 0.87
+            },
+            {
+                "text": "ah-ah,",
+                "start": 213.27,
+                "duration": 0.87
+            },
+            {
+                "text": "ah",
+                "start": 214.13,
+                "duration": 0.87
+            }
+        ]
+    },
+    {
+        "start": 215.2,
+        "end": 221,
+        "words": [
+            {
+                "text": "Ah-ah,",
+                "start": 215.2,
+                "duration": 1.16
+            },
+            {
+                "text": "ah-ah,",
+                "start": 216.36,
+                "duration": 1.16
+            },
+            {
+                "text": "ah-ah",
+                "start": 217.52,
+                "duration": 1.16
+            },
+            {
+                "text": "(Like",
+                "start": 218.68,
+                "duration": 1.16
+            },
+            {
+                "text": "me)",
+                "start": 219.84,
+                "duration": 1.16
+            }
+        ]
+    }
+]
 };

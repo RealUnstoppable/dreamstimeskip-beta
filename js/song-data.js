@@ -62,6 +62,16 @@ export const librarySongs = [
         bpm: 122, energy: 0.9, inmixPoint: 15, outmixPoint: 15,
         tags: ['upbeat', 'pop', 'happy']
     },
+    { 
+        id: 'isabel-larosa-dont-make-them-like-me',
+        title: "Don't Make Them Like Me", 
+        artist: "Isabel LaRosa", 
+        duration: "3:43", 
+        src: "/music/isabel_larosa_dont_make_them_like_me.mp3", 
+        art: "/images/isabel_larosa_cover.jpg",
+        bpm: 116, energy: 0.85, inmixPoint: 12, outmixPoint: 22,
+        tags: ['pop', 'dark pop', 'viral', 'trending']
+    },
 ];
 
 export const songColors = {
@@ -70,7 +80,8 @@ export const songColors = {
     'no-pole-remix': '#a11f8b',
     'tate-mcrae-its-okay-im-okay': '#1a2b4c',
     'astrophage': '#00d4aa',
-    'kesha-blow': '#e63995'
+    'kesha-blow': '#e63995',
+    'isabel-larosa-dont-make-them-like-me': '#4a2535'
 };
 
 export function getSongById(id) {

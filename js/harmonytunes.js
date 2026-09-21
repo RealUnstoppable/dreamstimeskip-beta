@@ -451,22 +451,24 @@ function initHarmonyTunes() {
             // Re-order library for leaderboard
             let viralSongs = [...librarySongs];
             
-            // Move Tate McRae to #1, PIXY to #2
+            // Move Tate McRae to #1, PIXY to #2, Isabel LaRosa to #3
             const tate = viralSongs.find(s => s.id === 'tate-mcrae-its-okay-im-okay');
             const pixy = viralSongs.find(s => s.id === 'pixy-legacy');
+            const isabel = viralSongs.find(s => s.id === 'isabel-larosa-dont-make-them-like-me');
             
-            viralSongs = viralSongs.filter(s => s.id !== 'tate-mcrae-its-okay-im-okay' && s.id !== 'pixy-legacy');
+            viralSongs = viralSongs.filter(s => s.id !== 'tate-mcrae-its-okay-im-okay' && s.id !== 'pixy-legacy' && s.id !== 'isabel-larosa-dont-make-them-like-me');
             
+            if (isabel) viralSongs.unshift(isabel);
             if (pixy) viralSongs.unshift(pixy);
             if (tate) viralSongs.unshift(tate);
             
-            // Mock views and trends
-            const mockViews = ['14.2M', '11.8M', '9.4M', '6.1M', '3.8M', '1.2M', '800K', '400K'];
-            const mockTrends = ['up', 'up', 'down', 'up', 'down', 'flat', 'down', 'up'];
+            // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
+            const mockViews = ['14.2M', '11.8M', '10.4M', '9.4M', '6.1M', '3.8M', '1.2M', '800K', '400K'];
+            const mockTrends = ['up', 'up', 'up', 'down', 'up', 'down', 'flat', 'down', 'up'];
             
             // Mock per-song extra stats
-            const mockPeakRanks = ['#1', '#2', '#1', '#3', '#5', '#4', '#7', '#6'];
-            const mockWeeks     = ['8 wks', '6 wks', '4 wks', '3 wks', '2 wks', '2 wks', '1 wk', '1 wk'];
+            const mockPeakRanks = ['#1', '#2', '#3', '#1', '#4', '#5', '#4', '#7', '#6'];
+            const mockWeeks     = ['8 wks', '6 wks', '5 wks', '4 wks', '3 wks', '2 wks', '2 wks', '1 wk', '1 wk'];
 
             const renderLeaderboard = (limit) => {
                 containerViralNow.innerHTML = viralSongs.slice(0, limit).map((song, idx) => {
@@ -1263,10 +1265,17 @@ function initHarmonyTunes() {
 
         // Artist Profile
         const openArtistProfile = (artistName) => {
-            document.getElementById('artist-name').textContent = artistName;
-            
-            // Find songs by artist
-            const artistSongs = librarySongs.filter(s => s.artist === artistName);
+            const cleanName = (artistName || '').toLowerCase().trim();
+            // Find songs by artist (case-insensitive + alias support for Isabel / Isabella)
+            const artistSongs = librarySongs.filter(s => {
+                const sArtist = s.artist.toLowerCase();
+                return sArtist === cleanName ||
+                    (cleanName.includes('larosa') && sArtist.includes('larosa')) ||
+                    (cleanName.includes('isabel') && sArtist.includes('isabel'));
+            });
+
+            const displayArtistName = artistSongs.length > 0 ? artistSongs[0].artist : artistName;
+            document.getElementById('artist-name').textContent = displayArtistName;
             
             const avatarDiv = document.getElementById('artist-avatar');
             if (avatarDiv && artistSongs.length > 0) {
@@ -1281,11 +1290,12 @@ function initHarmonyTunes() {
                 const trackListHTML = artistSongs.map(song => createSongCard(song)).join('');
                 document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
             } else {
-                document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(artistName)}</p>`;
+                document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
             }
             
             artistProfile.style.display = 'block';
         };
+        window.openArtistProfile = openArtistProfile;
         playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
         });
