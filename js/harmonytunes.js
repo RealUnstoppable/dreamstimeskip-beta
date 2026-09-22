@@ -365,6 +365,48 @@ function initHarmonyTunes() {
                 } else if (saved.currentTime) {
                     activeAudio.currentTime = saved.currentTime;
                 }
+
+                if (saved.shuffle) {
+                    isShuffle = true;
+                    const color = 'var(--accent-green)';
+                    if (shuffleBtn) shuffleBtn.style.color = color;
+                    const fsShuffleBtn = document.getElementById('fs-shuffle-btn');
+                    if (fsShuffleBtn) fsShuffleBtn.style.color = color;
+                    const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
+                    if (mobShuffleBtn) mobShuffleBtn.style.color = color;
+                }
+                
+                if (typeof saved.repeatMode === 'number') {
+                    repeatMode = saved.repeatMode;
+                    const updateRepeatVisuals = (btn, indicator) => {
+                        if(!btn) return;
+                        if (repeatMode === 0) {
+                            btn.style.color = '#b3b3b3';
+                            if(indicator) indicator.textContent = '';
+                        } else if (repeatMode === 1) {
+                            btn.style.color = 'var(--accent-green)';
+                            if(indicator) indicator.textContent = '.';
+                        } else {
+                            btn.style.color = 'var(--accent-green)';
+                            if(indicator) indicator.textContent = '1';
+                        }
+                    };
+                    updateRepeatVisuals(repeatBtn, repeatBtn ? repeatBtn.querySelector('.repeat-indicator') : null);
+                    const fsRepeatBtn = document.getElementById('fs-repeat-btn');
+                    if(fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
+                    const mobRepeatBtn = document.getElementById('mob-repeat-btn');
+                    if(mobRepeatBtn) updateRepeatVisuals(mobRepeatBtn, null);
+                }
+
+                if (saved.isMixerMode) {
+                    isMixerMode = true;
+                    if (mixerBtn) mixerBtn.classList.add('active');
+                    const fsMixerBtn = document.getElementById('fs-mixer-btn');
+                    if (fsMixerBtn) fsMixerBtn.classList.add('active');
+                    const mobMixerBtn = document.getElementById('mob-mixer-btn');
+                    if (mobMixerBtn) mobMixerBtn.classList.add('active');
+                }
+
                 restored = true;
             }
         } catch (_) {}
@@ -456,17 +498,23 @@ function initHarmonyTunes() {
         if (containerViralNow) {
             // Re-order library for leaderboard
             let viralSongs = [...librarySongs];
+            const priorityIds = [
+                'summer-bummer',
+                'on-the-floor',
+                'radiance-harp',
+                'rockstar',
+                'dead-fresh',
+                'tate-mcrae-its-okay-im-okay',
+                'pixy-legacy',
+                'isabel-larosa-dont-make-them-like-me'
+            ];
             
-            // Move Tate McRae to #1, PIXY to #2, Isabel LaRosa to #3
-            const tate = viralSongs.find(s => s.id === 'tate-mcrae-its-okay-im-okay');
-            const pixy = viralSongs.find(s => s.id === 'pixy-legacy');
-            const isabel = viralSongs.find(s => s.id === 'isabel-larosa-dont-make-them-like-me');
+            const prioritySongs = priorityIds
+                .map(id => viralSongs.find(s => s.id === id))
+                .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => s.id !== 'tate-mcrae-its-okay-im-okay' && s.id !== 'pixy-legacy' && s.id !== 'isabel-larosa-dont-make-them-like-me');
-            
-            if (isabel) viralSongs.unshift(isabel);
-            if (pixy) viralSongs.unshift(pixy);
-            if (tate) viralSongs.unshift(tate);
+            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
             const mockViews = ['14.2M', '11.8M', '10.4M', '9.4M', '6.1M', '3.8M', '1.2M', '800K', '400K'];
@@ -595,9 +643,17 @@ function initHarmonyTunes() {
             e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
         });
 
-        // 3. TikToks — preserve the 4 official blockquotes embedded directly in HTML for embed.js
-        if (containerTikToks && containerTikToks.children.length === 0) {
-            // Keep container clean if already loaded
+        // 3. TikToks — Dynamically inject robust iframes using the tiktokVideos array instead of flaky blockquotes
+        if (containerTikToks) {
+            containerTikToks.innerHTML = tiktokVideos.map(video => `
+                <div class="tiktok-card" style="position: relative; width: 100%; max-width: 325px; height: 580px; overflow: hidden; border-radius: 12px; background: #000;">
+                    <iframe src="https://www.tiktok.com/embed/v2/${video.id}" 
+                        style="width: 100%; height: 100%; border: none;" 
+                        scrolling="no" 
+                        allow="encrypted-media;">
+                    </iframe>
+                </div>
+            `).join('');
         }
 
         // 4. Playlists
@@ -818,6 +874,9 @@ function initHarmonyTunes() {
                 queueIndex: currentSongIndex,
                 timestamp: Date.now(),
                 volume: activeAudio ? activeAudio.volume : 1,
+                shuffle: isShuffle,
+                repeatMode: repeatMode,
+                isMixerMode: isMixerMode,
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
@@ -1042,44 +1101,29 @@ function initHarmonyTunes() {
             saveSitewideMusicState({ isPlaying: !activeAudio.paused });
         });
 
-        mixerBtn.addEventListener('click', () => {
+        // --- EXTRACTED HANDLERS FOR CROSS-PLATFORM SUPPORT ---
+        const toggleMixer = () => {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
                 setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
             }
-            // Sync .active on both main and fullscreen mixer buttons
             mixerBtn.classList.toggle('active', isMixerMode);
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
             const mobMixerBtn = document.getElementById('mob-mixer-btn');
             if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
-        });
+        };
 
-        volumeSlider.addEventListener('input', (e) => {
-            if (fadeInterval) {
-                clearInterval(fadeInterval);
-                fadeInterval = null;
-            }
-            activeAudio.volume = e.target.value;
-        });
-
-        progressBar.addEventListener('click', (e) => {
-            const width = progressBar.clientWidth;
-            const clickX = e.offsetX;
-            const duration = activeAudio.duration;
-            activeAudio.currentTime = (clickX / width) * duration;
-        });
-
-        shuffleBtn.addEventListener('click', () => {
+        const toggleShuffle = () => {
             isShuffle = !isShuffle;
             const color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
             shuffleBtn.style.color = color;
             if(fsShuffleBtn) fsShuffleBtn.style.color = color;
             const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
             if(mobShuffleBtn) mobShuffleBtn.style.color = color;
-        });
+        };
 
-        repeatBtn.addEventListener('click', () => {
+        const toggleRepeat = () => {
             repeatMode = (repeatMode + 1) % 3;
             const updateRepeatVisuals = (btn, indicator) => {
                 if(!btn) return;
@@ -1098,13 +1142,37 @@ function initHarmonyTunes() {
             updateRepeatVisuals(repeatBtn, repeatBtn.querySelector('.repeat-indicator'));
             if(fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
             const mobRepeatBtn = document.getElementById('mob-repeat-btn');
-            if(mobRepeatBtn) updateRepeatVisuals(mobRepeatBtn, null);
-        });
+            if(mobRepeatBtn) {
+                // For mobile we might just change color without the indicator dot, or with it if available.
+                updateRepeatVisuals(mobRepeatBtn, mobRepeatBtn.querySelector('.repeat-indicator') || mobRepeatBtn.querySelector('span'));
+            }
+        };
 
-        playerLikeBtn.addEventListener('click', () => {
+        const toggleLike = () => {
             if(currentQueue[currentSongIndex]) {
                 toggleFavorite(currentQueue[currentSongIndex].id);
             }
+        };
+
+        // Bind Extracted Handlers
+        mixerBtn.addEventListener('click', toggleMixer);
+        shuffleBtn.addEventListener('click', toggleShuffle);
+        repeatBtn.addEventListener('click', toggleRepeat);
+        playerLikeBtn.addEventListener('click', toggleLike);
+
+        volumeSlider.addEventListener('input', (e) => {
+            if (fadeInterval) {
+                clearInterval(fadeInterval);
+                fadeInterval = null;
+            }
+            activeAudio.volume = e.target.value;
+        });
+
+        progressBar.addEventListener('click', (e) => {
+            const width = progressBar.clientWidth;
+            const clickX = e.offsetX;
+            const duration = activeAudio.duration;
+            activeAudio.currentTime = (clickX / width) * duration;
         });
 
         // Viral Skip: Double Tap to Loop, Single Tap to Skip
@@ -1144,7 +1212,7 @@ function initHarmonyTunes() {
             btn.addEventListener('contextmenu', (e) => e.preventDefault());
         });
 
-        lyricsBtn.addEventListener('click', () => {
+        const toggleLyrics = () => {
             const mobLyricsBtn = document.getElementById('mob-lyrics-btn');
             if (viewLyrics.style.display !== 'none' && !viewLyrics.classList.contains('slide-down-active')) {
                 viewLyrics.classList.remove('slide-up-active');
@@ -1156,9 +1224,14 @@ function initHarmonyTunes() {
                     if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
                 }, 300);
             } else {
+                viewHome.style.display = 'none';
+                viewLibrary.style.display = 'none';
+                viewArtist.style.display = 'none';
+                viewBlog.style.display = 'none';
+                
+                viewLyrics.style.display = 'flex';
                 viewLyrics.classList.remove('slide-down-active');
                 viewLyrics.classList.add('slide-up-active');
-                viewLyrics.style.display = 'flex';
                 lyricsBtn.style.color = 'var(--accent-green)';
                 if(fsLyricsBtn) fsLyricsBtn.style.color = 'var(--accent-green)';
                 if(mobLyricsBtn) mobLyricsBtn.style.color = 'var(--accent-green)';
@@ -1174,7 +1247,8 @@ function initHarmonyTunes() {
                     }
                 }, 50);
             }
-        });
+        };
+        lyricsBtn.addEventListener('click', toggleLyrics);
 
         closeLyricsBtn.addEventListener('click', () => {
             viewLyrics.classList.remove('slide-up-active');
@@ -1335,17 +1409,22 @@ function initHarmonyTunes() {
         const mobileOverlay = document.getElementById('mobile-controls-overlay');
         const mobileOverflowBtn = document.getElementById('mobile-overflow-btn');
         if (mobileOverflowBtn && mobileOverlay) {
-            mobileOverflowBtn.addEventListener('click', (e) => {
+            const toggleOverlay = (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 mobileOverlay.classList.toggle('hidden');
+            };
+            
+            mobileOverflowBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleOverlay(e);
             });
-            // Delegate mobile button clicks to desktop counterparts
-            document.getElementById('mob-shuffle-btn')?.addEventListener('click', () => { triggerClick(shuffleBtn); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { triggerClick(mixerBtn); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { triggerClick(repeatBtn); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { triggerClick(lyricsBtn); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-queue-btn')?.addEventListener('click', () => { triggerClick(queueBtn); mobileOverlay.classList.add('hidden'); });
+
+            // Invoke the extracted functions directly for flawless Mobile Safari execution
+            document.getElementById('mob-shuffle-btn')?.addEventListener('click', () => { toggleShuffle(); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { toggleMixer(); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { toggleRepeat(); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { toggleLyrics(); mobileOverlay.classList.add('hidden'); });
+            document.getElementById('mob-queue-btn')?.addEventListener('click', () => { toggleQueue(); mobileOverlay.classList.add('hidden'); });
             
             // For Viral Skip
             const mobViralBtn = document.getElementById('mob-viral-btn');
@@ -1358,7 +1437,7 @@ function initHarmonyTunes() {
 
             // Close overlay when clicking outside
             document.addEventListener('click', (e) => {
-                if (!mobileOverlay.classList.contains('hidden') && !mobileOverlay.contains(e.target) && e.target !== mobileOverflowBtn) {
+                if (!mobileOverlay.classList.contains('hidden') && !mobileOverlay.contains(e.target) && !e.target.closest('#mobile-overflow-btn')) {
                     mobileOverlay.classList.add('hidden');
                 }
             });
@@ -2022,16 +2101,17 @@ function initHarmonyTunes() {
         });
     }
 
+    function toggleQueue() {
+        if (queuePanel.classList.contains('open')) {
+            queuePanel.classList.remove('open');
+        } else {
+            queuePanel.classList.remove('hidden');
+            setTimeout(() => queuePanel.classList.add('open'), 10);
+            renderQueue();
+        }
+    }
     if(queueBtn) {
-        queueBtn.addEventListener('click', () => {
-            if (queuePanel.classList.contains('open')) {
-                queuePanel.classList.remove('open');
-            } else {
-                queuePanel.classList.remove('hidden');
-                setTimeout(() => queuePanel.classList.add('open'), 10);
-                renderQueue();
-            }
-        });
+        queueBtn.addEventListener('click', toggleQueue);
     }
     if(closeQueueBtn) {
         closeQueueBtn.addEventListener('click', () => {

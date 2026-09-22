@@ -408,10 +408,10 @@ body {
 .tiktok-grid::-webkit-scrollbar { display: none; }
 
 .tiktok-card {
-    flex: 0 0 325px;
-    width: 325px;
-    max-width: 325px;
-    min-width: 325px;
+    flex: 0 0 min(325px, 90vw);
+    width: min(325px, 90vw);
+    max-width: min(325px, 90vw);
+    min-width: min(325px, 90vw);
     border-radius: 12px;
     overflow: hidden;
     background: #0f0f0f;

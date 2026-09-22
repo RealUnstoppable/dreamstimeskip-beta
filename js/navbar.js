@@ -64,11 +64,17 @@ export function loadNavbar() {
             <li><a href="blog.html">Blog</a></li>
             <li><a href="portfolio.html">About Me</a></li>
             <li><a href="uds.html">UDS</a></li>
-            <li>
+            <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
-                    <button class="notification-bell-btn" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
+                    <!-- Desktop bell button -->
+                    <button class="notification-bell-btn desktop-only" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
                         ${BELL_SVG}
                         <span class="notification-badge" style="display:none;" id="notification-badge">0</span>
+                    </button>
+                    <!-- Mobile text button -->
+                    <button class="notification-mobile-btn mobile-only" id="notification-mobile-btn">
+                        <span>Notifications</span>
+                        <span class="notification-badge mobile-badge" style="display:none;" id="notification-mobile-badge">0</span>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-dropdown-header">
@@ -83,6 +89,7 @@ export function loadNavbar() {
         </ul>
         <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
         </button>
     </nav>`;
 
@@ -113,11 +120,17 @@ export function loadUdsNavbar() {
                     <a href="detailing.html">Services</a>
                 </div>
             </li>
-            <li>
+            <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
-                    <button class="notification-bell-btn" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
+                    <!-- Desktop bell button -->
+                    <button class="notification-bell-btn desktop-only" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
                         ${BELL_SVG}
                         <span class="notification-badge" style="display:none;" id="notification-badge">0</span>
+                    </button>
+                    <!-- Mobile text button -->
+                    <button class="notification-mobile-btn mobile-only" id="notification-mobile-btn">
+                        <span>Notifications</span>
+                        <span class="notification-badge mobile-badge" style="display:none;" id="notification-mobile-badge">0</span>
                     </button>
                     <div class="notification-dropdown" id="notification-dropdown">
                         <div class="notification-dropdown-header">
@@ -132,6 +145,7 @@ export function loadUdsNavbar() {
         </ul>
         <button class="hamburger" title="Open menu" aria-label="Open menu">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
         </button>
     </nav>`;
 
@@ -164,24 +178,31 @@ function attachNavEvents() {
 
 function attachNotificationEvents() {
     const bellBtn = document.getElementById('notification-bell-btn');
+    const mobileBtn = document.getElementById('notification-mobile-btn');
     const dropdown = document.getElementById('notification-dropdown');
-    if (!bellBtn || !dropdown) return;
+    if (!dropdown) return;
 
-    // Toggle on click (YouTube-style click-to-open)
-    bellBtn.addEventListener('click', (e) => {
+    const toggleDropdown = (e) => {
         e.stopPropagation();
         const isOpen = dropdown.classList.contains('notif-open');
         dropdown.classList.toggle('notif-open', !isOpen);
-        if (!isOpen) {
+        if (!isOpen && bellBtn) {
             // Animate bell
             bellBtn.classList.add('bell-ring');
             setTimeout(() => bellBtn.classList.remove('bell-ring'), 600);
         }
-    });
+    };
+
+    if (bellBtn) bellBtn.addEventListener('click', toggleDropdown);
+    if (mobileBtn) mobileBtn.addEventListener('click', toggleDropdown);
 
     // Close on outside click
     document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target) && !bellBtn.contains(e.target)) {
+        const clickedInsideDropdown = dropdown.contains(e.target);
+        const clickedBell = bellBtn && bellBtn.contains(e.target);
+        const clickedMobile = mobileBtn && mobileBtn.contains(e.target);
+        
+        if (!clickedInsideDropdown && !clickedBell && !clickedMobile) {
             dropdown.classList.remove('notif-open');
         }
     });
@@ -199,18 +220,31 @@ function attachNotificationEvents() {
                     try { markAsRead(id); } catch (_) {}
                 }
             });
-            const badge = document.getElementById('notification-badge');
-            if (badge) badge.style.display = 'none';
+            updateNotificationBadge(0);
         });
     }
 
     // Load preloaded notifications immediately
     renderNotifications(PRELOADED_NOTIFICATIONS);
-    const badge = document.getElementById('notification-badge');
-    if (badge) {
-        badge.style.display = 'inline-block';
-        badge.textContent = PRELOADED_NOTIFICATIONS.length;
-    }
+    updateNotificationBadge(PRELOADED_NOTIFICATIONS.length);
+}
+
+function updateNotificationBadge(unreadCount) {
+    const badges = [
+        document.getElementById('notification-badge'),
+        document.getElementById('notification-mobile-badge'),
+        document.getElementById('hamburger-badge')
+    ];
+    badges.forEach(badge => {
+        if (badge) {
+            if (unreadCount > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
 }
 
 function renderNotifications(notifications) {
@@ -248,11 +282,7 @@ function renderNotifications(notifications) {
 
             // Recount badge
             const unread = document.querySelectorAll('.notification-item.unread').length;
-            const badge = document.getElementById('notification-badge');
-            if (badge) {
-                if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline-block'; }
-                else badge.style.display = 'none';
-            }
+            updateNotificationBadge(unread);
 
             if (link && link !== 'undefined' && link !== 'null' && link !== '') {
                 window.location.href = link;
@@ -274,22 +304,14 @@ function updateAuthLink() {
                 try {
                     if (notificationUnsubscribe) notificationUnsubscribe();
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
-                        const badge = document.getElementById('notification-badge');
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
                             if (!merged.find(n => n.id === pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
-                        if (badge) {
-                            const unreadCount = merged.filter(n => !n.isRead).length;
-                            if (unreadCount > 0) {
-                                badge.style.display = 'inline-block';
-                                badge.textContent = unreadCount;
-                            } else {
-                                badge.style.display = 'none';
-                            }
-                        }
+                        const unreadCount = merged.filter(n => !n.isRead).length;
+                        updateNotificationBadge(unreadCount);
                     });
                 } catch(err) { console.error('Manager info: Notification error ', err); }
 
@@ -317,14 +339,10 @@ function updateAuthLink() {
                 notificationUnsubscribe();
                 notificationUnsubscribe = null;
             }
-            const badge = document.getElementById('notification-badge');
-            if (badge) badge.style.display = 'none';
+            updateNotificationBadge(0);
             // Show preloaded for non-logged-in users too
             renderNotifications(PRELOADED_NOTIFICATIONS);
-            if (badge) {
-                badge.style.display = 'inline-block';
-                badge.textContent = PRELOADED_NOTIFICATIONS.length;
-            }
+            updateNotificationBadge(PRELOADED_NOTIFICATIONS.length);
         }
     });
 }

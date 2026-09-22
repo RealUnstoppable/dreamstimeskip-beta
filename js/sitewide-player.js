@@ -7,8 +7,8 @@ const STORAGE_KEY = 'dts_music_state';
 
 // High-quality SVGs for Lexi and playerhead
 export const ICONS = {
-    cart: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lexi-glyph-icon"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>`,
-    chat: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lexi-glyph-icon"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path><path d="m14 8 1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z" fill="currentColor" stroke="none"></path></svg>`,
+    cart: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="lexi-glyph-icon"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>`,
+    chat: `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="lexi-glyph-icon"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>`,
     play: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
     pause: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
     next: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>`
@@ -42,7 +42,10 @@ class SitewideMusicEngine {
                     queue: Array.isArray(parsed.queue) && parsed.queue.length ? parsed.queue : librarySongs.map(s => s.id),
                     queueIndex: typeof parsed.queueIndex === 'number' ? parsed.queueIndex : 0,
                     timestamp: parsed.timestamp || Date.now(),
-                    volume: typeof parsed.volume === 'number' ? parsed.volume : 0.8
+                    volume: typeof parsed.volume === 'number' ? parsed.volume : 0.8,
+                    shuffle: !!parsed.shuffle,
+                    repeatMode: typeof parsed.repeatMode === 'number' ? parsed.repeatMode : 0,
+                    isMixerMode: !!parsed.isMixerMode
                 };
             }
         } catch (_) {}
@@ -54,7 +57,10 @@ class SitewideMusicEngine {
             queue: librarySongs.map(s => s.id),
             queueIndex: 0,
             timestamp: Date.now(),
-            volume: 0.8
+            volume: 0.8,
+            shuffle: false,
+            repeatMode: 0,
+            isMixerMode: false
         };
     }
 
@@ -367,7 +373,6 @@ class SitewideMusicEngine {
             <div class="lexi-orb-disc ${isPlaying ? 'spinning' : 'paused'}">
                 <img src="${song.art}" alt="Now Playing" class="lexi-orb-disc-art">
                 <div class="lexi-orb-disc-grooves"></div>
-                <div class="lexi-orb-disc-center"></div>
             </div>
             <div class="lexi-soundwave-badge" style="display: ${isPlaying ? 'flex' : 'none'};">
                 <span></span><span></span><span></span>
@@ -492,7 +497,28 @@ class SitewideMusicEngine {
                 if (chatWindow) {
                     chatWindow.classList.add('active');
                 } else {
-                    window.location.href = 'index.html#chat';
+                    if (!document.getElementById('chatbot-style')) {
+                        const link = document.createElement('link');
+                        link.id = 'chatbot-style';
+                        link.rel = 'stylesheet';
+                        link.href = 'css/chatbot.css';
+                        document.head.appendChild(link);
+                    }
+                    import('./chatbot.js').then(() => {
+                        if (typeof window.openLexiChat === 'function') {
+                            window.openLexiChat();
+                        } else {
+                            const cw = document.getElementById('chatbot-window');
+                            if (cw) {
+                                cw.classList.add('active');
+                                const input = document.getElementById('chatbot-input');
+                                if (input) input.focus();
+                            }
+                        }
+                    }).catch(err => {
+                        console.error('Failed to load chatbot:', err);
+                        window.location.href = 'index.html#chat';
+                    });
                 }
             });
         }
@@ -523,16 +549,18 @@ class SitewideMusicEngine {
         if (!orb || !orb.classList.contains('expanded')) return;
         clearTimeout(this.inactivityTimeout);
 
-        // Smooth closing: fade out content, smoothly collapse dimensions back to orb
+        // Trigger smooth closing transition
         orb.classList.add('closing');
+        orb.classList.remove('lexi-player-expanded');
+        orb.classList.remove('expanded');
+        orb.classList.remove('idle-mode');
+        
+        // Wait for orb width/height transition to finish before swapping to disc
         setTimeout(() => {
-            orb.classList.remove('expanded');
-            orb.classList.remove('lexi-player-expanded');
-            orb.classList.remove('idle-mode');
             orb.classList.remove('closing');
             this.renderCollapsedOrb(orb);
             this.updateLexiUI();
-        }, 200);
+        }, 350);
     }
 
     updateLexiUI() {

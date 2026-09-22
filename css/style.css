@@ -1159,7 +1159,7 @@ textarea:focus-visible {
 /* Mini Vinyl Disc visible on the collapsed Lexi Orb */
 .lexi-orb-disc {
     position: absolute;
-    inset: 3px;
+    inset: 6px;
     border-radius: 50%;
     overflow: hidden;
     pointer-events: none;
@@ -1372,3 +1372,89 @@ textarea:focus-visible {
     margin-left: 2px;
 }
 
+
+/* --- Desktop / Mobile Notification Styles --- */
+.hamburger { position: relative; }
+.hamburger-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff0000;
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    font-size: 0.65rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    border: 2px solid var(--bg-color, #111);
+    z-index: 2;
+}
+
+.notification-mobile-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1.5rem; /* Match mobile nav links */
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+}
+.notification-mobile-btn:hover {
+    color: var(--accent-color);
+}
+
+.mobile-badge {
+    position: static;
+    display: inline-flex;
+    margin-left: 8px;
+    min-width: 22px;
+    height: 22px;
+    border: none;
+}
+
+/* Base Desktop Settings */
+.notification-bell-btn.desktop-only { display: flex; }
+.notification-mobile-btn.mobile-only { display: none; }
+
+/* Responsive Media Query */
+@media (max-width: 768px) {
+    .notification-bell-btn.desktop-only { display: none !important; }
+    .notification-mobile-btn.mobile-only { display: flex !important; }
+    
+    .nav-notification-item {
+        width: 100%;
+        display: block;
+        margin: 15px 0;
+    }
+    .notification-wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-start;
+    }
+    
+    .notification-dropdown {
+        position: static; 
+        width: 100%;
+        box-shadow: none;
+        border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+        background: transparent;
+        border-radius: 8px;
+        margin-top: 15px;
+        transform: none;
+    }
+    .notification-dropdown.notif-open {
+        transform: none;
+    }
+}

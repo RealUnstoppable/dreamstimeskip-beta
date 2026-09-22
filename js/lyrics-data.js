@@ -1,4 +1,39 @@
 export const lyricsData = {
+    'summer-bummer': [
+        { time: 0.0, text: "[Intro]" },
+        { time: 10.0, text: "Summer bummer", trending: true },
+        { time: 20.0, text: "Wrap you up in my daisy chains", trending: true },
+        { time: 30.0, text: "Hip hop in the summer", trending: true },
+        { time: 40.0, text: "Don't be a bummer, babe", trending: true }
+    ],
+    'on-the-floor': [
+        { time: 0.0, text: "[Intro]" },
+        { time: 5.0, text: "J-Lo! It's a new generation", trending: true },
+        { time: 10.0, text: "Mr. Worldwide", trending: true },
+        { time: 20.0, text: "If you go hard you gotta get on the floor", trending: true },
+        { time: 30.0, text: "Dance the night away", trending: true }
+    ],
+    'radiance-harp': [
+        { time: 0.0, text: "[Intro]" },
+        { time: 5.0, text: "Radiance", trending: true },
+        { time: 15.0, text: "The boy who played the harp", trending: true },
+        { time: 25.0, text: "Strings attached to my heart", trending: true },
+        { time: 35.0, text: "They hear the music when I walk", trending: true }
+    ],
+    'rockstar': [
+        { time: 0.0, text: "[Intro]" },
+        { time: 10.0, text: "I've been fuckin' hoes and poppin' pillies", trending: true },
+        { time: 20.0, text: "Man, I feel just like a rockstar", trending: true },
+        { time: 30.0, text: "All my brothers got that gas", trending: true },
+        { time: 40.0, text: "And they always be smokin' like a Rasta", trending: true }
+    ],
+    'dead-fresh': [
+        { time: 0.0, text: "[Intro]" },
+        { time: 5.0, text: "Dead fresh", trending: true },
+        { time: 15.0, text: "Came out the water", trending: true },
+        { time: 25.0, text: "Drippin' so hard", trending: true },
+        { time: 35.0, text: "Lookin' at the stars", trending: true }
+    ],
     "pixy-legacy": [
         {
             "start": 0,
@@ -6061,5 +6096,33 @@ export const lyricsData = {
             }
         ]
     }
-]
+],
+    'isabel-larosa-dont-make-them-like-me': [
+    { time: 0.0, text: "[Intro]" },
+    { time: 4.8, text: "Ah-ah, ah-ah, ah" },
+    { time: 9.6, text: "Ah-ah, ah-ah, ah" },
+    { time: 14.4, text: "Ah-ah, ah-ah, ah" },
+    { time: 19.2, text: "[Verse 1]" },
+    { time: 24.0, text: "Thought it was enough" },
+    { time: 28.8, text: "Thought I closed the door" },
+    { time: 33.7, text: "But you left some windows open, you" },
+    { time: 38.5, text: "You might call it love" },
+    { time: 43.3, text: "Somethin' in your cup" },
+    { time: 48.1, text: "It's not as intoxicating" },
+    { time: 52.9, text: "[Pre-Chorus]" },
+    { time: 57.7, text: "Had to tell me you found somebody new" },
+    { time: 62.5, text: "But the pictures are down when she's in your room" },
+    { time: 67.3, text: "[Chorus]" },
+    { time: 72.1, text: "When you kiss her, kiss her softly", trending: true },
+    { time: 76.9, text: "Searchin' down her body" },
+    { time: 81.7, text: "Boy, don't waste your time because you know what you need" },
+    { time: 86.5, text: "Kiss her, kiss her softly", trending: true },
+    { time: 91.3, text: "Searchin' for my copy" },
+    { time: 96.2, text: "Yeah, she might come close, but they don't make 'em like me", trending: true },
+    { time: 101.0, text: "Make 'em like—" },
+    { time: 105.8, text: "[Post-Chorus]" },
+    { time: 110.6, text: "Ah-ah, ah-ah, ah" },
+    { time: 115.4, text: "Ah-ah, ah-ah, ah" },
+    { time: 120.2, text: "Ah-ah, ah-ah, ah" }
+    ]
 };

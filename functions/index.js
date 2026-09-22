@@ -109,15 +109,28 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
     const uid = decodedToken.uid;
     const email = decodedToken.email;
 
-    const {plan, successUrl, cancelUrl} = req.body;
+    const {plan, project, successUrl, cancelUrl} = req.body;
 
-    // 🔴 Actual Price IDs from your Stripe Dashboard
-    const priceId = plan === "Business Pro" ?
-      "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
+    // Determine Price ID based on project
+    let priceId;
+    if (project === "dreamstimeskip") {
+      if (plan === "premium") {
+        priceId = "price_NEW_DREAMSTIMESKIP_PREMIUM";
+      } else if (plan === "ultimate") {
+        priceId = "price_NEW_DREAMSTIMESKIP_ULTIMATE";
+      } else {
+        priceId = "price_NEW_DREAMSTIMESKIP_PREMIUM"; // fallback
+      }
+    } else {
+      // Default to ezManage logic
+      priceId = plan === "Business Pro" ?
+        "price_1THHbVBp2C5GdKaKvCVoMf1X" : "price_1THHYPBp2C5GdKaKxNpqndNE";
+    }
 
     try {
       if (!stripe) throw new Error("Stripe is not configured.");
-      const session = await stripe.checkout.sessions.create({
+      
+      const sessionConfig = {
         mode: "subscription",
         payment_method_types: ["card"],
         customer_email: email,
@@ -126,13 +139,16 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 
         // Use URLs passed from frontend, fallback to hardcoded if missing
         success_url: successUrl ||
-          "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
-        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
+          "https://dreamstimeskip-beta.pages.dev/success",
+        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/cancel",
         metadata: {
           uid: uid || "unknown",
           planName: plan || "Pro",
+          project: project || "ezmanage",
         },
-      });
+      };
+
+      const session = await stripe.checkout.sessions.create(sessionConfig);
 
       res.status(200).json({url: session.url});
     } catch (err) {
@@ -220,16 +236,23 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     const session = event.data.object;
     const uid = session.metadata.uid;
     const planName = session.metadata.planName || "Pro";
+    const project = session.metadata.project || "ezmanage";
 
     if (uid && uid !== "unknown") {
       try {
-        await getUserDocRef(uid).set({
-          plan: planName, // Updates the frontend to unlock pro features
+        const updateData = {
+          plan: planName, // Original ezManage field
           subscription: {
             status: "active",
             customerId: session.customer,
           },
-        }, {merge: true});
+        };
+
+        if (project === "dreamstimeskip") {
+          updateData.membershipLevel = planName; // Dreamstimeskip specific field
+        }
+
+        await getUserDocRef(uid).set(updateData, {merge: true});
       } catch (error) {
         console.error("Manager info: Error processing checkout.session.completed: [" + error.message + "]");
       }
@@ -245,12 +268,13 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
           .where("subscription.customerId", "==", sub.customer)
           .get();
 
-      const updates = snapshot.docs.map((doc) =>
-        doc.ref.update({
+      const updates = snapshot.docs.map((doc) => {
+        return doc.ref.update({
           "plan": "free",
+          "membershipLevel": "free", // Ensures dreamstimeskip also reverts
           "subscription.status": "canceled",
-        }),
-      );
+        });
+      });
       await Promise.all(updates);
     } catch (error) {
       console.error("Manager info: Error processing customer.subscription.deleted: [" + error.message + "]");

@@ -55,15 +55,38 @@ try {
     console.error("AI Model Initialization Failed", error);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const siriOrb = document.getElementById('siri-orb');
-    const chatbotWindow = document.getElementById('chatbot-window');
+function initChatbot() {
+    let chatbotWindow = document.getElementById('chatbot-window');
+    
+    // Inject Chatbot HTML if not present
+    if (!chatbotWindow) {
+        chatbotWindow = document.createElement('div');
+        chatbotWindow.id = 'chatbot-window';
+        chatbotWindow.className = 'chatbot-overlay';
+        chatbotWindow.innerHTML = `
+            <div class="chatbot-header">
+                <h3>Lexi</h3>
+                <button id="chatbot-close" class="chatbot-close" aria-label="Close chat" title="Close chat">&times;</button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="chat-msg siri">
+                    <p>Hello! I'm Lexi. I can help you navigate the Unstoppable Hub, recommend games, or answer questions about the Unstoppable ecosystem and Dreams TimeSkip.</p>
+                </div>
+            </div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbot-input" placeholder="Ask Lexi..." autocomplete="off" aria-label="Chat input">
+                <button id="chatbot-send" aria-label="Send Message" title="Send Message" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        `;
+        document.body.appendChild(chatbotWindow);
+    }
+
     const closeBtn = document.getElementById('chatbot-close');
     const chatMessages = document.getElementById('chatbot-messages');
     const chatInput = document.getElementById('chatbot-input');
     const sendBtn = document.getElementById('chatbot-send');
-
-    if (!siriOrb || !chatbotWindow) return;
 
     // Global Functions for Cart Integration
     window.updateLexiCartCount = function(count) {
@@ -250,4 +273,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }[tag] || tag)
         );
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChatbot);
+} else {
+    initChatbot();
+}

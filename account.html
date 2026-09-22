@@ -243,7 +243,8 @@
         import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
         import { createTicket, getUserTickets } from '/js/ticket-service.js';
-        import { products, productMap, handleAddToCart, toggleWishlist } from '/js/shop.js';
+        import { products, productMap } from '/js/products-data.js';
+        import { handleAddToCart, toggleWishlist } from '/js/shop.js';
         import { renderOrders, renderRewards } from '/js/account.js';
         
         onAuthStateChanged(auth, async (user) => {
@@ -523,6 +524,57 @@
             if (userData.isAdmin) {
                 const adminBtn = document.getElementById('admin-back-button');
                 if (adminBtn) adminBtn.style.display = 'block';
+            }
+
+            // Update Billing Section
+            const currentPlan = (userData.membershipLevel || 'free').toUpperCase();
+            const billingContainer = document.querySelector('#billing .card');
+            if (billingContainer) {
+                if (userData.subscription && userData.subscription.status === 'active') {
+                    billingContainer.innerHTML = `
+                        <h4>Current Plan</h4>
+                        <p>You are currently on the <strong>${currentPlan}</strong> tier.</p>
+                        <p style="color:var(--accent-green);">Your subscription is active.</p>
+                        <button id="cancel-membership-btn" class="btn" style="background-color: #ef4444; color: white; margin-top: 10px; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Cancel Membership</button>
+                    `;
+                    document.getElementById('cancel-membership-btn').addEventListener('click', async () => {
+                        if (confirm("Are you sure you want to cancel your membership?")) {
+                            const btn = document.getElementById('cancel-membership-btn');
+                            const originalText = btn.textContent;
+                            btn.textContent = "Canceling...";
+                            btn.disabled = true;
+                            try {
+                                const token = await user.getIdToken();
+                                const res = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/cancelSubscription', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${token}`
+                                    }
+                                });
+                                if (res.ok) {
+                                    alert('Subscription canceled successfully.');
+                                    window.location.reload();
+                                } else {
+                                    alert('Failed to cancel subscription.');
+                                    btn.textContent = originalText;
+                                    btn.disabled = false;
+                                }
+                            } catch (e) {
+                                console.error(e);
+                                alert('Error canceling subscription.');
+                                btn.textContent = originalText;
+                                btn.disabled = false;
+                            }
+                        }
+                    });
+                } else {
+                    billingContainer.innerHTML = `
+                        <h4>Current Plan</h4>
+                        <p>You are currently on the <strong>${currentPlan}</strong> tier.</p>
+                        <a href="memberships.html" class="btn btn-primary" style="margin-top: 10px;">Upgrade Plan</a>
+                    `;
+                }
             }
 
             const welcomeHeader = document.getElementById('welcome-header');
