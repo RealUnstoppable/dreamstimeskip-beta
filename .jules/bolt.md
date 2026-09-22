@@ -54,3 +54,6 @@
 ## 2024-11-20 - Detecting Random Seeks in Media Playback
 **Learning:** When detecting random seeks in media playback to optimize sync operations (e.g., switching from an O(1) linear scan to an O(log N) binary search), compare the `currentTime` against the previously recorded frame time (`lastTime`). Do not calculate the difference between `currentTime` and the active item's start time (e.g., `currentTime - item.start > 5`), as this will falsely trigger expensive seek logic during long-playing items or intentional gaps.
 **Action:** Always track `lastTime` across frames and use `Math.abs(currentTime - lastTime) > threshold` to reliably detect non-linear seeking.
+## 2024-11-20 - Optimizing requestAnimationFrame DOM Updates
+**Learning:** Unconditional assignments to `.textContent` inside a `requestAnimationFrame` loop (like updating `currentTime` and `totalTime` displays on every `timeupdate` tick) trigger unnecessary layout thrashing and style recalculations even when the string value has not changed. Additionally, calling `document.querySelectorAll()` on every beat inside the animation loop wastes performance.
+**Action:** Always conditionally update `.textContent` by caching the string value and only updating the DOM when the string actually changes. Furthermore, cache any necessary DOM node lists outside of the animation loop.
