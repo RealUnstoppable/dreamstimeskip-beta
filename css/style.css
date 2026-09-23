@@ -1,5 +1,3 @@
-
-
 :root {
     --bg-color: #0A0A0A;
     --primary-card-color: #141414;
@@ -1487,42 +1485,42 @@ textarea:focus-visible {
 }
 
 /* Lexi States */
-.sitewide-lexi-orb.lexi-state-listening {
-    animation: blob-shape 12s ease-in-out infinite, pulse-white 2s ease-in-out infinite !important;
+
+@keyframes pulse-inner-glow {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.1; }
 }
 
-.sitewide-lexi-orb.lexi-state-mixing {
-    animation: blob-shape 12s ease-in-out infinite, pulse-green 2s ease-in-out infinite !important;
+.sitewide-lexi-orb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: background 0.35s ease, opacity 0.35s ease;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: overlay;
 }
 
-.sitewide-lexi-orb.lexi-state-inactive {
-    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.4), 0 0 20px rgba(239, 68, 68, 0.8) !important;
-    animation: blob-shape 12s ease-in-out infinite !important;
+.sitewide-lexi-orb.expanded::after {
+    display: none;
 }
 
-@keyframes pulse-white {
-    0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
-    50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255,255,255,0.5); }
-    100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+.sitewide-lexi-orb.lexi-state-listening::after {
+    background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.9) 0%, transparent 80%);
+    animation: pulse-inner-glow 2s ease-in-out infinite !important;
 }
 
-@keyframes pulse-green {
-    0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-    50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.9), inset 0 0 20px rgba(16,185,129,0.5); }
-    100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+.sitewide-lexi-orb.lexi-state-mixing::after {
+    background: radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.9) 0%, transparent 80%);
+    animation: pulse-inner-glow 2s ease-in-out infinite !important;
 }
 
-.sitewide-lexi-orb.lexi-state-listening {
-    animation: blob-shape 12s ease-in-out infinite, pulse-white 2s ease-in-out infinite !important;
-}
-
-.sitewide-lexi-orb.lexi-state-mixing {
-    animation: blob-shape 12s ease-in-out infinite, pulse-green 2s ease-in-out infinite !important;
-}
-
-.sitewide-lexi-orb.lexi-state-inactive {
-    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.4), 0 0 20px rgba(239, 68, 68, 0.8) !important;
-    animation: blob-shape 12s ease-in-out infinite !important;
+.sitewide-lexi-orb.lexi-state-inactive::after {
+    background: radial-gradient(circle at 40% 40%, rgba(239, 68, 68, 0.9) 0%, transparent 80%);
+    opacity: 0.8;
 }
 
 /* Also give the orb the reflection like index.html */
