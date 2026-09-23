@@ -54,3 +54,6 @@
 ## 2024-11-20 - Detecting Random Seeks in Media Playback
 **Learning:** When detecting random seeks in media playback to optimize sync operations (e.g., switching from an O(1) linear scan to an O(log N) binary search), compare the `currentTime` against the previously recorded frame time (`lastTime`). Do not calculate the difference between `currentTime` and the active item's start time (e.g., `currentTime - item.start > 5`), as this will falsely trigger expensive seek logic during long-playing items or intentional gaps.
 **Action:** Always track `lastTime` across frames and use `Math.abs(currentTime - lastTime) > threshold` to reliably detect non-linear seeking.
+## 2025-02-23 - Extracting Regex Compilation in Loops
+**Learning:** Instantiating `new RegExp` inside a loop (like `.map` or `.forEach`) forces the JavaScript engine to parse and compile the regular expression repeatedly, causing unnecessary CPU overhead and garbage collection thrashing during fast interactions like search.
+**Action:** Always extract regex compilation outside the loop, passing the pre-compiled `RegExp` object into the loop or helper functions to optimize performance.
