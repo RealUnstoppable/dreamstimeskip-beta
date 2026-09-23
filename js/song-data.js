@@ -131,7 +131,97 @@ export const librarySongs = [
         art: "/images/isabel_larosa_cover.jpg",
         bpm: 116, energy: 0.85, inmixPoint: 12, outmixPoint: 22,
         tags: ['pop', 'dark pop', 'viral', 'trending']
+    },,
+    {
+        id: 'dancin-krono-remix-luvli-aaron-smith',
+        title: "Dancin Krono Remix",
+        artist: "Luvli Aaron Smith",
+        duration: "0:00",
+        src: "/music/dancin-krono-remix-feat-luvli-aaron-smith.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
     },
+    {
+        id: 'did-i-tell-u-that-i-miss-u-adore',
+        title: "Did I Tell U That I Miss U Adore",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/did-i-tell-u-that-i-miss-u-adore.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'died-once-guitar-remix-aamadux',
+        title: "Died Once Guitar Remix Aamadux",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/died-once-guitar-remix-aamadux.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'fame-is-a-gun-addison-rae',
+        title: "Fame Is A Gun Addison Rae",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/fame-is-a-gun-addison-rae.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'i-feel-lost-aaron-hibell',
+        title: "I Feel Lost Aaron Hibell",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/i-feel-lost-aaron-hibell.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'i-smoked-away-my-brain-im-god-x-demons-mashup-imogen-heap-cl',
+        title: "I Smoked Away My Brain Im God X Demons Mashup",
+        artist: "Imogen Heap Clams Casino Aap Rocky",
+        duration: "0:00",
+        src: "/music/i-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'like-that-guitar-remix-aamadux',
+        title: "Like That Guitar Remix Aamadux",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/like-that-guitar-remix-aamadux.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'loverboy-a-wall',
+        title: "Loverboy A Wall",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/loverboy-a-wall.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    },
+    {
+        id: 'summer-bummer-rhy-rhy',
+        title: "Summer Bummer Rhy Rhy",
+        artist: "Unknown Artist",
+        duration: "0:00",
+        src: "/music/summer_bummer_rhy_rhy.mp3",
+        art: "/images/blank_cover.svg",
+        bpm: 120, energy: 0.7, inmixPoint: 10, outmixPoint: 10,
+        tags: ["untagged"]
+    }
 ];
 
 export const songColors = {

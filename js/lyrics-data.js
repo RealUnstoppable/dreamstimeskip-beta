@@ -4317,5 +4317,122 @@ export const lyricsData = {
                 }
             ]
         }
+    ],
+    "dancin-krono-remix-luvli-aaron-smith": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "did-i-tell-u-that-i-miss-u-adore": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "died-once-guitar-remix-aamadux": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "fame-is-a-gun-addison-rae": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-feel-lost-aaron-hibell": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-smoked-away-my-brain-im-god-x-demons-mashup-imogen-heap-cl": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "like-that-guitar-remix-aamadux": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "loverboy-a-wall": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "summer-bummer-rhy-rhy": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
     ]
 };
