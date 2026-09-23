@@ -1239,6 +1239,7 @@ function initHarmonyTunes() {
                 viewLyrics.classList.add('slide-down-active');
                 setTimeout(() => {
                     viewLyrics.style.display = 'none';
+                    viewHome.style.display = 'block';
                     lyricsBtn.style.color = '#b3b3b3';
                     if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
                     if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
@@ -1275,6 +1276,7 @@ function initHarmonyTunes() {
             viewLyrics.classList.add('slide-down-active');
             setTimeout(() => {
                 viewLyrics.style.display = 'none';
+                viewHome.style.display = 'block';
                 viewLyrics.classList.remove('slide-down-active');
             }, 400);
         });
