@@ -1,15 +1,41 @@
 const fs = require('fs');
+let code = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
-// 1. Fix js/harmonytunes.js
-let jsContent = fs.readFileSync('js/harmonytunes.js', 'utf8');
-jsContent = jsContent.replace("viewLibrary.style.display = 'none';", "");
-jsContent = jsContent.replace("viewArtist.style.display = 'none';", "");
-jsContent = jsContent.replace("viewBlog.style.display = 'none';", "");
-fs.writeFileSync('js/harmonytunes.js', jsContent, 'utf8');
+// Patch toggleLyrics
+const oldToggle = `                setTimeout(() => {
+                    viewLyrics.style.display = 'none';
+                    lyricsBtn.style.color = '#b3b3b3';
+                    if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
+                    if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
+                }, 300);`;
+const newToggle = `                setTimeout(() => {
+                    viewLyrics.style.display = 'none';
+                    viewHome.style.display = 'block';
+                    lyricsBtn.style.color = '#b3b3b3';
+                    if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
+                    if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
+                }, 300);`;
+code = code.replace(oldToggle, newToggle);
 
-// 2. Fix harmonytunes.html
-let htmlContent = fs.readFileSync('harmonytunes.html', 'utf8');
-htmlContent = htmlContent.replace('/js/harmonytunes.js?v=20260920b', '/js/harmonytunes.js?v=20260923c');
-fs.writeFileSync('harmonytunes.html', htmlContent, 'utf8');
+// Patch closeLyricsBtn
+const oldClose = `        closeLyricsBtn.addEventListener('click', () => {
+            viewLyrics.classList.remove('slide-up-active');
+            viewLyrics.classList.add('slide-down-active');
+            setTimeout(() => {
+                viewLyrics.style.display = 'none';
+                viewLyrics.classList.remove('slide-down-active');
+            }, 400);
+        });`;
+const newClose = `        closeLyricsBtn.addEventListener('click', () => {
+            viewLyrics.classList.remove('slide-up-active');
+            viewLyrics.classList.add('slide-down-active');
+            setTimeout(() => {
+                viewLyrics.style.display = 'none';
+                viewHome.style.display = 'block';
+                viewLyrics.classList.remove('slide-down-active');
+            }, 400);
+        });`;
+code = code.replace(oldClose, newClose);
 
-console.log("Patch applied successfully.");
+fs.writeFileSync('js/harmonytunes.js', code, 'utf8');
+console.log("Lyrics close bug fixed.");
