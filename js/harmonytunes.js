@@ -638,11 +638,15 @@ function initHarmonyTunes() {
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
         containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
-        containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
-        document.getElementById('show-more-recommended').addEventListener('click', (e) => {
-            containerRecommended.classList.toggle('expanded');
-            e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
-        });
+        let existingShowMore = document.getElementById('show-more-recommended');
+        if (!existingShowMore) {
+            containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
+            existingShowMore = document.getElementById('show-more-recommended');
+            existingShowMore.addEventListener('click', (e) => {
+                containerRecommended.classList.toggle('expanded');
+                e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
+            });
+        }
 
         // 3. TikToks — Dynamically inject robust iframes using the tiktokVideos array instead of flaky blockquotes
         if (containerTikToks) {
@@ -660,7 +664,10 @@ function initHarmonyTunes() {
         // 4. Playlists
         const playlists = [
             { id: 'main', title: "All Tracks", desc: "Complete Library" },
-            { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" }
+            { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" },
+            { id: 'hiphop', title: "Rap Caviar", desc: "Top Tier Rap" },
+            { id: 'viral', title: "Viral Hits", desc: "Trending on TikTok" },
+            { id: 'chill', title: "Late Night", desc: "Chill Vibes" }
         ];
         containerPlaylists.innerHTML = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
