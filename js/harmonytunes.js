@@ -1,9 +1,9 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { lyricsData } from './lyrics-data.js?v=1789909119';
+import { lyricsData } from './lyrics-data.js?v=20260923';
 
-import { librarySongs, songColors, getSongById } from './song-data.js?v=20260920';
+import { librarySongs, songColors, getSongById } from './song-data.js?v=20260923';
 
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
@@ -1225,9 +1225,9 @@ function initHarmonyTunes() {
                 }, 300);
             } else {
                 viewHome.style.display = 'none';
-                viewLibrary.style.display = 'none';
-                viewArtist.style.display = 'none';
-                viewBlog.style.display = 'none';
+                
+                
+                
                 
                 viewLyrics.style.display = 'flex';
                 viewLyrics.classList.remove('slide-down-active');
