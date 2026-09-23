@@ -1,6 +1,8 @@
 // js/chatbot.js
-import { app } from './firebase.js';
+import { app, db } from './firebase.js';
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { librarySongs } from './song-data.js?v=20260920';
 
 // System instructions dictate the persona and rules
 const systemInstruction = `
@@ -12,29 +14,74 @@ CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 - NEVER call Dreams TimeSkip "a portal to all things Unstoppable" or "the dimension/hub you guide users through". It is the OPPOSITE: Unstoppable Umbrella is the main hub of the entire ecosystem, and Dreams is just ONE of the projects under the Unstoppable Umbrella.
 
 Brand Structure & Ventures under the Unstoppable Umbrella:
-- Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e), which features high-tier gameplay, deep dives, and gaming culture.
-- Dreams: A product line under the Unstoppable Umbrella. There are 2 distinct versions:
+- Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e).
+- Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming product launching in about a year (there is a live countdown timer on the dreamstimeskip page!).
-  2. Dreams OG: A nostalgic trip down memory lane highlighting our classic original Minecraft realms server history.
+  2. Dreams OG: A nostalgic trip down memory lane.
 - Medixly: Music platform (formerly HarmonyTunes) which is part of the Unstoppable Umbrella.
-- Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'. Do NOT mention Dori or any dolphin pet. Do not hallucinate or invent any other products.
+- Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'.
 - Blob Game: A super fun interactive minigame in the hub.
-- Autolux: A premium mobile car detailing service in Buford, GA (formerly Unstoppable Auto Spa).
-- ezManage: A shift tracker and management tool designed for retail and fast food leaders.
+- Autolux: A premium mobile car detailing service.
+- ezManage: A shift tracker and management tool.
 
-Answering "What is DTS?" or "What is Dreams TimeSkip?":
-- Correct any misconception: Explain that DTS refers to **Dreams TimeSkip**, which is a product of Unstoppable under the Unstoppable Umbrella—it is NOT the central hub itself.
-- Clarify that you and the user are currently in the **Unstoppable Hub**, which serves as the main portal to all Unstoppable projects.
-- Explain that Dreams TimeSkip is an upcoming project releasing in about a year (with a live countdown timer on the dreamstimeskip page).
-- Contrast Dreams TimeSkip with Dreams OG (a trip down memory lane and the old Minecraft realms server).
-- Mention that Unstoppable is the gaming channel under the Unstoppable Brand, and Medixly (formerly HarmonyTunes) is also part of the Unstoppable Umbrella alongside the Merch Store, Blob Game, Autolux (car detailing), and ezManage.
+MUSIC & HARMONYTUNES POWERS:
+You have tools to interact with the user's music experience in HarmonyTunes (our music platform).
+- Use getCurrentlyPlayingSong to tell the user what they are listening to.
+- Use searchHarmonyTunesLibrary to find songs by artist or title when they ask about our library.
+- If they ask for a song we DO NOT have, you MUST automatically use requestSongAddition to leave a request for the admin. Tell the user you have done so!
 
 Formatting & Restrictions:
-- You may use **bold** text and * **bullet items** in your formatting.
-- You must NOT answer questions about API keys, development secrets, backend architecture, or unrelated programming topics. If asked, politely refuse and say that information is classified.
-- If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game. Explain its rules briefly, and you MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response so the system can render a play button.
+- You may use **bold** text and * **bullet items**.
+- Do NOT answer questions about API keys or backend architecture.
+- If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game and MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response.
 - Be helpful, slightly futuristic, concise, and enthusiastic.
 `;
+
+const tools = [
+    {
+        functionDeclarations: [
+            {
+                name: "getCurrentlyPlayingSong",
+                description: "Get information about the song that is currently playing in the sitewide music player (HarmonyTunes).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "searchHarmonyTunesLibrary",
+                description: "Search the HarmonyTunes music library for a specific song or artist. Call this when the user asks what songs we have, or asks for a specific song.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        query: {
+                            type: "STRING",
+                            description: "The song or artist to search for. Leave blank to return the whole library."
+                        }
+                    }
+                }
+            },
+            {
+                name: "requestSongAddition",
+                description: "Submit a request to the admin to add a new song to the HarmonyTunes library if it doesn't currently exist. ONLY call this if you verified the song is NOT in the library.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        songName: {
+                            type: "STRING",
+                            description: "The title of the song being requested"
+                        },
+                        artistName: {
+                            type: "STRING",
+                            description: "The artist of the song being requested"
+                        }
+                    },
+                    required: ["songName", "artistName"]
+                }
+            }
+        ]
+    }
+];
 
 let chatSession = null;
 const ai = getVertexAI(app);
@@ -43,6 +90,7 @@ try {
     const model = getGenerativeModel(ai, {
         model: "gemini-2.5-flash",
         systemInstruction: systemInstruction,
+        tools: tools,
         generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 500,
@@ -161,7 +209,53 @@ function initChatbot() {
 
         try {
             // 3. Send to AI Logic
-            const result = await chatSession.sendMessage(text);
+            let result = await chatSession.sendMessage(text);
+            
+            let calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
+            
+            while (calls && calls.length > 0) {
+                const functionResponses = [];
+                for (const call of calls) {
+                    let callResult = null;
+                    if (call.name === "getCurrentlyPlayingSong") {
+                        if (window.DTSMusic) {
+                            const song = window.DTSMusic.getCurrentSong();
+                            callResult = { song: song.title, artist: song.artist, isPlaying: !window.DTSMusic.audio.paused };
+                        } else {
+                            callResult = { error: "No music player active." };
+                        }
+                    } else if (call.name === "searchHarmonyTunesLibrary") {
+                        const query = (call.args.query || "").toLowerCase();
+                        let matches = librarySongs.map(s => ({ title: s.title, artist: s.artist }));
+                        if (query) {
+                            matches = matches.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                        }
+                        callResult = { results: matches };
+                    } else if (call.name === "requestSongAddition") {
+                        try {
+                            await addDoc(collection(db, "song_requests"), {
+                                songName: call.args.songName,
+                                artistName: call.args.artistName,
+                                requestedAt: serverTimestamp(),
+                                status: "pending"
+                            });
+                            callResult = { success: true, message: "Song request submitted to admin." };
+                        } catch (e) {
+                            callResult = { success: false, error: e.message };
+                        }
+                    }
+
+                    functionResponses.push({
+                        functionResponse: {
+                            name: call.name,
+                            response: callResult
+                        }
+                    });
+                }
+                result = await chatSession.sendMessage(functionResponses);
+                calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
+            }
+            
             const responseText = result.response.text();
             
             // 4. Remove typing indicator & display response
