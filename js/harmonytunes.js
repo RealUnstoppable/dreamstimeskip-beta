@@ -348,7 +348,8 @@ function initHarmonyTunes() {
                     currentQueue = [...librarySongs];
                 }
 
-                currentSongIndex = typeof saved.queueIndex === 'number' && saved.queueIndex < currentQueue.length ? saved.queueIndex : 0;
+                let foundIndex = saved.songId ? currentQueue.findIndex(s => s.id === saved.songId) : -1;
+                currentSongIndex = foundIndex !== -1 ? foundIndex : (typeof saved.queueIndex === 'number' && saved.queueIndex < currentQueue.length ? saved.queueIndex : 0);
                 loadSong(currentSongIndex);
 
                 const elapsed = Math.max(0, (Date.now() - (saved.timestamp || Date.now())) / 1000);
@@ -1112,7 +1113,26 @@ function initHarmonyTunes() {
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
             const mobMixerBtn = document.getElementById('mob-mixer-btn');
             if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
+            
+            document.querySelectorAll('.lexi-mixer-wrapper').forEach(w => {
+                if (isMixerMode) {
+                    w.classList.remove('state-listening', 'state-deactivated');
+                    w.classList.add('state-mixxing');
+                } else {
+                    w.classList.remove('state-mixxing');
+                    w.classList.add('state-deactivated'); // Turns red when deactivated
+                    setTimeout(() => {
+                        // Revert to listening or default after 2s of red
+                        if (w.classList.contains('state-deactivated')) {
+                            w.classList.remove('state-deactivated');
+                            if (!activeAudio.paused) w.classList.add('state-listening');
+                        }
+                    }, 2000);
+                }
+            });
         };
+        
+        window.toggleMixerMode = toggleMixer;
 
         const toggleShuffle = () => {
             isShuffle = !isShuffle;

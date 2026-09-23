@@ -2081,3 +2081,122 @@ body {
     box-shadow: 0 6px 28px rgba(29,185,84,0.6);
 }
 .viral-stats-play-btn:active { transform: scale(0.97); }
+
+/* ===== Lexi Mixxer Blob & States ===== */
+.lexi-mixer-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    touch-action: none; /* For dragging */
+}
+
+.lexi-mixxer-blob {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #3b82f6, #1e3a8a);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+    transition: all 0.4s ease;
+    cursor: grab;
+    position: absolute;
+    z-index: 50;
+}
+.lexi-mixxer-blob:active {
+    cursor: grabbing;
+}
+
+/* States */
+/* 1. Default (Not playing) is Blue (base state above) */
+
+/* 2. Listening (Playing, Mixer OFF) -> Pulse White */
+.lexi-mixer-wrapper.state-listening .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #ffffff, #9ca3af);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    animation: pulse-white 2s infinite ease-in-out;
+}
+
+/* 3. Mixxing (Mixer ON) -> Pulse Green */
+.lexi-mixer-wrapper.state-mixxing .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #4ade80, #166534);
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.8);
+    animation: pulse-green 1.5s infinite ease-in-out;
+}
+
+/* 4. Deactivated -> Red */
+.lexi-mixer-wrapper.state-deactivated .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #ef4444, #7f1d1d);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes pulse-white {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(255,255,255,0.6); }
+    50% { transform: scale(1.2); box-shadow: 0 0 20px rgba(255,255,255,1); }
+}
+
+@keyframes pulse-green {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(74,222,128,0.6); }
+    50% { transform: scale(1.3); box-shadow: 0 0 25px rgba(74,222,128,1); }
+}
+
+/* ===== Entry Animation Background Glow ===== */
+.player-glow-overlay {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+    z-index: -1;
+    border-radius: 20px;
+    pointer-events: none;
+}
+.player-glow-overlay.animate {
+    animation: player-glow-spread 1.5s ease-out forwards;
+}
+
+@keyframes player-glow-spread {
+    0% { width: 0; opacity: 1; }
+    50% { width: 100%; opacity: 0.8; }
+    100% { width: 100%; opacity: 0; }
+}
+
+/* ===== Drag Menu ===== */
+.lexi-drag-menu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 10px;
+    z-index: 10000;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.2s, transform 0.2s;
+}
+.lexi-drag-menu.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+}
+.lexi-action-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+.lexi-action-pill:hover {
+    background: rgba(255,255,255,0.2);
+}
