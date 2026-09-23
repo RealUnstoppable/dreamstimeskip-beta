@@ -63,7 +63,7 @@ export function loadNavbar() {
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="portfolio.html">About Me</a></li>
-            <li><a href="uds.html">Autolux</a></li>
+            <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
                     <!-- Desktop bell button -->
@@ -116,7 +116,7 @@ export function loadUdsNavbar() {
             <li class="nav-dropdown-wrapper">
                 <a href="#" style="cursor: default;">Autolux ▾</a>
                 <div class="nav-dropdown">
-                    <a href="uds.html">Overview</a>
+                    <a href="https://autolux.realunstoppable.store">Overview</a>
                     <a href="detailing.html">Services</a>
                 </div>
             </li>
