@@ -1,4 +1,5 @@
-import { auth, db, getCachedUserProfile } from './auth.js';
+import { auth, db } from './auth.js';
+import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products.js';
@@ -55,6 +56,14 @@ async function renderProfile(user, userDataParam = null) {
                     <strong>Joined:</strong> <span>${formatDate(userData.signupDate)}</span>
                 </div>
             `;
+
+        // Update Billing Section
+        const billingPlanText = document.querySelector('#billing h4 + p');
+        if (billingPlanText) {
+            const planName = (userData.membershipLevel || 'Free').charAt(0).toUpperCase() + (userData.membershipLevel || 'free').slice(1);
+            billingPlanText.innerHTML = `You are currently on the <strong>${escapeHTML(planName)}</strong> tier.`;
+        }
+
         }
     } catch (error) {
         console.error("Error rendering profile:", error);
