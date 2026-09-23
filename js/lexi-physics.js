@@ -74,14 +74,14 @@ export function initLexiPhysics() {
                 // Apply springy resistance
                 currentX = dx * 0.4;
                 currentY = dy * 0.4;
-                blob.style.transform = \`translate(\${currentX}px, \${currentY}px)\`;
+                blob.style.transform = `translate(${currentX}px, ${currentY}px)`;
 
                 // If pulled far enough, show menu
                 const dist = Math.sqrt(currentX*currentX + currentY*currentY);
                 if (dist > 30) {
                     const rect = blob.getBoundingClientRect();
-                    dragMenu.style.left = \`\${rect.left - 50}px\`;
-                    dragMenu.style.top = \`\${rect.top - 100}px\`;
+                    dragMenu.style.left = `${rect.left - 50}px`;
+                    dragMenu.style.top = `${rect.top - 100}px`;
                     dragMenu.classList.remove('hidden');
                 } else {
                     dragMenu.classList.add('hidden');
@@ -130,8 +130,17 @@ export function initLexiPhysics() {
                     wrapper.dispatchEvent(evt);
                 }
             } else {
-                // It was a drag. Hide menu if dropped
-                setTimeout(() => dragMenu.classList.add('hidden'), 2000);
+                // It was a drag. Keep menu open.
+                // We'll hide it if they click outside.
+                const outsideClickListener = (e) => {
+                    if (!dragMenu.contains(e.target) && !blob.contains(e.target)) {
+                        dragMenu.classList.add('hidden');
+                        document.removeEventListener('click', outsideClickListener);
+                    }
+                };
+                setTimeout(() => {
+                    document.addEventListener('click', outsideClickListener);
+                }, 100);
             }
             
             currentX = 0; currentY = 0;
