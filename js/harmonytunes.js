@@ -854,6 +854,21 @@ function initHarmonyTunes() {
         if (typeof backgroundMixxerAI === 'function') {
             backgroundMixxerAI();
         }
+
+        // Wire up MediaSession API for hardware/OS media buttons
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: song.title,
+                artist: song.artist,
+                artwork: [
+                    { src: song.art, sizes: '512x512', type: 'image/jpeg' }
+                ]
+            });
+            navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+            navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+            navigator.mediaSession.setActionHandler('play', () => { if (!isPlaying) togglePlayPause(); });
+            navigator.mediaSession.setActionHandler('pause', () => { if (isPlaying) togglePlayPause(); });
+        }
     }
 
     
@@ -1010,15 +1025,20 @@ function initHarmonyTunes() {
         if (activeAudio.currentTime > 3) {
             activeAudio.currentTime = 0;
         } else {
-            __recordHistory();
-            let prevIndex = currentSongIndex - 1;
-            if (prevIndex < 0) {
-                if (repeatMode === 1) prevIndex = currentQueue.length - 1;
-                else prevIndex = 0;
+            if (historyQueue.length > 0) {
+                const prevSong = historyQueue.pop(); // Take from history
+                currentQueue.splice(currentSongIndex, 0, prevSong); // Insert right at current position (pushes upcoming down)
+                // currentSongIndex stays the same, but it now points to the inserted song!
+                loadSong(currentSongIndex);
+                playSong();
+                
+                // Refresh the queue UI if history tab is open
+                if(queuePanel && queuePanel.classList.contains('open') && currentTab === 'history') {
+                    renderQueue();
+                }
+            } else {
+                activeAudio.currentTime = 0; // fallback if no history
             }
-            currentSongIndex = prevIndex;
-            loadSong(currentSongIndex);
-            playSong();
         }
     }
 
