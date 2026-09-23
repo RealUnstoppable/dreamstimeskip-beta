@@ -4,10 +4,10 @@
 export const librarySongs = [
     {
         id: 'summer-bummer',
-        title: "Summer Bummer",
+        title: "Summer Bummer (Lights On)",
         artist: "Rhy Rhy",
         duration: "4:20",
-        src: "/music/summer_bummer_rhy_rhy.mp3",
+        src: "/music/summer bummer (lights on).mp3",
         art: "/images/summer_bummer_rhy_rhy.jpg",
         bpm: 100, energy: 0.6, inmixPoint: 10, outmixPoint: 10,
         tags: ['pop', 'viral']
@@ -24,7 +24,7 @@ export const librarySongs = [
     },
     {
         id: 'radiance-harp',
-        title: "Radiance (The Boy Who Played the Harp)",
+        title: "Radiance",
         artist: "Santan Dave",
         duration: "3:40",
         src: "/music/radiance_the_boy_who_played_the_harp.mp3",

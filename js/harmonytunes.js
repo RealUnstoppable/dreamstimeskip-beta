@@ -988,7 +988,8 @@ function initHarmonyTunes() {
             const nextUserSong = window.__pullFromUserQueue();
             if(nextUserSong) {
                 currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
-                loadSong(currentSongIndex + 1);
+                currentSongIndex = currentSongIndex + 1;
+                loadSong(currentSongIndex);
                 playSong();
                 return;
             }
@@ -2330,6 +2331,46 @@ let dragItem = null;
                 </div>
                 ${isDraggable ? '<div class="queue-more-btn" title="Drag to move, click for options">...</div>' : ''}
             `;
+            
+            // Add click listener to play clicked queue item
+            item.addEventListener('click', (e) => {
+                if(e.target.classList.contains('queue-more-btn')) return; // Ignore drag button clicks
+                
+                if (currentTab === 'upnext') {
+                    if (song.isUserQueue) {
+                        // Play a user queue song: jump it to current queue immediately
+                        const userQIdx = userQueue.findIndex(s => s.id === song.id);
+                        if (userQIdx !== -1) {
+                            const [s] = userQueue.splice(userQIdx, 1);
+                            __recordHistory();
+                            currentQueue.splice(currentSongIndex + 1, 0, s);
+                            currentSongIndex = currentSongIndex + 1;
+                            loadSong(currentSongIndex);
+                            playSong();
+                        }
+                    } else {
+                        // Play a song from the normal upcoming queue
+                        __recordHistory();
+                        const queueIdxOffset = currentQueue.slice(currentSongIndex + 1).findIndex(s => s.id === song.id);
+                        if(queueIdxOffset !== -1) {
+                            currentSongIndex = currentSongIndex + 1 + queueIdxOffset;
+                            loadSong(currentSongIndex);
+                            playSong();
+                        }
+                    }
+                } else {
+                    // History tab
+                    const histIdx = historyQueue.findIndex(s => s.id === song.id);
+                    if (histIdx !== -1) {
+                        const s = historyQueue[histIdx];
+                        __recordHistory();
+                        currentQueue.splice(currentSongIndex + 1, 0, s);
+                        currentSongIndex = currentSongIndex + 1;
+                        loadSong(currentSongIndex);
+                        playSong();
+                    }
+                }
+            });
             
             if(isDraggable) {
                 const moreBtn = item.querySelector('.queue-more-btn');

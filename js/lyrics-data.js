@@ -56,63 +56,7 @@ export const lyricsData = {
             ]
         }
     ],
-    "on-the-floor": [
-        {
-            "start": 0,
-            "end": 5,
-            "trending": false,
-            "words": [
-                {
-                    "text": "[Intro]",
-                    "start": 0
-                }
-            ]
-        },
-        {
-            "start": 5,
-            "end": 10,
-            "trending": true,
-            "words": [
-                {
-                    "text": "J-Lo! It's a new generation",
-                    "start": 5
-                }
-            ]
-        },
-        {
-            "start": 10,
-            "end": 20,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Mr. Worldwide",
-                    "start": 10
-                }
-            ]
-        },
-        {
-            "start": 20,
-            "end": 30,
-            "trending": true,
-            "words": [
-                {
-                    "text": "If you go hard you gotta get on the floor",
-                    "start": 20
-                }
-            ]
-        },
-        {
-            "start": 30,
-            "end": 35,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Dance the night away",
-                    "start": 30
-                }
-            ]
-        }
-    ],
+    "on-the-floor": [{"start": 0, "end": 10, "trending": false, "words": [{"text": "J-Lo! [Loading lyrics...]", "start": 0}]}],
     "radiance-harp": [
         {
             "start": 0,
@@ -227,63 +171,7 @@ export const lyricsData = {
             ]
         }
     ],
-    "dead-fresh": [
-        {
-            "start": 0,
-            "end": 5,
-            "trending": false,
-            "words": [
-                {
-                    "text": "[Intro]",
-                    "start": 0
-                }
-            ]
-        },
-        {
-            "start": 5,
-            "end": 15,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Dead fresh",
-                    "start": 5
-                }
-            ]
-        },
-        {
-            "start": 15,
-            "end": 25,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Came out the water",
-                    "start": 15
-                }
-            ]
-        },
-        {
-            "start": 25,
-            "end": 35,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Drippin' so hard",
-                    "start": 25
-                }
-            ]
-        },
-        {
-            "start": 35,
-            "end": 40,
-            "trending": true,
-            "words": [
-                {
-                    "text": "Lookin' at the stars",
-                    "start": 35
-                }
-            ]
-        }
-    ],
+    "dead-fresh": [{"start": 0, "end": 10, "trending": false, "words": [{"text": "Dead Fresh [Loading lyrics...]", "start": 0}]}],
     "pixy-legacy": [
         {
             "start": 0,
