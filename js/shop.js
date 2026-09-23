@@ -261,7 +261,7 @@ async function handleRemoveFromCart(productId) {
 }
 
 export async function toggleWishlist(productId) {
-    if (!currentUser) {
+    if (!currentUser && !auth.currentUser) {
         window.location.href = 'sign in beta.html';
         return;
     }
@@ -297,7 +297,7 @@ async function saveWishlist() {
 
         saveWishlistTimeout = setTimeout(async () => {
             try {
-                const userWishlistRef = doc(db, 'wishlists', currentUser.uid);
+                const userWishlistRef = doc(db, 'wishlists', activeUser.uid);
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
@@ -318,9 +318,9 @@ async function saveCart() {
     return new Promise((resolve) => {
         pendingResolves.push(resolve);
         saveCartTimeout = setTimeout(async () => {
-            if (currentUser) {
+            if (currentUser || auth.currentUser) {
                 try {
-                    const userCartRef = doc(db, 'carts', currentUser.uid);
+                    const userCartRef = doc(db, 'carts', activeUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
                     console.error("Manager info: Error saving cart to Firestore:", error.message);
@@ -408,7 +408,7 @@ async function handleViewReviews(productId) {
     if (reviewModal) reviewModal.style.display = 'flex';
     if (reviewsListContainer) reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
 
-    if (currentUser) {
+    if (currentUser || auth.currentUser) {
         if (writeReviewSection) writeReviewSection.style.display = 'block';
         if (loginToReviewMsg) loginToReviewMsg.style.display = 'none';
     } else {
@@ -574,7 +574,8 @@ function setupEventListeners() {
     if (writeReviewForm) {
         writeReviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser || !currentReviewProductId) return;
+            const activeUser = currentUser || auth.currentUser;
+    if (!activeUser || !currentReviewProductId) return;
 
             const rating = parseInt(document.getElementById('review-rating').value, 10);
             const comment = document.getElementById('review-comment').value;
@@ -586,15 +587,15 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const userData = await getCachedUserProfile({uid: currentUser.uid});
+                const userData = await getCachedUserProfile({uid: activeUser.uid});
                 let username = userData ? (userData.username || "User") : "User";
 
-                const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
+                const reviewId = `${currentReviewProductId}_${activeUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
 
                 await setDoc(reviewRef, {
                     productId: currentReviewProductId,
-                    userId: currentUser.uid,
+                    userId: activeUser.uid,
                     username: username,
                     rating: rating,
                     comment: comment,
@@ -642,7 +643,7 @@ async function openReviewsModal(productId) {
     reviewNotification.innerHTML = '';
 
     // Toggle Auth Sections
-    if (currentUser) {
+    if (currentUser || auth.currentUser) {
         reviewSubmissionSection.style.display = 'block';
         loginPromptSection.style.display = 'none';
     } else {
@@ -704,7 +705,8 @@ async function loadReviews(productId) {
 
 async function handleReviewSubmit(e) {
     e.preventDefault();
-    if (!currentUser || !currentReviewProductId) return;
+    const activeUser = currentUser || auth.currentUser;
+    if (!activeUser || !currentReviewProductId) return;
 
     if (currentRating === 0) {
         reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
@@ -719,13 +721,13 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        let authorName = currentUser.displayName || 'Anonymous';
-        const userData = await getCachedUserProfile({uid: currentUser.uid});
+        let authorName = activeUser.displayName || 'Anonymous';
+        const userData = await getCachedUserProfile({uid: activeUser.uid});
         if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,
-            userId: currentUser.uid,
+            userId: activeUser.uid,
             authorName: authorName,
             rating: currentRating,
             text: text,

@@ -389,26 +389,40 @@ class SitewideMusicEngine {
         const song = this.getCurrentSong();
         const isPlaying = this.state.isPlaying;
 
-        // If nothing is playing, the song feature disappears! Only Cart and Chat.
-        if (!isPlaying) {
-            orb.classList.add('idle-mode');
-            orb.innerHTML = `
-                <div class="lexi-expanded-panel">
-                    <!-- Action Glyphs: Ask Lexi & View Cart -->
-                    <div class="lexi-actions-row">
-                        <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
-                            ${ICONS.chat}
-                            <span>Ask Lexi</span>
+        orb.classList.remove('idle-mode');
+        orb.innerHTML = `
+            <div class="lexi-expanded-panel">
+                <!-- Mini Playerhead Component -->
+                <div class="lexi-playerhead">
+                    <img src="${song.art}" alt="${song.title}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
+                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
+                        <div class="lexi-song-title">${song.title}</div>
+                        <div class="lexi-song-artist">${song.artist}</div>
+                    </div>
+                    <div class="lexi-player-controls">
+                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="${isPlaying ? 'Pause' : 'Play'}">
+                            ${isPlaying ? ICONS.pause : ICONS.play}
                         </button>
-                        <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
-                            ${ICONS.cart}
-                            <span>View Cart</span>
-                            <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
+                        <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
+                            ${ICONS.next}
                         </button>
                     </div>
                 </div>
-            `;
-        } else {
+
+                <!-- Action Glyphs / Buttons -->
+                <div class="lexi-actions-row">
+                    <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                        ${ICONS.chat}
+                        <span>Ask Lexi</span>
+                    </button>
+                    <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                        ${ICONS.cart}
+                        <span>View Cart</span>
+                        <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
+                    </button>
+                </div>
+            </div>
+        `; else {
             orb.classList.remove('idle-mode');
             orb.innerHTML = `
                 <div class="lexi-expanded-panel">

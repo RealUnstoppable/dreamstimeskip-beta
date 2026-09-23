@@ -18,7 +18,7 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming product launching in about a year (there is a live countdown timer on the dreamstimeskip page!).
   2. Dreams OG: A nostalgic trip down memory lane.
-- Medixly: Music platform (formerly HarmonyTunes) which is part of the Unstoppable Umbrella.
+- Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella. The name changed because it is much more than just music now—it's a hub for editors, creators, and casual listeners to hear all their favorite songs or just specific parts of them. It's all up to the user, and the new brand better reflects this company purpose.
 - Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'.
 - Blob Game: A super fun interactive minigame in the hub.
 - Autolux: A premium mobile car detailing service.
@@ -299,7 +299,7 @@ function initChatbot() {
         } catch (error) {
             console.error("Manager info: Chat Error ", error);
             removeElement(typingId);
-            addMessage(`I'm sorry, my neural link is experiencing interference: ${error.message || error}. Please try again later.`, 'siri');
+            addMessage('Lexi is sleeping right now. Check back later!', 'siri');
         } finally {
             sendBtn.disabled = false;
             chatInput.focus();
