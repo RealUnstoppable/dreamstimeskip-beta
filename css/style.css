@@ -160,7 +160,7 @@ body {
     min-height: 100vh;
     padding: 0 20px;
     position: relative;
-    overflow: hidden;
+    
 }
 
 .hero::before {
@@ -307,7 +307,7 @@ p.section-subtitle {
     border-radius: 24px;
     padding: 32px;
     position: relative;
-    overflow: hidden;
+    
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-decoration: none;
     color: var(--text-primary);
@@ -424,7 +424,7 @@ p.section-subtitle {
     align-items: center;
     text-align: center;
     padding: 0 20px;
-    overflow: hidden;
+    
 }
 
 .section-background {
@@ -437,7 +437,7 @@ p.section-subtitle {
     background-position: center;
     transform: scale(1.1);
     transition: transform 6s ease-out;
-    overflow: hidden;
+    
 }
 
 .section-background iframe {
@@ -788,7 +788,7 @@ textarea:focus-visible {
     border-radius: 12px;
     width: 320px;
     max-height: 420px;
-    overflow: hidden;
+    
     z-index: 10000;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     flex-direction: column;
@@ -849,7 +849,7 @@ textarea:focus-visible {
     font-weight: 600;
     color: var(--text-primary, #fff);
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 .notif-msg {
@@ -857,7 +857,7 @@ textarea:focus-visible {
     display: block;
     font-size: 0.78rem;
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 .notif-dot {
@@ -967,7 +967,7 @@ textarea:focus-visible {
     opacity: 1;
 }
 
-#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, padding 0.35s ease; box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
+#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center;  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, padding 0.35s ease; box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
 #siri-orb::after { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1; }
 #siri-orb.expanded { width: 220px; border-radius: 50px !important; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); }
 #siri-orb.expanded::before {
@@ -1161,7 +1161,7 @@ textarea:focus-visible {
     position: absolute;
     inset: 6px;
     border-radius: 50%;
-    overflow: hidden;
+    
     pointer-events: none;
     z-index: 1;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
@@ -1221,7 +1221,7 @@ textarea:focus-visible {
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 28px rgba(0, 255, 204, 0.28);
     padding: 10px 14px;
-    overflow: hidden;
+    
     cursor: default;
     animation: none !important;
 }
@@ -1287,7 +1287,7 @@ textarea:focus-visible {
     font-weight: 700;
     color: #ffffff;
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
     line-height: 1.2;
 }
@@ -1295,7 +1295,7 @@ textarea:focus-visible {
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 
@@ -1457,4 +1457,93 @@ textarea:focus-visible {
     .notification-dropdown.notif-open {
         transform: none;
     }
+}
+
+/* Sitewide Lexi Orb (matches .orb from index.html) */
+.sitewide-lexi-orb {
+    position: relative;
+    z-index: 9999;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: blob-shape 12s ease-in-out infinite;
+}
+
+.sitewide-lexi-orb.expanded {
+    width: 280px;
+    height: auto;
+    border-radius: 20px;
+    animation: none; /* Stop blob animation when expanded */
+    background: var(--primary-card-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    
+}
+
+/* Lexi States */
+.sitewide-lexi-orb.lexi-state-listening {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 60%), linear-gradient(to bottom, #f8fafc 0%, #cbd5e1 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8) !important;
+}
+
+.sitewide-lexi-orb.lexi-state-mixing {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%), linear-gradient(to bottom, #10b981 0%, #059669 100%) !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6) !important;
+}
+
+.sitewide-lexi-orb.lexi-state-inactive {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%), linear-gradient(to bottom, #ef4444 0%, #b91c1c 100%) !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6) !important;
+    animation: none !important;
+}
+
+@keyframes pulse-white {
+    0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.9), inset 0 0 20px rgba(255,255,255,0.5); }
+    100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
+}
+
+@keyframes pulse-green {
+    0% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.9), inset 0 0 20px rgba(16,185,129,0.5); }
+    100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+}
+
+.sitewide-lexi-orb.lexi-state-listening {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), transparent 60%), linear-gradient(to bottom, #cbd5e1 0%, #f8fafc 100%) !important;
+    animation: blob-shape 12s ease-in-out infinite, pulse-white 2s ease-in-out infinite !important;
+}
+
+.sitewide-lexi-orb.lexi-state-mixing {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 60%), linear-gradient(to bottom, #059669 0%, #10b981 100%) !important;
+    animation: blob-shape 12s ease-in-out infinite, pulse-green 2s ease-in-out infinite !important;
+}
+
+.sitewide-lexi-orb.lexi-state-inactive {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2), transparent 60%), linear-gradient(to bottom, #7f1d1d 0%, #ef4444 100%) !important;
+    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.4), 0 0 10px rgba(239, 68, 68, 0.6) !important;
+    /* Keeps blob shape, no pulse */
+    animation: blob-shape 12s ease-in-out infinite !important;
+}
+
+/* Also give the orb the reflection like index.html */
+#siri-orb::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 104%; height: 110%;
+    border-radius: inherit;
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, transparent 40%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+#siri-orb.expanded::before {
+    display: none;
 }

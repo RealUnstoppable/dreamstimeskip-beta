@@ -315,19 +315,91 @@ class SitewideMusicEngine {
         this.renderCollapsedOrb(orb);
 
         // Bind click/tap on Lexi Orb
-        orb.addEventListener('click', (e) => {
-            // If click was inside child button, let child handler execute
+
+        // Tap to Mixxer / Drag to Expand Logic
+        let isDragging = false;
+        let startX = 0, startY = 0;
+        let startTime = 0;
+
+        const onStart = (e) => {
+            // Only trigger if clicking the orb itself, not its children
             if (e.target.closest('#lexi-play-pause-btn') || 
                 e.target.closest('#lexi-next-btn') || 
                 e.target.closest('#lexi-view-cart') || 
                 e.target.closest('#lexi-ask') ||
-                e.target.closest('.lexi-song-info')) {
+                e.target.closest('.lexi-song-info') ||
+                orb.classList.contains('expanded')) {
                 return;
             }
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
+            isDragging = false;
+            startTime = Date.now();
+            orb.style.transition = 'none';
+
+            document.addEventListener('mousemove', onMove, { passive: false });
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd);
+        };
+
+        const onMove = (e) => {
+            if (orb.classList.contains('expanded')) return;
+            const touch = e.touches ? e.touches[0] : e;
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
+
+            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                isDragging = true;
+                e.preventDefault();
+            }
+
+            if (isDragging) {
+                orb.style.transform = `translate(${dx * 0.4}px, ${dy * 0.4}px)`;
+                
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > 40) {
+                    onEnd(); 
+                    this.expandLexi(orb);
+                }
+            }
+        };
+
+        const onEnd = (e) => {
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
 
             if (!orb.classList.contains('expanded')) {
-                this.expandLexi(orb);
-            } else {
+                orb.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                orb.style.transform = 'translate(0px, 0px)';
+            }
+
+            const duration = Date.now() - startTime;
+            if (!isDragging || duration < 200) {
+                if (!orb.classList.contains('expanded')) {
+                    if (orb.classList.contains('lexi-state-mixing')) {
+                        orb.classList.remove('lexi-state-mixing');
+                        orb.classList.add('lexi-state-inactive');
+                        setTimeout(() => orb.classList.remove('lexi-state-inactive'), 2000);
+                    } else {
+                        orb.classList.remove('lexi-state-inactive');
+                        orb.classList.add('lexi-state-mixing');
+                    }
+                    if (typeof window.toggleMixerMode === 'function') {
+                        window.toggleMixerMode();
+                    }
+                }
+            }
+        };
+
+        orb.addEventListener('mousedown', onStart);
+        orb.addEventListener('touchstart', onStart, { passive: true });
+        
+        orb.addEventListener('click', (e) => {
+            if (orb.classList.contains('expanded') && e.target === orb) {
                 this.collapseLexi(orb);
             }
         });
@@ -422,42 +494,7 @@ class SitewideMusicEngine {
                     </button>
                 </div>
             </div>
-        `; else {
-            orb.classList.remove('idle-mode');
-            orb.innerHTML = `
-                <div class="lexi-expanded-panel">
-                    <!-- Mini Playerhead Component -->
-                    <div class="lexi-playerhead">
-                        <img src="${song.art}" alt="${song.title}" class="lexi-player-art spinning">
-                        <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
-                            <div class="lexi-song-title">${song.title}</div>
-                            <div class="lexi-song-artist">${song.artist}</div>
-                        </div>
-                        <div class="lexi-player-controls">
-                            <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="Pause">
-                                ${ICONS.pause}
-                            </button>
-                            <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
-                                ${ICONS.next}
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Action Glyphs / Buttons -->
-                    <div class="lexi-actions-row">
-                        <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
-                            ${ICONS.chat}
-                            <span>Ask Lexi</span>
-                        </button>
-                        <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
-                            ${ICONS.cart}
-                            <span>View Cart</span>
-                            <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
+        `;
 
         // Update pill cart count
         try {

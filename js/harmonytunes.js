@@ -264,7 +264,7 @@ function initHarmonyTunes() {
         }
 
         const matches = librarySongs.filter(s =>
-            s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q)
+            s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || (s.lyrics && s.lyrics.toLowerCase().includes(q))
         );
 
         if (matches.length === 0) {
