@@ -4,7 +4,14 @@ export const setDoc = () => {};
 export const getFirestore = () => ({});
 export const collection = () => {};
 export const getDocs = () => {};
-
 export const serverTimestamp = () => {};
 export const addDoc = () => {};
 export const updateDoc = () => {};
+export const average = () => {};
+export const count = () => {};
+export const query = () => {};
+export const where = () => {};
+export const orderBy = () => {};
+export const getAggregateFromServer = () => {};
+export const arrayRemove = () => {};
+export const arrayUnion = () => {};
