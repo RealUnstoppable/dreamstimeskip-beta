@@ -131,7 +131,7 @@ export const librarySongs = [
         art: "/images/isabel_larosa_cover.jpg",
         bpm: 116, energy: 0.85, inmixPoint: 12, outmixPoint: 22,
         tags: ['pop', 'dark pop', 'viral', 'trending']
-    },,
+    },
     {
         id: 'dancin-krono-remix-luvli-aaron-smith',
         title: "Dancin Krono Remix",

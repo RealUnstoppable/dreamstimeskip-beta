@@ -293,8 +293,8 @@ class SitewideMusicEngine {
 
     // Initialize or bind to Lexi Orb
     initLexiOrb() {
-        // On HarmonyTunes page, don't overlay a second orb since it has full playerhead at bottom
-        if (this.isHarmonyTunesPage) return;
+        // On HarmonyTunes page, animate the orb flying into the player head
+        const isHarmonyPage = this.isHarmonyTunesPage;
 
         let orbWrapper = document.querySelector('.siri-orb-wrapper');
         let orb = document.getElementById('siri-orb');
@@ -429,6 +429,41 @@ class SitewideMusicEngine {
         });
 
         this.updateLexiUI();
+
+        // On HarmonyTunes, animate the orb flying into the mixer button then remove it
+        if (isHarmonyPage) {
+            // Force center positioning for the spawn
+            orbWrapper.style.left = '50%';
+            orbWrapper.style.transform = 'translateX(-50%)';
+            orbWrapper.style.bottom = '50%';
+
+            setTimeout(() => {
+                const targetBtn = document.getElementById('mixer-btn');
+                if (targetBtn && orbWrapper) {
+                    const targetRect = targetBtn.getBoundingClientRect();
+                    const orbRect = orb.getBoundingClientRect();
+
+                    const dx = targetRect.left - orbRect.left + (targetRect.width / 2 - orbRect.width / 2);
+                    const dy = targetRect.top - orbRect.top + (targetRect.height / 2 - orbRect.height / 2);
+
+                    orbWrapper.style.transition = 'transform 1s cubic-bezier(0.87, 0, 0.13, 1), opacity 0.8s ease-in 0.2s';
+                    orbWrapper.style.transform = `translateX(-50%) translate(${dx}px, ${dy}px) scale(0.4)`;
+                    orbWrapper.style.opacity = '0';
+
+                    setTimeout(() => {
+                        orbWrapper.remove();
+                        // Pulse the mixer button to show Lexi landed
+                        if (targetBtn) {
+                            targetBtn.style.transition = 'transform 0.2s ease';
+                            targetBtn.style.transform = 'scale(1.3)';
+                            setTimeout(() => { targetBtn.style.transform = 'scale(1)'; }, 200);
+                        }
+                    }, 1000);
+                } else {
+                    orbWrapper.remove();
+                }
+            }, 1200);
+        }
     }
 
     renderCollapsedOrb(orb) {
