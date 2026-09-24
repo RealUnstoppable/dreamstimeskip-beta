@@ -1919,6 +1919,15 @@ function initHarmonyTunes() {
     // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
     // to decouple rapid event firing from expensive DOM updates.
     let isUpdatingProgress = false;
+    let cachedPaintSpillEffects = null; // Cache for DOM query
+
+    // Helper to prevent layout thrashing from unconditional text assignments
+    function setTextContentIfChanged(element, newText) {
+        if (element && element.textContent !== newText) {
+            element.textContent = newText;
+        }
+    }
+
     function updateProgress() {
         if (!isUpdatingProgress) {
             window.requestAnimationFrame(() => {
@@ -1926,12 +1935,13 @@ function initHarmonyTunes() {
                 if (duration) {
                     const percent = (currentTime / duration) * 100;
                     progress.style.width = `${percent}%`;
-            if(fsProgress) fsProgress.style.width = `${percent}%`;
-            if(fsCurrentTime) fsCurrentTime.textContent = formatTime(activeAudio.currentTime);
-            if(fsTotalTime && activeAudio.duration) fsTotalTime.textContent = showCountdown ? "-" + formatTime(activeAudio.duration - activeAudio.currentTime) : formatTime(activeAudio.duration);
+                    if(fsProgress) fsProgress.style.width = `${percent}%`;
 
-                    currentTimeEl.textContent = formatTime(currentTime);
-                    totalTimeEl.textContent = showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration);
+                    if(fsCurrentTime) setTextContentIfChanged(fsCurrentTime, formatTime(currentTime));
+                    if(fsTotalTime) setTextContentIfChanged(fsTotalTime, showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration));
+
+                    setTextContentIfChanged(currentTimeEl, formatTime(currentTime));
+                    setTextContentIfChanged(totalTimeEl, showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration));
                 }
                 syncLyrics();
                 
@@ -1941,8 +1951,10 @@ function initHarmonyTunes() {
                     const currentBeat = Math.floor(currentTime / beatInterval);
                     if (window._lastPaintBeat !== currentBeat) {
                         window._lastPaintBeat = currentBeat;
-                        const effects = document.querySelectorAll('.paint-spill-effect');
-                        effects.forEach(effect => {
+                        if (!cachedPaintSpillEffects) {
+                            cachedPaintSpillEffects = document.querySelectorAll('.paint-spill-effect');
+                        }
+                        cachedPaintSpillEffects.forEach(effect => {
                             const rx = Math.floor(Math.random() * 80) + 10;
                             const ry = Math.floor(Math.random() * 80) + 10;
                             effect.style.background = `radial-gradient(circle at ${rx}% ${ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%), radial-gradient(circle at ${100-rx}% ${100-ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%)`;
