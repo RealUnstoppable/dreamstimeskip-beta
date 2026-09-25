@@ -2319,3 +2319,5 @@ body {
 .music-card {
     padding-bottom: 12px; /* ensure space for select if it wraps */
 }
+
+.modal-overlay.hidden { display: none !important; }
