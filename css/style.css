@@ -11,12 +11,12 @@
     --font-main: 'Inter', sans-serif;
 
 
-    --accent-color: var(--accent-blue);
+    --accent-color: var(--accent-color, #2563EB);
 }
 
 
 [data-accent="blue"] {
-    --accent-color: var(--accent-blue);
+    --accent-color: var(--accent-color, #2563EB);
 }
 
 [data-accent="red"] {
@@ -24,7 +24,7 @@
 }
 
 [data-accent="green"] {
-    --accent-color: var(--accent-green);
+    --accent-color: var(--accent-color, #16A34A);
 }
 
 [data-accent="purple"] {
@@ -500,7 +500,7 @@ p.section-subtitle {
 
 
 .main-footer {
-    background-color: #000;
+    background-color: var(--bg-color, #000);
     color: var(--text-secondary);
     padding: 80px 40px 40px;
     border-top: 1px solid var(--border-color);
@@ -1062,7 +1062,7 @@ textarea:focus-visible {
     border-radius: 4px;
     font-size: 0.85rem;
     background: rgba(136, 211, 206, 0.2);
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
     font-weight: bold;
 }
 

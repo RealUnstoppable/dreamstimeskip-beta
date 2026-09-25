@@ -1,12 +1,12 @@
 :root {
     --player-height: 80px;
-    --card-bg: #121212;
-    --card-bg-hover: #1f1f1f;
+    --card-bg: var(--primary-card-color, #121212);
+    --card-bg-hover: var(--secondary-card-color, #1f1f1f);
     --accent-green: #1ed760;
 }
 
 body {
-    background-color: #0A0A0A;
+    background-color: var(--bg-color, #0A0A0A);
     overflow-x: hidden;
     padding-bottom: 120px;
     font-family: 'Inter', sans-serif;
@@ -26,7 +26,7 @@ body {
 
 .harmony-main {
     flex-grow: 1;
-    background: #0A0A0A;
+    background: var(--bg-color, #0A0A0A);
     padding: 16px;
     width: 100%;
 }
@@ -218,9 +218,9 @@ body {
 }
 
 .nav-pill.active {
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     color: black;
-    border-color: var(--accent-green);
+    border-color: var(--accent-color, #16A34A);
 }
 
 
@@ -354,7 +354,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     color: black;
     display: flex;
     justify-content: center;
@@ -497,7 +497,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     border: none;
     font-size: 20px;
     color: black;
@@ -697,7 +697,7 @@ body {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     z-index: 2100;
-    background: #121212;
+    background: var(--secondary-card-color, #121212);
     color: white;
     overflow-y: auto;
     padding-top: 60px;
@@ -758,9 +758,9 @@ body {
 }
 
 .song-table .playing {
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
 }
-.song-table .playing .song-title { color: var(--accent-green); }
+.song-table .playing .song-title { color: var(--accent-color, #16A34A); }
 
 
 .music-player-bar {
@@ -862,7 +862,7 @@ body {
     transition: color 0.2s ease;
 }
 #mixer-btn.active {
-    color: var(--accent-green) !important;
+    color: var(--accent-color, #16A34A) !important;
     transition: color 0.2s ease;
 }
 
@@ -936,7 +936,7 @@ body {
     transition: width 0.2s ease;
 }
 
-.progress-bar:hover .progress { background-color: var(--accent-green); }
+.progress-bar:hover .progress { background-color: var(--accent-color, #16A34A); }
 
 .volume-container {
     display: none;
@@ -987,7 +987,7 @@ body {
     filter: drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.6));
     margin-left: 5px;
 }
-.like-btn-player.active { color: var(--accent-green) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
+.like-btn-player.active { color: var(--accent-color, #16A34A) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
 
 /* --- LYRICS OVERLAY --- */
 .lyrics-overlay {
@@ -1185,7 +1185,7 @@ body {
 .feature-text p { margin: 0; color: #b3b3b3; font-size: 0.85rem; line-height: 1.4; }
 
 .primary-btn {
-    background: var(--accent-green);
+    background: var(--accent-color, #16A34A);
     color: black;
     border: none;
     padding: 12px;
@@ -1242,7 +1242,7 @@ body {
 }
 .fs-progress-bar-container .progress {
     height: 100%;
-    background: var(--accent-green);
+    background: var(--accent-color, #16A34A);
     width: 0%;
     transition: width 0.2s ease;
 }
@@ -1300,13 +1300,13 @@ body {
     top: -4px;
     right: -4px;
     font-size: 9px;
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
     line-height: 1;
     pointer-events: none;
 }
 #viral-skip-btn.viral-locked, #fs-viral-skip-btn.viral-locked, #mob-viral-btn.viral-locked {
-    color: var(--accent-green);
-    filter: drop-shadow(0 0 4px var(--accent-green));
+    color: var(--accent-color, #16A34A);
+    filter: drop-shadow(0 0 4px var(--accent-color, #16A34A));
 }
 #viral-skip-btn.viral-locked .viral-repeat-badge, #fs-viral-skip-btn.viral-locked .viral-repeat-badge, #mob-viral-btn.viral-locked .viral-repeat-badge {
     display: inline !important;
@@ -1350,7 +1350,7 @@ body {
     min-width: 44px;
 }
 .mobile-controls-overlay .control-button:hover { color: #fff; }
-.mobile-controls-overlay .control-button.active, #mob-mixer-btn.active { color: var(--accent-green) !important; }
+.mobile-controls-overlay .control-button.active, #mob-mixer-btn.active { color: var(--accent-color, #16A34A) !important; }
 .mobile-controls-overlay.hidden {
     display: none;
 }
@@ -1454,7 +1454,7 @@ body {
 }
 .queue-item:active { cursor: grabbing; }
 .queue-item:hover { background: rgba(255, 255, 255, 0.1); }
-.queue-item.playing { border-left: 3px solid var(--accent-green); background: rgba(255, 255, 255, 0.1); }
+.queue-item.playing { border-left: 3px solid var(--accent-color, #16A34A); background: rgba(255, 255, 255, 0.1); }
 .queue-item img {
     width: 40px; height: 40px; border-radius: 6px; object-fit: cover;
 }

@@ -109,7 +109,7 @@
 }
 
 .review-submission-section {
-    background-color: #1a1a1a;
+    background-color: var(--primary-card-color, #1a1a1a);
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 20px;
@@ -166,19 +166,19 @@ textarea#review-text {
 
 textarea#review-text:focus {
     outline: none;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-color, #2563EB);
 }
 
 .login-prompt-section {
     text-align: center;
     padding: 20px;
-    background-color: #1a1a1a;
+    background-color: var(--primary-card-color, #1a1a1a);
     border-radius: 12px;
     margin-bottom: 20px;
 }
 
 .login-prompt-section a {
-    color: var(--accent-blue);
+    color: var(--accent-color, #2563EB);
     text-decoration: none;
 }
 
@@ -277,7 +277,7 @@ textarea#review-text:focus {
     width: 100%;
     height: 320px;
     object-fit: cover;
-    background-color: #000;
+    background-color: var(--bg-color, #000);
     cursor: pointer;
 }
 
@@ -314,7 +314,7 @@ textarea#review-text:focus {
 }
 
 .add-to-cart-btn {
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color, #2563EB);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -485,7 +485,7 @@ textarea#review-text:focus {
 .btn-checkout {
     width: 100%;
     padding: 15px;
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color, #2563EB);
     color: white;
     border: none;
     border-radius: 8px;
@@ -617,7 +617,7 @@ textarea#review-text:focus {
 }
 
 .comment-input textarea {
-    background-color: #0A0A0A;
+    background-color: var(--bg-color, #0A0A0A);
     border: 1px solid var(--border-color);
     color: white;
     padding: 10px;
@@ -626,7 +626,7 @@ textarea#review-text:focus {
 }
 
 .submit-review-btn {
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color, #2563EB);
     color: white;
     border: none;
     padding: 10px;
@@ -654,7 +654,7 @@ textarea#review-text:focus {
 }
 
 .login-to-review-msg a {
-    color: var(--accent-blue);
+    color: var(--accent-color, #2563EB);
     text-decoration: underline;
 }
 
@@ -684,7 +684,7 @@ textarea#review-text:focus {
 
 /* --- End of shop.css --- */
 .free-badge {
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
     font-weight: bold;
 }
 
@@ -709,7 +709,7 @@ textarea#review-text:focus {
 }
 
 .review-message.success {
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
 }
 
 .action-buttons-container {

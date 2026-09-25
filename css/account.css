@@ -13,7 +13,7 @@
     --accent-yellow: #FBBF24;
     --accent-purple: #9333EA;
     --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --accent-color: var(--accent-blue);
+    --accent-color: var(--accent-color, #2563EB);
 }
 
 body {
@@ -137,7 +137,7 @@ body {
 }
 
 .sidebar-nav a.active {
-    background: var(--accent-blue);
+    background: var(--accent-color, #2563EB);
     color: #ffffff !important;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
@@ -293,7 +293,7 @@ body {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-    border-color: var(--accent-blue);
+    border-color: var(--accent-color, #2563EB);
     outline: none;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
     background-color: #1c1c1e;
@@ -345,9 +345,9 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .btn-primary {
-    background-color: var(--accent-blue);
+    background-color: var(--accent-color, #2563EB);
     color: #ffffff !important;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-color, #2563EB);
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
 
@@ -426,8 +426,8 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 input:checked + .slider {
-    background-color: var(--accent-blue);
-    border-color: var(--accent-blue);
+    background-color: var(--accent-color, #2563EB);
+    border-color: var(--accent-color, #2563EB);
 }
 
 input:checked + .slider:before {
@@ -499,7 +499,7 @@ input:checked + .slider:before {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     background: rgba(37, 99, 235, 0.2);
-    color: var(--accent-blue);
+    color: var(--accent-color, #2563EB);
     border: 1px solid rgba(37, 99, 235, 0.35);
     margin-bottom: 6px;
 }
@@ -746,13 +746,13 @@ input:checked + .slider:before {
 }
 
 .step-dot.active {
-    background: var(--accent-blue);
+    background: var(--accent-color, #2563EB);
     color: #fff;
     box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
 }
 
 .step-dot.completed {
-    background: var(--accent-green);
+    background: var(--accent-color, #16A34A);
     color: #fff;
 }
 
@@ -808,7 +808,7 @@ input:checked + .slider:before {
 }
 
 .cancel-reason-option input {
-    accent-color: var(--accent-blue);
+    accent-color: var(--accent-color, #2563EB);
     cursor: pointer;
 }
 
@@ -1003,7 +1003,7 @@ input:checked + .slider:before {
 
 .support-card-option:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-color, #2563EB);
     transform: translateY(-2px);
 }
 
