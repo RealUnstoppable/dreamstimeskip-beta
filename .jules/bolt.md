@@ -54,3 +54,6 @@
 ## 2024-11-20 - Detecting Random Seeks in Media Playback
 **Learning:** When detecting random seeks in media playback to optimize sync operations (e.g., switching from an O(1) linear scan to an O(log N) binary search), compare the `currentTime` against the previously recorded frame time (`lastTime`). Do not calculate the difference between `currentTime` and the active item's start time (e.g., `currentTime - item.start > 5`), as this will falsely trigger expensive seek logic during long-playing items or intentional gaps.
 **Action:** Always track `lastTime` across frames and use `Math.abs(currentTime - lastTime) > threshold` to reliably detect non-linear seeking.
+## 2026-09-24 - Unnecessary user read in account page
+**Learning:** Replaced individual getDoc calls for fetching user profile in account.js with centralized getCachedUserProfile. It saves unnecessary DB reads and improves performance by utilizing sessionStorage cache.
+**Action:** Always use getCachedUserProfile to access user data during initial page loads instead of raw Firestore calls.
