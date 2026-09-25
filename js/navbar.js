@@ -6,6 +6,7 @@ import { subscribeToNotifications, markAsRead } from './notifications-service.js
 import './sitewide-player.js?v=20260924';
 import './ads.js';
 import './chatbot.js?v=20260925';
+import { initCookieConsent } from './cookie-consent.js';
 
 let notificationUnsubscribe = null;
 
@@ -102,6 +103,7 @@ export function loadNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 export function loadUdsNavbar() {
@@ -158,6 +160,7 @@ export function loadUdsNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 function attachNavEvents() {
