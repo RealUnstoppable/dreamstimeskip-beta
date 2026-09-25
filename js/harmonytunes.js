@@ -332,26 +332,36 @@ function initHarmonyTunes() {
             return;
         }
 
-        spotlightResults.innerHTML = matches.map(song => `
-            <div class="spotlight-result-row" tabindex="0" data-song-id="${escapeHTML(song.id)}" role="button" aria-label="Play ${escapeHTML(song.title)}">
-                <img class="spotlight-result-art" src="${escapeHTML(song.art)}" alt="" loading="lazy">
+        const groupedMatches = groupSongsByTitle(matches);
+        spotlightResults.innerHTML = groupedMatches.map(group => {
+            let optionsHtml = '';
+            if (group.versions && group.versions.length > 1) {
+                optionsHtml = `<select class="version-select" style="margin-right:10px;width:auto;max-width:120px;" onchange="this.closest('.spotlight-result-row').dataset.songId = this.value" onclick="event.stopPropagation()">` +
+                    group.versions.map(v => `<option value="${escapeHTML(v.id)}">${escapeHTML(v.versionName)}</option>`).join('') +
+                `</select>`;
+            }
+            return `
+            <div class="spotlight-result-row" tabindex="0" data-song-id="${escapeHTML(group.baseSong.id)}" role="button" aria-label="Play ${escapeHTML(group.baseTitle)}">
+                <img class="spotlight-result-art" src="${escapeHTML(group.baseSong.art)}" alt="" loading="lazy">
                 <div class="spotlight-result-info">
-                    <div class="spotlight-result-title">${highlightMatch(song.title, query)}</div>
-                    <div class="spotlight-result-artist">${highlightMatch(song.artist, query)}</div>
+                    <div class="spotlight-result-title">${highlightMatch(group.baseTitle, query)}</div>
+                    <div class="spotlight-result-artist">${highlightMatch(group.baseSong.artist, query)}</div>
                 </div>
+                ${optionsHtml}
                 <span class="spotlight-result-play">▶</span>
                 <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options">...</button>
             </div>
-        `).join('');
+        `}).join('');
 
         spotlightResults.querySelectorAll('.spotlight-result-row').forEach(row => {
             const activateFn = () => {
                 const songId = row.dataset.songId;
-                const idx = librarySongs.findIndex(s => s.id === songId);
-                if (idx !== -1) {
-                    currentQueue = [...librarySongs];
-                    currentSongIndex = idx;
-                    loadSong(idx);
+                const song = librarySongsMap.get(songId);
+                if (song) {
+                    // For spotlight, queue is just the selected song
+                    currentQueue = [song];
+                    currentSongIndex = 0;
+                    loadSong(0);
                     if (!isPlaying) togglePlayPause();
                 }
                 closeSpotlight();
@@ -970,19 +980,27 @@ function initHarmonyTunes() {
         // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
         const fragment = document.createDocumentFragment();
 
-        songs.forEach((song, index) => {
+        const groupedSongs = groupSongsByTitle(songs);
+        groupedSongs.forEach((group, index) => {
             const row = document.createElement('tr');
+            const song = group.baseSong;
             
             const isActive = (currentQueue[currentSongIndex]?.id === song.id);
             if (isActive) row.classList.add('playing');
+            
+            let optionsHtml = escapeHTML(group.baseTitle);
+            if (group.versions && group.versions.length > 1) {
+                optionsHtml += `<br><select class="version-select" style="margin-top:4px;width:100%;max-width:200px;" onchange="this.closest('tr').dataset.songId = this.value; event.stopPropagation();" onclick="event.stopPropagation()">` +
+                    group.versions.map(v => `<option value="${escapeHTML(v.id)}">${escapeHTML(v.versionName)}</option>`).join('') +
+                `</select>`;
+            }
 
-            // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
                     <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
                     <span class="playing-icon" style="${isActive ? 'display:inline' : 'display:none'}">▶</span>
                 </td>
-                <td class="song-title">${escapeHTML(song.title)}</td>
+                <td class="song-title">${optionsHtml}</td>
                 <td>${escapeHTML(song.artist)}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
                 <td style="width: 40px; text-align: center;">
@@ -995,7 +1013,16 @@ function initHarmonyTunes() {
             
             row.addEventListener('click', (e) => {
                 if (e.target.closest('.card-more-btn')) return; // ignore if clicking more btn
-                playContext(songs, index);
+                if (e.target.closest('.version-select')) return; // ignore select click
+                
+                // Construct the queue from the current visible table state (including selected versions)
+                const queueRows = Array.from(songListBody.querySelectorAll('tr'));
+                // If songListBody isn't populated yet, map over groupedSongs
+                const dynamicQueue = queueRows.length > 0 
+                    ? queueRows.map(r => librarySongsMap.get(r.dataset.songId)).filter(Boolean)
+                    : groupedSongs.map(g => librarySongsMap.get(row.dataset.songId || g.baseSong.id)).filter(Boolean);
+                
+                playContext(dynamicQueue, index);
             });
 
             fragment.appendChild(row);
