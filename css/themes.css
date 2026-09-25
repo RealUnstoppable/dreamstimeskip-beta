@@ -1,7 +1,7 @@
 
 
 
-body[data-theme="dark"] {
+body[data-theme="black"] {
     --bg-color: #0A0A0A;
     --primary-card-color: #141414;
     --secondary-card-color: #1f1f1f;
@@ -12,7 +12,7 @@ body[data-theme="dark"] {
 }
 
 
-body[data-theme="light"] {
+body[data-theme="white"] {
     --bg-color: #F3F4F6;
     --primary-card-color: #FFFFFF;
     --secondary-card-color: #F9FAFB;
@@ -49,4 +49,14 @@ input, select, textarea {
     background-color: var(--input-bg) !important;
     color: var(--text-primary) !important;
     border: 1px solid var(--border-color);
+}
+
+body[data-theme="pink"] {
+    --bg-color: #3b1425;
+    --primary-card-color: #4a2535;
+    --secondary-card-color: #5c3546;
+    --border-color: rgba(255, 153, 204, 0.3);
+    --text-primary: #ffe6f2;
+    --text-secondary: #ffb3d9;
+    --input-bg: #2d0f1c;
 }
