@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Orb Physics & Easter Egg ---
-    const orbElements = document.querySelectorAll('.orb, #siri-orb');
+    // --- Orb Physics & Easter Egg (For hero .orb on index.html; #siri-orb is handled sitewide in sitewide-player.js) ---
+    const orbElements = document.querySelectorAll('.orb:not(#siri-orb)');
     
     orbElements.forEach(orb => {
         let isDragging = false;

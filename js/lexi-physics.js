@@ -12,29 +12,7 @@ export function initLexiPhysics() {
         glow.className = 'player-glow-overlay';
         bottomBar.appendChild(glow);
         
-        const blob = mixerBtn.querySelector('.lexi-mixxer-blob');
-        if (blob) {
-            // Fake entry animation: start from bottom right and fly in!
-            // First, find the target position relative to the viewport
-            const rect = blob.getBoundingClientRect();
-            const startX = window.innerWidth - 80 - rect.left;
-            const startY = window.innerHeight - 80 - rect.top;
-            
-            // Set initial state
-            blob.style.transition = 'none';
-            blob.style.transform = `translate(${startX}px, ${startY}px) scale(3)`;
-            
-            // Trigger animation
-            setTimeout(() => {
-                blob.style.transition = 'transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'; // Bouncy spring
-                blob.style.transform = 'translate(0px, 0px) scale(1)';
-                
-                // Trigger glow right as it lands
-                setTimeout(() => {
-                    glow.classList.add('animate');
-                }, 600);
-            }, 100);
-        }
+        // Player glow overlay for when the sitewide Lexi orb lands into mixer-btn
     }
 
     wrappers.forEach(wrapper => {
@@ -67,6 +45,7 @@ export function initLexiPhysics() {
             
             if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
                 isDragging = true;
+                blob.classList.add('dragging');
                 e.preventDefault(); // Stop scrolling if dragging
             }
             
@@ -95,8 +74,15 @@ export function initLexiPhysics() {
             document.removeEventListener('touchmove', onMove);
             document.removeEventListener('touchend', onEnd);
 
+            blob.classList.remove('dragging');
             blob.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
             blob.style.transform = 'translate(0px, 0px)';
+            setTimeout(() => {
+                if (!isDragging) {
+                    blob.style.transform = '';
+                    blob.style.transition = '';
+                }
+            }, 400);
             
             const duration = Date.now() - startTime;
             if (!isDragging || duration < 200) {

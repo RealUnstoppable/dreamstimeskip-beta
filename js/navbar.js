@@ -3,7 +3,8 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
-import './sitewide-player.js?v=20260920';
+import './sitewide-player.js?v=20260924';
+import './ads.js';
 
 let notificationUnsubscribe = null;
 

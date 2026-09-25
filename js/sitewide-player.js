@@ -293,13 +293,13 @@ class SitewideMusicEngine {
 
     // Initialize or bind to Lexi Orb
     initLexiOrb() {
-        // On HarmonyTunes page, animate the orb flying into the player head
         const isHarmonyPage = this.isHarmonyTunesPage;
 
         let orbWrapper = document.querySelector('.siri-orb-wrapper');
         let orb = document.getElementById('siri-orb');
 
         if (!orbWrapper || !orb) {
+            if (isHarmonyPage) return; // Skip injecting sitewide orb on HarmonyTunes to prevent duplicated animation
             // Create sitewide Lexi Orb
             orbWrapper = document.createElement('div');
             orbWrapper.className = 'siri-orb-wrapper sitewide-lexi-wrapper';
@@ -310,115 +310,236 @@ class SitewideMusicEngine {
             `;
             document.body.appendChild(orbWrapper);
             orb = document.getElementById('siri-orb');
+        } else {
+            orb.classList.add('sitewide-lexi-orb');
+            if (!orb.hasAttribute('role')) orb.setAttribute('role', 'button');
+            if (!orb.hasAttribute('tabindex')) orb.setAttribute('tabindex', '0');
         }
 
         this.renderCollapsedOrb(orb);
 
-        // Bind click/tap on Lexi Orb
+        if (!isHarmonyPage) {
+            // Full interactive physics & click handling for sitewide Lexi Orb
+            let isDragging = false;
+            let startX = 0, startY = 0;
+            let hoverCenterX = 0, hoverCenterY = 0;
+            let isHovering = false;
+            let hasDragged = false;
+            let dragStartTime = 0;
 
-        // Tap to Mixxer / Drag to Expand Logic
-        let isDragging = false;
-        let startX = 0, startY = 0;
-        let startTime = 0;
+            // Physics variables for smooth fluid LERP
+            let currentAngle = 0;
+            let targetAngle = 0;
+            let currentStretch = 0;
+            let targetStretch = 0;
+            let isErratic = false;
+            let erraticTimeout;
+            const SNAP_DISTANCE = 300;
 
-        const onStart = (e) => {
-            // Only trigger if clicking the orb itself, not its children
-            if (e.target.closest('#lexi-play-pause-btn') || 
-                e.target.closest('#lexi-next-btn') || 
-                e.target.closest('#lexi-view-cart') || 
-                e.target.closest('#lexi-ask') ||
-                e.target.closest('.lexi-song-info') ||
-                orb.classList.contains('expanded')) {
-                return;
-            }
-            const touch = e.touches ? e.touches[0] : e;
-            startX = touch.clientX;
-            startY = touch.clientY;
-            isDragging = false;
-            startTime = Date.now();
-            orb.style.transition = 'none';
+            const baseShadow = `inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4)`;
+            const baseTransition = 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+            orb.style.transition = `${baseTransition}, box-shadow 0.3s ease`;
 
-            document.addEventListener('mousemove', onMove, { passive: false });
-            document.addEventListener('mouseup', onEnd);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('touchend', onEnd);
-        };
+            const physicsLoop = () => {
+                if (orb.classList.contains('expanded')) {
+                    targetStretch = 0;
+                }
 
-        const onMove = (e) => {
-            if (orb.classList.contains('expanded')) return;
-            const touch = e.touches ? e.touches[0] : e;
-            const dx = touch.clientX - startX;
-            const dy = touch.clientY - startY;
+                const actualTargetStretch = isErratic ? 0 : targetStretch;
+                currentStretch += (actualTargetStretch - currentStretch) * 0.15;
 
-            if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                if (currentStretch > 0.01) {
+                    let diff = targetAngle - currentAngle;
+                    while (diff > Math.PI) diff -= 2 * Math.PI;
+                    while (diff < -Math.PI) diff += 2 * Math.PI;
+                    currentAngle += diff * 0.25;
+
+                    orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 100}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3}) rotate(${-currentAngle}rad)`;
+                } else {
+                    currentAngle = currentAngle % (2 * Math.PI);
+                    targetAngle = currentAngle;
+                    if (!orb.classList.contains('expanded')) {
+                        orb.style.transform = '';
+                    }
+                }
+
+                requestAnimationFrame(physicsLoop);
+            };
+            requestAnimationFrame(physicsLoop);
+
+            const updateTarget = (dx, dy, isHover) => {
+                if (orb.classList.contains('expanded')) {
+                    targetStretch = 0;
+                    return;
+                }
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 1) {
+                    targetStretch = 0;
+                    return;
+                }
+
+                const rawAngle = Math.atan2(dy, dx);
+                let angleDiff = rawAngle - targetAngle;
+
+                while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
+                while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
+
+                if (Math.abs(angleDiff) > 0.5) {
+                    isErratic = true;
+                    clearTimeout(erraticTimeout);
+                    erraticTimeout = setTimeout(() => { isErratic = false; }, 200);
+                }
+
+                targetAngle += angleDiff;
+
+                if (isHover) {
+                    targetStretch = Math.min(distance / 300, 0.15);
+                } else {
+                    let nDist = Math.min(distance / SNAP_DISTANCE, 1);
+                    let resistanceDist = 1 - Math.pow(1 - nDist, 2);
+                    targetStretch = resistanceDist * 2.5;
+                }
+            };
+
+            orb.addEventListener('mouseenter', () => {
+                if (isDragging || orb.classList.contains('expanded')) return;
+                const rect = orb.getBoundingClientRect();
+                hoverCenterX = rect.left + rect.width / 2;
+                hoverCenterY = rect.top + rect.height / 2;
+                isHovering = true;
+            });
+
+            orb.addEventListener('mousemove', (e) => {
+                if (isDragging || !isHovering || orb.classList.contains('expanded')) return;
+                let dx = e.clientX - hoverCenterX;
+                let dy = e.clientY - hoverCenterY;
+                updateTarget(dx, dy, true);
+            });
+
+            orb.addEventListener('mouseleave', () => {
+                isHovering = false;
+                if (isDragging || orb.classList.contains('expanded')) return;
+                targetStretch = 0;
+            });
+
+            const handleDragStart = (clientX, clientY, e) => {
+                if (orb.classList.contains('expanded')) return;
+                if (e && e.target && e.target.closest('button, a')) return;
+
                 isDragging = true;
+                hasDragged = false;
+                dragStartTime = Date.now();
+                const rect = orb.getBoundingClientRect();
+                startX = rect.left + rect.width / 2;
+                startY = rect.top + rect.height / 2;
+                orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`;
+            };
+
+            orb.addEventListener('mousedown', (e) => handleDragStart(e.clientX, e.clientY, e));
+            orb.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) handleDragStart(e.touches[0].clientX, e.touches[0].clientY, e);
+            }, { passive: true });
+
+            const handleDragMove = (clientX, clientY) => {
+                if (!isDragging || orb.classList.contains('expanded')) return;
+
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance > 5 && Date.now() - dragStartTime > 150) hasDragged = true;
+
+                const tension = Math.min(distance / SNAP_DISTANCE, 1);
+
+                if (distance > SNAP_DISTANCE) {
+                    isDragging = false;
+                    targetStretch = 0;
+                    orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`;
+                    orb.style.boxShadow = baseShadow;
+                    return;
+                }
+
+                updateTarget(dx, dy, false);
+
+                if (tension > 0.8) {
+                    orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 60}px rgba(255, 50, 50, 0.9)`;
+                } else if (tension > 0.4) {
+                    orb.style.boxShadow = `inset 0 0 60px 10px rgba(0,0,0,0.2), inset 10px 10px 30px rgba(255,255,255,0.1), inset -10px -10px 30px rgba(0,0,0,0.2), 0 0 ${40 + tension * 40}px rgba(255, 200, 50, 0.8)`;
+                } else {
+                    orb.style.boxShadow = baseShadow;
+                }
+            };
+
+            document.addEventListener('mousemove', (e) => handleDragMove(e.clientX, e.clientY));
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
                 e.preventDefault();
-            }
+            }, { passive: false });
 
-            if (isDragging) {
-                orb.style.transform = `translate(${dx * 0.4}px, ${dy * 0.4}px)`;
-                
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > 40) {
-                    onEnd(); 
-                    this.expandLexi(orb);
+            const handleDragEnd = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    targetStretch = 0;
+                    orb.style.transition = `${baseTransition}, box-shadow 0.5s ease`;
+                    orb.style.boxShadow = baseShadow;
                 }
-            }
-        };
+            };
 
-        const onEnd = (e) => {
-            document.removeEventListener('mousemove', onMove);
-            document.removeEventListener('mouseup', onEnd);
-            document.removeEventListener('touchmove', onMove);
-            document.removeEventListener('touchend', onEnd);
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchend', handleDragEnd);
 
-            if (!orb.classList.contains('expanded')) {
-                orb.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-                orb.style.transform = 'translate(0px, 0px)';
-            }
+            // Click handling: expand or collapse pill
+            let tapCount = 0;
+            let tapTimeout;
 
-            const duration = Date.now() - startTime;
-            if (!isDragging || duration < 200) {
-                if (!orb.classList.contains('expanded')) {
-                    if (orb.classList.contains('lexi-state-mixing')) {
-                        orb.classList.remove('lexi-state-mixing');
-                        orb.classList.add('lexi-state-inactive');
-                        setTimeout(() => orb.classList.remove('lexi-state-inactive'), 2000);
-                    } else {
-                        orb.classList.remove('lexi-state-inactive');
-                        orb.classList.add('lexi-state-mixing');
-                    }
-                    if (typeof window.toggleMixerMode === 'function') {
-                        window.toggleMixerMode();
-                    }
-                }
-            }
-        };
-
-        orb.addEventListener('mousedown', onStart);
-        orb.addEventListener('touchstart', onStart, { passive: true });
-        
-        orb.addEventListener('click', (e) => {
-            if (orb.classList.contains('expanded') && e.target === orb) {
-                this.collapseLexi(orb);
-            }
-        });
-
-        orb.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                if (e.target === orb) {
+            orb.addEventListener('click', (e) => {
+                if (hasDragged) {
                     e.preventDefault();
-                    orb.click();
+                    hasDragged = false;
+                    return;
                 }
-            }
-        });
 
-        // Close on clicking outside
-        document.addEventListener('click', (e) => {
-            if (orb && orb.classList.contains('expanded') && !orb.contains(e.target)) {
-                this.collapseLexi(orb);
-            }
-        });
+                if (orb.classList.contains('expanded')) {
+                    // If user clicked the outer pill or padding, collapse
+                    if (e.target === orb || e.target.classList.contains('lexi-expanded-panel')) {
+                        this.collapseLexi(orb);
+                    }
+                    return;
+                }
+
+                // Expand into pill!
+                this.expandLexi(orb);
+
+                // Tap particle Easter egg
+                tapCount++;
+                clearTimeout(tapTimeout);
+                tapTimeout = setTimeout(() => {
+                    tapCount = 0;
+                    orb.style.setProperty('--charge-opacity', '0');
+                }, 1000);
+                this.triggerTapParticles(orb, tapCount);
+            });
+
+            orb.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    if (!orb.classList.contains('expanded')) {
+                        e.preventDefault();
+                        this.expandLexi(orb);
+                    } else if (e.target === orb) {
+                        e.preventDefault();
+                        this.collapseLexi(orb);
+                    }
+                }
+            });
+
+            // Close on clicking outside
+            document.addEventListener('click', (e) => {
+                if (orb && orb.classList.contains('expanded') && !orb.contains(e.target)) {
+                    this.collapseLexi(orb);
+                }
+            });
+        }
 
         // Listen for global cart updates
         window.addEventListener('cartUpdated', () => this.updateLexiUI());
@@ -428,41 +549,96 @@ class SitewideMusicEngine {
             }
         });
 
+        // Global update function for external scripts
+        window.updateLexiCartCount = (count) => {
+            const badge = document.getElementById('lexi-cart-badge');
+            if (badge) {
+                badge.textContent = count;
+                badge.classList.toggle('hidden', count <= 0);
+            }
+            const pillCount = document.getElementById('lexi-pill-cart-count');
+            if (pillCount) {
+                pillCount.textContent = count;
+                pillCount.style.display = count > 0 ? 'inline-block' : 'none';
+            }
+        };
+
         this.updateLexiUI();
 
         // On HarmonyTunes, animate the orb flying into the mixer button then remove it
         if (isHarmonyPage) {
+            const targetBtn = document.getElementById('mixer-btn');
+            const targetBlob = targetBtn?.querySelector('.lexi-mixxer-blob');
+            if (targetBlob) {
+                targetBlob.style.transform = 'scale(0)';
+                targetBlob.style.opacity = '0';
+                targetBlob.style.transition = 'none';
+            }
+
             // Force center positioning for the spawn
             orbWrapper.style.left = '50%';
             orbWrapper.style.transform = 'translateX(-50%)';
             orbWrapper.style.bottom = '50%';
 
             setTimeout(() => {
-                const targetBtn = document.getElementById('mixer-btn');
                 if (targetBtn && orbWrapper) {
                     const targetRect = targetBtn.getBoundingClientRect();
                     const orbRect = orb.getBoundingClientRect();
 
-                    const dx = targetRect.left - orbRect.left + (targetRect.width / 2 - orbRect.width / 2);
-                    const dy = targetRect.top - orbRect.top + (targetRect.height / 2 - orbRect.height / 2);
+                    let dx = 0;
+                    let dy = 0;
+                    if (targetRect.width > 0 && targetRect.height > 0) {
+                        dx = targetRect.left - orbRect.left + (targetRect.width / 2 - orbRect.width / 2);
+                        dy = targetRect.top - orbRect.top + (targetRect.height / 2 - orbRect.height / 2);
+                    } else {
+                        // Fallback on mobile if mixer button is in overflow menu
+                        dx = (window.innerWidth / 2) - (orbRect.left + orbRect.width / 2);
+                        dy = (window.innerHeight - 40) - (orbRect.top + orbRect.height / 2);
+                    }
 
                     orbWrapper.style.transition = 'transform 1s cubic-bezier(0.87, 0, 0.13, 1), opacity 0.8s ease-in 0.2s';
-                    orbWrapper.style.transform = `translateX(-50%) translate(${dx}px, ${dy}px) scale(0.4)`;
+                    orbWrapper.style.transform = `translateX(-50%) translate(${dx}px, ${dy}px) scale(0.35)`;
                     orbWrapper.style.opacity = '0';
 
                     setTimeout(() => {
                         orbWrapper.remove();
                         // Pulse the mixer button to show Lexi landed
                         if (targetBtn) {
-                            targetBtn.style.transition = 'transform 0.2s ease';
-                            targetBtn.style.transform = 'scale(1.3)';
-                            setTimeout(() => { targetBtn.style.transform = 'scale(1)'; }, 200);
+                            targetBtn.style.transition = 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                            targetBtn.style.transform = 'scale(1.25)';
+                            setTimeout(() => { targetBtn.style.transform = ''; }, 250);
                         }
+                        // Trigger explosive landing pop animation on the small Lexi blob!
+                        if (targetBlob) {
+                            targetBlob.style.transform = '';
+                            targetBlob.style.opacity = '';
+                            targetBlob.style.transition = '';
+                            targetBlob.classList.add('landing-animate');
+                            setTimeout(() => {
+                                targetBlob.classList.remove('landing-animate');
+                            }, 1000);
+                        }
+                        const glow = document.querySelector('.player-glow-overlay');
+                        if (glow) glow.classList.add('animate');
                     }, 1000);
                 } else {
+                    if (targetBlob) {
+                        targetBlob.style.transform = '';
+                        targetBlob.style.opacity = '';
+                        targetBlob.style.transition = '';
+                    }
                     orbWrapper.remove();
                 }
             }, 1200);
+
+            // Safety fallback: ensure blob is never left hidden under any condition
+            setTimeout(() => {
+                if (targetBlob && (targetBlob.style.opacity === '0' || targetBlob.style.transform === 'scale(0)')) {
+                    targetBlob.style.transform = '';
+                    targetBlob.style.opacity = '';
+                    targetBlob.style.transition = '';
+                }
+            }, 3000);
         }
     }
 
@@ -489,9 +665,11 @@ class SitewideMusicEngine {
     }
 
     expandLexi(orb) {
+        if (!orb) return;
         orb.classList.remove('closing');
         orb.classList.add('expanded');
         orb.classList.add('lexi-player-expanded');
+        orb.style.transform = '';
 
         const song = this.getCurrentSong();
         const isPlaying = this.state.isPlaying;
@@ -640,6 +818,7 @@ class SitewideMusicEngine {
         orb.classList.remove('lexi-player-expanded');
         orb.classList.remove('expanded');
         orb.classList.remove('idle-mode');
+        orb.style.transform = '';
         
         // Wait for orb width/height transition to finish before swapping to disc
         setTimeout(() => {
@@ -647,6 +826,66 @@ class SitewideMusicEngine {
             this.renderCollapsedOrb(orb);
             this.updateLexiUI();
         }, 350);
+    }
+
+    triggerTapParticles(orb, count) {
+        if (!orb) return;
+        const rect = orb.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
+
+        if (count > 10) {
+            const numParticles = 100;
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('orb-particle');
+                const angle = (i / numParticles) * Math.PI * 2 + (Math.random() * 0.1);
+                const distance = 300 + Math.random() * 300; 
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                const size = 6 + Math.random() * 8;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                const duration = 1.5 + Math.random() * 0.5;
+                particle.style.animationDuration = `${duration}s`;
+                fragment.appendChild(particle);
+                setTimeout(() => particle.remove(), duration * 1000);
+            }
+            document.body.appendChild(fragment);
+        } else {
+            let numParticles = count === 5 ? 50 : 8 + Math.floor(Math.random() * 6);
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('orb-particle');
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120 + Math.random() * 200; 
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                particle.style.left = `${centerX}px`;
+                particle.style.top = `${centerY}px`;
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+                particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
+                const size = 4 + Math.random() * 6;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                const duration = 0.8 + Math.random() * 0.5;
+                particle.style.animationDuration = `${duration}s`;
+                fragment.appendChild(particle);
+                setTimeout(() => particle.remove(), duration * 1000);
+            }
+            document.body.appendChild(fragment);
+        }
     }
 
     updateLexiUI() {
