@@ -18,6 +18,66 @@ function escapeHTML(str) {
 }
 
 function initHarmonyTunes() {
+
+    let customPlaylists = [];
+
+    async function loadCustomPlaylists() {
+        if (!currentUser) return;
+        try {
+            const userRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const data = userSnap.data();
+                customPlaylists = data.customPlaylists || [];
+                renderHomePlaylists();
+            }
+        } catch (e) {
+            console.error("Failed to load custom playlists", e);
+        }
+    }
+
+    async function saveCustomPlaylists() {
+        if (!currentUser) return;
+        try {
+            const userRef = doc(db, "users", currentUser.uid);
+            await updateDoc(userRef, { customPlaylists });
+        } catch (e) {
+            console.error("Failed to save custom playlists", e);
+        }
+    }
+
+    function renderHomePlaylists() {
+        const playlists = [
+            { id: 'main', title: "All Tracks", desc: "Complete Library" },
+            { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" },
+            { id: 'hiphop', title: "Rap Caviar", desc: "Top Tier Rap" },
+            { id: 'viral', title: "Viral Hits", desc: "Trending on TikTok" },
+            { id: 'chill', title: "Late Night", desc: "Chill Vibes" }
+        ];
+        
+        const allPlaylistsHtml = playlists.map(pl => `
+            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
+                <div class="card-img-wrapper">
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
+                </div>
+                <div class="card-title">${escapeHTML(pl.title)}</div>
+                <div class="card-desc">${escapeHTML(pl.desc)}</div>
+            </div>
+        `).join('') + customPlaylists.map(pl => `
+            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
+                <div class="card-img-wrapper">
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
+                </div>
+                <div class="card-title">${escapeHTML(pl.title)}</div>
+                <div class="card-desc">${escapeHTML(pl.songs.length)} songs</div>
+            </div>
+        `).join('');
+        
+        containerPlaylists.innerHTML = allPlaylistsHtml;
+    }
+
     // --- STATE ---
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
@@ -280,6 +340,7 @@ function initHarmonyTunes() {
                     <div class="spotlight-result-artist">${highlightMatch(song.artist, query)}</div>
                 </div>
                 <span class="spotlight-result-play">▶</span>
+                <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options">...</button>
             </div>
         `).join('');
 
@@ -505,6 +566,87 @@ function initHarmonyTunes() {
     }
 
     // --- NAVIGATION ---
+    
+    const createPlaylistBtn = document.getElementById('create-playlist-btn');
+    if (createPlaylistBtn) {
+        createPlaylistBtn.addEventListener('click', async () => {
+            if (!currentUser) return alert("Please sign in to create playlists.");
+            const title = prompt("Enter a name for your new playlist:");
+            if (!title) return;
+            const newPl = { id: 'custom_' + Date.now() + Math.random().toString(36).substr(2,5), title, songs: [] };
+            customPlaylists.push(newPl);
+            await saveCustomPlaylists();
+            renderHomePlaylists();
+        });
+    }
+
+    const playlistSelectModal = document.getElementById('playlist-select-modal');
+    const playlistSelectList = document.getElementById('playlist-select-list');
+    const createAndAddBtn = document.getElementById('create-and-add-btn');
+    const newPlaylistInput = document.getElementById('new-playlist-input');
+    const closePlaylistModalBtn = document.getElementById('close-playlist-modal-btn');
+    
+    let targetSongIdForPlaylist = null;
+
+    function openAddToPlaylistModal(songId) {
+        if (!currentUser) return alert("Please sign in to manage playlists.");
+        targetSongIdForPlaylist = songId;
+        
+        playlistSelectList.innerHTML = customPlaylists.map(pl => `
+            <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:10px;border-radius:4px;">
+                <span>${escapeHTML(pl.title)}</span>
+                <button class="action-btn-secondary add-to-existing-pl-btn" data-id="${escapeHTML(pl.id)}" style="padding:4px 8px;font-size:0.8rem;">Add</button>
+            </div>
+        `).join('') + (customPlaylists.length === 0 ? '<p style="color:#888;font-size:0.9rem;">No custom playlists yet.</p>' : '');
+        
+        playlistSelectList.querySelectorAll('.add-to-existing-pl-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const plId = e.target.getAttribute('data-id');
+                const pl = customPlaylists.find(p => p.id === plId);
+                if (pl && !pl.songs.includes(targetSongIdForPlaylist)) {
+                    pl.songs.push(targetSongIdForPlaylist);
+                    await saveCustomPlaylists();
+                    alert('Added to ' + pl.title);
+                } else if (pl) {
+                    alert('Song already in playlist.');
+                }
+                playlistSelectModal.classList.add('hidden');
+            });
+        });
+        
+        playlistSelectModal.classList.remove('hidden');
+    }
+
+    if (closePlaylistModalBtn) {
+        closePlaylistModalBtn.addEventListener('click', () => {
+            playlistSelectModal.classList.add('hidden');
+        });
+    }
+
+    if (createAndAddBtn) {
+        createAndAddBtn.addEventListener('click', async () => {
+            const title = newPlaylistInput.value.trim();
+            if (!title) return;
+            const newPl = { id: 'custom_' + Date.now(), title, songs: [targetSongIdForPlaylist] };
+            customPlaylists.push(newPl);
+            await saveCustomPlaylists();
+            newPlaylistInput.value = '';
+            playlistSelectModal.classList.add('hidden');
+            renderHomePlaylists();
+            alert('Created ' + title + ' and added song.');
+        });
+    }
+
+    document.getElementById('ctx-add-playlist')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) openAddToPlaylistModal(contextMenuTargetSongId);
+        if(contextMenu) contextMenu.classList.add('hidden');
+    });
+
+    document.getElementById('qctx-add-playlist')?.addEventListener('click', () => {
+        if(qctxTargetId) openAddToPlaylistModal(qctxTargetId);
+        if(queueContextMenu) queueContextMenu.classList.add('hidden');
+    });
+
     function setupNavigation() {
         navPills.forEach(pill => {
             pill.addEventListener('click', () => {
@@ -548,6 +690,9 @@ function initHarmonyTunes() {
         viewPlaylist.style.display = 'block';
         
         try {
+            const delBtn = document.getElementById('delete-playlist-btn');
+            if (delBtn) delBtn.style.display = 'none';
+
             if (type === 'favorites') {
                 playlistTitleEl.textContent = "Liked Songs";
                 playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
@@ -747,23 +892,7 @@ function initHarmonyTunes() {
         }
 
         // 4. Playlists
-        const playlists = [
-            { id: 'main', title: "All Tracks", desc: "Complete Library" },
-            { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" },
-            { id: 'hiphop', title: "Rap Caviar", desc: "Top Tier Rap" },
-            { id: 'viral', title: "Viral Hits", desc: "Trending on TikTok" },
-            { id: 'chill', title: "Late Night", desc: "Chill Vibes" }
-        ];
-        containerPlaylists.innerHTML = playlists.map(pl => `
-            <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
-                <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
-                    <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
-                </div>
-                <div class="card-title">${escapeHTML(pl.title)}</div>
-                <div class="card-desc">${escapeHTML(pl.desc)}</div>
-            </div>
-        `).join('');
+        renderHomePlaylists();
 
         // Event delegation for dynamically created cards
         document.addEventListener('click', (e) => {
@@ -856,9 +985,16 @@ function initHarmonyTunes() {
                 <td class="song-title">${escapeHTML(song.title)}</td>
                 <td>${escapeHTML(song.artist)}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
+                <td style="width: 40px; text-align: center;">
+                    <button class="card-more-btn" style="background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;" title="More Options">...</button>
+                </td>
             `;
 
-            row.addEventListener('click', () => {
+            // Assign data-song-id to the row so context menu click can find it
+            row.dataset.songId = song.id;
+            
+            row.addEventListener('click', (e) => {
+                if (e.target.closest('.card-more-btn')) return; // ignore if clicking more btn
                 playContext(songs, index);
             });
 
@@ -2225,11 +2361,12 @@ function initHarmonyTunes() {
 
     document.addEventListener('click', (e) => {
         const moreBtn = e.target.closest('.card-more-btn');
-        if (moreBtn) {
+        if (moreBtn && !moreBtn.closest('.queue-item')) { // ensure it doesn't conflict with queue more btn
             e.preventDefault();
             e.stopPropagation();
-            const card = moreBtn.closest('.music-card');
-            contextMenuTargetSongId = card.dataset.songId;
+            const card = moreBtn.closest('.music-card') || moreBtn.closest('.spotlight-result-row') || moreBtn.closest('tr');
+            contextMenuTargetSongId = card ? card.dataset.songId : null;
+            if (!contextMenuTargetSongId) return;
             
             // Position menu
             const rect = moreBtn.getBoundingClientRect();
@@ -2543,7 +2680,7 @@ let dragItem = null;
         <button class="context-menu-item" id="qctx-favorite">Favorite</button>
         <button class="context-menu-item" id="qctx-suggest-more">Suggest More by Mixxer</button>
         <button class="context-menu-item" id="qctx-suggest-less">Suggest Less</button>
-        <button class="context-menu-item" id="qctx-share">Share Song</button>
+        <button class="context-menu-item" id="qctx-share">Share Song</button>\n        <button class="context-menu-item" id="qctx-add-playlist">Add to Playlist</button>
         <button class="context-menu-item" id="qctx-remove" style="color: #ff4444;">Remove from Queue</button>
     `;
     queueContextMenu.style.zIndex = '3100';
