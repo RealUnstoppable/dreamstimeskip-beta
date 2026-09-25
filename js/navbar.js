@@ -65,7 +65,6 @@ export function loadNavbar() {
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
-            <li><a href="portfolio.html">About Me</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
