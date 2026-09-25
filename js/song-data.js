@@ -23477,6 +23477,19 @@ export const librarySongs = [
         "tags": [
             "untagged"
         ]
+    },
+    {
+        "id": "raindance-santan-dave",
+        "title": "Raindance",
+        "artist": "Santan Dave",
+        "duration": "3:39",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fraindance-santan-dave.mp3?alt=media&token=c4b3cc73-da7b-4f22-b506-b29e39e5338f",
+        "art": "/images/blank_cover.svg",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": ["untagged"]
     }
 ];
 

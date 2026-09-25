@@ -23388,5 +23388,18 @@ export const lyricsData = {
                 }
             ]
         }
+    ],
+    "raindance-santan-dave": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
     ]
 };
