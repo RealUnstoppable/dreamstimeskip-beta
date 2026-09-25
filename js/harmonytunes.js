@@ -327,6 +327,66 @@ function initHarmonyTunes() {
 
     let hasInitialized = false;
     function init() {
+
+    const params = new URLSearchParams(window.location.search);
+    const initialSongId = params.get('song');
+    const initialPlaylist = params.get('playlist');
+    
+    // Fallback share handling
+    async function generateShortLink(url) {
+        try {
+            const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
+            if (res.ok) return await res.text();
+        } catch (e) {
+            console.error(e);
+        }
+        return url; // fallback to long url
+    }
+
+    async function handleShare(type, id) {
+        const baseUrl = window.location.origin + window.location.pathname;
+        let targetUrl = baseUrl;
+        if (type === 'song') targetUrl += '?song=' + encodeURIComponent(id);
+        else if (type === 'playlist') targetUrl += '?playlist=' + encodeURIComponent(id);
+        
+        const originalText = document.activeElement ? document.activeElement.innerText : 'Share';
+        if (document.activeElement && document.activeElement.classList.contains('context-menu-item')) {
+            document.activeElement.innerText = 'Generating...';
+        }
+
+        const shortUrl = await generateShortLink(targetUrl);
+        
+        try {
+            await navigator.clipboard.writeText(shortUrl);
+            alert("Link copied to clipboard!\n" + shortUrl);
+        } catch (err) {
+            prompt("Copy this link:", shortUrl);
+        }
+        
+        if (document.activeElement && document.activeElement.classList.contains('context-menu-item')) {
+            document.activeElement.innerText = originalText;
+        }
+        
+        if (contextMenu) contextMenu.classList.add('hidden');
+        if (queueContextMenu) queueContextMenu.classList.add('hidden');
+    }
+
+    // Assign to window for inline calls if needed
+    window.handleShare = handleShare;
+
+    // Attach to playlist share button
+    const sharePlaylistBtn = document.getElementById('share-playlist-btn');
+    if (sharePlaylistBtn) {
+        sharePlaylistBtn.addEventListener('click', () => {
+            const currentPlaylistId = playlistTitleEl.textContent === 'Liked Songs' ? 'favorites' : 
+                                     playlistTitleEl.textContent === 'All Available Tracks' ? 'main' :
+                                     playlistTitleEl.textContent === 'Viral Hits' ? 'viral' :
+                                     playlistTitleEl.textContent === 'Rap Caviar' ? 'hiphop' :
+                                     playlistTitleEl.textContent === 'Late Night' ? 'chill' : 'main';
+            handleShare('playlist', currentPlaylistId);
+        });
+    }
+
         if (hasInitialized) {
             renderHome();
             return;
@@ -338,8 +398,30 @@ function initHarmonyTunes() {
         
         let restored = false;
         try {
+            
+            if (initialSongId) {
+                const sIndex = librarySongs.findIndex(s => s.id === initialSongId);
+                if (sIndex !== -1) {
+                    currentQueue = [...librarySongs];
+                    currentSongIndex = sIndex;
+                    loadSong(currentSongIndex);
+                    activeAudio.addEventListener('loadedmetadata', () => {
+                        playSong();
+                    }, { once: true });
+                    restored = true;
+                    // Remove param from URL without reloading
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            } else if (initialPlaylist) {
+                window.loadPlaylistView = loadPlaylistView; // ensure it's available
+                setTimeout(() => loadPlaylistView(initialPlaylist), 100);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                // Continue standard resume in background
+            }
+            
             const savedRaw = localStorage.getItem('dts_music_state');
-            if (savedRaw) {
+
+            if (savedRaw && !restored) {
                 const saved = JSON.parse(savedRaw);
                 if (Array.isArray(saved.queue) && saved.queue.length) {
                     const mapped = saved.queue.map(id => librarySongsMap.get(id)).filter(Boolean);
@@ -2209,6 +2291,13 @@ function initHarmonyTunes() {
         if(contextMenu) contextMenu.classList.add('hidden');
     });
 
+    document.getElementById('ctx-share')?.addEventListener('click', () => {
+        if(contextMenuTargetSongId) {
+            handleShare('song', contextMenuTargetSongId);
+        }
+    });
+
+
     if(homeHistoryBtn) {
         homeHistoryBtn.addEventListener('click', () => {
             if (!queuePanel.classList.contains('open')) {
@@ -2454,6 +2543,7 @@ let dragItem = null;
         <button class="context-menu-item" id="qctx-favorite">Favorite</button>
         <button class="context-menu-item" id="qctx-suggest-more">Suggest More by Mixxer</button>
         <button class="context-menu-item" id="qctx-suggest-less">Suggest Less</button>
+        <button class="context-menu-item" id="qctx-share">Share Song</button>
         <button class="context-menu-item" id="qctx-remove" style="color: #ff4444;">Remove from Queue</button>
     `;
     queueContextMenu.style.zIndex = '3100';
@@ -2487,6 +2577,13 @@ let dragItem = null;
             qctxTargetIdx = 0; // update index in case they click something else
         }
     });
+
+    document.getElementById('qctx-share')?.addEventListener('click', () => {
+        if(qctxTargetId) {
+            handleShare('song', qctxTargetId);
+        }
+    });
+
 
     document.getElementById('qctx-play-last')?.addEventListener('click', () => {
         if (qctxTargetIdx !== null) {
