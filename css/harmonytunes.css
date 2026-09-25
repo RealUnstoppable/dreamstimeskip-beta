@@ -2269,3 +2269,28 @@ body {
   initial-value: 0deg;
   inherits: false;
 }
+
+/* Fix iOS Safari SVG click bug where clicks on SVGs within buttons don't bubble correctly */
+.control-button svg, .control-button span {
+    pointer-events: none;
+}
+/* Ensure the mixxer blob remains grabbable */
+.lexi-mixxer-blob {
+    pointer-events: auto !important;
+}
+
+/* Increase mobile touch targets significantly */
+@media (max-width: 599px) {
+    .control-button {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 5px !important;
+    }
+    .play-pause-btn {
+        min-width: 50px !important;
+        min-height: 50px !important;
+    }
+    .controls {
+        gap: 4px !important;
+    }
+}

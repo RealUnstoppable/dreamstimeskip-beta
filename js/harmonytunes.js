@@ -1092,9 +1092,9 @@ function initHarmonyTunes() {
             });
         }
 
-        playPauseBtn.addEventListener('click', togglePlayPause);
-        nextBtn.addEventListener('click', nextSong);
-        prevBtn.addEventListener('click', prevSong);
+        bindEvent(playPauseBtn, togglePlayPause);
+        bindEvent(nextBtn, nextSong);
+        bindEvent(prevBtn, prevSong);
         let lastStateSaveTime = 0;
         [audioPlayer1, audioPlayer2].forEach(player => {
             player.addEventListener('timeupdate', (e) => {
@@ -1464,25 +1464,19 @@ function initHarmonyTunes() {
                 mobileOverlay.classList.toggle('hidden');
             };
             
-            mobileOverflowBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleOverlay(e);
-            });
+            bindEvent(mobileOverflowBtn, () => { mobileOverlay.classList.toggle("hidden"); });
 
             // Invoke the extracted functions directly for flawless Mobile Safari execution
-            document.getElementById('mob-shuffle-btn')?.addEventListener('click', () => { toggleShuffle(); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-mixer-btn')?.addEventListener('click', () => { toggleMixer(); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-repeat-btn')?.addEventListener('click', () => { toggleRepeat(); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-lyrics-btn')?.addEventListener('click', () => { toggleLyrics(); mobileOverlay.classList.add('hidden'); });
-            document.getElementById('mob-queue-btn')?.addEventListener('click', () => { toggleQueue(); mobileOverlay.classList.add('hidden'); });
+            bindEvent(document.getElementById('mob-shuffle-btn'), () => { toggleShuffle(); mobileOverlay.classList.add('hidden'); });
+            bindEvent(document.getElementById('mob-mixer-btn'), () => { toggleMixer(); mobileOverlay.classList.add('hidden'); });
+            bindEvent(document.getElementById('mob-repeat-btn'), () => { toggleRepeat(); mobileOverlay.classList.add('hidden'); });
+            bindEvent(document.getElementById('mob-lyrics-btn'), () => { toggleLyrics(); mobileOverlay.classList.add('hidden'); });
+            bindEvent(document.getElementById('mob-queue-btn'), () => { toggleQueue(); mobileOverlay.classList.add('hidden'); });
             
             // For Viral Skip
             const mobViralBtn = document.getElementById('mob-viral-btn');
             if (mobViralBtn) {
-                mobViralBtn.addEventListener('click', (e) => {
-                    handleViralClick(e);
-                    // Overlay intentionally stays open for double tap
-                });
+                bindEvent(mobViralBtn, () => { handleViralClick({preventDefault:()=>{}, stopPropagation:()=>{}}); });
             }
 
             // Close overlay when clicking outside
