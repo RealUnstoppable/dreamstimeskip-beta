@@ -42,6 +42,8 @@ export function loadFooter() {
                         <li><a href="blog.html">Blog</a></li>
                         <li><a href="shop.html">Shop</a></li>
                         <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div class="footer-column footer-newsletter">
