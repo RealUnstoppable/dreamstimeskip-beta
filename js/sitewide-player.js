@@ -1,7 +1,7 @@
 // js/sitewide-player.js
 // Sitewide music engine and Lexi floating mini-playerhead
 
-import { librarySongs, getSongById } from './song-data.js?v=20260920';
+import { librarySongs, getSongById } from './song-data.js?v=1790377272083';
 
 const STORAGE_KEY = 'dts_music_state';
 
