@@ -902,44 +902,27 @@ export function initAccountPage() {
         }
 
         currentUser = user;
-        const cacheKey = `profile_${user.uid}`;
-        let userData = null;
 
-        try {
-            const cachedStr = sessionStorage.getItem(cacheKey);
-            if (cachedStr) {
-                userData = JSON.parse(cachedStr);
-            }
-        } catch (_) {}
+        // ⚡ Bolt: Centralized cache function `getCachedUserProfile` reduces redundant Firestore calls.
+        let userData = await getCachedUserProfile(user);
 
         if (!userData) {
+            // Fallback initialization if profile doesn't exist at all yet
+            userData = {
+                username: user.displayName || user.email?.split('@')[0] || 'User',
+                email: user.email,
+                membershipLevel: 'free',
+                pointsBalance: 50,
+                loyaltyPoints: 50,
+                isAdmin: false,
+                signupDate: new Date()
+            };
             try {
                 const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                } else {
-                    userData = {
-                        username: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        membershipLevel: 'free',
-                        pointsBalance: 50,
-                        loyaltyPoints: 50,
-                        isAdmin: false,
-                        signupDate: new Date()
-                    };
-                    await setDoc(userDocRef, userData, { merge: true });
-                }
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                await setDoc(userDocRef, userData, { merge: true });
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
             } catch (err) {
-                console.error("Profile load warning:", err);
-                userData = {
-                    username: user.displayName || 'User',
-                    email: user.email,
-                    membershipLevel: 'free',
-                    pointsBalance: 50,
-                    loyaltyPoints: 50
-                };
+                console.error("Manager info: Profile init warning:", err);
             }
         }
 
