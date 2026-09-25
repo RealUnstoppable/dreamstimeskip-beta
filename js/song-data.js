@@ -25,8 +25,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "pop",
-            "viral"
+            "pop"
         ]
     },
     {
@@ -41,8 +40,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "pop",
-            "viral"
+            "pop"
         ]
     },
     {
@@ -57,8 +55,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "rap",
-            "viral"
+            "rap"
         ]
     },
     {
@@ -73,8 +70,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "rap",
-            "viral"
+            "rap"
         ]
     },
     {
@@ -89,8 +85,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "rap",
-            "viral"
+            "rap"
         ]
     },
     {
@@ -105,8 +100,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "pop",
-            "viral"
+            "pop"
         ]
     },
     {
@@ -224,7 +218,6 @@ export const librarySongs = [
         "tags": [
             "pop",
             "dark pop",
-            "viral",
             "trending"
         ]
     },
@@ -234,7 +227,7 @@ export const librarySongs = [
         "artist": "Luvli Aaron Smith",
         "duration": "4:03",
         "src": "/music/dancin-krono-remix-feat-luvli-aaron-smith.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4b/2a/75/4b2a75c9-a545-87a1-20e7-bba1a3c03a79/199891879823_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -245,11 +238,11 @@ export const librarySongs = [
     },
     {
         "id": "did-i-tell-u-that-i-miss-u-adore",
-        "title": "Did I Tell U That I Miss U Adore",
-        "artist": "Unknown Artist",
+        "title": "did i tell u that i miss u",
+        "artist": "adore",
         "duration": "1:55",
         "src": "/music/did-i-tell-u-that-i-miss-u-adore.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fe/8a/da/fe8ada16-a03f-9890-329c-cbb4208c2335/723277505657.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -260,11 +253,11 @@ export const librarySongs = [
     },
     {
         "id": "died-once-guitar-remix-aamadux",
-        "title": "Died Once Guitar Remix Aamadux",
-        "artist": "Unknown Artist",
+        "title": "Life Force (Slowed)",
+        "artist": "Aamadux",
         "duration": "2:19",
         "src": "/music/died-once-guitar-remix-aamadux.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/9e/25/079e25cf-7bd7-48ed-9d5e-84904eb8bc69/MOBX0879.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -275,11 +268,11 @@ export const librarySongs = [
     },
     {
         "id": "fame-is-a-gun-addison-rae",
-        "title": "Fame Is A Gun Addison Rae",
-        "artist": "Unknown Artist",
+        "title": "Fame is a Gun",
+        "artist": "Addison Rae",
         "duration": "3:02",
         "src": "/music/fame-is-a-gun-addison-rae.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cf/4a/e3/cf4ae3c9-3420-6021-f059-cc6c87cf11b2/196872958249.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -290,11 +283,11 @@ export const librarySongs = [
     },
     {
         "id": "i-feel-lost-aaron-hibell",
-        "title": "I Feel Lost Aaron Hibell",
-        "artist": "Unknown Artist",
+        "title": "I Feel Lost",
+        "artist": "Aaron Hibell",
         "duration": "2:27",
         "src": "/music/i-feel-lost-aaron-hibell.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/57/4b/a4/574ba412-c402-6de5-4fc2-283a67d6635b/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -309,7 +302,7 @@ export const librarySongs = [
         "artist": "Imogen Heap Clams Casino Aap Rocky",
         "duration": "3:11",
         "src": "/music/i-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/64/8f/5f/648f5f68-3ffa-e33d-39d0-50210803074f/196871388221.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -320,11 +313,11 @@ export const librarySongs = [
     },
     {
         "id": "like-that-guitar-remix-aamadux",
-        "title": "Like That Guitar Remix Aamadux",
-        "artist": "Unknown Artist",
+        "title": "Life Force (Slowed)",
+        "artist": "Aamadux",
         "duration": "4:27",
         "src": "/music/like-that-guitar-remix-aamadux.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/9e/25/079e25cf-7bd7-48ed-9d5e-84904eb8bc69/MOBX0879.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -335,11 +328,11 @@ export const librarySongs = [
     },
     {
         "id": "loverboy-a-wall",
-        "title": "Loverboy A Wall",
-        "artist": "Unknown Artist",
+        "title": "Loverboy",
+        "artist": "A-Wall",
         "duration": "3:44",
         "src": "/music/loverboy-a-wall.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/10/8e/20/108e204c-33cd-1b63-c506-91e1917b826f/1837.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -350,11 +343,11 @@ export const librarySongs = [
     },
     {
         "id": "summer-bummer-rhy-rhy",
-        "title": "Summer Bummer Rhy Rhy",
-        "artist": "Unknown Artist",
+        "title": "Summer Bummer",
+        "artist": "Mikey Mike",
         "duration": "0:00",
         "src": "/music/summer_bummer_rhy_rhy.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/0d/ce/43/0dce437b-0c54-b44f-17c8-1a212602eaa6/371390.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -365,11 +358,11 @@ export const librarySongs = [
     },
     {
         "id": "100-am-civ",
-        "title": "100 Am Civ",
-        "artist": "Unknown Artist",
+        "title": "Rockin' In the Free World",
+        "artist": "Neil Young",
         "duration": "2:13",
         "src": "/music/100-am-civ.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/64/5f/36/645f3612-b2ba-8cf1-c814-cb9d3a2216c5/dj.lmxzvmtb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -395,11 +388,11 @@ export const librarySongs = [
     },
     {
         "id": "505-arctic-monkeys",
-        "title": "505 Arctic Monkeys",
-        "artist": "Unknown Artist",
+        "title": "505",
+        "artist": "Arctic Monkeys",
         "duration": "4:14",
         "src": "/music/505-arctic-monkeys.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/82/90/14/829014ad-a301-62ab-bee6-f4cca4457411/mzi.hozudery.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -410,11 +403,11 @@ export const librarySongs = [
     },
     {
         "id": "7-rings-ariana-grande",
-        "title": "7 Rings Ariana Grande",
-        "artist": "Unknown Artist",
+        "title": "7 rings",
+        "artist": "Ariana Grande",
         "duration": "2:59",
         "src": "/music/7-rings-ariana-grande.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -425,11 +418,11 @@ export const librarySongs = [
     },
     {
         "id": "9pm-in-shibuya-432hz-adturnup",
-        "title": "9pm In Shibuya 432hz Adturnup",
-        "artist": "Unknown Artist",
+        "title": "9PM in Shibuya (432Hz)",
+        "artist": "ADTurnUp",
         "duration": "2:31",
         "src": "/music/9pm-in-shibuya-432hz-adturnup.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b6/80/0c/b6800c25-ca27-f461-ed91-09e0eebef47f/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -440,11 +433,11 @@ export const librarySongs = [
     },
     {
         "id": "abismo-mixed-clap-freckles",
-        "title": "Abismo Mixed Clap Freckles",
-        "artist": "Unknown Artist",
+        "title": "Abismo",
+        "artist": "Clap Freckles",
         "duration": "1:03",
         "src": "/music/abismo-mixed-clap-freckles.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2a/34/f5/2a34f542-cb50-b1bc-6014-7288ff990761/840200574327_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -455,11 +448,11 @@ export const librarySongs = [
     },
     {
         "id": "all-about-that-bass-chrxs-beats-bread-beatz",
-        "title": "All About That Bass Chrxs Beats Bread Beatz",
-        "artist": "Unknown Artist",
+        "title": "All About That Bass",
+        "artist": "Chrxs Beats & Bread Beatz",
         "duration": "2:16",
         "src": "/music/all-about-that-bass-chrxs-beats-bread-beatz.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4a/94/e0/4a94e0d6-845d-3029-2b96-efbc5dddd05d/3104743.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -470,11 +463,11 @@ export const librarySongs = [
     },
     {
         "id": "answer-to-everything-mixed-any-act",
-        "title": "Answer To Everything Mixed Any Act",
-        "artist": "Unknown Artist",
+        "title": "The Answer to Everything",
+        "artist": "Hazel Taylor",
         "duration": "1:57",
         "src": "/music/answer-to-everything-mixed-any-act.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/85/5e/57/855e57fe-9138-d7f9-bd2f-181b4a3377fb/196056327403_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -485,11 +478,11 @@ export const librarySongs = [
     },
     {
         "id": "anything-adrianne-lenker",
-        "title": "Anything Adrianne Lenker",
-        "artist": "Unknown Artist",
+        "title": "anything",
+        "artist": "Adrianne Lenker",
         "duration": "3:22",
         "src": "/music/anything-adrianne-lenker.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/70/f0/a6/70f0a6a5-cd71-9da2-174b-41927d331cdd/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -500,11 +493,11 @@ export const librarySongs = [
     },
     {
         "id": "are-you-falling-in-love-akucum",
-        "title": "Are You Falling In Love Akucum",
-        "artist": "Unknown Artist",
+        "title": "Are You Falling In Love?",
+        "artist": "Akucum",
         "duration": "4:19",
         "src": "/music/are-you-falling-in-love-akucum.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c9/d8/9b/c9d89b7a-ada8-6ffa-bf32-3afd4889db79/8790001426078_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -530,11 +523,11 @@ export const librarySongs = [
     },
     {
         "id": "automotivo-bibi-fogosa-bibi-babydoll-dj-brunin-xm-kza-produc",
-        "title": "Automotivo Bibi Fogosa Bibi Babydoll Dj Brunin Xm Kza ProduçÕEs",
-        "artist": "Unknown Artist",
+        "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
+        "artist": "bbygirl",
         "duration": "0:00",
         "src": "/music/automotivo-bibi-fogosa-bibi-babydoll-dj-brunin-xm-kza-produções.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -545,11 +538,11 @@ export const librarySongs = [
     },
     {
         "id": "automotivo-bibi-fogosa-slowed-reverb-bbygirl",
-        "title": "Automotivo Bibi Fogosa Slowed Reverb Bbygirl",
-        "artist": "Unknown Artist",
+        "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
+        "artist": "bbygirl",
         "duration": "2:49",
         "src": "/music/automotivo-bibi-fogosa-slowed-reverb-bbygirl.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -560,11 +553,11 @@ export const librarySongs = [
     },
     {
         "id": "b2b-charli-xcx",
-        "title": "B2b Charli Xcx",
-        "artist": "Unknown Artist",
+        "title": "B2b",
+        "artist": "Charli xcx",
         "duration": "2:58",
         "src": "/music/b2b-charli-xcx.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/4e/63/884e6321-ad41-aab1-f6f0-20efcafcfd55/075679666130.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -575,11 +568,11 @@ export const librarySongs = [
     },
     {
         "id": "babydoll-ari-abdul",
-        "title": "Babydoll Ari Abdul",
-        "artist": "Unknown Artist",
+        "title": "So Good",
+        "artist": "Ari Abdul",
         "duration": "3:16",
         "src": "/music/babydoll-ari-abdul.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/9e/2e/5b9e2e7c-a117-89ac-79c2-43fd866aad48/196874051207.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -605,11 +598,11 @@ export const librarySongs = [
     },
     {
         "id": "baila-jazzao-chrxs-beats-bread-beatz",
-        "title": "Baila JazzãO Chrxs Beats Bread Beatz",
-        "artist": "Unknown Artist",
+        "title": "BAILA JAZZÃO",
+        "artist": "Chrxs Beats & Bread Beatz",
         "duration": "0:00",
         "src": "/music/baila-jazzão-chrxs-beats-bread-beatz.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/75/53/f0/7553f084-8979-bff7-8602-155ec33b8a9a/60508.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -620,11 +613,11 @@ export const librarySongs = [
     },
     {
         "id": "birds-of-a-feather-billie-eilish",
-        "title": "Birds Of A Feather Billie Eilish",
-        "artist": "Unknown Artist",
+        "title": "BIRDS OF A FEATHER",
+        "artist": "Billie Eilish",
         "duration": "3:31",
         "src": "/music/birds-of-a-feather-billie-eilish.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -635,11 +628,11 @@ export const librarySongs = [
     },
     {
         "id": "black-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-aw",
-        "title": "Black Out Days Slowed Reverb Tell Me All The Ways To Stay Away Creamy Untrusted 1111 Music Group",
-        "artist": "Unknown Artist",
+        "title": "Black Out Days (Slowed + Reverb) - Tell Me All the Ways To Stay Away",
+        "artist": "Creamy, untrusted & 11:11 Music Group",
         "duration": "4:22",
         "src": "/music/black-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-away-creamy-untrusted-1111-music-group.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/9b/bc/89/9bbc89c6-da6a-7142-991f-a04623ae1fed/5063113322105_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -665,11 +658,11 @@ export const librarySongs = [
     },
     {
         "id": "blondie-current-joys",
-        "title": "Blondie Current Joys",
-        "artist": "Unknown Artist",
+        "title": "Blondie",
+        "artist": "Current Joys",
         "duration": "3:21",
         "src": "/music/blondie-current-joys.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/18/6c/4a/186c4a26-3ccf-65ce-2695-b15da578d0e4/617308019940.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -710,11 +703,11 @@ export const librarySongs = [
     },
     {
         "id": "blue-billie-eilish",
-        "title": "Blue Billie Eilish",
-        "artist": "Unknown Artist",
+        "title": "BLUE",
+        "artist": "Billie Eilish",
         "duration": "5:43",
         "src": "/music/blue-billie-eilish.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -729,7 +722,7 @@ export const librarySongs = [
         "artist": "Cash Cobain A Boogie Wit Da Hoodie",
         "duration": "3:12",
         "src": "/music/body-feat-cash-cobain-a-boogie-wit-da-hoodie.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/45/4a/f6454ad2-87e7-473f-988d-f0005acffd9b/075679846686.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -785,11 +778,11 @@ export const librarySongs = [
     },
     {
         "id": "break-up-with-your-girlfriend-im-bored-ariana-grande",
-        "title": "Break Up With Your Girlfriend Im Bored Ariana Grande",
-        "artist": "Unknown Artist",
+        "title": "break up with your girlfriend, i'm bored",
+        "artist": "Ariana Grande",
         "duration": "3:24",
         "src": "/music/break-up-with-your-girlfriend-im-bored-ariana-grande.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -800,11 +793,11 @@ export const librarySongs = [
     },
     {
         "id": "bubble-gum-clairo",
-        "title": "Bubble Gum Clairo",
-        "artist": "Unknown Artist",
+        "title": "Bubble Gum",
+        "artist": "Clairo",
         "duration": "2:55",
         "src": "/music/bubble-gum-clairo.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9b/f8/54/9bf854d7-cfec-6e5e-d42f-97a77fd358bb/5059033334878_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -830,11 +823,11 @@ export const librarySongs = [
     },
     {
         "id": "cabo-bankrol-hayden",
-        "title": "Cabo Bankrol Hayden",
-        "artist": "Unknown Artist",
+        "title": "Cabo",
+        "artist": "Bankrol Hayden",
         "duration": "2:38",
         "src": "/music/cabo-bankrol-hayden.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cb/77/f9/cb77f98a-48b9-6438-0e6e-dbb18682730b/075679779212.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -845,11 +838,11 @@ export const librarySongs = [
     },
     {
         "id": "cant-feel-myself-dadanny",
-        "title": "Cant Feel Myself Dadanny",
-        "artist": "Unknown Artist",
+        "title": "Can’t Feel Myself (Slowed)",
+        "artist": "dadanny",
         "duration": "3:44",
         "src": "/music/cant-feel-myself-dadanny.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/1a/ba/8a1aba40-a9e4-e11f-9e16-59144545a74d/198094906442.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -860,11 +853,11 @@ export const librarySongs = [
     },
     {
         "id": "celestial-angels-slowed-andromeda",
-        "title": "Celestial Angels Slowed Andromeda",
-        "artist": "Unknown Artist",
+        "title": "Celestial Angels (Slowed)",
+        "artist": "Andromeda",
         "duration": "4:29",
         "src": "/music/celestial-angels-slowed-andromeda.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/69/a8/25/69a8250d-4c85-495c-4d04-27392f54871c/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -875,11 +868,11 @@ export const librarySongs = [
     },
     {
         "id": "cloud-9-beach-bunny",
-        "title": "Cloud 9 Beach Bunny",
-        "artist": "Unknown Artist",
+        "title": "Cloud 9",
+        "artist": "Beach Bunny",
         "duration": "2:28",
         "src": "/music/cloud-9-beach-bunny.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/39/0c/c4/390cc45e-4a1e-9821-4d14-2ce487d918fd/112177.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -890,11 +883,11 @@ export const librarySongs = [
     },
     {
         "id": "cross-my-heart-artemas",
-        "title": "Cross My Heart Artemas",
-        "artist": "Unknown Artist",
+        "title": "cross my heart",
+        "artist": "Artemas",
         "duration": "2:26",
         "src": "/music/cross-my-heart-artemas.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bb/9c/4b/bb9c4b12-61a6-f6ff-5836-fea929212c97/198087623271.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -905,11 +898,11 @@ export const librarySongs = [
     },
     {
         "id": "cryst4l-darkxhawk",
-        "title": "Cryst4l Darkxhawk",
-        "artist": "Unknown Artist",
+        "title": "CRYST4L",
+        "artist": "DARKXHAWK",
         "duration": "2:20",
         "src": "/music/cryst4l-darkxhawk.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/3b/b5/543bb530-6075-4e75-18ab-ad4f61718c83/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -920,11 +913,11 @@ export const librarySongs = [
     },
     {
         "id": "death-is-no-more-slowed-blessed-mane",
-        "title": "Death Is No More Slowed Blessed Mane",
-        "artist": "Unknown Artist",
+        "title": "Death Is No More",
+        "artist": "BLESSED MANE",
         "duration": "2:52",
         "src": "/music/death-is-no-more-slowed-blessed-mane.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/52/5c/10/525c109f-4387-a65b-0526-abe474708729/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -935,11 +928,11 @@ export const librarySongs = [
     },
     {
         "id": "do-it-civ",
-        "title": "Do It Civ",
-        "artist": "Unknown Artist",
+        "title": "Do It",
+        "artist": "Civ",
         "duration": "3:58",
         "src": "/music/do-it-civ.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/86/ae/20/86ae20c4-77ed-3531-5df2-5248116415b8/51575.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -950,11 +943,11 @@ export const librarySongs = [
     },
     {
         "id": "dream-girl-crisaunt",
-        "title": "Dream Girl Crisaunt",
-        "artist": "Unknown Artist",
+        "title": "Dream Girl",
+        "artist": "Crisaunt",
         "duration": "2:59",
         "src": "/music/dream-girl-crisaunt.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/25/13/cb/2513cb34-b006-87c7-d052-a6ff32c98e0b/194491915384.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -965,11 +958,11 @@ export const librarySongs = [
     },
     {
         "id": "duvet-boa",
-        "title": "Duvet BôA",
-        "artist": "Unknown Artist",
+        "title": "Duvet",
+        "artist": "bôa",
         "duration": "0:00",
         "src": "/music/duvet-bôa.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/45/44/15/45441528-0288-eedc-f6fc-93137b8cfe96/067003248969.png/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -980,11 +973,11 @@ export const librarySongs = [
     },
     {
         "id": "echo-the-boyz",
-        "title": "Echo The Boyz",
-        "artist": "Unknown Artist",
+        "title": "WATCH IT",
+        "artist": "THE BOYZ",
         "duration": "3:45",
         "src": "/music/echo-the-boyz.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/9b/28/62/9b286259-65bf-83ed-0d73-2f99a5b21ba9/cover_KM0018909_1.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -995,11 +988,11 @@ export const librarySongs = [
     },
     {
         "id": "emo-boy-ayesha-erotica",
-        "title": "Emo Boy Ayesha Erotica",
-        "artist": "Unknown Artist",
+        "title": "Feel It",
+        "artist": "Ayesha Erotica",
         "duration": "2:34",
         "src": "/music/emo-boy-ayesha-erotica.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/a9/e5/dca9e55f-7220-1741-893c-894b8452f334/255692.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1055,11 +1048,11 @@ export const librarySongs = [
     },
     {
         "id": "fluxxwave-8d-audio-clovis-reyes",
-        "title": "Fluxxwave 8d Audio Clovis Reyes",
-        "artist": "Unknown Artist",
+        "title": "Fluxxwave (8D Audio)",
+        "artist": "Clovis Reyes",
         "duration": "2:23",
         "src": "/music/fluxxwave-8d-audio-clovis-reyes.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dd/ce/e7/ddcee713-3b24-398c-9ab1-5f4124497c3d/1963621480660.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1070,11 +1063,11 @@ export const librarySongs = [
     },
     {
         "id": "fluxxwave-clovis-reyes",
-        "title": "Fluxxwave Clovis Reyes",
-        "artist": "Unknown Artist",
+        "title": "Fluxxwave (Slowed + Reverb)",
+        "artist": "Clovis Reyes",
         "duration": "2:30",
         "src": "/music/fluxxwave-clovis-reyes.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6f/c2/d9/6fc2d9f9-c5ab-41d1-2bbc-ba84380e273e/197813827662.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1085,11 +1078,11 @@ export const librarySongs = [
     },
     {
         "id": "gilded-lily-cults",
-        "title": "Gilded Lily Cults",
-        "artist": "Unknown Artist",
+        "title": "Gilded Lily",
+        "artist": "Cults",
         "duration": "3:34",
         "src": "/music/gilded-lily-cults.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/5c/ee/77/5cee7770-c855-9e7e-f6d1-b0fc50bb82b6/196589778567.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1205,11 +1198,11 @@ export const librarySongs = [
     },
     {
         "id": "haza-tiktok-version-udiennx",
-        "title": "Haza Tiktok Version Udiennx",
-        "artist": "Unknown Artist",
+        "title": "HAZA (Tiktok Version)",
+        "artist": "UdieNnx",
         "duration": "0:00",
         "src": "/music/haza-tiktok-version-udiennx.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/09/36/56/0936562f-92fe-c199-a7cd-08b5f3a8d5f9/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1220,11 +1213,11 @@ export const librarySongs = [
     },
     {
         "id": "hdmi-bones",
-        "title": "Hdmi Bones",
-        "artist": "Unknown Artist",
+        "title": "Hdmi - Slowed + Reverb",
+        "artist": "Slo, Twilight & Tazzy",
         "duration": "2:17",
         "src": "/music/hdmi-bones.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/72/a0/37/72a03777-f0ad-92b0-92e0-0d4adaf72862/5063248587424_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1265,11 +1258,11 @@ export const librarySongs = [
     },
     {
         "id": "hot-to-go-chappell-roan",
-        "title": "Hot To Go Chappell Roan",
-        "artist": "Unknown Artist",
+        "title": "HOT TO GO!",
+        "artist": "Chappell Roan",
         "duration": "3:04",
         "src": "/music/hot-to-go-chappell-roan.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/fb/65/cb/fb65cb0f-4260-d740-d6f5-bb80c9c27c1b/23UMGIM84225.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -1980,7 +1973,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -2070,7 +2064,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -2090,11 +2085,11 @@ export const librarySongs = [
     },
     {
         "id": "passo-bem-solto-atlxs",
-        "title": "Passo Bem Solto Atlxs",
-        "artist": "Unknown Artist",
+        "title": "PASSO BEM SOLTO (Slowed)",
+        "artist": "ATLXS",
         "duration": "1:43",
         "src": "/music/passo-bem-solto-atlxs.mp3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/12/bb/14/12bb1406-e716-9694-587e-b167448c672b/198880970114.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -2550,7 +2545,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3030,16 +3026,17 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
         "id": "100-am-civ",
-        "title": "100 Am Civ",
-        "artist": "Unknown Artist",
+        "title": "Rockin' In the Free World",
+        "artist": "Neil Young",
         "duration": "2:13",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F100-am-civ.mp3?alt=media&token=556907e1-7648-4573-97dc-63b603a12848",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/64/5f/36/645f3612-b2ba-8cf1-c814-cb9d3a2216c5/dj.lmxzvmtb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3060,7 +3057,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3105,7 +3103,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3195,7 +3194,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3275,11 +3275,11 @@ export const librarySongs = [
     },
     {
         "id": "505-arctic-monkeys",
-        "title": "505 Arctic Monkeys",
-        "artist": "Unknown Artist",
+        "title": "505",
+        "artist": "Arctic Monkeys",
         "duration": "4:14",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F505-arctic-monkeys.mp3?alt=media&token=0fc55cb3-f181-45fb-a9a3-15ca6ed272e2",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/82/90/14/829014ad-a301-62ab-bee6-f4cca4457411/mzi.hozudery.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3320,11 +3320,11 @@ export const librarySongs = [
     },
     {
         "id": "7-rings-ariana-grande",
-        "title": "7 Rings Ariana Grande",
-        "artist": "Unknown Artist",
+        "title": "7 rings",
+        "artist": "Ariana Grande",
         "duration": "2:59",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F7-rings-ariana-grande.mp3?alt=media&token=5b7408a1-c146-4e80-9ceb-345639f8d620",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3395,11 +3395,11 @@ export const librarySongs = [
     },
     {
         "id": "9pm-in-shibuya-432hz-adturnup",
-        "title": "9pm In Shibuya 432hz Adturnup",
-        "artist": "Unknown Artist",
+        "title": "9PM in Shibuya (432Hz)",
+        "artist": "ADTurnUp",
         "duration": "2:31",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F9pm-in-shibuya-432hz-adturnup.mp3?alt=media&token=492ea2bf-7af2-47e6-b1cd-20eb1c8ac8e3",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b6/80/0c/b6800c25-ca27-f461-ed91-09e0eebef47f/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3470,11 +3470,11 @@ export const librarySongs = [
     },
     {
         "id": "abismo-mixed-clap-freckles",
-        "title": "Abismo Mixed Clap Freckles",
-        "artist": "Unknown Artist",
+        "title": "Abismo",
+        "artist": "Clap Freckles",
         "duration": "1:03",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fabismo-mixed-clap-freckles.mp3?alt=media&token=d41c09d8-9e5f-4b62-8828-388311b3dbad",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2a/34/f5/2a34f542-cb50-b1bc-6014-7288ff990761/840200574327_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3525,7 +3525,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3660,7 +3661,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3740,11 +3742,11 @@ export const librarySongs = [
     },
     {
         "id": "all-about-that-bass-chrxs-beats-bread-beatz",
-        "title": "All About That Bass Chrxs Beats Bread Beatz",
-        "artist": "Unknown Artist",
+        "title": "All About That Bass",
+        "artist": "Chrxs Beats & Bread Beatz",
         "duration": "2:16",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fall-about-that-bass-chrxs-beats-bread-beatz.mp3?alt=media&token=c09bb269-86fc-4816-bdb7-4b10fb90f3e6",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4a/94/e0/4a94e0d6-845d-3029-2b96-efbc5dddd05d/3104743.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3825,16 +3827,17 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
         "id": "all-night-dance-pw",
-        "title": "All Night Dance PøW",
-        "artist": "Unknown Artist",
+        "title": "All Night Dance",
+        "artist": "PØW",
         "duration": "0:00",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fall-night-dance-p%C3%B8w.mp3?alt=media&token=4fbdfdf0-cde7-46fe-88e3-330663b3d647",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/31/b4/75/31b47557-7854-3233-1cae-a85ac5165049/7330178114647.png/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3905,11 +3908,11 @@ export const librarySongs = [
     },
     {
         "id": "alpha-squad-hampus-naeselius",
-        "title": "Alpha Squad Hampus Naeselius",
-        "artist": "Unknown Artist",
+        "title": "Alpha Squad",
+        "artist": "Hampus Naeselius",
         "duration": "3:43",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Falpha-squad-hampus-naeselius.mp3?alt=media&token=5856fe2f-7533-4bca-84ae-a1bbaadf6572",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b1/36/e2/b136e26c-2e4b-84c4-ad9b-5e45b8f38dfb/7330178117884.png/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3965,11 +3968,11 @@ export const librarySongs = [
     },
     {
         "id": "always-be-my-fault-future-metro-boomin-the-weeknd",
-        "title": "Always Be My Fault Future Metro Boomin The Weeknd",
-        "artist": "Unknown Artist",
+        "title": "Always Be My Fault",
+        "artist": "Future, Metro Boomin & The Weeknd",
         "duration": "4:08",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Falways-be-my-fault-future-metro-boomin-the-weeknd.mp3?alt=media&token=993f57f5-45a7-4dba-a58d-6e20dc91deb1",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/33/aa/6c/33aa6ca4-cb53-d64a-2981-5fd79fdc57ce/196871990851.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3980,11 +3983,11 @@ export const librarySongs = [
     },
     {
         "id": "amazing-interlude-future-metro-boomin",
-        "title": "Amazing Interlude Future Metro Boomin",
-        "artist": "Unknown Artist",
+        "title": "Amazing (Interlude)",
+        "artist": "Future & Metro Boomin",
         "duration": "2:26",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Famazing-interlude-future-metro-boomin.mp3?alt=media&token=43baa932-ef5d-4077-9812-11e9c643e60a",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/33/aa/6c/33aa6ca4-cb53-d64a-2981-5fd79fdc57ce/196871990851.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4025,11 +4028,11 @@ export const librarySongs = [
     },
     {
         "id": "angels-all-around-me-kali-uchis",
-        "title": "Angels All Around Me Kali Uchis",
-        "artist": "Unknown Artist",
+        "title": "Angels All Around Me…",
+        "artist": "Kali Uchis",
         "duration": "5:34",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fangels-all-around-me-kali-uchis.mp3?alt=media&token=01583518-1e16-4a51-a74d-1b220d90b76e",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/32/cb/cd/32cbcd1f-ca12-df86-e3ed-8ef0f7ac09e9/25UMGIM43974.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4085,11 +4088,11 @@ export const librarySongs = [
     },
     {
         "id": "answer-to-everything-mixed-any-act",
-        "title": "Answer To Everything Mixed Any Act",
-        "artist": "Unknown Artist",
+        "title": "The Answer to Everything",
+        "artist": "Hazel Taylor",
         "duration": "1:57",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fanswer-to-everything-mixed-any-act.mp3?alt=media&token=60f7be9e-693d-401c-8a96-963af73a5d69",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/85/5e/57/855e57fe-9138-d7f9-bd2f-181b4a3377fb/196056327403_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4145,11 +4148,11 @@ export const librarySongs = [
     },
     {
         "id": "anything-adrianne-lenker",
-        "title": "Anything Adrianne Lenker",
-        "artist": "Unknown Artist",
+        "title": "anything",
+        "artist": "Adrianne Lenker",
         "duration": "3:22",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fanything-adrianne-lenker.mp3?alt=media&token=f012d83f-f8b7-44a3-9912-4b9ecca8b025",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/70/f0/a6/70f0a6a5-cd71-9da2-174b-41927d331cdd/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4205,11 +4208,11 @@ export const librarySongs = [
     },
     {
         "id": "are-you-falling-in-love-akucum",
-        "title": "Are You Falling In Love Akucum",
-        "artist": "Unknown Artist",
+        "title": "Are You Falling In Love?",
+        "artist": "Akucum",
         "duration": "4:19",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fare-you-falling-in-love-akucum.mp3?alt=media&token=40b4d420-a732-4f12-9504-63a7f3c59a42",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c9/d8/9b/c9d89b7a-ada8-6ffa-bf32-3afd4889db79/8790001426078_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4460,11 +4463,11 @@ export const librarySongs = [
     },
     {
         "id": "automotivo-bibi-fogosa-slowed-reverb-bbygirl",
-        "title": "Automotivo Bibi Fogosa Slowed Reverb Bbygirl",
-        "artist": "Unknown Artist",
+        "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
+        "artist": "bbygirl",
         "duration": "2:49",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fautomotivo-bibi-fogosa-slowed-reverb-bbygirl.mp3?alt=media&token=f1fed8d2-7ea5-4e6e-9486-8c311dcd69cd",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4505,11 +4508,11 @@ export const librarySongs = [
     },
     {
         "id": "b2b-charli-xcx",
-        "title": "B2b Charli Xcx",
-        "artist": "Unknown Artist",
+        "title": "B2b",
+        "artist": "Charli xcx",
         "duration": "2:58",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fb2b-charli-xcx.mp3?alt=media&token=bf943334-8213-471f-a10e-4f46b517f100",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/4e/63/884e6321-ad41-aab1-f6f0-20efcafcfd55/075679666130.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4550,11 +4553,11 @@ export const librarySongs = [
     },
     {
         "id": "babydoll-ari-abdul",
-        "title": "Babydoll Ari Abdul",
-        "artist": "Unknown Artist",
+        "title": "So Good",
+        "artist": "Ari Abdul",
         "duration": "3:16",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbabydoll-ari-abdul.mp3?alt=media&token=333b471e-816e-497a-9b75-5522a344f0ab",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/9e/2e/5b9e2e7c-a117-89ac-79c2-43fd866aad48/196874051207.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4665,7 +4668,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -4950,7 +4954,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -5175,7 +5180,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -5195,11 +5201,11 @@ export const librarySongs = [
     },
     {
         "id": "birds-of-a-feather-billie-eilish",
-        "title": "Birds Of A Feather Billie Eilish",
-        "artist": "Unknown Artist",
+        "title": "BIRDS OF A FEATHER",
+        "artist": "Billie Eilish",
         "duration": "3:31",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbirds-of-a-feather-billie-eilish.mp3?alt=media&token=32fb7333-1c3c-4ca2-8745-316597cff410",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5255,11 +5261,11 @@ export const librarySongs = [
     },
     {
         "id": "black-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-aw",
-        "title": "Black Out Days Slowed Reverb Tell Me All The Ways To Stay Away Creamy Untrusted 1111 Music Group",
-        "artist": "Unknown Artist",
+        "title": "Black Out Days (Slowed + Reverb) - Tell Me All the Ways To Stay Away",
+        "artist": "Creamy, untrusted & 11:11 Music Group",
         "duration": "4:22",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblack-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-away-creamy-untrusted-1111-music-group.mp3?alt=media&token=fa69f1f7-d869-4951-a9b6-fcc34fd5d6ae",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/9b/bc/89/9bbc89c6-da6a-7142-991f-a04623ae1fed/5063113322105_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5390,11 +5396,11 @@ export const librarySongs = [
     },
     {
         "id": "blondie-current-joys",
-        "title": "Blondie Current Joys",
-        "artist": "Unknown Artist",
+        "title": "Blondie",
+        "artist": "Current Joys",
         "duration": "3:21",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblondie-current-joys.mp3?alt=media&token=552beb23-f7dd-4321-97a8-cfd7e76363a9",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/18/6c/4a/186c4a26-3ccf-65ce-2695-b15da578d0e4/617308019940.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5525,11 +5531,11 @@ export const librarySongs = [
     },
     {
         "id": "blue-billie-eilish",
-        "title": "Blue Billie Eilish",
-        "artist": "Unknown Artist",
+        "title": "BLUE",
+        "artist": "Billie Eilish",
         "duration": "5:43",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblue-billie-eilish.mp3?alt=media&token=e9e66541-ccc7-4154-a25a-daa516585b13",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5649,7 +5655,7 @@ export const librarySongs = [
         "artist": "Cash Cobain A Boogie Wit Da Hoodie",
         "duration": "3:12",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbody-feat-cash-cobain-a-boogie-wit-da-hoodie.mp3?alt=media&token=39bbc741-f3b3-4fab-a70e-be111f744c86",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/45/4a/f6454ad2-87e7-473f-988d-f0005acffd9b/075679846686.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5865,7 +5871,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -5930,11 +5937,11 @@ export const librarySongs = [
     },
     {
         "id": "break-up-with-your-girlfriend-im-bored-ariana-grande",
-        "title": "Break Up With Your Girlfriend Im Bored Ariana Grande",
-        "artist": "Unknown Artist",
+        "title": "break up with your girlfriend, i'm bored",
+        "artist": "Ariana Grande",
         "duration": "3:24",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbreak-up-with-your-girlfriend-im-bored-ariana-grande.mp3?alt=media&token=56796add-359f-4f1b-a90c-781149560417",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6110,11 +6117,11 @@ export const librarySongs = [
     },
     {
         "id": "bubble-gum-clairo",
-        "title": "Bubble Gum Clairo",
-        "artist": "Unknown Artist",
+        "title": "Bubble Gum",
+        "artist": "Clairo",
         "duration": "2:55",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbubble-gum-clairo.mp3?alt=media&token=6749a948-82f7-47b4-bda5-02fa74b46093",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9b/f8/54/9bf854d7-cfec-6e5e-d42f-97a77fd358bb/5059033334878_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6135,7 +6142,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6255,7 +6263,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6275,11 +6284,11 @@ export const librarySongs = [
     },
     {
         "id": "cabo-bankrol-hayden",
-        "title": "Cabo Bankrol Hayden",
-        "artist": "Unknown Artist",
+        "title": "Cabo",
+        "artist": "Bankrol Hayden",
         "duration": "2:38",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcabo-bankrol-hayden.mp3?alt=media&token=bac2dc4f-6564-4dd0-8af7-0a4709a92915",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cb/77/f9/cb77f98a-48b9-6438-0e6e-dbb18682730b/075679779212.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6330,7 +6339,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6390,7 +6400,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6480,7 +6491,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6510,16 +6522,17 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
         "id": "cant-feel-myself-dadanny",
-        "title": "Cant Feel Myself Dadanny",
-        "artist": "Unknown Artist",
+        "title": "Can’t Feel Myself (Slowed)",
+        "artist": "dadanny",
         "duration": "3:44",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcant-feel-myself-dadanny.mp3?alt=media&token=a5cfeb10-892c-4d42-a6e7-3af8e82c6228",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/1a/ba/8a1aba40-a9e4-e11f-9e16-59144545a74d/198094906442.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6725,11 +6738,11 @@ export const librarySongs = [
     },
     {
         "id": "celestial-angels-slowed-andromeda",
-        "title": "Celestial Angels Slowed Andromeda",
-        "artist": "Unknown Artist",
+        "title": "Celestial Angels (Slowed)",
+        "artist": "Andromeda",
         "duration": "4:29",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcelestial-angels-slowed-andromeda.mp3?alt=media&token=e42e77a1-c0b2-46b7-a21c-85f3de57acf7",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/69/a8/25/69a8250d-4c85-495c-4d04-27392f54871c/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6825,7 +6838,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6995,11 +7009,11 @@ export const librarySongs = [
     },
     {
         "id": "cloud-9-beach-bunny",
-        "title": "Cloud 9 Beach Bunny",
-        "artist": "Unknown Artist",
+        "title": "Cloud 9",
+        "artist": "Beach Bunny",
         "duration": "2:28",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcloud-9-beach-bunny.mp3?alt=media&token=dfa787b1-7b05-46c5-b29f-b2fc4f3705ed",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/39/0c/c4/390cc45e-4a1e-9821-4d14-2ce487d918fd/112177.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7140,7 +7154,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7200,7 +7215,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7425,16 +7441,17 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
         "id": "cross-my-heart-artemas",
-        "title": "Cross My Heart Artemas",
-        "artist": "Unknown Artist",
+        "title": "cross my heart",
+        "artist": "Artemas",
         "duration": "2:26",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcross-my-heart-artemas.mp3?alt=media&token=2f224e27-d241-4349-98fd-0c93c189993a",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bb/9c/4b/bb9c4b12-61a6-f6ff-5836-fea929212c97/198087623271.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7455,7 +7472,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7490,11 +7508,11 @@ export const librarySongs = [
     },
     {
         "id": "cryst4l-darkxhawk",
-        "title": "Cryst4l Darkxhawk",
-        "artist": "Unknown Artist",
+        "title": "CRYST4L",
+        "artist": "DARKXHAWK",
         "duration": "2:20",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcryst4l-darkxhawk.mp3?alt=media&token=5efe2f6c-3e31-48fa-8041-ede7c2228d11",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/3b/b5/543bb530-6075-4e75-18ab-ad4f61718c83/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7659,7 +7677,7 @@ export const librarySongs = [
         "artist": "Luvli Aaron Smith",
         "duration": "4:03",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdancin-krono-remix-feat-luvli-aaron-smith.mp3?alt=media&token=6bf52ce0-ff30-4a13-ae5b-e8070c532563",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4b/2a/75/4b2a75c9-a545-87a1-20e7-bba1a3c03a79/199891879823_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7845,7 +7863,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7865,11 +7884,11 @@ export const librarySongs = [
     },
     {
         "id": "death-is-no-more-slowed-blessed-mane",
-        "title": "Death Is No More Slowed Blessed Mane",
-        "artist": "Unknown Artist",
+        "title": "Death Is No More",
+        "artist": "BLESSED MANE",
         "duration": "2:52",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdeath-is-no-more-slowed-blessed-mane.mp3?alt=media&token=fa7650ee-81f2-4df2-8b0f-0339fbd72bea",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/52/5c/10/525c109f-4387-a65b-0526-abe474708729/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8090,11 +8109,11 @@ export const librarySongs = [
     },
     {
         "id": "did-i-tell-u-that-i-miss-u-adore",
-        "title": "Did I Tell U That I Miss U Adore",
-        "artist": "Unknown Artist",
+        "title": "did i tell u that i miss u",
+        "artist": "adore",
         "duration": "1:55",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdid-i-tell-u-that-i-miss-u-adore.mp3?alt=media&token=3d93a342-ed04-438f-bbd1-5712ffc44413",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fe/8a/da/fe8ada16-a03f-9890-329c-cbb4208c2335/723277505657.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8130,7 +8149,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -8160,16 +8180,17 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
         "id": "died-once-guitar-remix-aamadux",
-        "title": "Died Once Guitar Remix Aamadux",
-        "artist": "Unknown Artist",
+        "title": "Life Force (Slowed)",
+        "artist": "Aamadux",
         "duration": "2:19",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdied-once-guitar-remix-aamadux.mp3?alt=media&token=cc38c311-8031-45f9-8e30-fcfbf5a1239b",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/9e/25/079e25cf-7bd7-48ed-9d5e-84904eb8bc69/MOBX0879.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8270,11 +8291,11 @@ export const librarySongs = [
     },
     {
         "id": "do-it-civ",
-        "title": "Do It Civ",
-        "artist": "Unknown Artist",
+        "title": "Do It",
+        "artist": "Civ",
         "duration": "3:58",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdo-it-civ.mp3?alt=media&token=89709e80-149a-42ff-9435-3c4094803710",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/86/ae/20/86ae20c4-77ed-3531-5df2-5248116415b8/51575.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8535,7 +8556,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -8555,11 +8577,11 @@ export const librarySongs = [
     },
     {
         "id": "dream-girl-crisaunt",
-        "title": "Dream Girl Crisaunt",
-        "artist": "Unknown Artist",
+        "title": "Dream Girl",
+        "artist": "Crisaunt",
         "duration": "2:59",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdream-girl-crisaunt.mp3?alt=media&token=73432015-34ec-4b90-97fd-5ebc8c943502",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/25/13/cb/2513cb34-b006-87c7-d052-a6ff32c98e0b/194491915384.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8735,11 +8757,11 @@ export const librarySongs = [
     },
     {
         "id": "echo-the-boyz",
-        "title": "Echo The Boyz",
-        "artist": "Unknown Artist",
+        "title": "WATCH IT",
+        "artist": "THE BOYZ",
         "duration": "3:45",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fecho-the-boyz.mp3?alt=media&token=a274ea32-5639-42fb-8d91-f143db798dcd",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/9b/28/62/9b286259-65bf-83ed-0d73-2f99a5b21ba9/cover_KM0018909_1.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8960,11 +8982,11 @@ export const librarySongs = [
     },
     {
         "id": "emo-boy-ayesha-erotica",
-        "title": "Emo Boy Ayesha Erotica",
-        "artist": "Unknown Artist",
+        "title": "Feel It",
+        "artist": "Ayesha Erotica",
         "duration": "2:34",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Femo-boy-ayesha-erotica.mp3?alt=media&token=1d992093-f4c4-4385-8641-a535e5c87b9b",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/a9/e5/dca9e55f-7220-1741-893c-894b8452f334/255692.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -9255,7 +9277,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9330,7 +9353,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9545,11 +9569,11 @@ export const librarySongs = [
     },
     {
         "id": "fame-is-a-gun-addison-rae",
-        "title": "Fame Is A Gun Addison Rae",
-        "artist": "Unknown Artist",
+        "title": "Fame is a Gun",
+        "artist": "Addison Rae",
         "duration": "3:02",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffame-is-a-gun-addison-rae.mp3?alt=media&token=9173dcf5-3696-4cb7-bae7-85c1efdce558",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cf/4a/e3/cf4ae3c9-3420-6021-f059-cc6c87cf11b2/196872958249.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -9735,7 +9759,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9780,7 +9805,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9900,7 +9926,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9935,11 +9962,11 @@ export const librarySongs = [
     },
     {
         "id": "fluxxwave-8d-audio-clovis-reyes",
-        "title": "Fluxxwave 8d Audio Clovis Reyes",
-        "artist": "Unknown Artist",
+        "title": "Fluxxwave (8D Audio)",
+        "artist": "Clovis Reyes",
         "duration": "2:23",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffluxxwave-8d-audio-clovis-reyes.mp3?alt=media&token=025f919c-f9d2-47b2-acbb-7ffe7cc6b41e",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dd/ce/e7/ddcee713-3b24-398c-9ab1-5f4124497c3d/1963621480660.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -9950,11 +9977,11 @@ export const librarySongs = [
     },
     {
         "id": "fluxxwave-clovis-reyes",
-        "title": "Fluxxwave Clovis Reyes",
-        "artist": "Unknown Artist",
+        "title": "Fluxxwave (Slowed + Reverb)",
+        "artist": "Clovis Reyes",
         "duration": "2:30",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffluxxwave-clovis-reyes.mp3?alt=media&token=e39ad078-b058-4544-8201-a77ce6a83a97",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6f/c2/d9/6fc2d9f9-c5ab-41d1-2bbc-ba84380e273e/197813827662.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -10065,7 +10092,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10395,7 +10423,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10410,7 +10439,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10425,7 +10455,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10460,11 +10491,11 @@ export const librarySongs = [
     },
     {
         "id": "gilded-lily-cults",
-        "title": "Gilded Lily Cults",
-        "artist": "Unknown Artist",
+        "title": "Gilded Lily",
+        "artist": "Cults",
         "duration": "3:34",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgilded-lily-cults.mp3?alt=media&token=8f903957-8318-4594-abaf-8237f6b39256",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/5c/ee/77/5cee7770-c855-9e7e-f6d1-b0fc50bb82b6/196589778567.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -10500,7 +10531,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10635,7 +10667,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10755,7 +10788,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11070,7 +11104,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11150,11 +11185,11 @@ export const librarySongs = [
     },
     {
         "id": "hdmi-bones",
-        "title": "Hdmi Bones",
-        "artist": "Unknown Artist",
+        "title": "Hdmi - Slowed + Reverb",
+        "artist": "Slo, Twilight & Tazzy",
         "duration": "2:17",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhdmi-bones.mp3?alt=media&token=1eb4b138-7a9c-400a-ab73-7e6441e1111b",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/72/a0/37/72a03777-f0ad-92b0-92e0-0d4adaf72862/5063248587424_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -11550,7 +11585,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11565,7 +11601,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11615,11 +11652,11 @@ export const librarySongs = [
     },
     {
         "id": "hot-to-go-chappell-roan",
-        "title": "Hot To Go Chappell Roan",
-        "artist": "Unknown Artist",
+        "title": "HOT TO GO!",
+        "artist": "Chappell Roan",
         "duration": "3:04",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhot-to-go-chappell-roan.mp3?alt=media&token=21057a50-4fd4-43f1-803b-0f92ddb6039a",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/fb/65/cb/fb65cb0f-4260-d740-d6f5-bb80c9c27c1b/23UMGIM84225.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -11900,11 +11937,11 @@ export const librarySongs = [
     },
     {
         "id": "i-feel-lost-aaron-hibell",
-        "title": "I Feel Lost Aaron Hibell",
-        "artist": "Unknown Artist",
+        "title": "I Feel Lost",
+        "artist": "Aaron Hibell",
         "duration": "2:27",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-feel-lost-aaron-hibell.mp3?alt=media&token=652c5665-0143-4719-bf44-6c74b8fb605d",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/57/4b/a4/574ba412-c402-6de5-4fc2-283a67d6635b/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -12045,7 +12082,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -12189,7 +12227,7 @@ export const librarySongs = [
         "artist": "Imogen Heap Clams Casino Aap Rocky",
         "duration": "3:11",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3?alt=media&token=5e541b97-f97d-4680-869a-8d4d93a33dc9",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/64/8f/5f/648f5f68-3ffa-e33d-39d0-50210803074f/196871388221.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -12405,7 +12443,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -12555,7 +12594,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -12600,7 +12640,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -13200,7 +13241,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -13455,7 +13497,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -14220,7 +14263,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -14535,7 +14579,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -14580,7 +14625,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -15780,7 +15826,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -15990,7 +16037,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -16320,7 +16368,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -16395,7 +16444,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -16425,7 +16475,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17145,7 +17196,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17295,7 +17347,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17325,7 +17378,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17355,7 +17409,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17370,7 +17425,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17430,7 +17486,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17535,7 +17592,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17565,7 +17623,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17580,7 +17639,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17640,7 +17700,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17670,7 +17731,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18015,7 +18077,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18090,7 +18153,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18180,7 +18244,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18780,7 +18845,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18840,7 +18906,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18900,7 +18967,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18960,7 +19028,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19080,7 +19149,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19215,7 +19285,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19440,7 +19511,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19800,7 +19872,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20055,7 +20128,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20190,7 +20264,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20235,7 +20310,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20445,7 +20521,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20505,7 +20582,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20640,7 +20718,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20760,7 +20839,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20900,11 +20980,11 @@ export const librarySongs = [
     },
     {
         "id": "the-color-violet-tory-lanez",
-        "title": "The Color Violet Tory Lanez",
-        "artist": "Unknown Artist",
+        "title": "The Color Violet",
+        "artist": "Tory Lanez",
         "duration": "3:45",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fthe-color-violet-tory-lanez.mp3?alt=media&token=6a6c929b-3b02-4f08-92ce-a575b3da0d1d",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/16/c8/eb/16c8eb6d-fe23-fa03-5e43-9827972763d3/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -21075,7 +21155,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21120,7 +21201,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21165,7 +21247,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21825,7 +21908,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22670,11 +22754,11 @@ export const librarySongs = [
     },
     {
         "id": "what-you-know-bout-love-pop-smoke",
-        "title": "What You Know Bout Love Pop Smoke",
-        "artist": "Unknown Artist",
+        "title": "What You Know Bout Love",
+        "artist": "Pop Smoke",
         "duration": "2:40",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwhat-you-know-bout-love-pop-smoke.mp3?alt=media&token=59a2fb11-1393-4129-9e9a-1ad596d36b70",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/23/f5/74/23f57450-8bbe-1c8c-6731-d539c658d4b6/00602435015781_Cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -22745,11 +22829,11 @@ export const librarySongs = [
     },
     {
         "id": "where-have-you-been-rihanna",
-        "title": "Where Have You Been Rihanna",
-        "artist": "Unknown Artist",
+        "title": "Where Have You Been",
+        "artist": "Rihanna",
         "duration": "4:04",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwhere-have-you-been-rihanna.mp3?alt=media&token=f986742e-b775-4a75-8091-401f1173fc60",
-        "art": "/images/blank_cover.svg",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/ac/51/45/ac51452d-c03f-94fb-6f3b-4f18b7beee53/11UMGIM38934.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -22800,7 +22884,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22815,7 +22900,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22860,7 +22946,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22875,7 +22962,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22965,7 +23053,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23160,7 +23249,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23190,7 +23280,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23370,7 +23461,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23385,7 +23477,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23489,7 +23582,9 @@ export const librarySongs = [
         "energy": 0.7,
         "inmixPoint": 10,
         "outmixPoint": 10,
-        "tags": ["untagged"]
+        "tags": [
+            "untagged"
+        ]
     }
 ];
 

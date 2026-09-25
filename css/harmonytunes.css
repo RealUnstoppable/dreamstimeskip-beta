@@ -2294,3 +2294,28 @@ body {
         gap: 4px !important;
     }
 }
+
+/* Version Dropdown styling */
+.version-select {
+    width: 100%;
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    outline: none;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.version-select option {
+    background: #1e1e1e;
+    color: #fff;
+}
+
+.music-card {
+    padding-bottom: 12px; /* ensure space for select if it wraps */
+}

@@ -491,7 +491,7 @@ function initHarmonyTunes() {
     // --- RENDERING HOME ---
     function renderHome() {
         // 1. Jump Back In
-        containerJumpBack.innerHTML = librarySongs.slice(0, 2).map(song => createSongCard(song)).join('');
+        containerJumpBack.innerHTML = groupSongsByTitle(librarySongs).slice(0, 2).map(group => createGroupCard(group)).join('');
 
         
         // Viral Now
@@ -636,8 +636,8 @@ function initHarmonyTunes() {
         }
 
         // 2. Recommended
-        const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
-        containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
+        const recommended = groupSongsByTitle([...librarySongs]).sort(() => 0.5 - Math.random());
+        containerRecommended.innerHTML = recommended.map(group => createGroupCard(group)).join('');
         let existingShowMore = document.getElementById('show-more-recommended');
         if (!existingShowMore) {
             containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
@@ -1419,7 +1419,7 @@ function initHarmonyTunes() {
             }
             
             if (artistSongs.length > 0) {
-                const trackListHTML = artistSongs.map(song => createSongCard(song)).join('');
+                const trackListHTML = groupSongsByTitle(artistSongs).map(group => createGroupCard(group)).join('');
                 document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
             } else {
                 document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
@@ -1450,7 +1450,17 @@ function initHarmonyTunes() {
                     renderSongTable(filtered);
                 } else if (viewHome.style.display !== 'none') {
                     const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-                    renderMusicGrid(filtered);
+                    
+                    if (filtered.length === 0) {
+                        document.getElementById('container-jumpback').innerHTML = '<p style="padding:20px;color:#888;">No results found.</p>';
+                    } else {
+                        document.getElementById('container-jumpback').innerHTML = groupSongsByTitle(filtered).map(group => createGroupCard(group)).join('');
+                    }
+                    // Hide other sections during search
+                    document.getElementById('leaderboard-section').style.display = query ? 'none' : 'block';
+                    document.getElementById('playlists-section').style.display = query ? 'none' : 'block';
+                    document.getElementById('container-recommended').innerHTML = '';
+
                 }
             }, 300); // ⚡ Bolt: Debounce global search to reduce unnecessary re-renders
         });
@@ -2587,23 +2597,92 @@ if (document.readyState === 'loading') {
     initHarmonyTunes();
 }
 
-export function createSongCard(song) {
+
+export function groupSongsByTitle(songs) {
+    // Deduplicate exact matches by ID first
+    songs = Array.from(new Map(songs.map(s => [s.id, s])).values());
+
+    const groups = new Map();
+    
+    songs.forEach(song => {
+        let title = song.title;
+        let lowerTitle = title.toLowerCase();
+        
+        let version = "Original";
+        if (lowerTitle.includes("slowed") || lowerTitle.includes("reverb")) {
+            version = "Slowed + Reverb";
+        } else if (lowerTitle.includes("sped")) {
+            version = "Sped Up";
+        } else if (lowerTitle.includes("remix")) {
+            version = "Remix";
+        } else if (lowerTitle.includes("instrumental")) {
+            version = "Instrumental";
+        } else if (lowerTitle.includes("acoustic")) {
+            version = "Acoustic";
+        }
+        
+        let baseTitle = title
+            .replace(/slowed/ig, '')
+            .replace(/reverb/ig, '')
+            .replace(/sped\s*up/ig, '')
+            .replace(/remix/ig, '')
+            .replace(/instrumental/ig, '')
+            .replace(/acoustic/ig, '')
+            .replace(/\(\s*\)/g, '')
+            .replace(/\[\s*\]/g, '')
+            .replace(/-s*$/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+        
+        const key = baseTitle.toLowerCase() + "||" + song.artist.toLowerCase();
+        if (!groups.has(key)) {
+            groups.set(key, { baseTitle, baseSong: song, versions: [] });
+        }
+        const group = groups.get(key);
+        
+        if (version === "Original" && group.versions.length > 0) {
+            group.baseSong = song;
+        }
+        
+        group.versions.push({
+            id: song.id,
+            versionName: version === "Original" ? "Original" : title
+        });
+    });
+    
+    return Array.from(groups.values());
+}
+
+export function createGroupCard(group) {
+    let optionsHtml = '';
+    if (group.versions && group.versions.length > 1) {
+        optionsHtml = `
+            <select class="version-select" onchange="this.closest('.music-card').dataset.songId = this.value" onclick="event.stopPropagation()">
+                ${group.versions.map(v => `<option value="${escapeHTML(v.id)}">${escapeHTML(v.versionName)}</option>`).join('')}
+            </select>
+        `;
+    }
+
     return `
-        <div class="music-card" data-song-id="${escapeHTML(song.id)}">
+        <div class="music-card" data-song-id="${escapeHTML(group.baseSong.id)}">
             <div class="card-img-wrapper">
-                <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}">
-                <button class="card-play-btn" aria-label="Play ${escapeHTML(song.title)}">▶</button>
-                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(song.title)} to queue">+</button>
-                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(song.title)}">...</button>
+                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}">
+                <button class="card-play-btn" aria-label="Play ${escapeHTML(group.baseTitle)}">▶</button>
+                <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(group.baseTitle)} to queue">+</button>
+                <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>
             </div>
-            <div class="card-title">${escapeHTML(song.title)}</div>
-            <div class="card-desc">${escapeHTML(song.artist)}</div>
+            <div class="card-title">${escapeHTML(group.baseTitle)}</div>
+            <div class="card-desc">${escapeHTML(group.baseSong.artist)}</div>
+            ${optionsHtml}
         </div>
     `;
 }
+
 
 export function formatTime(seconds) {
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
+export function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }
