@@ -89,6 +89,14 @@ const tools = [
                     },
                     required: ["songName", "artistName"]
                 }
+            },
+            {
+                name: "getShoppingCartContents",
+                description: "Retrieves the current items and quantities in the user's Unstoppable merchandise shopping cart.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             }
         ]
     }
@@ -97,9 +105,9 @@ const tools = [
 let chatSession = null;
 const ai = getVertexAI(app);
 try {
-    // Initialize Gemini 2.5 Flash
+    // Initialize Gemini 1.5 Flash
     const model = getGenerativeModel(ai, {
-        model: "gemini-2.5-flash",
+        model: "gemini-1.5-flash",
         systemInstruction: systemInstruction,
         tools: tools,
         generationConfig: {
@@ -115,6 +123,14 @@ try {
 }
 
 function initChatbot() {
+    // Inject CSS automatically if not present
+    if (!document.querySelector('link[href*="chatbot.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/chatbot.css';
+        document.head.appendChild(link);
+    }
+
     let chatbotWindow = document.getElementById('chatbot-window');
     
     // Inject Chatbot HTML if not present
@@ -277,6 +293,23 @@ function initChatbot() {
                             callResult = { success: true, message: "Song request submitted to admin." };
                         } catch (e) {
                             callResult = { success: false, error: e.message };
+                        }
+                    } else if (call.name === "getShoppingCartContents") {
+                        try {
+                            const rawCart = localStorage.getItem('localCart');
+                            if (rawCart) {
+                                const parsedCart = JSON.parse(rawCart);
+                                // The cart is typically an object mapping productId -> quantity
+                                if (Object.keys(parsedCart).length === 0) {
+                                    callResult = { empty: true, message: "The shopping cart is empty." };
+                                } else {
+                                    callResult = { empty: false, items: parsedCart };
+                                }
+                            } else {
+                                callResult = { empty: true, message: "The shopping cart is empty." };
+                            }
+                        } catch (e) {
+                            callResult = { error: "Failed to read shopping cart." };
                         }
                     }
 

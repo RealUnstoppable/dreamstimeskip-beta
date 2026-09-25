@@ -5,6 +5,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
 import './sitewide-player.js?v=20260924';
 import './ads.js';
+import './chatbot.js?v=20260925';
 
 let notificationUnsubscribe = null;
 
