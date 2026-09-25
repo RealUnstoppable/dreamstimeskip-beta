@@ -4434,5 +4434,2293 @@ export const lyricsData = {
                 }
             ]
         }
+    ],
+    "100-am-civ": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "2-dangerous-brennan-story-rarin": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "505-arctic-monkeys": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "7-rings-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "9pm-in-shibuya-432hz-adturnup": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "abismo-mixed-clap-freckles": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "all-about-that-bass-chrxs-beats-bread-beatz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "answer-to-everything-mixed-any-act": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "anything-adrianne-lenker": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "are-you-falling-in-love-akucum": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "ash-kaashh-lilbubblegum-1nonly": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "automotivo-bibi-fogosa-bibi-babydoll-dj-brunin-xm-kza-produc": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "automotivo-bibi-fogosa-slowed-reverb-bbygirl": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "b2b-charli-xcx": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "babydoll-ari-abdul": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bad-bitch-axaero-aio-holmes": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "baila-jazzao-chrxs-beats-bread-beatz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "birds-of-a-feather-billie-eilish": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "black-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-aw": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bleach-blvck-svm": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "blondie-current-joys": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bloodstained-shawty-ciscaux": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bludlust-daegho-ngxt": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "blue-billie-eilish": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "body-cash-cobain-a-boogie-wit-da-hoodie": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bop-aj-gravity": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bop-it-aliyahs-interlude": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "brag-aj-gravity": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "break-up-with-your-girlfriend-im-bored-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "bubble-gum-clairo": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "buster-atori-zoom": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "cabo-bankrol-hayden": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "cant-feel-myself-dadanny": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "celestial-angels-slowed-andromeda": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "cloud-9-beach-bunny": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "cross-my-heart-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "cryst4l-darkxhawk": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "death-is-no-more-slowed-blessed-mane": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "do-it-civ": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "dream-girl-crisaunt": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "duvet-boa": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "echo-the-boyz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "emo-boy-ayesha-erotica": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "empty-dreams-cypariss": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "fantasy-bazzi": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "fk-school-404vincent": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "fluxxwave-8d-audio-clovis-reyes": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "fluxxwave-clovis-reyes": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "gilded-lily-cults": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "government-hooker-bread-beatz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "government-hooker-slowed-bread-beatz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "grove-cheryltje": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "gta-iv-slowed-bianc0-stuck-in-98": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "guess-featuring-billie-eilish-charli-xcx-billie-eilish": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hatchback-cochise": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hate-that-i-made-you-love-me-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "haza-tiktok-version-udiennx": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hdmi-bones": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hey-hi-hello-1nonly-lilbubblegum-ciscaux": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "honest-baby-keem": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hot-to-go-chappell-roan": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "how-could-u-love-somebody-like-me-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "hydroplane-cochise": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-feel-it-bryansanon": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-like-the-way-you-kiss-me-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-wait-for-you-alex-g-offline": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "i-wanna-be-yours-arctic-monkeys": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "id-rather-pretend-a-colors-show-bryant-barnes": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "idfc-blackbear": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "idfc-tarro-remix-blackbear": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "if-u-think-im-pretty-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "if-you-care-akiaura-lonown-dj-pointless": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "im-god-clams-casino-imogen-heap": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "in-this-darkness-clara-la-san": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "job-application-chase-icon": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "jug-a-jug-mixed-any-act": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "just-want-u-to-feel-something-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "kerosene-crystal-castles": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "knicks-cochise": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "laa-mixed-danny-l-harle": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "legendary-lovers-x-save-me-aurelia-dopuu-b-star": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "les-childish-gambino": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "let-the-world-burn-chris-grey": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "let-the-world-burn-hoodtrap-mylancore-remix-chris-grey-r3bel": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "let-you-go-clara-la-san": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "lets-go-away-young-thug-a-boogie-wit-da-hoodie": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "lipstick-sped-up-version-burnedsam": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "look-back-at-it-a-boogie-wit-da-hoodie": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "lost-souls-baby-keem": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "love-game-bread-beatz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "love-island-civ": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "love-potions-princess-paparazzi-bj-lips": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "loyal-lil-wayne-tyga-chris-brown": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "lunch-billie-eilish": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "lyfe-prodbysky-teefaygoo-guitar-remix-ahfxck": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "makeba-sped-up-reverb-bbygirl": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "manasha-slowed-ashreveal-ashish-swargiary": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "me-vs-me-jaeychino-slimegetem": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "meet-me-halfway-black-eyed-peas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "mine-bazzi": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "montagem-coma-andromeda-elysian": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "montagem-kawaii-arxf-sayfalse": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "montagem-ladrao-super-slowed-atlxs-mxzi-itamar-mc": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "montagem-rebola-atlxs-dj-fku": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "motion-party-bossman-dlow": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "move-yo-body-sped-up-bryansanon": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "mr-pot-scraper-bossman-dlow": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "my-turn-ayetrappin-yeat": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "na-bala-bread-beatz-chrxs-beats": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "no-crumbs-radio-edit-alex-laws": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "on-my-own-darci": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "on-on-daniel-levi-cartoon-jeja": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "orange-soda-baby-keem": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "orions-belt-yeat-slowed-reverb-version-dammntc": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "palace-adturnup": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "passo-bem-solto-atlxs": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "passo-bem-solto-slowed-atlxs": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "petal-in-the-pavement-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "phonk-and-furious-atlxs": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "piano-tiles-2-armani-west-6arelyhuman-cortisa-star": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "piano-tiles-armani-west": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "pocket-rocket-cochise": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "pop-dat-thang-dababy": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "pretty-girl-clairo": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "pretty-scene-girl-clover": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "prettygrungewav-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "py-millions-travis-scott-drake-21-savage": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "rather-be-jess-glynne-clean-bandit": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "relationship-without-status-alkan-shade": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "ridin-brxkenbxy": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "ritual-andromeda-onimxru-maxpvnk": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "rock-that-body-black-eyed-peas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "rockstar-made-8d-audio-benz": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "romantic-homicide-d4vd": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "roxanne-arizona-zervas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sad-girlz-luv-money-kali-uchis-remix-amaarae-moliy": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sell-out-basco": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sex-drugs-etc-beach-weather": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "shake-sumn-remix-dababy-sexyy-red": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "shower-becky-g": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "side-to-side-nicki-minaj-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sigma-boy-betsy-maria-iankovskaia": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sleepwalker-slowed-akiaura-lonown-stm": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "slow-down-chase-atlantic": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sofia-clairo": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "somebody-future-a-boogie-wit-da-hoodie": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "someday-ill-get-it-alek-olsen": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "sonidero-mixed-ale-rossi": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "space-song-beach-house": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "stranger-things-chase-the-vulture": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "swim-chase-atlantic": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "tek-it-cafune": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "tek-it-sped-up-cafune": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "tell-em-cochise-not": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "the-days-notion-remix-slowed-chrystal": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "the-perfect-pair-beabadoobee": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "this-side-of-paradise-coyote-theory": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "time-alone-w-u-artemas": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "time-ariana-grande-childish-gambino": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "toradora-swoodeasu-caspy-breeton-boi": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "transgender-crystal-castles": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "trap-royalty-epic-version-carameii": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "tuca-donka-cursedevil-dj-fku-skorde": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "u-werent-here-i-really-miss-you-cult-member-mia-martina": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "u-werent-here-i-really-miss-you-slowed-cult-member-mia-marti": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "uwukrush-bemax-ovg": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "vyzee-slowed-charbo": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "wap-megan-thee-stallion-cardi-b": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "we-cant-be-friends-wait-for-your-love-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "we-on-go-bia": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "what-was-i-made-for-from-the-motion-picture-barbie-billie-ei": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "whoopty-cj": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "whyd-you-only-call-me-when-youre-high-arctic-monkeys": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "yes-and-ariana-grande": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "you-and-i-d4vd": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
+    ],
+    "yummy-righteous-remix-ayesha-erotica-mo-beats": [
+        {
+            "start": 0,
+            "end": 10,
+            "trending": false,
+            "words": [
+                {
+                    "text": "[Lyrics not yet available]",
+                    "start": 0
+                }
+            ]
+        }
     ]
 };
