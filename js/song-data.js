@@ -13,7 +13,23 @@ export const songColors = {
 };
 
 export const librarySongs = [
+
     {
+        "id": "lil-tjay-calling-my-phone",
+        "title": "Calling My Phone",
+        "artist": "Lil Tjay ft. 6LACK",
+        "duration": "3:04",
+        "src": "/music/lil_tjay_calling_my_phone.mp3",
+        "art": "/images/lil_tjay_calling_my_phone.jpg",
+        "bpm": 105,
+        "energy": 0.5,
+        "inmixPoint": 0,
+        "outmixPoint": 170,
+        "tags": [
+            "hiphop",
+            "viral"
+        ]
+    },    {
         "id": "summer-bummer",
         "title": "Summer Bummer (Lights On)",
         "artist": "Rhy Rhy",
