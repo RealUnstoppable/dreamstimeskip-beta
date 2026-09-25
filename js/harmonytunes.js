@@ -353,18 +353,21 @@ function initHarmonyTunes() {
                 loadSong(currentSongIndex);
 
                 const elapsed = Math.max(0, (Date.now() - (saved.timestamp || Date.now())) / 1000);
-                if (saved.isPlaying && elapsed < 20) {
-                    const targetTime = (saved.currentTime || 0) + elapsed;
-                    activeAudio.addEventListener('loadedmetadata', () => {
-                        activeAudio.currentTime = targetTime;
-                        playSong();
-                    }, { once: true });
-                    if (activeAudio.readyState >= 1) {
-                        activeAudio.currentTime = targetTime;
+                const isRecent = elapsed < 20;
+                
+                const targetTime = (saved.currentTime || 0) + (saved.isPlaying && isRecent ? elapsed : 0);
+                
+                const restorePositionAndState = () => {
+                    activeAudio.currentTime = targetTime;
+                    if (saved.isPlaying && isRecent) {
                         playSong();
                     }
-                } else if (saved.currentTime) {
-                    activeAudio.currentTime = saved.currentTime;
+                };
+
+                if (activeAudio.readyState >= 1) {
+                    restorePositionAndState();
+                } else {
+                    activeAudio.addEventListener('loadedmetadata', restorePositionAndState, { once: true });
                 }
 
                 if (saved.shuffle) {
@@ -1754,10 +1757,12 @@ function initHarmonyTunes() {
 
             // Load the same song into the new active audio
             activeAudio.src = song.src;
-            activeAudio.currentTime = block.paddedStart;
             
-            activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.addEventListener('loadedmetadata', () => {
+                activeAudio.currentTime = block.paddedStart;
+                activeAudio.volume = 0;
+                activeAudio.play().catch(e => console.error("Manager info:", e));
+            }, { once: true });
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1874,7 +1879,9 @@ function initHarmonyTunes() {
             
             activeAudio.src = song.src;
             const inmixPoint = songMetadata?.inmixPoint || 15;
-            activeAudio.currentTime = inmixPoint;
+            activeAudio.addEventListener('loadedmetadata', () => {
+                activeAudio.currentTime = inmixPoint;
+            }, { once: true });
             
             playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
             playerArtist.textContent = song.artist;
