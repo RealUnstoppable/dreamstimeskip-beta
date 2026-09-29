@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
 import { products, productMap } from './products-data.js';
@@ -204,24 +204,26 @@ export async function handleAddToCart(productId, event) {
                 // Trigger reflow
                 flyImg.getBoundingClientRect();
                 
-                const cartBtn = document.getElementById('cart-button');
-                const cartRect = cartBtn.getBoundingClientRect();
-                
-                flyImg.style.top = (cartRect.top + 10) + 'px';
-                flyImg.style.left = (cartRect.left + 10) + 'px';
-                flyImg.style.width = '50px';
-                flyImg.style.height = '50px';
-                flyImg.style.opacity = '0';
-                
-                setTimeout(() => {
-                    if (flyImg.parentNode) {
-                        flyImg.parentNode.removeChild(flyImg);
-                    }
-                    cartBtn.style.transform = 'scale(1.3)';
+                const targetOrb = document.getElementById('siri-orb') || document.getElementById('cart-button');
+                if (targetOrb) {
+                    const cartRect = targetOrb.getBoundingClientRect();
+                    flyImg.style.top = (cartRect.top + 10) + 'px';
+                    flyImg.style.left = (cartRect.left + 10) + 'px';
+                    flyImg.style.width = '40px';
+                    flyImg.style.height = '40px';
+                    flyImg.style.opacity = '0';
+                    
                     setTimeout(() => {
-                        cartBtn.style.transform = '';
-                    }, 300);
-                }, 800);
+                        if (flyImg.parentNode) {
+                            flyImg.parentNode.removeChild(flyImg);
+                        }
+                        targetOrb.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                        targetOrb.style.transform = 'scale(1.25)';
+                        setTimeout(() => {
+                            targetOrb.style.transform = '';
+                        }, 200);
+                    }, 800);
+                }
             }
         }
     }
@@ -261,7 +263,7 @@ async function handleRemoveFromCart(productId) {
 }
 
 export async function toggleWishlist(productId) {
-    if (!currentUser) {
+    if (!currentUser && !auth.currentUser) {
         window.location.href = 'sign in beta.html';
         return;
     }
@@ -297,7 +299,7 @@ async function saveWishlist() {
 
         saveWishlistTimeout = setTimeout(async () => {
             try {
-                const userWishlistRef = doc(db, 'wishlists', currentUser.uid);
+                const userWishlistRef = doc(db, 'wishlists', activeUser.uid);
                 await setDoc(userWishlistRef, { items: Array.from(wishlist) });
                 resolve();
             } catch (error) {
@@ -318,9 +320,9 @@ async function saveCart() {
     return new Promise((resolve) => {
         pendingResolves.push(resolve);
         saveCartTimeout = setTimeout(async () => {
-            if (currentUser) {
+            if (currentUser || auth.currentUser) {
                 try {
-                    const userCartRef = doc(db, 'carts', currentUser.uid);
+                    const userCartRef = doc(db, 'carts', activeUser.uid);
                     await setDoc(userCartRef, { items: cart });
                 } catch (error) {
                     console.error("Manager info: Error saving cart to Firestore:", error.message);
@@ -405,14 +407,19 @@ async function fetchProductReviews(productId) {
 
 async function handleViewReviews(productId) {
     currentReviewProductId = productId;
+    const reviewModal = document.getElementById('reviewModal');
     if (reviewModal) reviewModal.style.display = 'flex';
     if (reviewsListContainer) reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
 
-    if (currentUser) {
+    if (currentUser || auth.currentUser) {
+        const writeReviewSection = document.getElementById('writeReviewSection');
         if (writeReviewSection) writeReviewSection.style.display = 'block';
+        const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         if (loginToReviewMsg) loginToReviewMsg.style.display = 'none';
     } else {
+        const writeReviewSection = document.getElementById('writeReviewSection');
         if (writeReviewSection) writeReviewSection.style.display = 'none';
+        const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         if (loginToReviewMsg) loginToReviewMsg.style.display = 'block';
     }
 
@@ -488,54 +495,17 @@ function setupEventListeners() {
     }
 
     // Cart modal listeners
-    const lexiMenu = document.getElementById('lexi-menu');
-    const lexiViewCartBtn = document.getElementById('lexi-view-cart-btn');
-    const lexiAskBtn = document.getElementById('lexi-ask-btn');
-
-    if (cartButton && cartModal && closeCartBtn) {
-        cartButton.addEventListener('click', (e) => {
-            if (lexiMenu) {
-                e.stopPropagation();
-                if (lexiMenu.style.display === 'flex') {
-                    lexiMenu.style.opacity = '0';
-                    lexiMenu.style.transform = 'translateY(20px)';
-                    setTimeout(() => lexiMenu.style.display = 'none', 300);
-                } else {
-                    lexiMenu.style.display = 'flex';
-                    setTimeout(() => {
-                        lexiMenu.style.opacity = '1';
-                        lexiMenu.style.transform = 'translateY(0)';
-                    }, 10);
-                }
-            } else {
-                cartModal.style.display = 'block';
-            }
-        });
-
+    if (cartModal) {
+        if (closeCartBtn) {
+            closeCartBtn.addEventListener('click', () => {
+                cartModal.style.display = 'none';
+            });
+        }
         window.addEventListener('click', (e) => {
-            if (lexiMenu && lexiMenu.style.display === 'flex' && !lexiMenu.contains(e.target)) {
-                lexiMenu.style.opacity = '0';
-                lexiMenu.style.transform = 'translateY(20px)';
-                setTimeout(() => lexiMenu.style.display = 'none', 300);
-            }
             if (e.target === cartModal) {
                 cartModal.style.display = 'none';
             }
         });
-
-        if (lexiViewCartBtn) {
-            lexiViewCartBtn.addEventListener('click', () => {
-                cartModal.style.display = 'block';
-            });
-        }
-        if (lexiAskBtn) {
-            lexiAskBtn.addEventListener('click', () => {
-                // Future Lexi Chat logic
-                alert("Lexi is sleeping right now. Check back later!");
-            });
-        }
-
-        closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
     }
 
     // Cart item action listeners
@@ -562,6 +532,8 @@ function setupEventListeners() {
         });
     }
 
+    const closeReviewBtn = document.getElementById('closeReviewBtn');
+    const reviewModal = document.getElementById('reviewModal');
     if (closeReviewBtn && reviewModal) {
         closeReviewBtn.addEventListener('click', () => reviewModal.style.display = 'none');
         window.addEventListener('click', (e) => {
@@ -571,10 +543,12 @@ function setupEventListeners() {
         });
     }
 
+    const writeReviewForm = document.getElementById('writeReviewForm');
     if (writeReviewForm) {
         writeReviewForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser || !currentReviewProductId) return;
+            const activeUser = currentUser || auth.currentUser;
+    if (!activeUser || !currentReviewProductId) return;
 
             const rating = parseInt(document.getElementById('review-rating').value, 10);
             const comment = document.getElementById('review-comment').value;
@@ -586,15 +560,15 @@ function setupEventListeners() {
 
             try {
                 // Fetch username
-                const userData = await getCachedUserProfile({uid: currentUser.uid});
+                const userData = await getCachedUserProfile({uid: activeUser.uid});
                 let username = userData ? (userData.username || "User") : "User";
 
-                const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
+                const reviewId = `${currentReviewProductId}_${activeUser.uid}`;
                 const reviewRef = doc(db, 'product_reviews', reviewId);
 
                 await setDoc(reviewRef, {
                     productId: currentReviewProductId,
-                    userId: currentUser.uid,
+                    userId: activeUser.uid,
                     username: username,
                     rating: rating,
                     comment: comment,
@@ -642,7 +616,7 @@ async function openReviewsModal(productId) {
     reviewNotification.innerHTML = '';
 
     // Toggle Auth Sections
-    if (currentUser) {
+    if (currentUser || auth.currentUser) {
         reviewSubmissionSection.style.display = 'block';
         loginPromptSection.style.display = 'none';
     } else {
@@ -704,7 +678,8 @@ async function loadReviews(productId) {
 
 async function handleReviewSubmit(e) {
     e.preventDefault();
-    if (!currentUser || !currentReviewProductId) return;
+    const activeUser = currentUser || auth.currentUser;
+    if (!activeUser || !currentReviewProductId) return;
 
     if (currentRating === 0) {
         reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
@@ -719,18 +694,49 @@ async function handleReviewSubmit(e) {
     submitReviewBtn.textContent = 'Submitting...';
 
     try {
-        let authorName = currentUser.displayName || 'Anonymous';
-        const userData = await getCachedUserProfile({uid: currentUser.uid});
+        let authorName = activeUser.displayName || 'Anonymous';
+        const userData = await getCachedUserProfile({uid: activeUser.uid});
         if (userData && userData.username) authorName = userData.username;
 
         await addDoc(collection(db, "reviews"), {
             productId: currentReviewProductId,
-            userId: currentUser.uid,
+            userId: activeUser.uid,
             authorName: authorName,
             rating: currentRating,
             text: text,
             createdAt: serverTimestamp()
         });
+
+        // Award 25 loyalty points for reviewing a product
+        try {
+            const userRef = doc(db, "users", activeUser.uid);
+            await updateDoc(userRef, {
+                pointsBalance: increment(25),
+                loyaltyPoints: increment(25)
+            });
+
+            const prod = productMap.get(currentReviewProductId);
+            const prodName = prod ? prod.name : 'Product';
+
+            await addDoc(collection(db, "loyalty_transactions"), {
+                userId: activeUser.uid,
+                description: `Product Review - ${prodName} ⭐`,
+                points: 25,
+                type: 'earned',
+                createdAt: serverTimestamp()
+            });
+
+            const cacheKey = `profile_${activeUser.uid}`;
+            const cachedStr = sessionStorage.getItem(cacheKey);
+            if (cachedStr) {
+                const uData = JSON.parse(cachedStr);
+                uData.pointsBalance = (uData.pointsBalance || 0) + 25;
+                uData.loyaltyPoints = (uData.loyaltyPoints || 0) + 25;
+                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+            }
+        } catch (ptsErr) {
+            console.warn("Points award warning for review:", ptsErr);
+        }
 
         // Optimistic UI Update for stats
         const currentStats = productStatsMap.get(currentReviewProductId) || { averageRating: 0, reviewCount: 0 };
