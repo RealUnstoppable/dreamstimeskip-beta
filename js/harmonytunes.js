@@ -2175,6 +2175,10 @@ function initHarmonyTunes() {
     // ⚡ Bolt: Throttling high-frequency timeupdate event using requestAnimationFrame
     // to decouple rapid event firing from expensive DOM updates.
     let isUpdatingProgress = false;
+    let _cachedCurrentTimeStr = "";
+    let _cachedTotalTimeStr = "";
+    let _paintEffectsCache = null;
+
     function updateProgress() {
         if (!isUpdatingProgress) {
             window.requestAnimationFrame(() => {
@@ -2183,11 +2187,21 @@ function initHarmonyTunes() {
                     const percent = (currentTime / duration) * 100;
                     progress.style.width = `${percent}%`;
             if(fsProgress) fsProgress.style.width = `${percent}%`;
-            if(fsCurrentTime) fsCurrentTime.textContent = formatTime(activeAudio.currentTime);
-            if(fsTotalTime && activeAudio.duration) fsTotalTime.textContent = showCountdown ? "-" + formatTime(activeAudio.duration - activeAudio.currentTime) : formatTime(activeAudio.duration);
 
-                    currentTimeEl.textContent = formatTime(currentTime);
-                    totalTimeEl.textContent = showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration);
+                    const currTimeStr = formatTime(currentTime);
+                    const totalTimeStr = showCountdown ? "-" + formatTime(duration - currentTime) : formatTime(duration);
+
+                    if (currTimeStr !== _cachedCurrentTimeStr) {
+                        _cachedCurrentTimeStr = currTimeStr;
+                        if(fsCurrentTime) fsCurrentTime.textContent = currTimeStr;
+                        currentTimeEl.textContent = currTimeStr;
+                    }
+
+                    if (totalTimeStr !== _cachedTotalTimeStr) {
+                        _cachedTotalTimeStr = totalTimeStr;
+                        if(fsTotalTime) fsTotalTime.textContent = totalTimeStr;
+                        totalTimeEl.textContent = totalTimeStr;
+                    }
                 }
                 syncLyrics();
                 
@@ -2197,7 +2211,10 @@ function initHarmonyTunes() {
                     const currentBeat = Math.floor(currentTime / beatInterval);
                     if (window._lastPaintBeat !== currentBeat) {
                         window._lastPaintBeat = currentBeat;
-                        const effects = document.querySelectorAll('.paint-spill-effect');
+                        if (!_paintEffectsCache) {
+                            _paintEffectsCache = document.querySelectorAll('.paint-spill-effect');
+                        }
+                        const effects = _paintEffectsCache;
                         effects.forEach(effect => {
                             const rx = Math.floor(Math.random() * 80) + 10;
                             const ry = Math.floor(Math.random() * 80) + 10;
