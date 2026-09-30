@@ -8,6 +8,30 @@ link.rel = 'stylesheet';
 link.href = '/css/onboarding.css';
 document.head.appendChild(link);
 
+
+// Anti-Bypass System
+let antiBypassInterval;
+
+function enforceAntiBypass() {
+    const layout = document.querySelector('.spotify-layout');
+    if (layout) layout.style.display = 'none';
+    
+    // Watch for them deleting the overlay via DevTools
+    if (antiBypassInterval) clearInterval(antiBypassInterval);
+    antiBypassInterval = setInterval(() => {
+        if (!auth.currentUser && !document.getElementById('medixly-onboarding')) {
+            // They deleted the overlay without logging in!
+            window.location.replace('index.html');
+        }
+    }, 500);
+}
+
+function liftAntiBypass() {
+    const layout = document.querySelector('.spotify-layout');
+    if (layout) layout.style.display = '';
+    if (antiBypassInterval) clearInterval(antiBypassInterval);
+}
+
 function createOnboardingUI() {
     const overlay = document.createElement('div');
     overlay.className = 'medixly-onboarding-overlay';
@@ -53,7 +77,7 @@ function createOnboardingUI() {
                 <div class="onboarding-error" id="ob-error"></div>
             </form>
             <div style="margin-top: 15px; font-size: 13px; color: #aaa;">
-                Already have an account? <a href="/sign in beta.html" style="color: #bb86fc;">Sign in</a>
+                Already have an account? <a href="/sign in beta.html?redirect=harmonytunes.html" style="color: #bb86fc;">Sign in</a>
             </div>
         </div>
     `;
@@ -123,6 +147,7 @@ function createOnboardingUI() {
             // Wait a moment then dismiss the overlay
             submitBtn.textContent = "Welcome to Medixly!";
             submitBtn.style.background = "#50fa7b";
+            liftAntiBypass();
             
             setTimeout(() => {
                 overlay.style.opacity = '0';
@@ -145,12 +170,14 @@ onAuthStateChanged(auth, (user) => {
         hasCheckedAuth = true;
         if (!user) {
             createOnboardingUI();
+            enforceAntiBypass();
         }
     } else {
         // If they sign in/out later, we can optionally show/hide it
         if (user) {
             const ob = document.getElementById('medixly-onboarding');
             if (ob) ob.remove();
+            liftAntiBypass();
         }
     }
 });
