@@ -400,9 +400,7 @@ export async function renderRewards(user, userData) {
 
     } catch (err) {
         console.error("Error rendering rewards:", err);
-        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
-        if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
-        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
+        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
     }
 }
 
@@ -750,10 +748,34 @@ export async function loadWishlist(userId) {
                     if (shareBtn) shareBtn.style.display = 'inline-block';
                     if (linkContainer) linkContainer.style.display = 'none';
                 }
+                
+                // RENDER WISHLIST ITEMS
+                const itemsHtml = data.items.map(itemId => {
+                    const prod = productMap[itemId];
+                    if (!prod) return '';
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${prod.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" alt="${escapeHTML(prod.name)}">
+                                <div>
+                                    <strong style="color: #fff;">${escapeHTML(prod.name)}</strong>
+                                    <div style="color: var(--text-secondary); font-size: 0.9rem;">${prod.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <button onclick="window.location.href='shop.html'" style="padding: 5px 10px; background: var(--accent-color); color: #fff; border: none; border-radius: 4px; cursor: pointer;">View Shop</button>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = itemsHtml;
+                
             } else {
                 if (shareBtn) shareBtn.style.display = 'none';
                 if (linkContainer) linkContainer.style.display = 'none';
+                container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
             }
+        } else {
+            container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
         }
 
         if (shareBtn) {
@@ -893,6 +915,13 @@ export async function loadUserTickets(userId) {
 export function initAccountPage() {
     // Immediate tab setup so navigation is 100% interactive without waiting for auth
     initTabNavigation();
+    
+    // Listen for wishlist updates from shop.js
+    window.addEventListener('wishlistUpdated', () => {
+        if (currentUser) {
+            loadWishlist(currentUser.uid);
+        }
+    });
 
     // Firebase Auth State
     onAuthStateChanged(auth, async (user) => {
@@ -941,7 +970,7 @@ export function initAccountPage() {
 
         // Sign Out
         document.getElementById('sign-out')?.addEventListener('click', () => {
-            sessionStorage.removeItem(cacheKey);
+            sessionStorage.removeItem(`profile_${user.uid}`);
             signOut(auth).then(() => window.location.replace('index.html'));
         });
 
@@ -959,7 +988,7 @@ export function initAccountPage() {
             try {
                 await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                 userData.username = newUsername;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 const welcomeHeader = document.getElementById('welcome-header');
                 if (welcomeHeader) welcomeHeader.textContent = `Welcome back, ${newUsername}!`;
@@ -1005,7 +1034,7 @@ export function initAccountPage() {
                 await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                 userData.theme = theme;
                 userData.accentColor = accentColor;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 document.body.dataset.theme = theme;
                 document.documentElement.style.setProperty('--accent-color', accentColor);
@@ -1066,7 +1095,7 @@ export function initAccountPage() {
                 try {
                     await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
                     userData.twoFactorEnabled = isEnabled;
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
                     alert(`Two-Factor Authentication (2FA) is now ${isEnabled ? 'enabled' : 'disabled'}.`);
                 } catch (err) {
                     e.target.checked = !isEnabled;
@@ -1202,7 +1231,7 @@ export function initAccountPage() {
 
                 await updateDoc(doc(db, "users", user.uid), { photoURL });
                 userData.photoURL = photoURL;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 if (pfpNotification) {
                     pfpNotification.textContent = 'Profile picture updated successfully!';

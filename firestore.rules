@@ -40,7 +40,8 @@ service cloud.firestore {
     // Loyalty transactions
     match /loyalty_transactions/{transactionId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow write: if false; // Only backend writes
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {
@@ -143,7 +144,8 @@ service cloud.firestore {
     // Reward Transactions collection
     match /reward_transactions/{transactionId} {
       allow read: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow write: if false; // Only backend can write
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
     // Deny all other access by default
