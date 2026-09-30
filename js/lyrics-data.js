@@ -1,28 +1,1264 @@
 export const lyricsData = {
 
-        "kobzx2z-take-my-hand": [
-        { "start": 0, "end": 14, "trending": false, "words": [ { "text": "(Instrumental Intro)", "start": 0 } ] },
-        { "start": 14, "end": 17, "trending": false, "words": [ { "text": "I", "start": 14.0 }, { "text": "found", "start": 14.5 }, { "text": "a", "start": 15.0 }, { "text": "girl,", "start": 15.5 }, { "text": "real", "start": 16.0 }, { "text": "superstar", "start": 16.5 } ] },
-        { "start": 17, "end": 20, "trending": false, "words": [ { "text": "She's", "start": 17.0 }, { "text": "got", "start": 17.5 }, { "text": "it", "start": 18.0 }, { "text": "all,", "start": 18.5 }, { "text": "the", "start": 19.0 }, { "text": "face", "start": 19.5 }, { "text": "card", "start": 19.8 } ] },
-        { "start": 20, "end": 24, "trending": false, "words": [ { "text": "And", "start": 20.0 }, { "text": "I", "start": 20.5 }, { "text": "know", "start": 21.0 }, { "text": "she's", "start": 21.5 }, { "text": "worth", "start": 22.0 }, { "text": "any", "start": 22.5 }, { "text": "amount", "start": 23.0 } ] },
-        { "start": 24, "end": 28, "trending": true, "words": [ { "text": "Baby", "start": 24.0 }, { "text": "take", "start": 25.0 }, { "text": "my", "start": 26.0 }, { "text": "hand", "start": 27.0 } ] },
-        { "start": 28, "end": 35, "trending": false, "words": [ { "text": "(Instrumental Break)", "start": 28.0 } ] },
-        { "start": 35, "end": 38, "trending": false, "words": [ { "text": "I", "start": 35.0 }, { "text": "found", "start": 35.5 }, { "text": "a", "start": 36.0 }, { "text": "girl,", "start": 36.5 }, { "text": "real", "start": 37.0 }, { "text": "superstar", "start": 37.5 } ] },
-        { "start": 38, "end": 41, "trending": false, "words": [ { "text": "She's", "start": 38.0 }, { "text": "got", "start": 38.5 }, { "text": "it", "start": 39.0 }, { "text": "all,", "start": 39.5 }, { "text": "the", "start": 40.0 }, { "text": "face", "start": 40.5 }, { "text": "card", "start": 40.8 } ] },
-        { "start": 41, "end": 45, "trending": false, "words": [ { "text": "And", "start": 41.0 }, { "text": "I", "start": 41.5 }, { "text": "know", "start": 42.0 }, { "text": "she's", "start": 42.5 }, { "text": "worth", "start": 43.0 }, { "text": "any", "start": 43.5 }, { "text": "amount", "start": 44.0 } ] },
-        { "start": 45, "end": 49, "trending": true, "words": [ { "text": "Baby", "start": 45.0 }, { "text": "take", "start": 46.0 }, { "text": "my", "start": 47.0 }, { "text": "hand", "start": 48.0 } ] },
-        { "start": 49, "end": 65, "trending": false, "words": [ { "text": "(Instrumental Interlude)", "start": 49.0 } ] },
-        { "start": 65, "end": 68, "trending": false, "words": [ { "text": "I", "start": 65.0 }, { "text": "found", "start": 65.5 }, { "text": "a", "start": 66.0 }, { "text": "girl,", "start": 66.5 }, { "text": "real", "start": 67.0 }, { "text": "superstar", "start": 67.5 } ] },
-        { "start": 68, "end": 71, "trending": false, "words": [ { "text": "She's", "start": 68.0 }, { "text": "got", "start": 68.5 }, { "text": "it", "start": 69.0 }, { "text": "all,", "start": 69.5 }, { "text": "the", "start": 70.0 }, { "text": "face", "start": 70.5 }, { "text": "card", "start": 70.8 } ] },
-        { "start": 71, "end": 75, "trending": false, "words": [ { "text": "And", "start": 71.0 }, { "text": "I", "start": 71.5 }, { "text": "know", "start": 72.0 }, { "text": "she's", "start": 72.5 }, { "text": "worth", "start": 73.0 }, { "text": "any", "start": 73.5 }, { "text": "amount", "start": 74.0 } ] },
-        { "start": 75, "end": 79, "trending": true, "words": [ { "text": "Baby", "start": 75.0 }, { "text": "take", "start": 76.0 }, { "text": "my", "start": 77.0 }, { "text": "hand", "start": 78.0 } ] },
-        { "start": 79, "end": 105, "trending": false, "words": [ { "text": "(Instrumental Interlude)", "start": 79.0 } ] },
-        { "start": 105, "end": 108, "trending": false, "words": [ { "text": "I", "start": 105.0 }, { "text": "found", "start": 105.5 }, { "text": "a", "start": 106.0 }, { "text": "girl,", "start": 106.5 }, { "text": "real", "start": 107.0 }, { "text": "superstar", "start": 107.5 } ] },
-        { "start": 108, "end": 111, "trending": false, "words": [ { "text": "She's", "start": 108.0 }, { "text": "got", "start": 108.5 }, { "text": "it", "start": 109.0 }, { "text": "all,", "start": 109.5 }, { "text": "the", "start": 110.0 }, { "text": "face", "start": 110.5 }, { "text": "card", "start": 110.8 } ] },
-        { "start": 111, "end": 115, "trending": false, "words": [ { "text": "And", "start": 111.0 }, { "text": "I", "start": 111.5 }, { "text": "know", "start": 112.0 }, { "text": "she's", "start": 112.5 }, { "text": "worth", "start": 113.0 }, { "text": "any", "start": 113.5 }, { "text": "amount", "start": 114.0 } ] },
-        { "start": 115, "end": 119, "trending": true, "words": [ { "text": "Baby", "start": 115.0 }, { "text": "take", "start": 116.0 }, { "text": "my", "start": 117.0 }, { "text": "hand", "start": 118.0 } ] },
-        { "start": 119, "end": 154, "trending": false, "words": [ { "text": "(Outro)", "start": 119.0 } ] }
-    ],
+                "kobzx2z-take-my-hand": [
+    {
+        "start": 12,
+        "end": 16.21,
+        "trending": false,
+        "words": [
+            {
+                "text": "I",
+                "start": 12
+            },
+            {
+                "text": "found",
+                "start": 12.7
+            },
+            {
+                "text": "a",
+                "start": 13.4
+            },
+            {
+                "text": "girl,",
+                "start": 14.11
+            },
+            {
+                "text": "real",
+                "start": 14.81
+            },
+            {
+                "text": "superstar",
+                "start": 15.51
+            }
+        ]
+    },
+    {
+        "start": 16.71,
+        "end": 20.92,
+        "trending": false,
+        "words": [
+            {
+                "text": "She's",
+                "start": 16.71
+            },
+            {
+                "text": "got",
+                "start": 17.31
+            },
+            {
+                "text": "it",
+                "start": 17.91
+            },
+            {
+                "text": "all,",
+                "start": 18.51
+            },
+            {
+                "text": "the",
+                "start": 19.12
+            },
+            {
+                "text": "face",
+                "start": 19.72
+            },
+            {
+                "text": "card",
+                "start": 20.32
+            }
+        ]
+    },
+    {
+        "start": 21.43,
+        "end": 25.64,
+        "trending": false,
+        "words": [
+            {
+                "text": "And",
+                "start": 21.43
+            },
+            {
+                "text": "I",
+                "start": 22.03
+            },
+            {
+                "text": "know",
+                "start": 22.63
+            },
+            {
+                "text": "she's",
+                "start": 23.23
+            },
+            {
+                "text": "worth",
+                "start": 23.84
+            },
+            {
+                "text": "any",
+                "start": 24.44
+            },
+            {
+                "text": "amount",
+                "start": 25.04
+            }
+        ]
+    },
+    {
+        "start": 26.14,
+        "end": 30.35,
+        "trending": false,
+        "words": [
+            {
+                "text": "Not",
+                "start": 26.14
+            },
+            {
+                "text": "talking",
+                "start": 26.74
+            },
+            {
+                "text": "diamonds,",
+                "start": 27.34
+            },
+            {
+                "text": "'cause",
+                "start": 27.94
+            },
+            {
+                "text": "she's",
+                "start": 28.55
+            },
+            {
+                "text": "the",
+                "start": 29.15
+            },
+            {
+                "text": "prize",
+                "start": 29.75
+            }
+        ]
+    },
+    {
+        "start": 30.86,
+        "end": 35.07,
+        "trending": false,
+        "words": [
+            {
+                "text": "When",
+                "start": 30.86
+            },
+            {
+                "text": "I'm",
+                "start": 31.24
+            },
+            {
+                "text": "calling",
+                "start": 31.63
+            },
+            {
+                "text": "she",
+                "start": 32.01
+            },
+            {
+                "text": "don't",
+                "start": 32.39
+            },
+            {
+                "text": "mind,",
+                "start": 32.77
+            },
+            {
+                "text": "if",
+                "start": 33.16
+            },
+            {
+                "text": "it's",
+                "start": 33.54
+            },
+            {
+                "text": "late",
+                "start": 33.92
+            },
+            {
+                "text": "night,",
+                "start": 34.3
+            },
+            {
+                "text": "stateside",
+                "start": 34.69
+            }
+        ]
+    },
+    {
+        "start": 35.57,
+        "end": 39.78,
+        "trending": false,
+        "words": [
+            {
+                "text": "You",
+                "start": 35.57
+            },
+            {
+                "text": "know",
+                "start": 36.27
+            },
+            {
+                "text": "what",
+                "start": 36.97
+            },
+            {
+                "text": "I'd",
+                "start": 37.67
+            },
+            {
+                "text": "do",
+                "start": 38.38
+            },
+            {
+                "text": "(ou-ou)",
+                "start": 39.08
+            }
+        ]
+    },
+    {
+        "start": 40.29,
+        "end": 44.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "If",
+                "start": 40.29
+            },
+            {
+                "text": "I",
+                "start": 40.99
+            },
+            {
+                "text": "were",
+                "start": 41.69
+            },
+            {
+                "text": "with",
+                "start": 42.39
+            },
+            {
+                "text": "you",
+                "start": 43.1
+            },
+            {
+                "text": "(you)",
+                "start": 43.8
+            }
+        ]
+    },
+    {
+        "start": 45,
+        "end": 48.25,
+        "trending": true,
+        "words": [
+            {
+                "text": "Oh",
+                "start": 45
+            },
+            {
+                "text": "baby,",
+                "start": 45.41
+            },
+            {
+                "text": "take",
+                "start": 45.81
+            },
+            {
+                "text": "my",
+                "start": 46.22
+            },
+            {
+                "text": "hand,",
+                "start": 46.63
+            },
+            {
+                "text": "come",
+                "start": 47.03
+            },
+            {
+                "text": "with",
+                "start": 47.44
+            },
+            {
+                "text": "me",
+                "start": 47.84
+            }
+        ]
+    },
+    {
+        "start": 48.75,
+        "end": 52,
+        "trending": true,
+        "words": [
+            {
+                "text": "Ill",
+                "start": 48.75
+            },
+            {
+                "text": "take",
+                "start": 49.11
+            },
+            {
+                "text": "you",
+                "start": 49.47
+            },
+            {
+                "text": "to",
+                "start": 49.83
+            },
+            {
+                "text": "places",
+                "start": 50.19
+            },
+            {
+                "text": "you've",
+                "start": 50.56
+            },
+            {
+                "text": "never",
+                "start": 50.92
+            },
+            {
+                "text": "ever",
+                "start": 51.28
+            },
+            {
+                "text": "been",
+                "start": 51.64
+            }
+        ]
+    },
+    {
+        "start": 52.5,
+        "end": 55.75,
+        "trending": true,
+        "words": [
+            {
+                "text": "I",
+                "start": 52.5
+            },
+            {
+                "text": "could",
+                "start": 52.96
+            },
+            {
+                "text": "give",
+                "start": 53.43
+            },
+            {
+                "text": "that",
+                "start": 53.89
+            },
+            {
+                "text": "girl",
+                "start": 54.36
+            },
+            {
+                "text": "a",
+                "start": 54.82
+            },
+            {
+                "text": "palace",
+                "start": 55.29
+            }
+        ]
+    },
+    {
+        "start": 56.25,
+        "end": 59.5,
+        "trending": true,
+        "words": [
+            {
+                "text": "She",
+                "start": 56.25
+            },
+            {
+                "text": "don't",
+                "start": 56.79
+            },
+            {
+                "text": "know",
+                "start": 57.33
+            },
+            {
+                "text": "her",
+                "start": 57.88
+            },
+            {
+                "text": "beauty's",
+                "start": 58.42
+            },
+            {
+                "text": "timeless",
+                "start": 58.96
+            }
+        ]
+    },
+    {
+        "start": 60,
+        "end": 63.25,
+        "trending": true,
+        "words": [
+            {
+                "text": "Baby,",
+                "start": 60
+            },
+            {
+                "text": "take",
+                "start": 60.46
+            },
+            {
+                "text": "my",
+                "start": 60.93
+            },
+            {
+                "text": "hand,",
+                "start": 61.39
+            },
+            {
+                "text": "come",
+                "start": 61.86
+            },
+            {
+                "text": "with",
+                "start": 62.32
+            },
+            {
+                "text": "me",
+                "start": 62.79
+            }
+        ]
+    },
+    {
+        "start": 63.75,
+        "end": 67,
+        "trending": true,
+        "words": [
+            {
+                "text": "Riding",
+                "start": 63.75
+            },
+            {
+                "text": "till",
+                "start": 64.08
+            },
+            {
+                "text": "the",
+                "start": 64.4
+            },
+            {
+                "text": "end,",
+                "start": 64.72
+            },
+            {
+                "text": "no",
+                "start": 65.05
+            },
+            {
+                "text": "this",
+                "start": 65.38
+            },
+            {
+                "text": "ain't",
+                "start": 65.7
+            },
+            {
+                "text": "a",
+                "start": 66.03
+            },
+            {
+                "text": "bad",
+                "start": 66.35
+            },
+            {
+                "text": "trip",
+                "start": 66.67
+            }
+        ]
+    },
+    {
+        "start": 67.5,
+        "end": 70.75,
+        "trending": true,
+        "words": [
+            {
+                "text": "Think",
+                "start": 67.5
+            },
+            {
+                "text": "I",
+                "start": 67.96
+            },
+            {
+                "text": "found",
+                "start": 68.43
+            },
+            {
+                "text": "myself",
+                "start": 68.89
+            },
+            {
+                "text": "a",
+                "start": 69.36
+            },
+            {
+                "text": "bad",
+                "start": 69.82
+            },
+            {
+                "text": "bitch",
+                "start": 70.29
+            }
+        ]
+    },
+    {
+        "start": 71.25,
+        "end": 74.5,
+        "trending": true,
+        "words": [
+            {
+                "text": "She",
+                "start": 71.25
+            },
+            {
+                "text": "don't",
+                "start": 71.71
+            },
+            {
+                "text": "know",
+                "start": 72.18
+            },
+            {
+                "text": "that",
+                "start": 72.64
+            },
+            {
+                "text": "she's",
+                "start": 73.11
+            },
+            {
+                "text": "the",
+                "start": 73.57
+            },
+            {
+                "text": "baddest",
+                "start": 74.04
+            }
+        ]
+    },
+    {
+        "start": 75,
+        "end": 78.79,
+        "trending": false,
+        "words": [
+            {
+                "text": "I",
+                "start": 75
+            },
+            {
+                "text": "could",
+                "start": 75.47
+            },
+            {
+                "text": "be",
+                "start": 75.95
+            },
+            {
+                "text": "the",
+                "start": 76.42
+            },
+            {
+                "text": "cupid",
+                "start": 76.9
+            },
+            {
+                "text": "to",
+                "start": 77.37
+            },
+            {
+                "text": "your",
+                "start": 77.84
+            },
+            {
+                "text": "heart",
+                "start": 78.32
+            }
+        ]
+    },
+    {
+        "start": 79.29,
+        "end": 83.08,
+        "trending": false,
+        "words": [
+            {
+                "text": "You",
+                "start": 79.29
+            },
+            {
+                "text": "could",
+                "start": 79.76
+            },
+            {
+                "text": "be",
+                "start": 80.24
+            },
+            {
+                "text": "the",
+                "start": 80.71
+            },
+            {
+                "text": "music",
+                "start": 81.19
+            },
+            {
+                "text": "to",
+                "start": 81.66
+            },
+            {
+                "text": "my",
+                "start": 82.13
+            },
+            {
+                "text": "lines",
+                "start": 82.61
+            }
+        ]
+    },
+    {
+        "start": 83.57,
+        "end": 87.36,
+        "trending": false,
+        "words": [
+            {
+                "text": "You",
+                "start": 83.57
+            },
+            {
+                "text": "could",
+                "start": 84.04
+            },
+            {
+                "text": "be",
+                "start": 84.52
+            },
+            {
+                "text": "the",
+                "start": 84.99
+            },
+            {
+                "text": "Bonnie",
+                "start": 85.47
+            },
+            {
+                "text": "to",
+                "start": 85.94
+            },
+            {
+                "text": "my",
+                "start": 86.41
+            },
+            {
+                "text": "Clyde",
+                "start": 86.89
+            }
+        ]
+    },
+    {
+        "start": 87.86,
+        "end": 91.65,
+        "trending": false,
+        "words": [
+            {
+                "text": "You",
+                "start": 87.86
+            },
+            {
+                "text": "could",
+                "start": 88.24
+            },
+            {
+                "text": "be",
+                "start": 88.62
+            },
+            {
+                "text": "the",
+                "start": 89
+            },
+            {
+                "text": "muse",
+                "start": 89.38
+            },
+            {
+                "text": "I'm",
+                "start": 89.75
+            },
+            {
+                "text": "writing",
+                "start": 90.13
+            },
+            {
+                "text": "every",
+                "start": 90.51
+            },
+            {
+                "text": "song",
+                "start": 90.89
+            },
+            {
+                "text": "about",
+                "start": 91.27
+            }
+        ]
+    },
+    {
+        "start": 92.14,
+        "end": 95.93,
+        "trending": false,
+        "words": [
+            {
+                "text": "Don't",
+                "start": 92.14
+            },
+            {
+                "text": "wanna",
+                "start": 92.56
+            },
+            {
+                "text": "let",
+                "start": 92.98
+            },
+            {
+                "text": "go,",
+                "start": 93.4
+            },
+            {
+                "text": "'cause",
+                "start": 93.82
+            },
+            {
+                "text": "when",
+                "start": 94.25
+            },
+            {
+                "text": "I",
+                "start": 94.67
+            },
+            {
+                "text": "feel",
+                "start": 95.09
+            },
+            {
+                "text": "low",
+                "start": 95.51
+            }
+        ]
+    },
+    {
+        "start": 96.43,
+        "end": 100.22,
+        "trending": false,
+        "words": [
+            {
+                "text": "She",
+                "start": 96.43
+            },
+            {
+                "text": "get",
+                "start": 96.81
+            },
+            {
+                "text": "down",
+                "start": 97.19
+            },
+            {
+                "text": "there,",
+                "start": 97.57
+            },
+            {
+                "text": "yeah",
+                "start": 97.95
+            },
+            {
+                "text": "we",
+                "start": 98.33
+            },
+            {
+                "text": "take",
+                "start": 98.7
+            },
+            {
+                "text": "it",
+                "start": 99.08
+            },
+            {
+                "text": "real",
+                "start": 99.46
+            },
+            {
+                "text": "slow",
+                "start": 99.84
+            }
+        ]
+    },
+    {
+        "start": 100.71,
+        "end": 104.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "You",
+                "start": 100.71
+            },
+            {
+                "text": "know",
+                "start": 101.05
+            },
+            {
+                "text": "what",
+                "start": 101.4
+            },
+            {
+                "text": "I'd",
+                "start": 101.74
+            },
+            {
+                "text": "do,",
+                "start": 102.09
+            },
+            {
+                "text": "baby",
+                "start": 102.43
+            },
+            {
+                "text": "if",
+                "start": 102.78
+            },
+            {
+                "text": "I",
+                "start": 103.12
+            },
+            {
+                "text": "were",
+                "start": 103.47
+            },
+            {
+                "text": "with",
+                "start": 103.81
+            },
+            {
+                "text": "you",
+                "start": 104.16
+            }
+        ]
+    },
+    {
+        "start": 105,
+        "end": 108.25,
+        "trending": true,
+        "words": [
+            {
+                "text": "Baby,",
+                "start": 105
+            },
+            {
+                "text": "take",
+                "start": 105.46
+            },
+            {
+                "text": "my",
+                "start": 105.93
+            },
+            {
+                "text": "hand,",
+                "start": 106.39
+            },
+            {
+                "text": "come",
+                "start": 106.86
+            },
+            {
+                "text": "with",
+                "start": 107.32
+            },
+            {
+                "text": "me",
+                "start": 107.79
+            }
+        ]
+    },
+    {
+        "start": 108.75,
+        "end": 112,
+        "trending": true,
+        "words": [
+            {
+                "text": "Ill",
+                "start": 108.75
+            },
+            {
+                "text": "take",
+                "start": 109.11
+            },
+            {
+                "text": "you",
+                "start": 109.47
+            },
+            {
+                "text": "to",
+                "start": 109.83
+            },
+            {
+                "text": "places",
+                "start": 110.19
+            },
+            {
+                "text": "you've",
+                "start": 110.56
+            },
+            {
+                "text": "never",
+                "start": 110.92
+            },
+            {
+                "text": "ever",
+                "start": 111.28
+            },
+            {
+                "text": "been",
+                "start": 111.64
+            }
+        ]
+    },
+    {
+        "start": 112.5,
+        "end": 115.75,
+        "trending": true,
+        "words": [
+            {
+                "text": "I",
+                "start": 112.5
+            },
+            {
+                "text": "could",
+                "start": 112.96
+            },
+            {
+                "text": "give",
+                "start": 113.43
+            },
+            {
+                "text": "that",
+                "start": 113.89
+            },
+            {
+                "text": "girl",
+                "start": 114.36
+            },
+            {
+                "text": "a",
+                "start": 114.82
+            },
+            {
+                "text": "palace",
+                "start": 115.29
+            }
+        ]
+    },
+    {
+        "start": 116.25,
+        "end": 119.5,
+        "trending": true,
+        "words": [
+            {
+                "text": "She",
+                "start": 116.25
+            },
+            {
+                "text": "don't",
+                "start": 116.79
+            },
+            {
+                "text": "know",
+                "start": 117.33
+            },
+            {
+                "text": "her",
+                "start": 117.88
+            },
+            {
+                "text": "beauty's",
+                "start": 118.42
+            },
+            {
+                "text": "timeless",
+                "start": 118.96
+            }
+        ]
+    },
+    {
+        "start": 120,
+        "end": 123.25,
+        "trending": true,
+        "words": [
+            {
+                "text": "Baby,",
+                "start": 120
+            },
+            {
+                "text": "take",
+                "start": 120.46
+            },
+            {
+                "text": "my",
+                "start": 120.93
+            },
+            {
+                "text": "hand,",
+                "start": 121.39
+            },
+            {
+                "text": "come",
+                "start": 121.86
+            },
+            {
+                "text": "with",
+                "start": 122.32
+            },
+            {
+                "text": "me",
+                "start": 122.79
+            }
+        ]
+    },
+    {
+        "start": 123.75,
+        "end": 127,
+        "trending": true,
+        "words": [
+            {
+                "text": "Riding",
+                "start": 123.75
+            },
+            {
+                "text": "till",
+                "start": 124.08
+            },
+            {
+                "text": "the",
+                "start": 124.4
+            },
+            {
+                "text": "end,",
+                "start": 124.72
+            },
+            {
+                "text": "no",
+                "start": 125.05
+            },
+            {
+                "text": "this",
+                "start": 125.38
+            },
+            {
+                "text": "ain't",
+                "start": 125.7
+            },
+            {
+                "text": "a",
+                "start": 126.03
+            },
+            {
+                "text": "bad",
+                "start": 126.35
+            },
+            {
+                "text": "trip",
+                "start": 126.67
+            }
+        ]
+    },
+    {
+        "start": 127.5,
+        "end": 130.75,
+        "trending": true,
+        "words": [
+            {
+                "text": "Think",
+                "start": 127.5
+            },
+            {
+                "text": "I",
+                "start": 127.96
+            },
+            {
+                "text": "found",
+                "start": 128.43
+            },
+            {
+                "text": "myself",
+                "start": 128.89
+            },
+            {
+                "text": "a",
+                "start": 129.36
+            },
+            {
+                "text": "bad",
+                "start": 129.82
+            },
+            {
+                "text": "bitch",
+                "start": 130.29
+            }
+        ]
+    },
+    {
+        "start": 131.25,
+        "end": 134.5,
+        "trending": true,
+        "words": [
+            {
+                "text": "She",
+                "start": 131.25
+            },
+            {
+                "text": "don't",
+                "start": 131.71
+            },
+            {
+                "text": "know",
+                "start": 132.18
+            },
+            {
+                "text": "that",
+                "start": 132.64
+            },
+            {
+                "text": "she's",
+                "start": 133.11
+            },
+            {
+                "text": "the",
+                "start": 133.57
+            },
+            {
+                "text": "baddest",
+                "start": 134.04
+            }
+        ]
+    },
+    {
+        "start": 135,
+        "end": 137.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "Baby",
+                "start": 135
+            },
+            {
+                "text": "take",
+                "start": 135.63
+            },
+            {
+                "text": "my",
+                "start": 136.25
+            },
+            {
+                "text": "hand",
+                "start": 136.88
+            }
+        ]
+    },
+    {
+        "start": 138,
+        "end": 140.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "Baby",
+                "start": 138
+            },
+            {
+                "text": "take",
+                "start": 138.63
+            },
+            {
+                "text": "my",
+                "start": 139.25
+            },
+            {
+                "text": "hand",
+                "start": 139.88
+            }
+        ]
+    },
+    {
+        "start": 141,
+        "end": 143.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "My",
+                "start": 141
+            },
+            {
+                "text": "hand",
+                "start": 142.25
+            }
+        ]
+    },
+    {
+        "start": 144,
+        "end": 146.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "Baby",
+                "start": 144
+            },
+            {
+                "text": "take",
+                "start": 144.63
+            },
+            {
+                "text": "my",
+                "start": 145.25
+            },
+            {
+                "text": "hand",
+                "start": 145.88
+            }
+        ]
+    },
+    {
+        "start": 147,
+        "end": 149.5,
+        "trending": false,
+        "words": [
+            {
+                "text": "Baby",
+                "start": 147
+            },
+            {
+                "text": "take",
+                "start": 147.63
+            },
+            {
+                "text": "my",
+                "start": 148.25
+            },
+            {
+                "text": "hand",
+                "start": 148.88
+            }
+        ]
+    }
+],
 
 
     "lil-tjay-calling-my-phone": [
