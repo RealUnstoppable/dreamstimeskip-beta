@@ -1760,7 +1760,6 @@ function initHarmonyTunes() {
         });
 
         // Viral Skip: Double Tap to Loop, Single Tap to Skip
-        let viralLastTapTime = 0;
         const toggleViralLock = (forceUnlock = false) => {
             if (viralLocked || forceUnlock) {
                 viralLocked = false;
@@ -1772,20 +1771,23 @@ function initHarmonyTunes() {
                 if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
             }
         };
+        
         const handleViralClick = (e) => {
             if(e) e.preventDefault();
-            const now = Date.now();
-            if (now - viralLastTapTime < 5000 && viralLastTapTime !== 0) {
-                // Double tap detected (within 5 seconds)
-                toggleViralLock();
-                viralLastTapTime = 0; // reset
-            } else {
-                // Single tap detected
-                viralLastTapTime = now;
+            toggleViralLock();
+            
+            // If just enabled, instantly jump to the viral section
+            if (viralLocked) {
                 const song = currentQueue[currentSongIndex];
-                if (song && song.inmixPoint) {
-                    activeAudio.currentTime = song.inmixPoint;
-                    if (activeAudio.paused) playSong();
+                if (song) {
+                    const block = getViralBlock(song.id, activeAudio);
+                    if (block && activeAudio.currentTime < block.paddedStart) {
+                        activeAudio.currentTime = block.paddedStart;
+                        if (activeAudio.paused) playSong();
+                    } else if (!block && song.inmixPoint && activeAudio.currentTime < song.inmixPoint) {
+                        activeAudio.currentTime = song.inmixPoint;
+                        if (activeAudio.paused) playSong();
+                    }
                 }
             }
         };
