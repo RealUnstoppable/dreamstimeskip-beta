@@ -637,7 +637,7 @@ function initHarmonyTunes() {
 
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
-        containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
+        containerRecommended.innerHTML = recommended.slice(0, 30).map(song => createSongCard(song)).join('');
         let existingShowMore = document.getElementById('show-more-recommended');
         if (!existingShowMore) {
             containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
@@ -655,7 +655,8 @@ function initHarmonyTunes() {
                     <iframe src="https://www.tiktok.com/embed/v2/${video.id}" 
                         style="width: 100%; height: 100%; border: none;" 
                         scrolling="no" 
-                        allow="encrypted-media;">
+                        allow="encrypted-media;"
+                        loading="lazy">
                     </iframe>
                 </div>
             `).join('');
@@ -746,23 +747,46 @@ function initHarmonyTunes() {
     window.loadPlaylistView = loadPlaylistView;
 
     // --- RENDERING TABLE (Fixed Duration Bug) ---
-    function renderSongTable(songs) {
-        songListBody.innerHTML = '';
-        if (songs.length === 0) {
-            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
-            return;
-        }
+    function updateSongTableActiveState() {
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        const currentSongId = currentQueue[currentSongIndex].id;
+        const rows = songListBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const isMatch = row.dataset.songId === currentSongId;
+            if (isMatch) {
+                row.classList.add('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'none';
+                if(iconSpan) iconSpan.style.display = 'inline';
+            } else {
+                row.classList.remove('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'inline';
+                if(iconSpan) iconSpan.style.display = 'none';
+            }
+        });
+    }
 
-        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    let currentRenderIndex = 0;
+    let currentGroupedSongs = [];
+    const RENDER_CHUNK_SIZE = 50;
+    let intersectionObserver = null;
+
+    function renderSongTableChunk() {
+        if (currentRenderIndex >= currentGroupedSongs.length) return;
+
         const fragment = document.createDocumentFragment();
-
-        songs.forEach((song, index) => {
+        const endIndex = Math.min(currentRenderIndex + RENDER_CHUNK_SIZE, currentGroupedSongs.length);
+        
+        for (let index = currentRenderIndex; index < endIndex; index++) {
+            const song = currentGroupedSongs[index];
             const row = document.createElement('tr');
             
             const isActive = (currentQueue[currentSongIndex]?.id === song.id);
             if (isActive) row.classList.add('playing');
 
-            // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
                     <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
@@ -770,17 +794,63 @@ function initHarmonyTunes() {
                 </td>
                 <td class="song-title">${escapeHTML(song.title)}</td>
                 <td>${escapeHTML(song.artist)}</td>
+                <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
+            row.dataset.songId = song.id;
 
             row.addEventListener('click', () => {
-                playContext(songs, index);
+                playContext(currentGroupedSongs, index);
             });
 
             fragment.appendChild(row);
-        });
+        }
 
         songListBody.appendChild(fragment);
+        currentRenderIndex = endIndex;
+        
+        if (currentRenderIndex < currentGroupedSongs.length) {
+            setupIntersectionObserver();
+        }
+    }
+    
+    function setupIntersectionObserver() {
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        let sentinel = document.getElementById('table-sentinel-new');
+        if (!sentinel) {
+            sentinel = document.createElement('div');
+            sentinel.id = 'table-sentinel-new';
+            sentinel.style.height = '1px';
+            songListBody.parentElement.appendChild(sentinel);
+        }
+        
+        intersectionObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                renderSongTableChunk();
+            }
+        }, { rootMargin: '200px' });
+        
+        intersectionObserver.observe(sentinel);
+    }
+
+    function renderSongTable(songs) {
+        songListBody.innerHTML = '';
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        if (songs.length === 0) {
+            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
+            return;
+        }
+
+        currentGroupedSongs = songs;
+        currentRenderIndex = 0;
+        
+        renderSongTableChunk();
     }
 
     // --- PLAYER LOGIC ---
@@ -846,8 +916,7 @@ function initHarmonyTunes() {
 
         updateProgress();
         if(viewPlaylist.style.display !== 'none') {
-            const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-            renderSongTable(showingFavs ? userFavorites : librarySongs);
+            updateSongTableActiveState();
         }
         
         // Trigger Background Mixxer AI
@@ -1419,7 +1488,7 @@ function initHarmonyTunes() {
             }
             
             if (artistSongs.length > 0) {
-                const trackListHTML = artistSongs.map(song => createSongCard(song)).join('');
+                const trackListHTML = artistSongs.slice(0, 50).map(song => createSongCard(song)).join('');
                 document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
             } else {
                 document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
@@ -1877,8 +1946,7 @@ function initHarmonyTunes() {
 
             renderLyrics(song.id);
             if(viewPlaylist.style.display !== 'none') {
-                const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-                renderSongTable(showingFavs ? userFavorites : librarySongs);
+                updateSongTableActiveState();
             }
 
             activeAudio.volume = 0;
@@ -2312,10 +2380,10 @@ let dragItem = null;
         if (currentTab === 'upnext') {
             displayList = [
                 ...userQueue.map(s => ({...s, isUserQueue: true})),
-                ...currentQueue.slice(currentSongIndex + 1).map(s => ({...s, isUserQueue: false}))
+                ...currentQueue.slice(currentSongIndex + 1, currentSongIndex + 51).map(s => ({...s, isUserQueue: false}))
             ];
         } else {
-            displayList = [...historyQueue].reverse(); // Most recent first
+            displayList = [...historyQueue].reverse().slice(0, 50); // Most recent first, cap at 50
         }
 
         if(displayList.length === 0) {
@@ -2653,7 +2721,7 @@ export function createGroupCard(group) {
     return `
         <div class="music-card" data-song-id="${escapeHTML(group.baseSong.id)}">
             <div class="card-img-wrapper">
-                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}">
+                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}" loading="lazy">
                 <button class="card-play-btn" aria-label="Play ${escapeHTML(group.baseTitle)}">▶</button>
                 <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(group.baseTitle)} to queue">+</button>
                 <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>

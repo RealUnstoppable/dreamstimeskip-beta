@@ -1,25 +1,30 @@
 const fs = require('fs');
-let styleCss = fs.readFileSync('css/style.css', 'utf8');
-let htCss = fs.readFileSync('css/harmonytunes.css', 'utf8');
 
-const targetGradient = `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%)`;
-const oldGradient = `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%)`;
-const oldGradient2 = `radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.25), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%)`;
+function replaceColors(file) {
+    if (!fs.existsSync(file)) return;
+    let css = fs.readFileSync(file, 'utf8');
+    
+    // Replace explicit accent-blue and accent-green with accent-color
+    css = css.replace(/var\(--accent-blue\)/g, 'var(--accent-color, #2563EB)');
+    css = css.replace(/var\(--accent-green\)/g, 'var(--accent-color, #16A34A)');
+    
+    // Replace rigid backgrounds
+    // Only replace some very specific ones to be non-destructive
+    css = css.replace(/background-color: #0A0A0A;/g, 'background-color: var(--bg-color, #0A0A0A);');
+    css = css.replace(/background: #0A0A0A;/g, 'background: var(--bg-color, #0A0A0A);');
+    
+    css = css.replace(/background-color: #1a1a1a;/ig, 'background-color: var(--primary-card-color, #1a1a1a);');
+    css = css.replace(/background: #1a1a1a;/ig, 'background: var(--primary-card-color, #1a1a1a);');
+    css = css.replace(/background-color: #121212;/ig, 'background-color: var(--secondary-card-color, #121212);');
+    css = css.replace(/background: #121212;/ig, 'background: var(--secondary-card-color, #121212);');
+    css = css.replace(/background-color: #000;/g, 'background-color: var(--bg-color, #000);');
+    
+    fs.writeFileSync(file, css, 'utf8');
+    console.log("Patched", file);
+}
 
-styleCss = styleCss.replace(oldGradient, targetGradient);
-styleCss = styleCss.replace(oldGradient, targetGradient); // Just in case it appears twice
+replaceColors('css/shop.css');
+replaceColors('css/harmonytunes.css');
+replaceColors('css/style.css');
+replaceColors('css/account.css');
 
-// Fix border radius to be blobby
-styleCss = styleCss.replace(/#siri-orb \{[^}]+border-radius:\s*50%;/g, match => match.replace('border-radius: 50%;', 'border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%;'));
-styleCss = styleCss.replace(/\.sitewide-lexi-orb \{[^}]+border-radius:\s*50%;/g, match => match.replace('border-radius: 50%;', 'border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%;'));
-
-// Also replace the color-cycle animation
-styleCss = styleCss.replace(/#siri-orb \{([^}]+)animation:\s*blob-shape([^;}]+);/g, '#siri-orb {$1animation: blob-shape$2, color-cycle 15s ease-in-out infinite;');
-styleCss = styleCss.replace(/\.sitewide-lexi-orb \{([^}]+)animation:\s*blob-shape([^;}]+);/g, '.sitewide-lexi-orb {$1animation: blob-shape$2, color-cycle 15s ease-in-out infinite;');
-
-htCss = htCss.replace(oldGradient2, targetGradient);
-htCss = htCss.replace(/\.lexi-mixxer-blob \{[^}]+border-radius:\s*50%;/g, match => match.replace('border-radius: 50%;', 'border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%;'));
-htCss = htCss.replace(/\.lexi-mixxer-blob \{([^}]+)animation:\s*blob-shape([^;}]+);/g, '.lexi-mixxer-blob {$1animation: blob-shape$2, color-cycle 15s ease-in-out infinite;');
-
-fs.writeFileSync('css/style.css', styleCss, 'utf8');
-fs.writeFileSync('css/harmonytunes.css', htCss, 'utf8');
