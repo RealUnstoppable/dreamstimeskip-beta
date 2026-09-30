@@ -1582,7 +1582,166 @@ function initHarmonyTunes() {
             const width = progressBar.clientWidth;
             const clickX = e.offsetX;
             const duration = activeAudio.duration;
-            activeAudio.currentTime = (clickX / width) * duration;
+            const seekTo = (clickX / width) * duration;
+            activeAudio.currentTime = seekTo;
+
+            // Lexi Intelligent Seek Crossfade — only when Mixer is ON
+            if (isMixerMode && !isCrossfading && duration > 0) {
+                const remaining = duration - seekTo;
+                
+                // Reset any previous seek-triggered state
+                stopWorkerInterval("lexiSeekAnalyze");
+                isListening = false;
+                mixerBtn.classList.remove('analyzing');
+                if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+                const mobBtn = document.getElementById('mob-mixer-btn');
+                if(mobBtn) mobBtn.classList.remove('analyzing');
+
+                if (remaining <= 5) {
+                    // === EMERGENCY MODE (≤5s): Instant crossfade, no time to waste ===
+                    console.log("Lexi Seek: Emergency crossfade (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    // Force an immediate crossfade by triggering checkCrossfade logic
+                    // The existing checkCrossfade will pick it up on the next timeupdate
+                    
+                } else if (remaining <= 25) {
+                    // === PANIC MODE (≤25s): Stitch the two most similar sections ===
+                    console.log("Lexi Seek: Panic mode (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    mixerBtn.classList.add('analyzing');
+                    if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+                    if(mobBtn) mobBtn.classList.add('analyzing');
+
+                    // Find next song and preload at the point most similar in energy
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        
+                        // Find the best in-mix point: match energy/BPM similarity
+                        const currentBpm = currentMeta?.bpm || 120;
+                        const nextBpm = nextMeta?.bpm || 120;
+                        const bpmRatio = currentBpm / nextBpm;
+                        
+                        // Use a point ~40% into the next song for energy matching (choruses tend to be there)
+                        const nextDuration = nextMeta?.outmixPoint || 180;
+                        const stitchPoint = Math.min(nextDuration * 0.4, nextMeta?.inmixPoint || 15);
+                        
+                        if (!nextAudio.src.endsWith(nextSong.src)) {
+                            nextAudio.src = nextSong.src;
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = stitchPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = stitchPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                        
+                        // Override crossfade duration to use all remaining time
+                        crossfadeDuration = Math.max(3, remaining - 1);
+                    }
+
+                } else if (remaining <= 40) {
+                    // === SERIOUS MODE (≤40s): Find a good beat to transition on ===
+                    console.log("Lexi Seek: Serious mode (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    mixerBtn.classList.add('analyzing');
+                    if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+                    if(mobBtn) mobBtn.classList.add('analyzing');
+
+                    // Preload next song at optimal beat-aligned in-mix point
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        const inmixPoint = nextMeta?.inmixPoint || 15;
+                        
+                        if (!nextAudio.src.endsWith(nextSong.src)) {
+                            nextAudio.src = nextSong.src;
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = inmixPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = inmixPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                        
+                        // Use BPM-optimized crossfade duration (fit within remaining time)
+                        const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                        const optFade = calculateOptimalCrossfade(currentMeta?.bpm || 120);
+                        crossfadeDuration = Math.min(optFade, remaining - 2);
+                    }
+
+                } else if (remaining <= 50) {
+                    // === CALCULATE MODE (≤50s): Start analyzing early, plenty of time ===
+                    console.log("Lexi Seek: Calculate mode (" + remaining.toFixed(1) + "s left)");
+                    
+                    // Use BPM-matched crossfade, find best next song match
+                    const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                    if (currentMeta && currentQueue.length > 1) {
+                        let bestMatchIndex = currentSongIndex + 1;
+                        if (bestMatchIndex >= currentQueue.length) bestMatchIndex = 0;
+                        let smallestBpmDiff = Infinity;
+                        
+                        for (let i = 0; i < currentQueue.length; i++) {
+                            if (i === currentSongIndex) continue;
+                            const candidate = librarySongsMap.get(currentQueue[i].id);
+                            if (candidate) {
+                                const diff = Math.abs((candidate.bpm || 120) - (currentMeta.bpm || 120));
+                                if (diff < smallestBpmDiff) {
+                                    smallestBpmDiff = diff;
+                                    bestMatchIndex = i;
+                                }
+                            }
+                        }
+                        
+                        // Reorder queue so best match is next
+                        if (bestMatchIndex !== (currentSongIndex + 1) % currentQueue.length && !isShuffle) {
+                            const nextIdx = (currentSongIndex + 1) % currentQueue.length;
+                            const temp = currentQueue[nextIdx];
+                            currentQueue[nextIdx] = currentQueue[bestMatchIndex];
+                            currentQueue[bestMatchIndex] = temp;
+                        }
+                    }
+                    
+                    // Preload next song
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        const inmixPoint = nextMeta?.inmixPoint || 15;
+                        
+                        if (!nextAudio.src.endsWith(nextSong.src)) {
+                            nextAudio.src = nextSong.src;
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = inmixPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = inmixPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                    }
+                    
+                    // Full optimal crossfade
+                    crossfadeDuration = calculateOptimalCrossfade(currentMeta?.bpm || 120);
+                }
+            }
         });
 
         // Viral Skip: Double Tap to Loop, Single Tap to Skip
