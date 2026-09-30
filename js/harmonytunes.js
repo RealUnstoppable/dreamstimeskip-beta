@@ -179,6 +179,24 @@ function initHarmonyTunes() {
     
     
     
+    
+    // Lexi Engine: Anti-Glitch Pipeline Separator
+    // Browsers share media decoders if two audio elements have the exact same src string.
+    // This causes microscopic glitches when looping the same song.
+    // By appending an instance ID, we force independent decoder pipelines.
+    function setAudioSrc(audioEl, rawSrc) {
+        if (!rawSrc) return false;
+        const cleanSrc = rawSrc.split('?')[0];
+        const instanceParam = (audioEl.id === 'audio-player-2') ? '?inst=2' : '?inst=1';
+        const finalSrc = cleanSrc + instanceParam;
+        
+        if (!audioEl.src || !audioEl.src.endsWith(finalSrc)) {
+            audioEl.src = finalSrc;
+            return true;
+        }
+        return false;
+    }
+
     let activeAudio = audioPlayer1;
     let nextAudio = audioPlayer2;
     let isMixerMode = false;
@@ -1177,7 +1195,7 @@ function initHarmonyTunes() {
         const mobMixerBtn = document.getElementById('mob-mixer-btn');
         if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
-        activeAudio.src = song.src;
+        setAudioSrc(activeAudio, song.src);
         playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
@@ -1629,8 +1647,7 @@ function initHarmonyTunes() {
                         const nextDuration = nextMeta?.outmixPoint || 180;
                         const stitchPoint = Math.min(nextDuration * 0.4, nextMeta?.inmixPoint || 15);
                         
-                        if (!nextAudio.src.endsWith(nextSong.src)) {
-                            nextAudio.src = nextSong.src;
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
                             nextAudio.volume = 0;
                             nextAudio.addEventListener('loadedmetadata', () => {
                                 nextAudio.currentTime = stitchPoint;
@@ -1663,8 +1680,7 @@ function initHarmonyTunes() {
                         const nextMeta = librarySongsMap.get(nextSong.id);
                         const inmixPoint = nextMeta?.inmixPoint || 15;
                         
-                        if (!nextAudio.src.endsWith(nextSong.src)) {
-                            nextAudio.src = nextSong.src;
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
                             nextAudio.volume = 0;
                             nextAudio.addEventListener('loadedmetadata', () => {
                                 nextAudio.currentTime = inmixPoint;
@@ -1723,8 +1739,7 @@ function initHarmonyTunes() {
                         const nextMeta = librarySongsMap.get(nextSong.id);
                         const inmixPoint = nextMeta?.inmixPoint || 15;
                         
-                        if (!nextAudio.src.endsWith(nextSong.src)) {
-                            nextAudio.src = nextSong.src;
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
                             nextAudio.volume = 0;
                             nextAudio.addEventListener('loadedmetadata', () => {
                                 nextAudio.currentTime = inmixPoint;
@@ -2298,8 +2313,7 @@ function initHarmonyTunes() {
             // Tag the preloaded target so the crossfade phase knows where we're going
             nextAudio._viralDJTargetIdx = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) ? nextViralIdx : currentSongIndex;
             
-            if (!nextAudio.src.endsWith(targetSong.src)) {
-                nextAudio.src = targetSong.src;
+            if (setAudioSrc(nextAudio, targetSong.src)) {
                 nextAudio.volume = 0;
                 nextAudio.addEventListener('loadedmetadata', () => {
                     nextAudio.currentTime = seekTo;
@@ -2439,8 +2453,7 @@ function initHarmonyTunes() {
             }
             if (preloadIndex < currentQueue.length) {
                 const preloadSong = currentQueue[preloadIndex];
-                if (nextAudio.src !== window.location.origin + preloadSong.src && nextAudio.src !== preloadSong.src && !nextAudio.src.endsWith(preloadSong.src)) {
-                    nextAudio.src = preloadSong.src;
+                if (setAudioSrc(nextAudio, preloadSong.src)) {
                     nextAudio.volume = 0;
                     const meta = librarySongsMap.get(preloadSong.id);
                     nextAudio.addEventListener('loadedmetadata', () => {
@@ -2507,7 +2520,7 @@ function initHarmonyTunes() {
             // Safe play: Check if it was already preloaded
             const inmixPoint = songMetadata?.inmixPoint || 15;
             if (activeAudio.src !== window.location.origin + song.src && activeAudio.src !== song.src && !activeAudio.src.endsWith(song.src)) {
-                activeAudio.src = song.src;
+                setAudioSrc(activeAudio, song.src);
                 activeAudio.addEventListener('loadedmetadata', () => {
                     activeAudio.currentTime = inmixPoint;
                     activeAudio.volume = 0;
