@@ -49,19 +49,35 @@ const tools = [
         functionDeclarations: [
             {
                 name: "getCurrentlyPlayingSong",
-                description: "Get information about the song that is currently playing in the sitewide music player (Medixly/HarmonyTunes)."
+                description: "Get information about the song that is currently playing in the sitewide music player (Medixly/HarmonyTunes).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             },
             {
                 name: "getHarmonyTunesQueue",
-                description: "Get the upcoming songs in the user's Medixly queue."
+                description: "Get the upcoming songs in the user's Medixly queue.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             },
             {
                 name: "getHarmonyTunesHistory",
-                description: "Get the user's recently played songs history."
+                description: "Get the user's recently played songs history.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             },
             {
                 name: "getHarmonyTunesFavorites",
-                description: "Get the user's favorite songs (liked songs)."
+                description: "Get the user's favorite songs (liked songs).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             },
             {
                 name: "playHarmonyTunesSong",
@@ -92,7 +108,11 @@ const tools = [
             },
             {
                 name: "getDreamsCountdowns",
-                description: "Get the official launch dates and live countdowns for Dreams OG and Dreams TimeSkip."
+                description: "Get the official launch dates and live countdowns for Dreams OG and Dreams TimeSkip.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             },
             {
                 name: "requestSongAddition",
@@ -114,7 +134,11 @@ const tools = [
             },
             {
                 name: "getShoppingCartContents",
-                description: "Retrieves the current items and quantities in the user's Unstoppable merchandise shopping cart."
+                description: "Retrieves the current items and quantities in the user's Unstoppable merchandise shopping cart.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
             }
         ]
     }
