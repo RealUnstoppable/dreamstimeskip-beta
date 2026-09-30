@@ -19,7 +19,7 @@ export const librarySongs = [
         "artist": "kobzx2z",
         "duration": "2:34",
         "src": "/music/kobzx2z_take_my_hand.mp3",
-        "art": "/images/harmony-tunes-card.jpg",
+        "art": "/images/take_my_hand_cover.jpg",
         "bpm": 118,
         "energy": 0.8,
         "inmixPoint": 0,
