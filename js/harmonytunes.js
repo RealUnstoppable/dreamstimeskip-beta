@@ -2151,8 +2151,6 @@ function initHarmonyTunes() {
                     }
                 }
             }
-        }
-
             } // End of userQueue check
         }
 
