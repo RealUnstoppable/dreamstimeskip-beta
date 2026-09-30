@@ -138,56 +138,9 @@ function initHarmonyTunes() {
     // Player Elements
     const audioPlayer1 = document.getElementById('audio-player');
     const audioPlayer2 = document.getElementById('audio-player-2');
-    audioPlayer1.crossOrigin = "anonymous";
-    audioPlayer2.crossOrigin = "anonymous";
     
-    // AutoMix Engine State
-    let amCtx, amSource1, amSource2;
-    let amDry1, amDry2, amWet1, amWet2, amReverb;
-    let amLpf1, amLpf2;
-    let isAutoMixEnabled = false;
-
-    function initAutoMix() {
-        if (amCtx) return;
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        try {
-            amCtx = new AudioContext();
-            amSource1 = amCtx.createMediaElementSource(audioPlayer1);
-            amSource2 = amCtx.createMediaElementSource(audioPlayer2);
-            
-            amDry1 = amCtx.createGain(); amDry2 = amCtx.createGain();
-            amWet1 = amCtx.createGain(); amWet2 = amCtx.createGain();
-            amWet1.gain.value = 0; amWet2.gain.value = 0;
-            
-            amReverb = amCtx.createGain();
-            const delay = amCtx.createDelay(); delay.delayTime.value = 0.33; // 1/3 beat approx
-            const feedback = amCtx.createGain(); feedback.gain.value = 0.6; // Heavy echo tail
-            const lpfReverb = amCtx.createBiquadFilter(); lpfReverb.type = 'lowpass'; lpfReverb.frequency.value = 1500;
-            
-            amReverb.connect(delay);
-            delay.connect(feedback);
-            feedback.connect(delay);
-            delay.connect(lpfReverb);
-            lpfReverb.connect(amCtx.destination);
-            
-            // Seamless EQ Blending
-            amLpf1 = amCtx.createBiquadFilter(); amLpf1.type = 'lowshelf'; amLpf1.frequency.value = 300; amLpf1.gain.value = 0;
-            amLpf2 = amCtx.createBiquadFilter(); amLpf2.type = 'lowshelf'; amLpf2.frequency.value = 300; amLpf2.gain.value = 0;
-            
-            amSource1.connect(amLpf1); amLpf1.connect(amDry1); amLpf1.connect(amWet1);
-            amSource2.connect(amLpf2); amLpf2.connect(amDry2); amLpf2.connect(amWet2);
-            
-            amDry1.connect(amCtx.destination);
-            amDry2.connect(amCtx.destination);
-            amWet1.connect(amReverb);
-            amWet2.connect(amReverb);
-            
-            isAutoMixEnabled = true;
-        } catch(e) {
-            console.error("AutoMix Web Audio failed to initialize:", e);
-        }
-    }
+    
+    
     let activeAudio = audioPlayer1;
     let nextAudio = audioPlayer2;
     let isMixerMode = false;
@@ -1272,8 +1225,7 @@ function initHarmonyTunes() {
     }
 
     function playSong() {
-        if (!amCtx) initAutoMix();
-        if (amCtx && amCtx.state === 'suspended') amCtx.resume();
+        
         if (fadeInterval) clearInterval(fadeInterval);
         if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
         if (crossfadeInterval) clearInterval(crossfadeInterval);
@@ -1310,27 +1262,7 @@ function initHarmonyTunes() {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => {
-            console.error("Manager info:", e);
-            if (e.name === 'NotSupportedError' && activeAudio.crossOrigin === 'anonymous') {
-                console.warn("CORS failed. Disabling AutoMix Web Audio and falling back to native playback.");
-                activeAudio.removeAttribute('crossorigin');
-                nextAudio.removeAttribute('crossorigin');
-                isAutoMixEnabled = false;
-                const time = activeAudio.currentTime;
-                activeAudio.src = activeAudio.src; 
-                activeAudio.currentTime = time;
-                activeAudio.play().then(() => {
-                    isPlaying = true;
-                    saveSitewideMusicState({ isPlaying: true });
-                    playIcon.style.display = 'none';
-                    pauseIcon.style.display = 'block';
-                    if(fsPlayIcon) fsPlayIcon.style.display = 'none';
-                    if(fsPauseIcon) fsPauseIcon.style.display = 'block';
-                    activeAudio.volume = targetVol;
-                }).catch(err => console.error(err));
-            }
-        });
+        }).catch(e => console.error("Manager info:", e));
     }
 
     function pauseSong() {
@@ -2128,6 +2060,17 @@ function initHarmonyTunes() {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
+            
+            // PRELOAD audio seamlessly to prevent pausing/buffering when crossfade starts
+            if (nextAudio.src !== window.location.origin + song.src && nextAudio.src !== song.src) {
+                nextAudio.src = song.src;
+                nextAudio.volume = 0;
+                nextAudio.addEventListener('loadedmetadata', () => {
+                    nextAudio.currentTime = block.paddedStart;
+                }, { once: true });
+            } else {
+                nextAudio.currentTime = block.paddedStart;
+            }
         }
 
         // "Crossfading" phase
@@ -2144,26 +2087,9 @@ function initHarmonyTunes() {
             activeAudio = nextAudio;
             nextAudio = prevAudio;
 
-            // Load the same song into the new active audio
-            activeAudio.src = song.src;
-            
-            activeAudio.addEventListener('loadedmetadata', () => {
-                activeAudio.currentTime = block.paddedStart;
-                activeAudio.volume = 0;
-                activeAudio.play().catch(e => {
-            console.error("Manager info:", e);
-            if (e.name === 'NotSupportedError' && activeAudio.crossOrigin === 'anonymous') {
-                console.warn("CORS failed. Disabling AutoMix Web Audio and falling back to native playback.");
-                activeAudio.removeAttribute('crossorigin');
-                nextAudio.removeAttribute('crossorigin');
-                isAutoMixEnabled = false;
-                const time = activeAudio.currentTime;
-                activeAudio.src = activeAudio.src; 
-                activeAudio.currentTime = time;
-                activeAudio.play().catch(err => console.error(err));
-            }
-        });
-            }, { once: true });
+            // Start playing immediately (preloaded in analyzing phase)
+            activeAudio.volume = 0;
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -2236,6 +2162,28 @@ function initHarmonyTunes() {
                 }
             }
             } // End of userQueue check
+            
+            // PRELOAD audio for normal crossfade to prevent buffering pauses
+            let preloadIndex = currentSongIndex + 1;
+            if (repeatMode === 2) {
+                preloadIndex = currentSongIndex;
+            } else if (preloadIndex >= currentQueue.length) {
+                if (repeatMode === 1) preloadIndex = 0;
+            }
+            if (preloadIndex < currentQueue.length) {
+                const preloadSong = currentQueue[preloadIndex];
+                if (nextAudio.src !== window.location.origin + preloadSong.src && nextAudio.src !== preloadSong.src && !nextAudio.src.endsWith(preloadSong.src)) {
+                    nextAudio.src = preloadSong.src;
+                    nextAudio.volume = 0;
+                    const meta = librarySongsMap.get(preloadSong.id);
+                    nextAudio.addEventListener('loadedmetadata', () => {
+                        nextAudio.currentTime = meta?.inmixPoint || 15;
+                    }, { once: true });
+                } else {
+                    const meta = librarySongsMap.get(preloadSong.id);
+                    nextAudio.currentTime = meta?.inmixPoint || 15;
+                }
+            }
         }
 
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
@@ -2285,11 +2233,19 @@ function initHarmonyTunes() {
             const song = currentQueue[currentSongIndex];
             const songMetadata = librarySongsMap.get(song.id);
             
-            activeAudio.src = song.src;
+            // Safe play: Check if it was already preloaded
             const inmixPoint = songMetadata?.inmixPoint || 15;
-            activeAudio.addEventListener('loadedmetadata', () => {
-                activeAudio.currentTime = inmixPoint;
-            }, { once: true });
+            if (activeAudio.src !== window.location.origin + song.src && activeAudio.src !== song.src && !activeAudio.src.endsWith(song.src)) {
+                activeAudio.src = song.src;
+                activeAudio.addEventListener('loadedmetadata', () => {
+                    activeAudio.currentTime = inmixPoint;
+                    activeAudio.volume = 0;
+                    activeAudio.play().catch(e => console.error(e));
+                }, { once: true });
+            } else {
+                activeAudio.volume = 0;
+                activeAudio.play().catch(e => console.error(e));
+            }
             
             playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
             playerArtist.textContent = song.artist;
@@ -2304,9 +2260,6 @@ function initHarmonyTunes() {
             if(viewPlaylist.style.display !== 'none') {
                 updateSongTableActiveState();
             }
-
-            activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
             
             const prevIndex = currentSongIndex === 0 ? currentQueue.length - 1 : currentSongIndex - 1;
 
@@ -2329,17 +2282,7 @@ function initHarmonyTunes() {
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            // Prep AutoMix EQ and Reverb Routing
-            if (isAutoMixEnabled) {
-                const prevDry = prevAudio === audioPlayer1 ? amDry1 : amDry2;
-                const prevWet = prevAudio === audioPlayer1 ? amWet1 : amWet2;
-                const prevLpf = prevAudio === audioPlayer1 ? amLpf1 : amLpf2;
-                const nextLpf = activeAudio === audioPlayer1 ? amLpf1 : amLpf2;
-                
-                prevWet.gain.value = baseVolume * 0.8; // Send tail to reverb
-                prevLpf.gain.value = -12; // Cut bass on outgoing track for seamless blend
-                nextLpf.gain.value = 0; // Ensure incoming track has full bass
-            }
+            
 
             if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
             fadeIntervalCrossfade = setInterval(() => {
@@ -2354,13 +2297,7 @@ function initHarmonyTunes() {
                 if (ratio >= 1) {
                     clearInterval(fadeIntervalCrossfade);
                     
-                    // Reset AutoMix state
-                    if (isAutoMixEnabled) {
-                        const prevWet = prevAudio === audioPlayer1 ? amWet1 : amWet2;
-                        const prevLpf = prevAudio === audioPlayer1 ? amLpf1 : amLpf2;
-                        prevWet.gain.setTargetAtTime(0, amCtx.currentTime, 0.5);
-                        prevLpf.gain.value = 0;
-                    }
+                    
                     
                     // Slowly drift playbackRate back to normal if beatmatched
                     if (isBeatMatched) {
