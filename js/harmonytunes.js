@@ -174,6 +174,8 @@ function initHarmonyTunes() {
     // Player Elements
     const audioPlayer1 = document.getElementById('audio-player');
     const audioPlayer2 = document.getElementById('audio-player-2');
+    audioPlayer1.preload = 'auto';
+    audioPlayer2.preload = 'auto';
     
     
     
@@ -2098,14 +2100,18 @@ function initHarmonyTunes() {
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
             // PRELOAD audio seamlessly to prevent pausing/buffering when crossfade starts
-            if (nextAudio.src !== window.location.origin + song.src && nextAudio.src !== song.src) {
+            if (nextAudio.src !== window.location.origin + song.src && nextAudio.src !== song.src && !nextAudio.src.endsWith(song.src)) {
                 nextAudio.src = song.src;
                 nextAudio.volume = 0;
                 nextAudio.addEventListener('loadedmetadata', () => {
                     nextAudio.currentTime = block.paddedStart;
+                    const p = nextAudio.play();
+                    if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
                 }, { once: true });
             } else {
                 nextAudio.currentTime = block.paddedStart;
+                const p = nextAudio.play();
+                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
             }
         }
 
@@ -2214,10 +2220,14 @@ function initHarmonyTunes() {
                     const meta = librarySongsMap.get(preloadSong.id);
                     nextAudio.addEventListener('loadedmetadata', () => {
                         nextAudio.currentTime = meta?.inmixPoint || 15;
+                        const p = nextAudio.play();
+                        if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
                     }, { once: true });
                 } else {
                     const meta = librarySongsMap.get(preloadSong.id);
                     nextAudio.currentTime = meta?.inmixPoint || 15;
+                    const p = nextAudio.play();
+                    if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
                 }
             }
         }
