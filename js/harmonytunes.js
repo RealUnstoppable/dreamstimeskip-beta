@@ -19,6 +19,33 @@ function escapeHTML(str) {
 
 function initHarmonyTunes() {
 
+    // Background Tab Throttling Bypass
+    const workerBlob = new Blob([`
+        let timers = {};
+        self.onmessage = function(e) {
+            if (e.data.action === 'start') {
+                timers[e.data.id] = setInterval(() => self.postMessage(e.data.id), e.data.delay);
+            } else if (e.data.action === 'stop') {
+                clearInterval(timers[e.data.id]);
+                delete timers[e.data.id];
+            }
+        };
+    `], { type: 'application/javascript' });
+    const workerTimer = new Worker(URL.createObjectURL(workerBlob));
+    const workerCallbacks = {};
+    workerTimer.onmessage = (e) => {
+        if (workerCallbacks[e.data]) workerCallbacks[e.data]();
+    };
+    function startWorkerInterval(id, callback, delay) {
+        workerCallbacks[id] = callback;
+        workerTimer.postMessage({ action: 'start', id, delay });
+    }
+    function stopWorkerInterval(id) {
+        workerTimer.postMessage({ action: 'stop', id });
+        delete workerCallbacks[id];
+    }
+
+
     let customPlaylists = [];
 
     async function loadCustomPlaylists() {
@@ -1235,9 +1262,9 @@ function initHarmonyTunes() {
 
     function playSong() {
         
-        if (fadeInterval) clearInterval(fadeInterval);
-        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-        if (crossfadeInterval) clearInterval(crossfadeInterval);
+        stopWorkerInterval("fadeInterval");
+        stopWorkerInterval("fadeIntervalCrossfade");
+        stopWorkerInterval("crossfadeInterval");
 
         isCrossfading = false;
         mixerBtn.classList.remove('pulsing');
@@ -1263,11 +1290,11 @@ function initHarmonyTunes() {
             const steps = durationMs / fadeStep;
             let currentStep = 0;
             
-            fadeInterval = setInterval(() => {
+            startWorkerInterval("fadeInterval", () => {
                 currentStep++;
                 activeAudio.volume = targetVol * (currentStep / steps);
                 if (currentStep >= steps) {
-                    clearInterval(fadeInterval);
+                    stopWorkerInterval("fadeInterval");
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
@@ -1275,7 +1302,7 @@ function initHarmonyTunes() {
     }
 
     function pauseSong() {
-        if (fadeInterval) clearInterval(fadeInterval);
+        stopWorkerInterval("fadeInterval");
         
         isPlaying = false;
         saveSitewideMusicState({ isPlaying: false });
@@ -1297,12 +1324,12 @@ function initHarmonyTunes() {
         const steps = durationMs / fadeStep;
         let currentStep = 0;
         
-        fadeInterval = setInterval(() => {
+        startWorkerInterval("fadeInterval", () => {
             currentStep++;
             const newVol = startVol * (1 - (currentStep / steps));
             activeAudio.volume = Math.max(0, newVol);
             if (currentStep >= steps) {
-                clearInterval(fadeInterval);
+                stopWorkerInterval("fadeInterval");
                 activeAudio.pause();
                 activeAudio.volume = targetVol;
             }
@@ -1543,7 +1570,7 @@ function initHarmonyTunes() {
 
         volumeSlider.addEventListener('input', (e) => {
             if (fadeInterval) {
-                clearInterval(fadeInterval);
+                stopWorkerInterval("fadeInterval");
                 fadeInterval = null;
             }
             activeAudio.volume = e.target.value;
@@ -2104,8 +2131,8 @@ function initHarmonyTunes() {
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
+            stopWorkerInterval("fadeIntervalCrossfade");
+            startWorkerInterval("fadeIntervalCrossfade", () => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -2114,7 +2141,7 @@ function initHarmonyTunes() {
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
+                    stopWorkerInterval("fadeIntervalCrossfade");
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
@@ -2293,8 +2320,8 @@ function initHarmonyTunes() {
             
             
 
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
+            stopWorkerInterval("fadeIntervalCrossfade");
+            startWorkerInterval("fadeIntervalCrossfade", () => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -2304,7 +2331,7 @@ function initHarmonyTunes() {
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
+                    stopWorkerInterval("fadeIntervalCrossfade");
                     
                     
                     
