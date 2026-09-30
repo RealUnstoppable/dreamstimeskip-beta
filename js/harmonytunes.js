@@ -2065,6 +2065,24 @@ function initHarmonyTunes() {
         }
     }
 
+    // Find the next song in queue that has a viral block
+    function findNextViralSongIndex(startFrom) {
+        for (let i = startFrom; i < currentQueue.length; i++) {
+            const s = currentQueue[i];
+            const data = lyricsData[s.id];
+            if (data && data.some(l => l.trending)) return i;
+        }
+        // Wrap around if repeat is on
+        if (repeatMode === 1) {
+            for (let i = 0; i < startFrom; i++) {
+                const s = currentQueue[i];
+                const data = lyricsData[s.id];
+                if (data && data.some(l => l.trending)) return i;
+            }
+        }
+        return -1;
+    }
+
     function checkViralCrossfade() {
         if (!viralLocked) return;
         const song = currentQueue[currentSongIndex];
@@ -2082,34 +2100,55 @@ function initHarmonyTunes() {
             return;
         }
 
-        // If Mixxer is ON, apply the dynamic crossfade
+        // === VIRAL DJ MODE ===
+        // When Mixxer is ON + Viral is locked, crossfade into the NEXT song's viral section
         const fadeDur = block.actualFadeDur;
         
         if (fadeDur <= 0) {
-            // No room to crossfade without bleeding into viral lyrics, fallback to cut
             if (activeAudio.currentTime >= block.paddedEnd) {
-                activeAudio.currentTime = block.paddedStart;
+                // Advance to next song's viral part instead of looping
+                const nextViralIdx = findNextViralSongIndex(currentSongIndex + 1);
+                if (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) {
+                    __recordHistory();
+                    currentSongIndex = nextViralIdx;
+                    loadSong(currentSongIndex);
+                    const nextBlock = getViralBlock(currentQueue[currentSongIndex].id, activeAudio);
+                    if (nextBlock) activeAudio.currentTime = nextBlock.blockStart;
+                    playSong();
+                } else {
+                    activeAudio.currentTime = block.paddedStart; // fallback: loop same viral
+                }
             }
             return;
         }
 
-        // "Analyzing" phase (start analyzing 3 seconds before the crossfade)
-        if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
+        // "Analyzing" phase: preload NEXT song's viral section
+        if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 5 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
-            // PRELOAD audio seamlessly to prevent pausing/buffering when crossfade starts
-            if (nextAudio.src !== window.location.origin + song.src && nextAudio.src !== song.src && !nextAudio.src.endsWith(song.src)) {
-                nextAudio.src = song.src;
+            // Find the next song with a viral block
+            const nextViralIdx = findNextViralSongIndex(currentSongIndex + 1);
+            const targetSong = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) 
+                ? currentQueue[nextViralIdx] : song;
+            const targetBlock = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) 
+                ? getViralBlock(targetSong.id, nextAudio) : block;
+            const seekTo = targetBlock ? targetBlock.paddedStart : (block ? block.paddedStart : 0);
+            
+            // Tag the preloaded target so the crossfade phase knows where we're going
+            nextAudio._viralDJTargetIdx = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) ? nextViralIdx : currentSongIndex;
+            
+            if (!nextAudio.src.endsWith(targetSong.src)) {
+                nextAudio.src = targetSong.src;
                 nextAudio.volume = 0;
                 nextAudio.addEventListener('loadedmetadata', () => {
-                    nextAudio.currentTime = block.paddedStart;
+                    nextAudio.currentTime = seekTo;
                     const p = nextAudio.play();
                     if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
                 }, { once: true });
             } else {
-                nextAudio.currentTime = block.paddedStart;
+                nextAudio.currentTime = seekTo;
                 const p = nextAudio.play();
                 if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
             }
@@ -2124,12 +2163,39 @@ function initHarmonyTunes() {
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
             if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
-            // Swap players for intra-song crossfade
+            // Swap players
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
             nextAudio = prevAudio;
 
-            // Start playing immediately (preloaded in analyzing phase)
+            // Advance queue index to the next viral song
+            const targetIdx = activeAudio._viralDJTargetIdx;
+            if (typeof targetIdx === 'number' && targetIdx !== currentSongIndex) {
+                __recordHistory();
+                currentSongIndex = targetIdx;
+                const newSong = currentQueue[currentSongIndex];
+                if (newSong) {
+                    playerTitle.textContent = newSong.title; checkMarquee();
+                    playerArtist.textContent = newSong.artist;
+                    playerArt.src = newSong.art;
+                    document.documentElement.style.setProperty('--lyrics-color', songColors[newSong.id] || '#2d1445');
+                    const isFav = userFavoritesIds.has(newSong.id);
+                    playerLikeBtn.textContent = isFav ? '♥' : '♡';
+                    if(fsLikeBtn) { fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', isFav); }
+                    playerLikeBtn.classList.toggle('active', isFav);
+                    renderLyrics(newSong.id);
+                    if(viewPlaylist.style.display !== 'none') updateSongTableActiveState();
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: newSong.title, artist: newSong.artist,
+                            artwork: [{ src: newSong.art, sizes: '512x512', type: 'image/jpeg' }]
+                        });
+                    }
+                }
+            }
+            delete activeAudio._viralDJTargetIdx;
+
+            // Start playing (preloaded)
             activeAudio.volume = 0;
             activeAudio.play().catch(e => console.error("Manager info:", e));
 
