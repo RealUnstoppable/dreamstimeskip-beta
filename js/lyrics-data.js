@@ -1,39 +1,27 @@
 export const lyricsData = {
 
-    "kobzx2z-take-my-hand": [
-        { "start": 0, "end": 4, "trending": false, "words": [ { "text": "(Instrumental)", "start": 0 } ] },
-        { "start": 5, "end": 8, "trending": false, "words": [ 
-            { "text": "I", "start": 5.0 },
-            { "text": "found", "start": 5.5 },
-            { "text": "a", "start": 6.0 },
-            { "text": "girl,", "start": 6.5 },
-            { "text": "real", "start": 7.0 },
-            { "text": "superstar", "start": 7.5 }
-        ]},
-        { "start": 8, "end": 12, "trending": false, "words": [ 
-            { "text": "She's", "start": 8.0 },
-            { "text": "got", "start": 8.5 },
-            { "text": "it", "start": 9.0 },
-            { "text": "all,", "start": 9.5 },
-            { "text": "the", "start": 10.0 },
-            { "text": "face", "start": 10.5 },
-            { "text": "card", "start": 11.0 }
-        ]},
-        { "start": 12, "end": 16, "trending": false, "words": [ 
-            { "text": "And", "start": 12.0 },
-            { "text": "I", "start": 12.5 },
-            { "text": "know", "start": 13.0 },
-            { "text": "she's", "start": 13.5 },
-            { "text": "worth", "start": 14.0 },
-            { "text": "any", "start": 14.5 },
-            { "text": "amount", "start": 15.0 }
-        ]},
-        { "start": 16, "end": 20, "trending": true, "words": [ 
-            { "text": "Baby", "start": 16.0 },
-            { "text": "take", "start": 17.0 },
-            { "text": "my", "start": 18.0 },
-            { "text": "hand", "start": 19.0 }
-        ]}
+        "kobzx2z-take-my-hand": [
+        { "start": 0, "end": 14, "trending": false, "words": [ { "text": "(Instrumental Intro)", "start": 0 } ] },
+        { "start": 14, "end": 17, "trending": false, "words": [ { "text": "I", "start": 14.0 }, { "text": "found", "start": 14.5 }, { "text": "a", "start": 15.0 }, { "text": "girl,", "start": 15.5 }, { "text": "real", "start": 16.0 }, { "text": "superstar", "start": 16.5 } ] },
+        { "start": 17, "end": 20, "trending": false, "words": [ { "text": "She's", "start": 17.0 }, { "text": "got", "start": 17.5 }, { "text": "it", "start": 18.0 }, { "text": "all,", "start": 18.5 }, { "text": "the", "start": 19.0 }, { "text": "face", "start": 19.5 }, { "text": "card", "start": 19.8 } ] },
+        { "start": 20, "end": 24, "trending": false, "words": [ { "text": "And", "start": 20.0 }, { "text": "I", "start": 20.5 }, { "text": "know", "start": 21.0 }, { "text": "she's", "start": 21.5 }, { "text": "worth", "start": 22.0 }, { "text": "any", "start": 22.5 }, { "text": "amount", "start": 23.0 } ] },
+        { "start": 24, "end": 28, "trending": true, "words": [ { "text": "Baby", "start": 24.0 }, { "text": "take", "start": 25.0 }, { "text": "my", "start": 26.0 }, { "text": "hand", "start": 27.0 } ] },
+        { "start": 28, "end": 35, "trending": false, "words": [ { "text": "(Instrumental Break)", "start": 28.0 } ] },
+        { "start": 35, "end": 38, "trending": false, "words": [ { "text": "I", "start": 35.0 }, { "text": "found", "start": 35.5 }, { "text": "a", "start": 36.0 }, { "text": "girl,", "start": 36.5 }, { "text": "real", "start": 37.0 }, { "text": "superstar", "start": 37.5 } ] },
+        { "start": 38, "end": 41, "trending": false, "words": [ { "text": "She's", "start": 38.0 }, { "text": "got", "start": 38.5 }, { "text": "it", "start": 39.0 }, { "text": "all,", "start": 39.5 }, { "text": "the", "start": 40.0 }, { "text": "face", "start": 40.5 }, { "text": "card", "start": 40.8 } ] },
+        { "start": 41, "end": 45, "trending": false, "words": [ { "text": "And", "start": 41.0 }, { "text": "I", "start": 41.5 }, { "text": "know", "start": 42.0 }, { "text": "she's", "start": 42.5 }, { "text": "worth", "start": 43.0 }, { "text": "any", "start": 43.5 }, { "text": "amount", "start": 44.0 } ] },
+        { "start": 45, "end": 49, "trending": true, "words": [ { "text": "Baby", "start": 45.0 }, { "text": "take", "start": 46.0 }, { "text": "my", "start": 47.0 }, { "text": "hand", "start": 48.0 } ] },
+        { "start": 49, "end": 65, "trending": false, "words": [ { "text": "(Instrumental Interlude)", "start": 49.0 } ] },
+        { "start": 65, "end": 68, "trending": false, "words": [ { "text": "I", "start": 65.0 }, { "text": "found", "start": 65.5 }, { "text": "a", "start": 66.0 }, { "text": "girl,", "start": 66.5 }, { "text": "real", "start": 67.0 }, { "text": "superstar", "start": 67.5 } ] },
+        { "start": 68, "end": 71, "trending": false, "words": [ { "text": "She's", "start": 68.0 }, { "text": "got", "start": 68.5 }, { "text": "it", "start": 69.0 }, { "text": "all,", "start": 69.5 }, { "text": "the", "start": 70.0 }, { "text": "face", "start": 70.5 }, { "text": "card", "start": 70.8 } ] },
+        { "start": 71, "end": 75, "trending": false, "words": [ { "text": "And", "start": 71.0 }, { "text": "I", "start": 71.5 }, { "text": "know", "start": 72.0 }, { "text": "she's", "start": 72.5 }, { "text": "worth", "start": 73.0 }, { "text": "any", "start": 73.5 }, { "text": "amount", "start": 74.0 } ] },
+        { "start": 75, "end": 79, "trending": true, "words": [ { "text": "Baby", "start": 75.0 }, { "text": "take", "start": 76.0 }, { "text": "my", "start": 77.0 }, { "text": "hand", "start": 78.0 } ] },
+        { "start": 79, "end": 105, "trending": false, "words": [ { "text": "(Instrumental Interlude)", "start": 79.0 } ] },
+        { "start": 105, "end": 108, "trending": false, "words": [ { "text": "I", "start": 105.0 }, { "text": "found", "start": 105.5 }, { "text": "a", "start": 106.0 }, { "text": "girl,", "start": 106.5 }, { "text": "real", "start": 107.0 }, { "text": "superstar", "start": 107.5 } ] },
+        { "start": 108, "end": 111, "trending": false, "words": [ { "text": "She's", "start": 108.0 }, { "text": "got", "start": 108.5 }, { "text": "it", "start": 109.0 }, { "text": "all,", "start": 109.5 }, { "text": "the", "start": 110.0 }, { "text": "face", "start": 110.5 }, { "text": "card", "start": 110.8 } ] },
+        { "start": 111, "end": 115, "trending": false, "words": [ { "text": "And", "start": 111.0 }, { "text": "I", "start": 111.5 }, { "text": "know", "start": 112.0 }, { "text": "she's", "start": 112.5 }, { "text": "worth", "start": 113.0 }, { "text": "any", "start": 113.5 }, { "text": "amount", "start": 114.0 } ] },
+        { "start": 115, "end": 119, "trending": true, "words": [ { "text": "Baby", "start": 115.0 }, { "text": "take", "start": 116.0 }, { "text": "my", "start": 117.0 }, { "text": "hand", "start": 118.0 } ] },
+        { "start": 119, "end": 154, "trending": false, "words": [ { "text": "(Outro)", "start": 119.0 } ] }
     ],
 
 
