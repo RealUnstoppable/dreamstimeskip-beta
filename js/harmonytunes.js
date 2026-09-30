@@ -1,6 +1,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getCachedUserProfile } from './utils.js';
 import { lyricsData } from './lyrics-data.js?v=1790377272083b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1790377272083b';
@@ -51,10 +52,9 @@ function initHarmonyTunes() {
     async function loadCustomPlaylists() {
         if (!currentUser) return;
         try {
-            const userRef = doc(db, "users", currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
+            // ⚡ Bolt: Fetch user data from sessionStorage cache using getCachedUserProfile instead of a raw Firestore getDoc query to prevent unnecessary network reads and improve loading speed.
+            const data = await getCachedUserProfile(currentUser);
+            if (data) {
                 customPlaylists = data.customPlaylists || [];
                 renderHomePlaylists();
             }
@@ -68,6 +68,14 @@ function initHarmonyTunes() {
         try {
             const userRef = doc(db, "users", currentUser.uid);
             await updateDoc(userRef, { customPlaylists });
+            // Update session cache to prevent stale data on reload
+            const cacheKey = `profile_${currentUser.uid}`;
+            const cachedStr = sessionStorage.getItem(cacheKey);
+            if (cachedStr) {
+                const uData = JSON.parse(cachedStr);
+                uData.customPlaylists = customPlaylists;
+                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+            }
         } catch (e) {
             console.error("Failed to save custom playlists", e);
         }
