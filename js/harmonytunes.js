@@ -115,6 +115,15 @@ function initHarmonyTunes() {
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
+    
+    // API for AI Chatbot
+    window.HarmonyTunesAPI = {
+        getCurrentlyPlaying: () => currentQueue[currentSongIndex] || null,
+        getQueue: () => currentQueue.slice(currentSongIndex + 1),
+        getHistory: () => typeof historyQueue !== 'undefined' ? historyQueue : [],
+        getFavorites: () => Array.from(userFavoritesIds),
+        playSong: (id) => { if (typeof window.playSongById === 'function') window.playSongById(id); }
+    };
 
     // --- DOM ELEMENTS ---
     const viewHome = document.getElementById('view-home');
