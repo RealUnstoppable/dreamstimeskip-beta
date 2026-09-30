@@ -1069,13 +1069,16 @@ function initHarmonyTunes() {
         }
 
         if(typeof window.__pullFromUserQueue === 'function') {
-            const nextUserSong = window.__pullFromUserQueue();
-            if(nextUserSong) {
-                currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
-                currentSongIndex = currentSongIndex + 1;
-                loadSong(currentSongIndex);
-                playSong();
-                return;
+            if(userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    __recordHistory();
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                    currentSongIndex = currentSongIndex + 1;
+                    loadSong(currentSongIndex);
+                    playSong();
+                    return;
+                }
             }
         }
 
@@ -1185,7 +1188,9 @@ function initHarmonyTunes() {
             player.addEventListener('ended', (e) => {
                 if (e.target === activeAudio) {
                     if (isMixerMode && isCrossfading) return;
-                    if (repeatMode === 2) {
+                    if (userQueue.length > 0) {
+                        nextSong();
+                    } else if (repeatMode === 2) {
                         activeAudio.currentTime = 0;
                         playSong();
                     } else {
@@ -1851,7 +1856,8 @@ function initHarmonyTunes() {
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
-            mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            mixerBtn.classList.add('analyzing');
+            if (userQueue.length === 0) { if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
             // If there is no next song and repeat is off, auto-queue the best fit using AI
@@ -1889,6 +1895,9 @@ function initHarmonyTunes() {
             }
         }
 
+            } // End of userQueue check
+        }
+
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
             isListening = false;
             mixerBtn.classList.remove('analyzing');
@@ -1902,7 +1911,12 @@ function initHarmonyTunes() {
             nextAudio = prevAudio;
 
             let nextIndex = currentSongIndex + 1;
-            if (repeatMode === 2) {
+            if (typeof window.__pullFromUserQueue === 'function' && userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                }
+            } else if (repeatMode === 2) {
                 nextIndex = currentSongIndex;
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
