@@ -280,6 +280,11 @@ export async function renderRewards(user, userData) {
     const noRewardsMsg = document.getElementById('no-rewards-msg');
 
     try {
+        const referralLinkInput = document.getElementById('referral-link');
+        if (referralLinkInput) {
+            referralLinkInput.value = window.location.origin + '/sign in beta.html?ref=' + user.uid;
+        }
+
         const userRef = doc(db, 'users', user.uid);
         let userSnap = null;
 
@@ -922,6 +927,21 @@ export function initAccountPage() {
             loadWishlist(currentUser.uid);
         }
     });
+
+    const copyReferralBtn = document.getElementById('copy-referral-btn');
+    const referralLinkInput = document.getElementById('referral-link');
+    if (copyReferralBtn && referralLinkInput) {
+        copyReferralBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(referralLinkInput.value);
+                const originalText = copyReferralBtn.textContent;
+                copyReferralBtn.textContent = 'Copied!';
+                setTimeout(() => { copyReferralBtn.textContent = originalText; }, 2000);
+            } catch (err) {
+                console.error('Manager info: Failed to copy text: ', err);
+            }
+        });
+    }
 
     // Firebase Auth State
     onAuthStateChanged(auth, async (user) => {
