@@ -83,6 +83,17 @@ exports.adminAction = functions.https.onRequest((req, res) => {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
         await docRef.set(data, { merge: true });
+      } else if (action === "create") {
+        if (typeof data !== "object" || data === null) {
+          return res.status(400).send("Invalid create data");
+        }
+        if (data.createdAt === 'SERVER_TIMESTAMP') {
+          data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await docRef.set(data);
       } else if (action === "delete") {
         await docRef.delete();
       } else {
