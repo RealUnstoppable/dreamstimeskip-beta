@@ -58,9 +58,17 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         return res.status(403).send("Forbidden: Admins only");
       }
 
+      if (JSON.stringify(req.body).length > 15000) {
+        return res.status(413).send("Payload too large");
+      }
+
       const {action, collection, docId, data} = req.body;
       if (!action || !collection || !docId) {
         return res.status(400).send("Missing required fields");
+      }
+
+      if (typeof docId !== "string" || typeof collection !== "string") {
+        return res.status(400).send("Invalid parameter types");
       }
 
       // Allowed collections for admin actions via this endpoint
@@ -82,7 +90,18 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         if (data.updatedAt === "SERVER_TIMESTAMP") {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
-        await docRef.set(data, {merge: true});
+        await docRef.set(data, { merge: true });
+      } else if (action === "create") {
+        if (typeof data !== "object" || data === null) {
+          return res.status(400).send("Invalid create data");
+        }
+        if (data.createdAt === 'SERVER_TIMESTAMP') {
+          data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (data.updatedAt === "SERVER_TIMESTAMP") {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await docRef.set(data);
       } else if (action === "delete") {
         await docRef.delete();
       } else {
@@ -477,24 +496,20 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
       const decodedToken = await authenticateRequest(req, res, admin);
       if (!decodedToken) return;
 
+      if (JSON.stringify(req.body).length > 15000) {
+        return res.status(413).send("Payload too large");
+      }
+
       const uid = decodedToken.uid;
       const {cart, orderDetails, pointsToRedeem = 0} = req.body;
 
-      if (!cart || typeof cart !== "object" || Object.keys(cart).length === 0 || Object.keys(cart).length > 50) {
-        return res.status(400).send("Invalid cart payload");
+      if (!cart || !orderDetails || typeof cart !== "object" || typeof orderDetails !== "object") {
+        return res.status(400).send("Invalid or missing cart/orderDetails");
       }
 
-      if (!orderDetails || typeof orderDetails !== "object" || JSON.stringify(orderDetails).length > 5000) {
-        return res.status(400).send("Invalid orderDetails payload");
-      }
-
-      if (typeof pointsToRedeem !== "number" || pointsToRedeem < 0) {
-        return res.status(400).send("Invalid pointsToRedeem value");
-      }
-
-      if (orderDetails.userId !== uid) {
-        orderDetails.userId = uid;
-      }
+      // Fix: Securely override userId with authenticated user's id
+      orderDetails.userId = uid;
+      // Do not accept timestamps from the client, assign server-side
       orderDetails.orderDate = admin.firestore.FieldValue.serverTimestamp();
 
       const db = admin.firestore();
@@ -564,6 +579,98 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 });
 
 
+// 📅 Daily Check-in Rewards
+exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+    const uid = decodedToken.uid;
+    const db = admin.firestore();
+    const userRef = db.collection("users").doc(uid);
+    const transactionRef = db.collection("reward_transactions").doc();
+
+    try {
+      return await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+
+        const data = userDoc.data();
+        let lastCheckIn = data.lastCheckIn;
+        let streak = data.checkInStreak || 0;
+        let points = data.pointsBalance || 0;
+
+        const now = admin.firestore.Timestamp.now();
+        const nowDate = now.toDate();
+        // Convert to YYYY-MM-DD in UTC
+        const todayStr = nowDate.toISOString().split('T')[0];
+
+        let lastCheckInStr = "";
+        let isConsecutive = false;
+
+        if (lastCheckIn) {
+            const lastDate = lastCheckIn.toDate();
+            lastCheckInStr = lastDate.toISOString().split('T')[0];
+
+            if (todayStr === lastCheckInStr) {
+                // Already checked in today
+                return res.status(400).json({ error: "Already checked in today" });
+            }
+
+            // Check if it's consecutive (exactly 1 day diff)
+            const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
+            const lastMid = new Date(lastCheckInStr + 'T00:00:00Z').getTime();
+            const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                isConsecutive = true;
+            }
+        }
+
+        let newStreak = isConsecutive ? streak + 1 : 1;
+
+        // Base reward
+        let rewardPoints = 10;
+        let isStreakBonus = false;
+
+        // 7-day bonus
+        if (newStreak > 0 && newStreak % 7 === 0) {
+            rewardPoints += 50;
+            isStreakBonus = true;
+        }
+
+        const newPoints = points + rewardPoints;
+
+        transaction.set(userRef, {
+            pointsBalance: newPoints,
+            lastCheckIn: now,
+            checkInStreak: newStreak
+        }, { merge: true });
+
+        const reason = isStreakBonus ? "Daily Check-in (7-Day Bonus!)" : "Daily Check-in";
+
+        transaction.set(transactionRef, {
+            userId: uid,
+            amount: rewardPoints,
+            reason: reason,
+            createdAt: now
+        });
+
+        res.status(200).json({ success: true, pointsEarned: rewardPoints, currentStreak: newStreak, totalPoints: newPoints });
+      });
+    } catch (error) {
+      console.error("Manager info: Check-in Error: [" + error.message + "]");
+      res.status(500).json({ error: error.message });
+    }
+  });
+});
+
 // 👍 Toggle Feature Upvote
 exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
@@ -613,4 +720,80 @@ exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
       res.status(500).json({error: error.message});
     }
   });
+});
+
+
+// 🏆 Process Referral
+exports.processReferral = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Endpoint requires authentication!');
+    }
+
+    const newUserId = context.auth.uid;
+    const { referrerUid } = data;
+
+    if (!referrerUid) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing referrerUid');
+    }
+
+    if (referrerUid === newUserId) {
+        throw new functions.https.HttpsError('invalid-argument', 'Cannot refer yourself');
+    }
+
+    const db = admin.firestore();
+    const referrerRef = db.collection("users").doc(referrerUid);
+    const refereeRef = db.collection("users").doc(newUserId);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const referrerDoc = await transaction.get(referrerRef);
+        const refereeDoc = await transaction.get(refereeRef);
+
+        if (refereeDoc.exists && refereeDoc.data().referredBy) {
+            throw new Error("User has already used a referral code");
+        }
+
+        if (!referrerDoc.exists) {
+            // Referrer not found, safely ignore
+            return;
+        }
+
+        if (!refereeDoc.exists) {
+            throw new Error("Referee not found");
+        }
+
+        const referrerPoints = referrerDoc.data().loyaltyPoints || 0;
+        const refereePoints = refereeDoc.data().loyaltyPoints || 0;
+
+        const REFERRAL_BONUS = 50;
+
+        // Update points
+        transaction.update(referrerRef, { loyaltyPoints: referrerPoints + REFERRAL_BONUS });
+        transaction.update(refereeRef, { loyaltyPoints: refereePoints + REFERRAL_BONUS, referredBy: referrerUid });
+
+        // Record transactions
+        const referrerTxRef = db.collection("loyalty_transactions").doc();
+        transaction.set(referrerTxRef, {
+            userId: referrerUid,
+            amount: REFERRAL_BONUS,
+            type: 'referral_bonus_given',
+            description: 'Referral Bonus: You referred a new user!',
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        const refereeTxRef = db.collection("loyalty_transactions").doc();
+        transaction.set(refereeTxRef, {
+            userId: newUserId,
+            amount: REFERRAL_BONUS,
+            type: 'referral_bonus_received',
+            description: 'Referral Bonus: You used a referral code!',
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Manager info: Process Referral Error: [" + error.message + "]");
+      throw new functions.https.HttpsError('internal', error.message);
+    }
 });

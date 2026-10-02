@@ -3,7 +3,10 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
-import './sitewide-player.js?v=20260920';
+import './sitewide-player.js?v=20260924';
+import './ads.js';
+import './chatbot.js?v=20260925';
+import { initCookieConsent } from './cookie-consent.js';
 
 let notificationUnsubscribe = null;
 
@@ -11,8 +14,8 @@ let notificationUnsubscribe = null;
 const PRELOADED_NOTIFICATIONS = [
     {
         id: 'pre-1',
-        title: '🎶 Check out Medixly (HarmonyTunes)',
-        message: 'Stream your favourite hits on HarmonyTunes now.',
+        title: '🎶 Check out Medixly',
+        message: 'Stream your favourite hits on Medixly now.',
         link: 'harmonytunes.html',
         isRead: false,
         preloaded: true
@@ -58,12 +61,11 @@ export function loadNavbar() {
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
-            <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+            <li><a href="harmonytunes.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
-            <li><a href="portfolio.html">About Me</a></li>
-            <li><a href="uds.html">UDS</a></li>
+            <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
                     <!-- Desktop bell button -->
@@ -100,6 +102,7 @@ export function loadNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 export function loadUdsNavbar() {
@@ -111,12 +114,12 @@ export function loadUdsNavbar() {
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
-            <li><a href="harmonytunes.html">HarmonyTunes</a></li>
+            <li><a href="harmonytunes.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li class="nav-dropdown-wrapper">
-                <a href="#" style="cursor: default;">UDS ▾</a>
+                <a href="#" style="cursor: default;">Autolux ▾</a>
                 <div class="nav-dropdown">
-                    <a href="uds.html">Overview</a>
+                    <a href="https://autolux.realunstoppable.store">Overview</a>
                     <a href="detailing.html">Services</a>
                 </div>
             </li>
@@ -156,6 +159,7 @@ export function loadUdsNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 function attachNavEvents() {
@@ -306,8 +310,10 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
+                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
+                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
+                            if (!mergedIds.has(pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;
