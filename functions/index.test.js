@@ -62,7 +62,7 @@ jest.mock("firebase-admin", () => {
       }),
     }), {
       FieldValue: {
-        serverTimestamp: jest.fn().mockReturnValue(new Date('2026-09-15T11:08:03.745Z')),
+        serverTimestamp: jest.fn().mockReturnValue(new Date("2026-09-15T11:08:03.745Z")),
       },
     }),
   };
@@ -314,8 +314,8 @@ describe("adminAction", () => {
     require("firebase-admin").firestore().collection().doc.mockReturnValue({
       get: mockGetDoc,
       update: mockUpdateDoc,
-        set: mockSetDoc,
-        delete: mockDeleteDoc,
+      set: mockSetDoc,
+      delete: mockDeleteDoc,
     });
 
     require("firebase-admin")._mockVerifyIdToken.mockResolvedValue({
@@ -351,13 +351,13 @@ describe("adminAction", () => {
   it("should return 403 if user is not an admin", async () => {
     mockGetDoc.mockResolvedValueOnce({
       exists: true,
-      data: () => ({ isAdmin: false })
+      data: () => ({isAdmin: false}),
     });
 
     const req = mockReq({
       method: "POST",
-      headers: { authorization: "Bearer valid-token" },
-      body: { action: "update", collection: "users", docId: "u1" }
+      headers: {authorization: "Bearer valid-token"},
+      body: {action: "update", collection: "users", docId: "u1"},
     });
     const res = mockRes();
 
@@ -372,13 +372,13 @@ describe("adminAction", () => {
   it("should return 400 for invalid collection", async () => {
     mockGetDoc.mockResolvedValueOnce({
       exists: true,
-      data: () => ({ isAdmin: true })
+      data: () => ({isAdmin: true}),
     });
 
     const req = mockReq({
       method: "POST",
-      headers: { authorization: "Bearer valid-token" },
-      body: { action: "update", collection: "secrets", docId: "s1", data: {} }
+      headers: {authorization: "Bearer valid-token"},
+      body: {action: "update", collection: "secrets", docId: "s1", data: {}},
     });
     const res = mockRes();
 
@@ -393,15 +393,15 @@ describe("adminAction", () => {
   it("should perform an update successfully", async () => {
     mockGetDoc.mockResolvedValueOnce({
       exists: true,
-      data: () => ({ isAdmin: true })
+      data: () => ({isAdmin: true}),
     });
 
     mockUpdateDoc.mockResolvedValueOnce();
 
     const req = mockReq({
       method: "POST",
-      headers: { authorization: "Bearer valid-token" },
-      body: { action: "update", collection: "users", docId: "u1", data: { isBanned: true } }
+      headers: {authorization: "Bearer valid-token"},
+      body: {action: "update", collection: "users", docId: "u1", data: {isBanned: true}},
     });
     const res = mockRes();
 
@@ -411,24 +411,24 @@ describe("adminAction", () => {
     });
 
     expect(mockSetDoc).toHaveBeenCalledWith(
-        expect.objectContaining({ isBanned: true }), { merge: true }
+        expect.objectContaining({isBanned: true}), {merge: true},
     );
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ success: true });
+    expect(res.json).toHaveBeenCalledWith({success: true});
   });
 
   it("should perform a delete successfully", async () => {
     mockGetDoc.mockResolvedValueOnce({
       exists: true,
-      data: () => ({ isAdmin: true })
+      data: () => ({isAdmin: true}),
     });
 
     mockDeleteDoc.mockResolvedValueOnce();
 
     const req = mockReq({
       method: "POST",
-      headers: { authorization: "Bearer valid-token" },
-      body: { action: "delete", collection: "quotes", docId: "q1" }
+      headers: {authorization: "Bearer valid-token"},
+      body: {action: "delete", collection: "quotes", docId: "q1"},
     });
     const res = mockRes();
 
@@ -439,6 +439,6 @@ describe("adminAction", () => {
 
     expect(mockDeleteDoc).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ success: true });
+    expect(res.json).toHaveBeenCalledWith({success: true});
   });
 });
