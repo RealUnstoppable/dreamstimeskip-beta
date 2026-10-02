@@ -1,10 +1,11 @@
 // js/checkout.js
-import { auth, db, safeRedirect } from './auth.js';
+import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
+import { generateProductCardHtml } from './ui-utils.js';
 
 let currentUser = null;
 let userCart = {};
@@ -227,11 +228,7 @@ function renderCheckoutPage() {
 
 
 function updateSummaryUI() {
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
 
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
@@ -260,57 +257,48 @@ function updateSummaryUI() {
 
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
-    const orderDocId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fullOrder = {
-        orderId: orderDocId,
-        userId: uid || 'guest',
-        userEmail: orderDetails.email || '',
-        items: cart,
-        orderDate: serverTimestamp(),
-        status: 'Paid',
-        total: orderDetails.total || 0,
-        shippingInfo: orderDetails.shippingInfo,
-        paymentStatus: 'Paid via Stripe Test (Card ending in 4242)',
-        appliedPromo: orderDetails.appliedPromo || '',
-        pointsRedeemed: orderDetails.pointsRedeemed || 0,
-        earnedPoints: orderDetails.earnedPoints || 0
-    };
-
-    // If signed in, write to Firestore
-    if (currentUser && currentUser.uid) {
-        try {
-            await addDoc(collection(db, 'orders'), fullOrder);
-            await setDoc(doc(db, 'carts', currentUser.uid), { items: {} });
-
-            if (orderDetails.earnedPoints) {
-                const userRef = doc(db, 'users', currentUser.uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    const currentPoints = userSnap.data().pointsBalance || 0;
-                    const newBal = Math.max(0, currentPoints - (orderDetails.pointsRedeemed || 0) + orderDetails.earnedPoints);
-                    await setDoc(userRef, { pointsBalance: newBal }, { merge: true });
-                }
-            }
-        } catch (dbErr) {
-            console.warn("Firestore order write warning:", dbErr);
+    try {
+        if (!currentUser) {
+            throw new Error('User must be logged in to process an order.');
         }
+
+        const token = await currentUser.getIdToken();
+        const cloudFunctionUrl = window.location.hostname === 'localhost'
+            ? 'http://localhost:5001/dts-hub-website/us-central1/processOrderTransaction'
+            : 'https://us-central1-dts-hub-website.cloudfunctions.net/processOrderTransaction';
+
+        const response = await fetch(cloudFunctionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cart, orderDetails, pointsToRedeem: orderDetails.pointsRedeemed })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Server Error');
+        }
+
+        const data = await response.json();
+        const orderId = data.orderId || 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        // Always clear localStorage cart
+        localStorage.removeItem('localCart');
+        localStorage.removeItem('cartItemCount');
+
+        // Broadcast cartUpdated event so Lexi and headers clear the count
+        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart: {}, itemCount: 0, totalPrice: 0 } }));
+        if (typeof window.updateLexiCartCount === 'function') {
+            window.updateLexiCartCount(0);
+        }
+
+        return orderId;
+    } catch (error) {
+        console.error('Manager info: Error processing order transaction [' + error.message + ']');
+        throw error;
     }
-
-    // Always clear localStorage cart
-    localStorage.removeItem('localCart');
-    localStorage.removeItem('cartItemCount');
-    localStorage.setItem('lastCompletedOrder', JSON.stringify({
-        ...fullOrder,
-        orderDate: new Date().toISOString()
-    }));
-
-    // Broadcast cartUpdated event so Lexi and headers clear the count
-    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart: {}, itemCount: 0, totalPrice: 0 } }));
-    if (typeof window.updateLexiCartCount === 'function') {
-        window.updateLexiCartCount(0);
-    }
-
-    return orderDocId;
 }
 
 export async function handlePlaceOrder(e) {
@@ -333,11 +321,7 @@ export async function handlePlaceOrder(e) {
     const emailVal = emailInput ? emailInput.value : (currentUser ? currentUser.email : '');
 
     // Calculate final total
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
     const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
