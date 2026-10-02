@@ -204,7 +204,7 @@ export async function renderOrders(user) {
                     itemsHtml += `
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <div style="display: flex; align-items: center; gap: 12px;">
-                                ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover; background: #000;">` : ''}
+                                ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" loading="lazy" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover; background: #000;">` : ''}
                                 <div>
                                     <div style="font-weight: 600; color: #fff; font-size: 0.95rem;">${escapeHTML(product.name)}</div>
                                     <small style="color: var(--text-secondary);">Qty: ${qty} × $${(product.price || 0).toFixed(2)}</small>
@@ -573,9 +573,15 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     };
 
     document.getElementById('close-cancel-modal-btn').onclick = closeModal;
-    modal.querySelectorAll('.cancel-keep-btn').forEach(btn => {
-        btn.onclick = closeModal;
-    });
+    // ⚡ Bolt: Use event delegation for closing modal
+    if (!modal.dataset.delegated) {
+        modal.dataset.delegated = 'true';
+        modal.addEventListener('click', (e) => {
+            if (e.target.closest('.cancel-keep-btn')) {
+                closeModal();
+            }
+        });
+    }
 
     // Step 1 -> Step 2
     const step2Btn = document.getElementById('cancel-to-step-2-btn');
@@ -802,7 +808,7 @@ export async function loadWishlist(userId) {
             if (!product) return '';
             return `
                 <div class="product-card" style="padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column;">
-                    <img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #000;">
+                    <img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" loading="lazy" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #000;">
                     <div style="flex-grow: 1;">
                         <h4 style="margin: 0 0 6px 0; font-size: 1rem; color: #fff;">${escapeHTML(product.name)}</h4>
                         <div style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 14px;">$${product.price.toFixed(2)}</div>
@@ -815,28 +821,30 @@ export async function loadWishlist(userId) {
             `;
         }).join('');
 
-        // Wire Add to Cart
-        container.querySelectorAll('.wishlist-add-cart-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const orig = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Added! ✓';
-                await handleAddToCart(btn.dataset.id);
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = orig;
-                }, 1500);
-            };
-        });
+        // ⚡ Bolt: Use event delegation for wishlist actions instead of O(N) event listener bindings
+        container.onclick = async (e) => {
+            const addBtn = e.target.closest('.wishlist-add-cart-btn');
+            const removeBtn = e.target.closest('.wishlist-remove-btn');
 
-        // Wire Remove
-        container.querySelectorAll('.wishlist-remove-btn').forEach(btn => {
-            btn.onclick = async () => {
-                btn.disabled = true;
-                await toggleWishlist(btn.dataset.id);
+            if (addBtn && !addBtn.disabled) {
+                const orig = addBtn.textContent;
+                addBtn.disabled = true;
+                addBtn.textContent = 'Added! ✓';
+                await handleAddToCart(addBtn.dataset.id);
+                setTimeout(() => {
+                    addBtn.disabled = false;
+                    addBtn.textContent = orig;
+                }, 1500);
+                return;
+            }
+
+            if (removeBtn && !removeBtn.disabled) {
+                removeBtn.disabled = true;
+                await toggleWishlist(removeBtn.dataset.id);
                 await loadWishlist(userId);
-            };
-        });
+                return;
+            }
+        };
 
     } catch (err) {
         console.error("Error loading wishlist:", err);
@@ -1028,34 +1036,39 @@ export function initAccountPage() {
         });
 
         // Password Reset Email
-        document.querySelectorAll('#change-password-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                btn.disabled = true;
-                const orig = btn.textContent;
-                btn.textContent = 'Sending...';
+        // ⚡ Bolt: Use event delegation for password reset button to avoid querying the DOM multiple times
+        if (!document.body.dataset.pwdDelegated) {
+            document.body.dataset.pwdDelegated = 'true';
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('#change-password-btn');
+                if (btn && !btn.disabled) {
+                    btn.disabled = true;
+                    const orig = btn.textContent;
+                    btn.textContent = 'Sending...';
 
-                try {
-                    await sendPasswordResetEmail(auth, user.email);
-                    const notif = document.getElementById('security-notification');
-                    if (notif) {
-                        notif.textContent = 'Password reset email sent to ' + user.email;
-                        notif.className = 'notification success';
-                        notif.style.display = 'block';
-                        setTimeout(() => notif.style.display = 'none', 4000);
+                    try {
+                        await sendPasswordResetEmail(auth, user.email);
+                        const notif = document.getElementById('security-notification');
+                        if (notif) {
+                            notif.textContent = 'Password reset email sent to ' + user.email;
+                            notif.className = 'notification success';
+                            notif.style.display = 'block';
+                            setTimeout(() => notif.style.display = 'none', 4000);
+                        }
+                    } catch (err) {
+                        const notif = document.getElementById('security-notification');
+                        if (notif) {
+                            notif.textContent = `Error: ${err.message}`;
+                            notif.className = 'notification error';
+                            notif.style.display = 'block';
+                        }
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = orig;
                     }
-                } catch (err) {
-                    const notif = document.getElementById('security-notification');
-                    if (notif) {
-                        notif.textContent = `Error: ${err.message}`;
-                        notif.className = 'notification error';
-                        notif.style.display = 'block';
-                    }
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = orig;
                 }
             });
-        });
+        }
 
         // 2FA Toggle
         const toggle2FA = document.getElementById('toggle-2fa');
