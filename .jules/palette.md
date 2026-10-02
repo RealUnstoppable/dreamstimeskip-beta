@@ -20,6 +20,7 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
-## 2024-10-01 - [Loading States for Sync vs Async Actions]
-**Learning:** For actions like "Generate Report" or "Export CSV" that execute synchronous client-side aggregation or trigger browser-native behaviors (like `window.print()` which blocks execution until the dialog closes), relying purely on asynchronous Promises is insufficient. Simulating network latency via `setTimeout` is necessary to ensure the user actually sees the loading state (e.g., "Generating...") before the synchronous block takes over the main thread.
-**Action:** When adding UX loading states to handlers that invoke synchronous blocking UI (like print dialogs or heavy data parsing), wrap the blocking call inside a small `setTimeout` to allow the browser to paint the 'Processing...' button state first.
+
+## 2026-09-24 - Missing Title Tooltips on Icon-Only Buttons and Disabled Hover States
+**Learning:** Found multiple icon-only buttons across the site (e.g. in HarmonyTunes and sitewide player) that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning. Additionally, disabled buttons lacked proper CSS to prevent hover effects (`:hover:not(:disabled)`), causing them to seem interactable.
+**Action:** When adding `aria-label` to interactive elements without visible text, always add a matching `title` attribute. Ensure all button `:hover` pseudo-classes exclude the `:disabled` state, and add explicit `:disabled` styling (e.g., opacity, cursor).

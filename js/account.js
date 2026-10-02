@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from 
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products-data.js';
 import { escapeHTML, formatDate } from './utils.js';
+import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
 import { handleAddToCart, toggleWishlist } from './shop.js';
 
@@ -184,6 +185,8 @@ export async function renderOrders(user) {
         if (noOrdersMsg) noOrdersMsg.style.display = 'none';
         listEl.innerHTML = '';
 
+        const fragment = document.createDocumentFragment();
+
         orders.forEach(order => {
             const orderId = order.orderId || order.id || 'ORD-UNKNOWN';
             const orderDateStr = formatDate(order.orderDate || order.createdAt);
@@ -196,23 +199,12 @@ export async function renderOrders(user) {
 
             if (order.items && typeof order.items === 'object') {
                 for (const [productId, quantity] of Object.entries(order.items)) {
-                    const product = productMap.get(productId) || { name: productId, price: 0, imageUrl: '' };
+                    const product = productMap.get(productId) || { id: productId, name: productId, price: 0, imageUrl: '' };
                     const qty = parseInt(quantity, 10) || 1;
                     const itemTotal = (product.price || 0) * qty;
                     calculatedSubtotal += itemTotal;
 
-                    itemsHtml += `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover; background: #000;">` : ''}
-                                <div>
-                                    <div style="font-weight: 600; color: #fff; font-size: 0.95rem;">${escapeHTML(product.name)}</div>
-                                    <small style="color: var(--text-secondary);">Qty: ${qty} × $${(product.price || 0).toFixed(2)}</small>
-                                </div>
-                            </div>
-                            <div style="font-weight: bold; color: #fff;">$${itemTotal.toFixed(2)}</div>
-                        </div>
-                    `;
+                    itemsHtml += generateProductCardHtml(product, 'order-history', qty);
                 }
             }
 
@@ -257,8 +249,10 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
+
+        listEl.appendChild(fragment);
 
     } catch (err) {
         console.error("Error rendering orders:", err);
@@ -280,6 +274,11 @@ export async function renderRewards(user, userData) {
     const noRewardsMsg = document.getElementById('no-rewards-msg');
 
     try {
+        const referralLinkInput = document.getElementById('referral-link');
+        if (referralLinkInput) {
+            referralLinkInput.value = window.location.origin + '/sign in beta.html?ref=' + user.uid;
+        }
+
         const userRef = doc(db, 'users', user.uid);
         let userSnap = null;
 
@@ -290,9 +289,8 @@ export async function renderRewards(user, userData) {
         } else if (userData && typeof userData.loyaltyPoints === 'number') {
             points = userData.loyaltyPoints;
         } else {
-            userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
+            const data = await getCachedUserProfile(user);
+            if (data) {
                 points = typeof data.pointsBalance === 'number' 
                     ? data.pointsBalance 
                     : (typeof data.loyaltyPoints === 'number' ? data.loyaltyPoints : 50);
@@ -352,21 +350,7 @@ export async function renderRewards(user, userData) {
             if (txs.length === 0) {
                 dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet. Earn 10 points for every dollar spent in the shop!</p>`;
             } else {
-                dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => {
-                    const isPositive = (tx.points || 0) >= 0;
-                    const dateStr = formatDate(tx.createdAt);
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                            <div>
-                                <strong style="display: block; font-size: 0.9rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
-                                <small style="color: var(--text-secondary);">${dateStr}</small>
-                            </div>
-                            <div style="font-weight: 800; font-size: 0.95rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                                ${isPositive ? '+' : ''}${tx.points} pts
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => createTransactionHtml(tx, true)).join('');
             }
         }
 
@@ -380,29 +364,13 @@ export async function renderRewards(user, userData) {
                 rewardsHistoryList.innerHTML = '';
             } else {
                 if (noRewardsMsg) noRewardsMsg.style.display = 'none';
-                rewardsHistoryList.innerHTML = txs.map(tx => {
-                    const isPositive = (tx.points || 0) >= 0;
-                    const dateStr = formatDate(tx.createdAt);
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border: 1px solid var(--border-color); border-radius: 10px; background: rgba(255,255,255,0.02);">
-                            <div>
-                                <div style="font-weight: 700; color: #fff; font-size: 1rem;">${escapeHTML(tx.description || 'Reward Earned')}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                            <div style="font-weight: 800; font-size: 1.1rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                                ${isPositive ? '+' : ''}${tx.points} pts
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                rewardsHistoryList.innerHTML = txs.map(tx => createTransactionHtml(tx, false)).join('');
             }
         }
 
     } catch (err) {
         console.error("Error rendering rewards:", err);
-        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
-        if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
-        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
+        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
     }
 }
 
@@ -498,7 +466,11 @@ export function renderBilling(user, userData) {
             </div>
         `;
 
-        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async () => {
+        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Activating...';
             try {
                 await updateDoc(doc(db, "users", user.uid), {
                     membershipLevel: 'premium',
@@ -514,7 +486,10 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     }
@@ -573,9 +548,15 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     };
 
     document.getElementById('close-cancel-modal-btn').onclick = closeModal;
-    modal.querySelectorAll('.cancel-keep-btn').forEach(btn => {
-        btn.onclick = closeModal;
-    });
+    // ⚡ Bolt: Use event delegation for closing modal
+    if (!modal.dataset.delegated) {
+        modal.dataset.delegated = 'true';
+        modal.addEventListener('click', (e) => {
+            if (e.target.closest('.cancel-keep-btn')) {
+                closeModal();
+            }
+        });
+    }
 
     // Step 1 -> Step 2
     const step2Btn = document.getElementById('cancel-to-step-2-btn');
@@ -750,10 +731,23 @@ export async function loadWishlist(userId) {
                     if (shareBtn) shareBtn.style.display = 'inline-block';
                     if (linkContainer) linkContainer.style.display = 'none';
                 }
+                
+                // RENDER WISHLIST ITEMS
+                const itemsHtml = data.items.map(itemId => {
+                    const prod = productMap.get(itemId) || productMap[itemId];
+                    if (!prod) return '';
+                    return generateProductCardHtml(prod, 'wishlist-public');
+                }).join('');
+                
+                container.innerHTML = itemsHtml;
+                
             } else {
                 if (shareBtn) shareBtn.style.display = 'none';
                 if (linkContainer) linkContainer.style.display = 'none';
+                container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
             }
+        } else {
+            container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
         }
 
         if (shareBtn) {
@@ -800,43 +794,33 @@ export async function loadWishlist(userId) {
         container.innerHTML = items.map(id => {
             const product = productMap.get(id);
             if (!product) return '';
-            return `
-                <div class="product-card" style="padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column;">
-                    <img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #000;">
-                    <div style="flex-grow: 1;">
-                        <h4 style="margin: 0 0 6px 0; font-size: 1rem; color: #fff;">${escapeHTML(product.name)}</h4>
-                        <div style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 14px;">$${product.price.toFixed(2)}</div>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary wishlist-add-cart-btn" data-id="${product.id}" style="flex: 1; padding: 8px 12px; font-size: 0.85rem;">Add to Cart</button>
-                        <button class="btn wishlist-remove-btn" data-id="${product.id}" style="padding: 8px 12px; font-size: 0.85rem; background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);">Remove</button>
-                    </div>
-                </div>
-            `;
+            return generateProductCardHtml(product, 'wishlist-private');
         }).join('');
 
-        // Wire Add to Cart
-        container.querySelectorAll('.wishlist-add-cart-btn').forEach(btn => {
-            btn.onclick = async () => {
-                const orig = btn.textContent;
-                btn.disabled = true;
-                btn.textContent = 'Added! ✓';
-                await handleAddToCart(btn.dataset.id);
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = orig;
-                }, 1500);
-            };
-        });
+        // ⚡ Bolt: Use event delegation for wishlist actions instead of O(N) event listener bindings
+        container.onclick = async (e) => {
+            const addBtn = e.target.closest('.wishlist-add-cart-btn');
+            const removeBtn = e.target.closest('.wishlist-remove-btn');
 
-        // Wire Remove
-        container.querySelectorAll('.wishlist-remove-btn').forEach(btn => {
-            btn.onclick = async () => {
-                btn.disabled = true;
-                await toggleWishlist(btn.dataset.id);
+            if (addBtn && !addBtn.disabled) {
+                const orig = addBtn.textContent;
+                addBtn.disabled = true;
+                addBtn.textContent = 'Added! ✓';
+                await handleAddToCart(addBtn.dataset.id);
+                setTimeout(() => {
+                    addBtn.disabled = false;
+                    addBtn.textContent = orig;
+                }, 1500);
+                return;
+            }
+
+            if (removeBtn && !removeBtn.disabled) {
+                removeBtn.disabled = true;
+                await toggleWishlist(removeBtn.dataset.id);
                 await loadWishlist(userId);
-            };
-        });
+                return;
+            }
+        };
 
     } catch (err) {
         console.error("Error loading wishlist:", err);
@@ -893,6 +877,28 @@ export async function loadUserTickets(userId) {
 export function initAccountPage() {
     // Immediate tab setup so navigation is 100% interactive without waiting for auth
     initTabNavigation();
+    
+    // Listen for wishlist updates from shop.js
+    window.addEventListener('wishlistUpdated', () => {
+        if (currentUser) {
+            loadWishlist(currentUser.uid);
+        }
+    });
+
+    const copyReferralBtn = document.getElementById('copy-referral-btn');
+    const referralLinkInput = document.getElementById('referral-link');
+    if (copyReferralBtn && referralLinkInput) {
+        copyReferralBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(referralLinkInput.value);
+                const originalText = copyReferralBtn.textContent;
+                copyReferralBtn.textContent = 'Copied!';
+                setTimeout(() => { copyReferralBtn.textContent = originalText; }, 2000);
+            } catch (err) {
+                console.error('Manager info: Failed to copy text: ', err);
+            }
+        });
+    }
 
     // Firebase Auth State
     onAuthStateChanged(auth, async (user) => {
@@ -902,44 +908,27 @@ export function initAccountPage() {
         }
 
         currentUser = user;
-        const cacheKey = `profile_${user.uid}`;
-        let userData = null;
 
-        try {
-            const cachedStr = sessionStorage.getItem(cacheKey);
-            if (cachedStr) {
-                userData = JSON.parse(cachedStr);
-            }
-        } catch (_) {}
+        // ⚡ Bolt: Centralized cache function `getCachedUserProfile` reduces redundant Firestore calls.
+        let userData = await getCachedUserProfile(user);
 
         if (!userData) {
+            // Fallback initialization if profile doesn't exist at all yet
+            userData = {
+                username: user.displayName || user.email?.split('@')[0] || 'User',
+                email: user.email,
+                membershipLevel: 'free',
+                pointsBalance: 50,
+                loyaltyPoints: 50,
+                isAdmin: false,
+                signupDate: new Date()
+            };
             try {
                 const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                } else {
-                    userData = {
-                        username: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        membershipLevel: 'free',
-                        pointsBalance: 50,
-                        loyaltyPoints: 50,
-                        isAdmin: false,
-                        signupDate: new Date()
-                    };
-                    await setDoc(userDocRef, userData, { merge: true });
-                }
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                await setDoc(userDocRef, userData, { merge: true });
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
             } catch (err) {
-                console.error("Profile load warning:", err);
-                userData = {
-                    username: user.displayName || 'User',
-                    email: user.email,
-                    membershipLevel: 'free',
-                    pointsBalance: 50,
-                    loyaltyPoints: 50
-                };
+                console.error("Manager info: Profile init warning:", err);
             }
         }
 
@@ -958,7 +947,7 @@ export function initAccountPage() {
 
         // Sign Out
         document.getElementById('sign-out')?.addEventListener('click', () => {
-            sessionStorage.removeItem(cacheKey);
+            sessionStorage.removeItem(`profile_${user.uid}`);
             signOut(auth).then(() => window.location.replace('index.html'));
         });
 
@@ -976,7 +965,7 @@ export function initAccountPage() {
             try {
                 await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                 userData.username = newUsername;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 const welcomeHeader = document.getElementById('welcome-header');
                 if (welcomeHeader) welcomeHeader.textContent = `Welcome back, ${newUsername}!`;
@@ -1022,7 +1011,7 @@ export function initAccountPage() {
                 await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                 userData.theme = theme;
                 userData.accentColor = accentColor;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 document.body.dataset.theme = theme;
                 document.documentElement.style.setProperty('--accent-color', accentColor);
@@ -1045,34 +1034,39 @@ export function initAccountPage() {
         });
 
         // Password Reset Email
-        document.querySelectorAll('#change-password-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                btn.disabled = true;
-                const orig = btn.textContent;
-                btn.textContent = 'Sending...';
+        // ⚡ Bolt: Use event delegation for password reset button to avoid querying the DOM multiple times
+        if (!document.body.dataset.pwdDelegated) {
+            document.body.dataset.pwdDelegated = 'true';
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('#change-password-btn');
+                if (btn && !btn.disabled) {
+                    btn.disabled = true;
+                    const orig = btn.textContent;
+                    btn.textContent = 'Sending...';
 
-                try {
-                    await sendPasswordResetEmail(auth, user.email);
-                    const notif = document.getElementById('security-notification');
-                    if (notif) {
-                        notif.textContent = 'Password reset email sent to ' + user.email;
-                        notif.className = 'notification success';
-                        notif.style.display = 'block';
-                        setTimeout(() => notif.style.display = 'none', 4000);
+                    try {
+                        await sendPasswordResetEmail(auth, user.email);
+                        const notif = document.getElementById('security-notification');
+                        if (notif) {
+                            notif.textContent = 'Password reset email sent to ' + user.email;
+                            notif.className = 'notification success';
+                            notif.style.display = 'block';
+                            setTimeout(() => notif.style.display = 'none', 4000);
+                        }
+                    } catch (err) {
+                        const notif = document.getElementById('security-notification');
+                        if (notif) {
+                            notif.textContent = `Error: ${err.message}`;
+                            notif.className = 'notification error';
+                            notif.style.display = 'block';
+                        }
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = orig;
                     }
-                } catch (err) {
-                    const notif = document.getElementById('security-notification');
-                    if (notif) {
-                        notif.textContent = `Error: ${err.message}`;
-                        notif.className = 'notification error';
-                        notif.style.display = 'block';
-                    }
-                } finally {
-                    btn.disabled = false;
-                    btn.textContent = orig;
                 }
             });
-        });
+        }
 
         // 2FA Toggle
         const toggle2FA = document.getElementById('toggle-2fa');
@@ -1083,7 +1077,7 @@ export function initAccountPage() {
                 try {
                     await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
                     userData.twoFactorEnabled = isEnabled;
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
                     alert(`Two-Factor Authentication (2FA) is now ${isEnabled ? 'enabled' : 'disabled'}.`);
                 } catch (err) {
                     e.target.checked = !isEnabled;
@@ -1127,8 +1121,14 @@ export function initAccountPage() {
         });
 
         // Delete Account
-        document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
+        document.getElementById('delete-account-btn')?.addEventListener('click', async (e) => {
             if (!confirm('WARNING: Your account will be deactivated and permanently removed after 90 days. Are you sure you want to proceed?')) return;
+
+            const btn = e.currentTarget;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Deactivating...';
+
             try {
                 await deleteDoc(doc(db, "users", user.uid));
                 await deleteUser(user);
@@ -1136,6 +1136,8 @@ export function initAccountPage() {
                 window.location.replace('index.html');
             } catch (err) {
                 alert('For security, please log out and log back in before deleting your account.');
+                btn.disabled = false;
+                btn.textContent = originalText;
             }
         });
 
@@ -1219,7 +1221,7 @@ export function initAccountPage() {
 
                 await updateDoc(doc(db, "users", user.uid), { photoURL });
                 userData.photoURL = photoURL;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 if (pfpNotification) {
                     pfpNotification.textContent = 'Profile picture updated successfully!';
