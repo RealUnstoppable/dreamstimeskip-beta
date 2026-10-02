@@ -20,3 +20,6 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
+## 2026-10-02 - Consistent Async Form Feedback
+**Learning:** Users notice when adjacent forms provide inconsistent loading feedback. Missing a disabled loading state on one form while another has it degrades trust.
+**Action:** Always verify all forms on a page have consistent loading states for asynchronous operations, caching original button text to reliably restore it.

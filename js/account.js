@@ -1005,6 +1005,7 @@ export function initAccountPage() {
             const theme = document.getElementById('theme-select').value;
             const customHex = document.getElementById('custom-hex-color')?.value || '#00ffcc';
             const notificationEl = document.getElementById('theme-notification');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
             const isPremium = userData.membershipLevel === 'premium' || userData.membershipLevel === 'ultimate' || userData.isAdmin;
             if (!isPremium && (theme === 'pink' || theme === 'forest')) {
@@ -1017,6 +1018,14 @@ export function initAccountPage() {
             }
 
             const accentColor = isPremium ? customHex : '#00ffcc';
+
+            let origText = 'Save Theme';
+            if (submitBtn) {
+                origText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+                submitBtn.title = 'Saving theme preferences...';
+            }
 
             try {
                 await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
@@ -1040,6 +1049,12 @@ export function initAccountPage() {
                     notificationEl.textContent = `Error: ${err.message}`;
                     notificationEl.className = 'notification error';
                     notificationEl.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = origText;
+                    submitBtn.removeAttribute('title');
                 }
             }
         });
