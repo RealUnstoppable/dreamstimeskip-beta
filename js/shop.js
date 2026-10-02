@@ -40,6 +40,19 @@ const reviewNotification = document.getElementById('review-notification');
 
 let currentRating = 0;
 
+// Q&A Elements
+const tabReviews = document.getElementById('tab-reviews');
+const tabQa = document.getElementById('tab-qa');
+const reviewsTabContent = document.getElementById('reviews-tab-content');
+const qaTabContent = document.getElementById('qa-tab-content');
+const askQuestionSection = document.getElementById('ask-question-section');
+const qaLoginPrompt = document.getElementById('qa-login-prompt');
+const askQuestionForm = document.getElementById('ask-question-form');
+const qaListContainer = document.getElementById('qa-list-container');
+const questionText = document.getElementById('question-text');
+const questionNotification = document.getElementById('question-notification');
+
+
 // --- RENDER FUNCTIONS ---
 function generateStarsHtml(rating) {
     const fullStars = Math.floor(rating);
@@ -494,6 +507,45 @@ function setupEventListeners() {
         reviewForm.addEventListener('submit', handleReviewSubmit);
     }
 
+    // Q&A Tabs
+    if (tabReviews && tabQa) {
+        tabReviews.addEventListener('click', () => {
+            tabReviews.classList.add('active');
+            tabQa.classList.remove('active');
+            if(reviewsTabContent) reviewsTabContent.style.display = 'block';
+            if(qaTabContent) qaTabContent.style.display = 'none';
+        });
+
+        tabQa.addEventListener('click', async () => {
+            tabQa.classList.add('active');
+            tabReviews.classList.remove('active');
+            if(reviewsTabContent) reviewsTabContent.style.display = 'none';
+            if(qaTabContent) qaTabContent.style.display = 'block';
+            await loadProductQuestions(currentReviewProductId);
+        });
+    }
+
+    if (askQuestionForm) {
+        askQuestionForm.addEventListener('submit', handleAskQuestion);
+    }
+
+    if (qaListContainer) {
+        qaListContainer.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('reply-qa-btn')) {
+                const questionId = e.target.dataset.id;
+                const form = document.getElementById(`answer-form-${questionId}`);
+                if (form) {
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+            if (e.target.classList.contains('submit-answer-btn')) {
+                const questionId = e.target.dataset.id;
+                await handleAnswerSubmit(questionId);
+            }
+        });
+    }
+
+
     // Cart modal listeners
     if (cartModal) {
         if (closeCartBtn) {
@@ -630,7 +682,26 @@ async function openReviewsModal(productId) {
     document.getElementById('modal-stars-display').innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
     document.getElementById('modal-review-count').textContent = `${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''}`;
 
+
+    // Reset tabs
+    if (tabReviews && tabQa) {
+        tabReviews.classList.add('active');
+        tabQa.classList.remove('active');
+        if (reviewsTabContent) reviewsTabContent.style.display = 'block';
+        if (qaTabContent) qaTabContent.style.display = 'none';
+    }
+
+    // Toggle Q&A auth
+    if (currentUser || auth.currentUser) {
+        if (askQuestionSection) askQuestionSection.style.display = 'block';
+        if (qaLoginPrompt) qaLoginPrompt.style.display = 'none';
+    } else {
+        if (askQuestionSection) askQuestionSection.style.display = 'none';
+        if (qaLoginPrompt) qaLoginPrompt.style.display = 'block';
+    }
+
     reviewsModal.style.display = 'block';
+
     await loadReviews(productId);
 }
 
@@ -838,3 +909,210 @@ onAuthStateChanged(auth, async (user) => {
     renderCart();
     renderProducts();
 });
+
+
+async function loadProductQuestions(productId) {
+    if (!qaListContainer) return;
+    qaListContainer.innerHTML = '<p class="review-message loading">Loading questions...</p>';
+
+    try {
+        const q = query(collection(db, "product_questions"), where("productId", "==", productId), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+            qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No questions yet. Be the first to ask!</p>';
+            return;
+        }
+
+        let html = '';
+        const questionsData = [];
+
+        snapshot.forEach(doc => {
+            questionsData.push({ id: doc.id, ...doc.data() });
+        });
+
+        let isAdmin = false;
+        const activeUser = currentUser || auth.currentUser;
+        if (activeUser) {
+            const userData = await getCachedUserProfile({uid: activeUser.uid});
+            if (userData && userData.isAdmin) isAdmin = true;
+        }
+
+        for (const question of questionsData) {
+            const date = question.createdAt ? question.createdAt.toDate().toLocaleDateString() : 'Just now';
+
+            // Fetch answers
+            const ansQ = query(collection(db, "product_questions", question.id, "answers"), orderBy("createdAt", "asc"));
+            const ansSnapshot = await getDocs(ansQ);
+
+            let answersHtml = '';
+            ansSnapshot.forEach(ansDoc => {
+                const ans = ansDoc.data();
+                const ansDate = ans.createdAt ? ans.createdAt.toDate().toLocaleDateString() : 'Just now';
+                const adminBadge = ans.isAdmin ? '<span class="admin-badge">Admin</span>' : '';
+
+                // Manually implement a basic escape function specifically for rendering here to avoid referencing undefined utils
+                const sanitize = (str) => {
+                    if (!str) return '';
+                    return String(str).replace(/[&<>"']/g, function(m) {
+                        return {
+                            '&': '&amp;',
+                            '<': '&lt;',
+                            '>': '&gt;',
+                            '"': '&quot;',
+                            "'": '&#039;'
+                        }[m];
+                    });
+                };
+
+                answersHtml += `
+                    <div class="qa-answer">
+                        <div class="qa-header">
+                            <span class="qa-author">${sanitize(ans.username)} ${adminBadge}</span>
+                            <span class="qa-date">${ansDate}</span>
+                        </div>
+                        <p class="qa-text">${sanitize(ans.answer)}</p>
+                    </div>
+                `;
+            });
+
+            let replyFormHtml = '';
+            if (isAdmin) {
+                replyFormHtml = `
+                    <button class="reply-qa-btn btn-checkout" style="width: auto; padding: 5px 10px; font-size: 0.8rem; margin-top: 10px;" data-id="${question.id}">Reply</button>
+                    <div id="answer-form-${question.id}" class="qa-answer-form" style="display: none; margin-top: 10px;">
+                        <textarea id="answer-text-${question.id}" placeholder="Type your answer..." required title="Answer text" aria-label="Answer text" style="width: 100%; min-height: 60px;"></textarea>
+                        <button class="submit-answer-btn btn-checkout" style="width: auto; padding: 5px 10px; font-size: 0.8rem; margin-top: 5px;" data-id="${question.id}">Submit Answer</button>
+                    </div>
+                `;
+            }
+
+            const sanitize = (str) => {
+                if (!str) return '';
+                return String(str).replace(/[&<>"']/g, function(m) {
+                    return {
+                        '&': '&amp;',
+                        '<': '&lt;',
+                        '>': '&gt;',
+                        '"': '&quot;',
+                        "'": '&#039;'
+                    }[m];
+                });
+            };
+
+            html += `
+                <div class="qa-item review-item">
+                    <div class="qa-question">
+                        <div class="qa-header review-header">
+                            <span class="qa-author review-author">Q: ${sanitize(question.username)}</span>
+                            <span class="qa-date review-date">${date}</span>
+                        </div>
+                        <p class="qa-text review-content" style="font-weight: 500; color: var(--text-primary);">${sanitize(question.question)}</p>
+                    </div>
+                    <div class="qa-answers-list" style="margin-left: 20px; margin-top: 15px; border-left: 2px solid var(--border-color); padding-left: 15px;">
+                        ${answersHtml}
+                        ${replyFormHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        qaListContainer.innerHTML = html;
+
+    } catch (error) {
+        console.error("Manager info: Error loading questions: [" + error.message + "]");
+        // Gracefully handle missing index/permissions during local tests
+        if (error.message.includes("requires an index") || error.message.includes("permissions")) {
+            qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No questions yet. Be the first to ask!</p>';
+            return;
+        }
+        qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No questions yet. Be the first to ask!</p>';
+    }
+}
+
+async function handleAskQuestion(e) {
+    e.preventDefault();
+    const activeUser = currentUser || auth.currentUser;
+    if (!activeUser || !currentReviewProductId) return;
+
+    const text = questionText.value.trim();
+    if (!text) return;
+
+    const btn = document.getElementById('submit-question-btn');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+        let authorName = activeUser.displayName || 'Anonymous';
+        const userData = await getCachedUserProfile({uid: activeUser.uid});
+        if (userData && userData.username) authorName = userData.username;
+
+        await addDoc(collection(db, "product_questions"), {
+            productId: currentReviewProductId,
+            userId: activeUser.uid,
+            username: authorName,
+            question: text,
+            createdAt: serverTimestamp()
+        });
+
+        questionText.value = '';
+        questionNotification.innerHTML = '<span class="review-message success">Question submitted!</span>';
+        setTimeout(() => questionNotification.innerHTML = '', 3000);
+
+        await loadProductQuestions(currentReviewProductId);
+
+    } catch (error) {
+        console.error("Manager info: Error submitting question: [" + error.message + "]");
+        questionNotification.innerHTML = '<span class="review-message error">Failed to submit question.</span>';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+    }
+}
+
+async function handleAnswerSubmit(questionId) {
+    const activeUser = currentUser || auth.currentUser;
+    if (!activeUser) return;
+
+    const textInput = document.getElementById(`answer-text-${questionId}`);
+    const text = textInput ? textInput.value.trim() : '';
+    if (!text) return;
+
+    // Find the specific button to disable it
+    const submitBtn = document.querySelector(`.submit-answer-btn[data-id="${questionId}"]`);
+    let originalText = 'Submit Answer';
+    if(submitBtn) {
+        originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+    }
+
+    try {
+        let authorName = activeUser.displayName || 'Anonymous';
+        let isAdmin = false;
+        const userData = await getCachedUserProfile({uid: activeUser.uid});
+        if (userData) {
+            if (userData.username) authorName = userData.username;
+            if (userData.isAdmin) isAdmin = true;
+        }
+
+        await addDoc(collection(db, "product_questions", questionId, "answers"), {
+            userId: activeUser.uid,
+            username: authorName,
+            answer: text,
+            isAdmin: isAdmin,
+            createdAt: serverTimestamp()
+        });
+
+        await loadProductQuestions(currentReviewProductId);
+
+    } catch (error) {
+        console.error("Manager info: Error submitting answer: [" + error.message + "]");
+        alert("Failed to submit answer.");
+        if(submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+        }
+    }
+}
