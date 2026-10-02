@@ -156,7 +156,7 @@ async function fetchAndRenderRequests() {
                         throw new Error('Failed to toggle upvote');
                     }
                 } catch (err) {
-                    console.error("Manager info: Upvote error:", err.message || err);
+                    console.error("Manager info: Upvote error:", err);
                     // Revert optimistic update
                     if (isCurrentlyUpvoted) {
                         button.classList.add('upvoted');
@@ -174,7 +174,7 @@ async function fetchAndRenderRequests() {
         });
 
     } catch (error) {
-        if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Manager info: Error fetching feature requests:", error.message || error); }
+        if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Manager info: Error fetching feature requests:", error); }
         requestsList.innerHTML = '<p style="text-align: center; color: var(--accent-red);">Failed to load feature requests. Please try again later.</p>';
     }
 }
@@ -213,7 +213,6 @@ if (requestForm) {
             return;
         }
 
-        const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         formMessage.textContent = '';
@@ -243,12 +242,12 @@ if (requestForm) {
             }, 3000);
 
         } catch (error) {
-            console.error("Manager info: Error submitting feature request:", error.message || error);
+            console.error("Manager info: Error submitting feature request:", error);
             formMessage.textContent = 'Failed to submit request. Please try again.';
             formMessage.style.color = 'var(--accent-red)';
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            submitBtn.textContent = 'Submit Request';
         }
     });
 }

@@ -4,7 +4,6 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
-import { generateProductCardHtml } from './ui-utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
 
@@ -38,22 +37,8 @@ const reviewText = document.getElementById('review-text');
 const reviewsListContainer = document.getElementById('reviews-list-container');
 const submitReviewBtn = document.getElementById('submit-review-btn');
 const reviewNotification = document.getElementById('review-notification');
-const productSearchInput = document.getElementById('product-search');
 
 let currentRating = 0;
-
-// Q&A Elements
-const tabReviews = document.getElementById('tab-reviews');
-const tabQa = document.getElementById('tab-qa');
-const reviewsTabContent = document.getElementById('reviews-tab-content');
-const qaTabContent = document.getElementById('qa-tab-content');
-const askQuestionSection = document.getElementById('ask-question-section');
-const qaLoginPrompt = document.getElementById('qa-login-prompt');
-const askQuestionForm = document.getElementById('ask-question-form');
-const qaListContainer = document.getElementById('qa-list-container');
-const questionText = document.getElementById('question-text');
-const questionNotification = document.getElementById('question-notification');
-
 
 // --- RENDER FUNCTIONS ---
 function generateStarsHtml(rating) {
@@ -75,8 +60,44 @@ function renderProducts(searchQuery = '') {
         return nameMatch || descMatch;
     }).map(product => {
         const isWishlisted = wishlist.has(product.id);
+        const heartIcon = isWishlisted ? '❤️' : '🤍';
+        const activeClass = isWishlisted ? 'active' : '';
+
+
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
-        return generateProductCardHtml(product, 'shop', 1, isWishlisted, stats, generateStarsHtml);
+        const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
+
+        const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
+        const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
+
+        return `
+            <div class="product-card">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
+                    ${heartIcon}
+                </button>
+                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" >
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+
+                    <p>${product.description}</p>
+                    <div class="product-stars-container">
+                        ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
+                        <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
+                    </div>
+                    <div class="product-footer" >
+                        <div>
+                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>` : ''}
+                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
+                        </div>
+                        <div class="action-buttons-container">
+                            <button class="view-reviews-btn" data-id="${product.id}">Reviews</button>
+                            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                        </div>
+                    </div>
+                    <button class="reviews-btn" data-id="${product.id}">Read Reviews</button>
+                </div>
+            </div>
+        `;
     }).join('');
 
     // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
@@ -120,7 +141,19 @@ function renderCart() {
                 // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
                 const product = productMap.get(productId);
                 if (!product) return ''; // Should not happen
-                return generateProductCardHtml(product, 'cart', quantity);
+                return `
+                    <div class="cart-item">
+                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
+                        <div class="cart-item-info">
+                            <h4>${product.name}</h4>
+                            <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
+                        </div>
+                        <div class="cart-item-actions">
+                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
+                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
+                        </div>
+                    </div>
+                `;
             }).join('');
         }
         if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
@@ -138,7 +171,7 @@ function updateCartSummary() {
     try {
         localStorage.setItem('cartItemCount', itemCount.toString());
         localStorage.setItem('localCart', JSON.stringify(cart));
-    } catch (_) { /* ignore local storage error */ }
+    } catch (_) { /* ignore */ }
 
     // Update Lexi cart badge if window.updateLexiCartCount exists
     if (window.updateLexiCartCount) {
@@ -395,18 +428,6 @@ async function handleViewReviews(productId) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
-
-    // ⚡ Bolt: Debounce search input to prevent unnecessary re-renders during typing
-    if (productSearchInput) {
-        let searchTimeout;
-        productSearchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                renderProducts(e.target.value);
-            }, 300);
-        });
-    }
-
     // Product grid listeners
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
@@ -434,12 +455,8 @@ function setupEventListeners() {
     // Product search input
     const productSearchInput = document.getElementById('product-search');
     if (productSearchInput) {
-        let productSearchTimeout;
         productSearchInput.addEventListener('input', (e) => {
-            clearTimeout(productSearchTimeout);
-            productSearchTimeout = setTimeout(() => {
-                renderProducts(e.target.value);
-            }, 300); // ⚡ Bolt: Debounce product search to reduce unnecessary DOM re-renders
+            renderProducts(e.target.value);
         });
     }
 
@@ -474,64 +491,8 @@ function setupEventListeners() {
 
     // Review Form Submit
     if (reviewForm) {
-        if (reviewText) {
-            reviewText.addEventListener('input', (e) => {
-                const count = e.target.value.length;
-                const counterEl = document.getElementById('reviewCharCount');
-                if (counterEl) {
-                    counterEl.textContent = `${count} / 300`;
-                    counterEl.style.color = count >= 290 ? 'var(--accent-red)' : 'var(--text-secondary)';
-                }
-            });
-            // Initialize counter
-            const initialCount = reviewText.value.length;
-            const counterEl = document.getElementById('reviewCharCount');
-            if (counterEl) {
-                counterEl.textContent = `${initialCount} / 300`;
-                counterEl.style.color = initialCount >= 290 ? 'var(--accent-red)' : 'var(--text-secondary)';
-            }
-        }
         reviewForm.addEventListener('submit', handleReviewSubmit);
     }
-
-    // Q&A Tabs
-    if (tabReviews && tabQa) {
-        tabReviews.addEventListener('click', () => {
-            tabReviews.classList.add('active');
-            tabQa.classList.remove('active');
-            if(reviewsTabContent) reviewsTabContent.style.display = 'block';
-            if(qaTabContent) qaTabContent.style.display = 'none';
-        });
-
-        tabQa.addEventListener('click', async () => {
-            tabQa.classList.add('active');
-            tabReviews.classList.remove('active');
-            if(reviewsTabContent) reviewsTabContent.style.display = 'none';
-            if(qaTabContent) qaTabContent.style.display = 'block';
-            await loadProductQuestions(currentReviewProductId);
-        });
-    }
-
-    if (askQuestionForm) {
-        askQuestionForm.addEventListener('submit', handleAskQuestion);
-    }
-
-    if (qaListContainer) {
-        qaListContainer.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('reply-qa-btn')) {
-                const questionId = e.target.dataset.id;
-                const form = document.getElementById(`answer-form-${questionId}`);
-                if (form) {
-                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-                }
-            }
-            if (e.target.classList.contains('submit-answer-btn')) {
-                const questionId = e.target.dataset.id;
-                await handleAnswerSubmit(questionId);
-            }
-        });
-    }
-
 
     // Cart modal listeners
     if (cartModal) {
@@ -545,8 +506,6 @@ function setupEventListeners() {
                 cartModal.style.display = 'none';
             }
         });
-
-
     }
 
     // Cart item action listeners
@@ -582,59 +541,7 @@ function setupEventListeners() {
                 reviewModal.style.display = 'none';
             }
         });
-
-
     }
-
-
-
-
-
-    // Trap focus for cart and review modals
-    document.addEventListener('keydown', function(e) {
-        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-
-        // Handle Escape globally for modals
-        if (e.key === 'Escape') {
-            if (cartModal && cartModal.style.display !== 'none') {
-                cartModal.style.display = 'none';
-            }
-            if (reviewModal && reviewModal.style.display !== 'none') {
-                reviewModal.style.display = 'none';
-            }
-            return;
-        }
-
-        if (!isTabPressed) return;
-
-        let activeModal = null;
-        if (cartModal && cartModal.style.display !== 'none') {
-            activeModal = cartModal;
-        } else if (reviewModal && reviewModal.style.display !== 'none') {
-            activeModal = reviewModal;
-        }
-
-        if (activeModal) {
-            // Query dynamically to handle state changes
-            const focusableElements = activeModal.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], input[type="number"], select, [tabindex]:not([tabindex="-1"])');
-            if (focusableElements.length > 0) {
-                const firstFocusableElement = focusableElements[0];
-                const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-                if (e.shiftKey) {
-                    if (document.activeElement === firstFocusableElement) {
-                        lastFocusableElement.focus();
-                        e.preventDefault();
-                    }
-                } else {
-                    if (document.activeElement === lastFocusableElement) {
-                        firstFocusableElement.focus();
-                        e.preventDefault();
-                    }
-                }
-            }
-        }
-    });
 
     const writeReviewForm = document.getElementById('writeReviewForm');
     if (writeReviewForm) {
@@ -648,7 +555,6 @@ function setupEventListeners() {
             const messageEl = document.getElementById('review-message');
             const submitBtn = document.getElementById('submit-review-btn');
 
-            const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
 
@@ -685,7 +591,7 @@ function setupEventListeners() {
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
+                submitBtn.textContent = 'Submit Review';
             }
         });
     }
@@ -724,26 +630,7 @@ async function openReviewsModal(productId) {
     document.getElementById('modal-stars-display').innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
     document.getElementById('modal-review-count').textContent = `${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''}`;
 
-
-    // Reset tabs
-    if (tabReviews && tabQa) {
-        tabReviews.classList.add('active');
-        tabQa.classList.remove('active');
-        if (reviewsTabContent) reviewsTabContent.style.display = 'block';
-        if (qaTabContent) qaTabContent.style.display = 'none';
-    }
-
-    // Toggle Q&A auth
-    if (currentUser || auth.currentUser) {
-        if (askQuestionSection) askQuestionSection.style.display = 'block';
-        if (qaLoginPrompt) qaLoginPrompt.style.display = 'none';
-    } else {
-        if (askQuestionSection) askQuestionSection.style.display = 'none';
-        if (qaLoginPrompt) qaLoginPrompt.style.display = 'block';
-    }
-
     reviewsModal.style.display = 'block';
-
     await loadReviews(productId);
 }
 
@@ -820,9 +707,25 @@ async function handleReviewSubmit(e) {
             createdAt: serverTimestamp()
         });
 
-        // Award 25 loyalty points for reviewing a product (optimistic UI update only)
-        // Actual points are awarded via the onReviewCreated Cloud Function
+        // Award 25 loyalty points for reviewing a product
         try {
+            const userRef = doc(db, "users", activeUser.uid);
+            await updateDoc(userRef, {
+                pointsBalance: increment(25),
+                loyaltyPoints: increment(25)
+            });
+
+            const prod = productMap.get(currentReviewProductId);
+            const prodName = prod ? prod.name : 'Product';
+
+            await addDoc(collection(db, "loyalty_transactions"), {
+                userId: activeUser.uid,
+                description: `Product Review - ${prodName} ⭐`,
+                points: 25,
+                type: 'earned',
+                createdAt: serverTimestamp()
+            });
+
             const cacheKey = `profile_${activeUser.uid}`;
             const cachedStr = sessionStorage.getItem(cacheKey);
             if (cachedStr) {
@@ -832,11 +735,7 @@ async function handleReviewSubmit(e) {
                 sessionStorage.setItem(cacheKey, JSON.stringify(uData));
             }
         } catch (ptsErr) {
-<<<<<<< HEAD
-            console.warn("Manager info: Points award warning for review:", ptsErr);
-=======
-            console.warn("Points cache update warning for review:", ptsErr);
->>>>>>> origin/main
+            console.warn("Points award warning for review:", ptsErr);
         }
 
         // Optimistic UI Update for stats
@@ -885,7 +784,7 @@ try {
         cart = JSON.parse(localCartData);
         renderCart();
     }
-} catch (_) { /* ignore local storage error */ }
+} catch (_) { /* ignore */ }
 
 // Auth and Cart state synchronization
 onAuthStateChanged(auth, async (user) => {
@@ -894,7 +793,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localCartData = localStorage.getItem('localCart');
         if (localCartData) localCart = JSON.parse(localCartData);
-    } catch (_) { /* ignore local storage error */ }
+    } catch (_) { /* ignore */ }
 
     if (user) {
         // Load Wishlist
@@ -939,210 +838,3 @@ onAuthStateChanged(auth, async (user) => {
     renderCart();
     renderProducts();
 });
-
-
-async function loadProductQuestions(productId) {
-    if (!qaListContainer) return;
-    qaListContainer.innerHTML = '<p class="review-message loading">Loading questions...</p>';
-
-    try {
-        const q = query(collection(db, "product_questions"), where("productId", "==", productId), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
-
-        if (snapshot.empty) {
-            qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No questions yet. Be the first to ask!</p>';
-            return;
-        }
-
-        let html = '';
-        const questionsData = [];
-
-        snapshot.forEach(doc => {
-            questionsData.push({ id: doc.id, ...doc.data() });
-        });
-
-        let isAdmin = false;
-        const activeUser = currentUser || auth.currentUser;
-        if (activeUser) {
-            const userData = await getCachedUserProfile({uid: activeUser.uid});
-            if (userData && userData.isAdmin) isAdmin = true;
-        }
-
-        for (const question of questionsData) {
-            const date = question.createdAt ? question.createdAt.toDate().toLocaleDateString() : 'Just now';
-
-            // Fetch answers
-            const ansQ = query(collection(db, "product_questions", question.id, "answers"), orderBy("createdAt", "asc"));
-            const ansSnapshot = await getDocs(ansQ);
-
-            let answersHtml = '';
-            ansSnapshot.forEach(ansDoc => {
-                const ans = ansDoc.data();
-                const ansDate = ans.createdAt ? ans.createdAt.toDate().toLocaleDateString() : 'Just now';
-                const adminBadge = ans.isAdmin ? '<span class="admin-badge">Admin</span>' : '';
-
-                // Manually implement a basic escape function specifically for rendering here to avoid referencing undefined utils
-                const sanitize = (str) => {
-                    if (!str) return '';
-                    return String(str).replace(/[&<>"']/g, function(m) {
-                        return {
-                            '&': '&amp;',
-                            '<': '&lt;',
-                            '>': '&gt;',
-                            '"': '&quot;',
-                            "'": '&#039;'
-                        }[m];
-                    });
-                };
-
-                answersHtml += `
-                    <div class="qa-answer">
-                        <div class="qa-header">
-                            <span class="qa-author">${sanitize(ans.username)} ${adminBadge}</span>
-                            <span class="qa-date">${ansDate}</span>
-                        </div>
-                        <p class="qa-text">${sanitize(ans.answer)}</p>
-                    </div>
-                `;
-            });
-
-            let replyFormHtml = '';
-            if (isAdmin) {
-                replyFormHtml = `
-                    <button class="reply-qa-btn btn-checkout" style="width: auto; padding: 5px 10px; font-size: 0.8rem; margin-top: 10px;" data-id="${question.id}">Reply</button>
-                    <div id="answer-form-${question.id}" class="qa-answer-form" style="display: none; margin-top: 10px;">
-                        <textarea id="answer-text-${question.id}" placeholder="Type your answer..." required title="Answer text" aria-label="Answer text" style="width: 100%; min-height: 60px;"></textarea>
-                        <button class="submit-answer-btn btn-checkout" style="width: auto; padding: 5px 10px; font-size: 0.8rem; margin-top: 5px;" data-id="${question.id}">Submit Answer</button>
-                    </div>
-                `;
-            }
-
-            const sanitize = (str) => {
-                if (!str) return '';
-                return String(str).replace(/[&<>"']/g, function(m) {
-                    return {
-                        '&': '&amp;',
-                        '<': '&lt;',
-                        '>': '&gt;',
-                        '"': '&quot;',
-                        "'": '&#039;'
-                    }[m];
-                });
-            };
-
-            html += `
-                <div class="qa-item review-item">
-                    <div class="qa-question">
-                        <div class="qa-header review-header">
-                            <span class="qa-author review-author">Q: ${sanitize(question.username)}</span>
-                            <span class="qa-date review-date">${date}</span>
-                        </div>
-                        <p class="qa-text review-content" style="font-weight: 500; color: var(--text-primary);">${sanitize(question.question)}</p>
-                    </div>
-                    <div class="qa-answers-list" style="margin-left: 20px; margin-top: 15px; border-left: 2px solid var(--border-color); padding-left: 15px;">
-                        ${answersHtml}
-                        ${replyFormHtml}
-                    </div>
-                </div>
-            `;
-        }
-
-        qaListContainer.innerHTML = html;
-
-    } catch (error) {
-        console.error("Manager info: Error loading questions: [" + error.message + "]");
-        // Gracefully handle missing index/permissions during local tests
-        if (error.message.includes("requires an index") || error.message.includes("permissions")) {
-            qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No questions yet. Be the first to ask!</p>';
-            return;
-        }
-        qaListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No questions yet. Be the first to ask!</p>';
-    }
-}
-
-async function handleAskQuestion(e) {
-    e.preventDefault();
-    const activeUser = currentUser || auth.currentUser;
-    if (!activeUser || !currentReviewProductId) return;
-
-    const text = questionText.value.trim();
-    if (!text) return;
-
-    const btn = document.getElementById('submit-question-btn');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
-
-    try {
-        let authorName = activeUser.displayName || 'Anonymous';
-        const userData = await getCachedUserProfile({uid: activeUser.uid});
-        if (userData && userData.username) authorName = userData.username;
-
-        await addDoc(collection(db, "product_questions"), {
-            productId: currentReviewProductId,
-            userId: activeUser.uid,
-            username: authorName,
-            question: text,
-            createdAt: serverTimestamp()
-        });
-
-        questionText.value = '';
-        questionNotification.innerHTML = '<span class="review-message success">Question submitted!</span>';
-        setTimeout(() => questionNotification.innerHTML = '', 3000);
-
-        await loadProductQuestions(currentReviewProductId);
-
-    } catch (error) {
-        console.error("Manager info: Error submitting question: [" + error.message + "]");
-        questionNotification.innerHTML = '<span class="review-message error">Failed to submit question.</span>';
-    } finally {
-        btn.disabled = false;
-        btn.textContent = originalText;
-    }
-}
-
-async function handleAnswerSubmit(questionId) {
-    const activeUser = currentUser || auth.currentUser;
-    if (!activeUser) return;
-
-    const textInput = document.getElementById(`answer-text-${questionId}`);
-    const text = textInput ? textInput.value.trim() : '';
-    if (!text) return;
-
-    // Find the specific button to disable it
-    const submitBtn = document.querySelector(`.submit-answer-btn[data-id="${questionId}"]`);
-    let originalText = 'Submit Answer';
-    if(submitBtn) {
-        originalText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-    }
-
-    try {
-        let authorName = activeUser.displayName || 'Anonymous';
-        let isAdmin = false;
-        const userData = await getCachedUserProfile({uid: activeUser.uid});
-        if (userData) {
-            if (userData.username) authorName = userData.username;
-            if (userData.isAdmin) isAdmin = true;
-        }
-
-        await addDoc(collection(db, "product_questions", questionId, "answers"), {
-            userId: activeUser.uid,
-            username: authorName,
-            answer: text,
-            isAdmin: isAdmin,
-            createdAt: serverTimestamp()
-        });
-
-        await loadProductQuestions(currentReviewProductId);
-
-    } catch (error) {
-        console.error("Manager info: Error submitting answer: [" + error.message + "]");
-        alert("Failed to submit answer.");
-        if(submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
-        }
-    }
-}

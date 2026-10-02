@@ -285,36 +285,21 @@ function initHarmonyTunes() {
                 <span class="spotlight-result-play">▶</span>
             </div>
         `).join('');
-    }
 
-    // ⚡ Bolt: Event Delegation for Spotlight Results
-    if (spotlightResults && !spotlightResults.dataset.delegated) {
-        spotlightResults.dataset.delegated = 'true';
-        const activateResult = (row) => {
-            if (!row) return;
-            const songId = row.dataset.songId;
-            const idx = librarySongs.findIndex(s => s.id === songId);
-            if (idx !== -1) {
-                currentQueue = [...librarySongs];
-                currentSongIndex = idx;
-                loadSong(idx);
-                if (!isPlaying) togglePlayPause();
-            }
-            closeSpotlight();
-        };
-
-        spotlightResults.addEventListener('click', (e) => {
-            activateResult(e.target.closest('.spotlight-result-row'));
-        });
-
-        spotlightResults.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                const row = e.target.closest('.spotlight-result-row');
-                if (row) {
-                    e.preventDefault();
-                    activateResult(row);
+        spotlightResults.querySelectorAll('.spotlight-result-row').forEach(row => {
+            const activateFn = () => {
+                const songId = row.dataset.songId;
+                const idx = librarySongs.findIndex(s => s.id === songId);
+                if (idx !== -1) {
+                    currentQueue = [...librarySongs];
+                    currentSongIndex = idx;
+                    loadSong(idx);
+                    if (!isPlaying) togglePlayPause();
                 }
-            }
+                closeSpotlight();
+            };
+            row.addEventListener('click', activateFn);
+            row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateFn(); }});
         });
     }
 
@@ -428,7 +413,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) { /* ignore local storage error */ }
+        } catch (_) { /* ignore */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -528,16 +513,11 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
-            const prioritySet = new Set(priorityIds);
-            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
-
             const prioritySongs = priorityIds
-                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
-                .map(id => viralSongsMap.get(id))
+                .map(id => viralSongs.find(s => s.id === id))
                 .filter(Boolean);
             
-            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
-            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
+            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
@@ -557,7 +537,7 @@ function initHarmonyTunes() {
                         <div class="leaderboard-item" data-viral-idx="${idx}" style="cursor:pointer;">
                             <div class="leaderboard-rank">${idx + 1}</div>
                             <div class="leaderboard-trend ${trendClass}">${trendIcon}</div>
-                            <img class="leaderboard-art" src="${song.art}" alt="Art" loading="lazy">
+                            <img class="leaderboard-art" src="${song.art}" alt="Art">
                             <div class="leaderboard-info">
                                 <div class="leaderboard-title">${escapeHTML(song.title)}</div>
                                 <div class="leaderboard-artist">${escapeHTML(song.artist)}</div>
@@ -568,17 +548,12 @@ function initHarmonyTunes() {
                 }).join('');
 
                 // Wire up click → stats popup
-                // ⚡ Bolt: Event Delegation for Leaderboard Items
-                if (!containerViralNow.dataset.delegated) {
-                    containerViralNow.dataset.delegated = 'true';
-                    containerViralNow.addEventListener('click', (e) => {
-                        const item = e.target.closest('.leaderboard-item');
-                        if (item) {
-                            const idx = parseInt(item.dataset.viralIdx, 10);
-                            openViralStats(idx);
-                        }
+                containerViralNow.querySelectorAll('.leaderboard-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const idx = parseInt(item.dataset.viralIdx, 10);
+                        openViralStats(idx);
                     });
-                }
+                });
             };
 
             // ===== Viral Stats Popup =====
@@ -701,7 +676,7 @@ function initHarmonyTunes() {
         containerPlaylists.innerHTML = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}" loading="lazy">
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
@@ -1000,7 +975,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) { /* ignore local storage error */ }
+        } catch (_) { /* ignore */ }
     }
 
     function playSong() {
