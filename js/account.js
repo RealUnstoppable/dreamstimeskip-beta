@@ -161,6 +161,110 @@ async function renderOrders(user) {
 // Rewards Logic
 // Rewards merged function below
 
+// --- Daily Check-in Logic ---
+async function setupDailyCheckIn(user, userData) {
+    const claimBtn = document.getElementById('claim-checkin-btn');
+    const streakDisplay = document.getElementById('check-in-streak');
+    const messageDisplay = document.getElementById('checkin-message');
+
+    if (!claimBtn || !streakDisplay || !messageDisplay) return;
+
+    // Initialize UI from userData
+    if (userData) {
+        const streak = userData.checkInStreak || 0;
+        streakDisplay.textContent = streak;
+
+        if (userData.lastCheckIn) {
+            let lastCheckInDate;
+            // Handle Firestore Timestamp or Date object
+            if (userData.lastCheckIn.toDate) {
+                lastCheckInDate = userData.lastCheckIn.toDate();
+            } else {
+                lastCheckInDate = new Date(userData.lastCheckIn);
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const lastCheckInStr = lastCheckInDate.toISOString().split('T')[0];
+
+            if (todayStr === lastCheckInStr) {
+                claimBtn.disabled = true;
+                claimBtn.textContent = 'Claimed Today';
+                claimBtn.style.opacity = '0.6';
+                claimBtn.style.cursor = 'not-allowed';
+            } else {
+                claimBtn.disabled = false;
+                claimBtn.textContent = 'Claim Reward';
+                claimBtn.style.opacity = '1';
+                claimBtn.style.cursor = 'pointer';
+            }
+        }
+    }
+
+    // Attach event listener (ensure it's only attached once)
+    if (claimBtn.dataset.listenerAttached) return;
+    claimBtn.dataset.listenerAttached = 'true';
+
+    claimBtn.addEventListener('click', async () => {
+        claimBtn.disabled = true;
+        const originalText = claimBtn.textContent;
+        claimBtn.textContent = 'Claiming...';
+        messageDisplay.textContent = '';
+
+        try {
+            const token = await user.getIdToken();
+            const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/claimDailyCheckIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({})
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                messageDisplay.textContent = `+${data.pointsEarned} Points! Current streak: ${data.currentStreak} days`;
+                messageDisplay.style.color = 'var(--accent-green)';
+
+                streakDisplay.textContent = data.currentStreak;
+
+                claimBtn.textContent = 'Claimed Today';
+                claimBtn.style.opacity = '0.6';
+                claimBtn.style.cursor = 'not-allowed';
+
+                // Update Session Cache
+                const cacheKey = `profile_${user.uid}`;
+                const cachedData = sessionStorage.getItem(cacheKey);
+                if (cachedData) {
+                    const parsed = JSON.parse(cachedData);
+                    parsed.pointsBalance = data.totalPoints;
+                    parsed.checkInStreak = data.currentStreak;
+                    parsed.lastCheckIn = new Date().toISOString(); // Simplified representation
+                    sessionStorage.setItem(cacheKey, JSON.stringify(parsed));
+                }
+
+                // Refresh Rewards UI
+                const newUserData = await getCachedUserProfile(user);
+                renderRewards(user, newUserData);
+
+            } else {
+                claimBtn.disabled = false;
+                claimBtn.textContent = originalText;
+                messageDisplay.textContent = data.error || 'Failed to claim reward.';
+                messageDisplay.style.color = 'var(--accent-red)';
+            }
+        } catch (error) {
+            console.error('Manager info: Error claiming check-in:', error);
+            claimBtn.disabled = false;
+            claimBtn.textContent = originalText;
+            messageDisplay.textContent = 'An error occurred. Please try again.';
+            messageDisplay.style.color = 'var(--accent-red)';
+        }
+    });
+}
+
+
 // Authentication State Listener
 onAuthStateChanged(auth, async (user) => {
     if (user) {
@@ -175,6 +279,7 @@ onAuthStateChanged(auth, async (user) => {
         renderOrders(user);
         if (userData) {
             renderRewards(user, userData);
+            setupDailyCheckIn(user, userData);
         }
     } else {
         window.location.replace('/sign in beta.html');
