@@ -97,3 +97,7 @@
 **Vulnerability:** A malicious user could update their own user profile in Firestore and arbitrarily set their `pointsBalance` to a very high amount because the `firestore.rules` file did not restrict modifications to `pointsBalance`.
 **Learning:** Security rules on user profile collections must explicitly deny client-side modification of monetary or reward-related fields (like `pointsBalance` and `loyaltyPoints`) which should only be managed server-side. While `loyaltyPoints` was restricted, `pointsBalance` was missed.
 **Prevention:** Always verify that all fields which shouldn't be manipulated by the client (specifically any fields managed by Cloud Functions or Admin endpoints) are added to the `.hasAny([])` affected keys deny list in Firestore Security rules for `create` and `update` actions.
+## 2026-11-04 - [Remove redundant client-side points manipulation in js/shop.js and js/checkout.js]
+**Vulnerability:** The client-side application was directly trying to write points balances in Firestore using `updateDoc` and `addDoc`. This was blocked by Firestore rules and caused silent errors.
+**Learning:** Point balances and loyalty transactions must only be calculated and written securely from a backend environment (like Firebase Cloud Functions). Client-side attempts to do this are a severe security anti-pattern and often mask failures due to empty catch blocks.
+**Prevention:** Never attempt to increment monetary or points values on the client. Only perform these updates securely on the server.

@@ -707,25 +707,9 @@ async function handleReviewSubmit(e) {
             createdAt: serverTimestamp()
         });
 
-        // Award 25 loyalty points for reviewing a product
+        // Award 25 loyalty points for reviewing a product (optimistic UI update only)
+        // Actual points are awarded via the onReviewCreated Cloud Function
         try {
-            const userRef = doc(db, "users", activeUser.uid);
-            await updateDoc(userRef, {
-                pointsBalance: increment(25),
-                loyaltyPoints: increment(25)
-            });
-
-            const prod = productMap.get(currentReviewProductId);
-            const prodName = prod ? prod.name : 'Product';
-
-            await addDoc(collection(db, "loyalty_transactions"), {
-                userId: activeUser.uid,
-                description: `Product Review - ${prodName} ⭐`,
-                points: 25,
-                type: 'earned',
-                createdAt: serverTimestamp()
-            });
-
             const cacheKey = `profile_${activeUser.uid}`;
             const cachedStr = sessionStorage.getItem(cacheKey);
             if (cachedStr) {
@@ -735,7 +719,7 @@ async function handleReviewSubmit(e) {
                 sessionStorage.setItem(cacheKey, JSON.stringify(uData));
             }
         } catch (ptsErr) {
-            console.warn("Points award warning for review:", ptsErr);
+            console.warn("Points cache update warning for review:", ptsErr);
         }
 
         // Optimistic UI Update for stats
