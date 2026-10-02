@@ -966,7 +966,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> Performance History
                             </li>
                         </ul>
-                        <button onclick="processCheckout('Individual Pro')"
+                        <button onclick="processCheckout('Individual Pro', event)"
                             class="btn btn-outline w-full border-slate-300 dark:border-slate-700 hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors">Choose
                             Pro</button>
                     </div>
@@ -993,7 +993,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> Priority Feature
                                 Request</li>
                         </ul>
-                        <button onclick="processCheckout('Business Pro')"
+                        <button onclick="processCheckout('Business Pro', event)"
                             class="btn btn-accent w-full shadow-2xl shadow-sky-200 dark:shadow-none">Choose
                             Business</button>
                     </div>
@@ -1751,8 +1751,17 @@
         }
         window.initDefaults = initDefaults;
 
-        async function processCheckout(planName) {
+        async function processCheckout(planName, event) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
+
+            let btn = null;
+            let originalText = '';
+            if (event && event.currentTarget) {
+                btn = event.currentTarget;
+                originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+            }
 
             // Pricing logic is handled securely on the server
             try {
@@ -1778,6 +1787,11 @@
                 }
             } catch (err) {
                 alert("Payment system unreachable. Please try again later. Manager info: [" + err.message + "]");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             }
         }
 
