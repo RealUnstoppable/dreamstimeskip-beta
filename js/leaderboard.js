@@ -1,5 +1,6 @@
 import { db, auth } from './firebase.js';
 import { collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { fetchQueryData } from './utils.js';
 
 const COLLECTION_NAME = 'blobgame_leaderboard';
 
@@ -36,11 +37,7 @@ export async function saveScore(score) {
 export async function getTopScores() {
     try {
         const q = query(collection(db, COLLECTION_NAME), orderBy("score", "desc"), limit(10));
-        const querySnapshot = await getDocs(q);
-        let scores = [];
-        querySnapshot.forEach((doc) => {
-            scores.push(doc.data());
-        });
+        const scores = await fetchQueryData(getDocs, q, false);
         
         return mergeAndSortScores(scores);
     } catch (e) {
