@@ -39,15 +39,12 @@ service cloud.firestore {
     // Orders collection: Users can read their own orders and create new ones
     // Loyalty transactions
     match /loyalty_transactions/{transactionId} {
-      allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin();
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend writes
     }
 
     match /orders/{orderId} {
-      allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
       // Depending on checkout implementation, orders are created by user or backend.
       // Assuming frontend creation for now based on 'userId' equality:
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
@@ -145,10 +142,8 @@ service cloud.firestore {
 
     // Reward Transactions collection
     match /reward_transactions/{transactionId} {
-      allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin();
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if false; // Only backend can write
     }
 
     // Deny all other access by default

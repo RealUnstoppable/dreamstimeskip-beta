@@ -222,7 +222,7 @@
     transition: transform 0.2s;
 }
 
-.chatbot-input-area button:hover:not(:disabled) {
+.chatbot-input-area button:hover {
     transform: scale(1.1);
 }
 .chatbot-input-area button:disabled {

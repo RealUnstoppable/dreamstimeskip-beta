@@ -1,14 +1,5 @@
-💡 **What:**
-- Batched DOM insertions in `js/account.js`'s `renderOrders` function using a `DocumentFragment`.
-- Replaced the O(N) `merged.find()` array lookup in `js/navbar.js`'s `PRELOADED_NOTIFICATIONS` loop with an O(1) `Set` lookup (`mergedIds.has()`).
-
-🎯 **Why:**
-- Iteratively calling `listEl.appendChild(card)` inside a loop causes O(N) costly layout reflows and repaints in the browser. Using a `DocumentFragment` batches this into a single O(1) DOM update.
-- Using `Array.find()` inside a `forEach` loop results in O(N²) time complexity. Using a `Set` makes the lookup O(1), improving the overall operation to O(N), which prevents CPU bottlenecking as the notification list grows.
-
-📊 **Impact:**
-- Reduces layout reflows on the account page's order history from O(N) to O(1), significantly improving render speed for users with many orders.
-- Improves notification merging time complexity from O(N²) to O(N).
-
-🔬 **Measurement:**
-- Render times for the order list can be profiled using Chrome DevTools Performance tab; layout shifts and rendering time will be tangibly lower for large datasets.
+🚨 Severity: HIGH
+💡 Vulnerability: The `firestore.rules` file contained duplicate `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews`. Since Firebase evaluates overlapping match blocks with a logical OR, the less restrictive rules at the bottom of the file (e.g. `allow read: if true; allow update, delete: if false;`) were silently bypassing the stricter validations (like `request.resource.data.rating >= 1`) defined earlier.
+🎯 Impact: Attackers could bypass intended access controls and validations to update or manipulate data in these collections, as the OR logic of duplicate rules would grant them access based on the least restrictive condition.
+🔧 Fix: Removed the duplicate, overlapping `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews` from the bottom of `firestore.rules` to ensure only the strictly defined, secure `match` blocks evaluate.
+✅ Verification: `pnpm test` passes for the functions directory, and `cat firestore.rules` confirms the duplicates have been removed.

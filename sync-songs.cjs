@@ -148,9 +148,7 @@ const newEntries = newSongs.map(s => `    {
     }`).join(',\n');
 
 // Insert before the closing "];" of librarySongs
-// First, normalize: remove any trailing comma + whitespace before ];
-let normalized = songDataRaw.replace(/,?\s*\n\];\s*\n\nexport const songColors/, `\n];\n\nexport const songColors`);
-const updatedSongData = normalized.replace(
+const updatedSongData = songDataRaw.replace(
     /(\n\];\s*\n\nexport const songColors)/,
     `,\n${newEntries}\n];\n\nexport const songColors`
 );

@@ -3,10 +3,7 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
-import './sitewide-player.js?v=20260924';
-import './ads.js';
-import './chatbot.js?v=20260925';
-import { initCookieConsent } from './cookie-consent.js';
+import './sitewide-player.js?v=20260920';
 
 let notificationUnsubscribe = null;
 
@@ -65,6 +62,7 @@ export function loadNavbar() {
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
+            <li><a href="portfolio.html">About Me</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
@@ -102,7 +100,6 @@ export function loadNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
-    initCookieConsent();
 }
 
 export function loadUdsNavbar() {
@@ -159,7 +156,6 @@ export function loadUdsNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
-    initCookieConsent();
 }
 
 function attachNavEvents() {
@@ -310,10 +306,8 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
-                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
-                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!mergedIds.has(pre.id)) merged.push(pre);
+                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;

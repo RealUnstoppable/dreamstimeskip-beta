@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">| Elevate Your Store Management</title>
 
-    <link rel="icon" type="image/jpeg" href="ManagerPro.jpg?v=1790377266541">
-    <link rel="apple-touch-icon" href="ManagerPro.jpg?v=1790377266541">
+    <link rel="icon" type="image/jpeg" href="ManagerPro.jpg?v=2">
+    <link rel="apple-touch-icon" href="ManagerPro.jpg?v=2">
 
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -330,7 +330,7 @@
         <div class="absolute bottom-8 left-8 right-8">
             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <span class="text-xs font-bold uppercase tracking-widest">Dark Mode</span>
-                <label for="themeToggle" class="relative inline-flex items-center cursor-pointer">
+                <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
                     <div
                         class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
@@ -1292,12 +1292,10 @@
         function addDepositItem(val = "") {
             const div = document.createElement('div');
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
-            const uniqueIdVer = 'dep-ver-' + Date.now() + Math.random().toString(36).substr(2, 9);
-            const uniqueIdVal = 'dep-val-' + Date.now() + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;" title="Deposit Amount" aria-label="Deposit Amount">
-                <label for="${uniqueIdVer}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVer}" class="dep-ver" checked> VER</label>
-                <label for="${uniqueIdVal}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVal}" class="dep-val-chk" checked> VAL</label>
+                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
+                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit" title="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('depositsContainer').appendChild(div);
@@ -1818,8 +1816,8 @@
     <footer class="main-footer"></footer>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1790377266541';
-        import { loadFooter } from './js/footer.js?v=1790377266541';
+        import { loadNavbar } from './js/navbar.js?v=20260722';
+        import { loadFooter } from './js/footer.js?v=20260722';
 
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();

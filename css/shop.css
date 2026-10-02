@@ -109,7 +109,7 @@
 }
 
 .review-submission-section {
-    background-color: var(--primary-card-color, #1a1a1a);
+    background-color: #1a1a1a;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 20px;
@@ -166,19 +166,19 @@ textarea#review-text {
 
 textarea#review-text:focus {
     outline: none;
-    border-color: var(--accent-color, #2563EB);
+    border-color: var(--accent-blue);
 }
 
 .login-prompt-section {
     text-align: center;
     padding: 20px;
-    background-color: var(--primary-card-color, #1a1a1a);
+    background-color: #1a1a1a;
     border-radius: 12px;
     margin-bottom: 20px;
 }
 
 .login-prompt-section a {
-    color: var(--accent-color, #2563EB);
+    color: var(--accent-blue);
     text-decoration: none;
 }
 
@@ -277,7 +277,7 @@ textarea#review-text:focus {
     width: 100%;
     height: 320px;
     object-fit: cover;
-    background-color: var(--bg-color, #000);
+    background-color: #000;
     cursor: pointer;
 }
 
@@ -314,7 +314,7 @@ textarea#review-text:focus {
 }
 
 .add-to-cart-btn {
-    background-color: var(--accent-color, #2563EB);
+    background-color: var(--accent-blue);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -324,11 +324,76 @@ textarea#review-text:focus {
     transition: background-color 0.2s;
 }
 
-.add-to-cart-btn:hover:not(:disabled) {
+.add-to-cart-btn:hover {
     background-color: #1D4ED8;
 }
 
-/* Lexi Orb and menu are handled sitewide by style.css & sitewide-player.js */
+.lexi-orb {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 60px;
+    background:
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%),
+        linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%);
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4);
+    z-index: 1001;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: blob-shape 12s ease-in-out infinite;
+}
+
+.lexi-orb:hover {
+    transform: translateX(-50%) scale(1.1);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+}
+
+.lexi-core {
+    display: none;
+}
+
+.lexi-menu {
+    position: fixed;
+    bottom: 110px;
+    left: 50%;
+    background: var(--primary-card-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    transform: translateX(-50%) translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lexi-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.lexi-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
 
 .flying-item {
     position: fixed;
@@ -485,7 +550,7 @@ textarea#review-text:focus {
 .btn-checkout {
     width: 100%;
     padding: 15px;
-    background-color: var(--accent-color, #2563EB);
+    background-color: var(--accent-blue);
     color: white;
     border: none;
     border-radius: 8px;
@@ -617,7 +682,7 @@ textarea#review-text:focus {
 }
 
 .comment-input textarea {
-    background-color: var(--bg-color, #0A0A0A);
+    background-color: #0A0A0A;
     border: 1px solid var(--border-color);
     color: white;
     padding: 10px;
@@ -626,7 +691,7 @@ textarea#review-text:focus {
 }
 
 .submit-review-btn {
-    background-color: var(--accent-color, #2563EB);
+    background-color: var(--accent-blue);
     color: white;
     border: none;
     padding: 10px;
@@ -636,7 +701,7 @@ textarea#review-text:focus {
     margin-top: 10px;
 }
 
-.submit-review-btn:hover:not(:disabled) {
+.submit-review-btn:hover {
     background-color: #1D4ED8;
 }
 
@@ -654,7 +719,7 @@ textarea#review-text:focus {
 }
 
 .login-to-review-msg a {
-    color: var(--accent-color, #2563EB);
+    color: var(--accent-blue);
     text-decoration: underline;
 }
 
@@ -684,7 +749,7 @@ textarea#review-text:focus {
 
 /* --- End of shop.css --- */
 .free-badge {
-    color: var(--accent-color, #16A34A);
+    color: var(--accent-green);
     font-weight: bold;
 }
 
@@ -709,17 +774,10 @@ textarea#review-text:focus {
 }
 
 .review-message.success {
-    color: var(--accent-color, #16A34A);
+    color: var(--accent-green);
 }
 
 .action-buttons-container {
     display: flex;
     gap: 10px;
-}
-
-.add-to-cart-btn:disabled, .submit-review-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
 }
