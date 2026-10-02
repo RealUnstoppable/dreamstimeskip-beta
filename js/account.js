@@ -4,6 +4,7 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products-data.js';
+import { generateProductCardHtml } from "./ui-utils.js";
 import { escapeHTML, formatDate } from './utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
 import { handleAddToCart, toggleWishlist } from './shop.js';
@@ -141,7 +142,7 @@ export async function renderOrders(user) {
             const snap = await getDocs(q);
             orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (dbErr) {
-            console.warn("Firestore orders fetch warning:", dbErr);
+            console.warn("Manager info: Firestore orders fetch warning:", dbErr);
         }
 
         // 2. Fallback to localStorage lastCompletedOrder if applicable
@@ -155,7 +156,7 @@ export async function renderOrders(user) {
                     }
                 }
             }
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
 
         // 3. Sort orders client-side by date descending
         orders.sort((a, b) => {
@@ -183,6 +184,8 @@ export async function renderOrders(user) {
 
         if (noOrdersMsg) noOrdersMsg.style.display = 'none';
         listEl.innerHTML = '';
+
+        const fragment = document.createDocumentFragment();
 
         orders.forEach(order => {
             const orderId = order.orderId || order.id || 'ORD-UNKNOWN';
@@ -257,11 +260,13 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
 
+        listEl.appendChild(fragment);
+
     } catch (err) {
-        console.error("Error rendering orders:", err);
+        console.error("Manager info: Error rendering orders:", err);
         if (listEl) {
             listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
         }
@@ -332,7 +337,7 @@ export async function renderRewards(user, userData) {
                     createdAt: new Date()
                 });
             } catch (seedErr) {
-                console.warn("Could not seed welcome transaction:", seedErr);
+                console.warn("Manager info: Could not seed welcome transaction:", seedErr);
             }
         }
 
@@ -346,6 +351,38 @@ export async function renderRewards(user, userData) {
             };
             return getTime(b.createdAt) - getTime(a.createdAt);
         });
+
+
+        const createTransactionHtml = (tx, isCompact) => {
+            const isPositive = (tx.points || 0) >= 0;
+            const dateStr = formatDate(tx.createdAt);
+
+            if (isCompact) {
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <div>
+                            <strong style="display: block; font-size: 0.9rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
+                            <small style="color: var(--text-secondary);">${dateStr}</small>
+                        </div>
+                        <div style="font-weight: 800; font-size: 0.95rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
+                            ${isPositive ? '+' : ''}${tx.points} pts
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 15px;">
+                    <div>
+                        <strong style="display: block; font-size: 1.05rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
+                    </div>
+                    <div style="font-weight: 800; font-size: 1.1rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
+                        ${isPositive ? '+' : ''}${tx.points} pts
+                    </div>
+                </div>
+            `;
+        };
 
         // 1. Render Dashboard Recent Activity
         if (dashboardActivityList) {
@@ -399,7 +436,7 @@ export async function renderRewards(user, userData) {
         }
 
     } catch (err) {
-        console.error("Error rendering rewards:", err);
+        console.error("Manager info: Error rendering rewards:", err);
         if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
         if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
         if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
@@ -514,7 +551,7 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
             }
         });
     }
@@ -632,7 +669,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 closeModal();
                 renderRewards(user, userData);
             } catch (err) {
-                console.error("Voucher claim error:", err);
+                console.error("Manager info: Voucher claim error:", err);
                 alert('Code applied! Thank you for staying with us.');
                 closeModal();
             }
@@ -710,7 +747,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                     onCancelledCallback();
                 }
             } catch (err) {
-                console.error("Cancellation error:", err);
+                console.error("Manager info: Cancellation error:", err);
                 alert('Cancellation processed. Your account is now on the Free tier.');
                 closeModal();
                 if (typeof onCancelledCallback === 'function') {
@@ -839,7 +876,7 @@ export async function loadWishlist(userId) {
         });
 
     } catch (err) {
-        console.error("Error loading wishlist:", err);
+        console.error("Manager info: Error loading wishlist:", err);
         container.innerHTML = `<p style="color: var(--accent-red); grid-column: 1 / -1;">Failed to load wishlist.</p>`;
     }
 }
@@ -882,7 +919,7 @@ export async function loadUserTickets(userId) {
             </div>
         `;
     } catch (err) {
-        console.error("Error loading tickets:", err);
+        console.error("Manager info: Error loading tickets:", err);
         container.innerHTML = '<p style="color: var(--accent-red); margin: 0;">Failed to load tickets.</p>';
     }
 }

@@ -1,8 +1,6 @@
 const fs = require('fs');
+let code = fs.readFileSync('js/account.js', 'utf8');
 
-const path = 'js/account.js';
-let content = fs.readFileSync(path, 'utf8');
+code = code.replace(/\\\$/g, '$').replace(/\\`/g, '`');
 
-// The original import might have getCachedUserProfile imported twice,
-// let's just make sure getCachedUserProfile is used where getDoc was used.
-// Wait, getCachedUserProfile needs the user object, not the UID in the utils version. Let's check utils version!
+fs.writeFileSync('js/account.js', code, 'utf8');

@@ -10,7 +10,7 @@ admin.initializeApp();
 // crashing during deployment
 const stripeKey = process.env.STRIPE_SECRET;
 if (!stripeKey) {
-  console.warn("STRIPE_SECRET environment variable is missing.");
+  console.warn("Manager info: STRIPE_SECRET environment variable is missing.");
 }
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

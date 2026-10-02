@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransactio
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
+import { generateProductCardHtml } from "./ui-utils.js";
 
 let currentUser = null;
 let userCart = {};
@@ -227,11 +228,7 @@ function renderCheckoutPage() {
 
 
 function updateSummaryUI() {
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
 
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
@@ -333,7 +330,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
                 });
             }
         } catch (dbErr) {
-            console.warn("Firestore order write warning:", dbErr);
+            console.warn("Manager info: Firestore order write warning:", dbErr);
         }
     }
 
@@ -374,11 +371,7 @@ export async function handlePlaceOrder(e) {
     const emailVal = emailInput ? emailInput.value : (currentUser ? currentUser.email : '');
 
     // Calculate final total
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
     const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
@@ -453,7 +446,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localRaw = localStorage.getItem('localCart');
         if (localRaw) localCart = JSON.parse(localRaw);
-    } catch (_) {}
+    } catch (_) { /* ignore parse error */ }
 
     if (user) {
         currentUser = user;
@@ -462,14 +455,14 @@ onAuthStateChanged(auth, async (user) => {
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
             userCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
-        } catch (_) {
+        } catch (_) { /* ignore firestore read error */
             userCart = localCart;
         }
 
         try {
             const userData = await getCachedUserProfile(user);
             window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
-        } catch (_) {
+        } catch (_) { /* ignore profile read error */
             window.userPointsBalance = 0;
         }
     } else {

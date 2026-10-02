@@ -48,7 +48,7 @@ class SitewideMusicEngine {
                     isMixerMode: !!parsed.isMixerMode
                 };
             }
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         return {
             songId: librarySongs[0].id,
@@ -68,7 +68,7 @@ class SitewideMusicEngine {
         this.state = { ...this.state, ...updates, timestamp: Date.now() };
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
         this.notifyListeners();
     }
 
@@ -187,7 +187,7 @@ class SitewideMusicEngine {
         }
         this.audio.play().then(() => {
             this.saveState({ isPlaying: true });
-        }).catch(err => console.warn("Audio play prevented:", err));
+        }).catch(err => console.warn("Manager info: Audio play prevented:", err));
     }
 
     pause() {
@@ -649,7 +649,7 @@ class SitewideMusicEngine {
         let count = 0;
         try {
             count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         orb.innerHTML = `
             <span class="orb-text"></span>
@@ -717,7 +717,7 @@ class SitewideMusicEngine {
                 badge.textContent = count;
                 badge.style.display = 'inline-block';
             }
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         // Wire play/pause if present
         const playBtn = orb.querySelector('#lexi-play-pause-btn');
@@ -780,7 +780,7 @@ class SitewideMusicEngine {
                             }
                         }
                     }).catch(err => {
-                        console.error('Failed to load chatbot:', err);
+                        console.error('Manager info: Failed to load chatbot:', err);
                         window.location.href = 'index.html#chat';
                     });
                 }
@@ -913,7 +913,7 @@ class SitewideMusicEngine {
         let count = 0;
         try {
             count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
         const cartBadge = orb.querySelector('#lexi-cart-badge');
         if (cartBadge) {
             cartBadge.textContent = count;
@@ -949,7 +949,7 @@ window.DTSMusic = sitewidePlayer;
 window.updateLexiCartCount = function(count) {
     try {
         localStorage.setItem('cartItemCount', String(count));
-    } catch (_) {}
+    } catch (_) { /* ignore playback or state error */ }
 
     const badge = document.getElementById('lexi-cart-badge');
     if (badge) {
