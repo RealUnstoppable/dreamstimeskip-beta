@@ -455,8 +455,12 @@ function setupEventListeners() {
     // Product search input
     const productSearchInput = document.getElementById('product-search');
     if (productSearchInput) {
+        let productSearchTimeout;
         productSearchInput.addEventListener('input', (e) => {
-            renderProducts(e.target.value);
+            clearTimeout(productSearchTimeout);
+            productSearchTimeout = setTimeout(() => {
+                renderProducts(e.target.value);
+            }, 300); // ⚡ Bolt: Debounce product search to reduce unnecessary DOM re-renders
         });
     }
 
