@@ -20,6 +20,7 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
-## 2026-05-29 - Code Health: Abstracting UI Render Functions
-**Learning:** Found repetitive loops manually rendering HTML for identical UI components (like transaction history and product cards) scattered across multiple files (`account.js`, `checkout.js`, `shop.js`).
-**Action:** Always extract shared HTML templates into a central `ui-utils.js` utility using standard functions (e.g. `generateProductCardHtml(product, mode)`) to ensure consistency and keep files DRY.
+
+## 2026-09-24 - Missing Title Tooltips on Icon-Only Buttons and Disabled Hover States
+**Learning:** Found multiple icon-only buttons across the site (e.g. in HarmonyTunes and sitewide player) that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning. Additionally, disabled buttons lacked proper CSS to prevent hover effects (`:hover:not(:disabled)`), causing them to seem interactable.
+**Action:** When adding `aria-label` to interactive elements without visible text, always add a matching `title` attribute. Ensure all button `:hover` pseudo-classes exclude the `:disabled` state, and add explicit `:disabled` styling (e.g., opacity, cursor).
