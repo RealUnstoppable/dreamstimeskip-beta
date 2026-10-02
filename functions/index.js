@@ -486,9 +486,9 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
         return res.status(400).send("Missing cart or orderDetails");
       }
 
-      if (orderDetails.userId !== uid) {
-        orderDetails.userId = uid;
-      }
+      // Fix: Securely override userId with authenticated user's id
+      orderDetails.userId = uid;
+      // Do not accept timestamps from the client, assign server-side
       orderDetails.orderDate = admin.firestore.FieldValue.serverTimestamp();
 
       const db = admin.firestore();
