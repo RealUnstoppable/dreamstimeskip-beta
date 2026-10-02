@@ -20,3 +20,7 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
+
+## 2024-05-29 - Async Loading State for Checkout Buttons
+**Learning:** The checkout buttons in `tracker.html` triggered an asynchronous fetch request without indicating a loading state. Users could repeatedly click the button or think it was broken during the API call.
+**Action:** Always pass `event` from inline `onclick` handlers calling async functions so you can use `event.currentTarget` to disable the button and show a "Processing..." loading state, ensuring visual feedback and preventing double submissions.
