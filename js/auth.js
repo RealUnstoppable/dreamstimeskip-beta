@@ -64,6 +64,7 @@ if (document.getElementById('auth-form')) {
     const submitBtn = document.getElementById('submit-btn');
     const toggleLink = document.getElementById('toggle-form');
     const usernameGroup = document.getElementById('username-group');
+    const referralGroup = document.getElementById('referral-group');
     const messageEl = document.getElementById('message');
 
     let isSignUp = false;
@@ -71,6 +72,7 @@ if (document.getElementById('auth-form')) {
     const updateFormView = () => {
         formTitle.textContent = isSignUp ? 'Sign Up' : 'Sign In';
         usernameGroup.style.display = isSignUp ? 'block' : 'none';
+        if (referralGroup) referralGroup.style.display = isSignUp ? 'block' : 'none';
         document.getElementById('username').required = isSignUp;
         submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
         toggleLink.textContent = isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up";
@@ -110,6 +112,19 @@ if (document.getElementById('auth-form')) {
                     isAdmin: false, 
                     membershipLevel: 'free'
                 });
+
+                const referralCodeVal = document.getElementById('referralCode')?.value?.trim();
+                if (referralCodeVal) {
+                    try {
+                        const { getFunctions, httpsCallable } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-functions.js");
+                        const functions = getFunctions(app);
+                        const processReferral = httpsCallable(functions, 'processReferral');
+                        await processReferral({ referrerUid: referralCodeVal });
+                    } catch (refErr) {
+                         console.error('Manager info: Error calling processReferral:', refErr);
+                    }
+                }
+
                 sessionStorage.setItem('newUser', 'true');
                 window.location.replace('account.html');
             } else {
@@ -136,6 +151,18 @@ if (document.getElementById('auth-form')) {
 
     function showMessage(msg) { messageEl.textContent = msg; }
     updateFormView();
+
+    // Auto-fill referral code if present in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+        isSignUp = true;
+        updateFormView();
+        const refInput = document.getElementById('referralCode');
+        if (refInput) {
+            refInput.value = refCode;
+        }
+    }
 }
 
 export function getFirebaseErrorMessage(error) {

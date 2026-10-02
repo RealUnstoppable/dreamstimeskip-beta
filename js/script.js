@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Orb Physics & Easter Egg ---
-    const orbElements = document.querySelectorAll('.orb, #siri-orb');
+    // --- Orb Physics & Easter Egg (For hero .orb on index.html; #siri-orb is handled sitewide in sitewide-player.js) ---
+    const orbElements = document.querySelectorAll('.orb:not(#siri-orb)');
     
     orbElements.forEach(orb => {
         let isDragging = false;
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 100}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3}) rotate(${-currentAngle}rad)`;
             } catch (e) {
-                console.error("Manager info: Error in physics loop:", e);
+                console.error("Manager info: Error in physics loop:", e.message || e);
                 orb.style.transform = `rotate(${currentAngle}rad) translateX(${currentStretch * 50}px) scaleX(${1 + currentStretch}) scaleY(${1 - currentStretch * 0.3})`;
             }
             
