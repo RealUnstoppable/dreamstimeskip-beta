@@ -3,7 +3,10 @@ import { escapeHTML, getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
-import './sitewide-player.js?v=20260920';
+import './sitewide-player.js?v=20260924';
+import './ads.js';
+import './chatbot.js?v=20260925';
+import { initCookieConsent } from './cookie-consent.js';
 
 let notificationUnsubscribe = null;
 
@@ -53,7 +56,6 @@ export function loadNavbar() {
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
-            <li><a href="portfolio.html">About Me</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
@@ -91,6 +93,7 @@ export function loadNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 export function loadUdsNavbar() {
@@ -147,6 +150,7 @@ export function loadUdsNavbar() {
         attachNotificationEvents();
         updateAuthLink();
     }
+    initCookieConsent();
 }
 
 function attachNavEvents() {
@@ -208,7 +212,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) {}
+                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
                 }
             });
             updateNotificationBadge(0);
@@ -247,15 +251,22 @@ function renderNotifications(notifications) {
         return;
     }
 
-    list.innerHTML = notifications.map(n => `
+    list.innerHTML = notifications.map(n => {
+        let icon = '🔔';
+        if (n.type === 'reward') icon = '🎁';
+        if (n.type === 'ticket_reply') icon = '💬';
+
+        return `
         <div class="notification-item ${n.isRead ? '' : 'unread'}" data-id="${escapeHTML(n.id)}" data-link="${escapeHTML(n.link || '')}">
+            <div class="notif-icon" style="font-size: 1.2rem; margin-right: 12px; display: flex; align-items: center; justify-content: center;">${icon}</div>
             <div class="notif-content">
                 <p class="notif-title">${escapeHTML(n.title)}</p>
                 <small class="notif-msg">${escapeHTML(n.message)}</small>
             </div>
             ${!n.isRead ? '<span class="notif-dot"></span>' : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     list.querySelectorAll('.notification-item').forEach(item => {
         item.addEventListener('click', async (e) => {
@@ -268,7 +279,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) {}
+                try { await markAsRead(id); } catch (_) { /* ignore read error */ }
             }
 
             // Recount badge
@@ -297,8 +308,10 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
+                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
+                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
+                            if (!mergedIds.has(pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;

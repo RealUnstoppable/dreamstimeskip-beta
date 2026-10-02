@@ -328,6 +328,8 @@ p.section-subtitle {
     bottom: 0;
     width: 50%;
     height: auto;
+    max-height: 80%;
+    max-width: 300px;
     object-fit: contain;
     opacity: 0.8;
     transition: opacity 0.3s ease;
