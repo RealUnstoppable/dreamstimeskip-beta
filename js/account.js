@@ -184,6 +184,8 @@ export async function renderOrders(user) {
         if (noOrdersMsg) noOrdersMsg.style.display = 'none';
         listEl.innerHTML = '';
 
+        const fragment = document.createDocumentFragment();
+
         orders.forEach(order => {
             const orderId = order.orderId || order.id || 'ORD-UNKNOWN';
             const orderDateStr = formatDate(order.orderDate || order.createdAt);
@@ -257,8 +259,10 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
+
+        listEl.appendChild(fragment);
 
     } catch (err) {
         console.error("Error rendering orders:", err);
