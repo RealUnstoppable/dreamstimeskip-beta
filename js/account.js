@@ -127,9 +127,12 @@ export async function renderProfile(user, userData) {
  * Safe query without composite index requirement, plus offline/local order fallback.
  */
 export async function renderOrders(user) {
+    if (window.isRenderingOrders) return;
+    window.isRenderingOrders = true;
     const listEl = document.getElementById('orders-list');
     const noOrdersMsg = document.getElementById('no-orders-msg');
     if (!listEl) return;
+    const fragment = document.createDocumentFragment();
 
     try {
         let orders = [];
@@ -141,7 +144,7 @@ export async function renderOrders(user) {
             const snap = await getDocs(q);
             orders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (dbErr) {
-            console.warn("Firestore orders fetch warning:", dbErr);
+            console.error("Manager info: Firestore orders fetch warning:", dbErr.message || dbErr);
         }
 
         // 2. Fallback to localStorage lastCompletedOrder if applicable
@@ -155,7 +158,7 @@ export async function renderOrders(user) {
                     }
                 }
             }
-        } catch (_) {}
+        } catch (_) { /* intentionally swallowed */ }
 
         // 3. Sort orders client-side by date descending
         orders.sort((a, b) => {
@@ -257,14 +260,17 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
+        listEl.appendChild(fragment);
 
     } catch (err) {
-        console.error("Error rendering orders:", err);
+        console.error("Manager info: Error rendering orders:", err.message || err);
         if (listEl) {
             listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
         }
+    } finally {
+        window.isRenderingOrders = false;
     }
 }
 
@@ -332,7 +338,7 @@ export async function renderRewards(user, userData) {
                     createdAt: new Date()
                 });
             } catch (seedErr) {
-                console.warn("Could not seed welcome transaction:", seedErr);
+                console.error("Manager info: Could not seed welcome transaction:", seedErr.message || seedErr);
             }
         }
 
@@ -399,7 +405,7 @@ export async function renderRewards(user, userData) {
         }
 
     } catch (err) {
-        console.error("Error rendering rewards:", err);
+        console.error("Manager info: Error rendering rewards:", err.message || err);
         if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
         if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
         if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
@@ -910,7 +916,7 @@ export function initAccountPage() {
             if (cachedStr) {
                 userData = JSON.parse(cachedStr);
             }
-        } catch (_) {}
+        } catch (_) { /* intentionally swallowed */ }
 
         if (!userData) {
             try {

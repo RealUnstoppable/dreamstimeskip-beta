@@ -124,7 +124,7 @@ export async function loadProductStats() {
         const stats = await fetchCollectionData(db, getDocs, collection, 'product_stats', true);
         stats.forEach(s => productStatsMap.set(s.id, s));
     } catch (error) {
-        console.error("Manager info: Error loading product stats ", error);
+        console.error("Manager info: Error loading product stats:", error.message || error);
     } finally {
         renderProducts();
     }
@@ -171,7 +171,7 @@ function updateCartSummary() {
     try {
         localStorage.setItem('cartItemCount', itemCount.toString());
         localStorage.setItem('localCart', JSON.stringify(cart));
-    } catch (_) {}
+    } catch (_) { /* intentionally swallowed */ }
 
     // Update Lexi cart badge if window.updateLexiCartCount exists
     if (window.updateLexiCartCount) {
@@ -252,7 +252,7 @@ export async function handleUpdateQuantity(productId, quantity) {
             renderCart();
         }
     } catch (error) {
-        console.error('Manager info: Failed to update quantity ', error);
+        console.error("Manager info: Failed to update quantity:", error.message || error);
     }
 }
 
@@ -400,7 +400,7 @@ async function fetchProductReviews(productId) {
         renderProducts();
 
     } catch (error) {
-        console.error("Manager info: Error fetching reviews:", error);
+        console.error("Manager info: Error fetching reviews:", error.message || error);
         reviewsListContainer.innerHTML = '<p class="error-message">Failed to load reviews.</p>';
     }
 }
@@ -586,7 +586,7 @@ function setupEventListeners() {
                 await fetchProductReviews(currentReviewProductId);
 
             } catch (error) {
-                console.error("Manager info: Error submitting review:", error);
+                console.error("Manager info: Error submitting review:", error.message || error);
                 messageEl.textContent = 'Failed to submit review.';
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
@@ -784,7 +784,7 @@ try {
         cart = JSON.parse(localCartData);
         renderCart();
     }
-} catch (_) {}
+} catch (_) { /* intentionally swallowed */ }
 
 // Auth and Cart state synchronization
 onAuthStateChanged(auth, async (user) => {
@@ -793,7 +793,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localCartData = localStorage.getItem('localCart');
         if (localCartData) localCart = JSON.parse(localCartData);
-    } catch (_) {}
+    } catch (_) { /* intentionally swallowed */ }
 
     if (user) {
         // Load Wishlist

@@ -410,7 +410,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) {}
+        } catch (_) { /* intentionally swallowed */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -480,11 +480,11 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
-            try { playlistPlayBtn.onclick = null; } catch (e) {}
+            console.error("Manager info: Error loading playlist:", error.message || error);
+            try { playlistTitleEl.textContent = "Error"; } catch (_) { /* intentionally swallowed */ }
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (_) { /* intentionally swallowed */ }
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (_) { /* intentionally swallowed */ }
+            try { playlistPlayBtn.onclick = null; } catch (_) { /* intentionally swallowed */ }
         }
     }
 
@@ -903,7 +903,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) {}
+        } catch (_) { /* intentionally swallowed */ }
     }
 
     function playSong() {
@@ -943,7 +943,7 @@ function initHarmonyTunes() {
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
-        }).catch(e => console.error("Manager info:", e));
+        }).catch(e => console.error("Manager info:", e.message || e));
     }
 
     function pauseSong() {
@@ -1135,7 +1135,7 @@ function initHarmonyTunes() {
             isMixerMode = !isMixerMode;
             if(currentUser) {
                 const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e.message || e));
             }
             mixerBtn.classList.toggle('active', isMixerMode);
             if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
@@ -1747,7 +1747,7 @@ function initHarmonyTunes() {
             activeAudio.currentTime = block.paddedStart;
             
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Manager info:", e.message || e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1882,7 +1882,7 @@ function initHarmonyTunes() {
             }
 
             activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            activeAudio.play().catch(e => console.error("Manager info:", e.message || e));
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
@@ -1986,7 +1986,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Manager info: Firebase error:", e.message || e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2038,7 +2038,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Manager info:", e.message || e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2112,9 +2112,9 @@ function initHarmonyTunes() {
             const historyIds = historyQueue.map(s => s.id);
             updateDoc(userRef, { musicHistory: historyIds }).catch(e => {
                 if(e.code === 'not-found') {
-                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
+                    setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e.message || e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Manager info: Firebase history update error:", e.message || e);
                 }
             });
         }
@@ -2569,7 +2569,7 @@ let dragItem = null;
                 historyQueue = [];
                 if(currentUser) {
                     const userRef = doc(db, "users", currentUser.uid);
-                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e));
+                    updateDoc(userRef, { musicHistory: [] }).catch(e => console.error("Manager info:", e.message || e));
                 }
                 renderQueue();
             }

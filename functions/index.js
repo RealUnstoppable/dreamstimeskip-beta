@@ -138,13 +138,11 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
 
         // Use URLs passed from frontend, fallback to hardcoded if missing
-        success_url: successUrl ||
-          "https://dreamstimeskip-beta.pages.dev/success",
-        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/cancel",
+        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
         metadata: {
           uid: uid || "unknown",
-          planName: plan || "Pro",
-          project: project || "ezmanage",
+          planName: plan || "Pro"
         },
       };
 

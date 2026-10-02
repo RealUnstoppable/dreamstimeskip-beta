@@ -199,7 +199,7 @@ function renderCheckoutPage() {
                 msgEl.style.color = 'var(--accent-red)';
             }
         } catch (error) {
-            console.error('Manager info: Error applying promo code:', error);
+            console.error("Manager info: Error applying promo code:", error.message || error);
             discount = 0;
             appliedPromo = '';
             msgEl.textContent = 'Error applying promo code.';
@@ -333,7 +333,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
                 });
             }
         } catch (dbErr) {
-            console.warn("Firestore order write warning:", dbErr);
+            console.error("Manager info: Firestore order write warning:", dbErr.message || dbErr);
         }
     }
 
@@ -453,7 +453,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localRaw = localStorage.getItem('localCart');
         if (localRaw) localCart = JSON.parse(localRaw);
-    } catch (_) {}
+    } catch (_) { /* intentionally swallowed */ }
 
     if (user) {
         currentUser = user;

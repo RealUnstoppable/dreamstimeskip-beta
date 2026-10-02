@@ -221,7 +221,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) {}
+                    try { markAsRead(id); } catch (_) { /* intentionally swallowed */ }
                 }
             });
             updateNotificationBadge(0);
@@ -281,7 +281,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) {}
+                try { await markAsRead(id); } catch (_) { /* intentionally swallowed */ }
             }
 
             // Recount badge
@@ -317,7 +317,7 @@ function updateAuthLink() {
                         const unreadCount = merged.filter(n => !n.isRead).length;
                         updateNotificationBadge(unreadCount);
                     });
-                } catch(err) { console.error('Manager info: Notification error ', err); }
+                } catch(err) { console.error("Manager info: Notification error:", err.message || err); }
 
                 const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
@@ -332,7 +332,7 @@ function updateAuthLink() {
                     authLink.classList.remove('nav-pfp-link');
                 }
             } catch (e) {
-                console.error("Manager info: Nav Error: [" + e.message + "]", e);
+                console.error("Manager info: Nav Error: [" + e.message + "]:", e.message || e);
             }
         } else {
             authLink.href = 'sign in beta.html';
