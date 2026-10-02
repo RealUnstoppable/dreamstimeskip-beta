@@ -472,7 +472,7 @@
             btn.innerText = 'Creating...';
 
             try {
-                await setDoc(doc(db, 'promo_codes', code), { discount, active: true, createdAt: serverTimestamp() });
+                await performAdminAction('create', 'promo_codes', code, { discount, active: true, createdAt: 'SERVER_TIMESTAMP' });
                 showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
                 codeInput.value = '';
                 discountInput.value = '';
@@ -956,6 +956,7 @@
                             await replyToTicket(reqId, reply, 'answered');
                             const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
                         } catch (error) {
+                            console.error("Manager info: Error replying to ticket:", error);
                             alert("Error replying to ticket: " + error.message);
                         }
                     }
@@ -1023,18 +1024,30 @@
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await performAdminAction("update", "quotes", id, { status: 'responded' });
-                    if(tr) {
-                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
-                        tr.querySelector('td:nth-child(5) span').textContent = 'responded';
-                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    try {
+                        await performAdminAction("update", "quotes", id, { status: 'responded' });
+                        if(tr) {
+                            tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                            tr.querySelector('td:nth-child(5) span').textContent = 'responded';
+                            tr.querySelector('td:nth-child(6)').innerHTML = '';
+                        }
+                    } catch (error) {
+                        console.error("Manager info: [Error responding to quote:]", error);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await performAdminAction("delete", "quotes", id);
-                    if (tr) tr.remove();
+                    try {
+                        await performAdminAction("delete", "quotes", id);
+                        if (tr) tr.remove();
+                    } catch (error) {
+                        console.error("Manager info: [Error deleting quote:]", error);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    }
                 }
             });
 
@@ -1086,6 +1099,7 @@
                         await sendPasswordResetEmail(auth, email);
                         alert('Password reset email sent. Check your inbox.');
                     } catch (error) {
+                        console.error("Manager info: Error sending password reset email:", error);
                         alert('Error sending email: ' + error.message);
                     } finally {
                         btn.disabled = false;
@@ -1109,6 +1123,7 @@
                             await user.delete();
                             window.location.replace('index.html');
                         } catch(error) {
+                            console.error("Manager info: Error deleting admin account:", error);
                             alert('Error deleting account: ' + error.message);
                             btn.disabled = false;
                             btn.innerText = originalText;
