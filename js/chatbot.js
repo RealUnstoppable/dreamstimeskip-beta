@@ -221,6 +221,38 @@ function initChatbot() {
         chatbotWindow.classList.remove('active');
     });
 
+    // Close on Escape key press
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && chatbotWindow && chatbotWindow.classList.contains('active')) {
+            chatbotWindow.classList.remove('active');
+        }
+    });
+
+    // Trap focus within the chatbot window
+    chatbotWindow.addEventListener('keydown', function(e) {
+        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+        if (!isTabPressed) return;
+
+        // Query dynamically to ensure it captures any new elements if applicable
+        const focusableElements = chatbotWindow.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === firstFocusableElement) {
+                    lastFocusableElement.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastFocusableElement) {
+                    firstFocusableElement.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+    });
+
     // Handle Input
     const sendMessage = async () => {
         const text = chatInput.value.trim();

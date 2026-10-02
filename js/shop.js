@@ -506,6 +506,8 @@ function setupEventListeners() {
                 cartModal.style.display = 'none';
             }
         });
+
+
     }
 
     // Cart item action listeners
@@ -541,7 +543,59 @@ function setupEventListeners() {
                 reviewModal.style.display = 'none';
             }
         });
+
+
     }
+
+
+
+
+
+    // Trap focus for cart and review modals
+    document.addEventListener('keydown', function(e) {
+        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+
+        // Handle Escape globally for modals
+        if (e.key === 'Escape') {
+            if (cartModal && cartModal.style.display !== 'none') {
+                cartModal.style.display = 'none';
+            }
+            if (reviewModal && reviewModal.style.display !== 'none') {
+                reviewModal.style.display = 'none';
+            }
+            return;
+        }
+
+        if (!isTabPressed) return;
+
+        let activeModal = null;
+        if (cartModal && cartModal.style.display !== 'none') {
+            activeModal = cartModal;
+        } else if (reviewModal && reviewModal.style.display !== 'none') {
+            activeModal = reviewModal;
+        }
+
+        if (activeModal) {
+            // Query dynamically to handle state changes
+            const focusableElements = activeModal.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], input[type="number"], select, [tabindex]:not([tabindex="-1"])');
+            if (focusableElements.length > 0) {
+                const firstFocusableElement = focusableElements[0];
+                const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusableElement) {
+                        lastFocusableElement.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusableElement) {
+                        firstFocusableElement.focus();
+                        e.preventDefault();
+                    }
+                }
+            }
+        }
+    });
 
     const writeReviewForm = document.getElementById('writeReviewForm');
     if (writeReviewForm) {
