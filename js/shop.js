@@ -138,7 +138,7 @@ function updateCartSummary() {
     try {
         localStorage.setItem('cartItemCount', itemCount.toString());
         localStorage.setItem('localCart', JSON.stringify(cart));
-    } catch (_) {}
+    } catch (_) { /* ignore local storage error */ }
 
     // Update Lexi cart badge if window.updateLexiCartCount exists
     if (window.updateLexiCartCount) {
@@ -778,7 +778,11 @@ async function handleReviewSubmit(e) {
                 sessionStorage.setItem(cacheKey, JSON.stringify(uData));
             }
         } catch (ptsErr) {
+<<<<<<< HEAD
+            console.warn("Manager info: Points award warning for review:", ptsErr);
+=======
             console.warn("Points cache update warning for review:", ptsErr);
+>>>>>>> origin/main
         }
 
         // Optimistic UI Update for stats
@@ -827,7 +831,7 @@ try {
         cart = JSON.parse(localCartData);
         renderCart();
     }
-} catch (_) {}
+} catch (_) { /* ignore local storage error */ }
 
 // Auth and Cart state synchronization
 onAuthStateChanged(auth, async (user) => {
@@ -836,7 +840,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localCartData = localStorage.getItem('localCart');
         if (localCartData) localCart = JSON.parse(localCartData);
-    } catch (_) {}
+    } catch (_) { /* ignore local storage error */ }
 
     if (user) {
         // Load Wishlist
@@ -849,7 +853,7 @@ onAuthStateChanged(auth, async (user) => {
                 wishlist = new Set();
             }
         } catch (error) {
-            console.error("Error loading wishlist:", error);
+            console.error("Manager info: Error loading wishlist:", error);
         }
 
         try {
@@ -870,7 +874,7 @@ onAuthStateChanged(auth, async (user) => {
                 localStorage.removeItem('localCart');
             }
         } catch (error) {
-            console.error("Error loading cart from firestore:", error);
+            console.error("Manager info: Error loading cart from firestore:", error);
             cart = localCart;
         }
     } else {

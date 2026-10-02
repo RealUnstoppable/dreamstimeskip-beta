@@ -428,7 +428,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -499,10 +499,10 @@ function initHarmonyTunes() {
             }
         } catch (error) {
             console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
-            try { playlistPlayBtn.onclick = null; } catch (e) {}
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
+            try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
         }
     }
 
@@ -1000,7 +1000,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
     }
 
     function playSong() {

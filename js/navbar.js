@@ -221,7 +221,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) {}
+                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
                 }
             });
             updateNotificationBadge(0);
@@ -281,7 +281,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) {}
+                try { await markAsRead(id); } catch (_) { /* ignore read error */ }
             }
 
             // Recount badge

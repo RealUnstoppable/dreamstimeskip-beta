@@ -148,6 +148,22 @@ async function loadComments(postId) {
         listContainer.innerHTML = html;
 
         // Attach delete listeners
+<<<<<<< HEAD
+        listContainer.querySelectorAll('.delete-comment-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const commentId = e.target.dataset.id;
+                if (confirm('Are you sure you want to delete this comment?')) {
+                    try {
+                        e.target.disabled = true;
+                        e.target.textContent = 'Deleting...';
+                        await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
+                        await loadComments(postId); // Refresh
+                    } catch (err) {
+                        console.error('Manager info: Error deleting comment', err);
+                        alert('Failed to delete comment.');
+                        e.target.disabled = false;
+                        e.target.textContent = 'Delete';
+=======
         // ⚡ Bolt: Event Delegation for Delete Buttons
         if (!listContainer.dataset.delegated) {
             listContainer.dataset.delegated = 'true';
@@ -167,6 +183,7 @@ async function loadComments(postId) {
                             btn.disabled = false;
                             btn.textContent = 'Delete';
                         }
+>>>>>>> origin/main
                     }
                 }
             });

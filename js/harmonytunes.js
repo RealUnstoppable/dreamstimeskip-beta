@@ -59,7 +59,7 @@ function initHarmonyTunes() {
                 renderHomePlaylists();
             }
         } catch (e) {
-            console.error("Failed to load custom playlists", e);
+            console.error("Manager info: Failed to load custom playlists", e);
         }
     }
 
@@ -77,7 +77,7 @@ function initHarmonyTunes() {
                 sessionStorage.setItem(cacheKey, JSON.stringify(uData));
             }
         } catch (e) {
-            console.error("Failed to save custom playlists", e);
+            console.error("Manager info: Failed to save custom playlists", e);
         }
     }
 
@@ -474,7 +474,7 @@ function initHarmonyTunes() {
             const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
             if (res.ok) return await res.text();
         } catch (e) {
-            console.error(e);
+            console.error("Manager info:", e);
         }
         return url; // fallback to long url
     }
@@ -631,7 +631,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -785,11 +785,19 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
+<<<<<<< HEAD
+            console.error("Error loading playlist - Manager info:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
+            try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
+=======
             console.error("Manager info: Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
             try { playlistPlayBtn.onclick = null; } catch (e) {}
+>>>>>>> origin/main
         }
     }
 
@@ -1288,7 +1296,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
     }
 
     function playSong() {
