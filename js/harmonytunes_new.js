@@ -78,6 +78,9 @@ function initHarmonyTunes() {
     // Player Elements
     const audioPlayer1 = document.getElementById('audio-player');
     const audioPlayer2 = document.getElementById('audio-player-2');
+    
+    
+    
     let activeAudio = audioPlayer1;
     let nextAudio = audioPlayer2;
     let isMixerMode = false;
@@ -510,11 +513,16 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
+            const prioritySet = new Set(priorityIds);
+            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
+
             const prioritySongs = priorityIds
-                .map(id => viralSongs.find(s => s.id === id))
+                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
+                .map(id => viralSongsMap.get(id))
                 .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
+            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
@@ -637,7 +645,7 @@ function initHarmonyTunes() {
 
         // 2. Recommended
         const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
-        containerRecommended.innerHTML = recommended.map(song => createSongCard(song)).join('');
+        containerRecommended.innerHTML = recommended.slice(0, 30).map(song => createSongCard(song)).join('');
         let existingShowMore = document.getElementById('show-more-recommended');
         if (!existingShowMore) {
             containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
@@ -655,7 +663,8 @@ function initHarmonyTunes() {
                     <iframe src="https://www.tiktok.com/embed/v2/${video.id}" 
                         style="width: 100%; height: 100%; border: none;" 
                         scrolling="no" 
-                        allow="encrypted-media;">
+                        allow="encrypted-media;"
+                        loading="lazy">
                     </iframe>
                 </div>
             `).join('');
@@ -746,23 +755,46 @@ function initHarmonyTunes() {
     window.loadPlaylistView = loadPlaylistView;
 
     // --- RENDERING TABLE (Fixed Duration Bug) ---
-    function renderSongTable(songs) {
-        songListBody.innerHTML = '';
-        if (songs.length === 0) {
-            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
-            return;
-        }
+    function updateSongTableActiveState() {
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        const currentSongId = currentQueue[currentSongIndex].id;
+        const rows = songListBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const isMatch = row.dataset.songId === currentSongId;
+            if (isMatch) {
+                row.classList.add('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'none';
+                if(iconSpan) iconSpan.style.display = 'inline';
+            } else {
+                row.classList.remove('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'inline';
+                if(iconSpan) iconSpan.style.display = 'none';
+            }
+        });
+    }
 
-        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    let currentRenderIndex = 0;
+    let currentGroupedSongs = [];
+    const RENDER_CHUNK_SIZE = 50;
+    let intersectionObserver = null;
+
+    function renderSongTableChunk() {
+        if (currentRenderIndex >= currentGroupedSongs.length) return;
+
         const fragment = document.createDocumentFragment();
-
-        songs.forEach((song, index) => {
+        const endIndex = Math.min(currentRenderIndex + RENDER_CHUNK_SIZE, currentGroupedSongs.length);
+        
+        for (let index = currentRenderIndex; index < endIndex; index++) {
+            const song = currentGroupedSongs[index];
             const row = document.createElement('tr');
             
             const isActive = (currentQueue[currentSongIndex]?.id === song.id);
             if (isActive) row.classList.add('playing');
 
-            // REMOVED HEART COLUMN, ADDED DURATION
             row.innerHTML = `
                 <td>
                     <span class="song-index" style="${isActive ? 'display:none' : ''}">${escapeHTML(index + 1)}</span>
@@ -770,17 +802,63 @@ function initHarmonyTunes() {
                 </td>
                 <td class="song-title">${escapeHTML(song.title)}</td>
                 <td>${escapeHTML(song.artist)}</td>
+                <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
+            row.dataset.songId = song.id;
 
             row.addEventListener('click', () => {
-                playContext(songs, index);
+                playContext(currentGroupedSongs, index);
             });
 
             fragment.appendChild(row);
-        });
+        }
 
         songListBody.appendChild(fragment);
+        currentRenderIndex = endIndex;
+        
+        if (currentRenderIndex < currentGroupedSongs.length) {
+            setupIntersectionObserver();
+        }
+    }
+    
+    function setupIntersectionObserver() {
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        let sentinel = document.getElementById('table-sentinel-new');
+        if (!sentinel) {
+            sentinel = document.createElement('div');
+            sentinel.id = 'table-sentinel-new';
+            sentinel.style.height = '1px';
+            songListBody.parentElement.appendChild(sentinel);
+        }
+        
+        intersectionObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                renderSongTableChunk();
+            }
+        }, { rootMargin: '200px' });
+        
+        intersectionObserver.observe(sentinel);
+    }
+
+    function renderSongTable(songs) {
+        songListBody.innerHTML = '';
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        if (songs.length === 0) {
+            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
+            return;
+        }
+
+        currentGroupedSongs = songs;
+        currentRenderIndex = 0;
+        
+        renderSongTableChunk();
     }
 
     // --- PLAYER LOGIC ---
@@ -846,8 +924,7 @@ function initHarmonyTunes() {
 
         updateProgress();
         if(viewPlaylist.style.display !== 'none') {
-            const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-            renderSongTable(showingFavs ? userFavorites : librarySongs);
+            updateSongTableActiveState();
         }
         
         // Trigger Background Mixxer AI
@@ -907,6 +984,7 @@ function initHarmonyTunes() {
     }
 
     function playSong() {
+        
         if (fadeInterval) clearInterval(fadeInterval);
         if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
         if (crossfadeInterval) clearInterval(crossfadeInterval);
@@ -1000,13 +1078,16 @@ function initHarmonyTunes() {
         }
 
         if(typeof window.__pullFromUserQueue === 'function') {
-            const nextUserSong = window.__pullFromUserQueue();
-            if(nextUserSong) {
-                currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
-                currentSongIndex = currentSongIndex + 1;
-                loadSong(currentSongIndex);
-                playSong();
-                return;
+            if(userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    __recordHistory();
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                    currentSongIndex = currentSongIndex + 1;
+                    loadSong(currentSongIndex);
+                    playSong();
+                    return;
+                }
             }
         }
 
@@ -1116,7 +1197,9 @@ function initHarmonyTunes() {
             player.addEventListener('ended', (e) => {
                 if (e.target === activeAudio) {
                     if (isMixerMode && isCrossfading) return;
-                    if (repeatMode === 2) {
+                    if (userQueue.length > 0) {
+                        nextSong();
+                    } else if (repeatMode === 2) {
                         activeAudio.currentTime = 0;
                         playSong();
                     } else {
@@ -1419,7 +1502,7 @@ function initHarmonyTunes() {
             }
             
             if (artistSongs.length > 0) {
-                const trackListHTML = artistSongs.map(song => createSongCard(song)).join('');
+                const trackListHTML = artistSongs.slice(0, 50).map(song => createSongCard(song)).join('');
                 document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
             } else {
                 document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
@@ -1748,6 +1831,8 @@ function initHarmonyTunes() {
             
             activeAudio.volume = 0;
             activeAudio.play().catch(e => console.error("Manager info:", e));
+            
+            const prevIndex = currentSongIndex === 0 ? currentQueue.length - 1 : currentSongIndex - 1;
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
@@ -1782,7 +1867,8 @@ function initHarmonyTunes() {
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
-            mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            mixerBtn.classList.add('analyzing');
+            if (userQueue.length === 0) { if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
             // If there is no next song and repeat is off, auto-queue the best fit using AI
@@ -1818,6 +1904,7 @@ function initHarmonyTunes() {
                     }
                 }
             }
+            } // End of userQueue check
         }
 
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
@@ -1833,7 +1920,12 @@ function initHarmonyTunes() {
             nextAudio = prevAudio;
 
             let nextIndex = currentSongIndex + 1;
-            if (repeatMode === 2) {
+            if (typeof window.__pullFromUserQueue === 'function' && userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                }
+            } else if (repeatMode === 2) {
                 nextIndex = currentSongIndex;
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
@@ -1877,28 +1969,60 @@ function initHarmonyTunes() {
 
             renderLyrics(song.id);
             if(viewPlaylist.style.display !== 'none') {
-                const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-                renderSongTable(showingFavs ? userFavorites : librarySongs);
+                updateSongTableActiveState();
             }
 
             activeAudio.volume = 0;
             activeAudio.play().catch(e => console.error("Manager info:", e));
 
+            // AutoMix: Beat Matching & Time Stretching
+            let prevBpm = librarySongsMap.get(currentQueue[prevIndex]?.id)?.bpm || 120;
+            let nextBpm = songMetadata?.bpm || 120;
+            let bpmRatio = prevBpm / nextBpm;
+            
+            // Limit stretching to realistic DJ ranges (max 8% shift)
+            let isBeatMatched = false;
+            if (bpmRatio > 0.92 && bpmRatio < 1.08 && bpmRatio !== 1) {
+                activeAudio.preservesPitch = true;
+                activeAudio.playbackRate = bpmRatio;
+                isBeatMatched = true;
+            } else {
+                activeAudio.playbackRate = 1;
+            }
+
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
+            
+
             if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
             fadeIntervalCrossfade = setInterval(() => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
                 
+                // Volume fading (Standard)
                 prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (ratio >= 1) {
                     clearInterval(fadeIntervalCrossfade);
+                    
+                    
+                    
+                    // Slowly drift playbackRate back to normal if beatmatched
+                    if (isBeatMatched) {
+                        let driftInterval = setInterval(() => {
+                            if (Math.abs(activeAudio.playbackRate - 1) < 0.005) {
+                                activeAudio.playbackRate = 1;
+                                clearInterval(driftInterval);
+                            } else {
+                                activeAudio.playbackRate += (1 - activeAudio.playbackRate) * 0.1;
+                            }
+                        }, 100);
+                    }
+
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
@@ -2312,10 +2436,10 @@ let dragItem = null;
         if (currentTab === 'upnext') {
             displayList = [
                 ...userQueue.map(s => ({...s, isUserQueue: true})),
-                ...currentQueue.slice(currentSongIndex + 1).map(s => ({...s, isUserQueue: false}))
+                ...currentQueue.slice(currentSongIndex + 1, currentSongIndex + 51).map(s => ({...s, isUserQueue: false}))
             ];
         } else {
-            displayList = [...historyQueue].reverse(); // Most recent first
+            displayList = [...historyQueue].reverse().slice(0, 50); // Most recent first, cap at 50
         }
 
         if(displayList.length === 0) {
@@ -2653,7 +2777,7 @@ export function createGroupCard(group) {
     return `
         <div class="music-card" data-song-id="${escapeHTML(group.baseSong.id)}">
             <div class="card-img-wrapper">
-                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}">
+                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}" loading="lazy">
                 <button class="card-play-btn" aria-label="Play ${escapeHTML(group.baseTitle)}">▶</button>
                 <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(group.baseTitle)} to queue">+</button>
                 <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>
@@ -2671,3 +2795,4 @@ export function formatTime(seconds) {
     const s = Math.floor(seconds % 60);
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
+export function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }
