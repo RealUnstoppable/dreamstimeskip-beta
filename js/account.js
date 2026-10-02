@@ -1122,8 +1122,14 @@ export function initAccountPage() {
         });
 
         // Delete Account
-        document.getElementById('delete-account-btn')?.addEventListener('click', async () => {
+        document.getElementById('delete-account-btn')?.addEventListener('click', async (e) => {
             if (!confirm('WARNING: Your account will be deactivated and permanently removed after 90 days. Are you sure you want to proceed?')) return;
+
+            const btn = e.currentTarget;
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Deactivating...';
+
             try {
                 await deleteDoc(doc(db, "users", user.uid));
                 await deleteUser(user);
@@ -1131,6 +1137,8 @@ export function initAccountPage() {
                 window.location.replace('index.html');
             } catch (err) {
                 alert('For security, please log out and log back in before deleting your account.');
+                btn.disabled = false;
+                btn.textContent = originalText;
             }
         });
 

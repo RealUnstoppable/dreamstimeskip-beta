@@ -454,7 +454,10 @@
             }
         };
 
-        document.getElementById('create-promo-btn').addEventListener('click', async () => {
+        document.getElementById('create-promo-btn').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerText;
+
             const codeInput = document.getElementById('new-promo-code');
             const discountInput = document.getElementById('new-promo-discount');
             const code = codeInput.value.trim().toUpperCase();
@@ -465,6 +468,9 @@
                 return;
             }
 
+            btn.disabled = true;
+            btn.innerText = 'Creating...';
+
             try {
                 await performAdminAction('create', 'promo_codes', code, { discount, active: true, createdAt: 'SERVER_TIMESTAMP' });
                 showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
@@ -473,6 +479,9 @@
                 loadPromoCodes();
             } catch (e) {
                 showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
             }
         });
 
