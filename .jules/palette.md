@@ -20,6 +20,7 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
-## 2024-10-27 - Inline Copy Feedback
-**Learning:** Replaced a blocking `alert()` for the "Copy My Link" button with inline text feedback ("Copied!") on the button itself. This is a much smoother and modern UX pattern that prevents jarring interruptions.
-**Action:** Always favor inline UI feedback states (changing button text, showing a toast notification, or a checkmark) over native browser `alert()` popups for minor actions like copying to the clipboard.
+
+## 2026-09-24 - Missing Title Tooltips on Icon-Only Buttons and Disabled Hover States
+**Learning:** Found multiple icon-only buttons across the site (e.g. in HarmonyTunes and sitewide player) that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning. Additionally, disabled buttons lacked proper CSS to prevent hover effects (`:hover:not(:disabled)`), causing them to seem interactable.
+**Action:** When adding `aria-label` to interactive elements without visible text, always add a matching `title` attribute. Ensure all button `:hover` pseudo-classes exclude the `:disabled` state, and add explicit `:disabled` styling (e.g., opacity, cursor).
