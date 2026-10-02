@@ -1,7 +1,7 @@
 import { auth, db } from './auth.js';
 import { escapeHTML, getCachedUserProfile } from './utils.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getCachedUserProfile } from './auth.js';
 
 const COMMENTS_COLLECTION = 'blog_comments';
@@ -76,6 +76,7 @@ async function addComment(postId, content) {
     const input = document.getElementById('comment-input');
     const notificationEl = document.getElementById('comment-notification');
 
+    const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Posting...';
 
@@ -101,7 +102,7 @@ async function addComment(postId, content) {
         showNotification(notificationEl, 'Failed to post comment. Please try again.', 'error');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Post Comment';
+        submitBtn.textContent = originalText;
     }
 }
 
@@ -147,24 +148,29 @@ async function loadComments(postId) {
         listContainer.innerHTML = html;
 
         // Attach delete listeners
-        listContainer.querySelectorAll('.delete-comment-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const commentId = e.target.dataset.id;
-                if (confirm('Are you sure you want to delete this comment?')) {
-                    try {
-                        e.target.disabled = true;
-                        e.target.textContent = 'Deleting...';
-                        await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
-                        await loadComments(postId); // Refresh
-                    } catch (err) {
-                        console.error('Manager info: Error deleting comment', err);
-                        alert('Failed to delete comment.');
-                        e.target.disabled = false;
-                        e.target.textContent = 'Delete';
+        // ⚡ Bolt: Event Delegation for Delete Buttons
+        if (!listContainer.dataset.delegated) {
+            listContainer.dataset.delegated = 'true';
+            listContainer.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.delete-comment-btn');
+                if (btn && !btn.disabled) {
+                    const commentId = btn.dataset.id;
+                    if (confirm('Are you sure you want to delete this comment?')) {
+                        try {
+                            btn.disabled = true;
+                            btn.textContent = 'Deleting...';
+                            await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
+                            await loadComments(postId); // Refresh
+                        } catch (err) {
+                            console.error('Error deleting comment', err);
+                            alert('Failed to delete comment.');
+                            btn.disabled = false;
+                            btn.textContent = 'Delete';
+                        }
                     }
                 }
             });
-        });
+        }
 
     } catch (error) {
         console.error('Manager info: Error loading comments:', error);
