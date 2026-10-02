@@ -40,14 +40,14 @@ service cloud.firestore {
     // Loyalty transactions
     match /loyalty_transactions/{transactionId} {
       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null;
+      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }
 
     match /orders/{orderId} {
       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null;
+      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
       // Depending on checkout implementation, orders are created by user or backend.
       // Assuming frontend creation for now based on 'userId' equality:
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
@@ -76,6 +76,7 @@ service cloud.firestore {
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
       allow update: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true)
+                    && request.resource.data.userId == resource.data.userId
                     && request.resource.data.rating is number
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
@@ -88,7 +89,21 @@ service cloud.firestore {
       allow write: if false;
     }
 
-        // Product reviews collection
+
+    // Product Q&A Collection
+    match /product_questions/{questionId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+
+      match /answers/{answerId} {
+        allow read: if true;
+        allow create: if isAdmin() && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if isAdmin() && request.resource.data.userId == request.auth.uid;
+      }
+    }
+
+    // Product reviews collection
     match /product_reviews/{reviewId} {
       // Anyone can read reviews
       allow read: if true;
@@ -101,6 +116,8 @@ service cloud.firestore {
                     && request.resource.data.rating <= 5;
       // Users can update or delete their own reviews
       allow update: if request.auth != null && resource.data.userId == request.auth.uid
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.userEmail == resource.data.userEmail
                     && request.resource.data.rating is number
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
@@ -146,7 +163,7 @@ service cloud.firestore {
     // Reward Transactions collection
     match /reward_transactions/{transactionId} {
       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow list: if request.auth != null;
+      allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }

@@ -184,6 +184,8 @@ export async function renderOrders(user) {
         if (noOrdersMsg) noOrdersMsg.style.display = 'none';
         listEl.innerHTML = '';
 
+        const fragment = document.createDocumentFragment();
+
         orders.forEach(order => {
             const orderId = order.orderId || order.id || 'ORD-UNKNOWN';
             const orderDateStr = formatDate(order.orderDate || order.createdAt);
@@ -257,8 +259,10 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
+
+        listEl.appendChild(fragment);
 
     } catch (err) {
         console.error("Error rendering orders:", err);
@@ -280,6 +284,11 @@ export async function renderRewards(user, userData) {
     const noRewardsMsg = document.getElementById('no-rewards-msg');
 
     try {
+        const referralLinkInput = document.getElementById('referral-link');
+        if (referralLinkInput) {
+            referralLinkInput.value = window.location.origin + '/sign in beta.html?ref=' + user.uid;
+        }
+
         const userRef = doc(db, 'users', user.uid);
         let userSnap = null;
 
@@ -496,7 +505,11 @@ export function renderBilling(user, userData) {
             </div>
         `;
 
-        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async () => {
+        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Activating...';
             try {
                 await updateDoc(doc(db, "users", user.uid), {
                     membershipLevel: 'premium',
@@ -512,7 +525,10 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     }
@@ -922,6 +938,21 @@ export function initAccountPage() {
             loadWishlist(currentUser.uid);
         }
     });
+
+    const copyReferralBtn = document.getElementById('copy-referral-btn');
+    const referralLinkInput = document.getElementById('referral-link');
+    if (copyReferralBtn && referralLinkInput) {
+        copyReferralBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(referralLinkInput.value);
+                const originalText = copyReferralBtn.textContent;
+                copyReferralBtn.textContent = 'Copied!';
+                setTimeout(() => { copyReferralBtn.textContent = originalText; }, 2000);
+            } catch (err) {
+                console.error('Manager info: Failed to copy text: ', err);
+            }
+        });
+    }
 
     // Firebase Auth State
     onAuthStateChanged(auth, async (user) => {
