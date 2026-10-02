@@ -20,3 +20,6 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
+## 2024-05-29 - Missing Loading States on Async Database Operations
+**Learning:** Adding a loading state to an asynchronous database write is not just a UI improvement—it prevents users from double-clicking and firing off redundant operations. Specifically, test activation buttons executing `updateDoc` missed this crucial feedback, leading to potential duplicates or confusion.
+**Action:** Always set `disabled = true` and update text (e.g., "Activating...") immediately on click for async operations, and ensure the state is reverted in a `finally` block to recover from errors.
