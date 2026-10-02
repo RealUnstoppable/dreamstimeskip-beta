@@ -1,5 +1,5 @@
 import { auth, db } from './auth.js?v=1784516229';
-import { getCachedUserProfile } from './utils.js';
+import { escapeHTML, getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { subscribeToNotifications, markAsRead } from './notifications-service.js?v=1784516229';
@@ -38,16 +38,7 @@ const PRELOADED_NOTIFICATIONS = [
     }
 ];
 
-function escapeHTML(str) {
-    if (str == null) return '';
-    if (typeof str !== 'string') str = String(str);
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+
 
 // Bell SVG icon (YouTube-style)
 const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"/></svg>`;
@@ -221,7 +212,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) { /* ignore */ }
+                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
                 }
             });
             updateNotificationBadge(0);
@@ -260,15 +251,22 @@ function renderNotifications(notifications) {
         return;
     }
 
-    list.innerHTML = notifications.map(n => `
+    list.innerHTML = notifications.map(n => {
+        let icon = '🔔';
+        if (n.type === 'reward') icon = '🎁';
+        if (n.type === 'ticket_reply') icon = '💬';
+
+        return `
         <div class="notification-item ${n.isRead ? '' : 'unread'}" data-id="${escapeHTML(n.id)}" data-link="${escapeHTML(n.link || '')}">
+            <div class="notif-icon" style="font-size: 1.2rem; margin-right: 12px; display: flex; align-items: center; justify-content: center;">${icon}</div>
             <div class="notif-content">
                 <p class="notif-title">${escapeHTML(n.title)}</p>
                 <small class="notif-msg">${escapeHTML(n.message)}</small>
             </div>
             ${!n.isRead ? '<span class="notif-dot"></span>' : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     list.querySelectorAll('.notification-item').forEach(item => {
         item.addEventListener('click', async (e) => {
@@ -281,7 +279,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) { /* ignore */ }
+                try { await markAsRead(id); } catch (_) { /* ignore read error */ }
             }
 
             // Recount badge
@@ -310,8 +308,10 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
+                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
+                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
+                            if (!mergedIds.has(pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;

@@ -63,7 +63,7 @@ export async function getCachedUserProfile(user) {
             return userData;
         }
     } catch (error) {
-        console.error("Manager info: Error fetching user profile:", error);
+        console.error("Manager info: Error fetching user profile:", error.message || error);
     }
     return null;
 }
