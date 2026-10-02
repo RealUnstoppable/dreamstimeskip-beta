@@ -501,7 +501,11 @@ export function renderBilling(user, userData) {
             </div>
         `;
 
-        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async () => {
+        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Activating...';
             try {
                 await updateDoc(doc(db, "users", user.uid), {
                     membershipLevel: 'premium',
@@ -517,7 +521,10 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     }
