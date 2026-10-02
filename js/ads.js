@@ -47,8 +47,25 @@ function injectAdSense() {
     script.crossOrigin = 'anonymous';
     document.head.appendChild(script);
 
-    // Find all ad containers and initialize them
-    const adContainers = document.querySelectorAll('.ad-banner-container');
+    // Auto-inject an ad container if the page has none (AdSense compliance: 1 ad per page minimum)
+    let adContainers = document.querySelectorAll('.ad-banner-container');
+    if (adContainers.length === 0) {
+        const autoAdContainer = document.createElement('div');
+        autoAdContainer.className = 'ad-banner-container';
+        autoAdContainer.setAttribute('data-ad-slot', '9876543210');
+        autoAdContainer.style.margin = '40px auto';
+        autoAdContainer.style.maxWidth = '728px';
+        autoAdContainer.style.textAlign = 'center';
+        
+        // Try to insert before footer, else append to body
+        const footer = document.querySelector('footer, .main-footer, .footer-container');
+        if (footer && footer.parentNode) {
+            footer.parentNode.insertBefore(autoAdContainer, footer);
+        } else {
+            document.body.appendChild(autoAdContainer);
+        }
+        adContainers = [autoAdContainer];
+    }
     
     adContainers.forEach(container => {
         const adSlot = container.getAttribute('data-ad-slot');

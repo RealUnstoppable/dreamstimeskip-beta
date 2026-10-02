@@ -90,7 +90,18 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         if (data.updatedAt === "SERVER_TIMESTAMP") {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
-        await docRef.set(data, {merge: true});
+        await docRef.set(data, { merge: true });
+      } else if (action === "create") {
+        if (typeof data !== "object" || data === null) {
+          return res.status(400).send("Invalid create data");
+        }
+        if (data.createdAt === 'SERVER_TIMESTAMP') {
+          data.createdAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+          data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await docRef.set(data);
       } else if (action === "delete") {
         await docRef.delete();
       } else {
@@ -617,4 +628,80 @@ exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
       res.status(500).json({error: error.message});
     }
   });
+});
+
+
+// 🏆 Process Referral
+exports.processReferral = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Endpoint requires authentication!');
+    }
+
+    const newUserId = context.auth.uid;
+    const { referrerUid } = data;
+
+    if (!referrerUid) {
+      throw new functions.https.HttpsError('invalid-argument', 'Missing referrerUid');
+    }
+
+    if (referrerUid === newUserId) {
+        throw new functions.https.HttpsError('invalid-argument', 'Cannot refer yourself');
+    }
+
+    const db = admin.firestore();
+    const referrerRef = db.collection("users").doc(referrerUid);
+    const refereeRef = db.collection("users").doc(newUserId);
+
+    try {
+      await db.runTransaction(async (transaction) => {
+        const referrerDoc = await transaction.get(referrerRef);
+        const refereeDoc = await transaction.get(refereeRef);
+
+        if (refereeDoc.exists && refereeDoc.data().referredBy) {
+            throw new Error("User has already used a referral code");
+        }
+
+        if (!referrerDoc.exists) {
+            // Referrer not found, safely ignore
+            return;
+        }
+
+        if (!refereeDoc.exists) {
+            throw new Error("Referee not found");
+        }
+
+        const referrerPoints = referrerDoc.data().loyaltyPoints || 0;
+        const refereePoints = refereeDoc.data().loyaltyPoints || 0;
+
+        const REFERRAL_BONUS = 50;
+
+        // Update points
+        transaction.update(referrerRef, { loyaltyPoints: referrerPoints + REFERRAL_BONUS });
+        transaction.update(refereeRef, { loyaltyPoints: refereePoints + REFERRAL_BONUS, referredBy: referrerUid });
+
+        // Record transactions
+        const referrerTxRef = db.collection("loyalty_transactions").doc();
+        transaction.set(referrerTxRef, {
+            userId: referrerUid,
+            amount: REFERRAL_BONUS,
+            type: 'referral_bonus_given',
+            description: 'Referral Bonus: You referred a new user!',
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        const refereeTxRef = db.collection("loyalty_transactions").doc();
+        transaction.set(refereeTxRef, {
+            userId: newUserId,
+            amount: REFERRAL_BONUS,
+            type: 'referral_bonus_received',
+            description: 'Referral Bonus: You used a referral code!',
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      });
+
+      return { success: true };
+    } catch (error) {
+      console.error("Manager info: Process Referral Error: [" + error.message + "]");
+      throw new functions.https.HttpsError('internal', error.message);
+    }
 });

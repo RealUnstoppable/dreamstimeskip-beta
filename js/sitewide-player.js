@@ -1,7 +1,7 @@
 // js/sitewide-player.js
 // Sitewide music engine and Lexi floating mini-playerhead
 
-import { librarySongs, getSongById } from './song-data.js?v=20260920';
+import { librarySongs, getSongById } from './song-data.js?v=1790377272083';
 
 const STORAGE_KEY = 'dts_music_state';
 
@@ -685,10 +685,10 @@ class SitewideMusicEngine {
                         <div class="lexi-song-artist">${song.artist}</div>
                     </div>
                     <div class="lexi-player-controls">
-                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="${isPlaying ? 'Pause' : 'Play'}">
+                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" title="${isPlaying ? 'Pause' : 'Play'}" aria-label="${isPlaying ? 'Pause' : 'Play'}">
                             ${isPlaying ? ICONS.pause : ICONS.play}
                         </button>
-                        <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
+                        <button id="lexi-next-btn" class="lexi-ctrl-btn" title="Next Track" aria-label="Next Track">
                             ${ICONS.next}
                         </button>
                     </div>
@@ -696,11 +696,11 @@ class SitewideMusicEngine {
 
                 <!-- Action Glyphs / Buttons -->
                 <div class="lexi-actions-row">
-                    <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                    <button id="lexi-ask" class="lexi-action-pill" title="Ask Lexi" aria-label="Ask Lexi">
                         ${ICONS.chat}
                         <span>Ask Lexi</span>
                     </button>
-                    <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                    <button id="lexi-view-cart" class="lexi-action-pill" title="View Cart" aria-label="View Cart">
                         ${ICONS.cart}
                         <span>View Cart</span>
                         <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
