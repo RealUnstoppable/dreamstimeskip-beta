@@ -54,3 +54,6 @@
 ## 2024-11-20 - Detecting Random Seeks in Media Playback
 **Learning:** When detecting random seeks in media playback to optimize sync operations (e.g., switching from an O(1) linear scan to an O(log N) binary search), compare the `currentTime` against the previously recorded frame time (`lastTime`). Do not calculate the difference between `currentTime` and the active item's start time (e.g., `currentTime - item.start > 5`), as this will falsely trigger expensive seek logic during long-playing items or intentional gaps.
 **Action:** Always track `lastTime` across frames and use `Math.abs(currentTime - lastTime) > threshold` to reliably detect non-linear seeking.
+## 2024-09-27 - Debouncing Input Events
+**Learning:** Frequent input events on search bars trigger synchronous `renderProducts` or search functions. These functions iterate over arrays and regenerate innerHTML, leading to excessive DOM reflows and repaints.
+**Action:** Always wrap input event handlers for search/filter functionalities with a standard `setTimeout`-based debounce (e.g., 300ms) to throttle execution and prevent layout thrashing on every keystroke.
