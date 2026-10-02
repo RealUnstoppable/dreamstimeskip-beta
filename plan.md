@@ -1,9 +1,15 @@
-1. **Explore Codebase**: Read through the codebase to identify areas matching the requested micro-UX improvements.
-2. **Implement Fixes**: Use node scripts to modify the codebase to include the required fixes:
-   - Add explicit `for` attributes to `<label>` elements matching their corresponding inputs.
-   - Add descriptive `aria-label` attributes to icon-only buttons (`lexi-menu-btn`, `chatbot-send`).
-   - Implement proper disabled states with loading text (`Processing...`, `Applying...`) and add a `title` tooltip for async operation buttons (e.g. auth forms, checkout promo, account updates).
-   - Ensure the Siri Orb (`#siri-orb`) is fully keyboard accessible by giving it `role="button"`, `tabindex="0"`, and triggering its click event on 'Enter' and 'Space' keydown events.
-3. **Verify Updates**: Run tests to verify the changes have successfully been applied.
-4. **Pre-commit Checks**: Run tests and lint via `pre_commit_instructions` tool to verify codebase health.
-5. **Submit PR**: Create PR with a title exactly following the Palette guidelines (`🎨 Palette: [UX improvement]`). Include What, Why, Before/After, and Accessibility in the description.
+1. **DRY Sweep (Repeated Code & Logic)**:
+   - Issue: `calculateCartSummary` and `updateSummaryUI` logic are repeated across files or defined but not fully utilized to prevent duplication (especially in `js/checkout.js.new` and `js/checkout.js`). `js/checkout.js` and `js/checkout.js.new` duplicate the subtotal calculation logic (`let subtotal = 0; Object.entries(userCart)...`) instead of utilizing the imported `calculateCartSummary` in multiple places.
+   - Fix: Use `calculateCartSummary` consistently in `js/checkout.js` inside `updateSummaryUI`, `handlePlaceOrder`, etc., instead of manually recalculating `subtotal`. We'll modify `checkout.js` since `checkout.js.new` seems like a newer but unintegrated version (or we'll modify both depending on active use, likely `checkout.js.new` as well to be safe).
+2. **Error Handling Verification (Async Ops)**:
+   - Check all `catch` blocks in recently modified files. A few `catch` blocks lack `Manager info:` prefix in console.error calls, or silently swallow errors without comments.
+   - Files to check and fix:
+     - `js/account.js`: `renderProfile` error log `console.error("Error rendering profile:", error);` missing `Manager info:` prefix.
+     - `js/account.js`: `renderOrders` error log `console.error("Error rendering orders:", error);` missing `Manager info:` prefix.
+     - `js/checkout.js`: `onAuthStateChanged` error log missing `Manager info:`.
+     - Review `functions/index.js` for missing prefixes (seems mostly correct from earlier grep, but will double-check).
+3. **State Management Check (Dashboard Re-renders)**:
+   - Issue: In `js/account.js` `renderOrders`, `ordersData` is fetched and then stringified to check against a cache. However, `JSON.stringify(ordersData)` directly on Firestore snapshots can cause issues if not extracted, but `fetchQueryData` does extract it. Yet, the `renderRewards` function stringifies an object `{ loyalty: loyaltyData, rewards: rewardData }` which is fine. The issue might be unnecessary re-renders. Wait, let's look at `renderOrders`: it stringifies `ordersData` but does not prevent re-render correctly or the dependency array is missing. Wait, `fetchQueryData` is called on every `onAuthStateChanged` which is okay, but `onAuthStateChanged` fires once. If there's another trigger, it might cause re-renders.
+   - Wait, `onAuthStateChanged` in `account.js` doesn't seem to have a major re-render issue, but let's check `currentOrdersCache = serializedOrders;` ... if the data is identical, it returns early. This is good. But wait, `renderRewards` checks `if (serializedRewards === currentRewardsCache) return;`. Is there a way to streamline data flow? Maybe we can use the snapshot listener `onSnapshot` instead of manual caching and `JSON.stringify`? The instructions said: "Are there any unnecessary re-renders being triggered by state updates? Suggest ways to streamline the data flow." - Wait, the prompt says "review the frontend state management for any newly implemented dashboard features." In `account.js`, fetching orders and rewards is done via `fetchQueryData`. Using `JSON.stringify` for state caching on large objects can be slow. A better state management approach is to use `onSnapshot` for real-time updates without manual JSON stringify diffing. Or maybe we can just streamline the rendering by extracting the state caching logic.
+
+Wait, let's look closer at `js/checkout.js.new` vs `js/checkout.js`.
