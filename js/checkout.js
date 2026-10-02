@@ -1,7 +1,7 @@
 // js/checkout.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
@@ -285,27 +285,25 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
             await setDoc(doc(db, 'carts', effectiveUid), { items: {} });
 
             const userRef = doc(db, 'users', effectiveUid);
-            const userSnap = await getDoc(userRef);
-            const currentData = userSnap.exists() ? userSnap.data() : {};
-            const currentBal = currentData.pointsBalance || 0;
-            const currentEarned = currentData.loyaltyPoints || currentBal;
             const earnedPts = orderDetails.earnedPoints || 0;
             const redeemedPts = orderDetails.pointsRedeemed || 0;
-            const newBal = Math.max(0, currentBal - redeemedPts + earnedPts);
-            const newTotalEarned = currentEarned + earnedPts;
+            const netPoints = earnedPts - redeemedPts;
 
-            await setDoc(userRef, {
-                pointsBalance: newBal,
-                loyaltyPoints: newTotalEarned
-            }, { merge: true });
+            if (netPoints !== 0 || earnedPts !== 0) {
+                const updateData = {};
+                if (netPoints !== 0) updateData.pointsBalance = increment(netPoints);
+                if (earnedPts !== 0) updateData.loyaltyPoints = increment(earnedPts);
+
+                await setDoc(userRef, updateData, { merge: true });
+            }
 
             // Update session cache
             const cacheKey = `profile_${effectiveUid}`;
             const cachedStr = sessionStorage.getItem(cacheKey);
             if (cachedStr) {
                 const uData = JSON.parse(cachedStr);
-                uData.pointsBalance = newBal;
-                uData.loyaltyPoints = newTotalEarned;
+                uData.pointsBalance = (uData.pointsBalance || 0) + netPoints;
+                uData.loyaltyPoints = (uData.loyaltyPoints || 0) + earnedPts;
                 sessionStorage.setItem(cacheKey, JSON.stringify(uData));
             }
 

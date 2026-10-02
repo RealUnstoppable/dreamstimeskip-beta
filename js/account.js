@@ -290,9 +290,8 @@ export async function renderRewards(user, userData) {
         } else if (userData && typeof userData.loyaltyPoints === 'number') {
             points = userData.loyaltyPoints;
         } else {
-            userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
+            const data = await getCachedUserProfile(user);
+            if (data) {
                 points = typeof data.pointsBalance === 'number' 
                     ? data.pointsBalance 
                     : (typeof data.loyaltyPoints === 'number' ? data.loyaltyPoints : 50);
