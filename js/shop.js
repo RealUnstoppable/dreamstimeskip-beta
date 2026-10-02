@@ -38,6 +38,7 @@ const reviewText = document.getElementById('review-text');
 const reviewsListContainer = document.getElementById('reviews-list-container');
 const submitReviewBtn = document.getElementById('submit-review-btn');
 const reviewNotification = document.getElementById('review-notification');
+const productSearchInput = document.getElementById('product-search');
 
 let currentRating = 0;
 
@@ -394,6 +395,18 @@ async function handleViewReviews(productId) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+
+    // ⚡ Bolt: Debounce search input to prevent unnecessary re-renders during typing
+    if (productSearchInput) {
+        let searchTimeout;
+        productSearchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderProducts(e.target.value);
+            }, 300);
+        });
+    }
+
     // Product grid listeners
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
