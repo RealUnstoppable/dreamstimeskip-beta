@@ -484,6 +484,23 @@ function setupEventListeners() {
 
     // Review Form Submit
     if (reviewForm) {
+        if (reviewText) {
+            reviewText.addEventListener('input', (e) => {
+                const count = e.target.value.length;
+                const counterEl = document.getElementById('reviewCharCount');
+                if (counterEl) {
+                    counterEl.textContent = `${count} / 300`;
+                    counterEl.style.color = count >= 290 ? 'var(--accent-red)' : 'var(--text-secondary)';
+                }
+            });
+            // Initialize counter
+            const initialCount = reviewText.value.length;
+            const counterEl = document.getElementById('reviewCharCount');
+            if (counterEl) {
+                counterEl.textContent = `${initialCount} / 300`;
+                counterEl.style.color = initialCount >= 290 ? 'var(--accent-red)' : 'var(--text-secondary)';
+            }
+        }
         reviewForm.addEventListener('submit', handleReviewSubmit);
     }
 

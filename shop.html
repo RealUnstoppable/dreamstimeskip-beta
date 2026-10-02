@@ -79,7 +79,10 @@
                         <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
                         <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
                     </div>
-                    <textarea id="review-text" placeholder="Share your thoughts about this product..." required title="Review text" aria-label="Review text"></textarea>
+                    <div style="position: relative; width: 100%;">
+                        <textarea id="review-text" placeholder="Share your thoughts about this product..." required title="Review text" aria-label="Review text" maxlength="300" style="width: 100%; box-sizing: border-box;"></textarea>
+                        <div id="reviewCharCount" aria-live="polite" style="font-size: 0.8rem; text-align: right; color: var(--text-secondary); margin-top: 5px; margin-bottom: 10px;">0 / 300</div>
+                    </div>
                     <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
                     <div id="review-notification" class="notification"></div>
                 </form>
