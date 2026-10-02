@@ -579,6 +579,98 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 });
 
 
+// 📅 Daily Check-in Rewards
+exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+    const uid = decodedToken.uid;
+    const db = admin.firestore();
+    const userRef = db.collection("users").doc(uid);
+    const transactionRef = db.collection("reward_transactions").doc();
+
+    try {
+      return await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists) {
+          throw new Error("User not found");
+        }
+
+        const data = userDoc.data();
+        let lastCheckIn = data.lastCheckIn;
+        let streak = data.checkInStreak || 0;
+        let points = data.pointsBalance || 0;
+
+        const now = admin.firestore.Timestamp.now();
+        const nowDate = now.toDate();
+        // Convert to YYYY-MM-DD in UTC
+        const todayStr = nowDate.toISOString().split('T')[0];
+
+        let lastCheckInStr = "";
+        let isConsecutive = false;
+
+        if (lastCheckIn) {
+            const lastDate = lastCheckIn.toDate();
+            lastCheckInStr = lastDate.toISOString().split('T')[0];
+
+            if (todayStr === lastCheckInStr) {
+                // Already checked in today
+                return res.status(400).json({ error: "Already checked in today" });
+            }
+
+            // Check if it's consecutive (exactly 1 day diff)
+            const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
+            const lastMid = new Date(lastCheckInStr + 'T00:00:00Z').getTime();
+            const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                isConsecutive = true;
+            }
+        }
+
+        let newStreak = isConsecutive ? streak + 1 : 1;
+
+        // Base reward
+        let rewardPoints = 10;
+        let isStreakBonus = false;
+
+        // 7-day bonus
+        if (newStreak > 0 && newStreak % 7 === 0) {
+            rewardPoints += 50;
+            isStreakBonus = true;
+        }
+
+        const newPoints = points + rewardPoints;
+
+        transaction.set(userRef, {
+            pointsBalance: newPoints,
+            lastCheckIn: now,
+            checkInStreak: newStreak
+        }, { merge: true });
+
+        const reason = isStreakBonus ? "Daily Check-in (7-Day Bonus!)" : "Daily Check-in";
+
+        transaction.set(transactionRef, {
+            userId: uid,
+            amount: rewardPoints,
+            reason: reason,
+            createdAt: now
+        });
+
+        res.status(200).json({ success: true, pointsEarned: rewardPoints, currentStreak: newStreak, totalPoints: newPoints });
+      });
+    } catch (error) {
+      console.error("Manager info: Check-in Error: [" + error.message + "]");
+      res.status(500).json({ error: error.message });
+    }
+  });
+});
+
 // 👍 Toggle Feature Upvote
 exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
   cors(req, res, async () => {
