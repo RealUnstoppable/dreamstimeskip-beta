@@ -1,12 +1,12 @@
 :root {
     --player-height: 80px;
-    --card-bg: #121212;
-    --card-bg-hover: #1f1f1f;
+    --card-bg: var(--primary-card-color, #121212);
+    --card-bg-hover: var(--secondary-card-color, #1f1f1f);
     --accent-green: #1ed760;
 }
 
 body {
-    background-color: #0A0A0A;
+    background-color: var(--bg-color, #0A0A0A);
     overflow-x: hidden;
     padding-bottom: 120px;
     font-family: 'Inter', sans-serif;
@@ -26,7 +26,7 @@ body {
 
 .harmony-main {
     flex-grow: 1;
-    background: #0A0A0A;
+    background: var(--bg-color, #0A0A0A);
     padding: 16px;
     width: 100%;
 }
@@ -218,9 +218,9 @@ body {
 }
 
 .nav-pill.active {
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     color: black;
-    border-color: var(--accent-green);
+    border-color: var(--accent-color, #16A34A);
 }
 
 
@@ -354,7 +354,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     color: black;
     display: flex;
     justify-content: center;
@@ -497,7 +497,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: var(--accent-green);
+    background-color: var(--accent-color, #16A34A);
     border: none;
     font-size: 20px;
     color: black;
@@ -697,7 +697,7 @@ body {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     z-index: 2100;
-    background: #121212;
+    background: var(--secondary-card-color, #121212);
     color: white;
     overflow-y: auto;
     padding-top: 60px;
@@ -758,9 +758,9 @@ body {
 }
 
 .song-table .playing {
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
 }
-.song-table .playing .song-title { color: var(--accent-green); }
+.song-table .playing .song-title { color: var(--accent-color, #16A34A); }
 
 
 .music-player-bar {
@@ -862,7 +862,7 @@ body {
     transition: color 0.2s ease;
 }
 #mixer-btn.active {
-    color: var(--accent-green) !important;
+    color: var(--accent-color, #16A34A) !important;
     transition: color 0.2s ease;
 }
 
@@ -936,7 +936,7 @@ body {
     transition: width 0.2s ease;
 }
 
-.progress-bar:hover .progress { background-color: var(--accent-green); }
+.progress-bar:hover .progress { background-color: var(--accent-color, #16A34A); }
 
 .volume-container {
     display: none;
@@ -987,7 +987,7 @@ body {
     filter: drop-shadow(0px 2px 5px rgba(0, 0, 0, 0.6));
     margin-left: 5px;
 }
-.like-btn-player.active { color: var(--accent-green) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
+.like-btn-player.active { color: var(--accent-color, #16A34A) !important; text-shadow: 0 0 10px rgba(30, 215, 96, 0.5); }
 
 /* --- LYRICS OVERLAY --- */
 .lyrics-overlay {
@@ -1109,19 +1109,23 @@ body {
 }
 
 .lyric-line.active {
-    color: #fff;
+    /* Set un-sung words to a dimmer white/opacity */
+    color: rgba(255, 255, 255, 0.4); 
     transform: scale(1.02);
-    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+    /* Remove line-level text shadow so only active words glow */
 }
 
 .lyric-word {
     display: inline-block;
-    transition: color 0.1s ease;
+    transition: color 0.15s ease, transform 0.1s ease, text-shadow 0.15s ease;
 }
 
 .lyric-word.active-word {
+    /* Sung words become bright white and pop out slightly */
     color: #fff;
+    text-shadow: 0 0 15px rgba(255,255,255,0.6);
 }
+
 .lyric-line:not(.active) .lyric-word {
     color: inherit;
 }
@@ -1185,7 +1189,7 @@ body {
 .feature-text p { margin: 0; color: #b3b3b3; font-size: 0.85rem; line-height: 1.4; }
 
 .primary-btn {
-    background: var(--accent-green);
+    background: var(--accent-color, #16A34A);
     color: black;
     border: none;
     padding: 12px;
@@ -1242,7 +1246,7 @@ body {
 }
 .fs-progress-bar-container .progress {
     height: 100%;
-    background: var(--accent-green);
+    background: var(--accent-color, #16A34A);
     width: 0%;
     transition: width 0.2s ease;
 }
@@ -1300,13 +1304,13 @@ body {
     top: -4px;
     right: -4px;
     font-size: 9px;
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
     line-height: 1;
     pointer-events: none;
 }
 #viral-skip-btn.viral-locked, #fs-viral-skip-btn.viral-locked, #mob-viral-btn.viral-locked {
-    color: var(--accent-green);
-    filter: drop-shadow(0 0 4px var(--accent-green));
+    color: var(--accent-color, #16A34A);
+    filter: drop-shadow(0 0 4px var(--accent-color, #16A34A));
 }
 #viral-skip-btn.viral-locked .viral-repeat-badge, #fs-viral-skip-btn.viral-locked .viral-repeat-badge, #mob-viral-btn.viral-locked .viral-repeat-badge {
     display: inline !important;
@@ -1350,7 +1354,7 @@ body {
     min-width: 44px;
 }
 .mobile-controls-overlay .control-button:hover { color: #fff; }
-.mobile-controls-overlay .control-button.active, #mob-mixer-btn.active { color: var(--accent-green) !important; }
+.mobile-controls-overlay .control-button.active, #mob-mixer-btn.active { color: var(--accent-color, #16A34A) !important; }
 .mobile-controls-overlay.hidden {
     display: none;
 }
@@ -1454,7 +1458,7 @@ body {
 }
 .queue-item:active { cursor: grabbing; }
 .queue-item:hover { background: rgba(255, 255, 255, 0.1); }
-.queue-item.playing { border-left: 3px solid var(--accent-green); background: rgba(255, 255, 255, 0.1); }
+.queue-item.playing { border-left: 3px solid var(--accent-color, #16A34A); background: rgba(255, 255, 255, 0.1); }
 .queue-item img {
     width: 40px; height: 40px; border-radius: 6px; object-fit: cover;
 }
@@ -2081,3 +2085,243 @@ body {
     box-shadow: 0 6px 28px rgba(29,185,84,0.6);
 }
 .viral-stats-play-btn:active { transform: scale(0.97); }
+
+/* ===== Lexi Mixxer Blob & States ===== */
+.lexi-mixer-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    touch-action: none; /* For dragging */
+}
+
+.lexi-mixxer-blob {
+    width: 20px;
+    height: 20px;
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%);
+    box-shadow: inset 0 0 4px 1px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,0.2), 0 0 10px rgba(59, 130, 246, 0.7);
+    animation: blob-shape 10s ease-in-out infinite, color-cycle 15s ease-in-out infinite;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, filter 0.3s ease;
+    cursor: grab;
+    position: absolute;
+    z-index: 50;
+}
+.lexi-mixxer-blob:active {
+    cursor: grabbing;
+}
+
+.lexi-mixer-wrapper:hover .lexi-mixxer-blob {
+    transform: scale(1.18);
+    box-shadow: inset 0 0 5px 1px rgba(255,255,255,0.3), 0 0 15px rgba(59, 130, 246, 0.9);
+}
+
+/* Landing Pop Animation for when Lexi arrives */
+@keyframes lexi-blob-landing {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+        filter: brightness(2.2) drop-shadow(0 0 15px #00ffcc);
+    }
+    50% {
+        transform: scale(1.45);
+        opacity: 1;
+        filter: brightness(1.8) drop-shadow(0 0 20px #3b82f6);
+    }
+    75% {
+        transform: scale(0.92);
+        filter: brightness(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+.lexi-mixxer-blob.landing-animate {
+    animation: lexi-blob-landing 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, blob-shape 10s ease-in-out infinite 0.7s !important;
+}
+
+/* States */
+/* 1. Default (Not playing) is Blue (base state above) */
+
+/* 2. Listening (Playing, Mixer OFF) -> Pulse White with blob morph */
+.lexi-mixer-wrapper.state-listening .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #ffffff 0%, #9ca3af 100%);
+    box-shadow: inset 0 0 4px 1px rgba(255,255,255,0.5), 0 0 16px rgba(255, 255, 255, 0.85);
+    animation: blob-shape 8s ease-in-out infinite, pulse-white 2s infinite ease-in-out, color-cycle 15s ease-in-out infinite;
+}
+
+/* 3. Mixxing (Mixer ON) -> Pulse Green with blob morph */
+.lexi-mixer-wrapper.state-mixxing .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #4ade80 0%, #166534 100%);
+    box-shadow: inset 0 0 4px 1px rgba(74, 222, 128, 0.5), 0 0 18px rgba(74, 222, 128, 0.9);
+    animation: blob-shape 6s ease-in-out infinite, pulse-green 1.5s infinite ease-in-out, color-cycle 15s ease-in-out infinite;
+}
+
+/* 4. Deactivated -> Red */
+.lexi-mixer-wrapper.state-deactivated .lexi-mixxer-blob {
+    background: radial-gradient(circle at 30% 30%, #ef4444 0%, #7f1d1d 100%);
+    box-shadow: inset 0 0 4px 1px rgba(239, 68, 68, 0.5), 0 0 12px rgba(239, 68, 68, 0.7);
+    animation: blob-shape 10s ease-in-out infinite, color-cycle 15s ease-in-out infinite;
+}
+
+@keyframes pulse-white {
+    0%, 100% { box-shadow: inset 0 0 4px 1px rgba(255,255,255,0.4), 0 0 10px rgba(255,255,255,0.6); filter: brightness(1); }
+    50% { box-shadow: inset 0 0 6px 2px rgba(255,255,255,0.7), 0 0 20px rgba(255,255,255,1); filter: brightness(1.2); }
+}
+
+@keyframes pulse-green {
+    0%, 100% { box-shadow: inset 0 0 4px 1px rgba(74,222,128,0.4), 0 0 10px rgba(74,222,128,0.6); filter: brightness(1); }
+    50% { box-shadow: inset 0 0 6px 2px rgba(74,222,128,0.7), 0 0 22px rgba(74,222,128,1); filter: brightness(1.25); }
+}
+
+/* ===== Entry Animation Background Glow ===== */
+.player-glow-overlay {
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent);
+    z-index: -1;
+    border-radius: 20px;
+    pointer-events: none;
+}
+.player-glow-overlay.animate {
+    animation: player-glow-spread 1.5s ease-out forwards;
+}
+
+@keyframes player-glow-spread {
+    0% { width: 0; opacity: 1; }
+    50% { width: 100%; opacity: 0.8; }
+    100% { width: 100%; opacity: 0; }
+}
+
+/* ===== Drag Menu ===== */
+.lexi-drag-menu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 10px;
+    z-index: 10000;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.2s, transform 0.2s;
+}
+.lexi-drag-menu.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+}
+.lexi-action-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+.lexi-action-pill:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Add Lexi spinning glow to harmonytunes small blob */
+@keyframes spinGlowAngleHT {
+    0% { --glow-angle: 0deg; }
+    100% { --glow-angle: 360deg; }
+}
+.lexi-mixer-wrapper { position: relative; }
+.lexi-mixer-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% + 15px);
+    height: calc(100% + 15px);
+    border-radius: 50px;
+    background: conic-gradient(
+        from var(--glow-angle, 0deg),
+        rgba(255, 0, 127, 0.8), 
+        rgba(127, 0, 255, 0.2), 
+        rgba(0, 127, 255, 0.8), 
+        rgba(0, 255, 127, 0.2), 
+        rgba(255, 127, 0, 0.8), 
+        rgba(255, 0, 127, 0.8)
+    );
+    filter: blur(8px);
+    z-index: 10; /* Put behind the blob which has z-index 50 */
+    opacity: 0.8;
+    pointer-events: none;
+    animation: spinGlowAngleHT 3s linear infinite;
+}
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Fix iOS Safari SVG click bug where clicks on SVGs within buttons don't bubble correctly */
+.control-button svg, .control-button span {
+    pointer-events: none;
+}
+/* Ensure the mixxer blob remains grabbable */
+.lexi-mixxer-blob {
+    pointer-events: auto !important;
+}
+
+/* Increase mobile touch targets significantly */
+@media (max-width: 599px) {
+    .control-button {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 5px !important;
+    }
+    .play-pause-btn {
+        min-width: 50px !important;
+        min-height: 50px !important;
+    }
+    .controls {
+        gap: 4px !important;
+    }
+}
+
+/* Version Dropdown styling */
+.version-select {
+    width: 100%;
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-size: 0.75rem;
+    outline: none;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.version-select option {
+    background: #1e1e1e;
+    color: #fff;
+}
+
+.music-card {
+    padding-bottom: 12px; /* ensure space for select if it wraps */
+}
+
+.modal-overlay.hidden { display: none !important; }

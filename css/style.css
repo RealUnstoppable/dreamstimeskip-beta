@@ -1,5 +1,3 @@
-
-
 :root {
     --bg-color: #0A0A0A;
     --primary-card-color: #141414;
@@ -13,12 +11,12 @@
     --font-main: 'Inter', sans-serif;
 
 
-    --accent-color: var(--accent-blue);
+    --accent-color: var(--accent-color, #2563EB);
 }
 
 
 [data-accent="blue"] {
-    --accent-color: var(--accent-blue);
+    --accent-color: var(--accent-color, #2563EB);
 }
 
 [data-accent="red"] {
@@ -26,7 +24,7 @@
 }
 
 [data-accent="green"] {
-    --accent-color: var(--accent-green);
+    --accent-color: var(--accent-color, #16A34A);
 }
 
 [data-accent="purple"] {
@@ -160,7 +158,7 @@ body {
     min-height: 100vh;
     padding: 0 20px;
     position: relative;
-    overflow: hidden;
+    
 }
 
 .hero::before {
@@ -307,10 +305,11 @@ p.section-subtitle {
     border-radius: 24px;
     padding: 32px;
     position: relative;
-    overflow: hidden;
+    
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     text-decoration: none;
     color: var(--text-primary);
+    overflow: hidden;
 }
 
 .bento-card:hover {
@@ -371,6 +370,8 @@ p.section-subtitle {
     bottom: 0;
     width: 50%;
     height: auto;
+    max-height: 80%;
+    max-width: 300px;
     object-fit: contain;
     opacity: 0.8;
     transition: opacity 0.3s ease;
@@ -424,7 +425,7 @@ p.section-subtitle {
     align-items: center;
     text-align: center;
     padding: 0 20px;
-    overflow: hidden;
+    
 }
 
 .section-background {
@@ -437,7 +438,7 @@ p.section-subtitle {
     background-position: center;
     transform: scale(1.1);
     transition: transform 6s ease-out;
-    overflow: hidden;
+    
 }
 
 .section-background iframe {
@@ -499,7 +500,7 @@ p.section-subtitle {
 
 
 .main-footer {
-    background-color: #000;
+    background-color: var(--bg-color, #000);
     color: var(--text-secondary);
     padding: 80px 40px 40px;
     border-top: 1px solid var(--border-color);
@@ -788,7 +789,7 @@ textarea:focus-visible {
     border-radius: 12px;
     width: 320px;
     max-height: 420px;
-    overflow: hidden;
+    
     z-index: 10000;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     flex-direction: column;
@@ -803,6 +804,7 @@ textarea:focus-visible {
 }
 
 .notification-dropdown-header {
+    text-align: left;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -831,6 +833,7 @@ textarea:focus-visible {
 
 .notification-item {
     display: flex;
+    text-align: left;
     align-items: center;
     padding: 12px 16px;
     border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.07));
@@ -849,7 +852,7 @@ textarea:focus-visible {
     font-weight: 600;
     color: var(--text-primary, #fff);
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 .notif-msg {
@@ -857,7 +860,7 @@ textarea:focus-visible {
     display: block;
     font-size: 0.78rem;
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 .notif-dot {
@@ -965,36 +968,14 @@ textarea:focus-visible {
 
 .siri-orb-wrapper:has(#siri-orb.expanded)::before {
     opacity: 1;
+    width: calc(100% + 14px);
+    height: calc(100% + 14px);
+    border-radius: 34px;
 }
 
-#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(to bottom, #0a192f 0%, #3b82f6 100%); border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, padding 0.35s ease; box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite; }
+#siri-orb { position: relative; z-index: 1; width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%); border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%; cursor: pointer; display: flex; justify-content: center; align-items: center;  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s ease, padding 0.35s ease; box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4); animation: blob-shape 12s ease-in-out infinite, color-cycle 15s ease-in-out infinite; }
 #siri-orb::after { content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1; }
-#siri-orb.expanded { width: 220px; border-radius: 50px !important; animation: none !important; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5); }
-#siri-orb.expanded::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 104%;
-    height: 110%;
-    border-radius: inherit;
-    background: conic-gradient(
-        from var(--glow-angle, 0deg),
-        rgba(255, 0, 127, 0.5), 
-        rgba(127, 0, 255, 0.2), 
-        rgba(0, 127, 255, 0.5), 
-        rgba(0, 255, 127, 0.2), 
-        rgba(255, 127, 0, 0.5), 
-        rgba(255, 0, 127, 0.5)
-    );
-    filter: blur(8px);
-    z-index: -2;
-    animation: spinGlowAngle 4s linear infinite; 
-    opacity: 1;
-}
-#siri-orb.expanded::after { opacity: 1; }
-.orb-text { position: relative; z-index: 2; color: white; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 1rem; text-decoration: none; opacity: 0; transition: opacity 0.3s ease 0.4s; white-space: nowrap; transform: translateY(20px); }
-#siri-orb.expanded .orb-text { opacity: 1; transform: translateY(0); }
+.orb-text { display: none; }
 
 
 /* --- Orb Tap Particles --- */
@@ -1083,7 +1064,7 @@ textarea:focus-visible {
     border-radius: 4px;
     font-size: 0.85rem;
     background: rgba(136, 211, 206, 0.2);
-    color: var(--accent-green);
+    color: var(--accent-color, #16A34A);
     font-weight: bold;
 }
 
@@ -1161,7 +1142,7 @@ textarea:focus-visible {
     position: absolute;
     inset: 6px;
     border-radius: 50%;
-    overflow: hidden;
+    
     pointer-events: none;
     z-index: 1;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.8), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
@@ -1209,6 +1190,7 @@ textarea:focus-visible {
 }
 
 /* Expanded pill when tapped - Smooth height & width morphing */
+#siri-orb.expanded,
 #siri-orb.lexi-player-expanded {
     width: 340px !important;
     max-width: 92vw;
@@ -1221,12 +1203,12 @@ textarea:focus-visible {
     border: 1px solid rgba(255, 255, 255, 0.14);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 28px rgba(0, 255, 204, 0.28);
     padding: 10px 14px;
-    overflow: hidden;
     cursor: default;
     animation: none !important;
 }
 
 /* When idle (no track selected or nothing playing), compact pill with only Cart and Chat */
+#siri-orb.expanded.idle-mode,
 #siri-orb.lexi-player-expanded.idle-mode {
     width: 260px !important;
     height: 56px !important;
@@ -1287,7 +1269,7 @@ textarea:focus-visible {
     font-weight: 700;
     color: #ffffff;
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
     line-height: 1.2;
 }
@@ -1295,7 +1277,7 @@ textarea:focus-visible {
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
-    overflow: hidden;
+    
     text-overflow: ellipsis;
 }
 
@@ -1404,10 +1386,11 @@ textarea:focus-visible {
     font-size: 1.5rem; /* Match mobile nav links */
     font-weight: 500;
     cursor: pointer;
-    text-align: left;
+    text-align: center;
     padding: 0;
     width: 100%;
     align-items: center;
+    justify-content: center;
     gap: 8px;
 }
 .notification-mobile-btn:hover {
@@ -1441,20 +1424,239 @@ textarea:focus-visible {
         display: flex;
         flex-direction: column;
         width: 100%;
-        align-items: flex-start;
+        align-items: center;
     }
     
     .notification-dropdown {
         position: static; 
-        width: 100%;
-        box-shadow: none;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         border: 1px solid var(--border-color, rgba(255,255,255,0.1));
-        background: transparent;
-        border-radius: 8px;
+        background: var(--bg-color, #111);
+        border-radius: 12px;
         margin-top: 15px;
         transform: none;
+        overflow: hidden;
     }
     .notification-dropdown.notif-open {
         transform: none;
+    }
+}
+
+/* Sitewide Lexi Orb (matches .orb from index.html) */
+.sitewide-lexi-orb {
+    position: relative;
+    z-index: 9999;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 60%), linear-gradient(45deg, #ff007f 0%, #7f00ff 50%, #007fff 100%);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; background-size: 200% 200%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px 2px rgba(0,0,0,0.2), inset 2px 2px 5px rgba(255,255,255,0.1), inset -2px -2px 5px rgba(0,0,0,0.2), 0 0 15px rgba(59, 130, 246, 0.4);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: blob-shape 12s ease-in-out infinite, color-cycle 15s ease-in-out infinite;
+}
+
+
+/* Lexi States */
+
+@keyframes pulse-inner-glow {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.1; }
+}
+
+.sitewide-lexi-orb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: background 0.35s ease, opacity 0.35s ease;
+    z-index: 1;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+}
+
+.sitewide-lexi-orb.expanded::after {
+    display: none;
+}
+
+.sitewide-lexi-orb.lexi-state-listening::after {
+    background: radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.9) 0%, transparent 80%);
+    animation: pulse-inner-glow 2s ease-in-out infinite !important;
+}
+
+.sitewide-lexi-orb.lexi-state-mixing::after {
+    background: radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.9) 0%, transparent 80%);
+    animation: pulse-inner-glow 2s ease-in-out infinite !important;
+}
+
+.sitewide-lexi-orb.lexi-state-inactive::after {
+    background: radial-gradient(circle at 40% 40%, rgba(239, 68, 68, 0.9) 0%, transparent 80%);
+    opacity: 0.8;
+}
+
+/* Also give the orb the reflection like index.html */
+#siri-orb::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 104%; height: 110%;
+    border-radius: inherit;
+    background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, transparent 40%, rgba(255,255,255,0.05) 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+#siri-orb.expanded::before {
+    display: none;
+}
+
+/* Lexi Cart Badge & Animations (Sitewide) */
+.lexi-cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff007f;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    z-index: 10;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lexi-cart-badge.hidden {
+    transform: scale(0);
+}
+
+.lexi-cart-glyph {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.5rem;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 0.3s;
+}
+
+#siri-orb.expanded .lexi-cart-glyph,
+#siri-orb.expanded .lexi-cart-badge {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Item animation to cart */
+.fly-to-cart {
+    position: fixed;
+    z-index: 9999;
+    border-radius: 50%;
+    background: white;
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+
+/* Cookie Banner */
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #111827;
+    border-top: 1px solid #374151;
+    padding: 15px 20px;
+    z-index: 99999;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+.cookie-banner.hidden {
+    transform: translateY(100%);
+    opacity: 0;
+}
+.cookie-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    width: 100%;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.cookie-content p {
+    margin: 0;
+    color: #d1d5db;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 250px;
+}
+.cookie-content a {
+    color: #14b8a6;
+    text-decoration: none;
+    font-weight: 600;
+}
+.cookie-content a:hover {
+    text-decoration: underline;
+}
+.cookie-buttons {
+    display: flex;
+    gap: 10px;
+}
+.cookie-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    font-family: inherit;
+    font-size: 0.9rem;
+}
+.cookie-btn:active {
+    transform: scale(0.95);
+}
+.cookie-btn.primary {
+    background-color: #14b8a6;
+    color: #fff;
+}
+.cookie-btn.primary:hover {
+    background-color: #0f9183;
+}
+.cookie-btn.secondary {
+    background-color: transparent;
+    border: 1px solid #4b5563;
+    color: #d1d5db;
+}
+.cookie-btn.secondary:hover {
+    background-color: #374151;
+}
+@media (max-width: 600px) {
+    .cookie-content {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    .cookie-buttons {
+        justify-content: center;
+        width: 100%;
+    }
+    .cookie-btn {
+        flex: 1;
     }
 }

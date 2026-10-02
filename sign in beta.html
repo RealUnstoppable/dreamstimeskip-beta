@@ -34,6 +34,10 @@
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username">
                 </div>
+                <div class="input-group" id="referral-group" style="display: none;">
+                    <label for="referralCode">Referral Code (Optional)</label>
+                    <input type="text" id="referralCode" name="referralCode">
+                </div>
                 <div class="input-group" id="email-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required>
@@ -57,7 +61,19 @@
             if (user && !sessionStorage.getItem('newUser')) {
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists() && !userDoc.data().isBanned) {
-                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectParam = urlParams.get('redirect');
+                    
+                    let destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    if (redirectParam && !userDoc.data().isAdmin) {
+                        // Sanitize redirect to prevent open redirects
+                        const allowedRedirects = ['harmonytunes.html', 'index.html', 'shop.html'];
+                        if (allowedRedirects.includes(redirectParam)) {
+                            destination = redirectParam;
+                        }
+                    }
+
                     if (!window.location.pathname.includes(destination)) {
                         window.location.replace(destination);
                     }
@@ -69,8 +85,8 @@
     <footer class="main-footer"></footer>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=20260722';
-        import { loadFooter } from './js/footer.js?v=20260722';
+        import { loadNavbar } from './js/navbar.js?v=1790377266541';
+        import { loadFooter } from './js/footer.js?v=1790377266541';
         
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();

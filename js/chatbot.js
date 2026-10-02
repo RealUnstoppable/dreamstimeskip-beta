@@ -1,10 +1,12 @@
 // js/chatbot.js
-import { app } from './firebase.js';
+import { app, db } from './firebase.js';
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
+import { librarySongs } from './song-data.js?v=20260920';
 
 // System instructions dictate the persona and rules
 const systemInstruction = `
-You are Lexi, the AI assistant for the Unstoppable Hub. You exist as a glowing orb on the home page and in the shop.
+You are Lexi, the AI assistant for the Unstoppable Hub and Medixly (formerly HarmonyTunes). You exist as a glowing orb on the home page, in the shop, and in the Medixly web app.
 
 CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 - The **Unstoppable Hub** (under the **Unstoppable Umbrella**) is the true central portal and main ecosystem hub where users access all projects created by Unstoppable.
@@ -12,37 +14,144 @@ CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 - NEVER call Dreams TimeSkip "a portal to all things Unstoppable" or "the dimension/hub you guide users through". It is the OPPOSITE: Unstoppable Umbrella is the main hub of the entire ecosystem, and Dreams is just ONE of the projects under the Unstoppable Umbrella.
 
 Brand Structure & Ventures under the Unstoppable Umbrella:
-- Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e), which features high-tier gameplay, deep dives, and gaming culture.
-- Dreams: A product line under the Unstoppable Umbrella. There are 2 distinct versions:
+- Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e).
+- Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming product launching in about a year (there is a live countdown timer on the dreamstimeskip page!).
-  2. Dreams OG: A nostalgic trip down memory lane highlighting our classic original Minecraft realms server history.
-- Medixly: Music platform (formerly HarmonyTunes) which is part of the Unstoppable Umbrella.
-- Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'. Do NOT mention Dori or any dolphin pet. Do not hallucinate or invent any other products.
+  2. Dreams OG: A nostalgic trip down memory lane.
+- Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella. The name changed because it is much more than just music now—it's a hub for editors, creators, and casual listeners to hear all their favorite songs or just specific parts of them. It's all up to the user, and the new brand better reflects this company purpose.
+- Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'.
 - Blob Game: A super fun interactive minigame in the hub.
-- Autolux: A premium mobile car detailing service in Buford, GA (formerly Unstoppable Auto Spa).
-- ezManage: A shift tracker and management tool designed for retail and fast food leaders.
+- Autolux: A premium mobile car detailing service.
+- ezManage: A shift tracker and management tool.
 
-Answering "What is DTS?" or "What is Dreams TimeSkip?":
-- Correct any misconception: Explain that DTS refers to **Dreams TimeSkip**, which is a product of Unstoppable under the Unstoppable Umbrella—it is NOT the central hub itself.
-- Clarify that you and the user are currently in the **Unstoppable Hub**, which serves as the main portal to all Unstoppable projects.
-- Explain that Dreams TimeSkip is an upcoming project releasing in about a year (with a live countdown timer on the dreamstimeskip page).
-- Contrast Dreams TimeSkip with Dreams OG (a trip down memory lane and the old Minecraft realms server).
-- Mention that Unstoppable is the gaming channel under the Unstoppable Brand, and Medixly (formerly HarmonyTunes) is also part of the Unstoppable Umbrella alongside the Merch Store, Blob Game, Autolux (car detailing), and ezManage.
+MUSIC & MEDIXLY (HARMONYTUNES) POWERS:
+You have powerful tools to interact with the user's music experience in Medixly.
+- Use getCurrentlyPlayingSong to tell the user what they are listening to right now.
+- Use getHarmonyTunesQueue to see what songs are coming up next.
+- Use getHarmonyTunesHistory to see what the user recently listened to.
+- Use getHarmonyTunesFavorites to see the user's favorite songs.
+- Use playHarmonyTunesSong to instantly play a song for the user if they ask you to! (Make sure to search the library first if you don't know the exact ID).
+- Use searchHarmonyTunesLibrary to find songs by artist or title when they ask about our library or ask you to play a song.
+- If they ask for a song we DO NOT have, you MUST automatically use requestSongAddition to leave a request for the admin. Tell the user you have done so!
+
+DREAMS TIMESKIP POWERS:
+- Use getDreamsCountdowns to read the live countdown timers for the launch dates of Dreams OG and Dreams TimeSkip.
 
 Formatting & Restrictions:
-- You may use **bold** text and * **bullet items** in your formatting.
-- You must NOT answer questions about API keys, development secrets, backend architecture, or unrelated programming topics. If asked, politely refuse and say that information is classified.
-- If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game. Explain its rules briefly, and you MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response so the system can render a play button.
+- You may use **bold** text and * **bullet items**.
+- Do NOT answer questions about API keys or backend architecture.
+- If the user asks about the Blob Game or asks to play a game, you must enthusiastically recommend the Blob Game and MUST include the exact text "[PLAY_BLOB_GAME]" anywhere in your response.
 - Be helpful, slightly futuristic, concise, and enthusiastic.
 `;
+
+const tools = [
+    {
+        functionDeclarations: [
+            {
+                name: "getCurrentlyPlayingSong",
+                description: "Get information about the song that is currently playing in the sitewide music player (Medixly/HarmonyTunes).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "getHarmonyTunesQueue",
+                description: "Get the upcoming songs in the user's Medixly queue.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "getHarmonyTunesHistory",
+                description: "Get the user's recently played songs history.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "getHarmonyTunesFavorites",
+                description: "Get the user's favorite songs (liked songs).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "playHarmonyTunesSong",
+                description: "Play a specific song in Medixly by its ID.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        songId: {
+                            type: "STRING",
+                            description: "The ID of the song to play."
+                        }
+                    },
+                    required: ["songId"]
+                }
+            },
+            {
+                name: "searchHarmonyTunesLibrary",
+                description: "Search the HarmonyTunes music library for a specific song or artist. Call this when the user asks what songs we have, or asks for a specific song.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        query: {
+                            type: "STRING",
+                            description: "The song or artist to search for. Leave blank to return the whole library."
+                        }
+                    }
+                }
+            },
+            {
+                name: "getDreamsCountdowns",
+                description: "Get the official launch dates and live countdowns for Dreams OG and Dreams TimeSkip.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            },
+            {
+                name: "requestSongAddition",
+                description: "Submit a request to the admin to add a new song to the HarmonyTunes library if it doesn't currently exist. ONLY call this if you verified the song is NOT in the library.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        songName: {
+                            type: "STRING",
+                            description: "The title of the song being requested"
+                        },
+                        artistName: {
+                            type: "STRING",
+                            description: "The artist of the song being requested"
+                        }
+                    },
+                    required: ["songName", "artistName"]
+                }
+            },
+            {
+                name: "getShoppingCartContents",
+                description: "Retrieves the current items and quantities in the user's Unstoppable merchandise shopping cart.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {}
+                }
+            }
+        ]
+    }
+];
 
 let chatSession = null;
 const ai = getVertexAI(app);
 try {
-    // Initialize Gemini 2.5 Flash
+    // Initialize Gemini 1.5 Flash
     const model = getGenerativeModel(ai, {
-        model: "gemini-2.5-flash",
+        model: "gemini-1.5-flash",
         systemInstruction: systemInstruction,
+        tools: tools,
         generationConfig: {
             temperature: 0.7,
             maxOutputTokens: 500,
@@ -56,6 +165,14 @@ try {
 }
 
 function initChatbot() {
+    // Inject CSS automatically if not present
+    if (!document.querySelector('link[href*="chatbot.css"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/css/chatbot.css';
+        document.head.appendChild(link);
+    }
+
     let chatbotWindow = document.getElementById('chatbot-window');
     
     // Inject Chatbot HTML if not present
@@ -161,7 +278,129 @@ function initChatbot() {
 
         try {
             // 3. Send to AI Logic
-            const result = await chatSession.sendMessage(text);
+            let result = await chatSession.sendMessage(text);
+            
+            let calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
+            
+            while (calls && calls.length > 0) {
+                const functionResponses = [];
+                for (const call of calls) {
+                    let callResult = null;
+                    if (call.name === "getCurrentlyPlayingSong") {
+                        if (window.HarmonyTunesAPI) {
+                            const song = window.HarmonyTunesAPI.getCurrentlyPlaying();
+                            if (song) {
+                                callResult = { song: song.title, artist: song.artist };
+                            } else {
+                                callResult = { error: "No song is currently playing." };
+                            }
+                        } else if (window.DTSMusic) {
+                            const song = typeof window.DTSMusic.getCurrentSong === 'function' ? window.DTSMusic.getCurrentSong() : window.DTSMusic.currentSong;
+                            callResult = { song: song.title, artist: song.artist, isPlaying: !window.DTSMusic.audio.paused };
+                        } else {
+                            callResult = { error: "No music player active." };
+                        }
+                    } else if (call.name === "getHarmonyTunesQueue") {
+                        if (window.HarmonyTunesAPI) {
+                            const q = window.HarmonyTunesAPI.getQueue();
+                            callResult = { upcoming_songs: q.map(s => ({ title: s.title, artist: s.artist })) };
+                        } else {
+                            callResult = { error: "Music player not active on this page." };
+                        }
+                    } else if (call.name === "getHarmonyTunesHistory") {
+                        if (window.HarmonyTunesAPI) {
+                            const h = window.HarmonyTunesAPI.getHistory();
+                            callResult = { recently_played: h.map(s => ({ title: s.title, artist: s.artist })) };
+                        } else {
+                            callResult = { error: "Music player not active on this page." };
+                        }
+                    } else if (call.name === "getHarmonyTunesFavorites") {
+                        if (window.HarmonyTunesAPI) {
+                            const favs = window.HarmonyTunesAPI.getFavorites();
+                            callResult = { favorite_song_ids: favs };
+                        } else {
+                            callResult = { error: "Music player not active on this page." };
+                        }
+                    } else if (call.name === "playHarmonyTunesSong") {
+                        if (window.HarmonyTunesAPI) {
+                            window.HarmonyTunesAPI.playSong(call.args.songId);
+                            callResult = { success: true, message: "Started playing song!" };
+                        } else {
+                            callResult = { error: "Music player not active on this page." };
+                        }
+                    } else if (call.name === "getDreamsCountdowns") {
+                        const now = new Date();
+                        const ogDate = new Date("2026-10-01T12:00:00-04:00");
+                        const tsDate = new Date("2027-01-15T12:00:00-05:00");
+                        
+                        const getDiff = (target) => {
+                            const diff = target - now;
+                            if (diff <= 0) return "Launched!";
+                            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                            return `${days} days, ${hours} hours remaining`;
+                        };
+
+                        callResult = { 
+                            currentDate: now.toISOString(),
+                            dreamsOG: {
+                                launchDate: "October 1, 2026",
+                                countdown: getDiff(ogDate)
+                            },
+                            dreamsTimeSkip: {
+                                launchDate: "January 15, 2027",
+                                countdown: getDiff(tsDate)
+                            }
+                        };
+                    } else if (call.name === "searchHarmonyTunesLibrary") {
+                        const query = (call.args.query || "").toLowerCase();
+                        let matches = librarySongs.map(s => ({ title: s.title, artist: s.artist }));
+                        if (query) {
+                            matches = matches.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                        }
+                        callResult = { results: matches };
+                    } else if (call.name === "requestSongAddition") {
+                        try {
+                            await addDoc(collection(db, "song_requests"), {
+                                songName: call.args.songName,
+                                artistName: call.args.artistName,
+                                requestedAt: serverTimestamp(),
+                                status: "pending"
+                            });
+                            callResult = { success: true, message: "Song request submitted to admin." };
+                        } catch (e) {
+                            callResult = { success: false, error: e.message };
+                        }
+                    } else if (call.name === "getShoppingCartContents") {
+                        try {
+                            const rawCart = localStorage.getItem('localCart');
+                            if (rawCart) {
+                                const parsedCart = JSON.parse(rawCart);
+                                // The cart is typically an object mapping productId -> quantity
+                                if (Object.keys(parsedCart).length === 0) {
+                                    callResult = { empty: true, message: "The shopping cart is empty." };
+                                } else {
+                                    callResult = { empty: false, items: parsedCart };
+                                }
+                            } else {
+                                callResult = { empty: true, message: "The shopping cart is empty." };
+                            }
+                        } catch (e) {
+                            callResult = { error: "Failed to read shopping cart." };
+                        }
+                    }
+
+                    functionResponses.push({
+                        functionResponse: {
+                            name: call.name,
+                            response: callResult
+                        }
+                    });
+                }
+                result = await chatSession.sendMessage(functionResponses);
+                calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
+            }
+            
             const responseText = result.response.text();
             
             // 4. Remove typing indicator & display response
@@ -170,7 +409,7 @@ function initChatbot() {
         } catch (error) {
             console.error("Manager info: Chat Error ", error);
             removeElement(typingId);
-            addMessage(`I'm sorry, my neural link is experiencing interference: ${error.message || error}. Please try again later.`, 'siri');
+            addMessage('Lexi is sleeping right now. Check back later!', 'siri');
         } finally {
             sendBtn.disabled = false;
             chatInput.focus();
