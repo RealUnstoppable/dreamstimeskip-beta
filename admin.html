@@ -113,9 +113,72 @@
                 .hamburger-btn { display: none; }
             }
         }
+    <style>
+        /* ===== Admin Loading Screen ===== */
+        #admin-loading-screen {
+            position: fixed; inset: 0;
+            background: var(--bg-color, #0f0f0f);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+        #admin-loading-screen.fade-out {
+            opacity: 0; pointer-events: none;
+        }
+        .admin-loader-ring {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #2563EB;
+            border-radius: 50%;
+            animation: adminSpin 0.8s linear infinite;
+        }
+        @keyframes adminSpin { to { transform: rotate(360deg); } }
+        .admin-loader-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+        }
+        /* Error state shown inside loading screen */
+        #admin-auth-error {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            text-align: center;
+            padding: 0 24px;
+        }
+        #admin-auth-error .error-icon { font-size: 2.5rem; }
+        #admin-auth-error h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+        #admin-auth-error p { margin: 0; color: rgba(255,255,255,0.4); font-size: 0.85rem; }
+        #admin-auth-error a {
+            margin-top: 4px;
+            padding: 10px 28px;
+            background: #2563EB;
+            color: #fff; border-radius: 8px;
+            text-decoration: none; font-weight: 600;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
-<body style="display: none;">
+<body style="display: block;">
+
+    <!-- Loading screen — always visible until auth resolves -->
+    <div id="admin-loading-screen">
+        <div id="admin-loader-spinner">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+                <div class="admin-loader-ring"></div>
+                <div class="admin-loader-text">Verifying access…</div>
+            </div>
+        </div>
+        <div id="admin-auth-error">
+            <div class="error-icon">🔒</div>
+            <h3 id="admin-error-title">Access Denied</h3>
+            <p id="admin-error-msg">You don't have permission to view this page.</p>
+            <a href="account.html" id="admin-error-link">Go to Account</a>
+        </div>
+    </div>
+
     <header class="main-header"></header>
  
     <div class="mobile-header">
@@ -391,7 +454,10 @@
             }
         };
 
-        document.getElementById('create-promo-btn').addEventListener('click', async () => {
+        document.getElementById('create-promo-btn').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerText;
+
             const codeInput = document.getElementById('new-promo-code');
             const discountInput = document.getElementById('new-promo-discount');
             const code = codeInput.value.trim().toUpperCase();
@@ -402,35 +468,101 @@
                 return;
             }
 
+            btn.disabled = true;
+            btn.innerText = 'Creating...';
+
             try {
-                await setDoc(doc(db, 'promo_codes', code), { discount, active: true, createdAt: serverTimestamp() });
+                await performAdminAction('create', 'promo_codes', code, { discount, active: true, createdAt: 'SERVER_TIMESTAMP' });
                 showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
                 codeInput.value = '';
                 discountInput.value = '';
                 loadPromoCodes();
             } catch (e) {
                 showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
             }
         });
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
+        // ===== Admin Auth Guard =====
+        const loadingScreen  = document.getElementById('admin-loading-screen');
+        const loaderSpinner  = document.getElementById('admin-loader-spinner');
+        const authError      = document.getElementById('admin-auth-error');
+        const errorTitle     = document.getElementById('admin-error-title');
+        const errorMsg       = document.getElementById('admin-error-msg');
+        const errorLink      = document.getElementById('admin-error-link');
 
-                if (userDoc.exists() && userDoc.data().isAdmin) {
-                    document.body.style.display = 'flex';
+        function showAdminContent() {
+            // Fade out + remove loading screen to reveal dashboard
+            if (loadingScreen) {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => { loadingScreen.remove(); }, 320);
+            }
+        }
+
+        function showAuthError(title, msg, linkText = 'Go to Sign In', linkHref = 'sign in beta.html') {
+            if (!loadingScreen) return;
+            if (loaderSpinner) loaderSpinner.style.display = 'none';
+            if (authError) {
+                authError.style.display = 'flex';
+                errorTitle.textContent = title;
+                errorMsg.textContent   = msg;
+                errorLink.textContent  = linkText;
+                errorLink.href         = linkHref;
+            }
+        }
+
+        // Hard timeout — if auth takes > 10s, show an error instead of blank
+        const authTimeout = setTimeout(() => {
+            showAuthError(
+                'Taking too long…',
+                'Firebase is not responding. Check your connection and try again.',
+                'Retry', ''
+            );
+            document.getElementById('admin-error-link').addEventListener('click', (e) => {
+                e.preventDefault(); window.location.reload();
+            });
+        }, 10000);
+
+        onAuthStateChanged(auth, async (user) => {
+            clearTimeout(authTimeout);
+
+            if (!user) {
+                // Not signed in at all
+                showAuthError(
+                    'Not Signed In',
+                    'Please sign in to access the admin dashboard.',
+                    'Sign In', 'sign in beta.html'
+                );
+                return;
+            }
+
+            try {
+                const userDocRef = doc(db, "users", user.uid);
+                const userDoc    = await getDoc(userDocRef);
+
+                if (userDoc.exists() && userDoc.data().isAdmin === true) {
+                    showAdminContent();
                     initializeAdminPage(user);
                     loadPromoCodes();
                 } else {
-                    if (!window.location.pathname.includes('account.html')) {
-                        window.location.replace('account.html');
-                    }
+                    showAuthError(
+                        'Access Denied',
+                        'Your account does not have admin privileges.',
+                        'Go to Account', 'account.html'
+                    );
                 }
-            } else {
-                if (!window.location.pathname.includes('sign in beta.html')) {
-                    window.location.replace('sign in beta.html');
-                }
+            } catch (err) {
+                console.error('Admin auth check failed:', err);
+                showAuthError(
+                    'Verification Failed',
+                    `Could not verify your permissions: ${err.message}`,
+                    'Try Again', ''
+                );
+                document.getElementById('admin-error-link').addEventListener('click', (e) => {
+                    e.preventDefault(); window.location.reload();
+                });
             }
         });
 
@@ -824,6 +956,7 @@
                             await replyToTicket(reqId, reply, 'answered');
                             const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
                         } catch (error) {
+                            console.error("Manager info: Error replying to ticket:", error);
                             alert("Error replying to ticket: " + error.message);
                         }
                     }
@@ -891,18 +1024,30 @@
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await performAdminAction("update", "quotes", id, { status: 'responded' });
-                    if(tr) {
-                        tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
-                        tr.querySelector('td:nth-child(5) span').textContent = 'responded';
-                        tr.querySelector('td:nth-child(6)').innerHTML = '';
+                    try {
+                        await performAdminAction("update", "quotes", id, { status: 'responded' });
+                        if(tr) {
+                            tr.querySelector('td:nth-child(5) span').className = 'status-badge active';
+                            tr.querySelector('td:nth-child(5) span').textContent = 'responded';
+                            tr.querySelector('td:nth-child(6)').innerHTML = '';
+                        }
+                    } catch (error) {
+                        console.error("Manager info: [Error responding to quote:]", error);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
                     }
                 } else if (action === 'delete' && confirm("Delete this quote request?")) {
                     const originalText = btn.innerText;
                     btn.disabled = true;
                     btn.innerText = 'Processing...';
-                    await performAdminAction("delete", "quotes", id);
-                    if (tr) tr.remove();
+                    try {
+                        await performAdminAction("delete", "quotes", id);
+                        if (tr) tr.remove();
+                    } catch (error) {
+                        console.error("Manager info: [Error deleting quote:]", error);
+                        btn.disabled = false;
+                        btn.innerText = originalText;
+                    }
                 }
             });
 
@@ -915,7 +1060,6 @@
                     e.currentTarget.classList.add('active');
                     document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
                     if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); }
-                });
                 });
             });
 
@@ -955,6 +1099,7 @@
                         await sendPasswordResetEmail(auth, email);
                         alert('Password reset email sent. Check your inbox.');
                     } catch (error) {
+                        console.error("Manager info: Error sending password reset email:", error);
                         alert('Error sending email: ' + error.message);
                     } finally {
                         btn.disabled = false;
@@ -978,6 +1123,7 @@
                             await user.delete();
                             window.location.replace('index.html');
                         } catch(error) {
+                            console.error("Manager info: Error deleting admin account:", error);
                             alert('Error deleting account: ' + error.message);
                             btn.disabled = false;
                             btn.innerText = originalText;
@@ -993,8 +1139,8 @@
     <footer class="main-footer"></footer>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=20260722';
-        import { loadFooter } from './js/footer.js?v=20260722';
+        import { loadNavbar } from './js/navbar.js?v=1790377266541';
+        import { loadFooter } from './js/footer.js?v=1790377266541';
         
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();

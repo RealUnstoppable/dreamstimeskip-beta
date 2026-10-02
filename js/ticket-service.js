@@ -1,6 +1,6 @@
 import { db, auth } from './auth.js';
 import { mapCollectionData } from './utils.js';
-import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const TICKETS_COLLECTION = 'support_tickets';
 

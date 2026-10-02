@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin.html
+Disallow: /account.html
+Disallow: /checkout*.html
+Disallow: /success.html
+Disallow: /shared-wishlist.html
+Disallow: /sign%20in%20beta.html
+
+Sitemap: https://realunstoppable.store/sitemap.xml
