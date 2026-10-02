@@ -57,6 +57,6 @@
 ## 2026-09-24 - Unnecessary user read in account page
 **Learning:** Replaced individual getDoc calls for fetching user profile in account.js with centralized getCachedUserProfile. It saves unnecessary DB reads and improves performance by utilizing sessionStorage cache.
 **Action:** Always use getCachedUserProfile to access user data during initial page loads instead of raw Firestore calls.
-## 2026-10-25 - Cache Invalidation when Using sessionStorage
-**Learning:** Replaced raw `getDoc` calls with `getCachedUserProfile` in `harmonytunes.js` to avoid network reads. However, when user data changes (like updating custom playlists), the cache must be explicitly updated or invalidated, otherwise subsequent reads via `getCachedUserProfile` will return stale data and break UI synchronization.
-**Action:** When replacing raw queries with cache access (like `getCachedUserProfile`), always trace the mutation paths (like `saveCustomPlaylists`) and ensure explicit cache invalidation or update logic is added there as well.
+## 2026-10-25 - Avoid Array.find in Loops for static sets
+**Learning:** In static mappings where elements need matching based on ID from a larger set, nested array iterations `find` combined with filter creates O(N^2) complexity.
+**Action:** Replace `Array.find()` with `Map.get()` by instantiating a Map out of the source collection first, changing lookup complexity from O(N^2) to O(N).

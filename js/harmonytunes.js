@@ -817,11 +817,16 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
+            const prioritySet = new Set(priorityIds);
+            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
+
             const prioritySongs = priorityIds
-                .map(id => viralSongs.find(s => s.id === id))
+                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
+                .map(id => viralSongsMap.get(id))
                 .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
+            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
