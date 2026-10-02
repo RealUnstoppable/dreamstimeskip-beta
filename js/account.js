@@ -66,7 +66,7 @@ async function renderProfile(user, userDataParam = null) {
 
         }
     } catch (error) {
-        console.error("Error rendering profile:", error);
+        console.error("Manager info: Error rendering profile:", error);
         if (profileDetails) {
             profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
         }
@@ -152,7 +152,7 @@ async function renderOrders(user) {
         listEl.appendChild(fragment);
 
     } catch (error) {
-        console.error("Error rendering orders:", error);
+        console.error("Manager info: Error rendering orders:", error);
         listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
     }
 }
@@ -244,20 +244,22 @@ async function renderRewards(user, userData) {
                 historyList.innerHTML = '';
             } else {
                 if(msgEl) msgEl.style.display = 'none';
-                let html = '';
+                const fragment = document.createDocumentFragment();
                 loyaltyData.forEach(data => {
                     const dateStr = formatDate(data.createdAt);
-                    html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);">
+                    const el = document.createElement('div');
+                    el.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color);";
+                    el.innerHTML = `
                             <div>
                                 <div style="font-weight: 600; color: var(--text-primary);">${escapeHTML(data.description || 'Reward')}</div>
                                 <div style="font-size: 0.85rem; color: var(--text-secondary);">${dateStr}</div>
                             </div>
                             <div style="font-weight: bold; color: var(--accent-green);">+${data.points} pts</div>
-                        </div>
                     `;
+                    fragment.appendChild(el);
                 });
-                historyList.innerHTML = html;
+                historyList.innerHTML = '';
+                historyList.appendChild(fragment);
             }
         }
 

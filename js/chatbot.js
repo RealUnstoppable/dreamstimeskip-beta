@@ -111,7 +111,7 @@ try {
         history: [] // Start with empty history
     });
 } catch (error) {
-    console.error("AI Model Initialization Failed", error);
+    console.error("Manager info: AI Model Initialization Failed", error);
 }
 
 function initChatbot() {
