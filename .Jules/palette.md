@@ -20,3 +20,7 @@
 ## 2024-05-28 - Missing Title Tooltips on Icon-Only Buttons
 **Learning:** Found multiple icon-only buttons across the site that correctly implemented `aria-label` for screen reader support but failed to include `title` attributes. Sighted users rely on hover tooltips to understand icon meaning.
 **Action:** When adding `aria-label` to interactive elements (especially those without visible text labels), always add a matching `title` attribute to ensure a consistent experience for both sighted and non-sighted users.
+
+## 2026-05-29 - Missing Input Character Counters
+**Learning:** Textareas for open-ended user input (like reviews, feedback, or support tickets) often lack visual character counters. This leaves users guessing the allowed limit and can lead to frustration when hitting validation errors only after submitting.
+**Action:** When working with textareas or long text inputs, always implement a visual character counter showing `current / max` length (with a color change when approaching the limit) alongside the `maxlength` HTML attribute to provide immediate, clear feedback.

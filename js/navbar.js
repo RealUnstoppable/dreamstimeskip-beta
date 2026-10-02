@@ -221,7 +221,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) {}
+                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
                 }
             });
             updateNotificationBadge(0);
@@ -281,7 +281,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) {}
+                try { await markAsRead(id); } catch (_) { /* ignore read error */ }
             }
 
             // Recount badge
@@ -310,8 +310,10 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
+                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
+                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
+                            if (!mergedIds.has(pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;

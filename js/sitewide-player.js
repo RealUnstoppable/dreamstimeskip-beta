@@ -1,3 +1,4 @@
+import { escapeHTML } from "./utils.js";
 // js/sitewide-player.js
 // Sitewide music engine and Lexi floating mini-playerhead
 
@@ -48,7 +49,7 @@ class SitewideMusicEngine {
                     isMixerMode: !!parsed.isMixerMode
                 };
             }
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         return {
             songId: librarySongs[0].id,
@@ -68,7 +69,7 @@ class SitewideMusicEngine {
         this.state = { ...this.state, ...updates, timestamp: Date.now() };
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
         this.notifyListeners();
     }
 
@@ -79,7 +80,7 @@ class SitewideMusicEngine {
     notifyListeners() {
         this.updateLexiUI();
         this.listeners.forEach(fn => {
-            try { fn(this.state); } catch (err) { console.error(err); }
+            try { fn(this.state); } catch (err) { console.error("Manager info: ", err); }
         });
     }
 
@@ -187,7 +188,7 @@ class SitewideMusicEngine {
         }
         this.audio.play().then(() => {
             this.saveState({ isPlaying: true });
-        }).catch(err => console.warn("Audio play prevented:", err));
+        }).catch(err => console.warn("Manager info: Audio play prevented:", err));
     }
 
     pause() {
@@ -649,12 +650,12 @@ class SitewideMusicEngine {
         let count = 0;
         try {
             count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         orb.innerHTML = `
             <span class="orb-text"></span>
             <div class="lexi-orb-disc ${isPlaying ? 'spinning' : 'paused'}">
-                <img src="${song.art}" alt="Now Playing" class="lexi-orb-disc-art">
+                <img src="${escapeHTML(song.art)}" alt="Now Playing" class="lexi-orb-disc-art">
                 <div class="lexi-orb-disc-grooves"></div>
             </div>
             <div class="lexi-soundwave-badge" style="display: ${isPlaying ? 'flex' : 'none'};">
@@ -679,16 +680,16 @@ class SitewideMusicEngine {
             <div class="lexi-expanded-panel">
                 <!-- Mini Playerhead Component -->
                 <div class="lexi-playerhead">
-                    <img src="${song.art}" alt="${song.title}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
+                    <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
                     <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
-                        <div class="lexi-song-title">${song.title}</div>
-                        <div class="lexi-song-artist">${song.artist}</div>
+                        <div class="lexi-song-title">${escapeHTML(song.title)}</div>
+                        <div class="lexi-song-artist">${escapeHTML(song.artist)}</div>
                     </div>
                     <div class="lexi-player-controls">
-                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" aria-label="${isPlaying ? 'Pause' : 'Play'}">
+                        <button id="lexi-play-pause-btn" class="lexi-ctrl-btn" title="${isPlaying ? 'Pause' : 'Play'}" aria-label="${isPlaying ? 'Pause' : 'Play'}">
                             ${isPlaying ? ICONS.pause : ICONS.play}
                         </button>
-                        <button id="lexi-next-btn" class="lexi-ctrl-btn" aria-label="Next Track">
+                        <button id="lexi-next-btn" class="lexi-ctrl-btn" title="Next Track" aria-label="Next Track">
                             ${ICONS.next}
                         </button>
                     </div>
@@ -696,11 +697,11 @@ class SitewideMusicEngine {
 
                 <!-- Action Glyphs / Buttons -->
                 <div class="lexi-actions-row">
-                    <button id="lexi-ask" class="lexi-action-pill" aria-label="Ask Lexi">
+                    <button id="lexi-ask" class="lexi-action-pill" title="Ask Lexi" aria-label="Ask Lexi">
                         ${ICONS.chat}
                         <span>Ask Lexi</span>
                     </button>
-                    <button id="lexi-view-cart" class="lexi-action-pill" aria-label="View Cart">
+                    <button id="lexi-view-cart" class="lexi-action-pill" title="View Cart" aria-label="View Cart">
                         ${ICONS.cart}
                         <span>View Cart</span>
                         <span id="lexi-pill-cart-count" class="lexi-pill-count"></span>
@@ -717,7 +718,7 @@ class SitewideMusicEngine {
                 badge.textContent = count;
                 badge.style.display = 'inline-block';
             }
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
 
         // Wire play/pause if present
         const playBtn = orb.querySelector('#lexi-play-pause-btn');
@@ -780,7 +781,7 @@ class SitewideMusicEngine {
                             }
                         }
                     }).catch(err => {
-                        console.error('Failed to load chatbot:', err);
+                        console.error('Manager info: Failed to load chatbot:', err);
                         window.location.href = 'index.html#chat';
                     });
                 }
@@ -913,7 +914,7 @@ class SitewideMusicEngine {
         let count = 0;
         try {
             count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-        } catch (_) {}
+        } catch (_) { /* ignore playback or state error */ }
         const cartBadge = orb.querySelector('#lexi-cart-badge');
         if (cartBadge) {
             cartBadge.textContent = count;
@@ -949,7 +950,7 @@ window.DTSMusic = sitewidePlayer;
 window.updateLexiCartCount = function(count) {
     try {
         localStorage.setItem('cartItemCount', String(count));
-    } catch (_) {}
+    } catch (_) { /* ignore playback or state error */ }
 
     const badge = document.getElementById('lexi-cart-badge');
     if (badge) {

@@ -1,10 +1,15 @@
 // js/checkout.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
+<<<<<<< HEAD
+import { generateProductCardHtml } from "./ui-utils.js";
+=======
+import { generateProductCardHtml } from './ui-utils.js';
+>>>>>>> origin/main
 
 let currentUser = null;
 let userCart = {};
@@ -227,11 +232,7 @@ function renderCheckoutPage() {
 
 
 function updateSummaryUI() {
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
 
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
@@ -260,6 +261,7 @@ function updateSummaryUI() {
 
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
+<<<<<<< HEAD
     const orderDocId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const fullOrder = {
         orderId: orderDocId,
@@ -333,25 +335,51 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
                 });
             }
         } catch (dbErr) {
-            console.warn("Firestore order write warning:", dbErr);
+            console.warn("Manager info: Firestore order write warning:", dbErr);
+=======
+    try {
+        if (!currentUser) {
+            throw new Error('User must be logged in to process an order.');
+>>>>>>> origin/main
         }
+
+        const token = await currentUser.getIdToken();
+        const cloudFunctionUrl = window.location.hostname === 'localhost'
+            ? 'http://localhost:5001/dts-hub-website/us-central1/processOrderTransaction'
+            : 'https://us-central1-dts-hub-website.cloudfunctions.net/processOrderTransaction';
+
+        const response = await fetch(cloudFunctionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ cart, orderDetails, pointsToRedeem: orderDetails.pointsRedeemed })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Server Error');
+        }
+
+        const data = await response.json();
+        const orderId = data.orderId || 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        // Always clear localStorage cart
+        localStorage.removeItem('localCart');
+        localStorage.removeItem('cartItemCount');
+
+        // Broadcast cartUpdated event so Lexi and headers clear the count
+        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart: {}, itemCount: 0, totalPrice: 0 } }));
+        if (typeof window.updateLexiCartCount === 'function') {
+            window.updateLexiCartCount(0);
+        }
+
+        return orderId;
+    } catch (error) {
+        console.error('Manager info: Error processing order transaction [' + error.message + ']');
+        throw error;
     }
-
-    // Always clear localStorage cart
-    localStorage.removeItem('localCart');
-    localStorage.removeItem('cartItemCount');
-    localStorage.setItem('lastCompletedOrder', JSON.stringify({
-        ...fullOrder,
-        orderDate: new Date().toISOString()
-    }));
-
-    // Broadcast cartUpdated event so Lexi and headers clear the count
-    window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart: {}, itemCount: 0, totalPrice: 0 } }));
-    if (typeof window.updateLexiCartCount === 'function') {
-        window.updateLexiCartCount(0);
-    }
-
-    return orderDocId;
 }
 
 export async function handlePlaceOrder(e) {
@@ -374,11 +402,7 @@ export async function handlePlaceOrder(e) {
     const emailVal = emailInput ? emailInput.value : (currentUser ? currentUser.email : '');
 
     // Calculate final total
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
     const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
@@ -453,7 +477,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localRaw = localStorage.getItem('localCart');
         if (localRaw) localCart = JSON.parse(localRaw);
-    } catch (_) {}
+    } catch (_) { /* ignore parse error */ }
 
     if (user) {
         currentUser = user;
@@ -462,14 +486,14 @@ onAuthStateChanged(auth, async (user) => {
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
             userCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
-        } catch (_) {
+        } catch (_) { /* ignore firestore read error */
             userCart = localCart;
         }
 
         try {
             const userData = await getCachedUserProfile(user);
             window.userPointsBalance = userData ? (userData.pointsBalance || 0) : 0;
-        } catch (_) {
+        } catch (_) { /* ignore profile read error */
             window.userPointsBalance = 0;
         }
     } else {
