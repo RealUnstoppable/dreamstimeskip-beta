@@ -90,7 +90,7 @@ function setupUI() {
     document.getElementById('toggle-sfx').addEventListener('change', (e) => sfxEnabled = e.target.checked);
     document.getElementById('toggle-music').addEventListener('change', (e) => {
         musicEnabled = e.target.checked;
-        if (musicEnabled && isPlaying && !isPaused) bgmMusic.play().catch(e => console.log('Audio play blocked:', e));
+        if (musicEnabled && isPlaying && !isPaused) bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
         else bgmMusic.pause();
     });
 
@@ -197,7 +197,7 @@ function startGame() {
         // Crossfade to game music
         bgmMenu.pause();
         bgmMusic.currentTime = 0;
-        bgmMusic.play().catch(e => console.log('Audio play blocked:', e));
+        bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
     }
 
     animationFrameId = requestAnimationFrame(gameLoop);
