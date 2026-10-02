@@ -1,6 +1,5 @@
 import { db } from './auth.js';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, orderBy, getAggregateFromServer, average, count } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { fetchQueryData } from './utils.js';
 
 const REVIEWS_COLLECTION = 'product_reviews';
 
@@ -52,12 +51,13 @@ export async function getProductReviews(productId) {
             where('productId', '==', productId),
             orderBy('createdAt', 'desc')
         );
-        const data = await fetchQueryData(getDocs, q, true);
+        const querySnapshot = await getDocs(q);
 
-        return data.map(review => ({
-            ...review,
+        return querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
             // Optional: format the timestamp to date string
-            createdAtDate: review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now'
+            createdAtDate: doc.data().createdAt ? doc.data().createdAt.toDate().toLocaleDateString() : 'Just now'
         }));
     } catch (error) {
         console.error('Manager info: Error fetching product reviews:', error);

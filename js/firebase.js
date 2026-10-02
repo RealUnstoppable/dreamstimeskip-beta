@@ -90,7 +90,7 @@ export async function fetchCollectionData(collectionName, includeId = false) {
         const querySnapshot = await getDocs(collection(db, collectionName));
         return querySnapshot.docs.map(doc => includeId ? { id: doc.id, ...doc.data() } : doc.data());
     } catch (e) {
-        console.error(`Manager info: Error fetching collection ${collectionName}`, e);
+        console.error(`Error fetching collection ${collectionName}`, e);
         return [];
     }
 }

@@ -1,0 +1,44 @@
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/script.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /images/Pencil-1-logo-light.png HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/notifications-service.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/firebase.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:10] "GET /js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /UnstoppableHoodieModel300x300.png HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /DreamsTimeSkipModel300x300.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /HarmonyTunesModel300x300.png HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /images/Unstoppable%20Collection%20Logo.png HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /images/un-logo-1.png HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /images/harmony-tunes-card.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:44:11] "GET /images/dreams-lobby.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /index.html HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/theme-loader.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /images/Pencil-1-logo-light.png HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/navbar.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/script.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/footer.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /css/themes.css HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/auth.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/notifications-service.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/firebase.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /js/utils.js HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /DreamsTimeSkipModel300x300.jpg HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /UnstoppableHoodieModel300x300.png HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] code 404, message File not found
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /HarmonyTunesModel300x300.png HTTP/1.1" 404 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /images/dreams-lobby.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /images/un-logo-1.png HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /images/harmony-tunes-card.jpg HTTP/1.1" 200 -
+127.0.0.1 - - [19/Jul/2026 12:45:10] "GET /images/Unstoppable%20Collection%20Logo.png HTTP/1.1" 200 -

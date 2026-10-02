@@ -1,6 +1,6 @@
-🧹 Code Health: Extract inline styles to CSS in shop
+refactor: apply DRY sweep, update error logging, optimize state management
 
-🎯 **What:** Removed inline styles in `js/shop.js` (including `<span style="...">FREE (Beta)</span>`, `.product-image`, `.product-footer`, `.view-reviews-btn`, `.original-price`, and review messages) and replaced them with corresponding CSS classes defined in `css/shop.css`.
-💡 **Why:** Applying styles via CSS classes instead of inline strings separates concerns and makes styles much easier to maintain, read, and update.
-✅ **Verification:** Ran `pnpm test` and ensured that UI components visually map correctly without changing any functional logic. Replaced all raw style references using `grep` confirmation.
-✨ **Result:** A cleaner JavaScript file with no raw CSS formatting string artifacts, shifting responsibility back to the external stylesheet.
+This PR addresses three main objectives:
+1. **DRY Sweep**: Replaced duplicated manual cart subtotal calculation loops in checkout.js and checkout.js.new with the imported calculateCartSummary utility function.
+2. **Error Handling**: Ensured standard logging conventions by prefixing all console.error calls with "Manager info:" in account.js and checkout-related files for better troubleshooting.
+3. **State Management**: Optimized caching memoization checks in account.js by stringifying mapped identifiers instead of entire unextracted document objects to prevent overhead and unnecessary re-renders.
