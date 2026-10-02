@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <script type="module" src="/js/theme-loader.js"></script>
+    <script type="module" src="/js/medixly-onboarding.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medixly | un</title>
@@ -14,7 +15,8 @@
 
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
-    <link rel="stylesheet" href="/css/harmonytunes.css">
+    <link rel="stylesheet" href="/css/chatbot.css">
+    <link rel="stylesheet" href="/css/harmonytunes.css?v=1790377266541">
 </head>
 <body>
     
@@ -96,6 +98,7 @@
                         <div class="playlist-actions">
                             <button id="playlist-play-btn" class="action-btn-play" title="Play playlist" aria-label="Play playlist">▶</button>
                             <button id="share-playlist-btn" class="action-btn-secondary">Share</button>
+                            <button id="delete-playlist-btn" class="action-btn-secondary" style="color:var(--accent-red);border-color:var(--accent-red);display:none;">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -106,6 +109,7 @@
                                 <th style="width: 40px;">#</th>
                                 <th>Title</th>
                                 <th>Artist</th>
+                                <th>Genre</th>
                                 <th style="text-align: right;">Duration</th>
                             </tr>
                         </thead>
@@ -383,22 +387,24 @@
         <button class="context-menu-item" id="ctx-play-last">Play Last</button>
         <button class="context-menu-item" id="ctx-favorite">Favorite</button>
         <button class="context-menu-item" id="ctx-view-artist">View Artist</button>
+        <button class="context-menu-item" id="ctx-share">Share Song</button>
+        <button class="context-menu-item" id="ctx-add-playlist">Add to Playlist</button>
     </div>
 
-    <audio id="audio-player"></audio>
-    <audio id="audio-player-2"></audio>
+    <audio id="audio-player" preload="auto"></audio>
+    <audio id="audio-player-2" preload="auto"></audio>
 
   <footer class="main-footer"></footer> 
 
    <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=20260722';
-        import { loadFooter } from './js/footer.js?v=20260722'; // Add this line
+        import { loadNavbar } from './js/navbar.js?v=1790377266541';
+        import { loadFooter } from './js/footer.js?v=1790377266541'; // Add this line
         
         loadNavbar();
         loadFooter();
     </script>
     
-    <script type="module" src="/js/harmonytunes.js?v=20260923f"></script>
+    <script type="module" src="/js/harmonytunes.js?v=1790377266541f"></script>
     
     <!-- ===== Spotlight Search Overlay ===== -->
     <div id="spotlight-overlay" class="spotlight-overlay hidden" role="dialog" aria-modal="true" aria-label="Search">
@@ -472,6 +478,22 @@
     <!-- Script for chatbot logic since we need Lexi chat in harmonytunes -->
     <script type="module" src="/js/chatbot.js"></script>
     <!-- Script for Lexi drag physics -->
-    <script type="module" src="/js/lexi-physics.js"></script>
+    <script type="module" src="/js/lexi-physics.js?v=1790377266541"></script>
+
+    <!-- Playlist Selection Modal -->
+    <div id="playlist-select-modal" class="modal-overlay hidden" style="z-index: 4000;">
+        <div class="modal-content" style="max-width: 300px;">
+            <h2 class="modal-title" style="font-size: 1.2rem; margin-bottom: 15px;">Add to Playlist</h2>
+            <div id="playlist-select-list" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;margin-bottom:15px;">
+                <!-- Dynamically populated -->
+            </div>
+            <div style="display:flex;gap:10px;">
+                <input type="text" id="new-playlist-input" placeholder="New Playlist Name" style="flex:1;background:var(--secondary-bg);color:#fff;border:1px solid var(--border-color);border-radius:4px;padding:5px;">
+                <button id="create-and-add-btn" class="action-btn-primary" style="padding:5px 10px;">Create</button>
+            </div>
+            <button id="close-playlist-modal-btn" class="modal-close-btn" style="margin-top:15px;width:100%;">Close</button>
+        </div>
+    </div>
+
 </body>
 </html>

@@ -276,20 +276,61 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
         earnedPoints: orderDetails.earnedPoints || 0
     };
 
+    const effectiveUid = uid || (currentUser && currentUser.uid) || null;
+
     // If signed in, write to Firestore
-    if (currentUser && currentUser.uid) {
+    if (effectiveUid) {
         try {
             await addDoc(collection(db, 'orders'), fullOrder);
-            await setDoc(doc(db, 'carts', currentUser.uid), { items: {} });
+            await setDoc(doc(db, 'carts', effectiveUid), { items: {} });
 
-            if (orderDetails.earnedPoints) {
-                const userRef = doc(db, 'users', currentUser.uid);
-                const userSnap = await getDoc(userRef);
-                if (userSnap.exists()) {
-                    const currentPoints = userSnap.data().pointsBalance || 0;
-                    const newBal = Math.max(0, currentPoints - (orderDetails.pointsRedeemed || 0) + orderDetails.earnedPoints);
-                    await setDoc(userRef, { pointsBalance: newBal }, { merge: true });
-                }
+            const userRef = doc(db, 'users', effectiveUid);
+            const userSnap = await getDoc(userRef);
+            const currentData = userSnap.exists() ? userSnap.data() : {};
+            const currentBal = currentData.pointsBalance || 0;
+            const currentEarned = currentData.loyaltyPoints || currentBal;
+            const earnedPts = orderDetails.earnedPoints || 0;
+            const redeemedPts = orderDetails.pointsRedeemed || 0;
+            const newBal = Math.max(0, currentBal - redeemedPts + earnedPts);
+            const newTotalEarned = currentEarned + earnedPts;
+
+            await setDoc(userRef, {
+                pointsBalance: newBal,
+                loyaltyPoints: newTotalEarned
+            }, { merge: true });
+
+            // Update session cache
+            const cacheKey = `profile_${effectiveUid}`;
+            const cachedStr = sessionStorage.getItem(cacheKey);
+            if (cachedStr) {
+                const uData = JSON.parse(cachedStr);
+                uData.pointsBalance = newBal;
+                uData.loyaltyPoints = newTotalEarned;
+                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+            }
+
+            // Record points earned in loyalty_transactions
+            if (earnedPts > 0) {
+                await addDoc(collection(db, 'loyalty_transactions'), {
+                    userId: effectiveUid,
+                    description: `Order Purchase #${orderDocId} 🛍️`,
+                    points: earnedPts,
+                    type: 'earned',
+                    orderId: orderDocId,
+                    createdAt: serverTimestamp()
+                });
+            }
+
+            // Record points redeemed in loyalty_transactions
+            if (redeemedPts > 0) {
+                await addDoc(collection(db, 'loyalty_transactions'), {
+                    userId: effectiveUid,
+                    description: `Points Redeemed for Discount (Order #${orderDocId}) 🏷️`,
+                    points: -redeemedPts,
+                    type: 'redeemed',
+                    orderId: orderDocId,
+                    createdAt: serverTimestamp()
+                });
             }
         } catch (dbErr) {
             console.warn("Firestore order write warning:", dbErr);
