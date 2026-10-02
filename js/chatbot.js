@@ -1,6 +1,7 @@
 // js/chatbot.js
 import { app, db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { escapeHTML } from './utils.js';
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 import { librarySongs } from './song-data.js?v=20260920';
 
@@ -389,19 +390,7 @@ function initChatbot() {
         if (el) el.remove();
     }
 
-    function escapeHTML(str) {
-        if (str == null) return "";
-        if (typeof str !== 'string') str = String(str);
-        return str.replace(/[&<>'"]/g, 
-            tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag] || tag)
-        );
-    }
+
 }
 
 if (document.readyState === 'loading') {
