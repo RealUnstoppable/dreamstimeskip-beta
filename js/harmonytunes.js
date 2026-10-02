@@ -7,16 +7,7 @@ import { lyricsData } from './lyrics-data.js?v=1790377272083b';
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1790377272083b';
 
 // Utility to prevent DOM-based and Stored XSS
-function escapeHTML(str) {
-    if (str == null) return "";
-    if (typeof str !== 'string') str = String(str);
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+
 
 function initHarmonyTunes() {
 
@@ -785,19 +776,11 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-<<<<<<< HEAD
-            console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
-            try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
-=======
             console.error("Manager info: Error loading playlist:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
             try { playlistPlayBtn.onclick = null; } catch (e) {}
->>>>>>> origin/main
         }
     }
 

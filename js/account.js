@@ -402,15 +402,8 @@ export async function renderRewards(user, userData) {
         }
 
     } catch (err) {
-<<<<<<< HEAD
-        console.error("Manager info: Error rendering rewards:", err);
-        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
-        if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
-        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
-=======
         console.error("Error rendering rewards:", err);
         if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
->>>>>>> origin/main
     }
 }
 
@@ -527,12 +520,9 @@ export function renderBilling(user, userData) {
                 renderBilling(user, userData);
             } catch (err) {
                 console.error("Manager info: Test activate error:", err);
-<<<<<<< HEAD
-=======
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
->>>>>>> origin/main
             }
         });
     }
