@@ -1,6 +1,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getCachedUserProfile } from './utils.js';
 import { lyricsData } from './lyrics-data.js?v=1790377272083b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1790377272083b';
@@ -19,15 +20,41 @@ function escapeHTML(str) {
 
 function initHarmonyTunes() {
 
+    // Background Tab Throttling Bypass
+    const workerBlob = new Blob([`
+        let timers = {};
+        self.onmessage = function(e) {
+            if (e.data.action === 'start') {
+                timers[e.data.id] = setInterval(() => self.postMessage(e.data.id), e.data.delay);
+            } else if (e.data.action === 'stop') {
+                clearInterval(timers[e.data.id]);
+                delete timers[e.data.id];
+            }
+        };
+    `], { type: 'application/javascript' });
+    const workerTimer = new Worker(URL.createObjectURL(workerBlob));
+    const workerCallbacks = {};
+    workerTimer.onmessage = (e) => {
+        if (workerCallbacks[e.data]) workerCallbacks[e.data]();
+    };
+    function startWorkerInterval(id, callback, delay) {
+        workerCallbacks[id] = callback;
+        workerTimer.postMessage({ action: 'start', id, delay });
+    }
+    function stopWorkerInterval(id) {
+        workerTimer.postMessage({ action: 'stop', id });
+        delete workerCallbacks[id];
+    }
+
+
     let customPlaylists = [];
 
     async function loadCustomPlaylists() {
         if (!currentUser) return;
         try {
-            const userRef = doc(db, "users", currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
+            // ⚡ Bolt: Fetch user data from sessionStorage cache using getCachedUserProfile instead of a raw Firestore getDoc query to prevent unnecessary network reads and improve loading speed.
+            const data = await getCachedUserProfile(currentUser);
+            if (data) {
                 customPlaylists = data.customPlaylists || [];
                 renderHomePlaylists();
             }
@@ -41,6 +68,14 @@ function initHarmonyTunes() {
         try {
             const userRef = doc(db, "users", currentUser.uid);
             await updateDoc(userRef, { customPlaylists });
+            // Update session cache to prevent stale data on reload
+            const cacheKey = `profile_${currentUser.uid}`;
+            const cachedStr = sessionStorage.getItem(cacheKey);
+            if (cachedStr) {
+                const uData = JSON.parse(cachedStr);
+                uData.customPlaylists = customPlaylists;
+                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+            }
         } catch (e) {
             console.error("Manager info: Failed to save custom playlists", e);
         }
@@ -115,6 +150,15 @@ function initHarmonyTunes() {
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
+    
+    // API for AI Chatbot
+    window.HarmonyTunesAPI = {
+        getCurrentlyPlaying: () => currentQueue[currentSongIndex] || null,
+        getQueue: () => currentQueue.slice(currentSongIndex + 1),
+        getHistory: () => typeof historyQueue !== 'undefined' ? historyQueue : [],
+        getFavorites: () => Array.from(userFavoritesIds),
+        playSong: (id) => { if (typeof window.playSongById === 'function') window.playSongById(id); }
+    };
 
     // --- DOM ELEMENTS ---
     const viewHome = document.getElementById('view-home');
@@ -138,6 +182,29 @@ function initHarmonyTunes() {
     // Player Elements
     const audioPlayer1 = document.getElementById('audio-player');
     const audioPlayer2 = document.getElementById('audio-player-2');
+    audioPlayer1.preload = 'auto';
+    audioPlayer2.preload = 'auto';
+    
+    
+    
+    
+    // Lexi Engine: Anti-Glitch Pipeline Separator
+    // Browsers share media decoders if two audio elements have the exact same src string.
+    // This causes microscopic glitches when looping the same song.
+    // By appending an instance ID, we force independent decoder pipelines.
+    function setAudioSrc(audioEl, rawSrc) {
+        if (!rawSrc) return false;
+        const cleanSrc = rawSrc.split('?')[0];
+        const instanceParam = (audioEl.id === 'audio-player-2') ? '?inst=2' : '?inst=1';
+        const finalSrc = cleanSrc + instanceParam;
+        
+        if (!audioEl.src || !audioEl.src.endsWith(finalSrc)) {
+            audioEl.src = finalSrc;
+            return true;
+        }
+        return false;
+    }
+
     let activeAudio = audioPlayer1;
     let nextAudio = audioPlayer2;
     let isMixerMode = false;
@@ -307,11 +374,9 @@ function initHarmonyTunes() {
         spotlightResults.innerHTML = '';
     }
 
-    function highlightMatch(text, query) {
-        if (!query) return escapeHTML(text);
-        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`(${escaped})`, 'gi');
-        return escapeHTML(text).replace(re, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
+    function highlightMatch(text, regex) {
+        if (!regex) return escapeHTML(text);
+        return escapeHTML(text).replace(regex, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
     }
 
     function runSpotlightSearch(query) {
@@ -332,7 +397,7 @@ function initHarmonyTunes() {
             return;
         }
 
-        const groupedMatches = groupSongsByTitle(matches);
+        const groupedMatches = groupSongsByTitle(matches.slice(0, 50)); // Cap to 50 results to prevent UI lag
         spotlightResults.innerHTML = groupedMatches.map(group => {
             let optionsHtml = '';
             if (group.versions && group.versions.length > 1) {
@@ -720,11 +785,19 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
+<<<<<<< HEAD
             console.error("Error loading playlist - Manager info:", error);
             try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
             try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
+=======
+            console.error("Manager info: Error loading playlist:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
+            try { playlistPlayBtn.onclick = null; } catch (e) {}
+>>>>>>> origin/main
         }
     }
 
@@ -750,11 +823,16 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
+            const prioritySet = new Set(priorityIds);
+            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
+
             const prioritySongs = priorityIds
-                .map(id => viralSongs.find(s => s.id === id))
+                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
+                .map(id => viralSongsMap.get(id))
                 .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
+            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
@@ -877,7 +955,7 @@ function initHarmonyTunes() {
 
         // 2. Recommended
         const recommended = groupSongsByTitle([...librarySongs]).sort(() => 0.5 - Math.random());
-        containerRecommended.innerHTML = recommended.map(group => createGroupCard(group)).join('');
+        containerRecommended.innerHTML = recommended.slice(0, 30).map(group => createGroupCard(group)).join('');
         let existingShowMore = document.getElementById('show-more-recommended');
         if (!existingShowMore) {
             containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
@@ -895,7 +973,8 @@ function initHarmonyTunes() {
                     <iframe src="https://www.tiktok.com/embed/v2/${video.id}" 
                         style="width: 100%; height: 100%; border: none;" 
                         scrolling="no" 
-                        allow="encrypted-media;">
+                        allow="encrypted-media;"
+                        loading="lazy">
                     </iframe>
                 </div>
             `).join('');
@@ -970,18 +1049,41 @@ function initHarmonyTunes() {
     window.loadPlaylistView = loadPlaylistView;
 
     // --- RENDERING TABLE (Fixed Duration Bug) ---
-    function renderSongTable(songs) {
-        songListBody.innerHTML = '';
-        if (songs.length === 0) {
-            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
-            return;
-        }
+    function updateSongTableActiveState() {
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        const currentSongId = currentQueue[currentSongIndex].id;
+        const rows = songListBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const isMatch = row.dataset.songId === currentSongId;
+            if (isMatch) {
+                row.classList.add('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'none';
+                if(iconSpan) iconSpan.style.display = 'inline';
+            } else {
+                row.classList.remove('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'inline';
+                if(iconSpan) iconSpan.style.display = 'none';
+            }
+        });
+    }
 
-        // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
+    let currentRenderIndex = 0;
+    let currentGroupedSongs = [];
+    const RENDER_CHUNK_SIZE = 50;
+    let intersectionObserver = null;
+
+    function renderSongTableChunk() {
+        if (currentRenderIndex >= currentGroupedSongs.length) return;
+
         const fragment = document.createDocumentFragment();
-
-        const groupedSongs = groupSongsByTitle(songs);
-        groupedSongs.forEach((group, index) => {
+        const endIndex = Math.min(currentRenderIndex + RENDER_CHUNK_SIZE, currentGroupedSongs.length);
+        
+        for (let index = currentRenderIndex; index < endIndex; index++) {
+            const group = currentGroupedSongs[index];
             const row = document.createElement('tr');
             const song = group.baseSong;
             
@@ -1002,33 +1104,77 @@ function initHarmonyTunes() {
                 </td>
                 <td class="song-title">${optionsHtml}</td>
                 <td>${escapeHTML(song.artist)}</td>
+                <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
                 <td style="width: 40px; text-align: center;">
                     <button class="card-more-btn" style="background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;" title="More Options">...</button>
                 </td>
             `;
 
-            // Assign data-song-id to the row so context menu click can find it
             row.dataset.songId = song.id;
             
             row.addEventListener('click', (e) => {
-                if (e.target.closest('.card-more-btn')) return; // ignore if clicking more btn
-                if (e.target.closest('.version-select')) return; // ignore select click
+                if (e.target.closest('.card-more-btn')) return;
+                if (e.target.closest('.version-select')) return;
                 
-                // Construct the queue from the current visible table state (including selected versions)
                 const queueRows = Array.from(songListBody.querySelectorAll('tr'));
-                // If songListBody isn't populated yet, map over groupedSongs
                 const dynamicQueue = queueRows.length > 0 
                     ? queueRows.map(r => librarySongsMap.get(r.dataset.songId)).filter(Boolean)
-                    : groupedSongs.map(g => librarySongsMap.get(row.dataset.songId || g.baseSong.id)).filter(Boolean);
+                    : currentGroupedSongs.map(g => librarySongsMap.get(row.dataset.songId || g.baseSong.id)).filter(Boolean);
                 
                 playContext(dynamicQueue, index);
             });
 
             fragment.appendChild(row);
-        });
+        }
 
         songListBody.appendChild(fragment);
+        currentRenderIndex = endIndex;
+        
+        // Setup observer for next chunk if needed
+        if (currentRenderIndex < currentGroupedSongs.length) {
+            setupIntersectionObserver();
+        }
+    }
+    
+    function setupIntersectionObserver() {
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        // Find or create sentinel
+        let sentinel = document.getElementById('table-sentinel');
+        if (!sentinel) {
+            sentinel = document.createElement('div');
+            sentinel.id = 'table-sentinel';
+            sentinel.style.height = '1px';
+            songListBody.parentElement.appendChild(sentinel);
+        }
+        
+        intersectionObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                renderSongTableChunk();
+            }
+        }, { rootMargin: '200px' });
+        
+        intersectionObserver.observe(sentinel);
+    }
+
+    function renderSongTable(songs) {
+        songListBody.innerHTML = '';
+        if (intersectionObserver) {
+            intersectionObserver.disconnect();
+        }
+        
+        if (songs.length === 0) {
+            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
+            return;
+        }
+
+        currentGroupedSongs = groupSongsByTitle(songs);
+        currentRenderIndex = 0;
+        
+        renderSongTableChunk();
     }
 
     // --- PLAYER LOGIC ---
@@ -1068,7 +1214,7 @@ function initHarmonyTunes() {
         const mobMixerBtn = document.getElementById('mob-mixer-btn');
         if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
-        activeAudio.src = song.src;
+        setAudioSrc(activeAudio, song.src);
         playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
         playerArtist.textContent = song.artist;
         playerArt.src = song.art;
@@ -1094,8 +1240,7 @@ function initHarmonyTunes() {
 
         updateProgress();
         if(viewPlaylist.style.display !== 'none') {
-            const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-            renderSongTable(showingFavs ? userFavorites : librarySongs);
+            updateSongTableActiveState();
         }
         
         // Trigger Background Mixxer AI
@@ -1155,9 +1300,10 @@ function initHarmonyTunes() {
     }
 
     function playSong() {
-        if (fadeInterval) clearInterval(fadeInterval);
-        if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-        if (crossfadeInterval) clearInterval(crossfadeInterval);
+        
+        stopWorkerInterval("fadeInterval");
+        stopWorkerInterval("fadeIntervalCrossfade");
+        stopWorkerInterval("crossfadeInterval");
 
         isCrossfading = false;
         mixerBtn.classList.remove('pulsing');
@@ -1183,11 +1329,11 @@ function initHarmonyTunes() {
             const steps = durationMs / fadeStep;
             let currentStep = 0;
             
-            fadeInterval = setInterval(() => {
+            startWorkerInterval("fadeInterval", () => {
                 currentStep++;
                 activeAudio.volume = targetVol * (currentStep / steps);
                 if (currentStep >= steps) {
-                    clearInterval(fadeInterval);
+                    stopWorkerInterval("fadeInterval");
                     activeAudio.volume = targetVol;
                 }
             }, fadeStep);
@@ -1195,7 +1341,7 @@ function initHarmonyTunes() {
     }
 
     function pauseSong() {
-        if (fadeInterval) clearInterval(fadeInterval);
+        stopWorkerInterval("fadeInterval");
         
         isPlaying = false;
         saveSitewideMusicState({ isPlaying: false });
@@ -1217,12 +1363,12 @@ function initHarmonyTunes() {
         const steps = durationMs / fadeStep;
         let currentStep = 0;
         
-        fadeInterval = setInterval(() => {
+        startWorkerInterval("fadeInterval", () => {
             currentStep++;
             const newVol = startVol * (1 - (currentStep / steps));
             activeAudio.volume = Math.max(0, newVol);
             if (currentStep >= steps) {
-                clearInterval(fadeInterval);
+                stopWorkerInterval("fadeInterval");
                 activeAudio.pause();
                 activeAudio.volume = targetVol;
             }
@@ -1248,13 +1394,16 @@ function initHarmonyTunes() {
         }
 
         if(typeof window.__pullFromUserQueue === 'function') {
-            const nextUserSong = window.__pullFromUserQueue();
-            if(nextUserSong) {
-                currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
-                currentSongIndex = currentSongIndex + 1;
-                loadSong(currentSongIndex);
-                playSong();
-                return;
+            if(userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    __recordHistory();
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                    currentSongIndex = currentSongIndex + 1;
+                    loadSong(currentSongIndex);
+                    playSong();
+                    return;
+                }
             }
         }
 
@@ -1364,7 +1513,9 @@ function initHarmonyTunes() {
             player.addEventListener('ended', (e) => {
                 if (e.target === activeAudio) {
                     if (isMixerMode && isCrossfading) return;
-                    if (repeatMode === 2) {
+                    if (userQueue.length > 0) {
+                        nextSong();
+                    } else if (repeatMode === 2) {
                         activeAudio.currentTime = 0;
                         playSong();
                     } else {
@@ -1458,7 +1609,7 @@ function initHarmonyTunes() {
 
         volumeSlider.addEventListener('input', (e) => {
             if (fadeInterval) {
-                clearInterval(fadeInterval);
+                stopWorkerInterval("fadeInterval");
                 fadeInterval = null;
             }
             activeAudio.volume = e.target.value;
@@ -1468,11 +1619,166 @@ function initHarmonyTunes() {
             const width = progressBar.clientWidth;
             const clickX = e.offsetX;
             const duration = activeAudio.duration;
-            activeAudio.currentTime = (clickX / width) * duration;
+            const seekTo = (clickX / width) * duration;
+            activeAudio.currentTime = seekTo;
+
+            // Lexi Intelligent Seek Crossfade — only when Mixer is ON
+            if (isMixerMode && !isCrossfading && duration > 0) {
+                const remaining = duration - seekTo;
+                
+                // Reset any previous seek-triggered state
+                stopWorkerInterval("lexiSeekAnalyze");
+                isListening = false;
+                mixerBtn.classList.remove('analyzing');
+                if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
+                const mobBtn = document.getElementById('mob-mixer-btn');
+                if(mobBtn) mobBtn.classList.remove('analyzing');
+
+                if (remaining <= 5) {
+                    // === EMERGENCY MODE (≤5s): Instant crossfade, no time to waste ===
+                    console.log("Lexi Seek: Emergency crossfade (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    // Force an immediate crossfade by triggering checkCrossfade logic
+                    // The existing checkCrossfade will pick it up on the next timeupdate
+                    
+                } else if (remaining <= 25) {
+                    // === PANIC MODE (≤25s): Stitch the two most similar sections ===
+                    console.log("Lexi Seek: Panic mode (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    mixerBtn.classList.add('analyzing');
+                    if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+                    if(mobBtn) mobBtn.classList.add('analyzing');
+
+                    // Find next song and preload at the point most similar in energy
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        
+                        // Find the best in-mix point: match energy/BPM similarity
+                        const currentBpm = currentMeta?.bpm || 120;
+                        const nextBpm = nextMeta?.bpm || 120;
+                        const bpmRatio = currentBpm / nextBpm;
+                        
+                        // Use a point ~40% into the next song for energy matching (choruses tend to be there)
+                        const nextDuration = nextMeta?.outmixPoint || 180;
+                        const stitchPoint = Math.min(nextDuration * 0.4, nextMeta?.inmixPoint || 15);
+                        
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = stitchPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = stitchPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                        
+                        // Override crossfade duration to use all remaining time
+                        crossfadeDuration = Math.max(3, remaining - 1);
+                    }
+
+                } else if (remaining <= 40) {
+                    // === SERIOUS MODE (≤40s): Find a good beat to transition on ===
+                    console.log("Lexi Seek: Serious mode (" + remaining.toFixed(1) + "s left)");
+                    isListening = true;
+                    mixerBtn.classList.add('analyzing');
+                    if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+                    if(mobBtn) mobBtn.classList.add('analyzing');
+
+                    // Preload next song at optimal beat-aligned in-mix point
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        const inmixPoint = nextMeta?.inmixPoint || 15;
+                        
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = inmixPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = inmixPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                        
+                        // Use BPM-optimized crossfade duration (fit within remaining time)
+                        const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                        const optFade = calculateOptimalCrossfade(currentMeta?.bpm || 120);
+                        crossfadeDuration = Math.min(optFade, remaining - 2);
+                    }
+
+                } else if (remaining <= 50) {
+                    // === CALCULATE MODE (≤50s): Start analyzing early, plenty of time ===
+                    console.log("Lexi Seek: Calculate mode (" + remaining.toFixed(1) + "s left)");
+                    
+                    // Use BPM-matched crossfade, find best next song match
+                    const currentMeta = librarySongsMap.get(currentQueue[currentSongIndex]?.id);
+                    if (currentMeta && currentQueue.length > 1) {
+                        let bestMatchIndex = currentSongIndex + 1;
+                        if (bestMatchIndex >= currentQueue.length) bestMatchIndex = 0;
+                        let smallestBpmDiff = Infinity;
+                        
+                        for (let i = 0; i < currentQueue.length; i++) {
+                            if (i === currentSongIndex) continue;
+                            const candidate = librarySongsMap.get(currentQueue[i].id);
+                            if (candidate) {
+                                const diff = Math.abs((candidate.bpm || 120) - (currentMeta.bpm || 120));
+                                if (diff < smallestBpmDiff) {
+                                    smallestBpmDiff = diff;
+                                    bestMatchIndex = i;
+                                }
+                            }
+                        }
+                        
+                        // Reorder queue so best match is next
+                        if (bestMatchIndex !== (currentSongIndex + 1) % currentQueue.length && !isShuffle) {
+                            const nextIdx = (currentSongIndex + 1) % currentQueue.length;
+                            const temp = currentQueue[nextIdx];
+                            currentQueue[nextIdx] = currentQueue[bestMatchIndex];
+                            currentQueue[bestMatchIndex] = temp;
+                        }
+                    }
+                    
+                    // Preload next song
+                    let preloadIndex = currentSongIndex + 1;
+                    if (preloadIndex >= currentQueue.length) preloadIndex = repeatMode === 1 ? 0 : -1;
+                    if (preloadIndex >= 0 && preloadIndex < currentQueue.length) {
+                        const nextSong = currentQueue[preloadIndex];
+                        const nextMeta = librarySongsMap.get(nextSong.id);
+                        const inmixPoint = nextMeta?.inmixPoint || 15;
+                        
+                        if (setAudioSrc(nextAudio, nextSong.src)) {
+                            nextAudio.volume = 0;
+                            nextAudio.addEventListener('loadedmetadata', () => {
+                                nextAudio.currentTime = inmixPoint;
+                                const p = nextAudio.play();
+                                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                            }, { once: true });
+                        } else {
+                            nextAudio.currentTime = inmixPoint;
+                            const p = nextAudio.play();
+                            if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                        }
+                    }
+                    
+                    // Full optimal crossfade
+                    crossfadeDuration = calculateOptimalCrossfade(currentMeta?.bpm || 120);
+                }
+            }
         });
 
         // Viral Skip: Double Tap to Loop, Single Tap to Skip
-        let viralLastTapTime = 0;
         const toggleViralLock = (forceUnlock = false) => {
             if (viralLocked || forceUnlock) {
                 viralLocked = false;
@@ -1484,20 +1790,23 @@ function initHarmonyTunes() {
                 if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
             }
         };
+        
         const handleViralClick = (e) => {
             if(e) e.preventDefault();
-            const now = Date.now();
-            if (now - viralLastTapTime < 5000 && viralLastTapTime !== 0) {
-                // Double tap detected (within 5 seconds)
-                toggleViralLock();
-                viralLastTapTime = 0; // reset
-            } else {
-                // Single tap detected
-                viralLastTapTime = now;
+            toggleViralLock();
+            
+            // If just enabled, instantly jump to the viral section
+            if (viralLocked) {
                 const song = currentQueue[currentSongIndex];
-                if (song && song.inmixPoint) {
-                    activeAudio.currentTime = song.inmixPoint;
-                    if (activeAudio.paused) playSong();
+                if (song) {
+                    const block = getViralBlock(song.id, activeAudio);
+                    if (block && activeAudio.currentTime < block.paddedStart) {
+                        activeAudio.currentTime = block.paddedStart;
+                        if (activeAudio.paused) playSong();
+                    } else if (!block && song.inmixPoint && activeAudio.currentTime < song.inmixPoint) {
+                        activeAudio.currentTime = song.inmixPoint;
+                        if (activeAudio.paused) playSong();
+                    }
                 }
             }
         };
@@ -1667,7 +1976,7 @@ function initHarmonyTunes() {
             }
             
             if (artistSongs.length > 0) {
-                const trackListHTML = groupSongsByTitle(artistSongs).map(group => createGroupCard(group)).join('');
+                const trackListHTML = groupSongsByTitle(artistSongs).slice(0, 50).map(group => createGroupCard(group)).join('');
                 document.getElementById('artist-track-list').innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
             } else {
                 document.getElementById('artist-track-list').innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
@@ -1702,7 +2011,7 @@ function initHarmonyTunes() {
                     if (filtered.length === 0) {
                         document.getElementById('container-jumpback').innerHTML = '<p style="padding:20px;color:#888;">No results found.</p>';
                     } else {
-                        document.getElementById('container-jumpback').innerHTML = groupSongsByTitle(filtered).map(group => createGroupCard(group)).join('');
+                        document.getElementById('container-jumpback').innerHTML = groupSongsByTitle(filtered).slice(0, 50).map(group => createGroupCard(group)).join('');
                     }
                     // Hide other sections during search
                     document.getElementById('leaderboard-section').style.display = query ? 'none' : 'block';
@@ -1951,6 +2260,24 @@ function initHarmonyTunes() {
         }
     }
 
+    // Find the next song in queue that has a viral block
+    function findNextViralSongIndex(startFrom) {
+        for (let i = startFrom; i < currentQueue.length; i++) {
+            const s = currentQueue[i];
+            const data = lyricsData[s.id];
+            if (data && data.some(l => l.trending)) return i;
+        }
+        // Wrap around if repeat is on
+        if (repeatMode === 1) {
+            for (let i = 0; i < startFrom; i++) {
+                const s = currentQueue[i];
+                const data = lyricsData[s.id];
+                if (data && data.some(l => l.trending)) return i;
+            }
+        }
+        return -1;
+    }
+
     function checkViralCrossfade() {
         if (!viralLocked) return;
         const song = currentQueue[currentSongIndex];
@@ -1968,22 +2295,57 @@ function initHarmonyTunes() {
             return;
         }
 
-        // If Mixxer is ON, apply the dynamic crossfade
+        // === VIRAL DJ MODE ===
+        // When Mixxer is ON + Viral is locked, crossfade into the NEXT song's viral section
         const fadeDur = block.actualFadeDur;
         
         if (fadeDur <= 0) {
-            // No room to crossfade without bleeding into viral lyrics, fallback to cut
             if (activeAudio.currentTime >= block.paddedEnd) {
-                activeAudio.currentTime = block.paddedStart;
+                // Advance to next song's viral part instead of looping
+                const nextViralIdx = findNextViralSongIndex(currentSongIndex + 1);
+                if (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) {
+                    __recordHistory();
+                    currentSongIndex = nextViralIdx;
+                    loadSong(currentSongIndex);
+                    const nextBlock = getViralBlock(currentQueue[currentSongIndex].id, activeAudio);
+                    if (nextBlock) activeAudio.currentTime = nextBlock.blockStart;
+                    playSong();
+                } else {
+                    activeAudio.currentTime = block.paddedStart; // fallback: loop same viral
+                }
             }
             return;
         }
 
-        // "Analyzing" phase (start analyzing 3 seconds before the crossfade)
-        if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 3 && !isListening && !isCrossfading) {
+        // "Analyzing" phase: preload NEXT song's viral section
+        if (remainingToViralEnd > fadeDur && remainingToViralEnd <= fadeDur + 5 && !isListening && !isCrossfading) {
             isListening = true;
             mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
+            
+            // Find the next song with a viral block
+            const nextViralIdx = findNextViralSongIndex(currentSongIndex + 1);
+            const targetSong = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) 
+                ? currentQueue[nextViralIdx] : song;
+            const targetBlock = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) 
+                ? getViralBlock(targetSong.id, nextAudio) : block;
+            const seekTo = targetBlock ? targetBlock.paddedStart : (block ? block.paddedStart : 0);
+            
+            // Tag the preloaded target so the crossfade phase knows where we're going
+            nextAudio._viralDJTargetIdx = (nextViralIdx !== -1 && nextViralIdx !== currentSongIndex) ? nextViralIdx : currentSongIndex;
+            
+            if (setAudioSrc(nextAudio, targetSong.src)) {
+                nextAudio.volume = 0;
+                nextAudio.addEventListener('loadedmetadata', () => {
+                    nextAudio.currentTime = seekTo;
+                    const p = nextAudio.play();
+                    if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                }, { once: true });
+            } else {
+                nextAudio.currentTime = seekTo;
+                const p = nextAudio.play();
+                if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+            }
         }
 
         // "Crossfading" phase
@@ -1995,26 +2357,48 @@ function initHarmonyTunes() {
             mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
             if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
-            // Swap players for intra-song crossfade
+            // Swap players
             const prevAudio = activeAudio;
             activeAudio = nextAudio;
             nextAudio = prevAudio;
 
-            // Load the same song into the new active audio
-            activeAudio.src = song.src;
-            
-            activeAudio.addEventListener('loadedmetadata', () => {
-                activeAudio.currentTime = block.paddedStart;
-                activeAudio.volume = 0;
-                activeAudio.play().catch(e => console.error("Manager info:", e));
-            }, { once: true });
+            // Advance queue index to the next viral song
+            const targetIdx = activeAudio._viralDJTargetIdx;
+            if (typeof targetIdx === 'number' && targetIdx !== currentSongIndex) {
+                __recordHistory();
+                currentSongIndex = targetIdx;
+                const newSong = currentQueue[currentSongIndex];
+                if (newSong) {
+                    playerTitle.textContent = newSong.title; checkMarquee();
+                    playerArtist.textContent = newSong.artist;
+                    playerArt.src = newSong.art;
+                    document.documentElement.style.setProperty('--lyrics-color', songColors[newSong.id] || '#2d1445');
+                    const isFav = userFavoritesIds.has(newSong.id);
+                    playerLikeBtn.textContent = isFav ? '♥' : '♡';
+                    if(fsLikeBtn) { fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', isFav); }
+                    playerLikeBtn.classList.toggle('active', isFav);
+                    renderLyrics(newSong.id);
+                    if(viewPlaylist.style.display !== 'none') updateSongTableActiveState();
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.metadata = new MediaMetadata({
+                            title: newSong.title, artist: newSong.artist,
+                            artwork: [{ src: newSong.art, sizes: '512x512', type: 'image/jpeg' }]
+                        });
+                    }
+                }
+            }
+            delete activeAudio._viralDJTargetIdx;
+
+            // Start playing (preloaded)
+            activeAudio.volume = 0;
+            activeAudio.play().catch(e => console.error("Manager info:", e));
 
             const fadeMs = fadeDur * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
+            stopWorkerInterval("fadeIntervalCrossfade");
+            startWorkerInterval("fadeIntervalCrossfade", () => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
@@ -2023,7 +2407,7 @@ function initHarmonyTunes() {
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
+                    stopWorkerInterval("fadeIntervalCrossfade");
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
@@ -2042,7 +2426,8 @@ function initHarmonyTunes() {
 
         if (remaining > 0 && remaining <= 45 && !isListening && !isCrossfading) {
             isListening = true;
-            mixerBtn.classList.add('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
+            mixerBtn.classList.add('analyzing');
+            if (userQueue.length === 0) { if(fsMixerBtn) fsMixerBtn.classList.add('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.add('analyzing');
             
             // If there is no next song and repeat is off, auto-queue the best fit using AI
@@ -2078,6 +2463,32 @@ function initHarmonyTunes() {
                     }
                 }
             }
+            } // End of userQueue check
+            
+            // PRELOAD audio for normal crossfade to prevent buffering pauses
+            let preloadIndex = currentSongIndex + 1;
+            if (repeatMode === 2) {
+                preloadIndex = currentSongIndex;
+            } else if (preloadIndex >= currentQueue.length) {
+                if (repeatMode === 1) preloadIndex = 0;
+            }
+            if (preloadIndex < currentQueue.length) {
+                const preloadSong = currentQueue[preloadIndex];
+                if (setAudioSrc(nextAudio, preloadSong.src)) {
+                    nextAudio.volume = 0;
+                    const meta = librarySongsMap.get(preloadSong.id);
+                    nextAudio.addEventListener('loadedmetadata', () => {
+                        nextAudio.currentTime = meta?.inmixPoint || 15;
+                        const p = nextAudio.play();
+                        if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                    }, { once: true });
+                } else {
+                    const meta = librarySongsMap.get(preloadSong.id);
+                    nextAudio.currentTime = meta?.inmixPoint || 15;
+                    const p = nextAudio.play();
+                    if(p !== undefined) p.then(() => nextAudio.pause()).catch(()=>{});
+                }
+            }
         }
 
         if (remaining > 0 && remaining <= crossfadeDuration && !isCrossfading) {
@@ -2093,7 +2504,12 @@ function initHarmonyTunes() {
             nextAudio = prevAudio;
 
             let nextIndex = currentSongIndex + 1;
-            if (repeatMode === 2) {
+            if (typeof window.__pullFromUserQueue === 'function' && userQueue.length > 0) {
+                const nextUserSong = window.__pullFromUserQueue();
+                if(nextUserSong) {
+                    currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
+                }
+            } else if (repeatMode === 2) {
                 nextIndex = currentSongIndex;
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
@@ -2122,11 +2538,19 @@ function initHarmonyTunes() {
             const song = currentQueue[currentSongIndex];
             const songMetadata = librarySongsMap.get(song.id);
             
-            activeAudio.src = song.src;
+            // Safe play: Check if it was already preloaded
             const inmixPoint = songMetadata?.inmixPoint || 15;
-            activeAudio.addEventListener('loadedmetadata', () => {
-                activeAudio.currentTime = inmixPoint;
-            }, { once: true });
+            if (activeAudio.src !== window.location.origin + song.src && activeAudio.src !== song.src && !activeAudio.src.endsWith(song.src)) {
+                setAudioSrc(activeAudio, song.src);
+                activeAudio.addEventListener('loadedmetadata', () => {
+                    activeAudio.currentTime = inmixPoint;
+                    activeAudio.volume = 0;
+                    activeAudio.play().catch(e => console.error(e));
+                }, { once: true });
+            } else {
+                activeAudio.volume = 0;
+                activeAudio.play().catch(e => console.error(e));
+            }
             
             playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
             playerArtist.textContent = song.artist;
@@ -2139,28 +2563,59 @@ function initHarmonyTunes() {
 
             renderLyrics(song.id);
             if(viewPlaylist.style.display !== 'none') {
-                const showingFavs = playlistTitleEl.textContent === "Liked Songs";
-                renderSongTable(showingFavs ? userFavorites : librarySongs);
+                updateSongTableActiveState();
             }
+            
+            const prevIndex = currentSongIndex === 0 ? currentQueue.length - 1 : currentSongIndex - 1;
 
-            activeAudio.volume = 0;
-            activeAudio.play().catch(e => console.error("Manager info:", e));
+            // AutoMix: Beat Matching & Time Stretching
+            let prevBpm = librarySongsMap.get(currentQueue[prevIndex]?.id)?.bpm || 120;
+            let nextBpm = songMetadata?.bpm || 120;
+            let bpmRatio = prevBpm / nextBpm;
+            
+            // Limit stretching to realistic DJ ranges (max 8% shift)
+            let isBeatMatched = false;
+            if (bpmRatio > 0.92 && bpmRatio < 1.08 && bpmRatio !== 1) {
+                activeAudio.preservesPitch = true;
+                activeAudio.playbackRate = bpmRatio;
+                isBeatMatched = true;
+            } else {
+                activeAudio.playbackRate = 1;
+            }
 
             const fadeMs = crossfadeDuration * 1000;
             const startTime = Date.now();
             const baseVolume = parseFloat(volumeSlider.value) || 1;
             
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
+            
+
+            stopWorkerInterval("fadeIntervalCrossfade");
+            startWorkerInterval("fadeIntervalCrossfade", () => {
                 let elapsed = Date.now() - startTime;
                 let ratio = elapsed / fadeMs;
                 if (ratio >= 1) ratio = 1;
                 
+                // Volume fading (Standard)
                 prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
                 activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
 
                 if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
+                    stopWorkerInterval("fadeIntervalCrossfade");
+                    
+                    
+                    
+                    // Slowly drift playbackRate back to normal if beatmatched
+                    if (isBeatMatched) {
+                        let driftInterval = setInterval(() => {
+                            if (Math.abs(activeAudio.playbackRate - 1) < 0.005) {
+                                activeAudio.playbackRate = 1;
+                                clearInterval(driftInterval);
+                            } else {
+                                activeAudio.playbackRate += (1 - activeAudio.playbackRate) * 0.1;
+                            }
+                        }, 100);
+                    }
+
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
@@ -2265,7 +2720,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Manager info: Firebase error:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2317,7 +2772,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Manager info: ", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2393,7 +2848,7 @@ function initHarmonyTunes() {
                 if(e.code === 'not-found') {
                     setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Manager info: Firebase history update error:", e);
                 }
             });
         }
@@ -2599,10 +3054,10 @@ let dragItem = null;
         if (currentTab === 'upnext') {
             displayList = [
                 ...userQueue.map(s => ({...s, isUserQueue: true})),
-                ...currentQueue.slice(currentSongIndex + 1).map(s => ({...s, isUserQueue: false}))
+                ...currentQueue.slice(currentSongIndex + 1, currentSongIndex + 51).map(s => ({...s, isUserQueue: false}))
             ];
         } else {
-            displayList = [...historyQueue].reverse(); // Most recent first
+            displayList = [...historyQueue].reverse().slice(0, 50); // Most recent first, cap at 50
         }
 
         if(displayList.length === 0) {
@@ -2951,7 +3406,7 @@ export function createGroupCard(group) {
     return `
         <div class="music-card" data-song-id="${escapeHTML(group.baseSong.id)}">
             <div class="card-img-wrapper">
-                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}">
+                <img src="${escapeHTML(group.baseSong.art)}" alt="${escapeHTML(group.baseTitle)}" loading="lazy">
                 <button class="card-play-btn" aria-label="Play ${escapeHTML(group.baseTitle)}">▶</button>
                 <button class="add-queue-btn" title="Add to Queue" aria-label="Add ${escapeHTML(group.baseTitle)} to queue">+</button>
                 <button class="card-more-btn" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>

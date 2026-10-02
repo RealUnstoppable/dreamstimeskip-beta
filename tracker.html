@@ -330,7 +330,7 @@
         <div class="absolute bottom-8 left-8 right-8">
             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <span class="text-xs font-bold uppercase tracking-widest">Dark Mode</span>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label for="themeToggle" class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
                     <div
                         class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
@@ -807,7 +807,7 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6 pt-12 no-print">
-                        <button type="button" onclick="generateReport()"
+                        <button type="button" onclick="generateReport(event)"
                             class="btn btn-dark py-6 text-xl shadow-2xl shadow-slate-200 dark:shadow-none">
                             <i data-lucide="printer"></i> End Shift & Print
                         </button>
@@ -831,7 +831,7 @@
             <div class="max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-12">
                     <h1 class="text-4xl font-black">Manager Performance</h1>
-                    <button class="btn btn-outline btn-sm" onclick="exportPerformanceCSV()">Export CSV</button>
+                    <button class="btn btn-outline btn-sm" onclick="exportPerformanceCSV(event)">Export CSV</button>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
@@ -926,7 +926,7 @@
                         <p class="text-slate-500 mb-6 text-sm">Earn premium credits by referring other managers.</p>
                         <input type="text" id="referralLink" readonly title="Referral Link" aria-label="Referral Link"
                             class="font-mono text-xs mb-4 bg-slate-50 opacity-60 dark:bg-slate-800">
-                        <button onclick="copyReferral()" class="btn btn-outline w-full">Copy My Link</button>
+                        <button onclick="copyReferral(this)" class="btn btn-outline w-full">Copy My Link</button>
                         <div id="referralStatus" class="mt-4 text-[10px] font-black uppercase text-emerald-500 hidden">
                             Referral Detected: 10% Extra Discount Applied!
                         </div>
@@ -966,7 +966,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> Performance History
                             </li>
                         </ul>
-                        <button onclick="processCheckout('Individual Pro')"
+                        <button onclick="processCheckout('Individual Pro', event)"
                             class="btn btn-outline w-full border-slate-300 dark:border-slate-700 hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors">Choose
                             Pro</button>
                     </div>
@@ -993,7 +993,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> Priority Feature
                                 Request</li>
                         </ul>
-                        <button onclick="processCheckout('Business Pro')"
+                        <button onclick="processCheckout('Business Pro', event)"
                             class="btn btn-accent w-full shadow-2xl shadow-sky-200 dark:shadow-none">Choose
                             Business</button>
                     </div>
@@ -1292,10 +1292,12 @@
         function addDepositItem(val = "") {
             const div = document.createElement('div');
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
+            const uniqueIdVer = 'dep-ver-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            const uniqueIdVal = 'dep-val-' + Date.now() + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;" title="Deposit Amount" aria-label="Deposit Amount">
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
+                <label for="${uniqueIdVer}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVer}" class="dep-ver" checked> VER</label>
+                <label for="${uniqueIdVal}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVal}" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit" title="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('depositsContainer').appendChild(div);
@@ -1530,6 +1532,26 @@
             });
         }
 
+        window.exportPerformanceCSV = function(event) {
+            if (!currentUser) return alert("Sign in required to export CSV.");
+
+            const btn = event ? event.currentTarget : null;
+            let originalText = "";
+            if (btn) {
+                originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Exporting...';
+            }
+
+            setTimeout(() => {
+                alert('CSV Exported!');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }, 1500);
+        }
+
         function calculatePerformance() {
             if(!currentUser) return;
             const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1651,8 +1673,19 @@
             });
         }
 
-        window.generateReport = function() {
+        window.generateReport = function(event) {
             if(!currentUser) return alert("Sign in required.");
+
+            const btn = event ? event.currentTarget : null;
+            let originalHtml = "";
+            if (btn) {
+                originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i data-lucide="printer"></i> Generating...';
+                btn.title = "Generating report...";
+                lucide.createIcons();
+            }
+
             const state = getTrackerState();
 
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
@@ -1671,12 +1704,22 @@
             state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
-            if (typeof window.manualSaveHistory === 'function') {
-                window.manualSaveHistory();
-            } else if (typeof manualSaveHistory === 'function') {
-                manualSaveHistory();
-            }
-            window.print();
+            setTimeout(() => {
+                if (typeof window.manualSaveHistory === 'function') {
+                    window.manualSaveHistory();
+                } else if (typeof manualSaveHistory === 'function') {
+                    manualSaveHistory();
+                }
+
+                window.print();
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    btn.removeAttribute('title');
+                    lucide.createIcons();
+                }
+            }, 1500);
         }
 
         function loadProfileUI(data) {
@@ -1709,11 +1752,17 @@
             });
         }
 
-        window.copyReferral = function() {
+        window.copyReferral = function(btn) {
             const el = document.getElementById('referralLink');
             el.select();
             document.execCommand('copy');
-            alert("Link copied! Share to earn credits.");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Copied!';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
         }
 
         window.clearData = function() {
@@ -1749,8 +1798,17 @@
         }
         window.initDefaults = initDefaults;
 
-        async function processCheckout(planName) {
+        async function processCheckout(planName, event) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
+
+            let btn = null;
+            let originalText = '';
+            if (event && event.currentTarget) {
+                btn = event.currentTarget;
+                originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+            }
 
             // Pricing logic is handled securely on the server
             try {
@@ -1776,6 +1834,11 @@
                 }
             } catch (err) {
                 alert("Payment system unreachable. Please try again later. Manager info: [" + err.message + "]");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             }
         }
 

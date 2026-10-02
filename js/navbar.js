@@ -310,8 +310,10 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
+                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
+                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
+                            if (!mergedIds.has(pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;
