@@ -55,7 +55,7 @@ async function renderProfile(user, userDataParam = null) {
             </div>
         `;
     } catch (error) {
-        console.error("Error rendering profile:", error);
+        console.error("Manager info: Error rendering profile:", error);
         profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
     }
 }
@@ -137,7 +137,7 @@ async function renderOrders(user) {
         ordersList.appendChild(fragment);
 
     } catch (error) {
-        console.error("Error rendering orders:", error);
+        console.error("Manager info: Error rendering orders:", error);
         ordersList.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
     }
 }
@@ -184,12 +184,6 @@ async function renderRewards(user, userData) {
         let balance = 0;
         if (userData && typeof userData.pointsBalance === 'number') {
             balance = userData.pointsBalance;
-        } else {
-             const userRef = doc(db, 'users', user.uid);
-             const userDoc = await getDoc(userRef);
-             balance = userDoc.exists() && typeof userDoc.data().pointsBalance === 'number'
-                ? userDoc.data().pointsBalance
-                : 0;
         }
 
         if (balanceEl) {

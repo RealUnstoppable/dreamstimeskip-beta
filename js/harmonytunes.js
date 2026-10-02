@@ -437,8 +437,8 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
+            console.error("Manager info: Error loading playlist:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
             try { playlistPlayBtn.onclick = null; } catch (e) {}
@@ -1806,7 +1806,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Manager info: Firebase error:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -1858,7 +1858,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Manager info: ", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -1934,7 +1934,7 @@ function initHarmonyTunes() {
                 if(e.code === 'not-found') {
                     setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Manager info: Firebase history update error:", e);
                 }
             });
         }

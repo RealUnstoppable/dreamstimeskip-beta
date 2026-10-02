@@ -73,7 +73,7 @@ class SitewideMusicEngine {
     notifyListeners() {
         this.updateLexiUI();
         this.listeners.forEach(fn => {
-            try { fn(this.state); } catch (err) { console.error(err); }
+            try { fn(this.state); } catch (err) { console.error("Manager info: ", err); }
         });
     }
 
