@@ -221,7 +221,7 @@ function attachNotificationEvents() {
                 item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
                 if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
+                    try { markAsRead(id); } catch (_) { /* intentionally swallowed */ }
                 }
             });
             updateNotificationBadge(0);
@@ -281,7 +281,7 @@ function renderNotifications(notifications) {
 
             if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
                 e.currentTarget.classList.add('read-processed');
-                try { await markAsRead(id); } catch (_) { /* ignore read error */ }
+                try { await markAsRead(id); } catch (_) { /* intentionally swallowed */ }
             }
 
             // Recount badge
@@ -310,16 +310,14 @@ function updateAuthLink() {
                     notificationUnsubscribe = subscribeToNotifications(user.uid, (notifications) => {
                         // Merge Firebase notifications on top of preloaded (avoid dupes)
                         const merged = [...notifications];
-                        // ⚡ Bolt: O(1) Set lookup replaces O(N) merged.find()
-                        const mergedIds = new Set(merged.map(n => n.id));
                         PRELOADED_NOTIFICATIONS.forEach(pre => {
-                            if (!mergedIds.has(pre.id)) merged.push(pre);
+                            if (!merged.find(n => n.id === pre.id)) merged.push(pre);
                         });
                         renderNotifications(merged);
                         const unreadCount = merged.filter(n => !n.isRead).length;
                         updateNotificationBadge(unreadCount);
                     });
-                } catch(err) { console.error('Manager info: Notification error ', err); }
+                } catch(err) { console.error("Manager info: Notification error:", err.message || err); }
 
                 const destination = userData && userData.isAdmin ? 'admin.html' : 'account.html';
                 authLink.href = destination;
@@ -334,7 +332,7 @@ function updateAuthLink() {
                     authLink.classList.remove('nav-pfp-link');
                 }
             } catch (e) {
-                console.error("Manager info: Nav Error: [" + e.message + "]", e);
+                console.error("Manager info: Nav Error: [" + e.message + "]:", e.message || e);
             }
         } else {
             authLink.href = 'sign in beta.html';

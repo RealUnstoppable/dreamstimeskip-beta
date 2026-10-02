@@ -1109,23 +1109,19 @@ body {
 }
 
 .lyric-line.active {
-    /* Set un-sung words to a dimmer white/opacity */
-    color: rgba(255, 255, 255, 0.4); 
+    color: #fff;
     transform: scale(1.02);
-    /* Remove line-level text shadow so only active words glow */
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
 }
 
 .lyric-word {
     display: inline-block;
-    transition: color 0.15s ease, transform 0.1s ease, text-shadow 0.15s ease;
+    transition: color 0.1s ease;
 }
 
 .lyric-word.active-word {
-    /* Sung words become bright white and pop out slightly */
     color: #fff;
-    text-shadow: 0 0 15px rgba(255,255,255,0.6);
 }
-
 .lyric-line:not(.active) .lyric-word {
     color: inherit;
 }

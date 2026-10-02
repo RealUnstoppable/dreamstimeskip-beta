@@ -211,7 +211,6 @@ if (requestForm) {
             return;
         }
 
-        const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Submitting...';
         formMessage.textContent = '';
@@ -246,7 +245,7 @@ if (requestForm) {
             formMessage.style.color = 'var(--accent-red)';
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            submitBtn.textContent = 'Submit Request';
         }
     });
 }

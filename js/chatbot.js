@@ -6,7 +6,7 @@ import { librarySongs } from './song-data.js?v=20260920';
 
 // System instructions dictate the persona and rules
 const systemInstruction = `
-You are Lexi, the AI assistant for the Unstoppable Hub and Medixly (formerly HarmonyTunes). You exist as a glowing orb on the home page, in the shop, and in the Medixly web app.
+You are Lexi, the AI assistant for the Unstoppable Hub. You exist as a glowing orb on the home page and in the shop.
 
 CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 - The **Unstoppable Hub** (under the **Unstoppable Umbrella**) is the true central portal and main ecosystem hub where users access all projects created by Unstoppable.
@@ -24,14 +24,10 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Autolux: A premium mobile car detailing service.
 - ezManage: A shift tracker and management tool.
 
-MUSIC & MEDIXLY (HARMONYTUNES) POWERS:
-You have powerful tools to interact with the user's music experience in Medixly.
-- Use getCurrentlyPlayingSong to tell the user what they are listening to right now.
-- Use getHarmonyTunesQueue to see what songs are coming up next.
-- Use getHarmonyTunesHistory to see what the user recently listened to.
-- Use getHarmonyTunesFavorites to see the user's favorite songs.
-- Use playHarmonyTunesSong to instantly play a song for the user if they ask you to! (Make sure to search the library first if you don't know the exact ID).
-- Use searchHarmonyTunesLibrary to find songs by artist or title when they ask about our library or ask you to play a song.
+MUSIC & HARMONYTUNES POWERS:
+You have tools to interact with the user's music experience in HarmonyTunes (our music platform).
+- Use getCurrentlyPlayingSong to tell the user what they are listening to.
+- Use searchHarmonyTunesLibrary to find songs by artist or title when they ask about our library.
 - If they ask for a song we DO NOT have, you MUST automatically use requestSongAddition to leave a request for the admin. Tell the user you have done so!
 
 DREAMS TIMESKIP POWERS:
@@ -49,48 +45,10 @@ const tools = [
         functionDeclarations: [
             {
                 name: "getCurrentlyPlayingSong",
-                description: "Get information about the song that is currently playing in the sitewide music player (Medixly/HarmonyTunes).",
+                description: "Get information about the song that is currently playing in the sitewide music player (HarmonyTunes).",
                 parameters: {
                     type: "OBJECT",
                     properties: {}
-                }
-            },
-            {
-                name: "getHarmonyTunesQueue",
-                description: "Get the upcoming songs in the user's Medixly queue.",
-                parameters: {
-                    type: "OBJECT",
-                    properties: {}
-                }
-            },
-            {
-                name: "getHarmonyTunesHistory",
-                description: "Get the user's recently played songs history.",
-                parameters: {
-                    type: "OBJECT",
-                    properties: {}
-                }
-            },
-            {
-                name: "getHarmonyTunesFavorites",
-                description: "Get the user's favorite songs (liked songs).",
-                parameters: {
-                    type: "OBJECT",
-                    properties: {}
-                }
-            },
-            {
-                name: "playHarmonyTunesSong",
-                description: "Play a specific song in Medixly by its ID.",
-                parameters: {
-                    type: "OBJECT",
-                    properties: {
-                        songId: {
-                            type: "STRING",
-                            description: "The ID of the song to play."
-                        }
-                    },
-                    required: ["songId"]
                 }
             },
             {
@@ -161,7 +119,7 @@ try {
         history: [] // Start with empty history
     });
 } catch (error) {
-    console.error("Manager info: AI Model Initialization Failed", error);
+    console.error("AI Model Initialization Failed", error);
 }
 
 function initChatbot() {
@@ -263,38 +221,6 @@ function initChatbot() {
         chatbotWindow.classList.remove('active');
     });
 
-    // Close on Escape key press
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && chatbotWindow && chatbotWindow.classList.contains('active')) {
-            chatbotWindow.classList.remove('active');
-        }
-    });
-
-    // Trap focus within the chatbot window
-    chatbotWindow.addEventListener('keydown', function(e) {
-        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-        if (!isTabPressed) return;
-
-        // Query dynamically to ensure it captures any new elements if applicable
-        const focusableElements = chatbotWindow.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])');
-        if (focusableElements.length > 0) {
-            const firstFocusableElement = focusableElements[0];
-            const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-            if (e.shiftKey) {
-                if (document.activeElement === firstFocusableElement) {
-                    lastFocusableElement.focus();
-                    e.preventDefault();
-                }
-            } else {
-                if (document.activeElement === lastFocusableElement) {
-                    firstFocusableElement.focus();
-                    e.preventDefault();
-                }
-            }
-        }
-    });
-
     // Handle Input
     const sendMessage = async () => {
         const text = chatInput.value.trim();
@@ -319,46 +245,11 @@ function initChatbot() {
                 for (const call of calls) {
                     let callResult = null;
                     if (call.name === "getCurrentlyPlayingSong") {
-                        if (window.HarmonyTunesAPI) {
-                            const song = window.HarmonyTunesAPI.getCurrentlyPlaying();
-                            if (song) {
-                                callResult = { song: song.title, artist: song.artist };
-                            } else {
-                                callResult = { error: "No song is currently playing." };
-                            }
-                        } else if (window.DTSMusic) {
-                            const song = typeof window.DTSMusic.getCurrentSong === 'function' ? window.DTSMusic.getCurrentSong() : window.DTSMusic.currentSong;
+                        if (window.DTSMusic) {
+                            const song = window.DTSMusic.getCurrentSong();
                             callResult = { song: song.title, artist: song.artist, isPlaying: !window.DTSMusic.audio.paused };
                         } else {
                             callResult = { error: "No music player active." };
-                        }
-                    } else if (call.name === "getHarmonyTunesQueue") {
-                        if (window.HarmonyTunesAPI) {
-                            const q = window.HarmonyTunesAPI.getQueue();
-                            callResult = { upcoming_songs: q.map(s => ({ title: s.title, artist: s.artist })) };
-                        } else {
-                            callResult = { error: "Music player not active on this page." };
-                        }
-                    } else if (call.name === "getHarmonyTunesHistory") {
-                        if (window.HarmonyTunesAPI) {
-                            const h = window.HarmonyTunesAPI.getHistory();
-                            callResult = { recently_played: h.map(s => ({ title: s.title, artist: s.artist })) };
-                        } else {
-                            callResult = { error: "Music player not active on this page." };
-                        }
-                    } else if (call.name === "getHarmonyTunesFavorites") {
-                        if (window.HarmonyTunesAPI) {
-                            const favs = window.HarmonyTunesAPI.getFavorites();
-                            callResult = { favorite_song_ids: favs };
-                        } else {
-                            callResult = { error: "Music player not active on this page." };
-                        }
-                    } else if (call.name === "playHarmonyTunesSong") {
-                        if (window.HarmonyTunesAPI) {
-                            window.HarmonyTunesAPI.playSong(call.args.songId);
-                            callResult = { success: true, message: "Started playing song!" };
-                        } else {
-                            callResult = { error: "Music player not active on this page." };
                         }
                     } else if (call.name === "getDreamsCountdowns") {
                         const now = new Date();

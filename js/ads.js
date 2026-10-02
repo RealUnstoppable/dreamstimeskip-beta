@@ -22,7 +22,7 @@ export async function initAds() {
                     }
                 }
             } catch (err) {
-                console.error('Manager info: Error checking membership for ads:', err);
+                console.error('Error checking membership for ads:', err);
             }
         }
         
@@ -83,7 +83,7 @@ function injectAdSense() {
         try {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (err) {
-            console.error("Manager info: AdSense error", err);
+            console.error("AdSense error", err);
         }
     });
 }
