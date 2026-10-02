@@ -466,7 +466,7 @@
             }
 
             try {
-                await setDoc(doc(db, 'promo_codes', code), { discount, active: true, createdAt: serverTimestamp() });
+                await performAdminAction('update', 'promo_codes', code, { discount, active: true, createdAt: 'SERVER_TIMESTAMP' });
                 showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
                 codeInput.value = '';
                 discountInput.value = '';

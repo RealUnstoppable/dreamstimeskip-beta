@@ -584,3 +584,52 @@ exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
     }
   });
 });
+
+// 📝 Submit Review Securely
+exports.submitReview = functions.https.onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+
+    const decodedToken = await authenticateRequest(req, res, admin);
+    if (!decodedToken) return;
+
+    const { productId, rating, reviewText, authorName } = req.body;
+
+    if (!productId || typeof rating !== "number" || rating < 1 || rating > 5) {
+      return res.status(400).send("Invalid review data");
+    }
+
+    try {
+      const db = admin.firestore();
+
+      const newReviewRef = db.collection("reviews").doc();
+      await newReviewRef.set({
+        productId,
+        userId: decodedToken.uid,
+        userEmail: decodedToken.email,
+        authorName: authorName || 'Anonymous',
+        rating,
+        text: reviewText,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      const newProductReviewRef = db.collection("product_reviews").doc(`${productId}_${decodedToken.uid}`);
+      await newProductReviewRef.set({
+        productId,
+        userId: decodedToken.uid,
+        userEmail: decodedToken.email,
+        username: authorName || 'Anonymous',
+        rating,
+        comment: reviewText,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      res.status(200).json({ success: true, id: newReviewRef.id });
+    } catch (error) {
+      console.error("Manager info: Error submitting review [" + error.message + "]");
+      res.status(500).send("Internal Server Error");
+    }
+  });
+});

@@ -301,7 +301,7 @@ export async function handlePlaceOrder(e) {
     const orderDetails = {
         userId: currentUser.uid,
         items: userCart,
-        orderDate: serverTimestamp(),
+
         status: 'Paid',
         shippingInfo: {
             name: document.getElementById('name').value,

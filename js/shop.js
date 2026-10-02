@@ -573,17 +573,24 @@ function setupEventListeners() {
                 const userData = await getCachedUserProfile({uid: currentUser.uid});
                 let username = userData ? (userData.username || "User") : "User";
 
-                const reviewId = `${currentReviewProductId}_${currentUser.uid}`;
-                const reviewRef = doc(db, 'product_reviews', reviewId);
-
-                await setDoc(reviewRef, {
-                    productId: currentReviewProductId,
-                    userId: currentUser.uid,
-                    username: username,
-                    rating: rating,
-                    comment: comment,
-                    createdAt: serverTimestamp()
+                const token = await currentUser.getIdToken();
+                const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/submitReview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        productId: currentReviewProductId,
+                        rating: rating,
+                        reviewText: comment,
+                        authorName: username
+                    })
                 });
+
+                if (!response.ok) {
+                    throw new Error('Failed to submit review');
+                }
 
                 writeReviewForm.reset();
                 messageEl.textContent = 'Review submitted successfully!';
@@ -707,14 +714,24 @@ async function handleReviewSubmit(e) {
         const userData = await getCachedUserProfile({uid: currentUser.uid});
         if (userData && userData.username) authorName = userData.username;
 
-        await addDoc(collection(db, "reviews"), {
-            productId: currentReviewProductId,
-            userId: currentUser.uid,
-            authorName: authorName,
-            rating: currentRating,
-            text: text,
-            createdAt: serverTimestamp()
+        const token = await currentUser.getIdToken();
+        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/submitReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                productId: currentReviewProductId,
+                rating: currentRating,
+                reviewText: text,
+                authorName: authorName
+            })
         });
+
+        if (!response.ok) {
+            throw new Error('Failed to submit review');
+        }
 
         // Optimistic UI Update for stats
         const currentStats = productStatsMap.get(currentReviewProductId) || { averageRating: 0, reviewCount: 0 };
