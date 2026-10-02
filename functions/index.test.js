@@ -165,11 +165,12 @@ describe("createCheckoutSession", () => {
     expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
       customer_email: "test@example.com",
       line_items: [{price: "price_1THHYPBp2C5GdKaKxNpqndNE", quantity: 1}],
-      success_url: "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
-      cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
+      success_url: "https://dreamstimeskip-beta.pages.dev/success",
+      cancel_url: "https://dreamstimeskip-beta.pages.dev/cancel",
       metadata: {
         uid: "user123",
-        planName: "Pro", // default if not provided
+        planName: "Pro",
+        project: "ezmanage",
       },
     }));
 
@@ -213,6 +214,7 @@ describe("createCheckoutSession", () => {
       metadata: {
         uid: "bizuser",
         planName: "Business Pro",
+        project: "ezmanage",
       },
     }));
 

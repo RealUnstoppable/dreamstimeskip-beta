@@ -98,7 +98,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
         if (data.createdAt === 'SERVER_TIMESTAMP') {
           data.createdAt = admin.firestore.FieldValue.serverTimestamp();
         }
-        if (data.updatedAt === 'SERVER_TIMESTAMP') {
+        if (data.updatedAt === "SERVER_TIMESTAMP") {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
         await docRef.set(data);
