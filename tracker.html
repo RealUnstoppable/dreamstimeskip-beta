@@ -330,7 +330,7 @@
         <div class="absolute bottom-8 left-8 right-8">
             <div class="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                 <span class="text-xs font-bold uppercase tracking-widest">Dark Mode</span>
-                <label class="relative inline-flex items-center cursor-pointer">
+                <label for="themeToggle" class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">
                     <div
                         class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-sky-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all">
@@ -966,7 +966,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-500"></i> Performance History
                             </li>
                         </ul>
-                        <button onclick="processCheckout('Individual Pro')"
+                        <button onclick="processCheckout('Individual Pro', event)"
                             class="btn btn-outline w-full border-slate-300 dark:border-slate-700 hover:bg-sky-500 hover:border-sky-500 hover:text-white transition-colors">Choose
                             Pro</button>
                     </div>
@@ -993,7 +993,7 @@
                             <li class="flex gap-3"><i data-lucide="check" class="text-sky-600"></i> Priority Feature
                                 Request</li>
                         </ul>
-                        <button onclick="processCheckout('Business Pro')"
+                        <button onclick="processCheckout('Business Pro', event)"
                             class="btn btn-accent w-full shadow-2xl shadow-sky-200 dark:shadow-none">Choose
                             Business</button>
                     </div>
@@ -1292,10 +1292,12 @@
         function addDepositItem(val = "") {
             const div = document.createElement('div');
             div.className = "flex gap-4 items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-xl animate-fadeIn";
+            const uniqueIdVer = 'dep-ver-' + Date.now() + Math.random().toString(36).substr(2, 9);
+            const uniqueIdVal = 'dep-val-' + Date.now() + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <input type="text" placeholder="Amount" class="dep-val" value="${escapeHTML(val)}" style="flex:1;" title="Deposit Amount" aria-label="Deposit Amount">
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-ver" checked> VER</label>
-                <label class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" class="dep-val-chk" checked> VAL</label>
+                <label for="${uniqueIdVer}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVer}" class="dep-ver" checked> VER</label>
+                <label for="${uniqueIdVal}" class="flex items-center gap-1 text-[10px] font-bold"><input type="checkbox" id="${uniqueIdVal}" class="dep-val-chk" checked> VAL</label>
                 <button type="button" onclick="this.parentElement.remove(); triggerDraftSync();" class="text-red-400" aria-label="Remove deposit" title="Remove deposit"><i data-lucide="x" class="w-4"></i></button>
             `;
             if (window.trackerCurrentFragment) window.trackerCurrentFragment.appendChild(div); else document.getElementById('depositsContainer').appendChild(div);
@@ -1749,8 +1751,17 @@
         }
         window.initDefaults = initDefaults;
 
-        async function processCheckout(planName) {
+        async function processCheckout(planName, event) {
             if (!currentUser) { alert("Please sign in or create an account to upgrade."); navTo('auth'); return; }
+
+            let btn = null;
+            let originalText = '';
+            if (event && event.currentTarget) {
+                btn = event.currentTarget;
+                originalText = btn.textContent;
+                btn.disabled = true;
+                btn.textContent = 'Processing...';
+            }
 
             // Pricing logic is handled securely on the server
             try {
@@ -1776,6 +1787,11 @@
                 }
             } catch (err) {
                 alert("Payment system unreachable. Please try again later. Manager info: [" + err.message + "]");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             }
         }
 
