@@ -15,7 +15,7 @@ export function loadFooter() {
                         <li><a href="index.html#bento">Overview</a></li>
                         <li><a href="unstoppable.html">Unstoppable</a></li>
                         <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
-                        <li><a href="harmonytunes.html">Medixly</a></li>
+                        <li><a href="harmonytunes.html">HarmonyTunes</a></li>
                         <li><a href="blobgame.html">Squishly (Beta)</a></li>
                     </ul>
                     <h5 style="margin-top: 15px;">Betas</h5>
@@ -42,8 +42,6 @@ export function loadFooter() {
                         <li><a href="blog.html">Blog</a></li>
                         <li><a href="shop.html">Shop</a></li>
                         <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="terms.html">Terms of Service</a></li>
                     </ul>
                 </div>
                 <div class="footer-column footer-newsletter">

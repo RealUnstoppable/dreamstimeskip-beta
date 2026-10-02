@@ -25,7 +25,7 @@ describe('chatbot.js error handling', () => {
         await import('../js/chatbot.js');
 
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            "Manager info: AI Model Initialization Failed",
+            "Manager info: [AI Model Initialization Failed]",
             expect.any(Error)
         );
         expect(consoleErrorSpy.mock.calls[0][1].message).toBe("Mocked initialization error");
