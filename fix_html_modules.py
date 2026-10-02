@@ -19,10 +19,10 @@ for filename in os.listdir('.'):
 
         pattern1 = r"document\.addEventListener\('DOMContentLoaded',\s*\(\)\s*=>\s*\{\s*if\s*\(typeof\s*loadNavbar\s*===\s*'function'\)\s*loadNavbar\(\);\s*if\s*\(typeof\s*loadFooter\s*===\s*'function'\)\s*loadFooter\(\);\s*\}\);"
         pattern2 = r"document\.addEventListener\('DOMContentLoaded',\s*\(\)\s*=>\s*\{\s*loadNavbar\(\);\s*loadFooter\(\);\s*\}\);"
-        
+
         new_content = re.sub(pattern1, r"if (typeof loadNavbar === 'function') loadNavbar();\n        if (typeof loadFooter === 'function') loadFooter();", content)
         new_content = re.sub(pattern2, r"loadNavbar();\n        loadFooter();", new_content)
-        
+
         # Also let's check for any remaining DOMContentLoaded for loadNavbar
         pattern3 = r"document\.addEventListener\('DOMContentLoaded',\s*\(\)\s*=>\s*\{\s*if\s*\(typeof\s*loadNavbar\s*===\s*'function'\)\s*loadNavbar\(\);\s*\}\);"
         new_content = re.sub(pattern3, r"if (typeof loadNavbar === 'function') loadNavbar();", new_content)

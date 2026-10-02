@@ -8,7 +8,7 @@ for filename in os.listdir('.'):
     if filename.endswith('.html'):
         with open(filename, 'r') as f:
             content = f.read()
-        
+
         # Replace import { loadNavbar } from './js/navbar.js...'; with ?v=VERSION
         new_content = re.sub(r"(import\s+\{\s*loadNavbar\s*\}\s*from\s*['\"](/|\./)?js/navbar\.js)(\?v=\d+)?(['\"])", r"\g<1>?v=" + version + r"\4", content)
         new_content = re.sub(r"(import\s+\{\s*loadFooter\s*\}\s*from\s*['\"](/|\./)?js/footer\.js)(\?v=\d+)?(['\"])", r"\g<1>?v=" + version + r"\4", new_content)
@@ -27,4 +27,3 @@ if os.path.exists('js/navbar.js'):
         with open('js/navbar.js', 'w') as f:
             f.write(new_content)
         print("Busted cache in js/navbar.js")
-
