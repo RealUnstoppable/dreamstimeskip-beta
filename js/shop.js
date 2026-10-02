@@ -581,6 +581,7 @@ function setupEventListeners() {
             const messageEl = document.getElementById('review-message');
             const submitBtn = document.getElementById('submit-review-btn');
 
+            const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
 
@@ -617,7 +618,7 @@ function setupEventListeners() {
                 messageEl.style.color = 'var(--accent-red)';
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Review';
+                submitBtn.textContent = originalText;
             }
         });
     }

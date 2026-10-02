@@ -76,6 +76,7 @@ async function addComment(postId, content) {
     const input = document.getElementById('comment-input');
     const notificationEl = document.getElementById('comment-notification');
 
+    const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Posting...';
 
@@ -101,7 +102,7 @@ async function addComment(postId, content) {
         showNotification(notificationEl, 'Failed to post comment. Please try again.', 'error');
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Post Comment';
+        submitBtn.textContent = originalText;
     }
 }
 
