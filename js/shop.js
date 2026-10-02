@@ -4,6 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
+import { generateProductCardHtml } from './ui-utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
 
@@ -60,44 +61,8 @@ function renderProducts(searchQuery = '') {
         return nameMatch || descMatch;
     }).map(product => {
         const isWishlisted = wishlist.has(product.id);
-        const heartIcon = isWishlisted ? '❤️' : '🤍';
-        const activeClass = isWishlisted ? 'active' : '';
-
-
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
-        const ratingDisplay = stats.reviewCount > 0 ? `${stats.averageRating.toFixed(1)} ★ (${stats.reviewCount})` : 'No reviews';
-
-        const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
-        const starsHtml = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '';
-
-        return `
-            <div class="product-card">
-                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
-                    ${heartIcon}
-                </button>
-                <img src="${product.imageUrl}" alt="${product.name}" class="product-image" data-id="${product.id}" loading="lazy" >
-                <div class="product-info">
-                    <h3>${product.name}</h3>
-
-                    <p>${product.description}</p>
-                    <div class="product-stars-container">
-                        ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
-                        <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
-                    </div>
-                    <div class="product-footer" >
-                        <div>
-                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>` : ''}
-                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
-                        </div>
-                        <div class="action-buttons-container">
-                            <button class="view-reviews-btn" data-id="${product.id}">Reviews</button>
-                            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
-                        </div>
-                    </div>
-                    <button class="reviews-btn" data-id="${product.id}">Read Reviews</button>
-                </div>
-            </div>
-        `;
+        return generateProductCardHtml(product, 'shop', 1, isWishlisted, stats, generateStarsHtml);
     }).join('');
 
     // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
@@ -141,19 +106,7 @@ function renderCart() {
                 // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
                 const product = productMap.get(productId);
                 if (!product) return ''; // Should not happen
-                return `
-                    <div class="cart-item">
-                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                        <div class="cart-item-info">
-                            <h4>${product.name}</h4>
-                            <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
-                        </div>
-                        <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
-                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
-                        </div>
-                    </div>
-                `;
+                return generateProductCardHtml(product, 'cart', quantity);
             }).join('');
         }
         if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }

@@ -5,6 +5,7 @@ import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from 
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products-data.js';
 import { escapeHTML, formatDate } from './utils.js';
+import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
 import { handleAddToCart, toggleWishlist } from './shop.js';
 
@@ -196,23 +197,12 @@ export async function renderOrders(user) {
 
             if (order.items && typeof order.items === 'object') {
                 for (const [productId, quantity] of Object.entries(order.items)) {
-                    const product = productMap.get(productId) || { name: productId, price: 0, imageUrl: '' };
+                    const product = productMap.get(productId) || { id: productId, name: productId, price: 0, imageUrl: '' };
                     const qty = parseInt(quantity, 10) || 1;
                     const itemTotal = (product.price || 0) * qty;
                     calculatedSubtotal += itemTotal;
 
-                    itemsHtml += `
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 42px; height: 42px; border-radius: 6px; object-fit: cover; background: #000;">` : ''}
-                                <div>
-                                    <div style="font-weight: 600; color: #fff; font-size: 0.95rem;">${escapeHTML(product.name)}</div>
-                                    <small style="color: var(--text-secondary);">Qty: ${qty} × $${(product.price || 0).toFixed(2)}</small>
-                                </div>
-                            </div>
-                            <div style="font-weight: bold; color: #fff;">$${itemTotal.toFixed(2)}</div>
-                        </div>
-                    `;
+                    itemsHtml += generateProductCardHtml(product, 'order-history', qty);
                 }
             }
 
@@ -352,21 +342,7 @@ export async function renderRewards(user, userData) {
             if (txs.length === 0) {
                 dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet. Earn 10 points for every dollar spent in the shop!</p>`;
             } else {
-                dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => {
-                    const isPositive = (tx.points || 0) >= 0;
-                    const dateStr = formatDate(tx.createdAt);
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                            <div>
-                                <strong style="display: block; font-size: 0.9rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
-                                <small style="color: var(--text-secondary);">${dateStr}</small>
-                            </div>
-                            <div style="font-weight: 800; font-size: 0.95rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                                ${isPositive ? '+' : ''}${tx.points} pts
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => createTransactionHtml(tx, true)).join('');
             }
         }
 
@@ -380,21 +356,7 @@ export async function renderRewards(user, userData) {
                 rewardsHistoryList.innerHTML = '';
             } else {
                 if (noRewardsMsg) noRewardsMsg.style.display = 'none';
-                rewardsHistoryList.innerHTML = txs.map(tx => {
-                    const isPositive = (tx.points || 0) >= 0;
-                    const dateStr = formatDate(tx.createdAt);
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border: 1px solid var(--border-color); border-radius: 10px; background: rgba(255,255,255,0.02);">
-                            <div>
-                                <div style="font-weight: 700; color: #fff; font-size: 1rem;">${escapeHTML(tx.description || 'Reward Earned')}</div>
-                                <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                            </div>
-                            <div style="font-weight: 800; font-size: 1.1rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                                ${isPositive ? '+' : ''}${tx.points} pts
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                rewardsHistoryList.innerHTML = txs.map(tx => createTransactionHtml(tx, false)).join('');
             }
         }
 
@@ -751,20 +713,9 @@ export async function loadWishlist(userId) {
                 
                 // RENDER WISHLIST ITEMS
                 const itemsHtml = data.items.map(itemId => {
-                    const prod = productMap[itemId];
+                    const prod = productMap.get(itemId) || productMap[itemId];
                     if (!prod) return '';
-                    return `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="${prod.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" alt="${escapeHTML(prod.name)}">
-                                <div>
-                                    <strong style="color: #fff;">${escapeHTML(prod.name)}</strong>
-                                    <div style="color: var(--text-secondary); font-size: 0.9rem;">${prod.price.toFixed(2)}</div>
-                                </div>
-                            </div>
-                            <button onclick="window.location.href='shop.html'" style="padding: 5px 10px; background: var(--accent-color); color: #fff; border: none; border-radius: 4px; cursor: pointer;">View Shop</button>
-                        </div>
-                    `;
+                    return generateProductCardHtml(prod, 'wishlist-public');
                 }).join('');
                 
                 container.innerHTML = itemsHtml;
@@ -822,19 +773,7 @@ export async function loadWishlist(userId) {
         container.innerHTML = items.map(id => {
             const product = productMap.get(id);
             if (!product) return '';
-            return `
-                <div class="product-card" style="padding: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; display: flex; flex-direction: column;">
-                    <img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; background: #000;">
-                    <div style="flex-grow: 1;">
-                        <h4 style="margin: 0 0 6px 0; font-size: 1rem; color: #fff;">${escapeHTML(product.name)}</h4>
-                        <div style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 14px;">$${product.price.toFixed(2)}</div>
-                    </div>
-                    <div style="display: flex; gap: 8px;">
-                        <button class="btn btn-primary wishlist-add-cart-btn" data-id="${product.id}" style="flex: 1; padding: 8px 12px; font-size: 0.85rem;">Add to Cart</button>
-                        <button class="btn wishlist-remove-btn" data-id="${product.id}" style="padding: 8px 12px; font-size: 0.85rem; background: transparent; border: 1px solid var(--accent-red); color: var(--accent-red);">Remove</button>
-                    </div>
-                </div>
-            `;
+            return generateProductCardHtml(product, 'wishlist-private');
         }).join('');
 
         // Wire Add to Cart
