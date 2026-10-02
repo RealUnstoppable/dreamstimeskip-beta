@@ -374,11 +374,9 @@ function initHarmonyTunes() {
         spotlightResults.innerHTML = '';
     }
 
-    function highlightMatch(text, query) {
-        if (!query) return escapeHTML(text);
-        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`(${escaped})`, 'gi');
-        return escapeHTML(text).replace(re, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
+    function highlightMatch(text, regex) {
+        if (!regex) return escapeHTML(text);
+        return escapeHTML(text).replace(regex, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
     }
 
     function runSpotlightSearch(query) {
