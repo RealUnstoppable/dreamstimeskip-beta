@@ -260,15 +260,22 @@ function renderNotifications(notifications) {
         return;
     }
 
-    list.innerHTML = notifications.map(n => `
+    list.innerHTML = notifications.map(n => {
+        let icon = '🔔';
+        if (n.type === 'reward') icon = '🎁';
+        if (n.type === 'ticket_reply') icon = '💬';
+
+        return `
         <div class="notification-item ${n.isRead ? '' : 'unread'}" data-id="${escapeHTML(n.id)}" data-link="${escapeHTML(n.link || '')}">
+            <div class="notif-icon" style="font-size: 1.2rem; margin-right: 12px; display: flex; align-items: center; justify-content: center;">${icon}</div>
             <div class="notif-content">
                 <p class="notif-title">${escapeHTML(n.title)}</p>
                 <small class="notif-msg">${escapeHTML(n.message)}</small>
             </div>
             ${!n.isRead ? '<span class="notif-dot"></span>' : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     list.querySelectorAll('.notification-item').forEach(item => {
         item.addEventListener('click', async (e) => {

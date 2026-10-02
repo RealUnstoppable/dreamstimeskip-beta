@@ -480,6 +480,17 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
         });
       }
 
+      const notificationRef = db.collection("notifications").doc();
+      transaction.set(notificationRef, {
+        userId: userId,
+        title: "Points Earned!",
+        message: `You earned ${rewardPointsToAward} Reward Points and ${loyaltyPointsEarned} Loyalty Points from your recent order.`,
+        isRead: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        link: "account.html#rewards",
+        type: "reward",
+      });
+
       if (Object.keys(updateData).length > 0) {
         transaction.set(userRef, updateData, {merge: true});
       }
