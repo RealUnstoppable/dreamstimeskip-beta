@@ -184,6 +184,8 @@ export async function renderOrders(user) {
         if (noOrdersMsg) noOrdersMsg.style.display = 'none';
         listEl.innerHTML = '';
 
+        const fragment = document.createDocumentFragment();
+
         orders.forEach(order => {
             const orderId = order.orderId || order.id || 'ORD-UNKNOWN';
             const orderDateStr = formatDate(order.orderDate || order.createdAt);
@@ -257,8 +259,10 @@ export async function renderOrders(user) {
                 if (link) link.click();
             });
 
-            listEl.appendChild(card);
+            fragment.appendChild(card);
         });
+
+        listEl.appendChild(fragment);
 
     } catch (err) {
         console.error("Error rendering orders:", err);
@@ -280,6 +284,11 @@ export async function renderRewards(user, userData) {
     const noRewardsMsg = document.getElementById('no-rewards-msg');
 
     try {
+        const referralLinkInput = document.getElementById('referral-link');
+        if (referralLinkInput) {
+            referralLinkInput.value = window.location.origin + '/sign in beta.html?ref=' + user.uid;
+        }
+
         const userRef = doc(db, 'users', user.uid);
         let userSnap = null;
 
@@ -400,9 +409,7 @@ export async function renderRewards(user, userData) {
 
     } catch (err) {
         console.error("Error rendering rewards:", err);
-        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = '0';
-        if (userLoyaltyPoints) userLoyaltyPoints.textContent = '0';
-        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity.</p>`;
+        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
     }
 }
 
@@ -498,7 +505,11 @@ export function renderBilling(user, userData) {
             </div>
         `;
 
-        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async () => {
+        document.getElementById('test-activate-premium-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Activating...';
             try {
                 await updateDoc(doc(db, "users", user.uid), {
                     membershipLevel: 'premium',
@@ -514,7 +525,10 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
     }
@@ -750,10 +764,34 @@ export async function loadWishlist(userId) {
                     if (shareBtn) shareBtn.style.display = 'inline-block';
                     if (linkContainer) linkContainer.style.display = 'none';
                 }
+                
+                // RENDER WISHLIST ITEMS
+                const itemsHtml = data.items.map(itemId => {
+                    const prod = productMap[itemId];
+                    if (!prod) return '';
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${prod.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" alt="${escapeHTML(prod.name)}">
+                                <div>
+                                    <strong style="color: #fff;">${escapeHTML(prod.name)}</strong>
+                                    <div style="color: var(--text-secondary); font-size: 0.9rem;">${prod.price.toFixed(2)}</div>
+                                </div>
+                            </div>
+                            <button onclick="window.location.href='shop.html'" style="padding: 5px 10px; background: var(--accent-color); color: #fff; border: none; border-radius: 4px; cursor: pointer;">View Shop</button>
+                        </div>
+                    `;
+                }).join('');
+                
+                container.innerHTML = itemsHtml;
+                
             } else {
                 if (shareBtn) shareBtn.style.display = 'none';
                 if (linkContainer) linkContainer.style.display = 'none';
+                container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
             }
+        } else {
+            container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
         }
 
         if (shareBtn) {
@@ -893,6 +931,28 @@ export async function loadUserTickets(userId) {
 export function initAccountPage() {
     // Immediate tab setup so navigation is 100% interactive without waiting for auth
     initTabNavigation();
+    
+    // Listen for wishlist updates from shop.js
+    window.addEventListener('wishlistUpdated', () => {
+        if (currentUser) {
+            loadWishlist(currentUser.uid);
+        }
+    });
+
+    const copyReferralBtn = document.getElementById('copy-referral-btn');
+    const referralLinkInput = document.getElementById('referral-link');
+    if (copyReferralBtn && referralLinkInput) {
+        copyReferralBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(referralLinkInput.value);
+                const originalText = copyReferralBtn.textContent;
+                copyReferralBtn.textContent = 'Copied!';
+                setTimeout(() => { copyReferralBtn.textContent = originalText; }, 2000);
+            } catch (err) {
+                console.error('Manager info: Failed to copy text: ', err);
+            }
+        });
+    }
 
     // Firebase Auth State
     onAuthStateChanged(auth, async (user) => {
@@ -902,44 +962,27 @@ export function initAccountPage() {
         }
 
         currentUser = user;
-        const cacheKey = `profile_${user.uid}`;
-        let userData = null;
 
-        try {
-            const cachedStr = sessionStorage.getItem(cacheKey);
-            if (cachedStr) {
-                userData = JSON.parse(cachedStr);
-            }
-        } catch (_) {}
+        // ⚡ Bolt: Centralized cache function `getCachedUserProfile` reduces redundant Firestore calls.
+        let userData = await getCachedUserProfile(user);
 
         if (!userData) {
+            // Fallback initialization if profile doesn't exist at all yet
+            userData = {
+                username: user.displayName || user.email?.split('@')[0] || 'User',
+                email: user.email,
+                membershipLevel: 'free',
+                pointsBalance: 50,
+                loyaltyPoints: 50,
+                isAdmin: false,
+                signupDate: new Date()
+            };
             try {
                 const userDocRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userDocRef);
-                if (userDoc.exists()) {
-                    userData = userDoc.data();
-                } else {
-                    userData = {
-                        username: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        membershipLevel: 'free',
-                        pointsBalance: 50,
-                        loyaltyPoints: 50,
-                        isAdmin: false,
-                        signupDate: new Date()
-                    };
-                    await setDoc(userDocRef, userData, { merge: true });
-                }
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                await setDoc(userDocRef, userData, { merge: true });
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
             } catch (err) {
-                console.error("Profile load warning:", err);
-                userData = {
-                    username: user.displayName || 'User',
-                    email: user.email,
-                    membershipLevel: 'free',
-                    pointsBalance: 50,
-                    loyaltyPoints: 50
-                };
+                console.error("Manager info: Profile init warning:", err);
             }
         }
 
@@ -958,7 +1001,7 @@ export function initAccountPage() {
 
         // Sign Out
         document.getElementById('sign-out')?.addEventListener('click', () => {
-            sessionStorage.removeItem(cacheKey);
+            sessionStorage.removeItem(`profile_${user.uid}`);
             signOut(auth).then(() => window.location.replace('index.html'));
         });
 
@@ -976,7 +1019,7 @@ export function initAccountPage() {
             try {
                 await updateDoc(doc(db, "users", user.uid), { username: newUsername });
                 userData.username = newUsername;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 const welcomeHeader = document.getElementById('welcome-header');
                 if (welcomeHeader) welcomeHeader.textContent = `Welcome back, ${newUsername}!`;
@@ -1022,7 +1065,7 @@ export function initAccountPage() {
                 await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
                 userData.theme = theme;
                 userData.accentColor = accentColor;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 document.body.dataset.theme = theme;
                 document.documentElement.style.setProperty('--accent-color', accentColor);
@@ -1083,7 +1126,7 @@ export function initAccountPage() {
                 try {
                     await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
                     userData.twoFactorEnabled = isEnabled;
-                    sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
                     alert(`Two-Factor Authentication (2FA) is now ${isEnabled ? 'enabled' : 'disabled'}.`);
                 } catch (err) {
                     e.target.checked = !isEnabled;
@@ -1219,7 +1262,7 @@ export function initAccountPage() {
 
                 await updateDoc(doc(db, "users", user.uid), { photoURL });
                 userData.photoURL = photoURL;
-                sessionStorage.setItem(cacheKey, JSON.stringify(userData));
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 if (pfpNotification) {
                     pfpNotification.textContent = 'Profile picture updated successfully!';

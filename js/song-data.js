@@ -13,6 +13,22 @@ export const songColors = {
 };
 
 export const librarySongs = [
+    {
+        "id": "kobzx2z-take-my-hand",
+        "title": "take my hand",
+        "artist": "kobzx2z",
+        "duration": "2:34",
+        "src": "/music/kobzx2z_take_my_hand.mp3",
+        "art": "/images/take_my_hand_cover.jpg",
+        "bpm": 118,
+        "energy": 0.8,
+        "inmixPoint": 0,
+        "outmixPoint": 154,
+        "tags": [
+            "pop"
+        ]
+    },
+
 
     {
         "id": "lil-tjay-calling-my-phone",
