@@ -324,7 +324,7 @@ textarea#review-text:focus {
     transition: background-color 0.2s;
 }
 
-.add-to-cart-btn:hover {
+.add-to-cart-btn:hover:not(:disabled) {
     background-color: #1D4ED8;
 }
 
@@ -701,7 +701,7 @@ textarea#review-text:focus {
     margin-top: 10px;
 }
 
-.submit-review-btn:hover {
+.submit-review-btn:hover:not(:disabled) {
     background-color: #1D4ED8;
 }
 
@@ -780,4 +780,11 @@ textarea#review-text:focus {
 .action-buttons-container {
     display: flex;
     gap: 10px;
+}
+
+.add-to-cart-btn:disabled, .submit-review-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
