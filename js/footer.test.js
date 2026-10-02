@@ -21,7 +21,7 @@ async function runTest() {
     if (footerElement.innerHTML.includes('footer-container') && footerElement.innerHTML.includes('Unstoppable LLC')) {
         console.log('✅ Test Case 1 Passed: Footer HTML injected correctly.');
     } else {
-        console.error('❌ Test Case 1 Failed: Footer HTML not injected correctly.');
+        console.error('Manager info: ❌ Test Case 1 Failed: Footer HTML not injected correctly.');
         process.exit(1);
     }
 
@@ -32,7 +32,7 @@ async function runTest() {
         loadFooter();
         console.log('✅ Test Case 2 Passed: Handles missing footer element gracefully.');
     } catch (e) {
-        console.error('❌ Test Case 2 Failed: Threw error when footer element missing.', e);
+        console.error('Manager info: ❌ Test Case 2 Failed: Threw error when footer element missing.', e);
         process.exit(1);
     }
 
@@ -40,6 +40,6 @@ async function runTest() {
 }
 
 runTest().catch(err => {
-    console.error('Test execution failed:', err);
+    console.error('Manager info: Test execution failed:', err);
     process.exit(1);
 });

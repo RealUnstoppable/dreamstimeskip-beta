@@ -155,7 +155,7 @@ export async function renderOrders(user) {
                     }
                 }
             }
-        } catch (_) {}
+        } catch (_) { /* ignore */ }
 
         // 3. Sort orders client-side by date descending
         orders.sort((a, b) => {
@@ -261,7 +261,7 @@ export async function renderOrders(user) {
         });
 
     } catch (err) {
-        console.error("Error rendering orders:", err);
+        console.error("Manager info: Error rendering orders:", err);
         if (listEl) {
             listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
         }
@@ -352,7 +352,7 @@ export async function renderRewards(user, userData) {
             if (txs.length === 0) {
                 dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet. Earn 10 points for every dollar spent in the shop!</p>`;
             } else {
-                dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => {
+                const newDashboardHtml = txs.slice(0, 4).map(tx => {
                     const isPositive = (tx.points || 0) >= 0;
                     const dateStr = formatDate(tx.createdAt);
                     return `
@@ -367,6 +367,9 @@ export async function renderRewards(user, userData) {
                         </div>
                     `;
                 }).join('');
+                if (dashboardActivityList.innerHTML !== newDashboardHtml) {
+                    dashboardActivityList.innerHTML = newDashboardHtml;
+                }
             }
         }
 
@@ -380,7 +383,7 @@ export async function renderRewards(user, userData) {
                 rewardsHistoryList.innerHTML = '';
             } else {
                 if (noRewardsMsg) noRewardsMsg.style.display = 'none';
-                rewardsHistoryList.innerHTML = txs.map(tx => {
+                const newRewardsHtml = txs.map(tx => {
                     const isPositive = (tx.points || 0) >= 0;
                     const dateStr = formatDate(tx.createdAt);
                     return `
@@ -395,11 +398,14 @@ export async function renderRewards(user, userData) {
                         </div>
                     `;
                 }).join('');
+                if (rewardsHistoryList.innerHTML !== newRewardsHtml) {
+                    rewardsHistoryList.innerHTML = newRewardsHtml;
+                }
             }
         }
 
     } catch (err) {
-        console.error("Error rendering rewards:", err);
+        console.error("Manager info: Error rendering rewards:", err);
         if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
     }
 }
@@ -512,7 +518,7 @@ export function renderBilling(user, userData) {
                 alert('Premium plan activated in test mode! You can now test the cancellation flow.');
                 renderBilling(user, userData);
             } catch (err) {
-                console.error("Test activate error:", err);
+                console.error("Manager info: Test activate error:", err);
             }
         });
     }
@@ -630,7 +636,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 closeModal();
                 renderRewards(user, userData);
             } catch (err) {
-                console.error("Voucher claim error:", err);
+                console.error("Manager info: Voucher claim error:", err);
                 alert('Code applied! Thank you for staying with us.');
                 closeModal();
             }
@@ -708,7 +714,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                     onCancelledCallback();
                 }
             } catch (err) {
-                console.error("Cancellation error:", err);
+                console.error("Manager info: Cancellation error:", err);
                 alert('Cancellation processed. Your account is now on the Free tier.');
                 closeModal();
                 if (typeof onCancelledCallback === 'function') {
@@ -767,7 +773,9 @@ export async function loadWishlist(userId) {
                     `;
                 }).join('');
                 
-                container.innerHTML = itemsHtml;
+                if (container.innerHTML !== itemsHtml) {
+                    container.innerHTML = itemsHtml;
+                }
                 
             } else {
                 if (shareBtn) shareBtn.style.display = 'none';
@@ -819,7 +827,7 @@ export async function loadWishlist(userId) {
         }
 
         const items = snap.data().items;
-        container.innerHTML = items.map(id => {
+        const newWishlistHtml = items.map(id => {
             const product = productMap.get(id);
             if (!product) return '';
             return `
@@ -836,6 +844,9 @@ export async function loadWishlist(userId) {
                 </div>
             `;
         }).join('');
+        if (container.innerHTML !== newWishlistHtml) {
+            container.innerHTML = newWishlistHtml;
+        }
 
         // Wire Add to Cart
         container.querySelectorAll('.wishlist-add-cart-btn').forEach(btn => {
@@ -861,7 +872,7 @@ export async function loadWishlist(userId) {
         });
 
     } catch (err) {
-        console.error("Error loading wishlist:", err);
+        console.error("Manager info: Error loading wishlist:", err);
         container.innerHTML = `<p style="color: var(--accent-red); grid-column: 1 / -1;">Failed to load wishlist.</p>`;
     }
 }
@@ -880,7 +891,7 @@ export async function loadUserTickets(userId) {
             return;
         }
 
-        container.innerHTML = `
+        const newTicketsHtml = `
             <div class="tickets-list">
                 ${tickets.map(ticket => {
                     const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
@@ -903,8 +914,11 @@ export async function loadUserTickets(userId) {
                 }).join('')}
             </div>
         `;
+        if (container.innerHTML !== newTicketsHtml) {
+            container.innerHTML = newTicketsHtml;
+        }
     } catch (err) {
-        console.error("Error loading tickets:", err);
+        console.error("Manager info: Error loading tickets:", err);
         container.innerHTML = '<p style="color: var(--accent-red); margin: 0;">Failed to load tickets.</p>';
     }
 }

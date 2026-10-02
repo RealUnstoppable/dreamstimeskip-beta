@@ -171,7 +171,7 @@ function updateCartSummary() {
     try {
         localStorage.setItem('cartItemCount', itemCount.toString());
         localStorage.setItem('localCart', JSON.stringify(cart));
-    } catch (_) {}
+    } catch (_) { /* ignore */ }
 
     // Update Lexi cart badge if window.updateLexiCartCount exists
     if (window.updateLexiCartCount) {
@@ -784,7 +784,7 @@ try {
         cart = JSON.parse(localCartData);
         renderCart();
     }
-} catch (_) {}
+} catch (_) { /* ignore */ }
 
 // Auth and Cart state synchronization
 onAuthStateChanged(auth, async (user) => {
@@ -793,7 +793,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localCartData = localStorage.getItem('localCart');
         if (localCartData) localCart = JSON.parse(localCartData);
-    } catch (_) {}
+    } catch (_) { /* ignore */ }
 
     if (user) {
         // Load Wishlist
@@ -806,7 +806,7 @@ onAuthStateChanged(auth, async (user) => {
                 wishlist = new Set();
             }
         } catch (error) {
-            console.error("Error loading wishlist:", error);
+            console.error("Manager info: Error loading wishlist:", error);
         }
 
         try {
@@ -827,7 +827,7 @@ onAuthStateChanged(auth, async (user) => {
                 localStorage.removeItem('localCart');
             }
         } catch (error) {
-            console.error("Error loading cart from firestore:", error);
+            console.error("Manager info: Error loading cart from firestore:", error);
             cart = localCart;
         }
     } else {

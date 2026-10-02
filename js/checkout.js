@@ -453,7 +453,7 @@ onAuthStateChanged(auth, async (user) => {
     try {
         const localRaw = localStorage.getItem('localCart');
         if (localRaw) localCart = JSON.parse(localRaw);
-    } catch (_) {}
+    } catch (_) { /* ignore */ }
 
     if (user) {
         currentUser = user;
