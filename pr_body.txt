@@ -1,5 +1,16 @@
-🚨 Severity: HIGH
-💡 Vulnerability: The `firestore.rules` file contained duplicate `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews`. Since Firebase evaluates overlapping match blocks with a logical OR, the less restrictive rules at the bottom of the file (e.g. `allow read: if true; allow update, delete: if false;`) were silently bypassing the stricter validations (like `request.resource.data.rating >= 1`) defined earlier.
-🎯 Impact: Attackers could bypass intended access controls and validations to update or manipulate data in these collections, as the OR logic of duplicate rules would grant them access based on the least restrictive condition.
-🔧 Fix: Removed the duplicate, overlapping `match` blocks for `/reviews`, `/product_stats`, and `/product_reviews` from the bottom of `firestore.rules` to ensure only the strictly defined, secure `match` blocks evaluate.
-✅ Verification: `pnpm test` passes for the functions directory, and `cat firestore.rules` confirms the duplicates have been removed.
+🎯 What:
+- Extracted duplicate `.docs.map(doc => ({ id: doc.id, ...doc.data() }))` logic from components into a centralized `mapCollectionData` utility function in `js/utils.js`.
+- Applied the new `mapCollectionData` function to `js/utils.js`, `js/firebase.js`, `js/account.js`, `js/utils/db-utils.js`, and `js/review-service.js`.
+- Made sure all warning/error logs use the `Manager info: ` prefix convention.
+
+💡 Why:
+- Decreases boilerplate duplicate code parsing Firestore querySnapshots across multiple API fetch functions (DRY rule).
+- Provides a consistent interface.
+
+✅ Verification:
+- Reviewed all calls to `.docs.map()` replaced by `mapCollectionData()`.
+- Grepped `catch` error blocks to guarantee all meaningful ones prepend `Manager info: ` when they log.
+
+✨ Result:
+- Centralized mapping utility shrinks component file sizes and simplifies snapshot parsing logic.
+- More uniform code health across frontend data layers!
