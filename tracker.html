@@ -926,7 +926,7 @@
                         <p class="text-slate-500 mb-6 text-sm">Earn premium credits by referring other managers.</p>
                         <input type="text" id="referralLink" readonly title="Referral Link" aria-label="Referral Link"
                             class="font-mono text-xs mb-4 bg-slate-50 opacity-60 dark:bg-slate-800">
-                        <button onclick="copyReferral()" class="btn btn-outline w-full">Copy My Link</button>
+                        <button onclick="copyReferral(this)" class="btn btn-outline w-full">Copy My Link</button>
                         <div id="referralStatus" class="mt-4 text-[10px] font-black uppercase text-emerald-500 hidden">
                             Referral Detected: 10% Extra Discount Applied!
                         </div>
@@ -1752,11 +1752,17 @@
             });
         }
 
-        window.copyReferral = function() {
+        window.copyReferral = function(btn) {
             const el = document.getElementById('referralLink');
             el.select();
             document.execCommand('copy');
-            alert("Link copied! Share to earn credits.");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = 'Copied!';
+            btn.disabled = true;
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 2000);
         }
 
         window.clearData = function() {
