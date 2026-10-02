@@ -74,7 +74,7 @@ async function fetchAndRenderRequests() {
         }
 
         const serializedRequests = JSON.stringify({
-            requests: requestsData.map(req => ({ ...req, createdAt: req.createdAt ? (typeof req.createdAt.toMillis === "function" ? req.createdAt.toMillis() : req.createdAt) : null })),
+            requests: requestsData,
             upvotes: Array.from(userUpvotes)
         });
         if (serializedRequests === currentRequestsCache) return;

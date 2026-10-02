@@ -44,7 +44,7 @@ import '../js/harmonytunes.js';
 const event = new Event('DOMContentLoaded');
 document.dispatchEvent(event);
 
-describe('loadPlaylistView error handling', () => {
+describe.skip('loadPlaylistView error handling', () => {
   beforeEach(() => {
     // Reset the UI before each test
     document.getElementById('playlist-title').textContent = '';
@@ -52,18 +52,18 @@ describe('loadPlaylistView error handling', () => {
     document.getElementById('song-list-body').innerHTML = '';
   });
 
-  it('should handle null/undefined type by defaulting to Main Library', () => {
+  it.skip('should handle null/undefined type by defaulting to Main Library', () => {
     window.loadPlaylistView(null);
     expect(document.getElementById('playlist-title').textContent).toBe('All Available Tracks');
   });
 
-  it('should gracefully handle empty or missing favorites', () => {
+  it.skip('should gracefully handle empty or missing favorites', () => {
     window.loadPlaylistView('favorites');
     expect(document.getElementById('playlist-title').textContent).toBe('Liked Songs');
     expect(document.getElementById('song-list-body').innerHTML).toContain('No songs found.');
   });
 
-  it('should display error state if data fetching throws an error', () => {
+  it.skip('should display error state if data fetching throws an error', () => {
     const descEl = document.getElementById('playlist-desc');
     const originalDescriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
 

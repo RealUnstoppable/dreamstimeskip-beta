@@ -57,7 +57,7 @@ async function renderProfile(user, userDataParam = null) {
             `;
         }
     } catch (error) {
-        console.error("Manager info: Error rendering profile:", error);
+        console.error("Error rendering profile:", error);
         if (profileDetails) {
             profileDetails.innerHTML = `<p style="color: var(--accent-red);">Failed to load profile. Please try again later.</p>`;
         }
@@ -79,7 +79,7 @@ async function renderOrders(user) {
         const ordersData = await fetchQueryData(getDocs, q);
 
         // Memoization check
-        const serializedOrders = JSON.stringify(ordersData.map(order => ({ ...order, orderDate: order.orderDate ? (typeof order.orderDate.toMillis === "function" ? order.orderDate.toMillis() : order.orderDate) : null })));
+        const serializedOrders = JSON.stringify(ordersData);
         if (serializedOrders === currentOrdersCache) return;
         currentOrdersCache = serializedOrders;
 
@@ -143,7 +143,7 @@ async function renderOrders(user) {
         listEl.appendChild(fragment);
 
     } catch (error) {
-        console.error("Manager info: Error rendering orders:", error);
+        console.error("Error rendering orders:", error);
         listEl.innerHTML = `<p style="color: var(--accent-red);">Failed to load order history. Please try again later.</p>`;
     }
 }
@@ -219,9 +219,10 @@ async function renderRewards(user, userData) {
         ]);
 
         const serializedRewards = JSON.stringify({
-            loyalty: loyaltyData.map(d => ({ ...d, createdAt: d.createdAt ? (typeof d.createdAt.toMillis === "function" ? d.createdAt.toMillis() : d.createdAt) : null })),
-            rewards: rewardData.map(d => ({ ...d, createdAt: d.createdAt ? (typeof d.createdAt.toMillis === "function" ? d.createdAt.toMillis() : d.createdAt) : null }))
+            loyalty: loyaltyData,
+            rewards: rewardData
         });
+
         if (serializedRewards === currentRewardsCache) return;
         currentRewardsCache = serializedRewards;
 

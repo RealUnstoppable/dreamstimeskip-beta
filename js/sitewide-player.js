@@ -79,7 +79,7 @@ class SitewideMusicEngine {
     notifyListeners() {
         this.updateLexiUI();
         this.listeners.forEach(fn => {
-            try { fn(this.state); } catch (err) { console.error("Manager info: ", err); }
+            try { fn(this.state); } catch (err) { console.error(err); }
         });
     }
 
@@ -516,7 +516,7 @@ class SitewideMusicEngine {
                             }
                         }
                     }).catch(err => {
-                        console.error('Manager info: Failed to load chatbot:', err);
+                        console.error('Failed to load chatbot:', err);
                         window.location.href = 'index.html#chat';
                     });
                 }

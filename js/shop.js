@@ -800,7 +800,7 @@ onAuthStateChanged(auth, async (user) => {
                 wishlist = new Set();
             }
         } catch (error) {
-            console.error("Manager info: Error loading wishlist:", error);
+            console.error("Error loading wishlist:", error);
         }
 
         try {
@@ -821,7 +821,7 @@ onAuthStateChanged(auth, async (user) => {
                 localStorage.removeItem('localCart');
             }
         } catch (error) {
-            console.error("Manager info: Error loading cart from firestore:", error);
+            console.error("Error loading cart from firestore:", error);
             cart = localCart;
         }
     } else {
