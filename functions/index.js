@@ -549,7 +549,7 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
         }
       });
 
-      res.status(200).send({ success: true });
+      res.status(200).send({ success: true, orderId: newOrderRef.id });
     } catch (error) {
       console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
