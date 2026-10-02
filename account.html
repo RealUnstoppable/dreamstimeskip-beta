@@ -209,9 +209,10 @@
                             <label for="ticket-subject">Subject</label>
                             <input type="text" id="ticket-subject" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="position: relative;">
                             <label for="ticket-message">Message</label>
-                            <textarea id="ticket-message" rows="4" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary);"></textarea>
+                            <textarea id="ticket-message" rows="4" required maxlength="500" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary);"></textarea>
+                            <div id="ticket-message-counter" style="text-align: right; font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">0 / 500</div>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit Ticket</button>
                         <div id="ticket-notification" class="notification"></div>
@@ -600,6 +601,21 @@
                 }
             });
 
+            const ticketMessageInput = document.getElementById('ticket-message');
+            const ticketMessageCounter = document.getElementById('ticket-message-counter');
+
+            if (ticketMessageInput && ticketMessageCounter) {
+                ticketMessageInput.addEventListener('input', () => {
+                    const currentLength = ticketMessageInput.value.length;
+                    ticketMessageCounter.textContent = `${currentLength} / 500`;
+                    if (currentLength >= 480) {
+                        ticketMessageCounter.style.color = 'var(--accent-red, #ef4444)';
+                    } else {
+                        ticketMessageCounter.style.color = 'var(--text-secondary)';
+                    }
+                });
+            }
+
             document.getElementById('support-ticket-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const subject = document.getElementById('ticket-subject').value;
@@ -616,6 +632,10 @@
                     await createTicket(user.uid, user.email, subject, message);
                     showNotification(notificationEl, 'Ticket submitted successfully!', 'success');
                     e.target.reset();
+                    if (ticketMessageCounter) {
+                        ticketMessageCounter.textContent = '0 / 500';
+                        ticketMessageCounter.style.color = 'var(--text-secondary)';
+                    }
                     await loadUserTickets(user.uid);
                 } catch (error) {
                     showNotification(notificationEl, `Error: ${error.message}`, 'error');
