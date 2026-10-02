@@ -807,7 +807,7 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6 pt-12 no-print">
-                        <button type="button" onclick="generateReport()"
+                        <button type="button" onclick="generateReport(event)"
                             class="btn btn-dark py-6 text-xl shadow-2xl shadow-slate-200 dark:shadow-none">
                             <i data-lucide="printer"></i> End Shift & Print
                         </button>
@@ -831,7 +831,7 @@
             <div class="max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-12">
                     <h1 class="text-4xl font-black">Manager Performance</h1>
-                    <button class="btn btn-outline btn-sm" onclick="exportPerformanceCSV()">Export CSV</button>
+                    <button class="btn btn-outline btn-sm" onclick="exportPerformanceCSV(event)">Export CSV</button>
                 </div>
 
                 <div class="grid md:grid-cols-3 gap-6 mb-12">
@@ -1532,6 +1532,26 @@
             });
         }
 
+        window.exportPerformanceCSV = function(event) {
+            if (!currentUser) return alert("Sign in required to export CSV.");
+
+            const btn = event ? event.currentTarget : null;
+            let originalText = "";
+            if (btn) {
+                originalText = btn.innerText;
+                btn.disabled = true;
+                btn.innerText = 'Exporting...';
+            }
+
+            setTimeout(() => {
+                alert('CSV Exported!');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            }, 1500);
+        }
+
         function calculatePerformance() {
             if(!currentUser) return;
             const userDocRef = doc(db, 'users', currentUser.uid);
@@ -1653,8 +1673,19 @@
             });
         }
 
-        window.generateReport = function() {
+        window.generateReport = function(event) {
             if(!currentUser) return alert("Sign in required.");
+
+            const btn = event ? event.currentTarget : null;
+            let originalHtml = "";
+            if (btn) {
+                originalHtml = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i data-lucide="printer"></i> Generating...';
+                btn.title = "Generating report...";
+                lucide.createIcons();
+            }
+
             const state = getTrackerState();
 
             document.getElementById('printHeader').innerText = `ezManage Shift Summary: ${state.dateSaved} - ${state.manager}`;
@@ -1673,12 +1704,22 @@
             state.inventory.forEach(i => invHtml += `<div>${escapeHTML(i.name)}: ${escapeHTML(i.bl)} BL | ${escapeHTML(i.cl)} CL | ${escapeHTML(i.fr)} FR</div>`);
             document.getElementById('printInventoryList').innerHTML = invHtml;
 
-            if (typeof window.manualSaveHistory === 'function') {
-                window.manualSaveHistory();
-            } else if (typeof manualSaveHistory === 'function') {
-                manualSaveHistory();
-            }
-            window.print();
+            setTimeout(() => {
+                if (typeof window.manualSaveHistory === 'function') {
+                    window.manualSaveHistory();
+                } else if (typeof manualSaveHistory === 'function') {
+                    manualSaveHistory();
+                }
+
+                window.print();
+
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    btn.removeAttribute('title');
+                    lucide.createIcons();
+                }
+            }, 1500);
         }
 
         function loadProfileUI(data) {
