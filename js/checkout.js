@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransactio
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
+import { generateProductCardHtml } from './ui-utils.js';
 
 let currentUser = null;
 let userCart = {};
@@ -227,11 +228,7 @@ function renderCheckoutPage() {
 
 
 function updateSummaryUI() {
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
 
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
@@ -324,11 +321,7 @@ export async function handlePlaceOrder(e) {
     const emailVal = emailInput ? emailInput.value : (currentUser ? currentUser.email : '');
 
     // Calculate final total
-    let subtotal = 0;
-    Object.entries(userCart).forEach(([productId, quantity]) => {
-        const product = productMap.get(productId);
-        if (product) subtotal += product.price * quantity;
-    });
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
     const promoDiscountAmount = subtotal * discount;
     const pointsDiscountAmount = pointsToRedeem / 100;
     const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
