@@ -111,7 +111,9 @@ async function fetchAndRenderRequests() {
             `;
         }
 
-        requestsList.innerHTML = html;
+        if (requestsList.innerHTML !== html) {
+            requestsList.innerHTML = html;
+        }
 
         // Attach event listeners to upvote buttons
         document.querySelectorAll('.upvote-btn').forEach(btn => {

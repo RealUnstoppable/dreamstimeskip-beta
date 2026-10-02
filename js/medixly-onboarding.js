@@ -155,7 +155,7 @@ function createOnboardingUI() {
             }, 1000);
             
         } catch (err) {
-            console.error(err);
+            console.error("Manager info: ", err);
             errorDiv.textContent = err.message;
             submitBtn.disabled = false;
             submitBtn.textContent = "Create Account";
