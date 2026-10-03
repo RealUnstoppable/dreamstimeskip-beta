@@ -170,11 +170,7 @@ describe("createCheckoutSession", () => {
       metadata: {
         uid: "user123",
         planName: "Pro",
-<<<<<<< HEAD
-        project: "ezmanage"
-=======
         project: "ezmanage",
->>>>>>> origin/main
       },
     }));
 
@@ -218,11 +214,7 @@ describe("createCheckoutSession", () => {
       metadata: {
         uid: "bizuser",
         planName: "Business Pro",
-<<<<<<< HEAD
-        project: "ezmanage"
-=======
         project: "ezmanage",
->>>>>>> origin/main
       },
     }));
 
