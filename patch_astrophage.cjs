@@ -3,7 +3,7 @@ const fs = require('fs');
 let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
 // Update image
-js = js.replace(/id: 'astrophage',[\s\S]*?art: "\/images\/harmony-tunes-card.jpg",/, 
+js = js.replace(/id: 'astrophage',[\s\S]*?art: "\/images\/harmony-tunes-card.jpg",/,
 `id: 'astrophage',
             title: "Astrophage",
             artist: "Lupus Nocte",

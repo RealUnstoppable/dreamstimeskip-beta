@@ -3,12 +3,12 @@ const fs = require('fs');
 let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
 // Update image
-js = js.replace(/id: 'pixy-legacy',[\s\S]*?art: "\/images\/dreams-lobby.jpg",/, 
+js = js.replace(/id: 'pixy-legacy',[\s\S]*?art: "\/images\/dreams-lobby.jpg",/,
 `id: 'pixy-legacy',
-            title: "PIXY - LEGACY", 
-            artist: "Catalin", 
-            duration: "2:17", 
-            src: "/music/PIXY - LEGACY.mp3", 
+            title: "PIXY - LEGACY",
+            artist: "Catalin",
+            duration: "2:17",
+            src: "/music/PIXY - LEGACY.mp3",
             art: "/images/legacy_cover.jpg",`);
 
 // Update color

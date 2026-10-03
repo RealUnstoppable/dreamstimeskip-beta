@@ -1,5 +1,6 @@
 import { db } from './auth.js';
 import { collection, addDoc, getDocs, query, where, serverTimestamp, orderBy, getAggregateFromServer, average, count } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { fetchQueryData } from './utils.js';
 
 const REVIEWS_COLLECTION = 'product_reviews';
 
@@ -22,17 +23,33 @@ export async function submitReview(productId, userId, userEmail, rating, reviewT
     }
 
     try {
-        const docRef = await addDoc(collection(db, REVIEWS_COLLECTION), {
-            productId,
-            userId,
-            userEmail,
-            rating,
-            reviewText,
-            createdAt: serverTimestamp()
+        const { auth } = await import('./auth.js');
+        const user = auth.currentUser;
+        if (!user) throw new Error('Not authenticated');
+
+        const token = await user.getIdToken();
+        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/submitReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                productId: productId,
+                rating: rating,
+                reviewText: reviewText,
+                authorName: userEmail // Fallback if name is not passed separately in this old signature
+            })
         });
-        return { success: true, id: docRef.id };
+
+        if (!response.ok) {
+            throw new Error('Failed to submit review via API');
+        }
+
+        const data = await response.json();
+        return { success: true, id: data.id };
     } catch (error) {
-        console.error('Manager info: Error submitting review:', error);
+        console.error("Manager info: Error submitting review:", error.message || error);
         return { success: false, error: error.message };
     }
 }
@@ -51,16 +68,15 @@ export async function getProductReviews(productId) {
             where('productId', '==', productId),
             orderBy('createdAt', 'desc')
         );
-        const querySnapshot = await getDocs(q);
+        const data = await fetchQueryData(getDocs, q, true);
 
-        return querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
+        return data.map(review => ({
+            ...review,
             // Optional: format the timestamp to date string
-            createdAtDate: doc.data().createdAt ? doc.data().createdAt.toDate().toLocaleDateString() : 'Just now'
+            createdAtDate: review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now'
         }));
     } catch (error) {
-        console.error('Manager info: Error fetching product reviews:', error);
+        console.error("Manager info: Error fetching product reviews:", error.message || error);
         return [];
     }
 }
@@ -87,7 +103,7 @@ export async function getAverageRating(productId) {
             count: data.totalReviews || 0
         };
     } catch (error) {
-        console.error('Manager info: Error calculating average rating:', error);
+        console.error("Manager info: Error calculating average rating:", error.message || error);
         return { average: 0, count: 0 };
     }
 }

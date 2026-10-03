@@ -12,18 +12,18 @@ html = html.replace(/<div class="fs-player-options">([\s\S]*?)<\/div>\s*<!-- Mid
     const lyricsBtn = options.match(/<button[^>]*id="fs-lyrics-btn"[^>]*>[\s\S]*?<\/button>/)[0];
     const viralBtn = options.match(/<button[^>]*id="fs-viral-skip-btn"[^>]*>[\s\S]*?<\/button>/)[0];
     const likeBtn = options.match(/<button[^>]*id="fs-like-btn"[^>]*>.*?<\/button>/)[0];
-    
+
     const mixerBtn = options.match(/<button[^>]*id="fs-mixer-btn"[^>]*>[\s\S]*?<\/button>/)[0];
     const shuffleBtn = options.match(/<button[^>]*id="fs-shuffle-btn"[^>]*>[\s\S]*?<\/button>/)[0];
     const repeatBtn = options.match(/<button[^>]*id="fs-repeat-btn"[^>]*>[\s\S]*?<\/button>/)[0];
-    
+
     const newOptions = `
                 <div class="fs-player-options">
                     ${lyricsBtn}
                     ${viralBtn}
                     ${likeBtn}
                 </div>`;
-                
+
     const newControls = `
                 <div class="fullscreen-controls" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;">
                     ${shuffleBtn}
@@ -31,7 +31,7 @@ html = html.replace(/<div class="fs-player-options">([\s\S]*?)<\/div>\s*<!-- Mid
                     ${controls.trim()}
                     ${repeatBtn}
                 </div>`;
-                
+
     return newOptions + '\n\n                <!-- Middle Row: Controls -->\n' + newControls;
 });
 
@@ -57,7 +57,7 @@ js = js.replace(/effects\.forEach\(effect => \{[\s\S]*?effect\.classList\.add\('
                             const rx = Math.floor(Math.random() * 80) + 10;
                             const ry = Math.floor(Math.random() * 80) + 10;
                             effect.style.background = \`radial-gradient(circle at \${rx}% \${ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%), radial-gradient(circle at \${100-rx}% \${100-ry}%, color-mix(in srgb, var(--theme-color, #1a2b4c) 90%, transparent) 0%, transparent 60%)\`;
-                            
+
                             effect.classList.remove('beat');
                             void effect.offsetWidth; // trigger reflow
                             effect.classList.add('beat');

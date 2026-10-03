@@ -4,11 +4,11 @@ const fs = require('fs');
 let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
 // Lyrics background
-js = js.replace(/linear-gradient\(to bottom, color-mix\(in srgb, var\(--theme-color\) 70%, transparent\) 0%, color-mix\(in srgb, var\(--theme-color\) 90%, transparent\) 100%\)/, 
+js = js.replace(/linear-gradient\(to bottom, color-mix\(in srgb, var\(--theme-color\) 70%, transparent\) 0%, color-mix\(in srgb, var\(--theme-color\) 90%, transparent\) 100%\)/,
 `linear-gradient(to bottom, color-mix(in srgb, var(--theme-color) 30%, transparent) 0%, color-mix(in srgb, var(--theme-color) 40%, transparent) 100%)`);
 
 // Paint spill flashes
-js = js.replace(/color-mix\(in srgb, var\(--theme-color, #1a2b4c\) 90%, transparent\) 0%, transparent 60%/g, 
+js = js.replace(/color-mix\(in srgb, var\(--theme-color, #1a2b4c\) 90%, transparent\) 0%, transparent 60%/g,
 `color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%`);
 
 fs.writeFileSync('js/harmonytunes.js', js);

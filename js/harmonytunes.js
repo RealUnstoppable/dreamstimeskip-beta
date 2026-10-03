@@ -1,21 +1,13 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getCachedUserProfile } from './utils.js';
 import { lyricsData } from './lyrics-data.js?v=1790377272083b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1790377272083b';
 
 // Utility to prevent DOM-based and Stored XSS
-function escapeHTML(str) {
-    if (str == null) return "";
-    if (typeof str !== 'string') str = String(str);
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
+
 
 function initHarmonyTunes() {
 
@@ -51,15 +43,14 @@ function initHarmonyTunes() {
     async function loadCustomPlaylists() {
         if (!currentUser) return;
         try {
-            const userRef = doc(db, "users", currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                const data = userSnap.data();
+            // ⚡ Bolt: Fetch user data from sessionStorage cache using getCachedUserProfile instead of a raw Firestore getDoc query to prevent unnecessary network reads and improve loading speed.
+            const data = await getCachedUserProfile(currentUser);
+            if (data) {
                 customPlaylists = data.customPlaylists || [];
                 renderHomePlaylists();
             }
         } catch (e) {
-            console.error("Failed to load custom playlists", e);
+            console.error("Manager info: Failed to load custom playlists", e);
         }
     }
 
@@ -68,8 +59,16 @@ function initHarmonyTunes() {
         try {
             const userRef = doc(db, "users", currentUser.uid);
             await updateDoc(userRef, { customPlaylists });
+            // Update session cache to prevent stale data on reload
+            const cacheKey = `profile_${currentUser.uid}`;
+            const cachedStr = sessionStorage.getItem(cacheKey);
+            if (cachedStr) {
+                const uData = JSON.parse(cachedStr);
+                uData.customPlaylists = customPlaylists;
+                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+            }
         } catch (e) {
-            console.error("Failed to save custom playlists", e);
+            console.error("Manager info: Failed to save custom playlists", e);
         }
     }
 
@@ -366,11 +365,9 @@ function initHarmonyTunes() {
         spotlightResults.innerHTML = '';
     }
 
-    function highlightMatch(text, query) {
-        if (!query) return escapeHTML(text);
-        const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`(${escaped})`, 'gi');
-        return escapeHTML(text).replace(re, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
+    function highlightMatch(text, regex) {
+        if (!regex) return escapeHTML(text);
+        return escapeHTML(text).replace(regex, '<mark style="background:rgba(29,185,84,0.35);color:#fff;border-radius:2px;">$1</mark>');
     }
 
     function runSpotlightSearch(query) {
@@ -468,7 +465,7 @@ function initHarmonyTunes() {
             const res = await fetch('https://tinyurl.com/api-create.php?url=' + encodeURIComponent(url));
             if (res.ok) return await res.text();
         } catch (e) {
-            console.error(e);
+            console.error("Manager info:", e);
         }
         return url; // fallback to long url
     }
@@ -625,7 +622,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -779,8 +776,8 @@ function initHarmonyTunes() {
                 };
             }
         } catch (error) {
-            console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
+            console.error("Manager info: Error loading playlist:", error);
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
             try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
             try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
             try { playlistPlayBtn.onclick = null; } catch (e) {}
@@ -809,11 +806,16 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
+            const prioritySet = new Set(priorityIds);
+            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
+
             const prioritySongs = priorityIds
-                .map(id => viralSongs.find(s => s.id === id))
+                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
+                .map(id => viralSongsMap.get(id))
                 .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
+            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
@@ -1277,7 +1279,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
     }
 
     function playSong() {
@@ -2701,7 +2703,7 @@ function initHarmonyTunes() {
                     userFavoritesIds.add(songId);
                 }
             } else {
-                console.error("Firebase error - Manager info:", e);
+                console.error("Manager info: Firebase error:", e);
                 // Revert state on failure
                 if (isFav) {
                     userFavorites.push(song);
@@ -2753,7 +2755,7 @@ function initHarmonyTunes() {
                         if(typeof renderQueue === 'function') renderQueue();
                     }
                 }
-            } catch (e) { console.error("Manager info:", e); }
+            } catch (e) { console.error("Manager info: ", e); }
             
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
@@ -2829,7 +2831,7 @@ function initHarmonyTunes() {
                 if(e.code === 'not-found') {
                     setDoc(userRef, { musicHistory: historyIds }, { merge: true }).catch(e => console.error("Manager info:", e));
                 } else {
-                    console.error("Firebase history update error - Manager info:", e);
+                    console.error("Manager info: Firebase history update error:", e);
                 }
             });
         }

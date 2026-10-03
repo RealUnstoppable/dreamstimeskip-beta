@@ -120,7 +120,7 @@ body {
     border: 1px solid transparent;
 }
 
-.cta-button:hover {
+.cta-button:hover:not(:disabled) {
     background-color: transparent;
     border-color: var(--accent-color);
     transform: scale(1.05);
@@ -574,7 +574,7 @@ p.section-subtitle {
     transition: background-color 0.3s ease;
 }
 
-.signup-form button:hover {
+.signup-form button:hover:not(:disabled) {
     background-color: #1D4ED8;
 }
 

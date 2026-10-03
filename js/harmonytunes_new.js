@@ -285,21 +285,36 @@ function initHarmonyTunes() {
                 <span class="spotlight-result-play">▶</span>
             </div>
         `).join('');
+    }
 
-        spotlightResults.querySelectorAll('.spotlight-result-row').forEach(row => {
-            const activateFn = () => {
-                const songId = row.dataset.songId;
-                const idx = librarySongs.findIndex(s => s.id === songId);
-                if (idx !== -1) {
-                    currentQueue = [...librarySongs];
-                    currentSongIndex = idx;
-                    loadSong(idx);
-                    if (!isPlaying) togglePlayPause();
+    // ⚡ Bolt: Event Delegation for Spotlight Results
+    if (spotlightResults && !spotlightResults.dataset.delegated) {
+        spotlightResults.dataset.delegated = 'true';
+        const activateResult = (row) => {
+            if (!row) return;
+            const songId = row.dataset.songId;
+            const idx = librarySongs.findIndex(s => s.id === songId);
+            if (idx !== -1) {
+                currentQueue = [...librarySongs];
+                currentSongIndex = idx;
+                loadSong(idx);
+                if (!isPlaying) togglePlayPause();
+            }
+            closeSpotlight();
+        };
+
+        spotlightResults.addEventListener('click', (e) => {
+            activateResult(e.target.closest('.spotlight-result-row'));
+        });
+
+        spotlightResults.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const row = e.target.closest('.spotlight-result-row');
+                if (row) {
+                    e.preventDefault();
+                    activateResult(row);
                 }
-                closeSpotlight();
-            };
-            row.addEventListener('click', activateFn);
-            row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateFn(); }});
+            }
         });
     }
 
@@ -413,7 +428,7 @@ function initHarmonyTunes() {
 
                 restored = true;
             }
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
 
         if (!restored) {
             currentQueue = [...librarySongs];
@@ -484,10 +499,10 @@ function initHarmonyTunes() {
             }
         } catch (error) {
             console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) {}
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) {}
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) {}
-            try { playlistPlayBtn.onclick = null; } catch (e) {}
+            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
+            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
+            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
+            try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
         }
     }
 
@@ -513,11 +528,16 @@ function initHarmonyTunes() {
                 'isabel-larosa-dont-make-them-like-me'
             ];
             
+            const prioritySet = new Set(priorityIds);
+            const viralSongsMap = new Map(viralSongs.map(s => [s.id, s]));
+
             const prioritySongs = priorityIds
-                .map(id => viralSongs.find(s => s.id === id))
+                // ⚡ Bolt: O(1) lookup replaces O(N) viralSongs.find()
+                .map(id => viralSongsMap.get(id))
                 .filter(Boolean);
             
-            viralSongs = viralSongs.filter(s => !priorityIds.includes(s.id));
+            // ⚡ Bolt: O(1) Set lookup replaces O(N) Array.includes()
+            viralSongs = viralSongs.filter(s => !prioritySet.has(s.id));
             viralSongs = [...prioritySongs, ...viralSongs];
             
             // Mock views and trends (#1 Tate: 14.2M up, #2 PIXY: 11.8M up, #3 Isabel: 10.4M up)
@@ -537,7 +557,7 @@ function initHarmonyTunes() {
                         <div class="leaderboard-item" data-viral-idx="${idx}" style="cursor:pointer;">
                             <div class="leaderboard-rank">${idx + 1}</div>
                             <div class="leaderboard-trend ${trendClass}">${trendIcon}</div>
-                            <img class="leaderboard-art" src="${song.art}" alt="Art">
+                            <img class="leaderboard-art" src="${song.art}" alt="Art" loading="lazy">
                             <div class="leaderboard-info">
                                 <div class="leaderboard-title">${escapeHTML(song.title)}</div>
                                 <div class="leaderboard-artist">${escapeHTML(song.artist)}</div>
@@ -548,12 +568,17 @@ function initHarmonyTunes() {
                 }).join('');
 
                 // Wire up click → stats popup
-                containerViralNow.querySelectorAll('.leaderboard-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const idx = parseInt(item.dataset.viralIdx, 10);
-                        openViralStats(idx);
+                // ⚡ Bolt: Event Delegation for Leaderboard Items
+                if (!containerViralNow.dataset.delegated) {
+                    containerViralNow.dataset.delegated = 'true';
+                    containerViralNow.addEventListener('click', (e) => {
+                        const item = e.target.closest('.leaderboard-item');
+                        if (item) {
+                            const idx = parseInt(item.dataset.viralIdx, 10);
+                            openViralStats(idx);
+                        }
                     });
-                });
+                }
             };
 
             // ===== Viral Stats Popup =====
@@ -676,7 +701,7 @@ function initHarmonyTunes() {
         containerPlaylists.innerHTML = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}" loading="lazy">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)} playlist">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
@@ -975,7 +1000,7 @@ function initHarmonyTunes() {
                 ...extra
             };
             localStorage.setItem('dts_music_state', JSON.stringify(state));
-        } catch (_) {}
+        } catch (_) { /* ignore local storage error */ }
     }
 
     function playSong() {

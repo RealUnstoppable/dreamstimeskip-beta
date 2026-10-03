@@ -3,7 +3,7 @@ const fs = require('fs');
 const lyricsFile = 'js/lyrics-data.js';
 let content = fs.readFileSync(lyricsFile, 'utf8');
 
-// We need to parse it. 
+// We need to parse it.
 // A simple way is to remove the "export const lyricsData = " part, parse it as JSON... wait, the keys aren't quoted.
 // Let's use eval or Function.
 let objStr = content.replace('export const lyricsData = ', '').trim();

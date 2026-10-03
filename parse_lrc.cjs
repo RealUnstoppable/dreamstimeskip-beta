@@ -191,19 +191,19 @@ for (const b of blocks) {
     let text = lines[0].trim();
     if(text.startsWith("'") && text.endsWith("'")) text = text.slice(1, -1);
     if(text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
-    
+
     const startStr = lines.find(l => l.includes('start_ms:'));
     const endStr = lines.find(l => l.includes('end_ms:'));
-    
+
     const startMs = parseInt(startStr.split(':')[1].trim(), 10);
     const endMs = parseInt(endStr.split(':')[1].trim(), 10);
-    
+
     const startSec = startMs / 1000;
     const endSec = endMs / 1000;
-    
+
     const words = text.split(' ');
     const wordDur = (endSec - startSec) / words.length;
-    
+
     const wordObjs = words.map((w, i) => {
         return {
             text: w,
@@ -211,7 +211,7 @@ for (const b of blocks) {
             duration: parseFloat(wordDur.toFixed(2))
         };
     });
-    
+
     jsonArr.push({
         start: parseFloat(startSec.toFixed(2)),
         end: parseFloat(endSec.toFixed(2)),

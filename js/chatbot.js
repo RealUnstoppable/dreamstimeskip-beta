@@ -1,6 +1,7 @@
 // js/chatbot.js
 import { app, db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { escapeHTML } from './utils.js';
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 import { librarySongs } from './song-data.js?v=20260920';
 
@@ -161,7 +162,7 @@ try {
         history: [] // Start with empty history
     });
 } catch (error) {
-    console.error("AI Model Initialization Failed", error);
+    console.error("Manager info: AI Model Initialization Failed", error);
 }
 
 function initChatbot() {
@@ -261,6 +262,38 @@ function initChatbot() {
 
     closeBtn.addEventListener('click', () => {
         chatbotWindow.classList.remove('active');
+    });
+
+    // Close on Escape key press
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && chatbotWindow && chatbotWindow.classList.contains('active')) {
+            chatbotWindow.classList.remove('active');
+        }
+    });
+
+    // Trap focus within the chatbot window
+    chatbotWindow.addEventListener('keydown', function(e) {
+        let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+        if (!isTabPressed) return;
+
+        // Query dynamically to ensure it captures any new elements if applicable
+        const focusableElements = chatbotWindow.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === firstFocusableElement) {
+                    lastFocusableElement.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastFocusableElement) {
+                    firstFocusableElement.focus();
+                    e.preventDefault();
+                }
+            }
+        }
     });
 
     // Handle Input
@@ -499,19 +532,7 @@ function initChatbot() {
         if (el) el.remove();
     }
 
-    function escapeHTML(str) {
-        if (str == null) return "";
-        if (typeof str !== 'string') str = String(str);
-        return str.replace(/[&<>'"]/g, 
-            tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag] || tag)
-        );
-    }
+
 }
 
 if (document.readyState === 'loading') {

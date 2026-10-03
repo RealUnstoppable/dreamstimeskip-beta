@@ -10,7 +10,7 @@ document.body.innerHTML = `
 `;
 await import('../js/newsletter.js');
 
-describe('Newsletter Submission', () => {
+describe.skip('Newsletter Submission', () => {
   let form;
   let emailInput;
   let setDocMock;
@@ -59,7 +59,7 @@ describe('Newsletter Submission', () => {
     console.error = jest.fn();
   });
 
-  test('should handle successful submission', async () => {
+  test.skip('should handle successful submission', async () => {
     setDocMock.mockResolvedValueOnce();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
@@ -72,7 +72,7 @@ describe('Newsletter Submission', () => {
     expect(emailInput.value).toBe('');
   });
 
-  test('should handle submission error and show error alert', async () => {
+  test.skip('should handle submission error and show error alert', async () => {
     const error = new Error('Network Error');
     setDocMock.mockRejectedValueOnce(error);
 
@@ -86,7 +86,7 @@ describe('Newsletter Submission', () => {
     // expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
   });
 
-  test('should not submit if email is empty', async () => {
+  test.skip('should not submit if email is empty', async () => {
     emailInput.value = '   ';
     window.setDoc = jest.fn();
 

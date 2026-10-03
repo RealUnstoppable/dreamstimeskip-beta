@@ -3,12 +3,12 @@ const fs = require('fs');
 let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
 // Update image
-js = js.replace(/id: 'kesha-blow',[\s\S]*?art: "\/images\/un-logo.png",/, 
+js = js.replace(/id: 'kesha-blow',[\s\S]*?art: "\/images\/un-logo.png",/,
 `id: 'kesha-blow',
-            title: "Blow", 
-            artist: "Kesha", 
-            duration: "3:40", 
-            src: "/music/Blow - Kesha.mp3", 
+            title: "Blow",
+            artist: "Kesha",
+            duration: "3:40",
+            src: "/music/Blow - Kesha.mp3",
             art: "/images/blow_cover.jpg",`);
 
 // Update color
