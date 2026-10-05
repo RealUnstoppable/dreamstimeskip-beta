@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medixly for Artists</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/medixly.css">
+    <style>
+        .artist-portal {
+            max-width: 1000px;
+            margin: 100px auto;
+            padding: 20px;
+            color: white;
+            font-family: var(--font-primary, sans-serif);
+        }
+        .portal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .upload-section, .library-section {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 8px;
+        }
+        .btn-primary {
+            background: var(--theme-color, #e63995);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .lyrics-editor {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .lyric-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .lyric-line input[type="text"] {
+            flex: 1;
+        }
+        .lyric-line input[type="number"] {
+            width: 80px;
+        }
+        .audio-preview {
+            width: 100%;
+            margin: 15px 0;
+        }
+        .library-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+        .hidden-badge {
+            background: #555;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header"></header>
+    <main class="artist-portal">
+        <div class="portal-header">
+            <h1>Medixly for Artists</h1>
+            <button class="btn-primary" id="new-upload-btn">+ New Upload</button>
+        </div>
+
+        <div class="upload-section" id="upload-section" style="display: none;">
+            <h2>Upload a Track</h2>
+            <div class="form-group">
+                <label>Track Title</label>
+                <input type="text" id="track-title" placeholder="e.g. Summer Vibes">
+            </div>
+            <div class="form-group">
+                <label>Credits (Producers, Writers)</label>
+                <input type="text" id="track-credits" placeholder="e.g. Prod. by John Doe">
+            </div>
+            <div class="form-group">
+                <label>Audio File (.mp3, .wav)</label>
+                <input type="file" id="track-file" accept="audio/*">
+            </div>
+            <div class="form-group">
+                <label>Cover Art (.jpg, .png)</label>
+                <input type="file" id="track-art" accept="image/*">
+            </div>
+
+            <audio id="audio-preview" class="audio-preview" controls style="display: none;"></audio>
+
+            <div class="lyrics-editor">
+                <h3>Lyrics Sync Editor</h3>
+                <p style="font-size: 0.9rem; margin-bottom: 15px; color: #aaa;">Play your track above and click 'Sync' next to a line to stamp the current time.</p>
+                <div id="lyrics-container"></div>
+                <button class="btn-primary" style="background: #333; margin-top: 10px;" id="add-lyric-btn">+ Add Lyric Line</button>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button class="btn-primary" id="publish-btn">Process & Publish to Library</button>
+            </div>
+        </div>
+
+        <div class="library-section">
+            <h2>Your Upload Library</h2>
+            <div id="artist-library">
+                <!-- Populated by JS -->
+                <p style="color: #aaa;">Loading your tracks...</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/js/theme-loader.js"></script>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        loadNavbar();
+    </script>
+    <script type="module" src="/js/medixly-artists.js"></script>
+</body>
+</html>

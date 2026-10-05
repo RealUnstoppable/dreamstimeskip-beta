@@ -375,17 +375,22 @@ async function fetchProductReviews(productId) {
 async function handleViewReviews(productId) {
     currentReviewProductId = productId;
     const reviewModal = document.getElementById('reviewModal');
+    const reviewModal = document.getElementById('reviewModal');
     if (reviewModal) reviewModal.style.display = 'flex';
     if (reviewsListContainer) reviewsListContainer.innerHTML = '<p>Loading reviews...</p>';
 
     if (currentUser || auth.currentUser) {
         const writeReviewSection = document.getElementById('writeReviewSection');
+        const writeReviewSection = document.getElementById('writeReviewSection');
         if (writeReviewSection) writeReviewSection.style.display = 'block';
+        const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         if (loginToReviewMsg) loginToReviewMsg.style.display = 'none';
     } else {
         const writeReviewSection = document.getElementById('writeReviewSection');
+        const writeReviewSection = document.getElementById('writeReviewSection');
         if (writeReviewSection) writeReviewSection.style.display = 'none';
+        const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         const loginToReviewMsg = document.getElementById('loginToReviewMsg');
         if (loginToReviewMsg) loginToReviewMsg.style.display = 'block';
     }
@@ -575,6 +580,8 @@ function setupEventListeners() {
 
     const closeReviewBtn = document.getElementById('closeReviewBtn');
     const reviewModal = document.getElementById('reviewModal');
+    const closeReviewBtn = document.getElementById('closeReviewBtn');
+    const reviewModal = document.getElementById('reviewModal');
     if (closeReviewBtn && reviewModal) {
         closeReviewBtn.addEventListener('click', () => reviewModal.style.display = 'none');
         window.addEventListener('click', (e) => {
@@ -636,6 +643,7 @@ function setupEventListeners() {
         }
     });
 
+    const writeReviewForm = document.getElementById('writeReviewForm');
     const writeReviewForm = document.getElementById('writeReviewForm');
     if (writeReviewForm) {
         writeReviewForm.addEventListener('submit', async (e) => {

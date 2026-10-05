@@ -2,7 +2,7 @@ import { escapeHTML } from "./utils.js";
 // js/sitewide-player.js
 // Sitewide music engine and Lexi floating mini-playerhead
 
-import { librarySongs, getSongById } from './song-data.js?v=1790377272083';
+import { librarySongs, getSongById } from './song-data.js?v=1791167969660';
 
 const STORAGE_KEY = 'dts_music_state';
 
@@ -17,7 +17,7 @@ export const ICONS = {
 
 class SitewideMusicEngine {
     constructor() {
-        this.isHarmonyTunesPage = window.location.pathname.includes('medixly.html');
+        this.isHarmonyTunesPage = window.location.pathname.includes('medixly');
         this.audio = null;
         this.state = this.loadState();
         this.listeners = new Set();

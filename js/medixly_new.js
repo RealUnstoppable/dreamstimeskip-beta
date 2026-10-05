@@ -797,6 +797,28 @@ function initHarmonyTunes() {
         });
     }
 
+    function updateSongTableActiveState() {
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        const currentSongId = currentQueue[currentSongIndex].id;
+        const rows = songListBody.querySelectorAll('tr');
+        rows.forEach(row => {
+            const isMatch = row.dataset.songId === currentSongId;
+            if (isMatch) {
+                row.classList.add('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'none';
+                if(iconSpan) iconSpan.style.display = 'inline';
+            } else {
+                row.classList.remove('playing');
+                const idxSpan = row.querySelector('.song-index');
+                const iconSpan = row.querySelector('.playing-icon');
+                if(idxSpan) idxSpan.style.display = 'inline';
+                if(iconSpan) iconSpan.style.display = 'none';
+            }
+        });
+    }
+
     let currentRenderIndex = 0;
     let currentGroupedSongs = [];
     const RENDER_CHUNK_SIZE = 50;
@@ -823,8 +845,10 @@ function initHarmonyTunes() {
                 <td class="song-title">${escapeHTML(song.title)}</td>
                 <td>${escapeHTML(song.artist)}</td>
                 <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
+                <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
             `;
+            row.dataset.songId = song.id;
             row.dataset.songId = song.id;
 
             row.addEventListener('click', () => {
