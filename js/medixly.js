@@ -3096,4 +3096,3 @@ export function formatTime(seconds) {
 }
 export function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }
 
-export function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }
