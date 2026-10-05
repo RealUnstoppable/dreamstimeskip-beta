@@ -32,12 +32,28 @@ newUploadBtn.addEventListener('click', () => {
     uploadSection.style.display = uploadSection.style.display === 'none' ? 'block' : 'none';
 });
 
+
+const artInput = document.getElementById('track-art');
+
 fileInput.addEventListener('change', (e) => {
+    const display = document.getElementById('file-name-display');
     if (e.target.files.length > 0) {
+        if (display) display.innerHTML = `<span style="color:#fff">${e.target.files[0].name}</span>`;
         if (audioBlobUrl) URL.revokeObjectURL(audioBlobUrl);
         audioBlobUrl = URL.createObjectURL(e.target.files[0]);
         audioPreview.src = audioBlobUrl;
         audioPreview.style.display = 'block';
+    } else {
+        if (display) display.innerHTML = '<span>Browse</span> or drop audio file';
+    }
+});
+
+artInput.addEventListener('change', (e) => {
+    const display = document.getElementById('art-name-display');
+    if (e.target.files.length > 0) {
+        if (display) display.innerHTML = `<span style="color:#fff">${e.target.files[0].name}</span>`;
+    } else {
+        if (display) display.innerHTML = '<span>Browse</span> or drop image';
     }
 });
 
@@ -45,10 +61,10 @@ function createLyricLine(time = 0, text = "") {
     const div = document.createElement('div');
     div.className = 'lyric-line';
     div.innerHTML = `
-        <input type="number" step="0.1" class="lyric-time" placeholder="Secs" value="${time}">
-        <input type="text" class="lyric-text" placeholder="Lyric text" value="${text}">
-        <button class="btn-primary sync-btn" style="padding: 8px 12px; background: #666; font-size: 0.8rem;">Sync to Audio</button>
-        <button class="btn-primary remove-btn" style="padding: 8px 12px; background: #900; font-size: 0.8rem;">X</button>
+        <input type="number" step="0.1" class="lyric-time search-style-input" placeholder="0.0" value="${time}">
+        <input type="text" class="lyric-text search-style-input" placeholder="Lyric text" value="${text}">
+        <button class="sync-btn" title="Sync to Audio">Sync</button>
+        <button class="remove-btn" title="Remove Line">&times;</button>
     `;
     
     div.querySelector('.sync-btn').addEventListener('click', () => {
@@ -138,7 +154,7 @@ publishBtn.addEventListener('click', async () => {
         console.error(e);
         alert("Upload failed. Make sure Firebase Storage is enabled and rules allow writes.");
     } finally {
-        publishBtn.textContent = "Process & Publish to Library";
+        publishBtn.textContent = "Process & Publish";
         publishBtn.disabled = false;
     }
 });
