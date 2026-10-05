@@ -111,7 +111,7 @@ export function initLexiPhysics() {
                 if (typeof window.toggleMixerMode === 'function') {
                     window.toggleMixerMode();
                 } else {
-                    // Simulate click for harmonytunes.js logic if window func isn't exported
+                    // Simulate click for medixly.js logic if window func isn't exported
                     const evt = new Event('click', { bubbles: true });
                     wrapper.dispatchEvent(evt);
                 }

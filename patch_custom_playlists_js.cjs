@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Add "Add to Playlist" to queueContextMenu
 js = js.replace(
@@ -75,5 +75,5 @@ js = js.replace(/const playlists = \[[\s\S]*?containerPlaylists\.innerHTML = pla
 // We need to inject the `newLogic` outside `init` but where it has access, or just inside `initHarmonyTunes()`
 js = js.replace(/function initHarmonyTunes\(\) \{/, 'function initHarmonyTunes() {\n' + newLogic);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched custom playlists storage logic");

@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 js = js.replace(/renderMusicGrid\(filtered\);/, `
                     if (filtered.length === 0) {
@@ -13,4 +13,4 @@ js = js.replace(/renderMusicGrid\(filtered\);/, `
                     document.getElementById('container-recommended').innerHTML = '';
 `);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');

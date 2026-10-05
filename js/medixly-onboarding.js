@@ -77,7 +77,7 @@ function createOnboardingUI() {
                 <div class="onboarding-error" id="ob-error"></div>
             </form>
             <div style="margin-top: 15px; font-size: 13px; color: #aaa;">
-                Already have an account? <a href="/sign in beta.html?redirect=harmonytunes.html" style="color: #bb86fc;">Sign in</a>
+                Already have an account? <a href="/sign in beta.html?redirect=medixly.html" style="color: #bb86fc;">Sign in</a>
             </div>
         </div>
     `;

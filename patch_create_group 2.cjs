@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/medixly_new.js', 'utf8');
+let js = fs.readFileSync('js/harmonytunes_new.js', 'utf8');
 
 js = js.replace(
     /containerJumpBack\.innerHTML = librarySongs\.slice\(0, 2\)\.map\(song => createSongCard\(song\)\)\.join\(''\);/,
@@ -20,5 +20,5 @@ js = js.replace(
 // We should also replace the export for createSongCard in case it breaks tests
 js += `\nexport function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }\n`;
 
-fs.writeFileSync('js/medixly.js', js, 'utf8');
-console.log("Successfully replaced medixly.js with grouped logic");
+fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+console.log("Successfully replaced harmonytunes.js with grouped logic");

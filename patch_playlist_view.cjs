@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Patch loadPlaylistView
 const oldViewLogic = `            if (type === 'favorites') {
@@ -45,5 +45,5 @@ js = js.replace(/userFavoritesIds = new Set\(userFavorites\.map\(s => s\.id\)\);
                 loadCustomPlaylists();
                 if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {`);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched playlist view logic");

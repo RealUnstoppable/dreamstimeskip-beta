@@ -84,7 +84,7 @@ function initHarmonyTunes() {
         const allPlaylistsHtml = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <img src="/images/medixly-logo.png" alt="${escapeHTML(pl.title)}">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
@@ -93,7 +93,7 @@ function initHarmonyTunes() {
         `).join('') + customPlaylists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <img src="/images/medixly-logo.png" alt="${escapeHTML(pl.title)}">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>

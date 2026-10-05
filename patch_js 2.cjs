@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/medixly.js', 'utf8');
+let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
 
 // Replace loadSong logic
 js = js.replace(/const paintSpillEffect = document\.getElementById\('paint-spill-effect'\);\s*if \(paintSpillEffect\) \{\s*if \(song\.id === 'tate-mcrae-its-okay-im-okay'\) \{\s*paintSpillEffect\.classList\.remove\('hidden'\);\s*setTimeout\(\(\) => paintSpillEffect\.classList\.add\('active'\), 50\);\s*\} else \{\s*paintSpillEffect\.classList\.remove\('active'\);\s*setTimeout\(\(\) => paintSpillEffect\.classList\.add\('hidden'\), 500\);\s*\}\s*\}/,
@@ -23,5 +23,5 @@ js = js.replace(/const effect = document\.getElementById\('paint-spill-effect'\)
                             effect.classList.add('beat');
                         });`);
 
-fs.writeFileSync('js/medixly.js', js);
-console.log("Patched medixly.js");
+fs.writeFileSync('js/harmonytunes.js', js);
+console.log("Patched harmonytunes.js");

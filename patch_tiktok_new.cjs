@@ -1,5 +1,5 @@
 const fs = require('fs');
-const file = 'js/harmonytunes_new.js';
+const file = 'js/medixly_new.js';
 if(!fs.existsSync(file)) return;
 let content = fs.readFileSync(file, 'utf8');
 

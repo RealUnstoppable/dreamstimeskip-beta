@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Update image
 js = js.replace(/id: 'kesha-blow',[\s\S]*?art: "\/images\/un-logo.png",/,
@@ -16,5 +16,5 @@ js = js.replace(/const songColors = \{[\s\S]*?\};/, (match) => {
     return match.replace("};", "    'kesha-blow': '#e63995' // Neon Pink\n    };");
 });
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 console.log("Patched Blow image and color");

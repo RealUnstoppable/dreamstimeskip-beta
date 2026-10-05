@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Update image
 js = js.replace(/id: 'deorc-decuple',[\s\S]*?art: "\/images\/Unstoppable Collection Logo.png",/,
@@ -14,5 +14,5 @@ js = js.replace(/id: 'deorc-decuple',[\s\S]*?art: "\/images\/Unstoppable Collect
 // Update color
 js = js.replace(/'deorc-decuple': '#8a196e',    \/\/ Dim Pink/, "'deorc-decuple': '#1d3036',    // Dark Teal Grey");
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 console.log("Patched Deorc Decuple image and color");

@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const oldLogic = `            // Load the same song into the new active audio
             activeAudio.src = song.src;
@@ -18,5 +18,5 @@ const newLogic = `            // Load the same song into the new active audio
             }, { once: true });`;
 
 js = js.replace(oldLogic, newLogic);
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched mixxer");

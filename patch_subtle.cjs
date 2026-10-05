@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // 1. JS
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Lyrics background
 js = js.replace(/linear-gradient\(to bottom, color-mix\(in srgb, var\(--theme-color\) 70%, transparent\) 0%, color-mix\(in srgb, var\(--theme-color\) 90%, transparent\) 100%\)/,
@@ -11,11 +11,11 @@ js = js.replace(/linear-gradient\(to bottom, color-mix\(in srgb, var\(--theme-co
 js = js.replace(/color-mix\(in srgb, var\(--theme-color, #1a2b4c\) 90%, transparent\) 0%, transparent 60%/g,
 `color-mix(in srgb, var(--theme-color, #1a2b4c) 40%, transparent) 0%, transparent 50%`);
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 
 
 // 2. CSS
-let css = fs.readFileSync('css/harmonytunes.css', 'utf8');
+let css = fs.readFileSync('css/medixly.css', 'utf8');
 
 // Allow paintBeat to have more subtle scale, contrast, and brightness
 css = css.replace(/@keyframes paintBeat \{[\s\S]*?\}/,
@@ -37,6 +37,6 @@ css = css.replace(/@keyframes paintBeat \{[\s\S]*?\}/,
     }
 }`);
 
-fs.writeFileSync('css/harmonytunes.css', css);
+fs.writeFileSync('css/medixly.css', css);
 
 console.log("Patched to be more subtle.");

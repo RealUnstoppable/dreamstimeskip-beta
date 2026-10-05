@@ -16,7 +16,7 @@ const PRELOADED_NOTIFICATIONS = [
         id: 'pre-1',
         title: '🎶 Check out Medixly',
         message: 'Stream your favourite hits on Medixly now.',
-        link: 'harmonytunes.html',
+        link: 'medixly.html',
         isRead: false,
         preloaded: true
     },
@@ -44,15 +44,20 @@ const PRELOADED_NOTIFICATIONS = [
 const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"/></svg>`;
 
 export function loadNavbar() {
+    const isMedixlyPage = window.location.pathname.includes('medixly');
+    const logoContent = isMedixlyPage
+        ? `<span class="un-letters">UN</span><span style="font-weight: 800; margin: 0 10px; font-size: 1.2rem; color: var(--text-primary);">x</span><img src="/images/medixly-logo.png" alt="Medixly" style="height: 18px; margin-top: 2px;">`
+        : `<span class="un-letters">UN</span><span class="un-250">250</span>`;
+
     const headerHTML = `
     <nav class="navbar">
-        <a href="index.html" class="nav-logo un-text-logo">
-            <span class="un-letters">UN</span><span class="un-250">250</span>
+        <a href="index.html" class="nav-logo un-text-logo" style="display: flex; align-items: center;">
+            ${logoContent}
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
-            <li><a href="harmonytunes.html">Medixly</a></li>
+            <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
@@ -105,7 +110,7 @@ export function loadUdsNavbar() {
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
-            <li><a href="harmonytunes.html">Medixly</a></li>
+            <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li class="nav-dropdown-wrapper">
                 <a href="#" style="cursor: default;">Autolux ▾</a>

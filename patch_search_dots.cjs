@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // 1. Patch Spotlight Search HTML to include `...` button
 const searchHtmlOld = `                <span class="spotlight-result-play">▶</span>
@@ -47,5 +47,5 @@ const ctxMenuNew = `        const moreBtn = e.target.closest('.card-more-btn');
             if (!contextMenuTargetSongId) return;`;
 js = js.replace(ctxMenuOld, ctxMenuNew);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched search and playlist dots");

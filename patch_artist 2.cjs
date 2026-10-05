@@ -1,5 +1,5 @@
 const fs = require('fs');
-const files = ['js/medixly.js', 'js/medixly_new.js'];
+const files = ['js/harmonytunes.js', 'js/harmonytunes_new.js'];
 
 for (const file of files) {
     if (!fs.existsSync(file)) continue;

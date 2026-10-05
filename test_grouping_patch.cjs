@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const groupingLogic = `
 export function groupSongsByTitle(songs) {
@@ -83,5 +83,5 @@ export function createGroupCard(group) {
 
 js = js.replace(/export function createSongCard\(song\) \{[\s\S]*?\n\}/, groupingLogic);
 
-fs.writeFileSync('js/harmonytunes_new.js', js, 'utf8');
+fs.writeFileSync('js/medixly_new.js', js, 'utf8');
 console.log("Patched grouping logic into new file");

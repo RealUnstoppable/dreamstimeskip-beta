@@ -11,6 +11,6 @@ function patchFile(file) {
     fs.writeFileSync(file, content, 'utf8');
 }
 
-patchFile('js/harmonytunes.js');
-patchFile('js/harmonytunes_new.js');
+patchFile('js/medixly.js');
+patchFile('js/medixly_new.js');
 console.log("Patched");

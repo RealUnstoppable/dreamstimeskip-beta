@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const oldLogic = `                const elapsed = Math.max(0, (Date.now() - (saved.timestamp || Date.now())) / 1000);
                 if (saved.isPlaying && elapsed < 20) {
@@ -35,5 +35,5 @@ const newLogic = `                const elapsed = Math.max(0, (Date.now() - (sav
                 }`;
 
 js = js.replace(oldLogic, newLogic);
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched init logic");

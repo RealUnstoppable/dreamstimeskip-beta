@@ -17,7 +17,7 @@ export const ICONS = {
 
 class SitewideMusicEngine {
     constructor() {
-        this.isHarmonyTunesPage = window.location.pathname.includes('harmonytunes.html');
+        this.isHarmonyTunesPage = window.location.pathname.includes('medixly.html');
         this.audio = null;
         this.state = this.loadState();
         this.listeners = new Set();
@@ -681,7 +681,7 @@ class SitewideMusicEngine {
                 <!-- Mini Playerhead Component -->
                 <div class="lexi-playerhead">
                     <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
-                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
+                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='medixly.html'">
                         <div class="lexi-song-title">${escapeHTML(song.title)}</div>
                         <div class="lexi-song-artist">${escapeHTML(song.artist)}</div>
                     </div>
