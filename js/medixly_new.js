@@ -21,6 +21,8 @@ function initHarmonyTunes() {
     // --- STATE ---
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+    const librarySongsIndexMap = new Map(librarySongs.map((s, i) => [s.id, i]));
+    // ⚡ Bolt: Pre-computed Map for O(1) index lookups, avoiding O(N) array search on play clicks
 
     // TikTok videos — using direct iframe embed (no embed.js needed, always works after dynamic injection)
     const tiktokVideos = [
@@ -293,8 +295,8 @@ function initHarmonyTunes() {
         const activateResult = (row) => {
             if (!row) return;
             const songId = row.dataset.songId;
-            const idx = librarySongs.findIndex(s => s.id === songId);
-            if (idx !== -1) {
+            const idx = librarySongsIndexMap.get(songId);
+            if (idx !== undefined) {
                 currentQueue = [...librarySongs];
                 currentSongIndex = idx;
                 loadSong(idx);
@@ -639,8 +641,8 @@ function initHarmonyTunes() {
             if (viralPlayBtn) {
                 viralPlayBtn.addEventListener('click', () => {
                     if (!viralTargetSongId) return;
-                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
-                    if (songIdx !== -1) {
+                    const songIdx = librarySongsIndexMap.get(viralTargetSongId);
+                    if (songIdx !== undefined) {
                         currentQueue = [...librarySongs];
                         currentSongIndex = songIdx;
                         loadSong(songIdx);
@@ -768,8 +770,8 @@ function initHarmonyTunes() {
 
     window.playSongById = (id) => {
         __recordHistory();
-        const songIndex = librarySongs.findIndex(s => s.id === id);
-        if (songIndex > -1) playContext(librarySongs, songIndex);
+        const songIndex = librarySongsIndexMap.get(id);
+        if (songIndex !== undefined) playContext(librarySongs, songIndex);
     };
     
     window.loadPlaylistView = loadPlaylistView;
