@@ -2209,11 +2209,12 @@ function initHarmonyTunes() {
                 const songMetadata = librarySongsMap.get(preloadedNextSongObj.id);
                 
                 nextAudio.addEventListener('loadedmetadata', () => {
-                    // Use the audio engine's offline block analyzer to find exact non-silent onset
-                    mixEngine.trimSilence(nextAudio).then(({ startOffset }) => {
-                        const inmixPoint = songMetadata?.inmixPoint || startOffset || 15;
-                        nextAudio.currentTime = inmixPoint;
-                    });
+                    if (songMetadata && typeof songMetadata.inmixPoint === 'number') {
+                        nextAudio.currentTime = songMetadata.inmixPoint;
+                    } else {
+                        // Removed frontend processing (trimSilence) to prevent the 5-second pause during crossfade
+                        nextAudio.currentTime = 0; // Default to 0 instead of pausing the UI to compute
+                    }
                 }, { once: true });
             }
         }
@@ -3005,6 +3006,35 @@ let dragItem = null;
             }
         });
     }
+
+    // Logo click navigation logic
+    document.addEventListener('click', (e) => {
+        const logoLink = e.target.closest('#navbar-logo-link');
+        if (logoLink) {
+            if (viewHome && viewHome.style.display === 'none') {
+                e.preventDefault();
+                showHome();
+                const navHome = document.getElementById('nav-home');
+                if (navHome) navHome.classList.add('active');
+                ['nav-search', 'nav-playlists', 'nav-favorites'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.remove('active');
+                });
+                
+                const fullscreenPlayer = document.getElementById('fullscreen-player');
+                if (fullscreenPlayer && fullscreenPlayer.style.display !== 'none') {
+                    const closeFs = document.getElementById('close-fullscreen-btn');
+                    if (closeFs) closeFs.click();
+                }
+                
+                const viewLyrics = document.getElementById('view-lyrics');
+                if (viewLyrics && viewLyrics.style.display !== 'none') {
+                    const closeLyrics = document.getElementById('close-lyrics-btn');
+                    if (closeLyrics) closeLyrics.click();
+                }
+            }
+        }
+    });
 
     // Initialize immediately without waiting for auth resolution
     init();

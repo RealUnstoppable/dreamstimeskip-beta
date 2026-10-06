@@ -2760,6 +2760,35 @@ let dragItem = null;
         });
     }
 
+    // Logo click navigation logic
+    document.addEventListener('click', (e) => {
+        const logoLink = e.target.closest('#navbar-logo-link');
+        if (logoLink) {
+            if (viewHome && viewHome.style.display === 'none') {
+                e.preventDefault();
+                showHome();
+                const navHome = document.getElementById('nav-home');
+                if (navHome) navHome.classList.add('active');
+                ['nav-search', 'nav-playlists', 'nav-favorites'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.remove('active');
+                });
+                
+                const fullscreenPlayer = document.getElementById('fullscreen-player');
+                if (fullscreenPlayer && fullscreenPlayer.style.display !== 'none') {
+                    const closeFs = document.getElementById('close-fullscreen-btn');
+                    if (closeFs) closeFs.click();
+                }
+                
+                const viewLyrics = document.getElementById('view-lyrics');
+                if (viewLyrics && viewLyrics.style.display !== 'none') {
+                    const closeLyrics = document.getElementById('close-lyrics-btn');
+                    if (closeLyrics) closeLyrics.click();
+                }
+            }
+        }
+    });
+
     // Initialize immediately without waiting for auth resolution
     init();
 
