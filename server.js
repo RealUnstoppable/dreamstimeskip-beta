@@ -9,6 +9,14 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(cors());
+
+// Cross-Origin Isolation headers for SharedArrayBuffer and AudioWorklet support
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+  next();
+});
+
 app.use(express.json());
 
 // Serve static files from the root directory to fix absolute paths in HTML files

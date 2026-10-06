@@ -4,6 +4,8 @@ import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, ad
 import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1791167969660b';
+import { mixEngine } from "./audio-engine.js";
+
 
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
@@ -143,6 +145,10 @@ function initHarmonyTunes() {
     
     let activeAudio = audioPlayer1;
     let nextAudio = audioPlayer2;
+    
+    // Initialize professional mixing engine
+    mixEngine.init(audioPlayer1, audioPlayer2);
+    
     let isMixerMode = false;
     let isCrossfading = false;
     let isListening = false;
@@ -1232,6 +1238,7 @@ function initHarmonyTunes() {
     function saveSitewideMusicState(extra = {}) {
         const currentSong = currentQueue[currentSongIndex] || librarySongs[0];
         try {
+            const currentVolume = mixEngine.getContext() ? mixEngine.getMasterGain().gain.value : (activeAudio ? activeAudio.volume : 1);
             const state = {
                 songId: currentSong ? currentSong.id : librarySongs[0].id,
                 isPlaying: isPlaying,
@@ -1239,7 +1246,7 @@ function initHarmonyTunes() {
                 queue: currentQueue.map(s => s.id),
                 queueIndex: currentSongIndex,
                 timestamp: Date.now(),
-                volume: activeAudio ? activeAudio.volume : 1,
+                volume: currentVolume,
                 shuffle: isShuffle,
                 repeatMode: repeatMode,
                 isMixerMode: isMixerMode,
@@ -1249,7 +1256,7 @@ function initHarmonyTunes() {
         } catch (_) { /* ignore local storage error */ }
     }
 
-    function playSong() {
+    async function playSong() {
         
         if (fadeInterval) clearInterval(fadeInterval);
         if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
@@ -1263,9 +1270,13 @@ function initHarmonyTunes() {
 
         nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
 
-        const targetVol = parseFloat(volumeSlider.value) || 1;
+        await mixEngine.ensureRunning();
 
-        activeAudio.volume = 0;
+        const deck = activeAudio === audioPlayer1 ? 'A' : 'B';
+
+        activeAudio.volume = 1;
+        mixEngine.setDeckVolume(deck, 0);
+
         activeAudio.play().then(() => {
             isPlaying = true;
             saveSitewideMusicState({ isPlaying: true });
@@ -1274,19 +1285,7 @@ function initHarmonyTunes() {
             if(fsPlayIcon) fsPlayIcon.style.display = 'none';
             if(fsPauseIcon) fsPauseIcon.style.display = 'block';
             
-            const fadeStep = 50;
-            const durationMs = 500;
-            const steps = durationMs / fadeStep;
-            let currentStep = 0;
-            
-            fadeInterval = setInterval(() => {
-                currentStep++;
-                activeAudio.volume = targetVol * (currentStep / steps);
-                if (currentStep >= steps) {
-                    clearInterval(fadeInterval);
-                    activeAudio.volume = targetVol;
-                }
-            }, fadeStep);
+            mixEngine.fadeIn(deck, 0.5, 1);
         }).catch(e => console.error("Manager info:", e));
     }
 
@@ -1301,34 +1300,23 @@ function initHarmonyTunes() {
         if(fsPauseIcon) fsPauseIcon.style.display = 'none';
 
         if (isCrossfading) {
+            mixEngine.cancelCrossfade();
             activeAudio.pause();
             nextAudio.pause();
             return;
         }
 
-        const startVol = activeAudio.volume;
-        const targetVol = parseFloat(volumeSlider.value) || 1;
-        const fadeStep = 50;
-        const durationMs = 500;
-        const steps = durationMs / fadeStep;
-        let currentStep = 0;
-        
-        fadeInterval = setInterval(() => {
-            currentStep++;
-            const newVol = startVol * (1 - (currentStep / steps));
-            activeAudio.volume = Math.max(0, newVol);
-            if (currentStep >= steps) {
-                clearInterval(fadeInterval);
-                activeAudio.pause();
-                activeAudio.volume = targetVol;
-            }
-        }, fadeStep);
+        const deck = activeAudio === audioPlayer1 ? 'A' : 'B';
+        mixEngine.fadeOut(deck, 0.5, () => {
+            activeAudio.pause();
+        });
     }
 
     let hasUnlockedAudio = false;
-    function togglePlayPause() {
+    async function togglePlayPause() {
         if (!hasUnlockedAudio) {
             hasUnlockedAudio = true;
+            await mixEngine.ensureRunning();
             if (audioPlayer1.paused) audioPlayer1.play().catch(()=>{});
             if (audioPlayer2.paused) audioPlayer2.play().catch(()=>{});
             if (activeAudio !== audioPlayer1) audioPlayer1.pause();
@@ -1578,7 +1566,12 @@ function initHarmonyTunes() {
                 clearInterval(fadeInterval);
                 fadeInterval = null;
             }
-            activeAudio.volume = e.target.value;
+            if (mixEngine.getContext()) {
+                const targetVol = parseFloat(e.target.value);
+                mixEngine.getMasterGain().gain.setValueAtTime(targetVol, mixEngine.getContext().currentTime);
+            } else {
+                activeAudio.volume = e.target.value;
+            }
         });
 
         progressBar.addEventListener('click', (e) => {
@@ -2117,39 +2110,28 @@ function initHarmonyTunes() {
             activeAudio = nextAudio;
             nextAudio = prevAudio;
 
+            const fromDeck = prevAudio === audioPlayer1 ? 'A' : 'B';
+            const toDeck = activeAudio === audioPlayer1 ? 'A' : 'B';
+
             // Load the same song into the new active audio
             activeAudio.src = song.src;
             
             activeAudio.addEventListener('loadedmetadata', () => {
                 activeAudio.currentTime = block.paddedStart;
-                activeAudio.volume = 0;
+                activeAudio.volume = 1;
                 activeAudio.play().catch(e => console.error("Manager info:", e));
             }, { once: true });
             
-            const prevIndex = currentSongIndex === 0 ? currentQueue.length - 1 : currentSongIndex - 1;
-
-            const fadeMs = fadeDur * 1000;
-            const startTime = Date.now();
-            const baseVolume = parseFloat(volumeSlider.value) || 1;
-            
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
-                let elapsed = Date.now() - startTime;
-                let ratio = elapsed / fadeMs;
-                if (ratio >= 1) ratio = 1;
-                
-                prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
-                activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
-
-                if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
+            mixEngine.crossfade(fromDeck, toDeck, fadeDur, {
+                equalPower: true,
+                onComplete: () => {
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
                     mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                     const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
-            }, 50);
+            });
         }
     }
 
@@ -2268,55 +2250,23 @@ function initHarmonyTunes() {
                 updateSongTableActiveState();
             }
 
-            activeAudio.volume = 0;
+            const fromDeck = prevAudio === audioPlayer1 ? 'A' : 'B';
+            const toDeck = activeAudio === audioPlayer1 ? 'A' : 'B';
+
+            activeAudio.volume = 1;
             activeAudio.play().catch(e => console.error("Manager info:", e));
 
             // AutoMix: Beat Matching & Time Stretching
             let prevBpm = librarySongsMap.get(currentQueue[prevIndex]?.id)?.bpm || 120;
             let nextBpm = songMetadata?.bpm || 120;
-            let bpmRatio = prevBpm / nextBpm;
             
-            // Limit stretching to realistic DJ ranges (max 8% shift)
-            let isBeatMatched = false;
-            if (bpmRatio > 0.92 && bpmRatio < 1.08 && bpmRatio !== 1) {
-                activeAudio.preservesPitch = true;
-                activeAudio.playbackRate = bpmRatio;
-                isBeatMatched = true;
-            } else {
-                activeAudio.playbackRate = 1;
-            }
+            let isBeatMatched = mixEngine.applyBeatMatch(activeAudio, prevBpm, nextBpm);
 
-            const fadeMs = crossfadeDuration * 1000;
-            const startTime = Date.now();
-            const baseVolume = parseFloat(volumeSlider.value) || 1;
-            
-            
-
-            if (fadeIntervalCrossfade) clearInterval(fadeIntervalCrossfade);
-            fadeIntervalCrossfade = setInterval(() => {
-                let elapsed = Date.now() - startTime;
-                let ratio = elapsed / fadeMs;
-                if (ratio >= 1) ratio = 1;
-                
-                // Volume fading (Standard)
-                prevAudio.volume = Math.max(0, baseVolume * (1 - ratio));
-                activeAudio.volume = Math.min(baseVolume, baseVolume * ratio);
-
-                if (ratio >= 1) {
-                    clearInterval(fadeIntervalCrossfade);
-                    
-                    
-                    
-                    // Slowly drift playbackRate back to normal if beatmatched
+            mixEngine.crossfade(fromDeck, toDeck, crossfadeDuration, {
+                equalPower: true,
+                onComplete: () => {
                     if (isBeatMatched) {
-                        let driftInterval = setInterval(() => {
-                            if (Math.abs(activeAudio.playbackRate - 1) < 0.005) {
-                                activeAudio.playbackRate = 1;
-                                clearInterval(driftInterval);
-                            } else {
-                                activeAudio.playbackRate += (1 - activeAudio.playbackRate) * 0.1;
-                            }
-                        }, 100);
+                        mixEngine.driftPlaybackRateToNormal(activeAudio);
                     }
 
                     prevAudio.pause();
@@ -2326,7 +2276,7 @@ function initHarmonyTunes() {
                     if(typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                     const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
-            }, 50);
+            });
         }
     }
 
