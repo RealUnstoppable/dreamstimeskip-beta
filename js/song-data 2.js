@@ -23620,6 +23620,8 @@ export const librarySongs = [
     }
 ];
 
+export const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return librarySongsMap.get(id) || null;
 }
