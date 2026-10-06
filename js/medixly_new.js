@@ -1103,7 +1103,15 @@ function initHarmonyTunes() {
         }, fadeStep);
     }
 
+    let hasUnlockedAudio = false;
     function togglePlayPause() {
+        if (!hasUnlockedAudio) {
+            hasUnlockedAudio = true;
+            if (audioPlayer1.paused) audioPlayer1.play().catch(()=>{});
+            if (audioPlayer2.paused) audioPlayer2.play().catch(()=>{});
+            if (activeAudio !== audioPlayer1) audioPlayer1.pause();
+            if (activeAudio !== audioPlayer2) audioPlayer2.pause();
+        }
         if (activeAudio.paused) playSong();
         else pauseSong();
     }
@@ -1138,8 +1146,9 @@ function initHarmonyTunes() {
         __recordHistory();
         let nextIndex = currentSongIndex + 1;
         if (nextIndex >= currentQueue.length) {
+            // endless mode not added yet, just repeats
             if (repeatMode === 1) nextIndex = 0;
-            else return;
+            else nextIndex = 0;
         }
         currentSongIndex = nextIndex;
         loadSong(currentSongIndex);
@@ -1152,8 +1161,11 @@ function initHarmonyTunes() {
         } else {
             if (historyQueue.length > 0) {
                 const prevSong = historyQueue.pop(); // Take from history
-                currentQueue.splice(currentSongIndex, 0, prevSong); // Insert right at current position (pushes upcoming down)
-                // currentSongIndex stays the same, but it now points to the inserted song!
+                if (currentSongIndex > 0 && currentQueue[currentSongIndex - 1].id === prevSong.id) {
+                    currentSongIndex--;
+                } else {
+                    currentQueue.splice(currentSongIndex, 0, prevSong); // Insert right at current position (pushes upcoming down)
+                }
                 loadSong(currentSongIndex);
                 playSong();
                 
@@ -1161,6 +1173,10 @@ function initHarmonyTunes() {
                 if(queuePanel && queuePanel.classList.contains('open') && currentTab === 'history') {
                     renderQueue();
                 }
+            } else if (currentSongIndex > 0) {
+                currentSongIndex--;
+                loadSong(currentSongIndex);
+                playSong();
             } else {
                 activeAudio.currentTime = 0; // fallback if no history
             }
