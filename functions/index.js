@@ -1,3 +1,4 @@
+const { onRequest } = require("firebase-functions/v2/https");
 const functions = require("firebase-functions/v1");
 const {onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {AggregateField} = require("firebase-admin/firestore");
@@ -46,7 +47,7 @@ function getUserDocRef(uid) {
 // 🔹 Create Checkout Session
 
 // 🛡️ Admin Action Proxy
-exports.adminAction = functions.https.onRequest((req, res) => {
+exports.adminAction = onRequest((req, res) => {
   cors(req, res, async () => {
     const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
@@ -116,7 +117,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
   });
 });
 
-exports.createCheckoutSession = functions.https.onRequest((req, res) => {
+exports.createCheckoutSession = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -236,7 +237,7 @@ exports.onReviewWrite = functions.firestore
     });
 
 // 🔐 STRIPE WEBHOOK (SECURE)
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
 
@@ -302,7 +303,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 });
 
 // 🔻 Cancel Subscription Manually
-exports.cancelSubscription = functions.https.onRequest((req, res) => {
+exports.cancelSubscription = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -499,7 +500,7 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
   }
 });
 
-exports.processOrderTransaction = functions.https.onRequest((req, res) => {
+exports.processOrderTransaction = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
       const decodedToken = await authenticateRequest(req, res, admin);
@@ -589,7 +590,7 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 
 
 // 📅 Daily Check-in Rewards
-exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
+exports.claimDailyCheckIn = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -681,7 +682,7 @@ exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
 });
 
 // 👍 Toggle Feature Upvote
-exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
+exports.toggleFeatureUpvote = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
