@@ -139,10 +139,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f4f4f4;
-            border: 1px dashed #ccc;
+            background-color: #eaeaea;
+            border: 2px dashed #bbb;
             margin: 20px 0;
             overflow: hidden;
+            position: relative;
+        }
+        .ad-container::before {
+            content: 'Ad Space (' attr(class) ')';
+            color: #888;
+            font-family: monospace;
+            font-size: 14px;
+            position: absolute;
+            z-index: 0;
+        }
+        /* Hide the long class names and just show a generic Ad string */
+        .ad-top-banner::before { content: 'Advertisement (728x90)'; }
+        .ad-right-rail::before { content: 'Advertisement (300x600)'; }
+        .ad-in-feed::before { content: 'Advertisement (300x250)'; }
+        .ad-mobile-sticky::before { content: 'Advertisement Mobile (320x50)'; }
+        
+        .ad-container div {
+            z-index: 1; /* Ensure actual ad loads on top of placeholder text */
         }
         
         /* Top Banner - Responsive */
