@@ -809,7 +809,6 @@ exports.processReferral = functions.https.onCall(async (data, context) => {
 
 
 // --- SONG PROCESSING BACKEND FUNCTION ---
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
