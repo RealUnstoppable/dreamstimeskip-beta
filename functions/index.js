@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const {onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {AggregateField} = require("firebase-admin/firestore");
 const admin = require("firebase-admin");
