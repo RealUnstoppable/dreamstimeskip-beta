@@ -151,7 +151,10 @@
             font-family: monospace;
             font-size: 14px;
             position: absolute;
-            z-index: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none; /* Let clicks pass through to the real ad */
         }
         /* Hide the long class names and just show a generic Ad string */
         .ad-top-banner::before { content: 'Advertisement (728x90)'; }
@@ -159,8 +162,14 @@
         .ad-in-feed::before { content: 'Advertisement (300x250)'; }
         .ad-mobile-sticky::before { content: 'Advertisement Mobile (320x50)'; }
         
-        .ad-container div {
-            z-index: 1; /* Ensure actual ad loads on top of placeholder text */
+        .ad-container > div {
+            position: relative;
+            z-index: 2; /* Ensure actual ad loads on top of placeholder text */
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         /* Top Banner - Responsive */
