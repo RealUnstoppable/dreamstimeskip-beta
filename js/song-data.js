@@ -23618,6 +23618,9 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: O(1) lookup replaces O(N) librarySongs.find()
+const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return librarySongsMap.get(id) || null;
 }
