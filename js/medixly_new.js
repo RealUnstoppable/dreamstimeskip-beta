@@ -2014,9 +2014,19 @@ function initHarmonyTunes() {
             const song = currentQueue[currentSongIndex];
             const songMetadata = librarySongsMap.get(song.id);
             
-            activeAudio.src = song.src;
-            const inmixPoint = songMetadata?.inmixPoint || 15;
-            activeAudio.currentTime = inmixPoint;
+            let isMatch = false;
+            if (activeAudio.src) {
+                try {
+                    isMatch = decodeURI(activeAudio.src).endsWith(decodeURI(song.src));
+                } catch(e) {
+                    isMatch = activeAudio.src.endsWith(song.src);
+                }
+            }
+            if (!isMatch) {
+                activeAudio.src = song.src;
+                const inmixPoint = songMetadata?.inmixPoint || 15;
+                activeAudio.currentTime = inmixPoint;
+            }
             
             playerTitle.textContent = song.title; checkMarquee(); checkMarquee();
             playerArtist.textContent = song.artist;

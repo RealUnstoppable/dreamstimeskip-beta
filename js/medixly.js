@@ -2275,7 +2275,15 @@ function initHarmonyTunes() {
             const songMetadata = librarySongsMap.get(song.id);
             
             // Failsafe: if the song isn't the preloaded one (e.g. user queue inserted), load it
-            if (!activeAudio.src || !activeAudio.src.endsWith(song.src)) {
+            let isMatch = false;
+            if (activeAudio.src) {
+                try {
+                    isMatch = decodeURI(activeAudio.src).endsWith(decodeURI(song.src));
+                } catch(e) {
+                    isMatch = activeAudio.src.endsWith(song.src);
+                }
+            }
+            if (!isMatch) {
                 activeAudio.src = song.src;
                 activeAudio.currentTime = songMetadata?.inmixPoint || 15;
             }
