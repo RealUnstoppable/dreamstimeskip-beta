@@ -196,6 +196,21 @@ onAuthStateChanged(auth, (user) => {
 
 // Handle form submission
 if (requestForm) {
+    const descriptionInput = document.getElementById('request-description');
+    const counterEl = document.getElementById('request-description-counter');
+
+    if (descriptionInput && counterEl) {
+        const updateCounter = () => {
+            const count = descriptionInput.value.length;
+            counterEl.textContent = `${count} / 500`;
+            counterEl.style.color = count >= 450 ? 'var(--accent-red)' : 'var(--text-secondary)';
+        };
+
+        descriptionInput.addEventListener('input', updateCounter);
+        // Initialize counter
+        updateCounter();
+    }
+
     requestForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -231,6 +246,12 @@ if (requestForm) {
 
             titleInput.value = '';
             descriptionInput.value = '';
+
+            // Reset counter after submission
+            if (counterEl) {
+                counterEl.textContent = '0 / 500';
+                counterEl.style.color = 'var(--text-secondary)';
+            }
 
             formMessage.textContent = 'Feature request submitted successfully!';
             formMessage.style.color = 'var(--accent-green)';
