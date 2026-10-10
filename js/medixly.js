@@ -60,7 +60,8 @@ function initHarmonyTunes() {
         const allPlaylistsHtml = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <!-- ⚡ Bolt: Added loading="lazy" to defer off-screen image loading -->
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}" loading="lazy">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
@@ -69,7 +70,8 @@ function initHarmonyTunes() {
         `).join('') + customPlaylists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
                 <div class="card-img-wrapper">
-                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}">
+                    <!-- ⚡ Bolt: Added loading="lazy" to defer off-screen image loading -->
+                    <img src="/images/harmony-tunes-card.jpg" alt="${escapeHTML(pl.title)}" loading="lazy">
                     <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
                 </div>
                 <div class="card-title">${escapeHTML(pl.title)}</div>
@@ -2768,8 +2770,9 @@ let dragItem = null;
             item.dataset.index = idx; // Maps 1:1 with userQueue index since userQueue is added first
             item.dataset.songId = song.id;
             
+            // ⚡ Bolt: Added loading="lazy" to queue item image to improve LCP when rendering large queues
             item.innerHTML = `
-                <img src="${song.art}" alt="${song.title}">
+                <img src="${song.art}" alt="${song.title}" loading="lazy">
                 <div class="queue-item-info">
                     <h4>${song.title}</h4>
                     <p>${song.artist}</p>

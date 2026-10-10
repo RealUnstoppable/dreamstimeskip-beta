@@ -2531,8 +2531,9 @@ let dragItem = null;
             item.dataset.index = idx; // Maps 1:1 with userQueue index since userQueue is added first
             item.dataset.songId = song.id;
             
+            // ⚡ Bolt: Added loading="lazy" to queue item image to improve LCP when rendering large queues
             item.innerHTML = `
-                <img src="${song.art}" alt="${song.title}">
+                <img src="${song.art}" alt="${song.title}" loading="lazy">
                 <div class="queue-item-info">
                     <h4>${song.title}</h4>
                     <p>${song.artist}</p>
