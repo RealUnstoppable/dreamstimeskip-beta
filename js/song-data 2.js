@@ -23620,6 +23620,21 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Pre-computed Hash Map for O(1) lookups
+const _songsById = new Map();
+const _songIndexById = new Map();
+
+for (let i = 0; i < librarySongs.length; i++) {
+    const s = librarySongs[i];
+    _songsById.set(s.id, s);
+    _songIndexById.set(s.id, i);
+}
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return _songsById.get(id) || null;
+}
+
+export function getSongIndexById(id) {
+    const idx = _songIndexById.get(id);
+    return idx !== undefined ? idx : -1;
 }
