@@ -110,7 +110,8 @@ if (document.getElementById('auth-form')) {
                     signupDate: serverTimestamp(),
                     isBanned: false,
                     isAdmin: false, 
-                    membershipLevel: 'free'
+                    membershipLevel: 'free',
+                    earnedBadges: []
                 });
 
                 const referralCodeVal = document.getElementById('referralCode')?.value?.trim();
