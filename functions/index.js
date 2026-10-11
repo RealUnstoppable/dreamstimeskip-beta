@@ -416,6 +416,8 @@ exports.onReviewCreated = onDocumentCreated("product_reviews/{reviewId}", async 
           reason: "Product Review",
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
+
+        await awardBadge(userId, 'FIRST_REVIEW', transaction, db);
       }
     });
   } catch (error) {
@@ -493,6 +495,9 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
       if (Object.keys(updateData).length > 0) {
         transaction.set(userRef, updateData, {merge: true});
       }
+
+      // Award FIRST_PURCHASE badge
+      await awardBadge(userId, 'FIRST_PURCHASE', transaction, db);
     });
   } catch (error) {
     console.error("Manager info: Error updating order points: [" + error.message + "]");
@@ -589,6 +594,26 @@ exports.processOrderTransaction = onRequest((req, res) => {
 });
 
 
+// 🏆 Helper Function: Award Badge
+async function awardBadge(userId, badgeId, transaction = null, db = admin.firestore()) {
+  const userRef = db.collection("users").doc(userId);
+
+  if (transaction) {
+    // Rely on arrayUnion to guarantee uniqueness without reading the document first
+    // This avoids "read-after-write" violations in Firestore transactions
+    transaction.set(userRef, {
+      earnedBadges: admin.firestore.FieldValue.arrayUnion(badgeId)
+    }, { merge: true });
+    return true;
+  } else {
+    // Non-transactional fallback if needed
+    await userRef.set({
+      earnedBadges: admin.firestore.FieldValue.arrayUnion(badgeId)
+    }, { merge: true });
+    return true;
+  }
+}
+
 // 📅 Daily Check-in Rewards
 exports.claimDailyCheckIn = onRequest((req, res) => {
   cors(req, res, async () => {
@@ -662,6 +687,10 @@ exports.claimDailyCheckIn = onRequest((req, res) => {
             lastCheckIn: now,
             checkInStreak: newStreak
         }, { merge: true });
+
+        if (isStreakBonus) {
+            await awardBadge(uid, '7_DAY_STREAK', transaction, db);
+        }
 
         const reason = isStreakBonus ? "Daily Check-in (7-Day Bonus!)" : "Daily Check-in";
 

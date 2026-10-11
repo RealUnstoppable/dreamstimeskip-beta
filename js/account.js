@@ -4,7 +4,6 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products-data.js';
-import { generateProductCardHtml } from "./ui-utils.js";
 import { escapeHTML, formatDate } from './utils.js';
 import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
@@ -384,6 +383,39 @@ export async function renderRewards(user, userData) {
                 dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet. Earn 10 points for every dollar spent in the shop!</p>`;
             } else {
                 dashboardActivityList.innerHTML = txs.slice(0, 4).map(tx => createTransactionHtml(tx, true)).join('');
+            }
+        }
+
+        // Render Achievements
+        const achievementsList = document.getElementById('achievements-list');
+        if (achievementsList) {
+            let badges = [];
+            if (userData && userData.earnedBadges) {
+                badges = userData.earnedBadges;
+            } else {
+                const data = await getCachedUserProfile(user);
+                if (data && data.earnedBadges) badges = data.earnedBadges;
+            }
+
+            const badgeDefs = {
+                '7_DAY_STREAK': { icon: '🔥', title: '7-Day Streak', desc: 'Logged in for 7 consecutive days' },
+                'FIRST_PURCHASE': { icon: '🛍️', title: 'First Purchase', desc: 'Made your first purchase' },
+                'FIRST_REVIEW': { icon: '⭐', title: 'First Review', desc: 'Left your first review' }
+            };
+
+            if (badges.length === 0) {
+                achievementsList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No achievements unlocked yet. Keep exploring!</p>`;
+            } else {
+                achievementsList.innerHTML = badges.map(badgeId => {
+                    const b = badgeDefs[badgeId] || { icon: '🏅', title: escapeHTML(badgeId), desc: 'Achievement Unlocked' };
+                    return `
+                        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; text-align: center; width: calc(33% - 10px); min-width: 120px; transition: transform 0.2s ease, box-shadow 0.2s ease;">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">${b.icon}</div>
+                            <div style="font-size: 0.9rem; font-weight: bold; color: #fff; margin-bottom: 4px;">${escapeHTML(b.title)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHTML(b.desc)}</div>
+                        </div>
+                    `;
+                }).join('');
             }
         }
 
