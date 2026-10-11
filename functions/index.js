@@ -564,10 +564,21 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
         const userCartRef = db.collection("carts").doc(uid);
         transaction.update(userCartRef, {items: {}});
 
-        // Deduct points
-        if (pointsToRedeem > 0) {
-          transaction.update(userRef, {pointsBalance: currentPoints - pointsToRedeem});
+        // Process loyalty points securely on the backend
+        // Do NOT trust orderDetails.earnedPoints from the client as it can be easily manipulated
+        // Recalculate based on the total charged
+        const totalCharged = orderDetails.total || 0;
+        const secureEarnedPoints = Math.floor(totalCharged * 10);
 
+        const newBalance = currentPoints - pointsToRedeem + secureEarnedPoints;
+        const currentLoyaltyPoints = userDoc.exists ? (userDoc.data().loyaltyPoints || 0) : 0;
+
+        transaction.update(userRef, {
+          pointsBalance: newBalance,
+          loyaltyPoints: currentLoyaltyPoints + secureEarnedPoints
+        });
+
+        if (pointsToRedeem > 0) {
           const rewardTxRef = db.collection("reward_transactions").doc();
           transaction.set(rewardTxRef, {
             userId: uid,
@@ -575,6 +586,28 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
             reason: "Redeemed points at checkout",
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
             orderId: newOrderRef.id,
+          });
+
+          const loyaltyTxRef1 = db.collection("loyalty_transactions").doc();
+          transaction.set(loyaltyTxRef1, {
+            userId: uid,
+            description: `Points Redeemed for Discount (Order #${newOrderRef.id}) 🏷️`,
+            points: -pointsToRedeem,
+            type: "redeemed",
+            orderId: newOrderRef.id,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+
+        if (secureEarnedPoints > 0) {
+          const loyaltyTxRef2 = db.collection("loyalty_transactions").doc();
+          transaction.set(loyaltyTxRef2, {
+            userId: uid,
+            description: `Order Purchase #${newOrderRef.id} 🛍️`,
+            points: secureEarnedPoints,
+            type: "earned",
+            orderId: newOrderRef.id,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
           });
         }
       });
