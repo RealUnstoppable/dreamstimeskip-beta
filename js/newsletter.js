@@ -19,6 +19,10 @@ document.addEventListener('submit', async (e) => {
         const email = emailInput.value.trim();
         let originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : 'Subscribe';
 
+        if (!email) {
+            return;
+        }
+
         if (submitBtn) {
             submitBtn.disabled = true;
             if (submitBtn.tagName === 'INPUT') {

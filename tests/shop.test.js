@@ -62,7 +62,7 @@ describe('handleUpdateQuantity', () => {
     test('logs error when product is not found', async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         await handleUpdateQuantity('non-existent-product', 5);
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Product not found: non-existent-product');
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Manager info: Product not found: non-existent-product');
         consoleErrorSpy.mockRestore();
     });
 
@@ -77,7 +77,7 @@ describe('handleUpdateQuantity', () => {
 
         await handleUpdateQuantity('unstoppable-hoodie', 5);
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to update quantity:', testError);
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Manager info: Error saving cart to Firestore:', expect.any(String));
 
         localStorage.setItem = originalSetItem;
         consoleErrorSpy.mockRestore();
@@ -100,10 +100,7 @@ describe('loadProductStats', () => {
 
         // Since the environment isn't fully mocked, getDocs should fail on its own
         // We just need to check if the error is caught and logged correctly.
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-            'Error loading product stats - Manager info:',
-            expect.any(Error)
-        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Manager info: Error fetching product_stats:'), expect.any(String));
 
         consoleErrorSpy.mockRestore();
     });

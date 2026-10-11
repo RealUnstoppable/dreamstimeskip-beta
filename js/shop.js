@@ -2,7 +2,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { calculateCartSummary } from './cart-utils.js';
+import { calculateCartSummary, generateCartItemsHtml } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
 import { products, productMap } from './products-data.js';
 import { getAverageRating } from './review-service.js';
@@ -137,24 +137,7 @@ function renderCart() {
         if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.title = 'Your cart is empty'; }
     } else {
         if (cartItemsContainer) {
-            cartItemsContainer.innerHTML = Object.entries(cart).map(([productId, quantity]) => {
-                // ⚡ Bolt: O(1) lookup replaces O(N) products.find()
-                const product = productMap.get(productId);
-                if (!product) return ''; // Should not happen
-                return `
-                    <div class="cart-item">
-                        <img src="${product.imageUrl}" alt="${product.name}" class="cart-item-img" loading="lazy">
-                        <div class="cart-item-info">
-                            <h4>${product.name}</h4>
-                            <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
-                        </div>
-                        <div class="cart-item-actions">
-                            <input type="number" value="${quantity}" min="1" data-id="${productId}" class="item-quantity-input" title="Quantity for ${product.name}" aria-label="Quantity for ${product.name}">
-                            <button class="remove-item-btn" data-id="${productId}" title="Remove item" aria-label="Remove item">&#128465;</button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            cartItemsContainer.innerHTML = generateCartItemsHtml(cart, productMap, 'shop');
         }
         if (checkoutBtn) { checkoutBtn.disabled = false; checkoutBtn.removeAttribute('title'); }
     }

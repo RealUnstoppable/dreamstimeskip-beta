@@ -3,7 +3,7 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { products, productMap } from './products.js';
-import { calculateCartSummary } from './cart-utils.js';
+import { calculateCartSummary, generateCartItemsHtml } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
 
 let currentUser = null;
@@ -26,7 +26,7 @@ function renderCheckoutPage() {
     if (!checkoutContainer) return;
 
     if (Object.keys(userCart).length === 0) {
-        checkoutContainer.innerHTML = '<h1>Your cart is empty.</h1><a href="/shop.html" class="cta-button">Continue Shopping</a>';
+        checkoutContainer.innerHTML = generateCartItemsHtml(userCart, productMap, 'checkout');
         return;
     }
 
@@ -114,10 +114,7 @@ function renderCheckoutPage() {
             <div class="checkout-summary-container">
                 <h3>Order Summary</h3>
                 <div id="summary-items">
-                    ${Object.entries(userCart).map(([productId, quantity]) => {
-                        const product = productMap.get(productId);
-                        return `<div class="summary-item"><span>${quantity}x ${escapeHTML(product.name)}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
-                    }).join('')}
+                    ${generateCartItemsHtml(userCart, productMap, 'checkout')}
                 </div>
                 
                 
