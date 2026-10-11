@@ -41,7 +41,7 @@ service cloud.firestore {
     match /loyalty_transactions/{transactionId} {
       allow get: if request.auth != null && resource.data.userId == request.auth.uid;
       allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if false; // Only Cloud Functions (Admin SDK) can award/redeem points
       allow update, delete: if isAdmin();
     }
 
@@ -50,7 +50,7 @@ service cloud.firestore {
       allow list: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
       // Depending on checkout implementation, orders are created by user or backend.
       // Assuming frontend creation for now based on 'userId' equality:
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow create: if false; // Only Cloud Functions (Admin SDK) can create orders
     }
 
 
