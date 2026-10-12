@@ -1135,6 +1135,23 @@ export function initAccountPage() {
         }
 
         // Support Ticket Form
+        const ticketMessageEl = document.getElementById('ticket-message');
+        const ticketMessageCounterEl = document.getElementById('ticket-message-counter');
+
+        if (ticketMessageEl && ticketMessageCounterEl) {
+            ticketMessageEl.addEventListener('input', () => {
+                const currentLength = ticketMessageEl.value.length;
+                const maxLength = ticketMessageEl.maxLength || 500;
+                ticketMessageCounterEl.textContent = `${currentLength} / ${maxLength}`;
+
+                if (currentLength > (maxLength - 50)) {
+                    ticketMessageCounterEl.style.color = 'var(--accent-red)';
+                } else {
+                    ticketMessageCounterEl.style.color = 'var(--text-secondary)';
+                }
+            });
+        }
+
         document.getElementById('support-ticket-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const subject = document.getElementById('ticket-subject').value.trim();
@@ -1155,6 +1172,10 @@ export function initAccountPage() {
                     setTimeout(() => notificationEl.style.display = 'none', 4000);
                 }
                 e.target.reset();
+                if (ticketMessageCounterEl) {
+                    ticketMessageCounterEl.textContent = `0 / ${ticketMessageEl.maxLength || 500}`;
+                    ticketMessageCounterEl.style.color = 'var(--text-secondary)';
+                }
                 await loadUserTickets(user.uid);
             } catch (err) {
                 if (notificationEl) {
