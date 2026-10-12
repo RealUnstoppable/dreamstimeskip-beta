@@ -23620,6 +23620,21 @@ export const librarySongs = [
     }
 ];
 
+
+export const librarySongsIdMap = new Map();
+export const librarySongsIndexMap = new Map();
+
+for (let i = 0; i < librarySongs.length; i++) {
+    const song = librarySongs[i];
+    librarySongsIdMap.set(song.id, song);
+    librarySongsIndexMap.set(song.id, i);
+}
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return librarySongsIdMap.get(id) || null;
+}
+
+export function getSongIndexById(id) {
+    const index = librarySongsIndexMap.get(id);
+    return index !== undefined ? index : -1;
 }
