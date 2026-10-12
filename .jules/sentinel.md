@@ -1,0 +1,4 @@
+## 2025-02-28 - [Path Traversal in Custom Middleware]
+**Vulnerability:** A custom Express middleware used regex (`replace(/^(\.\.[\/\\])+/, '')`) to sanitize paths, which failed to prevent directory traversal when users passed deeply nested URL-encoded dots and slashes (e.g., `/%2E%2E/%2E%2E/`).
+**Learning:** `req.path` is partially decoded, but not fully decoded for certain traversal dots. Relying solely on `path.normalize` and a regex replacement is insecure. Furthermore, absolute pathing in `path.resolve` requires careful leading slash stripping, or else the resolution escapes `__dirname` completely.
+**Prevention:** Always use `decodeURIComponent(req.path)`. Strip any leading slash to treat the path as relative when passing to `path.resolve(__dirname, ...)`. Finally, rigorously check boundary enforcement using `!resolvedPath.startsWith(__dirname + path.sep) && resolvedPath !== __dirname` to ensure it has not escaped the intended directory.
