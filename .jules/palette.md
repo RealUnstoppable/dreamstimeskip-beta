@@ -1,0 +1,4 @@
+## 2024-05-18 - Textarea Character Counters
+
+**Learning:** When implementing open-ended text inputs like `<textarea>`, adding a visual character counter improves usability by helping users avoid surprise truncation. For accessibility, it's critical to add `aria-describedby` pointing to the counter ID on the textarea itself so screen readers announce the limit immediately upon focus. `aria-live="polite"` on the counter is also needed so updates are announced as the user types without being overly intrusive.
+**Action:** When adding visual counters to inputs or textareas, ensure the counter is dynamically updated, initialized on load, and reset on form submission. Use `aria-describedby` to link the input to the counter and `aria-live="polite"` on the counter. Use existing design tokens (`var(--text-secondary)`, `var(--accent-red)`) for states.
