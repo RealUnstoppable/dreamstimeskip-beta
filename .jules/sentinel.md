@@ -1,0 +1,4 @@
+## 2024-05-18 - Prevent XSS in Server Responses via DOM innerHTML
+**Vulnerability:** A returned backend value (`orderId`) was directly concatenated into an HTML template string and assigned to `.innerHTML` without escaping, opening a potential XSS vector if the backend value could be manipulated or unexpectedly included HTML characters.
+**Learning:** Even variables returned from trusted server sources (like generated IDs or references) should not be inherently trusted when constructing raw DOM structures. Relying on implicit trust creates fragile security boundaries that can be broken by downstream backend changes.
+**Prevention:** As a strict defense-in-depth practice, always wrap variables interpolated into `innerHTML` strings with a sanitizer function like `escapeHTML()`, regardless of their origin, unless they explicitly require rendering raw HTML.
