@@ -658,9 +658,281 @@
             box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
         }
 
+        /* --- START: Bento Music Pulse & Wave Background --- */
+        #bento-harmony {
+            position: relative;
+            overflow: hidden;
+            background: 
+                radial-gradient(circle at 85% 20%, rgba(255, 45, 135, 0.22) 0%, transparent 60%),
+                radial-gradient(circle at 15% 85%, rgba(0, 210, 255, 0.16) 0%, transparent 60%),
+                linear-gradient(145deg, #16121c 0%, #0d0e14 100%);
+            border: 1.5px solid rgba(255, 45, 135, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 16px rgba(255, 45, 135, 0.2);
+            animation: bentoSongPulse 1.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        @keyframes bentoSongPulse {
+            0%, 100% {
+                border-color: rgba(255, 45, 135, 0.4);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 
+                            0 0 16px rgba(255, 45, 135, 0.2);
+            }
+            15% {
+                border-color: rgba(255, 45, 135, 0.85);
+                box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8), 
+                            0 0 30px rgba(255, 45, 135, 0.6),
+                            0 0 52px rgba(0, 210, 255, 0.35),
+                            inset 0 0 22px rgba(255, 45, 135, 0.15);
+                transform: translateY(-2px) scale(1.008);
+            }
+            32% {
+                border-color: rgba(255, 45, 135, 0.45);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 
+                            0 0 18px rgba(255, 45, 135, 0.25);
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                border-color: rgba(0, 210, 255, 0.8);
+                box-shadow: 0 14px 42px rgba(0, 0, 0, 0.8), 
+                            0 0 34px rgba(0, 210, 255, 0.55),
+                            0 0 60px rgba(255, 45, 135, 0.4),
+                            inset 0 0 22px rgba(0, 210, 255, 0.15);
+                transform: translateY(-3px) scale(1.012);
+            }
+            68% {
+                border-color: rgba(255, 45, 135, 0.45);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 
+                            0 0 18px rgba(255, 45, 135, 0.22);
+                transform: translateY(0) scale(1);
+            }
+        }
+
         #bento-harmony:hover {
             border-color: #ff2d87;
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(225, 29, 72, 0.45);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85), 
+                        0 0 36px rgba(255, 45, 135, 0.75), 
+                        0 0 65px rgba(0, 210, 255, 0.45);
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .music-wave-bg {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+            border-radius: inherit;
+        }
+
+        .music-glow-orb {
+            position: absolute;
+            top: 45%;
+            right: 25%;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255, 45, 135, 0.35) 0%, rgba(0, 210, 255, 0.2) 50%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+            filter: blur(35px);
+            pointer-events: none;
+            animation: orbPulse 1.9s ease-in-out infinite;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% { transform: translate(50%, -50%) scale(0.85); opacity: 0.5; }
+            50% { transform: translate(50%, -50%) scale(1.25); opacity: 0.9; }
+        }
+
+        .music-waves-svg {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 200%;
+            height: 90%;
+            opacity: 0.85;
+            pointer-events: none;
+        }
+
+        .wave-layer {
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        .wave-1 {
+            animation: waveDrift1 7s ease-in-out infinite alternate, wavePulse 1.9s ease-in-out infinite;
+            transform-origin: bottom center;
+        }
+
+        .wave-2 {
+            animation: waveDrift2 9s ease-in-out infinite alternate, wavePulse 1.9s ease-in-out infinite 0.5s;
+            transform-origin: bottom center;
+        }
+
+        .wave-3 {
+            animation: waveDrift3 11s ease-in-out infinite alternate, wavePulse 1.9s ease-in-out infinite 1s;
+            transform-origin: bottom center;
+        }
+
+        @keyframes waveDrift1 {
+            0% { transform: translateX(0) scaleY(1); }
+            100% { transform: translateX(-25%) scaleY(1.25); }
+        }
+
+        @keyframes waveDrift2 {
+            0% { transform: translateX(-20%) scaleY(1.1); }
+            100% { transform: translateX(5%) scaleY(0.9); }
+        }
+
+        @keyframes waveDrift3 {
+            0% { transform: translateX(0) scaleY(0.95); }
+            100% { transform: translateX(-15%) scaleY(1.2); }
+        }
+
+        @keyframes wavePulse {
+            0%, 100% { opacity: 0.55; }
+            50% { opacity: 0.95; }
+        }
+
+        .music-bento-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #ff66b2;
+            background: rgba(255, 45, 135, 0.15);
+            border: 1px solid rgba(255, 45, 135, 0.4);
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            letter-spacing: 0.6px;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .music-bento-badge .eq-bars {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+        }
+
+        .music-bento-badge .eq-bars span {
+            width: 2.5px;
+            background: #ff66b2;
+            border-radius: 2px;
+            animation: eqBounce 0.75s ease-in-out infinite alternate;
+        }
+        .music-bento-badge .eq-bars span:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+        .music-bento-badge .eq-bars span:nth-child(2) { height: 100%; animation-delay: 0.35s; }
+        .music-bento-badge .eq-bars span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+        .music-bento-badge .eq-bars span:nth-child(4) { height: 85%; animation-delay: 0.45s; }
+
+        @keyframes eqBounce {
+            0% { height: 25%; }
+            100% { height: 100%; }
+        }
+
+        /* --- Shared Bento Action Buttons --- */
+        .bento-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: fit-content;
+            margin-top: 14px;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Start Listening Button (Medixly) */
+        .btn-music {
+            background: linear-gradient(135deg, #ff1744 0%, #e11d48 50%, #ec4899 100%);
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 16px rgba(225, 29, 72, 0.45);
+        }
+
+        #bento-harmony:hover .btn-music {
+            background: linear-gradient(135deg, #ff2d60 0%, #f43f5e 50%, #f472b6 100%);
+            box-shadow: 0 6px 22px rgba(225, 29, 72, 0.7), 0 0 18px rgba(244, 114, 182, 0.5);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        /* Fact of the Day: White Learn More Button */
+        .btn-white {
+            background: #ffffff;
+            color: #0b0c10 !important;
+            border: 1px solid #ffffff;
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        #bento-fotd:hover .btn-white {
+            background: #f1f2f6;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.45);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        /* Founder's Note Button: About the founder */
+        .btn-founder {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+        }
+
+        #bento-founder:hover .btn-founder {
+            background: rgba(255, 255, 255, 0.24);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        /* Unstoppable Collection: Gold Shop Now Button */
+        .btn-gold {
+            background: linear-gradient(135deg, #FFE27D 0%, #E5A91E 50%, #B87A04 100%);
+            color: #1a1200 !important;
+            font-weight: 700;
+            border: 1px solid #FFEAA0;
+            box-shadow: 0 4px 16px rgba(229, 169, 30, 0.4);
+        }
+
+        #bento-shop:hover .btn-gold {
+            background: linear-gradient(135deg, #FFF09E 0%, #F5B82A 50%, #C98705 100%);
+            box-shadow: 0 6px 24px rgba(245, 184, 42, 0.65), 0 0 16px rgba(255, 226, 125, 0.4);
+            transform: translateY(-2px) scale(1.04);
+        }
+
+        #bento-fotd .card-content {
+            width: 100%;
+        }
+
+        #bento-founder .card-content {
+            width: 60%;
+        }
+        /* --- END: Bento Music Pulse & Wave Background --- */
+
+        @media (max-width: 600px) {
+            #dts-brand-content, #medixly-brand-content {
+                padding: 30px 18px !important;
+            }
+            .mc-hero-features, .medixly-feature-pills {
+                gap: 6px;
+            }
+            .mc-pill, .m-pill {
+                font-size: 0.72rem;
+                padding: 4px 10px;
+            }
         }
         /* --- END: Medixly Styling --- */
     </style>
@@ -710,7 +982,7 @@
 
         <section id="bento" class="bento-section">
             <div class="bento-grid">
-                <a href="#unstoppable" class="bento-card reveal" id="bento-unstoppable">
+                <a href="unstoppable.html" class="bento-card reveal" id="bento-unstoppable">
                     <div class="card-content">
                         <h3>Unstoppable</h3>
                         <p>High-tier gameplay & gaming content.</p>
@@ -735,10 +1007,45 @@
                 <div id="status-issues-list" class="status-issues-list" style="display: none;"></div>
                     <p>Last check: Oct 13, 2026</p>
                 </div>
-                <a href="#harmony" class="bento-card reveal" id="bento-harmony">
+                <a href="medixly.html" class="bento-card reveal" id="bento-harmony">
+                    <div class="music-wave-bg" aria-hidden="true">
+                        <div class="music-glow-orb"></div>
+                        <svg class="music-waves-svg" viewBox="0 0 1200 300" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#ff1744" stop-opacity="0.35"/>
+                                    <stop offset="50%" stop-color="#9b51e0" stop-opacity="0.25"/>
+                                    <stop offset="100%" stop-color="#00d2ff" stop-opacity="0.35"/>
+                                </linearGradient>
+                                <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.3"/>
+                                    <stop offset="50%" stop-color="#ec4899" stop-opacity="0.22"/>
+                                    <stop offset="100%" stop-color="#9b51e0" stop-opacity="0.3"/>
+                                </linearGradient>
+                                <linearGradient id="waveGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#9b51e0" stop-opacity="0.22"/>
+                                    <stop offset="50%" stop-color="#00f2fe" stop-opacity="0.18"/>
+                                    <stop offset="100%" stop-color="#ff2d87" stop-opacity="0.28"/>
+                                </linearGradient>
+                            </defs>
+                            <path class="wave-layer wave-1" d="M0,150 C300,280, 450,20, 750,160 C1050,300, 1100,60, 1200,130 L1200,300 L0,300 Z" fill="url(#waveGrad1)"></path>
+                            <path class="wave-layer wave-2" d="M0,120 C220,30, 460,250, 780,110 C980,10, 1100,210, 1200,170 L1200,300 L0,300 Z" fill="url(#waveGrad2)"></path>
+                            <path class="wave-layer wave-3" d="M0,190 C280,90, 520,270, 840,140 C1040,70, 1140,210, 1200,180 L1200,300 L0,300 Z" fill="url(#waveGrad3)"></path>
+                        </svg>
+                    </div>
                     <div class="card-content">
+                        <div class="music-bento-badge">
+                            <span class="eq-bars" aria-hidden="true">
+                                <span></span><span></span><span></span><span></span>
+                            </span>
+                            <span>NOW STREAMING</span>
+                        </div>
                         <h3>Medixly</h3>
                         <p>Your daily dose of trending music.</p>
+                        <span class="bento-cta-btn btn-music">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 2px;" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                            Start listening
+                        </span>
                     </div>
                     <img src="/images/medixly-logo.png" alt="Medixly Card" loading="lazy">
                 </a>
@@ -746,18 +1053,21 @@
                     <div class="card-content">
                         <h3>Fact of the Day</h3>
                         <p id="homepage-fotd-text">Loading...</p>
+                        <span class="bento-cta-btn btn-white">Learn more</span>
                     </div>
                 </a>
-                <div class="bento-card reveal" id="bento-founder">
+                <a href="portfolio.html" class="bento-card reveal" id="bento-founder">
                     <div class="card-content">
                         <h4>Founder's Note</h4>
                         <p>"We're building the future of digital entertainment, one project at a time." - Catalin A.</p>
+                        <span class="bento-cta-btn btn-founder">About the founder</span>
                     </div>
-                </div>
+                </a>
                 <a href="shop.html" class="bento-card reveal" id="bento-shop">
                     <div class="card-content">
                         <h3>Unstoppable Collection</h3>
                         <p>New drops available now.</p>
+                        <span class="bento-cta-btn btn-gold">Shop now</span>
                     </div>
                     <img src="/images/Unstoppable Collection Logo.png" alt="Unstoppable Mousepad" loading="lazy">
                 </a>
@@ -766,7 +1076,7 @@
 
         <div class="scroll-container">
             <section id="unstoppable" class="brand-section" style="height: auto; min-height: 100vh; padding: 100px 20px;">
-                <div class="section-background" style="background-image: url('UnstoppableHoodieModel300x300.png');">
+                <div class="section-background" style="background-image: url('/images/UnstoppableHoodieModel300x300.png');">
                     <iframe src="https://www.youtube.com/embed/-MfSBwzapaU?autoplay=1&mute=1&loop=1&playlist=-MfSBwzapaU&controls=0&showinfo=0&rel=0&playsinline=1&enablejsapi=1" title="Unstoppable Channel Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="section-overlay"
@@ -777,7 +1087,7 @@
                     
                     <div class="youtube-container" style="display: flex; flex-direction: column; gap: 2rem; align-items: center; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
                         <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed?listType=search&list=Unstoppab1e+gaming" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                            <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/-MfSBwzapaU" title="Unstoppable Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
                         
                         <div class="youtube-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
@@ -785,7 +1095,7 @@
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                                 Subscribe to @Unstoppab1e
                             </a>
-                            <a href="#" class="cta-button" style="background: #FF8C00; color: white;">Support Us / Donate</a>
+                            <a href="support.html" class="cta-button btn-support-blue" style="background: #0071e3; color: white; display: inline-flex; align-items: center; gap: 8px;">Support Us / Donate</a>
                         </div>
 
                         <div class="coming-soon-videos" style="width: 100%; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
@@ -806,26 +1116,57 @@
             </section>
 
             <section id="dts" class="brand-section">
-                <div class="section-background" style="background-image: url('DreamsTimeSkipModel300x300.jpg');"></div>
-                <div class="section-overlay"
-                    style="background: linear-gradient(0deg, rgba(48,25,52,0.7) 0%, rgba(20,20,20,0.8) 100%);"></div>
-                <div class="brand-content reveal">
-                    <h2>Dreams TimeSkip</h2>
-                    <p class="section-subtitle">An epic Minecraft saga awaits. With a rich storyline, interactive NPCs,
-                        and live events, this is a server unlike any other. Expected release: 2027.</p>
-                    <a href="dreamstimeskip.html" class="cta-button">Explore Dreams TimeSkip</a>
+                <div class="section-background" style="background-image: url('/images/image4.jpg');"></div>
+                <div class="section-overlay mc-dts-overlay"></div>
+                <div class="brand-content reveal" id="dts-brand-content">
+                    <div class="mc-hero-badge">
+                        <span>⚔️</span> MINECRAFT SAGA • EXPECTED 2027
+                    </div>
+                    <h2 class="mc-hero-title">Dreams TimeSkip</h2>
+                    <p class="section-subtitle mc-hero-subtitle">An epic Minecraft saga awaits. With a rich storyline, interactive NPCs, and live events, this is a server unlike any other. Expected release: 2027.</p>
+                    <div class="mc-hero-features">
+                        <span class="mc-pill"><span>📜</span> Rich Storyline</span>
+                        <span class="mc-pill"><span>🧙‍♂️</span> Interactive NPCs</span>
+                        <span class="mc-pill"><span>⚡</span> Live Events</span>
+                        <span class="mc-pill"><span>🏰</span> Custom Biomes</span>
+                    </div>
+                    <a href="dreamstimeskip.html" class="mc-btn mc-btn-green">
+                        Explore Dreams TimeSkip <span>▶</span>
+                    </a>
                 </div>
             </section>
 
-            <section id="harmony" class="brand-section">
-                <div class="section-background" style="background-image: url('MedixlyModel300x300.png');"></div>
-                <div class="section-overlay"
-                    style="background: linear-gradient(0deg, rgba(0,113,227,0.6) 0%, rgba(20,20,20,0.8) 100%);"></div>
-                <div class="brand-content reveal">
-                    <h2>Medixly</h2>
-                    <p class="section-subtitle">Your daily dose of trending music. Follow us on TikTok for the most
-                        popular songs, every single day. The official app is launching next year!</p>
-                    <a href="medixly.html" class="cta-button">Explore Medixly</a>
+            <section id="harmony" class="brand-section medixly-section">
+                <div class="medixly-ambient-bg">
+                    <div class="medixly-pulse-orb orb-red"></div>
+                    <div class="medixly-pulse-orb orb-pink"></div>
+                    <div class="medixly-pulse-mesh"></div>
+                    <div class="medixly-grid-overlay"></div>
+                </div>
+                <div class="section-overlay medixly-dark-overlay"></div>
+                <div class="brand-content reveal" id="medixly-brand-content">
+                    <div class="medixly-badge">
+                        <div class="medixly-eq">
+                            <span class="eq-bar bar-1"></span>
+                            <span class="eq-bar bar-2"></span>
+                            <span class="eq-bar bar-3"></span>
+                            <span class="eq-bar bar-4"></span>
+                        </div>
+                        <span>NEXT-GEN AUDIO • DAILY VIRAL SOUNDS</span>
+                    </div>
+                    <h2 class="medixly-title">Medixly</h2>
+                    <p class="section-subtitle medixly-subtitle">Your daily dose of trending music. Hand-curated charts, high-fidelity audio, and the hottest viral sounds from around the globe.</p>
+                    <div class="medixly-feature-pills">
+                        <span class="m-pill"><span>🎧</span> Lossless Audio</span>
+                        <span class="m-pill"><span>🔥</span> Viral Daily Charts</span>
+                        <span class="m-pill"><span>⚡</span> Ad-Free Streaming</span>
+                    </div>
+                    <a href="medixly.html" class="medixly-listen-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <span>Start Listening.</span>
+                    </a>
                 </div>
             </section>
         </div>
@@ -833,27 +1174,31 @@
 
     
     <!-- AD_SLOT_START -->
+    <section class="site-ad-section" style="max-width: 1200px; margin: 40px auto 20px; padding: 0 20px;" aria-label="Sponsored Content">
+        <div class="site-ad-label">Sponsored</div>
+        <div class="ad-container ad-bottom-banner">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4254213062632381"
+                 data-ad-slot="9876543210"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </section>
+
     <div class="ad-container ad-mobile-sticky">
         <div id="div-gpt-ad-mobile-sticky">
             <script>
-                googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
+                if (window.googletag) {
+                    googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
+                }
             </script>
         </div>
     </div>
     <!-- AD_SLOT_END -->
-
-
-    
-    <!-- AD_SLOT_START -->
-    <div class="ad-container ad-mobile-sticky">
-        <div id="div-gpt-ad-mobile-sticky">
-            <script>
-                googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
-            </script>
-        </div>
-    </div>
-    <!-- AD_SLOT_END -->
-
 
     <footer class="main-footer"></footer>
 
