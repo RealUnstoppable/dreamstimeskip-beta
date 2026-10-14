@@ -178,7 +178,7 @@ async function loadComments(postId) {
                             await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
                             await loadComments(postId); // Refresh
                         } catch (err) {
-                            console.error('Error deleting comment', err);
+                            console.error('Manager info: Error deleting comment', err);
                             alert('Failed to delete comment.');
                             btn.disabled = false;
                             btn.textContent = 'Delete';

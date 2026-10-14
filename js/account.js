@@ -402,7 +402,7 @@ export async function renderRewards(user, userData) {
         }
 
     } catch (err) {
-        console.error("Error rendering rewards:", err);
+        console.error("Manager info: Error rendering rewards:", err);
         if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
     }
 }

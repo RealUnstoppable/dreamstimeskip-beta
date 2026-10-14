@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { collection, addDoc, query, orderBy, getDocs, getDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { collection, addDoc, query, orderBy, getDocs, getDoc, doc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { escapeHTML, formatDate, fetchQueryData } from './utils.js';
 
 const requestForm = document.getElementById('feature-request-form');
@@ -27,12 +27,18 @@ function renderStatus(status) {
     return `<span class="request-status ${statusClass}">${displayStatus}</span>`;
 }
 
-async function fetchAndRenderRequests() {
+let unsubscribeFeatureRequests = null;
+
+function fetchAndRenderRequests() {
     if (!requestsList) return;
 
-    try {
-        const q = query(collection(db, 'feature_requests'));
-        let requestsData = await fetchQueryData(getDocs, q);
+    const q = query(collection(db, 'feature_requests'));
+    if (unsubscribeFeatureRequests) {
+        unsubscribeFeatureRequests();
+    }
+
+    unsubscribeFeatureRequests = onSnapshot(q, async (snapshot) => {
+            let requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
         if (requestsData.length === 0) {
             requestsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">No feature requests yet. Be the first to submit one!</p>';
@@ -172,11 +178,10 @@ async function fetchAndRenderRequests() {
                 }
             });
         });
-
-    } catch (error) {
+    }, (error) => {
         if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Manager info: Error fetching feature requests:", error.message || error); }
         requestsList.innerHTML = '<p style="text-align: center; color: var(--accent-red);">Failed to load feature requests. Please try again later.</p>';
-    }
+    });
 }
 
 // Check auth state
@@ -236,7 +241,7 @@ if (requestForm) {
             formMessage.style.color = 'var(--accent-green)';
 
             // Refresh list
-            await fetchAndRenderRequests();
+
 
             setTimeout(() => {
                 formMessage.textContent = '';

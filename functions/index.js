@@ -37,6 +37,30 @@ async function authenticateRequest(req, res, adminInstance = admin) {
 }
 const stripe = stripeKey ? require("stripe")(stripeKey) : null;
 
+
+
+
+// 🛡️ Higher-Order Function for CORS & Auth
+function withAuth(handler) {
+  return functions.https.onRequest((req, res) => {
+    cors(req, res, async () => {
+      if (req.method !== "POST") {
+        return res.status(405).send("Method Not Allowed");
+      }
+      try {
+        const decodedToken = await authenticateRequest(req, res, admin);
+        if (!decodedToken) return;
+
+        return await handler(req, res, decodedToken);
+      } catch (err) {
+        console.error("Manager info: Request handling error: [" + err.message + "]");
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    });
+  });
+}
+
+
 // 🛡️ Shared Utils
 function getUserDocRef(uid) {
   return admin.firestore().collection("users").doc(uid);
@@ -46,10 +70,7 @@ function getUserDocRef(uid) {
 // 🔹 Create Checkout Session
 
 // 🛡️ Admin Action Proxy
-exports.adminAction = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+exports.adminAction = withAuth(async (req, res, decodedToken) => {
 
 
     try {
@@ -113,17 +134,9 @@ exports.adminAction = functions.https.onRequest((req, res) => {
       console.error("Manager info: Admin Action Error: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
-  });
 });
 
-exports.createCheckoutSession = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+exports.createCheckoutSession = withAuth(async (req, res, decodedToken) => {
 
     const uid = decodedToken.uid;
     const email = decodedToken.email;
@@ -172,7 +185,6 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
       console.error("Manager info: Checkout Error: [" + err.message + "]");
       res.status(500).json({error: `Checkout Error. [${err.message}]`});
     }
-  });
 });
 
 // 🔔 Notification on Support Ticket Update
@@ -302,14 +314,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 });
 
 // 🔻 Cancel Subscription Manually
-exports.cancelSubscription = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+exports.cancelSubscription = withAuth(async (req, res, decodedToken) => {
 
     try {
       const uid = decodedToken.uid;
@@ -338,8 +343,8 @@ exports.cancelSubscription = functions.https.onRequest((req, res) => {
       console.error("Manager info: Cancel Error: [" + err.message + "]");
       res.status(500).json({error: err.message});
     }
-  });
 });
+
 // ⭐️ Update Product Stats on New Review
 const {onDocumentCreated} = require("firebase-functions/v2/firestore");
 
@@ -499,11 +504,8 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
   }
 });
 
-exports.processOrderTransaction = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
+exports.processOrderTransaction = withAuth(async (req, res, decodedToken) => {
     try {
-      const decodedToken = await authenticateRequest(req, res, admin);
-      if (!decodedToken) return;
 
       if (JSON.stringify(req.body).length > 15000) {
         return res.status(413).send("Payload too large");
@@ -584,19 +586,10 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
       console.error("Manager info: Error processing order transaction [" + error.message + "]");
       res.status(500).send("Internal Server Error");
     }
-  });
 });
 
-
 // 📅 Daily Check-in Rewards
-exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+exports.claimDailyCheckIn = withAuth(async (req, res, decodedToken) => {
 
     const uid = decodedToken.uid;
     const db = admin.firestore();
@@ -677,18 +670,10 @@ exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
       console.error("Manager info: Check-in Error: [" + error.message + "]");
       res.status(500).json({ error: error.message });
     }
-  });
 });
 
 // 👍 Toggle Feature Upvote
-exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== "POST") {
-      return res.status(405).send("Method Not Allowed");
-    }
-
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+exports.toggleFeatureUpvote = withAuth(async (req, res, decodedToken) => {
 
     const uid = decodedToken.uid;
     const {requestId} = req.body;
@@ -728,9 +713,7 @@ exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
       console.error("Manager info: Toggle Upvote Error: [" + error.message + "]");
       res.status(500).json({error: error.message});
     }
-  });
 });
-
 
 // 🏆 Process Referral
 exports.processReferral = functions.https.onCall(async (data, context) => {

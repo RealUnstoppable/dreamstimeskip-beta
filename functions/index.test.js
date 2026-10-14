@@ -165,16 +165,11 @@ describe("createCheckoutSession", () => {
     expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
       customer_email: "test@example.com",
       line_items: [{price: "price_1THHYPBp2C5GdKaKxNpqndNE", quantity: 1}],
-      success_url: "https://dreamstimeskip-beta.pages.dev/success",
-      cancel_url: "https://dreamstimeskip-beta.pages.dev/cancel",
+      success_url: "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
+      cancel_url: "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
       metadata: {
         uid: "user123",
-        planName: "Pro",
-<<<<<<< HEAD
-        project: "ezmanage"
-=======
-        project: "ezmanage",
->>>>>>> origin/main
+        planName: "Pro"
       },
     }));
 
@@ -217,12 +212,7 @@ describe("createCheckoutSession", () => {
       cancel_url: "https://mycustomurl.com/cancel",
       metadata: {
         uid: "bizuser",
-        planName: "Business Pro",
-<<<<<<< HEAD
-        project: "ezmanage"
-=======
-        project: "ezmanage",
->>>>>>> origin/main
+        planName: "Business Pro"
       },
     }));
 
