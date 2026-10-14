@@ -218,6 +218,451 @@
             border-radius: 4px;
         }
         /* --- END: Minecraft Themed Bento Card --- */
+
+        /* --- Support Us Blue Button --- */
+        .btn-support-blue {
+            background: #0071e3 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.4);
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+        }
+        .btn-support-blue:hover {
+            background: #0077ed !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 113, 227, 0.6);
+        }
+
+        /* --- Dreams TimeSkip Minecraft Brand Section Styling --- */
+        #dts {
+            position: relative;
+            background: #0f1311;
+        }
+
+        #dts .section-background {
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        .mc-dts-overlay {
+            background: 
+                radial-gradient(circle at center, rgba(10, 15, 20, 0.3) 0%, rgba(5, 8, 12, 0.75) 100%),
+                linear-gradient(180deg, rgba(18, 26, 20, 0.35) 0%, rgba(10, 14, 12, 0.65) 100%);
+        }
+
+        #dts-brand-content {
+            background: rgba(16, 20, 24, 0.9) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
+            border-top: 3px solid #5eb33a !important;
+            border-left: 3px solid #5eb33a !important;
+            border-right: 3px solid #1c5212 !important;
+            border-bottom: 4px solid #1c5212 !important;
+            border-radius: 6px !important;
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.9),
+                0 0 35px rgba(60, 133, 39, 0.35),
+                inset 2px 2px 0 rgba(94, 179, 58, 0.3) !important;
+            position: relative;
+            overflow: hidden;
+            max-width: 780px;
+            padding: 44px 36px;
+        }
+
+        #dts-brand-content::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(60, 133, 39, 0.25) 0%, transparent 60%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #dts-brand-content > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .mc-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #3c8527;
+            color: #55ff55;
+            font-family: 'Silkscreen', 'Press Start 2P', monospace;
+            font-size: 0.78rem;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            margin-bottom: 16px;
+            border-radius: 2px;
+        }
+
+        .mc-hero-title {
+            font-family: 'Silkscreen', 'Press Start 2P', monospace !important;
+            font-size: clamp(2.2rem, 5.5vw, 4rem) !important;
+            letter-spacing: -1px !important;
+            color: #ffffff !important;
+            text-shadow: 3px 3px 0 #18440f, 0 0 25px rgba(85, 255, 85, 0.45) !important;
+            margin: 0 0 16px 0 !important;
+            line-height: 1.2 !important;
+        }
+
+        .mc-hero-subtitle {
+            font-family: 'Inter', sans-serif !important;
+            font-size: clamp(1rem, 1.8vw, 1.15rem) !important;
+            line-height: 1.65 !important;
+            color: #d1d5db !important;
+            max-width: 640px !important;
+            margin: 0 auto 22px auto !important;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9) !important;
+        }
+
+        .mc-hero-features {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 26px;
+        }
+
+        .mc-pill {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #3c8527;
+            padding: 6px 14px;
+            border-radius: 2px;
+            font-family: 'Silkscreen', monospace;
+            font-size: 0.76rem;
+            color: #bbf7d0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* --- Minecraft 3D Button --- */
+        .mc-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 30px;
+            font-family: 'Silkscreen', 'Press Start 2P', monospace;
+            font-size: 0.92rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid #000;
+            position: relative;
+            user-select: none;
+            transition: transform 0.08s ease, filter 0.15s ease, box-shadow 0.15s ease;
+            box-sizing: border-box;
+            border-radius: 2px;
+        }
+
+        .mc-btn-green {
+            background: #3c8527;
+            color: #ffffff !important;
+            border-top: 3px solid #5eb33a;
+            border-left: 3px solid #5eb33a;
+            border-right: 3px solid #1c5212;
+            border-bottom: 4px solid #1c5212;
+            box-shadow: 0 4px 0 #000, 0 8px 20px rgba(0,0,0,0.6);
+            text-shadow: 2px 2px 0px #18440f;
+        }
+
+        .mc-btn-green:hover {
+            background: #469c2e;
+            filter: brightness(1.12);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #000, 0 12px 25px rgba(60, 133, 39, 0.5);
+            color: #ffffff !important;
+        }
+
+        .mc-btn-green:active {
+            border-top: 3px solid #1c5212;
+            border-left: 3px solid #1c5212;
+            border-right: 3px solid #5eb33a;
+            border-bottom: 3px solid #5eb33a;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
+        /* --- Medixly Red/Pink Pulsing Background & Premium Music Redesign --- */
+        .medixly-section {
+            position: relative;
+            background: #080207 !important;
+            overflow: hidden;
+        }
+
+        .medixly-ambient-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .medixly-pulse-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(85px);
+            opacity: 0.75;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        .orb-red {
+            top: -15%;
+            left: 10%;
+            width: 65vw;
+            height: 65vw;
+            max-width: 750px;
+            max-height: 750px;
+            background: radial-gradient(circle, #e11d48 0%, #be123c 45%, #881337 70%, transparent 85%);
+            animation: medixlyRedPulse 4s ease-in-out infinite alternate;
+        }
+
+        .orb-pink {
+            bottom: -15%;
+            right: 10%;
+            width: 60vw;
+            height: 60vw;
+            max-width: 700px;
+            max-height: 700px;
+            background: radial-gradient(circle, #ff2d87 0%, #ec4899 45%, #9d174d 70%, transparent 85%);
+            animation: medixlyPinkPulse 4.5s ease-in-out infinite alternate 1.5s;
+        }
+
+        .medixly-pulse-mesh {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(225, 29, 72, 0.3) 0%, transparent 60%),
+                radial-gradient(circle at 15% 85%, rgba(255, 45, 135, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 85% 15%, rgba(190, 18, 60, 0.25) 0%, transparent 50%);
+            animation: medixlyMeshBreathe 3.5s ease-in-out infinite alternate;
+        }
+
+        .medixly-grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 32px 32px;
+            opacity: 0.6;
+        }
+
+        .medixly-dark-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(10, 4, 10, 0.3) 0%, rgba(7, 2, 7, 0.75) 100%);
+            z-index: 1;
+        }
+
+        @keyframes medixlyRedPulse {
+            0% {
+                transform: scale(0.92) translate(-4%, -4%);
+                opacity: 0.6;
+                filter: blur(85px) saturate(1.2);
+            }
+            50% {
+                transform: scale(1.15) translate(4%, 3%);
+                opacity: 0.95;
+                filter: blur(70px) saturate(1.8);
+            }
+            100% {
+                transform: scale(1.28) translate(2%, 7%);
+                opacity: 0.85;
+                filter: blur(80px) saturate(1.6);
+            }
+        }
+
+        @keyframes medixlyPinkPulse {
+            0% {
+                transform: scale(1.12) translate(4%, 4%);
+                opacity: 0.7;
+                filter: blur(80px) saturate(1.3);
+            }
+            50% {
+                transform: scale(0.92) translate(-3%, -2%);
+                opacity: 0.55;
+                filter: blur(95px) saturate(1.1);
+            }
+            100% {
+                transform: scale(1.22) translate(-5%, -5%);
+                opacity: 0.92;
+                filter: blur(65px) saturate(1.8);
+            }
+        }
+
+        @keyframes medixlyMeshBreathe {
+            0% {
+                opacity: 0.5;
+                transform: scale(0.98);
+            }
+            50% {
+                opacity: 0.92;
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+        }
+
+        #medixly-brand-content {
+            background: rgba(16, 7, 14, 0.7) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border: 1px solid rgba(255, 45, 100, 0.35) !important;
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.85),
+                0 0 50px rgba(225, 29, 72, 0.3),
+                inset 0 1px 0 rgba(255, 120, 180, 0.4) !important;
+            border-radius: 28px !important;
+            max-width: 760px !important;
+            padding: 48px 36px !important;
+            position: relative;
+            z-index: 2;
+        }
+
+        .medixly-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 18px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 45, 100, 0.35);
+            border-radius: 9999px;
+            color: #ff6b9d;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(255, 45, 100, 0.2);
+        }
+
+        .medixly-eq {
+            display: inline-flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 16px;
+        }
+
+        .eq-bar {
+            width: 3px;
+            background: linear-gradient(180deg, #ff2d87, #e11d48);
+            border-radius: 2px;
+            animation: eqPulse 1.2s ease-in-out infinite alternate;
+        }
+        .bar-1 { height: 6px; animation-delay: 0.0s; }
+        .bar-2 { height: 14px; animation-delay: 0.25s; }
+        .bar-3 { height: 10px; animation-delay: 0.4s; }
+        .bar-4 { height: 16px; animation-delay: 0.15s; }
+
+        @keyframes eqPulse {
+            0% { height: 4px; }
+            50% { height: 15px; }
+            100% { height: 7px; }
+        }
+
+        .medixly-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: clamp(3.2rem, 7.5vw, 5.5rem) !important;
+            font-weight: 900 !important;
+            letter-spacing: -2px !important;
+            margin: 0 0 16px 0 !important;
+            line-height: 1 !important;
+            background: linear-gradient(135deg, #ffffff 30%, #ff6b9d 75%, #ff1744 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            filter: drop-shadow(0 4px 20px rgba(255, 23, 68, 0.45)) !important;
+        }
+
+        .medixly-subtitle {
+            font-size: clamp(1rem, 1.8vw, 1.2rem) !important;
+            line-height: 1.6 !important;
+            color: #f1d3dc !important;
+            max-width: 620px !important;
+            margin: 0 auto 26px auto !important;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8) !important;
+        }
+
+        .medixly-feature-pills {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .m-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #ffd6e4;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+        }
+
+        .medixly-listen-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #ff1744 0%, #e11d48 45%, #ec4899 100%);
+            color: #ffffff !important;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.08rem;
+            letter-spacing: -0.2px;
+            padding: 16px 38px;
+            border-radius: 9999px;
+            text-decoration: none;
+            box-shadow: 
+                0 8px 30px rgba(225, 29, 72, 0.5),
+                0 0 20px rgba(255, 45, 135, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, filter 0.25s ease;
+        }
+
+        .medixly-listen-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 
+                0 12px 40px rgba(225, 29, 72, 0.7),
+                0 0 30px rgba(255, 45, 135, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            filter: brightness(1.1);
+            color: #ffffff !important;
+        }
+
+        .medixly-listen-btn:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
+        }
+
+        #bento-harmony:hover {
+            border-color: #ff2d87;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(225, 29, 72, 0.45);
+        }
+        /* --- END: Medixly Styling --- */
     </style>
 
     <!-- GPT SRA and Lazy Loading setup -->

@@ -199,6 +199,7 @@
                 <ul>
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
+                    <li><a href="#waitlist" class="nav-link">⚔️ DTS Whitelist</a></li>
                     <li><a href="#bookings" class="nav-link">Bookings</a></li>
                     <li><a href="#quotes" class="nav-link">Quotes</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
@@ -321,6 +322,76 @@
                 </div>
             </section>
 
+            <section id="waitlist" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+                    <div>
+                        <h3 style="margin: 0 0 6px;">⚔️ Dreams TimeSkip Whitelist & Founders</h3>
+                        <p style="color: var(--text-secondary); margin: 0; font-size: 0.92rem;">
+                            Live registrations, Founder rank holders, linked Minecraft usernames, and server access roster.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button id="export-whitelist-json-btn" class="btn-action btn-sm" style="padding: 10px 18px; font-weight: 600; background: var(--accent-blue); color: #fff; border: none; border-radius: 6px;">
+                            📥 Export whitelist.json
+                        </button>
+                        <button id="refresh-waitlist-btn" class="btn-action btn-sm" style="padding: 10px 16px; border-radius: 6px;">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="value" id="wl-metric-total">-</div>
+                        <div class="label">Total Whitelist Sign-ups</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="value" id="wl-metric-founders" style="color: var(--accent-yellow);">-</div>
+                        <div class="label">Founder Rank Holders</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="value" id="wl-metric-mc">-</div>
+                        <div class="label">Minecraft IGNs Linked</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="value" id="wl-metric-discord">-</div>
+                        <div class="label">Discord Handles Linked</div>
+                    </div>
+                </div>
+
+                <!-- Controls & Search -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                    <input type="text" id="wl-search-input" placeholder="Search by Minecraft IGN, email, site username, discord..." style="flex: 1; min-width: 260px; padding: 10px 14px; background: var(--input-bg, #1a1d24); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px;">
+                    <select id="wl-rank-filter" class="graph-dropdown" style="padding: 10px 14px;">
+                        <option value="all">All Ranks</option>
+                        <option value="Founder">Founders Only</option>
+                        <option value="Member">Members Only</option>
+                    </select>
+                </div>
+
+                <!-- Whitelist Table Container -->
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">Skin</th>
+                                <th>Minecraft IGN</th>
+                                <th>Site User / Email</th>
+                                <th>Rank</th>
+                                <th>Discord</th>
+                                <th>Birthday</th>
+                                <th>Registered</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waitlist-table-body">
+                            <tr><td colspan="8" style="text-align: center; padding: 24px;">Loading whitelist roster...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <section id="featurerequests" class="content-section">
                 <h3>App Feature Requests (ezManage)</h3>
                 <div class="user-table-container">
@@ -395,7 +466,7 @@
    <script type="module">
         import { auth, db } from '/js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-        import { doc, getDoc, collection, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+        import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
         import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
         import { fetchCollectionData, escapeHTML } from '/js/utils.js';
 
@@ -591,12 +662,17 @@
                     getDoc(doc(db, "site_stats", "downloads")).catch(e => {
                         document.getElementById('download-count-infosheet').textContent = "N/A";
                         return null;
+                    }),
+                    getDocs(collection(db, "dts_waitlist")).catch(e => {
+                        console.error("Manager info: [Error fetching waitlist:]", e);
+                        return null;
                     })
                 ];
 
                 const [
                     usersSnapshot, cartsSnapshot, ordersSnapshot, newsletterSnapshot,
-                    bookingsSnap, quotesSnap, tickets, featureRequestsSnapshot, statsDoc
+                    bookingsSnap, quotesSnap, tickets, featureRequestsSnapshot, statsDoc,
+                    waitlistSnapshot
                 ] = await Promise.all(promises);
 
                 let users = usersSnapshot ? usersSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
@@ -606,6 +682,7 @@
                 let bookings = bookingsSnap ? bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
                 bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
                 let quotes = quotesSnap ? quotesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
+                let waitlist = waitlistSnapshot ? waitlistSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
 
                 // Core Calculations
                 const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
@@ -616,6 +693,7 @@
 
                 // Renderers
                 renderUserTable(users);
+                renderWaitlistTable(waitlist, users);
                 renderNewsletterTable(subscribers); 
                 calculatePerformanceMetrics(users, carts, orders, bookings, quotes);
                 renderChart('summary', users);
@@ -636,6 +714,168 @@
             } catch (error) {
                 console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
             }
+        }
+
+        let allWaitlistData = [];
+
+        function renderWaitlistTable(entries, usersList = []) {
+            const entryMap = new Map();
+
+            // 1. Add entries from dts_waitlist collection
+            entries.forEach(item => {
+                const key = item.uid || item.id || item.minecraftUsername;
+                if (key) {
+                    entryMap.set(key, { ...item });
+                }
+            });
+
+            // 2. Cross-reference users collection for whitelisted members
+            usersList.forEach(u => {
+                if (u.minecraftUsername || u.isWhitelisted) {
+                    if (!entryMap.has(u.id)) {
+                        entryMap.set(u.id, {
+                            id: u.id,
+                            uid: u.id,
+                            minecraftUsername: u.minecraftUsername || 'Unknown',
+                            siteUsername: u.username || 'User',
+                            email: u.email || 'N/A',
+                            rank: u.dtsRank || (u.isFounder ? 'Founder' : 'Member'),
+                            isFounder: u.isFounder || (u.dtsRank === 'Founder'),
+                            discordUsername: u.discordUsername || '',
+                            birthday: u.birthday || '',
+                            createdAt: u.whitelistedAt || u.signupDate || null,
+                            serverIp: 'dts.realunstoppable.store'
+                        });
+                    } else {
+                        const existing = entryMap.get(u.id);
+                        if (!existing.email && u.email) existing.email = u.email;
+                        if (!existing.siteUsername && u.username) existing.siteUsername = u.username;
+                        if (!existing.discordUsername && u.discordUsername) existing.discordUsername = u.discordUsername;
+                        if (!existing.birthday && u.birthday) existing.birthday = u.birthday;
+                    }
+                }
+            });
+
+            allWaitlistData = Array.from(entryMap.values());
+
+            // Metrics calculation
+            const total = allWaitlistData.length;
+            const founders = allWaitlistData.filter(w => w.isFounder || w.rank === 'Founder').length;
+            const mcCount = allWaitlistData.filter(w => w.minecraftUsername && w.minecraftUsername.trim().length > 0).length;
+            const discordCount = allWaitlistData.filter(w => w.discordUsername && w.discordUsername.trim().length > 0).length;
+
+            const metricTotalEl = document.getElementById('wl-metric-total');
+            const metricFoundersEl = document.getElementById('wl-metric-founders');
+            const metricMcEl = document.getElementById('wl-metric-mc');
+            const metricDiscordEl = document.getElementById('wl-metric-discord');
+
+            if (metricTotalEl) metricTotalEl.textContent = total;
+            if (metricFoundersEl) metricFoundersEl.textContent = founders;
+            if (metricMcEl) metricMcEl.textContent = mcCount;
+            if (metricDiscordEl) metricDiscordEl.textContent = discordCount;
+
+            filterAndDisplayWaitlist();
+        }
+
+        function filterAndDisplayWaitlist() {
+            const searchVal = (document.getElementById('wl-search-input')?.value || '').toLowerCase().trim();
+            const rankFilter = document.getElementById('wl-rank-filter')?.value || 'all';
+            const tbody = document.getElementById('waitlist-table-body');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+
+            const filtered = allWaitlistData.filter(item => {
+                const isFounder = item.isFounder || (item.rank === 'Founder');
+                const rankMatch = (rankFilter === 'all') || 
+                    (rankFilter === 'Founder' && isFounder) ||
+                    (rankFilter === 'Member' && !isFounder);
+
+                if (!rankMatch) return false;
+                if (!searchVal) return true;
+
+                const mc = (item.minecraftUsername || '').toLowerCase();
+                const site = (item.siteUsername || '').toLowerCase();
+                const email = (item.email || '').toLowerCase();
+                const discord = (item.discordUsername || '').toLowerCase();
+
+                return mc.includes(searchVal) || site.includes(searchVal) || email.includes(searchVal) || discord.includes(searchVal);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color: var(--text-secondary);">No waitlist entries match your criteria.</td></tr>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            filtered.forEach(item => {
+                const tr = document.createElement('tr');
+                const ign = item.minecraftUsername || 'Unknown';
+                const isFounder = item.isFounder || (item.rank === 'Founder');
+                const rankBadge = isFounder 
+                    ? `<span class="status-badge pro" style="border: 1px solid var(--accent-yellow); font-weight: bold;">⚔️ Founder</span>`
+                    : `<span class="status-badge active">Member</span>`;
+
+                let dateStr = 'N/A';
+                if (item.createdAt) {
+                    if (typeof item.createdAt.toDate === 'function') {
+                        dateStr = item.createdAt.toDate().toLocaleDateString();
+                    } else if (item.createdAt.seconds) {
+                        dateStr = new Date(item.createdAt.seconds * 1000).toLocaleDateString();
+                    } else {
+                        dateStr = new Date(item.createdAt).toLocaleDateString();
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td>
+                        <img src="https://mc-heads.net/avatar/${encodeURIComponent(ign)}/32" alt="${escapeHTML(ign)}" style="width: 32px; height: 32px; border-radius: 4px; image-rendering: pixelated; vertical-align: middle; background: #000;" onerror="this.src='https://mc-heads.net/avatar/Steve/32'">
+                    </td>
+                    <td>
+                        <strong>${escapeHTML(ign)}</strong>
+                    </td>
+                    <td>
+                        <div>${escapeHTML(item.siteUsername || 'Player')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHTML(item.email || '')}</div>
+                    </td>
+                    <td>${rankBadge}</td>
+                    <td>${item.discordUsername ? `<span style="color: #5865F2; font-weight: 500;">${escapeHTML(item.discordUsername)}</span>` : '<span style="color: var(--text-secondary);">-</span>'}</td>
+                    <td>${item.birthday ? escapeHTML(item.birthday) : '<span style="color: var(--text-secondary);">-</span>'}</td>
+                    <td>${dateStr}</td>
+                    <td>
+                        <button class="btn-sm btn-action wl-copy-btn" data-ign="${escapeHTML(ign)}">Copy IGN</button>
+                        <button class="btn-sm btn-danger wl-remove-btn" data-id="${escapeHTML(item.id || item.uid)}" data-ign="${escapeHTML(ign)}">Revoke</button>
+                    </td>
+                `;
+                fragment.appendChild(tr);
+            });
+
+            tbody.appendChild(fragment);
+        }
+
+        function exportWhitelistJson() {
+            if (!allWaitlistData || allWaitlistData.length === 0) {
+                alert('No whitelist records to export.');
+                return;
+            }
+
+            const exportList = allWaitlistData.map(entry => ({
+                name: entry.minecraftUsername,
+                rank: (entry.isFounder || entry.rank === 'Founder') ? 'Founder' : 'Member',
+                discord: entry.discordUsername || '',
+                email: entry.email || '',
+                birthday: entry.birthday || '',
+                whitelistedAt: entry.createdAt || new Date().toISOString()
+            }));
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportList, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `dts-whitelist-${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
         function renderBookingsTable(bookings) {
@@ -1083,6 +1323,50 @@
                     }
                 });
             }
+            // Whitelist Controls & Actions
+            document.getElementById('wl-search-input')?.addEventListener('input', () => filterAndDisplayWaitlist());
+            document.getElementById('wl-rank-filter')?.addEventListener('change', () => filterAndDisplayWaitlist());
+            document.getElementById('export-whitelist-json-btn')?.addEventListener('click', () => exportWhitelistJson());
+            document.getElementById('refresh-waitlist-btn')?.addEventListener('click', () => loadAdminData());
+
+            document.getElementById('waitlist-table-body')?.addEventListener('click', async (e) => {
+                const copyBtn = e.target.closest('.wl-copy-btn');
+                if (copyBtn) {
+                    const ign = copyBtn.dataset.ign;
+                    navigator.clipboard.writeText(ign).then(() => {
+                        const orig = copyBtn.textContent;
+                        copyBtn.textContent = 'Copied!';
+                        setTimeout(() => { copyBtn.textContent = orig; }, 1800);
+                    });
+                    return;
+                }
+
+                const removeBtn = e.target.closest('.wl-remove-btn');
+                if (removeBtn) {
+                    const id = removeBtn.dataset.id;
+                    const ign = removeBtn.dataset.ign;
+                    if (confirm(`Are you sure you want to revoke whitelist access for ${ign}?`)) {
+                        try {
+                            removeBtn.disabled = true;
+                            removeBtn.textContent = 'Revoking...';
+                            await deleteDoc(doc(db, "dts_waitlist", id));
+                            try {
+                                await setDoc(doc(db, "users", id), { isWhitelisted: false }, { merge: true });
+                            } catch (uErr) {
+                                console.warn('Could not update user doc:', uErr);
+                            }
+                            allWaitlistData = allWaitlistData.filter(w => (w.id !== id && w.uid !== id));
+                            filterAndDisplayWaitlist();
+                        } catch (err) {
+                            console.error('Error revoking whitelist:', err);
+                            alert(`Failed to revoke whitelist: ${err.message}`);
+                            removeBtn.disabled = false;
+                            removeBtn.textContent = 'Revoke';
+                        }
+                    }
+                }
+            });
+
             document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
             document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
 

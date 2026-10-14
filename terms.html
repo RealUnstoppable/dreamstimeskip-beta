@@ -1,46 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - Unstoppable</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script type="module" src="js/navbar.js" defer></script>
+    <title>Terms and Conditions | Unstoppable Ecosystem</title>
+    <meta name="description" content="Terms and Conditions governing the use of Unstoppable, Medixly, Dreams TimeSkip, the Shop, and all related services.">
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    
     <style>
-        .legal-container { max-width: 800px; margin: 120px auto 40px; padding: 20px; color: #fff; line-height: 1.6; }
-        .legal-container h1 { font-size: 2.5rem; margin-bottom: 20px; color: #14b8a6; }
-        .legal-container h2 { font-size: 1.5rem; margin-top: 30px; margin-bottom: 10px; color: #fff; }
-        .legal-container p { margin-bottom: 15px; color: #aaa; }
-        .legal-container a { color: #14b8a6; text-decoration: none; }
+        .legal-wrapper {
+            max-width: 900px;
+            margin: 120px auto 60px;
+            padding: 0 24px;
+            color: var(--text-primary, #f5f5f7);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+
+        .legal-header {
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+        }
+
+        .legal-badge {
+            display: inline-block;
+            background: rgba(20, 184, 166, 0.15);
+            color: #14b8a6;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(20, 184, 166, 0.3);
+        }
+
+        .legal-header h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--text-primary, #ffffff);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .legal-meta {
+            color: var(--text-secondary, #a3a3a3);
+            font-size: 0.95rem;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legal-notice-box {
+            background: var(--primary-card-color, #141414);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-left: 4px solid #14b8a6;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .legal-notice-box p {
+            margin: 0;
+            color: var(--text-secondary, #d1d5db);
+            font-size: 0.98rem;
+        }
+
+        .toc-container {
+            background: var(--primary-card-color, #141414);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        .toc-container h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary, #ffffff);
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px 20px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc-grid li a {
+            color: var(--text-secondary, #a3a3a3);
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: color 0.2s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .toc-grid li a:hover {
+            color: #14b8a6;
+            transform: translateX(3px);
+        }
+
+        .legal-section {
+            margin-bottom: 45px;
+            scroll-margin-top: 100px;
+        }
+
+        .legal-section h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--text-primary, #ffffff);
+            margin-top: 0;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legal-section h2 span.section-num {
+            color: #14b8a6;
+            font-size: 1.2rem;
+        }
+
+        .legal-section h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-primary, #f5f5f7);
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+
+        .legal-section p {
+            color: var(--text-secondary, #b3b3b3);
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+
+        .legal-section ul, .legal-section ol {
+            color: var(--text-secondary, #b3b3b3);
+            padding-left: 24px;
+            margin-bottom: 18px;
+        }
+
+        .legal-section li {
+            margin-bottom: 8px;
+        }
+
+        .legal-section a {
+            color: #14b8a6;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: opacity 0.2s;
+        }
+
+        .legal-section a:hover {
+            opacity: 0.85;
+        }
+
+        .highlight-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 16px 0;
+        }
+
+        .contact-box {
+            background: var(--primary-card-color, #141414);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .contact-box h3 {
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .contact-box p {
+            color: var(--text-secondary, #a3a3a3);
+            margin-bottom: 20px;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-legal-cta {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #14b8a6;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .btn-legal-cta:hover {
+            background: #0f9183;
+            transform: translateY(-2px);
+        }
+
+        .btn-legal-secondary {
+            display: inline-block;
+            padding: 12px 24px;
+            background: transparent;
+            color: var(--text-primary, #ffffff);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+
+        .btn-legal-secondary:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        @media (max-width: 768px) {
+            .legal-wrapper {
+                margin-top: 90px;
+                padding: 0 16px;
+            }
+            .legal-header h1 {
+                font-size: 2.1rem;
+            }
+            .toc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body class="dark-theme">
-    <div id="navbar-placeholder"></div>
+    <header class="main-header"></header>
 
-    <main class="legal-container">
-        <h1>Terms of Service</h1>
-        <p>Last updated: September 25, 2026</p>
+    <main class="legal-wrapper">
+        <header class="legal-header">
+            <span class="legal-badge">Legal Documentation</span>
+            <h1>Terms and Conditions</h1>
+            <div class="legal-meta">
+                <span><strong>Entity:</strong> Unstoppable LLC</span>
+                <span><strong>Effective Date:</strong> October 14, 2026</span>
+                <span><strong>Last Updated:</strong> October 14, 2026</span>
+            </div>
+        </header>
 
-        <h2>1. Acceptance of Terms</h2>
-        <p>By accessing or using the Real Unstoppable website, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access our service.</p>
+        <div class="legal-notice-box">
+            <p><strong>Important Notice:</strong> These Terms and Conditions ("Terms") constitute a legally binding agreement between you and Unstoppable LLC governing your access to and use of our central website, platforms, and digital ecosystems—including the Unstoppable Hub, Medixly Music, Dreams TimeSkip, ezManage Tracker, the Unstoppable Shop, Memberships, and related services. Please review these Terms thoroughly before using our services.</p>
+        </div>
 
-        <h2>2. User Accounts</h2>
-        <p>When you create an account, you are responsible for maintaining the security of your account and password. You are fully responsible for all activities that occur under the account.</p>
+        <nav class="toc-container" aria-label="Table of Contents">
+            <h3>Table of Contents</h3>
+            <ol class="toc-grid">
+                <li><a href="#section-1">1. Acceptance of Terms</a></li>
+                <li><a href="#section-2">2. Eligibility & Account Security</a></li>
+                <li><a href="#section-3">3. Ecosystem Services & Beta Features</a></li>
+                <li><a href="#section-4">4. Medixly Music Streaming</a></li>
+                <li><a href="#section-5">5. Dreams TimeSkip Universe</a></li>
+                <li><a href="#section-6">6. E-Commerce & Merch Shop</a></li>
+                <li><a href="#section-7">7. Memberships, Subscriptions & Billing</a></li>
+                <li><a href="#section-8">8. Loyalty Points & Promo Codes</a></li>
+                <li><a href="#section-9">9. User Content & Community Conduct</a></li>
+                <li><a href="#section-10">10. Intellectual Property Rights</a></li>
+                <li><a href="#section-11">11. Third-Party Integrations & Ads</a></li>
+                <li><a href="#section-12">12. Disclaimer of Warranties</a></li>
+                <li><a href="#section-13">13. Limitation of Liability</a></li>
+                <li><a href="#section-14">14. Indemnification</a></li>
+                <li><a href="#section-15">15. Termination & Suspension</a></li>
+                <li><a href="#section-16">16. Governing Law & Dispute Resolution</a></li>
+                <li><a href="#section-17">17. Modifications to Terms</a></li>
+                <li><a href="#section-18">18. Contact & Legal Notices</a></li>
+            </ol>
+        </nav>
 
-        <h2>3. Subscriptions and Payments</h2>
-        <p>Some features require a Premium or Ultimate subscription. By subscribing, you agree to pay the associated fees. Subscriptions can be canceled at any time from your account settings.</p>
+        <section id="section-1" class="legal-section">
+            <h2><span class="section-num">1.</span> Acceptance of Terms</h2>
+            <p>By accessing, browsing, registering an account on, subscribing to, or purchasing from <strong>realunstoppable.store</strong> or any affiliated web properties (collectively, the "Site" or "Services"), you acknowledge that you have read, understood, and agree to be bound by these Terms and our <a href="privacy.html">Privacy Policy</a>.</p>
+            <p>If you do not agree with any provision contained herein, you must immediately discontinue your access to and use of the Site and Services.</p>
+        </section>
 
-        <h2>4. Content and Copyright</h2>
-        <p>All original content, trademarks, and intellectual property on this site belong to Unstoppable LLC. You may not distribute or reproduce our content without permission.</p>
+        <section id="section-2" class="legal-section">
+            <h2><span class="section-num">2.</span> Eligibility & Account Security</h2>
+            <p>To register an account or initiate digital transactions on our Site, you must be at least 13 years of age (or the minimum legal age of consent in your jurisdiction). If you are between 13 and the legal age of majority, you affirm that you have reviewed these Terms with your parent or legal guardian and that they consent to your use.</p>
+            <p>When creating an account, you agree to:</p>
+            <ul>
+                <li>Provide accurate, current, and complete registration credentials.</li>
+                <li>Maintain the confidentiality of your password and account credentials.</li>
+                <li>Promptly notify us at <a href="mailto:unstoppableplays2016@hotmail.com">unstoppableplays2016@hotmail.com</a> of any unauthorized access or security breach.</li>
+                <li>Accept full responsibility for all activities occurring under your account credentials.</li>
+            </ul>
+            <p>Unstoppable LLC reserves the right to suspend or terminate accounts containing false information or displaying unauthorized activity.</p>
+        </section>
 
-        <h2>5. Changes to Terms</h2>
-        <p>We reserve the right to modify these terms at any time. We will notify users of any significant changes.</p>
+        <section id="section-3" class="legal-section">
+            <h2><span class="section-num">3.</span> Ecosystem Services & Beta Features</h2>
+            <p>The Unstoppable ecosystem incorporates multiple ongoing projects, digital applications, and interactive experiences, including but not limited to:</p>
+            <ul>
+                <li><strong>Unstoppable Hub:</strong> The centralized dashboard and status monitor for all network projects.</li>
+                <li><strong>ezManage Tracker (Beta):</strong> Project tracking, roadmap timelines, and task management systems.</li>
+                <li><strong>Squishly / Blobgame (Beta):</strong> Physics-driven mini-games and interactive demos.</li>
+                <li><strong>Autolux:</strong> Vehicle detailing services and booking consultation interfaces.</li>
+            </ul>
+            <div class="highlight-card">
+                <p><strong>Beta Software Notice:</strong> Certain features, pages, or games on the Site are explicitly identified as "Beta" or experimental releases. Beta features are provided for evaluation purposes, may contain bugs or service disruptions, and may be updated, altered, or retired at any time without notice.</p>
+            </div>
+        </section>
+
+        <section id="section-4" class="legal-section">
+            <h2><span class="section-num">4.</span> Medixly Music Streaming</h2>
+            <p>Medixly provides on-demand digital music streaming, synchronized lyric viewing, song discovery, artist profiles, and personalized playlists. By utilizing Medixly, you agree that:</p>
+            <ul>
+                <li>Audio playback is granted strictly under a personal, non-exclusive, non-transferable, revocable license for private, non-commercial entertainment.</li>
+                <li>You may not capture, rip, download, scrape, re-stream, broadcast, or redistribute any musical recordings, audio assets, or synchronized lyrics from Medixly.</li>
+                <li>Free-tier accounts may be subject to skip limits, audio promotions, or sponsored content, which are removed or expanded for active Premium and Ultimate subscribers.</li>
+            </ul>
+        </section>
+
+        <section id="section-5" class="legal-section">
+            <h2><span class="section-num">5.</span> Dreams TimeSkip Universe</h2>
+            <p>Dreams TimeSkip encompasses original animated media, narrative storylines, episodic video trailers, Minecraft adventure worlds, and associated soundtracks. All characters, names, scripts, original world designs, and audiovisual presentations are the exclusive intellectual property of Unstoppable LLC and Catalin Andrian. You may not claim ownership or produce commercial adaptations without explicit written license from Unstoppable LLC.</p>
+        </section>
+
+        <section id="section-6" class="legal-section">
+            <h2><span class="section-num">6.</span> E-Commerce & Merch Shop</h2>
+            <p>Our online shop enables users to purchase official physical merchandise (apparel, streetwear, accessories, stickers, posters) and digital perks. The following terms govern all store purchases:</p>
+            <h3>Pricing & Availability</h3>
+            <p>All prices are listed in USD ($) and are subject to change without prior notice. We reserve the right to correct pricing errors and cancel orders resulting from typographical or clerical mistakes.</p>
+            <h3>Order Processing & Fulfillment</h3>
+            <p>Placing an order constitutes an offer to purchase. Orders are confirmed once processed and billed. You are responsible for ensuring that all shipping address details and contact details are accurate at checkout.</p>
+            <h3>Returns & Refunds</h3>
+            <p>If physical merchandise arrives damaged, defective, or misprinted, you must contact <a href="mailto:unstoppableplays2016@hotmail.com">unstoppableplays2016@hotmail.com</a> within 14 calendar days of delivery with photographic evidence. Digital passes, downloadable items, and redeemed points are strictly non-refundable.</p>
+        </section>
+
+        <section id="section-7" class="legal-section">
+            <h2><span class="section-num">7.</span> Memberships, Subscriptions & Billing</h2>
+            <p>We provide tiered memberships (Free, Premium, and Ultimate) granting premium benefits such as ad-free navigation, unlimited Medixly skips, exclusive merchandise discounts, and early beta access.</p>
+            <ul>
+                <li><strong>Billing Cycle:</strong> Paid subscriptions are billed on a recurring monthly or annual basis via our authorized payment processors (including Stripe).</li>
+                <li><strong>Automatic Renewal:</strong> Unless canceled prior to the renewal date, subscriptions automatically renew at the applicable prevailing rate.</li>
+                <li><strong>Cancellation:</strong> You may cancel your subscription at any time via your <a href="account.html">Account Settings</a>. Your benefits will remain active until the conclusion of your current paid billing period.</li>
+                <li><strong>Fee Changes:</strong> Unstoppable LLC reserves the right to modify membership pricing upon giving reasonable advance notice to active subscribers.</li>
+            </ul>
+        </section>
+
+        <section id="section-8" class="legal-section">
+            <h2><span class="section-num">8.</span> Loyalty Points & Promo Codes</h2>
+            <p>Users can earn Unstoppable Points through qualifying purchases, community participation, and account milestones. Points have no monetary cash value, cannot be redeemed for legal currency, and may only be applied toward eligible discounts or perks in the Unstoppable Shop as outlined in our promotional guidelines. Promotional codes (such as introductory discounts) are subject to expiration and may not be combined unless expressly stated.</p>
+        </section>
+
+        <section id="section-9" class="legal-section">
+            <h2><span class="section-num">9.</span> User Content & Community Conduct</h2>
+            <p>When participating in our community blog comments, feature request forums, or user profile sections, you agree to maintain a respectful and lawful environment. You agree NOT to transmit, post, or distribute:</p>
+            <ul>
+                <li>Content that is unlawful, defamatory, harassing, threatening, abusive, hateful, or discriminatory.</li>
+                <li>Spam, unsolicited advertising, chain letters, or commercial solicitations.</li>
+                <li>Files containing viruses, trojans, worms, malicious scripts, or data-mining tools.</li>
+                <li>Content that infringes any copyright, trademark, trade secret, or privacy right of any party.</li>
+            </ul>
+            <p>By submitting comments or feedback to our Site, you grant Unstoppable LLC a worldwide, perpetual, royalty-free license to use, display, reproduce, and adapt your feedback for platform improvement.</p>
+        </section>
+
+        <section id="section-10" class="legal-section">
+            <h2><span class="section-num">10.</span> Intellectual Property Rights</h2>
+            <p>All content included on the Site—such as text, graphics, logos, icons, audio tracks, video clips, user interfaces, code, stylesheets, and compilation—is the exclusive property of Unstoppable LLC, Catalin Andrian, or its content licensors, protected under applicable United States and international copyright and trademark laws.</p>
+            <p>"Unstoppable", "UN250", "Medixly", and "Dreams TimeSkip" are trademarks and trade dress of Unstoppable LLC. No trademark or trade dress may be used in connection with any third-party product or service without prior written authorization.</p>
+        </section>
+
+        <section id="section-11" class="legal-section">
+            <h2><span class="section-num">11.</span> Third-Party Integrations & Ads</h2>
+            <p>The Site incorporates third-party services, including Google AdSense advertising, Firebase authentication/database services, Stripe payment processing, and embedded YouTube videos. We are not responsible for the privacy practices, content, or accuracy of third-party platforms. Your interactions with third-party providers are governed by their respective terms and privacy policies.</p>
+        </section>
+
+        <section id="section-12" class="legal-section">
+            <h2><span class="section-num">12.</span> Disclaimer of Warranties</h2>
+            <p>TO THE MAXIMUM EXTENT PERMITTED UNDER APPLICABLE LAW, THE SITE, SERVICES, BETA FEATURES, MERCHANDISE, AND DIGITAL CONTENT ARE PROVIDED ON AN <strong>"AS IS"</strong> AND <strong>"AS AVAILABLE"</strong> BASIS WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE.</p>
+            <p>UNSTOPPABLE LLC EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. WE DO NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED, TIMELY, SECURE, OR ERROR-FREE.</p>
+        </section>
+
+        <section id="section-13" class="legal-section">
+            <h2><span class="section-num">13.</span> Limitation of Liability</h2>
+            <p>IN NO EVENT SHALL UNSTOPPABLE LLC, ITS DIRECTORS, OFFICERS, EMPLOYEES, AFFILIATES, AGENTS, OR LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES—INCLUDING LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES—RESULTING FROM (I) YOUR ACCESS TO OR INABILITY TO ACCESS THE SERVICES; (II) ANY CONDUCT OR CONTENT OF ANY THIRD PARTY; OR (III) UNAUTHORIZED ACCESS TO OR ALTERATION OF YOUR TRANSMISSIONS OR DATA.</p>
+            <p>IN NO CIRCUMSTANCES SHALL OUR AGGREGATE LIABILITY EXCEED THE GREATER OF ONE HUNDRED DOLLARS ($100 USD) OR THE AMOUNT PAID BY YOU TO UNSTOPPABLE LLC IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.</p>
+        </section>
+
+        <section id="section-14" class="legal-section">
+            <h2><span class="section-num">14.</span> Indemnification</h2>
+            <p>You agree to indemnify, defend, and hold harmless Unstoppable LLC, its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal and accounting fees) arising out of or in any way connected with your breach of these Terms or your misuse of the Site.</p>
+        </section>
+
+        <section id="section-15" class="legal-section">
+            <h2><span class="section-num">15.</span> Termination & Suspension</h2>
+            <p>We reserve the right, without prior notice and at our sole discretion, to suspend or terminate your account or revoke your license to access the Site if you violate any provision of these Terms, engage in fraudulent transactions, or compromise the security or community experience of the platform.</p>
+        </section>
+
+        <section id="section-16" class="legal-section">
+            <h2><span class="section-num">16.</span> Governing Law & Dispute Resolution</h2>
+            <p>These Terms and any dispute arising out of or related to your use of the Services shall be governed by and construed in accordance with the laws of the United States, without regard to its conflict of law provisions.</p>
+            <p>Before initiating any formal legal dispute, you agree to contact us informally at <a href="mailto:unstoppableplays2016@hotmail.com">unstoppableplays2016@hotmail.com</a> and make a good-faith effort to resolve the dispute amicably with our leadership team.</p>
+        </section>
+
+        <section id="section-17" class="legal-section">
+            <h2><span class="section-num">17.</span> Modifications to Terms</h2>
+            <p>We may revise these Terms from time to time to reflect product enhancements, statutory changes, or platform evolutions. When updates are published, the "Last Updated" date at the top of this document will be amended accordingly. Continued use of the Site following the posting of amended Terms constitutes your acceptance of the revisions.</p>
+        </section>
+
+        <section id="section-18" class="legal-section">
+            <h2><span class="section-num">18.</span> Contact & Legal Notices</h2>
+            <p>For questions, legal inquiries, copyright notices, or clarifications regarding these Terms and Conditions, please contact us through any of the following channels:</p>
+            <ul>
+                <li><strong>Entity:</strong> Unstoppable LLC</li>
+                <li><strong>Email:</strong> <a href="mailto:unstoppableplays2016@hotmail.com">unstoppableplays2016@hotmail.com</a></li>
+                <li><strong>Community Support:</strong> <a href="https://discord.gg/6zdH5De3ab" target="_blank" rel="noopener">Official Discord Server</a></li>
+                <li><strong>Help Desk:</strong> <a href="support.html">Support Center</a></li>
+                <li><strong>Privacy Policy:</strong> <a href="privacy.html">Privacy Documentation</a></li>
+            </ul>
+
+            <div class="contact-box">
+                <h3>Have Questions About Our Terms?</h3>
+                <p>Our team is committed to transparency across the entire Unstoppable ecosystem.</p>
+                <div class="contact-actions">
+                    <a href="mailto:unstoppableplays2016@hotmail.com" class="btn-legal-cta">Contact Legal Support</a>
+                    <a href="privacy.html" class="btn-legal-secondary">Read Privacy Policy</a>
+                    <a href="index.html" class="btn-legal-secondary">Return to Hub</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="main-footer"></footer>
+
     <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=1791167958698';
         import { loadFooter } from './js/footer.js?v=1791167958698';
-        document.addEventListener('DOMContentLoaded', loadFooter);
+        
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
 </html>
