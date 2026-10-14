@@ -56,14 +56,15 @@ export async function getCachedUserProfile(user) {
 
     try {
         const userDocRef = doc(db, "users", uid);
-        const userDoc = await getDoc(userDocRef);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Profile fetch timeout')), 3500));
+        const userDoc = await Promise.race([getDoc(userDocRef), timeoutPromise]);
         if (userDoc.exists()) {
             const userData = userDoc.data();
             sessionStorage.setItem(cacheKey, JSON.stringify(userData));
             return userData;
         }
     } catch (error) {
-        console.error("Manager info: Error fetching user profile:", error.message || error);
+        console.warn("Manager info: Error fetching user profile:", error.message || error);
     }
     return null;
 }

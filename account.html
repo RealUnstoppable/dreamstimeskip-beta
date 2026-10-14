@@ -21,7 +21,7 @@
         <aside class="sidebar">
             <a href="admin.html" id="admin-back-button" class="btn-admin-back">&#8592; Back to Admin</a>
             <div class="sidebar-header">
-                <h2 id="welcome-header">Loading...</h2>
+                <h2 id="welcome-header">My Account</h2>
                 <p id="user-email-sidebar"></p>
             </div>
             <nav class="sidebar-nav">
@@ -70,12 +70,12 @@
                 <div class="card" style="margin-top: 20px;">
                     <h4>Loyalty Rewards</h4>
                     <p style="font-size: 1.5rem; font-weight: bold; margin: 10px 0; color: var(--accent-blue);">
-                        ✨ <span id="points-balance-display">Loading...</span> Points
+                        ✨ <span id="points-balance-display">0</span> Points
                     </p>
                     <p style="color: var(--text-secondary); margin-bottom: 15px;">Earn points by completing purchases and leaving reviews!</p>
                     <h5>Recent Activity</h5>
                     <div id="reward-transactions-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
-                        <p style="color: var(--text-secondary);">Loading activity...</p>
+                        <p style="color: var(--text-secondary);">No recent activity.</p>
                     </div>
                 </div>
             </section>
@@ -84,7 +84,7 @@
                 <h3>Order History</h3>
                 <div class="card" id="orders-container">
                     <h4>Recent Purchases</h4>
-                    <p style="color: var(--text-secondary);" id="no-orders-msg">Loading orders...</p>
+                    <p style="color: var(--text-secondary);" id="no-orders-msg">No recent purchases found.</p>
                     <div id="orders-list"></div>
                 </div>
             </section>
@@ -103,7 +103,7 @@
 
                     <h4>Rewards History</h4>
                     <div id="rewards-history-container">
-                        <p style="color: var(--text-secondary);" id="no-rewards-msg">Loading history...</p>
+                        <p style="color: var(--text-secondary);" id="no-rewards-msg">No rewards history yet.</p>
                         <div id="rewards-history-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                         <button id="disable-share-btn" class="btn" style="padding: 5px 10px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--accent-red); color: var(--accent-red); margin-left: 5px;">Make Private</button>
                     </div>
                     <div id="wishlist-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                        <p style="color: var(--text-secondary);">Loading your wishlist...</p>
+                        <p style="color: var(--text-secondary);">Your wishlist is empty.</p>
                     </div>
                 </div>
             </section>
@@ -254,7 +254,7 @@
                 <div class="card">
                     <h4>Your Tickets</h4>
                     <div id="user-tickets-container">
-                        <p style="color: var(--text-secondary);">Loading tickets...</p>
+                        <p style="color: var(--text-secondary);">No support tickets submitted yet.</p>
                     </div>
                 </div>
             </section>
@@ -527,7 +527,7 @@
     </div>
 
     <!-- Account Controller Script -->
-    <script type="module" src="/js/account.js?v=1791167958698"></script>
+    <script type="module" src="/js/account.js?v=20261014_rev3"></script>
     <footer class="main-footer"></footer>
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1791167958698';

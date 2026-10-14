@@ -7,7 +7,6 @@ import { productMap } from './products-data.js';
 import { escapeHTML, formatDate } from './utils.js';
 import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
-import { handleAddToCart, toggleWishlist } from './shop.js';
 
 // Global state
 let currentUser = null;
@@ -110,17 +109,19 @@ export function initTabNavigation() {
 /**
  * 2. PROFILE RENDERING
  */
-export async function renderProfile(user, userData) {
-    if (!user || !userData) return;
+export function renderProfile(user, userData) {
+    if (!user) return;
+    const data = userData || {};
 
     const welcomeHeader = document.getElementById('welcome-header');
     if (welcomeHeader) {
-        welcomeHeader.textContent = `Welcome back, ${escapeHTML(userData.username || user.displayName || 'User')}!`;
+        const displayName = data.username || user.displayName || user.email?.split('@')[0] || 'User';
+        welcomeHeader.textContent = `Welcome back, ${escapeHTML(displayName)}!`;
     }
 
     const emailSidebar = document.getElementById('user-email-sidebar');
     if (emailSidebar) {
-        emailSidebar.textContent = user.email || '';
+        emailSidebar.textContent = user.email || data.email || '';
     }
 
     const usernameInput = document.getElementById('update-username');
@@ -326,16 +327,20 @@ export async function renderRewards(user, userData) {
         // Update displays immediately so it never hangs on "Loading..."
         if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = points;
         if (userLoyaltyPoints) userLoyaltyPoints.textContent = points;
+        if (dashboardActivityList) {
+            dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet. Earn 10 points for every dollar spent in the shop!</p>`;
+        }
 
-        // Fetch reward transactions (WITHOUT orderBy to prevent composite index errors)
+        // Fetch reward transactions (WITHOUT orderBy to prevent composite index errors, with 3s timeout)
         let txs = [];
         try {
             const transactionsRef = collection(db, 'loyalty_transactions');
             const q = query(transactionsRef, where("userId", "==", user.uid));
-            const snap = await getDocs(q);
+            const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000));
+            const snap = await Promise.race([getDocs(q), timeoutPromise]);
             txs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (dbErr) {
-            console.warn("Notice: loyalty_transactions query notice:", dbErr);
+            console.warn("Notice: loyalty_transactions query notice:", dbErr.message || dbErr);
         }
 
         // If no transactions exist, seed the welcome 50 points transaction into Firestore
@@ -392,37 +397,6 @@ export async function renderRewards(user, userData) {
             };
             return getTime(b.createdAt) - getTime(a.createdAt);
         });
-
-        const createTransactionHtml = (tx, isCompact) => {
-            const isPositive = (tx.points || 0) >= 0;
-            const dateStr = formatDate(tx.createdAt);
-
-            if (isCompact) {
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                        <div>
-                            <strong style="display: block; font-size: 0.9rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
-                            <small style="color: var(--text-secondary);">${dateStr}</small>
-                        </div>
-                        <div style="font-weight: 800; font-size: 0.95rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                            ${isPositive ? '+' : ''}${tx.points} pts
-                        </div>
-                    </div>
-                `;
-            }
-
-            return `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 15px;">
-                    <div>
-                        <strong style="display: block; font-size: 1.05rem; color: #fff;">${escapeHTML(tx.description || 'Points Activity')}</strong>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">${dateStr}</div>
-                    </div>
-                    <div style="font-weight: 800; font-size: 1.1rem; color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'};">
-                        ${isPositive ? '+' : ''}${tx.points} pts
-                    </div>
-                </div>
-            `;
-        };
 
         // 1. Render Dashboard Recent Activity
         if (dashboardActivityList) {
@@ -791,6 +765,41 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     }
 }
 
+async function addWishlistItemToCart(productId) {
+    try {
+        let cart = {};
+        const localCartData = localStorage.getItem('localCart');
+        if (localCartData) {
+            try { cart = JSON.parse(localCartData); } catch (_) {}
+        }
+        cart[productId] = (cart[productId] || 0) + 1;
+        localStorage.setItem('localCart', JSON.stringify(cart));
+        const itemCount = Object.values(cart).reduce((sum, q) => sum + (parseInt(q, 10) || 0), 0);
+        localStorage.setItem('cartItemCount', itemCount.toString());
+        window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart, itemCount } }));
+
+        if (currentUser) {
+            const userCartRef = doc(db, 'carts', currentUser.uid);
+            await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() }, { merge: true });
+        }
+    } catch (err) {
+        console.warn("Notice: Wishlist add to cart:", err);
+    }
+}
+
+async function removeWishlistItem(userId, productId) {
+    try {
+        const wishlistRef = doc(db, 'wishlists', userId);
+        const snap = await getDoc(wishlistRef);
+        if (snap.exists()) {
+            const items = (snap.data().items || []).filter(id => id !== productId);
+            await setDoc(wishlistRef, { items }, { merge: true });
+        }
+    } catch (err) {
+        console.warn("Notice: Wishlist remove item:", err);
+    }
+}
+
 /**
  * 7. USER WISHLIST LOADING
  * Fixes broken DOM element reference and wires item addition/removal.
@@ -877,7 +886,7 @@ export async function loadWishlist(userId) {
                 const orig = addBtn.textContent;
                 addBtn.disabled = true;
                 addBtn.textContent = 'Added! ✓';
-                await handleAddToCart(addBtn.dataset.id);
+                await addWishlistItemToCart(addBtn.dataset.id);
                 setTimeout(() => {
                     addBtn.disabled = false;
                     addBtn.textContent = orig;
@@ -887,7 +896,7 @@ export async function loadWishlist(userId) {
 
             if (removeBtn && !removeBtn.disabled) {
                 removeBtn.disabled = true;
-                await toggleWishlist(removeBtn.dataset.id);
+                await removeWishlistItem(userId, removeBtn.dataset.id);
                 await loadWishlist(userId);
                 return;
             }
@@ -1519,17 +1528,94 @@ export function initAccountPage() {
         });
     }
 
-    // Firebase Auth State
+    // 1. Immediately pre-populate with cached session profile or auth.currentUser if available (0ms delay)
+    try {
+        const cachedUser = auth.currentUser;
+        if (cachedUser) {
+            currentUser = cachedUser;
+            let cachedProfile = null;
+            const stored = sessionStorage.getItem(`profile_${cachedUser.uid}`);
+            if (stored) {
+                try { cachedProfile = JSON.parse(stored); } catch (_) {}
+            }
+            currentUserData = cachedProfile;
+            renderProfile(cachedUser, cachedProfile);
+            renderRewards(cachedUser, cachedProfile);
+            initDailyCheckin(cachedUser, cachedProfile);
+        } else {
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                if (key && key.startsWith('profile_')) {
+                    try {
+                        const pData = JSON.parse(sessionStorage.getItem(key));
+                        if (pData) {
+                            const tempUid = key.replace('profile_', '');
+                            const tempUser = { uid: tempUid, email: pData.email, displayName: pData.username };
+                            currentUserData = pData;
+                            renderProfile(tempUser, pData);
+                            renderRewards(tempUser, pData);
+                            initDailyCheckin(tempUser, pData);
+                            break;
+                        }
+                    } catch (_) {}
+                }
+            }
+        }
+    } catch (preErr) {
+        console.warn("Notice: Pre-render notice:", preErr);
+    }
+
+    // 2. Auth Timeout Safeguard: If Firebase Auth takes > 3.5s, don't leave page hanging
+    const authTimeout = setTimeout(() => {
+        if (!currentUser && !auth.currentUser) {
+            const welcomeHeader = document.getElementById('welcome-header');
+            if (welcomeHeader && (welcomeHeader.textContent === 'Loading...' || welcomeHeader.textContent === 'My Account')) {
+                welcomeHeader.textContent = 'Welcome, Guest';
+            }
+            const dashboardCard = document.querySelector('#dashboard .card');
+            if (dashboardCard && !document.getElementById('auth-warning-banner')) {
+                const banner = document.createElement('div');
+                banner.id = 'auth-warning-banner';
+                banner.style.cssText = 'background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 20px; text-align: center;';
+                banner.innerHTML = `
+                    <strong style="color: #f59e0b; font-size: 1rem; display: block; margin-bottom: 6px;">Sign In to DTS Hub</strong>
+                    <p style="color: var(--text-secondary); margin: 0 0 12px; font-size: 0.9rem;">Sign in to access your rewards, streak bonuses, and Minecraft daily check-in.</p>
+                    <a href="sign in beta.html" class="cta-button" style="display: inline-block; padding: 8px 18px; text-decoration: none;">Sign In / Sign Up →</a>
+                `;
+                dashboardCard.parentNode.insertBefore(banner, dashboardCard);
+            }
+        }
+    }, 3500);
+
+    // 3. Firebase Auth State Listener
     onAuthStateChanged(auth, async (user) => {
+        clearTimeout(authTimeout);
+        const warningBanner = document.getElementById('auth-warning-banner');
+        if (warningBanner) warningBanner.remove();
+
         if (!user) {
-            window.location.replace('sign in beta.html');
+            setTimeout(() => {
+                if (!auth.currentUser) {
+                    window.location.replace('sign in beta.html');
+                }
+            }, 500);
             return;
         }
 
         currentUser = user;
 
+        // Render immediately with user object before waiting for Firestore document
+        renderProfile(user, currentUserData);
+        renderRewards(user, currentUserData);
+        initDailyCheckin(user, currentUserData);
+
         // ⚡ Bolt: Centralized cache function `getCachedUserProfile` reduces redundant Firestore calls.
-        let userData = await getCachedUserProfile(user);
+        let userData = null;
+        try {
+            userData = await getCachedUserProfile(user);
+        } catch (fetchErr) {
+            console.warn("Notice: Profile fetch note:", fetchErr);
+        }
 
         if (!userData) {
             // Fallback initialization if profile doesn't exist at all yet (rules-compliant)
@@ -1545,24 +1631,24 @@ export function initAccountPage() {
                 console.warn("Notice: Profile init notice:", err);
             }
             userData.membershipLevel = 'free';
-            userData.pointsBalance = 50;
-            userData.loyaltyPoints = 50;
+            userData.pointsBalance = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10) || 50;
+            userData.loyaltyPoints = userData.pointsBalance;
             sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
         }
 
         currentUserData = userData;
 
-        // Render all account sections
+        // Render all account sections independently so no single failure blocks others
         const container = document.getElementById('account-layout-container');
         if (container) container.style.display = 'flex';
 
-        renderProfile(user, userData);
-        renderOrders(user);
-        renderRewards(user, userData);
-        renderBilling(user, userData);
-        loadWishlist(user.uid);
-        loadUserTickets(user.uid);
-        initDailyCheckin(user, userData);
+        try { renderProfile(user, userData); } catch (e) { console.warn("Profile render:", e); }
+        try { renderRewards(user, userData); } catch (e) { console.warn("Rewards render:", e); }
+        try { initDailyCheckin(user, userData); } catch (e) { console.warn("Checkin render:", e); }
+        try { renderOrders(user); } catch (e) { console.warn("Orders render:", e); }
+        try { renderBilling(user, userData); } catch (e) { console.warn("Billing render:", e); }
+        try { loadWishlist(user.uid); } catch (e) { console.warn("Wishlist render:", e); }
+        try { loadUserTickets(user.uid); } catch (e) { console.warn("Tickets render:", e); }
 
         // Sign Out
         document.getElementById('sign-out')?.addEventListener('click', () => {
