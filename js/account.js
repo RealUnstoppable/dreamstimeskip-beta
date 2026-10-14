@@ -789,12 +789,22 @@ async function addWishlistItemToCart(productId) {
 
 async function removeWishlistItem(userId, productId) {
     try {
-        const wishlistRef = doc(db, 'wishlists', userId);
-        const snap = await getDoc(wishlistRef);
-        if (snap.exists()) {
-            const items = (snap.data().items || []).filter(id => id !== productId);
-            await setDoc(wishlistRef, { items }, { merge: true });
+        let items = [];
+        try {
+            const localWishlist = JSON.parse(localStorage.getItem('localWishlist') || '[]');
+            items = localWishlist.filter(id => id !== productId);
+            localStorage.setItem('localWishlist', JSON.stringify(items));
+        } catch (_) {}
+
+        if (userId) {
+            const wishlistRef = doc(db, 'wishlists', userId);
+            const snap = await getDoc(wishlistRef);
+            if (snap.exists()) {
+                items = (snap.data().items || []).filter(id => id !== productId);
+            }
+            await setDoc(wishlistRef, { items, updatedAt: serverTimestamp() }, { merge: true });
         }
+        window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { wishlist: items } }));
     } catch (err) {
         console.warn("Notice: Wishlist remove item:", err);
     }
@@ -818,7 +828,29 @@ export async function loadWishlist(userId) {
         const copyBtn = document.getElementById('copy-share-link-btn');
         const disableBtn = document.getElementById('disable-share-btn');
 
-        if (!snap.exists() || !snap.data().items || snap.data().items.length === 0) {
+        let items = [];
+        let data = {};
+        if (snap.exists() && snap.data().items && snap.data().items.length > 0) {
+            data = snap.data();
+            items = data.items;
+        }
+
+        // Also check if user has localWishlist items in localStorage
+        try {
+            const localRaw = localStorage.getItem('localWishlist');
+            if (localRaw) {
+                const localItems = JSON.parse(localRaw);
+                if (Array.isArray(localItems) && localItems.length > 0) {
+                    const merged = Array.from(new Set([...items, ...localItems]));
+                    if (merged.length > items.length) {
+                        items = merged;
+                        await setDoc(wishlistRef, { items, updatedAt: serverTimestamp() }, { merge: true });
+                    }
+                }
+            }
+        } catch (_) {}
+
+        if (items.length === 0) {
             if (shareBtn) shareBtn.style.display = 'none';
             if (linkContainer) linkContainer.style.display = 'none';
             container.innerHTML = `
@@ -832,10 +864,10 @@ export async function loadWishlist(userId) {
             return;
         }
 
-        const data = snap.data();
-        if (data.isPublic && data.sharedId) {
+        const wishlistData = (snap.exists() ? snap.data() : null) || {};
+        if (wishlistData.isPublic && wishlistData.sharedId) {
             if (linkContainer) linkContainer.style.display = 'block';
-            if (linkInput) linkInput.value = `${window.location.origin}/shared-wishlist.html?id=${data.sharedId}`;
+            if (linkInput) linkInput.value = `${window.location.origin}/shared-wishlist.html?id=${wishlistData.sharedId}`;
             if (shareBtn) shareBtn.style.display = 'none';
         } else {
             if (shareBtn) shareBtn.style.display = 'inline-block';
@@ -870,7 +902,6 @@ export async function loadWishlist(userId) {
             };
         }
 
-        const items = data.items;
         container.innerHTML = items.map(id => {
             const product = productMap.get(id);
             if (!product) return '';

@@ -40,9 +40,12 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
         const displayRating = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'No reviews';
         const starsHtml = stats.averageRating > 0 && generateStarsHtml ? generateStarsHtml(stats.averageRating) : '';
 
+        const origPrice = product.originalPrice ?? Number((product.price * 1.35).toFixed(2));
+        const currentSalePrice = product.salePrice ?? Number((origPrice * 0.75).toFixed(2));
+
         return `
             <div class="product-card">
-                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="Toggle Wishlist" aria-label="Toggle Wishlist">
+                <button class="wishlist-btn ${activeClass}" data-id="${product.id}" title="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}" aria-label="${isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}">
                     ${heartIcon}
                 </button>
                 <img src="${product.imageUrl}" alt="${escapeHTML(product.name)}" class="product-image" data-id="${product.id}" loading="lazy" >
@@ -53,17 +56,17 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
                         ${stats.averageRating > 0 ? `<span class="star-rating">${starsHtml}</span>` : ''}
                         <span class="rating-count">(${displayRating}${stats.reviewCount > 0 ? ` - ${stats.reviewCount} reviews` : ''})</span>
                     </div>
-                    <div class="product-footer" >
-                        <div>
-                            ${product.originalPrice ? `<span class="original-price">$${product.originalPrice.toFixed(2)}</span>` : ''}
-                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${product.price === 0 ? 'FREE (Beta)' : '$' + product.price.toFixed(2)}</span>
+                    <div class="product-footer">
+                        <div class="product-price-wrapper" style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;">
+                            <span class="original-price" style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.95rem;">$${origPrice.toFixed(2)}</span>
+                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}" style="font-weight: 700; font-size: 1.15rem; color: #fff;">$${currentSalePrice.toFixed(2)}</span>
+                            <span class="discount-badge" style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; vertical-align: middle;">25% OFF</span>
                         </div>
                         <div class="action-buttons-container">
-                            <button class="view-reviews-btn" data-id="${product.id}">Reviews</button>
-                            <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                            <button class="reviews-btn view-reviews-btn" data-id="${product.id}" aria-label="Reviews for ${escapeHTML(product.name)}">Reviews</button>
+                            <button class="add-to-cart-btn" data-id="${product.id}" aria-label="Add ${escapeHTML(product.name)} to cart">Add to Cart</button>
                         </div>
                     </div>
-                    <button class="reviews-btn" data-id="${product.id}">Read Reviews</button>
                 </div>
             </div>
         `;

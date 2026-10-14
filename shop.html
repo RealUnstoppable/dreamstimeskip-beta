@@ -32,11 +32,23 @@
         </section>
 
 
-    <!-- Product Search Section -->
-    <div class="search-container" style="max-width: 1200px; margin: 20px auto; padding: 0 20px;">
-        <input type="text" id="product-search" placeholder="Search products by name or description..."
-               style="width: 100%; padding: 10px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--card-bg); color: var(--text-color);"
-               aria-label="Search products">
+    <!-- Product Search Section (Medixly-inspired Spotlight Design) -->
+    <div class="shop-search-container">
+        <div class="shop-search-panel">
+            <div class="shop-search-row">
+                <svg class="spotlight-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="product-search" class="spotlight-input" placeholder="Search hoodies, tees, caps, vinyls, mugs..." aria-label="Search products" autocomplete="off" spellcheck="false">
+                <button type="button" id="product-search-btn" class="shop-search-action-btn" aria-label="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <span>Search</span>
+                </button>
+            </div>
+        </div>
+        <!-- Did You Mean & Typo / Status Feedback -->
+        <div id="search-feedback-container" class="search-feedback-container" style="display: none;"></div>
     </div>
 
         <section id="product-grid" class="product-grid">
@@ -66,70 +78,116 @@
         </div>
     </div>
 
-    <!-- Reviews Modal -->
-    <div id="reviews-modal" class="cart-modal">
-        <div class="cart-modal-content">
-            <div class="cart-modal-header">
-                <h2 id="reviews-modal-title">Product Reviews</h2>
-                <button id="close-reviews-btn" class="close-cart-btn" aria-label="Close reviews" title="Close reviews">&times;</button>
-            </div>
-
-            <div class="modal-tabs">
-                <button class="tab-btn active" id="tab-reviews">Reviews</button>
-                <button class="tab-btn" id="tab-qa">Q&amp;A</button>
-            </div>
-
-            <div id="reviews-tab-content">
-                <div class="reviews-summary" id="reviews-summary">
-                    <div class="average-rating" id="modal-average-rating">0.0</div>
-                    <div class="stars-display" id="modal-stars-display">★★★★★</div>
-                    <div class="review-count" id="modal-review-count">0 reviews</div>
+    <!-- Store Product Details & Reviews Popup Modal -->
+    <div id="reviews-modal" class="store-detail-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="detail-product-name">
+        <div class="store-modal-content">
+            <button id="close-reviews-btn" class="store-modal-close" aria-label="Close product popup" title="Close product popup">&times;</button>
+            
+            <div class="store-modal-body">
+                <!-- Left Side: Product Image & Gallery -->
+                <div class="store-modal-left">
+                    <div class="modal-main-image-container">
+                        <img id="detail-main-image" src="" alt="Product Image" class="detail-main-image">
+                        <span class="modal-sale-ribbon">SALE</span>
+                    </div>
+                    <div id="detail-thumbnails" class="detail-thumbnails">
+                        <!-- Extra thumbnails injected here if available -->
+                    </div>
                 </div>
 
-                <div id="review-submission-section" class="review-submission-section" style="display: none;">
-                    <h3>Write a Review</h3>
-                    <form id="review-form">
-                        <div class="star-rating-input" id="star-rating-input" role="radiogroup" title="Rating" aria-label="Rating">
-                            <span class="star-input" data-value="1" role="radio" aria-checked="false" tabindex="0">★</span>
-                            <span class="star-input" data-value="2" role="radio" aria-checked="false" tabindex="0">★</span>
-                            <span class="star-input" data-value="3" role="radio" aria-checked="false" tabindex="0">★</span>
-                            <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
-                            <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
+                <!-- Right Side: Details, Sale Pricing, Quantity, Reviews -->
+                <div class="store-modal-right">
+                    <div class="detail-header-section">
+                        <h2 id="detail-product-name" class="detail-product-title">Product Name</h2>
+                        <div class="detail-pricing-row">
+                            <span id="detail-original-price" class="original-price" style="text-decoration: line-through; color: var(--text-secondary); font-size: 1.25rem;">$0.00</span>
+                            <span id="detail-sale-price" class="sale-price" style="font-size: 2rem; font-weight: 800; color: #fff;">$0.00</span>
+                            <span class="discount-badge" style="background-color: #ef4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">25% OFF</span>
                         </div>
-                        <textarea id="review-text" placeholder="Share your thoughts about this product..." required title="Review text" aria-label="Review text"></textarea>
-                        <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
-                        <div id="review-notification" class="notification"></div>
-                    </form>
-                </div>
-                <div id="login-prompt-section" class="login-prompt-section">
-                    <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
-                </div>
+                        <p id="detail-description" class="detail-description">High-quality gear for the dedicated fan.</p>
+                    </div>
 
-                <div id="reviews-list-container" class="reviews-list-container">
-                    <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>
-                </div>
-            </div>
+                    <!-- Quantity & Add to Cart -->
+                    <div class="detail-purchase-row">
+                        <div class="quantity-control-group">
+                            <label for="detail-quantity-input" class="quantity-label">Quantity:</label>
+                            <div class="quantity-stepper">
+                                <button type="button" id="detail-qty-minus" class="qty-btn" aria-label="Decrease quantity">-</button>
+                                <input type="number" id="detail-quantity-input" min="1" max="99" value="1" class="qty-input" aria-label="Quantity">
+                                <button type="button" id="detail-qty-plus" class="qty-btn" aria-label="Increase quantity">+</button>
+                            </div>
+                        </div>
+                        <button type="button" id="detail-add-to-cart-btn" class="detail-add-cart-btn">
+                            <span>Add to Cart</span>
+                        </button>
+                    </div>
+                    <div id="detail-cart-feedback" class="detail-cart-feedback" style="display: none;"></div>
 
-            <div id="qa-tab-content" style="display: none;">
-                <div id="ask-question-section" class="review-submission-section" style="display: none;">
-                    <h3>Ask a Question</h3>
-                    <form id="ask-question-form">
-                        <textarea id="question-text" placeholder="What do you want to know about this product?" required title="Question text" aria-label="Question text"></textarea>
-                        <button type="submit" id="submit-question-btn" class="btn-checkout">Ask Question</button>
-                        <div id="question-notification" class="notification"></div>
-                    </form>
-                </div>
-                <div id="qa-login-prompt" class="login-prompt-section">
-                    <p>Please <a href="sign in beta.html">log in</a> to ask a question.</p>
-                </div>
+                    <div class="detail-divider"></div>
 
-                <div id="qa-list-container" class="reviews-list-container">
-                    <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading questions...</p>
+                    <!-- Reviews & Q&A Tabs Header -->
+                    <div class="detail-reviews-header">
+                        <div class="modal-tabs" style="margin-bottom: 0;">
+                            <button class="tab-btn active" id="tab-reviews">Customer Reviews</button>
+                            <button class="tab-btn" id="tab-qa">Q&amp;A</button>
+                        </div>
+                        <div class="reviews-quick-stats">
+                            <span class="detail-avg-num" id="modal-average-rating">0.0</span>
+                            <span class="stars-display" id="modal-stars-display" style="font-size: 1.2rem; margin: 0 4px;">★★★★★</span>
+                            <span class="review-count" id="modal-review-count">(0 reviews)</span>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab Content -->
+                    <div id="reviews-tab-content">
+                        <div id="review-submission-section" class="review-submission-section" style="display: none; margin-top: 15px;">
+                            <h3>Write a Review</h3>
+                            <form id="review-form">
+                                <div class="star-rating-input" id="star-rating-input" role="radiogroup" title="Rating" aria-label="Rating">
+                                    <span class="star-input" data-value="1" role="radio" aria-checked="false" tabindex="0">★</span>
+                                    <span class="star-input" data-value="2" role="radio" aria-checked="false" tabindex="0">★</span>
+                                    <span class="star-input" data-value="3" role="radio" aria-checked="false" tabindex="0">★</span>
+                                    <span class="star-input" data-value="4" role="radio" aria-checked="false" tabindex="0">★</span>
+                                    <span class="star-input" data-value="5" role="radio" aria-checked="false" tabindex="0">★</span>
+                                </div>
+                                <textarea id="review-text" placeholder="Share your experience with this product..." required title="Review text" aria-label="Review text"></textarea>
+                                <button type="submit" class="btn-checkout" id="submit-review-btn">Submit Review</button>
+                                <div id="review-notification" class="notification"></div>
+                            </form>
+                        </div>
+                        <div id="login-prompt-section" class="login-prompt-section" style="margin-top: 15px;">
+                            <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+                        </div>
+
+                        <div id="reviews-list-container" class="reviews-list-container">
+                            <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading reviews...</p>
+                        </div>
+                    </div>
+
+                    <!-- Q&A Tab Content -->
+                    <div id="qa-tab-content" style="display: none;">
+                        <div id="ask-question-section" class="review-submission-section" style="display: none; margin-top: 15px;">
+                            <h3>Ask a Question</h3>
+                            <form id="ask-question-form">
+                                <textarea id="question-text" placeholder="What do you want to know about this product?" required title="Question text" aria-label="Question text"></textarea>
+                                <button type="submit" id="submit-question-btn" class="btn-checkout">Ask Question</button>
+                                <div id="question-notification" class="notification"></div>
+                            </form>
+                        </div>
+                        <div id="qa-login-prompt" class="login-prompt-section" style="margin-top: 15px;">
+                            <p>Please <a href="sign in beta.html">log in</a> to ask a question.</p>
+                        </div>
+
+                        <div id="qa-list-container" class="reviews-list-container">
+                            <p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">Loading questions...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Cart Modal -->
     <div id="cart-modal" class="cart-modal">
         <div class="cart-modal-content">
             <div class="cart-modal-header">
@@ -143,52 +201,7 @@
                     <span>Total:</span>
                     <span id="cart-total-price">$0.00</span>
                 </div>
-                <button id="checkout-btn" class="btn-checkout" disabled>Proceed to Checkout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Review Modal -->
-    <div id="review-modal" class="review-modal" style="display: none;">
-        <div class="review-modal-content">
-            <div class="review-modal-header">
-                <h2>Product Reviews</h2>
-                <button id="close-review-btn" class="close-review-btn" aria-label="Close reviews" title="Close reviews">&times;</button>
-            </div>
-
-            <div class="review-stats" id="review-stats">
-                <div class="avg-rating">
-                    <span id="avg-rating-value">0.0</span> <span class="star-rating">★</span>
-                </div>
-                <div class="total-reviews" id="total-reviews-count">0 reviews</div>
-            </div>
-
-            <div id="reviews-list-container" class="reviews-list-container">
-                <!-- Reviews will be injected here -->
-            </div>
-
-            <div id="write-review-section" class="write-review-section" style="display: none;">
-                <h3>Write a Review</h3>
-                <form id="write-review-form">
-                    <div class="rating-input">
-                        <label for="review-rating">Rating (1-5):</label>
-                        <select id="review-rating" required>
-                            <option value="5">5 Stars</option>
-                            <option value="4">4 Stars</option>
-                            <option value="3">3 Stars</option>
-                            <option value="2">2 Stars</option>
-                            <option value="1">1 Star</option>
-                        </select>
-                    </div>
-                    <div class="comment-input">
-                        <textarea id="review-comment" rows="4" placeholder="Share your thoughts about this product..." required></textarea>
-                    </div>
-                    <button type="submit" id="submit-review-btn" class="submit-review-btn">Submit Review</button>
-                    <div id="review-message" class="review-message"></div>
-                </form>
-            </div>
-            <div id="login-to-review-msg" class="login-to-review-msg" style="display: none;">
-                <p>Please <a href="sign in beta.html">log in</a> to write a review.</p>
+                <button id="checkout-btn" class="btn-checkout" disabled>Go to Checkout &rarr;</button>
             </div>
         </div>
     </div>

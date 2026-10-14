@@ -812,7 +812,7 @@ class SitewideMusicEngine {
                 if (cartModal) {
                     cartModal.style.display = 'block';
                 } else {
-                    window.location.href = 'shop.html';
+                    this.openSitewideLexiCart();
                 }
             });
         }
@@ -822,6 +822,105 @@ class SitewideMusicEngine {
         this.inactivityTimeout = setTimeout(() => {
             this.collapseLexi(orb);
         }, 10000);
+    }
+
+    openSitewideLexiCart() {
+        let modal = document.getElementById('sitewide-lexi-cart-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'sitewide-lexi-cart-modal';
+            modal.className = 'cart-modal sitewide-lexi-cart-modal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1050; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;';
+            modal.innerHTML = `
+                <div class="cart-modal-content" style="background: var(--primary-card-color, #141416); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; width: 100%; max-width: 480px; padding: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.85); box-sizing: border-box;">
+                    <div class="cart-modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px;">
+                        <h2 style="margin: 0; font-size: 1.4rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                            <span>🛒</span> Lexi Cart
+                        </h2>
+                        <button id="close-sitewide-cart-btn" class="close-cart-btn" aria-label="Close cart" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.3rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">&times;</button>
+                    </div>
+                    <div id="sitewide-cart-items-container" class="cart-items-container" style="max-height: 320px; overflow-y: auto; padding-right: 5px;">
+                    </div>
+                    <div class="cart-modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 15px;">
+                        <div class="cart-total" style="display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; font-weight: 700; margin-bottom: 15px; color: #fff;">
+                            <span>Total:</span>
+                            <span id="sitewide-cart-total-price" style="color: var(--accent-color, #2563EB); font-size: 1.35rem;">$0.00</span>
+                        </div>
+                        <button id="sitewide-checkout-btn" class="btn-checkout" style="width: 100%; padding: 14px; background: var(--accent-color, #2563EB); color: #fff; border: none; border-radius: 10px; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: all 0.2s ease;">Go to Checkout &rarr;</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#close-sitewide-cart-btn')?.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.style.display = 'none';
+            });
+            modal.querySelector('#sitewide-checkout-btn')?.addEventListener('click', () => {
+                window.location.href = 'checkout.html';
+            });
+        }
+
+        let localCart = {};
+        try {
+            const raw = localStorage.getItem('localCart');
+            if (raw) localCart = JSON.parse(raw);
+        } catch (_) {}
+
+        const itemsContainer = modal.querySelector('#sitewide-cart-items-container');
+        const totalPriceEl = modal.querySelector('#sitewide-cart-total-price');
+        const checkoutBtn = modal.querySelector('#sitewide-checkout-btn');
+
+        const entries = Object.entries(localCart).filter(([_, qty]) => qty > 0);
+        if (entries.length === 0) {
+            itemsContainer.innerHTML = `
+                <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary, #aaa);">
+                    <div style="font-size: 2.2rem; margin-bottom: 10px;">🛍️</div>
+                    <p style="font-size: 1.05rem; margin-bottom: 15px; color: #fff;">Your cart is empty.</p>
+                    <a href="shop.html" style="display: inline-block; padding: 8px 18px; background: rgba(255,255,255,0.08); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600;">Explore Shop</a>
+                </div>
+            `;
+            if (totalPriceEl) totalPriceEl.textContent = '$0.00';
+            if (checkoutBtn) {
+                checkoutBtn.disabled = true;
+                checkoutBtn.style.opacity = '0.5';
+                checkoutBtn.style.cursor = 'not-allowed';
+            }
+        } else {
+            import('./products.js').then(({ productMap, getProductPricing }) => {
+                let total = 0;
+                itemsContainer.innerHTML = entries.map(([id, qty]) => {
+                    const prod = productMap.get(id);
+                    if (!prod) return '';
+                    const pricing = typeof getProductPricing === 'function' ? getProductPricing(prod) : { salePrice: prod.price };
+                    const unitPrice = pricing.salePrice || prod.price;
+                    const itemTotal = unitPrice * qty;
+                    total += itemTotal;
+                    return `
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px;">
+                            <img src="${prod.imageUrl}" alt="${escapeHTML(prod.name)}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; background: #000;">
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 600; color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHTML(prod.name)}</div>
+                                <div style="color: var(--text-secondary, #aaa); font-size: 0.85rem; margin-top: 2px;">Qty: ${qty} &bull; $${unitPrice.toFixed(2)}</div>
+                            </div>
+                            <div style="font-weight: 700; color: #fff; font-size: 1rem;">$${itemTotal.toFixed(2)}</div>
+                        </div>
+                    `;
+                }).join('');
+                if (totalPriceEl) totalPriceEl.textContent = `$${total.toFixed(2)}`;
+                if (checkoutBtn) {
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.style.opacity = '1';
+                    checkoutBtn.style.cursor = 'pointer';
+                }
+            }).catch(() => {
+                itemsContainer.innerHTML = `<p style="text-align: center; color: #fff;"><a href="shop.html" style="color: #38bdf8;">View in Shop &rarr;</a></p>`;
+            });
+        }
+
+        modal.style.display = 'flex';
     }
 
     collapseLexi(orb) {

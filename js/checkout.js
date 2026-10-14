@@ -27,7 +27,14 @@ function renderCheckoutPage() {
     if (!checkoutContainer) return;
 
     if (Object.keys(userCart).length === 0) {
-        checkoutContainer.innerHTML = '<h1>Your cart is empty.</h1><a href="/shop.html" class="cta-button">Continue Shopping</a>';
+        checkoutContainer.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; max-width: 500px; margin: 40px auto; background: rgba(24, 24, 28, 0.85); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;">
+                <div style="font-size: 3.5rem; margin-bottom: 15px;">🛒</div>
+                <h1 style="color: #fff; font-size: 1.8rem; margin-bottom: 10px;">Your Cart is Empty</h1>
+                <p style="color: var(--text-secondary, #888); margin-bottom: 25px;">Looks like you haven't added any gear or accessories yet.</p>
+                <a href="/shop.html" class="place-order-button" style="display: inline-block; width: auto; padding: 12px 28px; text-decoration: none; margin-top: 0;">Explore the Shop &rarr;</a>
+            </div>
+        `;
         return;
     }
 
@@ -35,198 +42,270 @@ function renderCheckoutPage() {
         const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
         
         const discountAmount = subtotal * discount;
-        const discountedSubtotal = subtotal - discountAmount;
-        const tax = discountedSubtotal * 0.07;
+        const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+        const tax = discountedSubtotal * 0.08;
         const total = discountedSubtotal + tax;
 
         return { subtotal, discountAmount, discountedSubtotal, tax, total };
     };
 
-    const updateSummaryUI = () => {
-        const { subtotal, discountAmount, discountedSubtotal, tax, total } = renderSummary();
-        document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('summary-discount').textContent = `-$${discountAmount.toFixed(2)}`;
-        document.getElementById('summary-discount-row').style.display = discount > 0 ? 'flex' : 'none';
-        document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
-        document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
-        const points = Math.floor(subtotal * 10);
-        document.getElementById('summary-points').textContent = `✨ You will earn ${points} Unstoppable Points with this order!`;
-
-    };
-
     const { subtotal, discountAmount, tax, total } = renderSummary();
 
     checkoutContainer.innerHTML = `
-        <h1>Checkout</h1>
+        <div class="checkout-top-header">
+            <div class="checkout-brand-title">
+                <a href="/shop.html" style="color: var(--text-secondary, #aaa); text-decoration: none; font-size: 1rem; display: flex; align-items: center; gap: 6px;">&larr; Back to Shop</a>
+                <span style="color: rgba(255,255,255,0.2);">|</span>
+                <h1>Secure Checkout</h1>
+            </div>
+            <div class="checkout-security-badge">
+                <span>🔒</span>
+                <span>256-Bit SSL Encrypted</span>
+            </div>
+        </div>
+
+        <div class="checkout-stepper">
+            <div class="step-item completed">
+                <div class="step-badge">✓</div>
+                <span>1. Cart</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item active">
+                <div class="step-badge">2</div>
+                <span>2. Shipping & Payment</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item">
+                <div class="step-badge">3</div>
+                <span>3. Confirmation</span>
+            </div>
+        </div>
+
         <div class="checkout-layout">
             <div class="checkout-form-container">
                 <form id="checkout-form">
-                    <section>
-                        <h3>Shipping Information</h3>
-                        <div class="form-group">
-                            <label for="name">Full Name</label>
-                            <input type="text" id="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" ${currentUser ? `value="${escapeHTML(currentUser.email || '')}"` : 'placeholder="you@example.com"'} required>
-                        </div>
-                        <div class="form-group">
-                            <label for="address">Address</label>
-                            <input type="text" id="address" required>
-                        </div>
-                        <div class="form-group-inline">
-                            <div class="form-group">
-                                <label for="city">City</label>
-                                <input type="text" id="city" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="zip">ZIP Code</label>
-                                <input type="text" id="zip" required>
-                            </div>
-                        </div>
-                    </section>
-                    
-                    <section style="margin-top: 30px;">
-                        <h3>Payment Information (Stripe Test)</h3>
-                        <div class="form-group">
-                            <label for="card-number">Card Number</label>
-                            <input type="text" id="card-number" placeholder="4242 4242 4242 4242" required>
-                        </div>
-                        <div class="form-group-inline">
-                            <div class="form-group">
-                                <label for="card-expiry">Expiry (MM/YY)</label>
-                                <input type="text" id="card-expiry" placeholder="12/26" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="card-cvc">CVC</label>
-                                <input type="text" id="card-cvc" placeholder="123" required>
-                            </div>
-                        </div>
-                    </section>
-
-                    <div style="background: rgba(255, 255, 0, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ffeeba; margin-top: 20px;">
-                        <p style="margin: 0; color: #ffca2c; font-size: 0.9rem;"><strong>TEST MODE:</strong> Use the test card number 4242 4242 4242 4242 to simulate a successful payment.</p>
+                    <div class="checkout-section-header">
+                        <div class="section-num">1</div>
+                        <h2>Shipping Information</h2>
                     </div>
-                    <button type="submit" class="cta-button place-order-button" id="place-order-btn">Pay Now</button>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin-top: 15px; text-align: center;">By clicking Pay Now, you agree to our <a href="terms.html" target="_blank" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" target="_blank" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Privacy Policy</a>.</p>
-                    <div id="checkout-message"></div>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="Alex Mercer" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" ${currentUser ? `value="${escapeHTML(currentUser.email || '')}"` : 'placeholder="alex@example.com"'} required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Street Address</label>
+                        <input type="text" id="address" placeholder="742 Evergreen Terrace" required>
+                    </div>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" placeholder="Springfield" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zip">ZIP / Postal Code</label>
+                            <input type="text" id="zip" placeholder="97477" required>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-section-header" style="margin-top: 35px;">
+                        <div class="section-num">2</div>
+                        <h2>Payment Information (Stripe Test)</h2>
+                    </div>
+
+                    <div class="test-mode-box">
+                        <p class="test-mode-box-text"><strong>TEST MODE:</strong> Stripe sandbox active. Test card: 4242 4242 4242 4242</p>
+                        <button type="button" class="fill-test-btn" id="fill-test-btn">⚡ Auto-fill Test Details</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="card-number">Card Number</label>
+                        <input type="text" id="card-number" placeholder="4242 4242 4242 4242" required maxlength="19">
+                    </div>
+                    <div class="form-group-inline">
+                        <div class="form-group">
+                            <label for="card-expiry">Expiry Date (MM/YY)</label>
+                            <input type="text" id="card-expiry" placeholder="12/26" required maxlength="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="card-cvc">CVC</label>
+                            <input type="text" id="card-cvc" placeholder="123" required maxlength="4">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="place-order-button" id="place-order-btn">Pay Now &rarr;</button>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary, #aaa); margin-top: 15px; text-align: center;">By clicking Pay Now, you agree to our <a href="terms.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Privacy Policy</a>.</p>
+                    <div id="checkout-message" style="margin-top: 15px; font-weight: 600; text-align: center;"></div>
                 </form>
             </div>
+
             <div class="checkout-summary-container">
-                <h3>Order Summary</h3>
+                <div class="checkout-section-header">
+                    <h3>Order Summary</h3>
+                </div>
                 <div id="summary-items">
                     ${Object.entries(userCart).map(([productId, quantity]) => {
-                        const product = productMap.get(productId);
-                        return `<div class="summary-item"><span>${quantity}x ${escapeHTML(product.name)}</span> <span>$${(product.price * quantity).toFixed(2)}</span></div>`;
+                        const product = productMap.get(productId) || { name: 'Item', price: 0, image: '/images/logo.png' };
+                        const pricing = product.price || 0;
+                        return `
+                            <div class="summary-item-card">
+                                <img src="${product.image || '/images/logo.png'}" alt="${escapeHTML(product.name)}" class="summary-item-img" onerror="this.src='/images/logo.png'">
+                                <div class="summary-item-details">
+                                    <div class="summary-item-title">${escapeHTML(product.name)}</div>
+                                    <div class="summary-item-qty">Qty: ${quantity} &times; $${pricing.toFixed(2)}</div>
+                                </div>
+                                <div class="summary-item-price">$${(pricing * quantity).toFixed(2)}</div>
+                            </div>
+                        `;
                     }).join('')}
                 </div>
                 
-                
-                <div class="form-group" style="margin-top: 20px;">
+                <div class="form-group" style="margin-top: 25px;">
                     <label for="promo-code" style="font-size: 0.9rem;">Promo Code</label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="promo-code" placeholder="e.g. DTS10" style="flex: 1; padding: 8px;">
-                        <button type="button" id="apply-promo-btn" style="padding: 8px 15px; background: var(--text-secondary); color: white; border: none; border-radius: 4px; cursor: pointer;">Apply</button>
+                        <input type="text" id="promo-code" placeholder="e.g. DTS10" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff;">
+                        <button type="button" id="apply-promo-btn" style="padding: 10px 18px; background: var(--accent-color, #2563EB); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Apply</button>
                     </div>
-                    <small id="promo-message" class="promo-message-text"></small>
+                    <small id="promo-message" class="promo-message-text" style="display:block; margin-top:6px; font-weight:500;"></small>
                 </div>
 
+                ${(window.userPointsBalance && window.userPointsBalance > 0) ? `
                 <div class="form-group" style="margin-top: 20px;">
                     <label for="points-slider" style="font-size: 0.9rem; display: flex; justify-content: space-between;">
                         <span>Loyalty Points</span>
-                        <span>Available: <strong id="points-available">${window.userPointsBalance}</strong></span>
+                        <span>Available: <strong id="points-available" style="color: var(--accent-green, #10b981);">${window.userPointsBalance}</strong></span>
                     </label>
-                    <div style="display: flex; gap: 10px; align-items: center;">
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 6px;">
                         <input type="range" id="points-slider" min="0" max="${window.userPointsBalance}" step="100" value="0" style="flex: 1;">
-                        <span style="font-weight: bold;" id="points-to-redeem-display">0</span>
+                        <span style="font-weight: bold; color: #fff; min-width: 40px; text-align: right;" id="points-to-redeem-display">0</span>
                     </div>
-                    <small id="points-message" style="display: block; margin-top: 5px; color: var(--accent-green);">100 points = $1.00 off</small>
+                    <small id="points-message" style="display: block; margin-top: 5px; color: var(--accent-green, #10b981);">100 points = $1.00 off</small>
                 </div>
-
+                ` : ''}
 
                 <div class="summary-calculation">
-                    <div class="summary-item"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
-                    <div class="summary-item discount-row" id="summary-discount-row"><span>Discount</span> <span id="summary-discount">-$0.00</span></div>
-                    <div class="summary-item"><span>Tax</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
+                    <div class="summary-calc-row"><span>Subtotal</span> <span id="summary-subtotal">$${subtotal.toFixed(2)}</span></div>
+                    <div class="summary-calc-row discount-row" id="summary-discount-row" style="display: ${discountAmount > 0 ? 'flex' : 'none'}; color: var(--accent-green, #10b981);">
+                        <span>Discount</span> <span id="summary-discount">-$${discountAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="summary-calc-row"><span>Tax (8%)</span> <span id="summary-tax">$${tax.toFixed(2)}</span></div>
 
-                    <div class="summary-total"><span>Total</span> <span id="summary-total">${total.toFixed(2)}</span></div>
-                    <div style="margin-top: 15px; font-size: 0.9rem; color: var(--accent-blue); text-align: center; font-weight: 500;" id="summary-points">✨ You will earn ${Math.floor(subtotal * 10)} Unstoppable Points with this order!</div>
+                    <div class="summary-calc-total">
+                        <span>Total</span> <span id="summary-total">$${total.toFixed(2)}</span>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.88rem; color: #60a5fa; text-align: center; font-weight: 600;" id="summary-points">✨ You will earn ${Math.floor(subtotal * 10)} Unstoppable Points with this order!</div>
+                </div>
 
+                <div class="trust-badges-row">
+                    <span>🔒 Secure Checkout</span>
+                    <span>⚡ Instant Confirmation</span>
+                    <span>🛡️ Satisfaction Guaranteed</span>
                 </div>
             </div>
         </div>
     `;
 
-    document.getElementById('apply-promo-btn').addEventListener('click', async (e) => {
-        const btn = e.currentTarget;
-        const originalText = btn.textContent;
-        const code = document.getElementById('promo-code').value.trim().toUpperCase();
-        const msgEl = document.getElementById('promo-message');
-        if (!code) {
-            msgEl.textContent = 'Please enter a promo code.';
-            msgEl.style.color = 'var(--accent-red)';
-            discount = 0;
-            appliedPromo = '';
-            updateSummaryUI();
-            return;
-        }
-        msgEl.textContent = 'Applying...';
-        msgEl.style.color = 'var(--text-secondary)';
+    // Auto-fill test details handler
+    const fillTestBtn = document.getElementById('fill-test-btn');
+    if (fillTestBtn) {
+        fillTestBtn.addEventListener('click', () => {
+            const nameInput = document.getElementById('name');
+            const emailInput = document.getElementById('email');
+            const addressInput = document.getElementById('address');
+            const cityInput = document.getElementById('city');
+            const zipInput = document.getElementById('zip');
+            const cardInput = document.getElementById('card-number');
+            const expiryInput = document.getElementById('card-expiry');
+            const cvcInput = document.getElementById('card-cvc');
 
-        btn.disabled = true;
-        btn.textContent = 'Applying...';
-        btn.title = 'Processing your request...';
+            if (nameInput) nameInput.value = 'Alex Mercer';
+            if (emailInput && !emailInput.value) emailInput.value = 'alex@example.com';
+            if (addressInput) addressInput.value = '742 Evergreen Terrace';
+            if (cityInput) cityInput.value = 'Springfield';
+            if (zipInput) zipInput.value = '97477';
+            if (cardInput) cardInput.value = '4242 4242 4242 4242';
+            if (expiryInput) expiryInput.value = '12/26';
+            if (cvcInput) cvcInput.value = '123';
+        });
+    }
 
-        try {
-            const promoRef = doc(db, 'promo_codes', code);
-            const promoSnap = await getDoc(promoRef);
-            if (promoSnap.exists()) {
-                const promoData = promoSnap.data();
-                if (promoData.active) {
-                    discount = promoData.discount / 100;
-                    appliedPromo = code;
-                    msgEl.textContent = `${promoData.discount}% discount applied!`;
-                    msgEl.style.color = 'var(--accent-green)';
+    const promoBtn = document.getElementById('apply-promo-btn');
+    if (promoBtn) {
+        promoBtn.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const originalText = btn.textContent;
+            const code = document.getElementById('promo-code').value.trim().toUpperCase();
+            const msgEl = document.getElementById('promo-message');
+            if (!code) {
+                msgEl.textContent = 'Please enter a promo code.';
+                msgEl.style.color = 'var(--accent-red, #ef4444)';
+                discount = 0;
+                appliedPromo = '';
+                updateSummaryUI();
+                return;
+            }
+            msgEl.textContent = 'Applying...';
+            msgEl.style.color = 'var(--text-secondary, #aaa)';
+
+            btn.disabled = true;
+            btn.textContent = 'Applying...';
+            btn.title = 'Processing your request...';
+
+            try {
+                const promoRef = doc(db, 'promo_codes', code);
+                const promoSnap = await getDoc(promoRef);
+                if (promoSnap.exists()) {
+                    const promoData = promoSnap.data();
+                    if (promoData.active) {
+                        discount = promoData.discount / 100;
+                        appliedPromo = code;
+                        msgEl.textContent = `${promoData.discount}% discount applied!`;
+                        msgEl.style.color = 'var(--accent-green, #10b981)';
+                    } else {
+                        discount = 0;
+                        appliedPromo = '';
+                        msgEl.textContent = 'Promo code is inactive.';
+                        msgEl.style.color = 'var(--accent-red, #ef4444)';
+                    }
                 } else {
                     discount = 0;
                     appliedPromo = '';
-                    msgEl.textContent = 'Promo code is inactive.';
-                    msgEl.style.color = 'var(--accent-red)';
+                    msgEl.textContent = 'Invalid promo code.';
+                    msgEl.style.color = 'var(--accent-red, #ef4444)';
                 }
-            } else {
+            } catch (error) {
+                console.error('Manager info: Error applying promo code:', error);
                 discount = 0;
                 appliedPromo = '';
-                msgEl.textContent = 'Invalid promo code.';
-                msgEl.style.color = 'var(--accent-red)';
+                msgEl.textContent = 'Error applying promo code.';
+                msgEl.style.color = 'var(--accent-red, #ef4444)';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+                btn.removeAttribute('title');
             }
-        } catch (error) {
-            console.error('Manager info: Error applying promo code:', error);
-            discount = 0;
-            appliedPromo = '';
-            msgEl.textContent = 'Error applying promo code.';
-            msgEl.style.color = 'var(--accent-red)';
-        } finally {
-            btn.disabled = false;
-            btn.textContent = originalText;
-            btn.removeAttribute('title');
-        }
-        updateSummaryUI();
-    });
-
-    
-    const pointsSlider = document.getElementById('points-slider');
-    if (pointsSlider) {
-        pointsSlider.addEventListener('input', (e) => {
-            pointsToRedeem = parseInt(e.target.value, 10) || 0;
-            document.getElementById('points-to-redeem-display').textContent = pointsToRedeem;
             updateSummaryUI();
         });
     }
 
-    document.getElementById('checkout-form').addEventListener('submit', handlePlaceOrder);
-}
+    const pointsSlider = document.getElementById('points-slider');
+    if (pointsSlider) {
+        pointsSlider.addEventListener('input', (e) => {
+            pointsToRedeem = parseInt(e.target.value, 10) || 0;
+            const displayEl = document.getElementById('points-to-redeem-display');
+            if (displayEl) displayEl.textContent = pointsToRedeem;
+            updateSummaryUI();
+        });
+    }
 
+    const formEl = document.getElementById('checkout-form');
+    if (formEl) {
+        formEl.addEventListener('submit', handlePlaceOrder);
+    }
+}
 
 function updateSummaryUI() {
     const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
@@ -241,19 +320,28 @@ function updateSummaryUI() {
     const tax = subtotalAfterDiscount * 0.08;
     const total = subtotalAfterDiscount + tax;
 
-    document.getElementById('summary-subtotal').textContent = `${subtotal.toFixed(2)}`;
+    const subtotalEl = document.getElementById('summary-subtotal');
+    if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
     
     const discountRow = document.getElementById('summary-discount-row');
-    if (totalDiscount > 0) {
-        discountRow.style.display = 'flex';
-        document.getElementById('summary-discount').textContent = `-${totalDiscount.toFixed(2)}`;
-    } else {
-        discountRow.style.display = 'none';
+    const discountEl = document.getElementById('summary-discount');
+    if (discountRow && discountEl) {
+        if (totalDiscount > 0) {
+            discountRow.style.display = 'flex';
+            discountEl.textContent = `-$${totalDiscount.toFixed(2)}`;
+        } else {
+            discountRow.style.display = 'none';
+        }
     }
     
-    document.getElementById('summary-tax').textContent = `${tax.toFixed(2)}`;
-    document.getElementById('summary-total').textContent = `${total.toFixed(2)}`;
-    document.getElementById('summary-points').textContent = `✨ You will earn ${Math.floor(subtotalAfterDiscount * 10)} Unstoppable Points with this order!`;
+    const taxEl = document.getElementById('summary-tax');
+    if (taxEl) taxEl.textContent = `$${tax.toFixed(2)}`;
+
+    const totalEl = document.getElementById('summary-total');
+    if (totalEl) totalEl.textContent = `$${total.toFixed(2)}`;
+
+    const pointsEl = document.getElementById('summary-points');
+    if (pointsEl) pointsEl.textContent = `✨ You will earn ${Math.floor(subtotalAfterDiscount * 10)} Unstoppable Points with this order!`;
 }
 
 
@@ -402,25 +490,41 @@ export async function handlePlaceOrder(e) {
 
         // Render sleek order confirmation receipt
         checkoutContainer.innerHTML = `
-            <div style="max-width: 620px; margin: 30px auto; text-align: center; background: var(--primary-card-color, #1a1a24); border: 1px solid var(--border-color, #333); border-radius: 20px; padding: 40px 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.5);">
-                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(0, 255, 204, 0.15); border: 2px solid #00ffcc; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #00ffcc; font-size: 2rem;">✓</div>
-                <h1 style="color: #ffffff; font-size: 1.8rem; margin-bottom: 8px;">Payment Successful!</h1>
+            <div class="checkout-stepper" style="max-width: 620px; margin: 0 auto 30px;">
+                <div class="step-item completed">
+                    <div class="step-badge">✓</div>
+                    <span>1. Cart</span>
+                </div>
+                <div class="step-divider"></div>
+                <div class="step-item completed">
+                    <div class="step-badge">✓</div>
+                    <span>2. Shipping & Payment</span>
+                </div>
+                <div class="step-divider"></div>
+                <div class="step-item active completed">
+                    <div class="step-badge">✓</div>
+                    <span>3. Confirmation</span>
+                </div>
+            </div>
+            <div style="max-width: 620px; margin: 0 auto; text-align: center; background: linear-gradient(180deg, rgba(24, 24, 28, 0.95) 0%, rgba(18, 18, 22, 0.92) 100%); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 40px 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.5);">
+                <div style="width: 70px; height: 70px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #10b981; font-size: 2rem;">✓</div>
+                <h1 style="color: #ffffff; font-size: 1.85rem; margin-bottom: 8px; font-weight: 800;">Payment Successful!</h1>
                 <p style="color: var(--text-secondary, #aaa); margin-bottom: 25px; font-size: 0.95rem;">
                     Thank you, <strong>${escapeHTML(shippingInfo.name)}</strong>. Your order has been placed and confirmed.
                 </p>
                 
-                <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 20px; margin-bottom: 25px; text-align: left; font-size: 0.9rem;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 22px; margin-bottom: 25px; text-align: left; font-size: 0.92rem;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
                         <span style="color: var(--text-secondary, #888);">Order Reference:</span>
-                        <strong style="color: #00ffcc; font-family: monospace; letter-spacing: 1px;">#${orderId}</strong>
+                        <strong style="color: #10b981; font-family: monospace; letter-spacing: 1px; font-size: 1rem;">#${orderId}</strong>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
                         <span style="color: var(--text-secondary, #888);">Payment Method:</span>
                         <span style="color: #ffffff;">Stripe Test (•••• 4242)</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
                         <span style="color: var(--text-secondary, #888);">Total Charged:</span>
-                        <strong style="color: #00ffcc; font-size: 1.05rem;">$${finalTotal.toFixed(2)}</strong>
+                        <strong style="color: #10b981; font-size: 1.15rem;">$${finalTotal.toFixed(2)}</strong>
                     </div>
                     <div style="display:flex; justify-content:space-between;">
                         <span style="color: var(--text-secondary, #888);">Shipping Destination:</span>
@@ -429,8 +533,8 @@ export async function handlePlaceOrder(e) {
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                    <a href="shop.html" class="cta-button" style="padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Continue Shopping</a>
-                    <a href="account.html#orders" class="cta-button" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">View Order History</a>
+                    <a href="shop.html" class="place-order-button" style="text-decoration: none; display: inline-block; padding: 12px 26px; width: auto; margin-top: 0;">Continue Shopping &rarr;</a>
+                    <a href="account.html#orders" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 12px; display: inline-block; font-weight: 600; transition: all 0.2s;">View Order History</a>
                 </div>
             </div>
         `;

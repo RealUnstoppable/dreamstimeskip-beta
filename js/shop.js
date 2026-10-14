@@ -64,22 +64,147 @@ function generateStarsHtml(rating) {
     return '★'.repeat(fullStars) + (hasHalfStar ? '☆' : '') + '☆'.repeat(emptyStars);
 }
 
-function renderProducts(searchQuery = '') {
-    if (!productGrid) return;
-    const query = searchQuery.toLowerCase();
+// Levenshtein distance algorithm for robust typo matching
+function levenshteinDistance(a, b) {
+    if (!a || !b) return (a || b).length;
+    const matrix = [];
+    for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+    for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
 
-    productGrid.innerHTML = products.filter(product => {
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    matrix[i][j - 1] + 1,     // insertion
+                    matrix[i - 1][j] + 1      // deletion
+                );
+            }
+        }
+    }
+    return matrix[b.length][a.length];
+}
+
+const SEARCH_CATALOG = [
+    { name: 'Unstoppable Hoodie', keywords: ['hoodie', 'hoodies', 'unstoppable', 'black', 'fleece', 'sweatshirt'] },
+    { name: 'DTS Model Tee', keywords: ['tee', 'shirt', 't-shirt', 'tshirt', 'model', 'dts', 'dreams', 'timeskip'] },
+    { name: 'HarmonyTunes Cap', keywords: ['cap', 'hat', 'harmonytunes', 'music', 'headwear'] },
+    { name: 'Unstoppable Mousepad', keywords: ['mousepad', 'mouse', 'pad', 'mat', 'gaming', 'precision'] },
+    { name: 'Unstoppable Ceramic Mug', keywords: ['mug', 'ceramic', 'coffee', 'cup', 'tea'] },
+    { name: 'HarmonyTunes Vinyl LP', keywords: ['vinyl', 'record', 'lp', 'album', 'music', 'disc'] },
+    { name: 'Isabel LaRosa Art Print', keywords: ['isabel', 'larosa', 'poster', 'posters', 'print', 'prints', 'art', 'metallic'] },
+    { name: 'UN 250 Heritage Special Tee', keywords: ['heritage', 'special', 'flag', 'tee', 'shirt', 't-shirt', 'tshirt', '250', 'celebration'] }
+];
+
+export function findDidYouMeanSuggestion(rawQuery) {
+    const q = rawQuery.toLowerCase().trim();
+    if (!q || q.length < 2) return null;
+
+    let bestMatch = null;
+    let minDistance = Infinity;
+
+    // Check individual keywords and product titles
+    for (const item of SEARCH_CATALOG) {
+        // Full product title distance
+        const distTitle = levenshteinDistance(q, item.name.toLowerCase());
+        if (distTitle < minDistance && distTitle <= 4) {
+            minDistance = distTitle;
+            bestMatch = item.name;
+        }
+
+        // Keywords distance
+        for (const kw of item.keywords) {
+            const distKw = levenshteinDistance(q, kw);
+            if (distKw < minDistance && distKw <= 2) {
+                minDistance = distKw;
+                bestMatch = kw;
+            }
+        }
+    }
+
+    // Prefix match fallback
+    if (!bestMatch) {
+        for (const item of SEARCH_CATALOG) {
+            for (const kw of item.keywords) {
+                if (kw.startsWith(q.substring(0, Math.min(3, q.length)))) {
+                    return kw;
+                }
+            }
+        }
+    }
+
+    return bestMatch;
+}
+
+export function renderProducts(searchQuery = '') {
+    if (!productGrid) return;
+    const query = searchQuery.toLowerCase().trim();
+    const feedbackContainer = document.getElementById('search-feedback-container');
+
+    const filtered = products.filter(product => {
         if (!query) return true;
         const nameMatch = product.name.toLowerCase().includes(query);
         const descMatch = product.description.toLowerCase().includes(query);
-        return nameMatch || descMatch;
-    }).map(product => {
+        const idMatch = product.id.toLowerCase().includes(query);
+        return nameMatch || descMatch || idMatch;
+    });
+
+    if (query) {
+        if (filtered.length > 0) {
+            if (feedbackContainer) {
+                feedbackContainer.style.display = 'flex';
+                feedbackContainer.innerHTML = `
+                    <div class="did-you-mean-container">
+                        Showing ${filtered.length} product${filtered.length > 1 ? 's' : ''} for "<strong>${escapeHTML(searchQuery)}</strong>"
+                    </div>
+                    <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
+                `;
+            }
+        } else {
+            // No direct matches: compute typo suggestion
+            const suggestion = findDidYouMeanSuggestion(query);
+            if (feedbackContainer) {
+                feedbackContainer.style.display = 'flex';
+                if (suggestion && suggestion.toLowerCase() !== query) {
+                    feedbackContainer.innerHTML = `
+                        <div class="did-you-mean-container">
+                            Searching for "<strong>${escapeHTML(searchQuery)}</strong>"... Did you mean <a href="javascript:void(0)" class="did-you-mean-link" data-query="${escapeHTML(suggestion)}">${escapeHTML(suggestion)}</a>?
+                        </div>
+                        <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
+                    `;
+                } else {
+                    feedbackContainer.innerHTML = `
+                        <div class="did-you-mean-container">
+                            No products found for "<strong>${escapeHTML(searchQuery)}</strong>". Try searching for "hoodie", "tee", "cap", "mug", or "vinyl".
+                        </div>
+                        <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
+                    `;
+                }
+            }
+        }
+    } else {
+        if (feedbackContainer) feedbackContainer.style.display = 'none';
+    }
+
+    if (filtered.length === 0 && query) {
+        productGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed var(--border-color);">
+                <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
+                <h3 style="color: #fff; margin-bottom: 8px;">No Matching Products Found</h3>
+                <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 20px;">We couldn't find items matching "${escapeHTML(searchQuery)}". Click a suggestion above or view our complete catalog.</p>
+                <button type="button" class="cta-button" onclick="window.clearProductSearch()">Explore Full Collection</button>
+            </div>
+        `;
+        return;
+    }
+
+    productGrid.innerHTML = filtered.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
         return generateProductCardHtml(product, 'shop', 1, isWishlisted, stats, generateStarsHtml);
     }).join('');
-
-    // ⚡ Bolt: No longer fetching all reviews. renderProducts already uses productStatsMap.
 }
 
 async function updateAllProductRatings() {
@@ -149,12 +274,14 @@ function updateCartSummary() {
 }
 
 // --- CART LOGIC ---
-export async function handleAddToCart(productId, event) {
+export async function handleAddToCart(productId, event, quantity = 1) {
+    const addQty = Math.max(1, parseInt(quantity, 10) || 1);
+
     if (event) {
         const btn = event.currentTarget || event.target;
-        const card = btn.closest('.product-card');
+        const card = btn ? (btn.closest('.product-card') || btn.closest('.store-modal-body') || btn.closest('.store-modal-content')) : null;
         if (card) {
-            const img = card.querySelector('.product-image');
+            const img = card.querySelector('.product-image') || card.querySelector('.detail-main-image');
             if (img) {
                 const flyImg = document.createElement('img');
                 flyImg.src = img.src;
@@ -163,8 +290,8 @@ export async function handleAddToCart(productId, event) {
                 const imgRect = img.getBoundingClientRect();
                 flyImg.style.top = imgRect.top + 'px';
                 flyImg.style.left = imgRect.left + 'px';
-                flyImg.style.width = imgRect.width + 'px';
-                flyImg.style.height = imgRect.height + 'px';
+                flyImg.style.width = Math.min(imgRect.width, 100) + 'px';
+                flyImg.style.height = Math.min(imgRect.height, 100) + 'px';
                 
                 document.body.appendChild(flyImg);
                 
@@ -176,8 +303,8 @@ export async function handleAddToCart(productId, event) {
                     const cartRect = targetOrb.getBoundingClientRect();
                     flyImg.style.top = (cartRect.top + 10) + 'px';
                     flyImg.style.left = (cartRect.left + 10) + 'px';
-                    flyImg.style.width = '40px';
-                    flyImg.style.height = '40px';
+                    flyImg.style.width = '35px';
+                    flyImg.style.height = '35px';
                     flyImg.style.opacity = '0';
                     
                     setTimeout(() => {
@@ -195,7 +322,7 @@ export async function handleAddToCart(productId, event) {
         }
     }
 
-    cart[productId] = (cart[productId] || 0) + 1;
+    cart[productId] = (cart[productId] || 0) + addQty;
     try {
         await saveCart();
         renderCart();
@@ -230,21 +357,28 @@ async function handleRemoveFromCart(productId) {
 }
 
 export async function toggleWishlist(productId) {
-    if (!currentUser && !auth.currentUser) {
-        window.location.href = 'sign in beta.html';
-        return;
-    }
-
-    if (wishlist.has(productId)) {
-        wishlist.delete(productId);
-    } else {
+    const isNowWishlisted = !wishlist.has(productId);
+    if (isNowWishlisted) {
         wishlist.add(productId);
+    } else {
+        wishlist.delete(productId);
     }
 
-    renderProducts();
+    // Instantly update heart buttons in the UI for instant feedback
+    document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`).forEach(btn => {
+        btn.classList.toggle('active', isNowWishlisted);
+        btn.textContent = isNowWishlisted ? '❤️' : '🤍';
+        btn.title = isNowWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist';
+        btn.setAttribute('aria-label', isNowWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist');
+    });
 
-    // Dispatch a custom event so account.html can listen to updates if needed
-    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { wishlist } }));
+    // Save to localStorage immediately so state survives refresh and works offline/logged-out
+    try {
+        localStorage.setItem('localWishlist', JSON.stringify(Array.from(wishlist)));
+    } catch (_) {}
+
+    // Dispatch a custom event so account.html can update live
+    window.dispatchEvent(new CustomEvent('wishlistUpdated', { detail: { wishlist: Array.from(wishlist) } }));
 
     try {
         await saveWishlist();
@@ -259,7 +393,12 @@ let saveWishlistTimeout = null;
 let pendingResolves = [];
 
 async function saveWishlist() {
-    if (!currentUser) return;
+    try {
+        localStorage.setItem('localWishlist', JSON.stringify(Array.from(wishlist)));
+    } catch (_) {}
+
+    const activeUser = currentUser || auth.currentUser;
+    if (!activeUser) return;
 
     return new Promise((resolve, reject) => {
         if (saveWishlistTimeout) clearTimeout(saveWishlistTimeout);
@@ -267,7 +406,7 @@ async function saveWishlist() {
         saveWishlistTimeout = setTimeout(async () => {
             try {
                 const userWishlistRef = doc(db, 'wishlists', activeUser.uid);
-                await setDoc(userWishlistRef, { items: Array.from(wishlist) });
+                await setDoc(userWishlistRef, { items: Array.from(wishlist), updatedAt: serverTimestamp() }, { merge: true });
                 resolve();
             } catch (error) {
                 console.error("Manager info: Error saving wishlist to Firestore:", error.message);
@@ -287,17 +426,24 @@ async function saveCart() {
     return new Promise((resolve) => {
         pendingResolves.push(resolve);
         saveCartTimeout = setTimeout(async () => {
-            if (currentUser || auth.currentUser) {
+            const activeUser = currentUser || auth.currentUser;
+            
+            // Always sync localCart and cartItemCount so Lexi and all pages can read it immediately
+            try {
+                localStorage.setItem('localCart', JSON.stringify(cart));
+                const { itemCount } = calculateCartSummary(cart, products);
+                localStorage.setItem('cartItemCount', itemCount.toString());
+            } catch (_) {}
+
+            if (activeUser) {
                 try {
                     const userCartRef = doc(db, 'carts', activeUser.uid);
-                    await setDoc(userCartRef, { items: cart });
+                    await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() }, { merge: true });
                 } catch (error) {
                     console.error("Manager info: Error saving cart to Firestore:", error.message);
                 }
-            } else {
-                // Save cart to localStorage for logged-out users
-                localStorage.setItem('localCart', JSON.stringify(cart));
             }
+
             // Resolve all promises that were waiting for this debounce cycle
             const resolves = pendingResolves;
             pendingResolves = [];
@@ -394,60 +540,150 @@ async function handleViewReviews(productId) {
 
 // --- EVENT LISTENERS ---
 function setupEventListeners() {
+    const searchInput = document.getElementById('product-search');
+    const searchBtn = document.getElementById('product-search-btn');
 
-    // ⚡ Bolt: Debounce search input to prevent unnecessary re-renders during typing
-    if (productSearchInput) {
-        let searchTimeout;
-        productSearchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                renderProducts(e.target.value);
-            }, 300);
+    const handleSearch = () => {
+        if (!searchInput) return;
+        renderProducts(searchInput.value);
+    };
+
+    if (searchInput) {
+        // Enter key support for search
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+            }
+        });
+
+        // Live reset if cleared
+        searchInput.addEventListener('input', (e) => {
+            if (e.target.value.trim() === '') {
+                renderProducts('');
+            }
         });
     }
+
+    if (searchBtn) {
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSearch();
+        });
+    }
+
+    // Did-you-mean suggestion click and clear search buttons
+    document.addEventListener('click', (e) => {
+        const didYouMean = e.target.closest('.did-you-mean-link');
+        if (didYouMean) {
+            e.preventDefault();
+            const query = didYouMean.dataset.query;
+            if (searchInput && query) {
+                searchInput.value = query;
+                renderProducts(query);
+            }
+            return;
+        }
+
+        const clearBtn = e.target.closest('#clear-search-btn') || e.target.closest('.clear-search-btn');
+        if (clearBtn) {
+            e.preventDefault();
+            if (searchInput) searchInput.value = '';
+            renderProducts('');
+            return;
+        }
+    });
+
+    window.clearProductSearch = () => {
+        if (searchInput) searchInput.value = '';
+        renderProducts('');
+    };
 
     // Product grid listeners
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.add-to-cart-btn');
-            const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title') || e.target.closest('.product-rating-summary');
+            const reviewBtn = e.target.closest('.reviews-btn') || e.target.closest('.view-reviews-btn');
+            const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title');
 
             if (addBtn) {
                 const productId = addBtn.dataset.id;
-                handleAddToCart(productId, e);
+                handleAddToCart(productId, e, 1);
             } else if (e.target.classList.contains('wishlist-btn') || e.target.closest('.wishlist-btn')) {
                 const btn = e.target.classList.contains('wishlist-btn') ? e.target : e.target.closest('.wishlist-btn');
                 const productId = btn.dataset.id;
                 toggleWishlist(productId);
-            } else if (e.target.classList.contains('view-reviews-btn') || e.target.classList.contains('reviews-btn')) {
-                const productId = e.target.dataset.id;
-                if (e.target.classList.contains('view-reviews-btn')) {
-                    handleViewReviews(productId);
-                } else {
+            } else if (reviewBtn || productClickable) {
+                const targetEl = reviewBtn || productClickable;
+                const productId = targetEl.dataset.id;
+                if (productId) {
                     openReviewsModal(productId);
                 }
             }
         });
     }
 
-    // Product search input
-    const productSearchInput = document.getElementById('product-search');
-    if (productSearchInput) {
-        let productSearchTimeout;
-        productSearchInput.addEventListener('input', (e) => {
-            clearTimeout(productSearchTimeout);
-            productSearchTimeout = setTimeout(() => {
-                renderProducts(e.target.value);
-            }, 300); // ⚡ Bolt: Debounce product search to reduce unnecessary DOM re-renders
+    // Thumbnail switching in Store Detail Popup
+    const detailThumbs = document.getElementById('detail-thumbnails');
+    if (detailThumbs) {
+        detailThumbs.addEventListener('click', (e) => {
+            const btn = e.target.closest('.detail-thumb-btn');
+            if (btn) {
+                const src = btn.dataset.src;
+                const mainImg = document.getElementById('detail-main-image');
+                if (mainImg && src) {
+                    mainImg.src = src;
+                    detailThumbs.querySelectorAll('.detail-thumb-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            }
+        });
+    }
+
+    // Quantity controls in Store Detail Popup
+    const qtyMinus = document.getElementById('detail-qty-minus');
+    const qtyPlus = document.getElementById('detail-qty-plus');
+    const qtyInput = document.getElementById('detail-quantity-input');
+    if (qtyMinus && qtyInput) {
+        qtyMinus.addEventListener('click', () => {
+            const current = parseInt(qtyInput.value, 10) || 1;
+            if (current > 1) qtyInput.value = current - 1;
+        });
+    }
+    if (qtyPlus && qtyInput) {
+        qtyPlus.addEventListener('click', () => {
+            const current = parseInt(qtyInput.value, 10) || 1;
+            if (current < 99) qtyInput.value = current + 1;
+        });
+    }
+
+    // Add to Cart from Store Detail Popup
+    const detailAddBtn = document.getElementById('detail-add-to-cart-btn');
+    if (detailAddBtn) {
+        detailAddBtn.addEventListener('click', async (e) => {
+            if (!currentReviewProductId) return;
+            const quantity = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
+            await handleAddToCart(currentReviewProductId, e, quantity);
+            
+            const feedback = document.getElementById('detail-cart-feedback');
+            if (feedback) {
+                feedback.textContent = `✓ Added ${quantity} item${quantity > 1 ? 's' : ''} to cart!`;
+                feedback.style.display = 'block';
+                setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+            }
         });
     }
 
     // Review Modal Listeners
     if (closeReviewsBtn && reviewsModal) {
-        closeReviewsBtn.addEventListener('click', () => reviewsModal.style.display = 'none');
+        closeReviewsBtn.addEventListener('click', () => {
+            reviewsModal.classList.remove('active');
+            setTimeout(() => { reviewsModal.style.display = 'none'; }, 200);
+        });
         window.addEventListener('click', (e) => {
             if (e.target === reviewsModal) {
-                reviewsModal.style.display = 'none';
+                reviewsModal.classList.remove('active');
+                setTimeout(() => { reviewsModal.style.display = 'none'; }, 200);
             }
         });
     }
@@ -695,8 +931,52 @@ function setupEventListeners() {
 async function openReviewsModal(productId) {
     currentReviewProductId = productId;
     const product = productMap.get(productId);
+    if (!product) return;
 
-    document.getElementById('reviews-modal-title').textContent = `Reviews for ${product.name}`;
+    // 1. Left Side: Product Images Gallery
+    const mainImg = document.getElementById('detail-main-image');
+    if (mainImg) {
+        mainImg.src = product.imageUrl;
+        mainImg.alt = product.name;
+    }
+
+    const thumbsContainer = document.getElementById('detail-thumbnails');
+    if (thumbsContainer) {
+        const allImages = (product.extraImages && product.extraImages.length > 0) ? product.extraImages : [product.imageUrl];
+        if (allImages.length > 1) {
+            thumbsContainer.innerHTML = allImages.map((src, idx) => `
+                <button type="button" class="detail-thumb-btn ${idx === 0 ? 'active' : ''}" data-src="${src}" aria-label="View photo ${idx + 1}">
+                    <img src="${src}" alt="${escapeHTML(product.name)} photo ${idx + 1}">
+                </button>
+            `).join('');
+        } else {
+            thumbsContainer.innerHTML = '';
+        }
+    }
+
+    // 2. Right Side: Product Details & Sale Pricing (Markup 35%, 25% Discount like memberships)
+    const titleEl = document.getElementById('detail-product-name');
+    if (titleEl) titleEl.textContent = product.name;
+
+    const modalTitleLegacy = document.getElementById('reviews-modal-title');
+    if (modalTitleLegacy) modalTitleLegacy.textContent = `Reviews for ${product.name}`;
+
+    const origPrice = product.originalPrice ?? Number((product.price * 1.35).toFixed(2));
+    const salePrice = product.salePrice ?? Number((origPrice * 0.75).toFixed(2));
+    const origPriceEl = document.getElementById('detail-original-price');
+    const salePriceEl = document.getElementById('detail-sale-price');
+    if (origPriceEl) origPriceEl.textContent = `$${origPrice.toFixed(2)}`;
+    if (salePriceEl) salePriceEl.textContent = `$${salePrice.toFixed(2)}`;
+
+    const descEl = document.getElementById('detail-description');
+    if (descEl) descEl.textContent = product.description;
+
+    const qtyInput = document.getElementById('detail-quantity-input');
+    if (qtyInput) qtyInput.value = '1';
+
+    const cartFeedback = document.getElementById('detail-cart-feedback');
+    if (cartFeedback) cartFeedback.style.display = 'none';
+
     reviewsListContainer.innerHTML = '<p class="review-message loading">Loading reviews...</p>';
 
     // Reset Form
@@ -705,24 +985,26 @@ async function openReviewsModal(productId) {
         s.classList.remove('active');
         s.setAttribute('aria-checked', 'false');
     });
-    reviewText.value = '';
-    reviewNotification.innerHTML = '';
+    if (reviewText) reviewText.value = '';
+    if (reviewNotification) reviewNotification.innerHTML = '';
 
     // Toggle Auth Sections
     if (currentUser || auth.currentUser) {
-        reviewSubmissionSection.style.display = 'block';
-        loginPromptSection.style.display = 'none';
+        if (reviewSubmissionSection) reviewSubmissionSection.style.display = 'block';
+        if (loginPromptSection) loginPromptSection.style.display = 'none';
     } else {
-        reviewSubmissionSection.style.display = 'none';
-        loginPromptSection.style.display = 'block';
+        if (reviewSubmissionSection) reviewSubmissionSection.style.display = 'none';
+        if (loginPromptSection) loginPromptSection.style.display = 'block';
     }
 
     // Load Stats and Reviews
     const stats = productStatsMap.get(productId) || { averageRating: 0, reviewCount: 0 };
-    document.getElementById('modal-average-rating').textContent = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '0.0';
-    document.getElementById('modal-stars-display').innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
-    document.getElementById('modal-review-count').textContent = `${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''}`;
-
+    const avgRatingEl = document.getElementById('modal-average-rating');
+    const starsDisplayEl = document.getElementById('modal-stars-display');
+    const reviewCountEl = document.getElementById('modal-review-count');
+    if (avgRatingEl) avgRatingEl.textContent = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '0.0';
+    if (starsDisplayEl) starsDisplayEl.innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
+    if (reviewCountEl) reviewCountEl.textContent = `(${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''})`;
 
     // Reset tabs
     if (tabReviews && tabQa) {
@@ -741,7 +1023,10 @@ async function openReviewsModal(productId) {
         if (qaLoginPrompt) qaLoginPrompt.style.display = 'block';
     }
 
-    reviewsModal.style.display = 'block';
+    if (reviewsModal) {
+        reviewsModal.style.display = 'flex';
+        requestAnimationFrame(() => reviewsModal.classList.add('active'));
+    }
 
     await loadReviews(productId);
 }
