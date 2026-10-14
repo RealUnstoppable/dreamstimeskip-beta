@@ -1,5 +1,5 @@
 // js/song-data.js
-// Auto-generated song library
+// Auto-generated song library with Medixly Top 100 playlist
 
 export const songColors = {
     'pixy-legacy': '#5c4a3d',
@@ -13,6 +13,7159 @@ export const songColors = {
 };
 
 export const librarySongs = [
+    {
+        "id": "top100-blinding-lights-the-weeknd",
+        "title": "Blinding Lights",
+        "artist": "The Weeknd",
+        "duration": "3:22",
+        "src": "/music/blinding-lights-the-weeknd.mp3",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 1
+    },
+    {
+        "id": "top100-sunflower-post-malone",
+        "title": "Sunflower",
+        "artist": "Post Malone & Swae Lee",
+        "duration": "2:38",
+        "src": "/music/sunflower-post-malone.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/98/f0/d6/98f0d67e-f8bf-762d-cac7-1c6b3b6b35dd/mzaf_4543283896248560946.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4b/30/2c/4b302cb6-7a14-5464-4e97-0577e9d0be49/18UMGIM82277.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 2
+    },
+    {
+        "id": "top100-shape-of-you-ed-sheeran",
+        "title": "Shape of You",
+        "artist": "Ed Sheeran",
+        "duration": "3:54",
+        "src": "/music/shape-of-you-ed-sheeran.mp3",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 3
+    },
+    {
+        "id": "top100-billie-jean-michael-jackson",
+        "title": "Billie Jean",
+        "artist": "Michael Jackson",
+        "duration": "4:54",
+        "src": "/music/billie-jean-michael-jackson.mp3",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 4
+    },
+    {
+        "id": "top100-not-like-us-kendrick-lamar",
+        "title": "Not Like Us",
+        "artist": "Kendrick Lamar",
+        "duration": "4:34",
+        "src": "/music/not-like-us-kendrick-lamar.mp3",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 5
+    },
+    {
+        "id": "top100-gods-plan-drake",
+        "title": "God's Plan",
+        "artist": "Drake",
+        "duration": "3:19",
+        "src": "/music/gods-plan-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c6/4a/be/c64abe74-adb4-cff5-005d-0fab3d72a806/mzaf_10276154697254415719.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/6d/8f/bb6d8f67-6d04-10b5-dd62-eb5809ac54fc/00602567879152.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 6
+    },
+    {
+        "id": "top100-last-night-morgan-wallen",
+        "title": "Last Night",
+        "artist": "Morgan Wallen",
+        "duration": "2:44",
+        "src": "/music/last-night-morgan-wallen.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5e/80/50/5e80506c-cee2-618a-a481-63ca5c74c5ab/mzaf_1765193813138928866.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/db/9f/8e/db9f8e0c-d947-b7fd-cc93-a832c81ce4ee/00602455241252_Cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 7
+    },
+    {
+        "id": "top100-die-with-a-smile-lady-gaga",
+        "title": "Die With A Smile",
+        "artist": "Lady Gaga, Bruno Mars",
+        "duration": "4:12",
+        "src": "/music/die-with-a-smile-lady-gaga.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/6a/99/076a99ed-b946-431b-6f1f-54fa187ca5bd/mzaf_8102882277995122875.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 8
+    },
+    {
+        "id": "top100-mr-brightside-the-killers",
+        "title": "Mr. Brightside",
+        "artist": "The Killers",
+        "duration": "3:43",
+        "src": "/music/mr-brightside-the-killers.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/a0/30/c3a03008-17c5-aa29-6c6a-5e757ccdbaa5/mzaf_6073120660767081787.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/11/64/9c/11649c80-2066-dba8-77a9-df7eecae26c1/17UM1IM06937.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rock",
+            "viral"
+        ],
+        "rank": 9
+    },
+    {
+        "id": "top100-7-rings-ariana-grande",
+        "title": "7 rings",
+        "artist": "Ariana Grande",
+        "duration": "2:59",
+        "src": "/music/7-rings-ariana-grande.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d5/c8/f3/d5c8f31b-1c8f-93ed-e78b-8c0bce3e8b66/mzaf_14456154925680073521.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 10
+    },
+    {
+        "id": "top100-passionfruit-drake",
+        "title": "Passionfruit",
+        "artist": "Drake",
+        "duration": "4:59",
+        "src": "/music/passionfruit-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/b7/73/3db773ac-bade-82c1-c570-4a699945d1f6/mzaf_13103071700695768982.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/18/9d/b8/189db80b-bfa8-89d1-1514-5fcb7e5cf8f4/00602557611526.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "hiphop",
+            "viral"
+        ],
+        "rank": 11
+    },
+    {
+        "id": "top100-i-had-some-help-post-malone",
+        "title": "I Had Some Help",
+        "artist": "Post Malone",
+        "duration": "2:58",
+        "src": "/music/i-had-some-help-post-malone.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/70/04/1f7004b7-414e-a89c-0148-abdd38981be8/mzaf_10246855408392712577.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/df/b9/84dfb96b-27c8-4d40-4780-b65ff22790e4/24UMGIM50612.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 12
+    },
+    {
+        "id": "top100-snooze-sza",
+        "title": "Snooze",
+        "artist": "SZA",
+        "duration": "3:22",
+        "src": "/music/snooze-sza.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b3/9b/ca/b39bca57-2627-1aec-77af-cbf551205394/mzaf_4430383240210492712.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/62/93/13/6293132e-20ff-67ab-3d1f-96bb6797a6ba/196589564955.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 13
+    },
+    {
+        "id": "top100-baby-justin-bieber",
+        "title": "Baby",
+        "artist": "Justin Bieber",
+        "duration": "3:34",
+        "src": "/music/baby-justin-bieber.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/66/d3/8966d3cb-68eb-5f2c-fef8-4ac420721387/mzaf_3044382270474258872.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 14
+    },
+    {
+        "id": "top100-thank-u-next-ariana-grande",
+        "title": "thank u, next",
+        "artist": "Ariana Grande",
+        "duration": "3:27",
+        "src": "/music/thank-u-next-ariana-grande.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/89/96/16/8996169e-2309-a298-f6f0-e7c52fe8e176/mzaf_590631660224715451.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 15
+    },
+    {
+        "id": "top100-yonaguni-bad-bunny",
+        "title": "Yonaguni",
+        "artist": "Andres G.",
+        "duration": "3:27",
+        "src": "/music/yonaguni-bad-bunny.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/de/dd/fc/deddfc96-39df-7624-b864-7654583fb353/mzaf_15466035064086576219.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/16/d5/6e/16d56e79-e92c-5ea4-b66b-084d976cd982/artwork.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "latin",
+            "viral"
+        ],
+        "rank": 16
+    },
+    {
+        "id": "top100-the-hills-the-weeknd",
+        "title": "The Hills",
+        "artist": "The Weeknd",
+        "duration": "4:02",
+        "src": "/music/the-hills-the-weeknd.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/70/c8/0b70c898-ec23-3131-5d17-aa7417045013/mzaf_3059117378996578649.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/30/05/1e/30051e57-a63a-3acc-4b30-42568293f5f7/15UMGIM36514.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 17
+    },
+    {
+        "id": "top100-perfect-ed-sheeran",
+        "title": "Perfect",
+        "artist": "Ed Sheeran",
+        "duration": "4:23",
+        "src": "/music/perfect-ed-sheeran.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c7/ba/bc/c7babc66-f598-aaa6-bcf6-307281795817/mzaf_16337361235117168274.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 18
+    },
+    {
+        "id": "top100-tennessee-whiskey-chris-stapleton",
+        "title": "Tennessee Whiskey",
+        "artist": "Chris Stapleton",
+        "duration": "4:53",
+        "src": "/music/tennessee-whiskey-chris-stapleton.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/b3/e0/76b3e0d2-54e7-cf85-5acd-7e80842965b8/mzaf_15197962862081974235.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e2/4b/60/e24b6016-8278-bb18-cf5d-d44bf68371da/00602547223838.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 19
+    },
+    {
+        "id": "top100-something-in-the-orange-zach-bryan",
+        "title": "Something in the Orange",
+        "artist": "Zach Bryan",
+        "duration": "3:48",
+        "src": "/music/something-in-the-orange-zach-bryan.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/32/b3/f1/32b3f1e5-33f9-2783-7011-89faa0e4c707/mzaf_15798803351390194915.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/d6/cd/d8/d6cdd86f-db67-ffc8-cd5e-26c4559686c3/054391903860.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 20
+    },
+    {
+        "id": "top100-like-that-future",
+        "title": "Like That",
+        "artist": "Future, Metro Boomin",
+        "duration": "4:28",
+        "src": "/music/like-that-future.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 21
+    },
+    {
+        "id": "top100-wait-for-u-future",
+        "title": "WAIT FOR U",
+        "artist": "Future",
+        "duration": "3:10",
+        "src": "/music/wait-for-u-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/45/c7/b7/45c7b762-45b3-c597-aa82-7f028c5efe00/mzaf_12117055212901229792.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c8/4c/fa/c84cfa03-1916-89f1-5362-03425fbe2ff9/196589073709.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 22
+    },
+    {
+        "id": "top100-sweater-weather-the-neighbourhood",
+        "title": "Sweater Weather",
+        "artist": "The Neighbourhood",
+        "duration": "4:00",
+        "src": "/music/sweater-weather-the-neighbourhood.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/37/20/8c372047-2727-8054-9411-0e4867643dd8/mzaf_10169659262182214119.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "indie",
+            "viral"
+        ],
+        "rank": 23
+    },
+    {
+        "id": "top100-iris-the-goo-goo-dolls",
+        "title": "Iris",
+        "artist": "The Goo Goo Dolls",
+        "duration": "4:50",
+        "src": "/music/iris-the-goo-goo-dolls.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/17/35/60173512-3d5c-1d6f-549e-d8ddafa93e07/mzaf_5281658494050788067.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/2c/13/18/2c131801-00af-58b1-3cc2-13abf4ad5416/093624919162.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rock",
+            "viral"
+        ],
+        "rank": 24
+    },
+    {
+        "id": "top100-marvins-room-drake",
+        "title": "Marvins Room",
+        "artist": "Drake",
+        "duration": "5:47",
+        "src": "/music/marvins-room-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/94/13/84/941384e8-b69f-c94c-cac6-66742c905133/mzaf_12485282444355403803.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/d2/53/62/d2536245-b94c-b3fd-7168-9512f655f6d4/00602527899091.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 25
+    },
+    {
+        "id": "top100-wildflower-billie-eilish",
+        "title": "WILDFLOWER",
+        "artist": "Billie Eilish",
+        "duration": "4:21",
+        "src": "/music/wildflower-billie-eilish.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/de/c3/e8/dec3e884-7237-9622-718a-12c5f48c5ca2/mzaf_3134455671785145822.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 26
+    },
+    {
+        "id": "top100-wicked-games-the-weeknd",
+        "title": "Wicked Games",
+        "artist": "The Weeknd",
+        "duration": "5:25",
+        "src": "/music/wicked-games-the-weeknd.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/2f/a8/be/2fa8be8c-4dd8-5b72-a100-855acf921275/mzaf_9274276073018723273.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4b/ab/3c/4bab3c0d-ea9a-ad8e-4229-b1e73cad0283/21UMGIM06668.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 27
+    },
+    {
+        "id": "top100-you-proof-morgan-wallen",
+        "title": "You Proof",
+        "artist": "Morgan Wallen",
+        "duration": "2:37",
+        "src": "/music/you-proof-morgan-wallen.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fb/7d/32/fb7d325a-d807-54fd-2722-f9f689ff01f2/mzaf_16988886038036192673.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 28
+    },
+    {
+        "id": "top100-fukumean-gunna",
+        "title": "fukumean",
+        "artist": "Gunna",
+        "duration": "2:05",
+        "src": "/music/fukumean-gunna.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/56/99/48/569948e7-53ad-63db-c9e6-7d2bcb42ee37/mzaf_13339036632173809468.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/af/f8/ef/aff8ef1c-e1e7-8c70-75fa-2201d8785f3d/075679678492.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 29
+    },
+    {
+        "id": "top100-freestyle-lil-baby",
+        "title": "Freestyle",
+        "artist": "Lil Baby & Gunna",
+        "duration": "2:42",
+        "src": "/music/freestyle-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8a/ad/b6/8aadb675-ddd7-1127-8e82-760b37eb352a/mzaf_1875505956465342074.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/2f/51/732f51a6-2f11-bdf6-dffc-f8b68e22b7ad/18UMGIM62580.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 30
+    },
+    {
+        "id": "top100-best-i-ever-had-drake",
+        "title": "Best I Ever Had",
+        "artist": "Drake",
+        "duration": "4:18",
+        "src": "/music/best-i-ever-had-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/46/a1/a7/46a1a74a-bc24-91e6-7fca-334718928181/mzaf_16387926407277270668.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/50/7f/3b/507f3b71-c606-5a59-06ee-22be3e1e6ca5/00602577542602.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 31
+    },
+    {
+        "id": "top100-type-shit-future",
+        "title": "Type Shit",
+        "artist": "Future, Metro Boomin",
+        "duration": "3:48",
+        "src": "/music/type-shit-future.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 32
+    },
+    {
+        "id": "top100-broken-clocks-sza",
+        "title": "Broken Clocks",
+        "artist": "SZA",
+        "duration": "3:51",
+        "src": "/music/broken-clocks-sza.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/06/8e/41/068e4113-639e-d3f0-dfd3-efe4de309022/mzaf_13933063054300365168.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/a2/bc/ad/a2bcad46-b389-4be1-8bac-5a0959b0b8e4/886446548449.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 33
+    },
+    {
+        "id": "top100-power-trip-j-cole",
+        "title": "Power Trip",
+        "artist": "J. Cole",
+        "duration": "4:01",
+        "src": "/music/power-trip-j-cole.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/08/df/b3/08dfb3fe-7661-d0df-a039-bebac477acf5/mzaf_7054863511762371556.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/da/52/41/da52415b-d0ac-d61f-422c-e84bf5ef8162/20UMGIM66000.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 34
+    },
+    {
+        "id": "top100-beautiful-things-benson-boone",
+        "title": "Beautiful Things",
+        "artist": "Benson Boone",
+        "duration": "3:00",
+        "src": "/music/beautiful-things-benson-boone.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/d5/00/4dd5006f-ee02-c3f1-94db-0ed4b8dd68f1/mzaf_14250561294796027079.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/54/f4/92/54f49210-e260-b519-ebbd-f4f40ee710cd/054391342751.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 35
+    },
+    {
+        "id": "top100-dont-bryson-tiller",
+        "title": "Don't",
+        "artist": "Bryson Tiller",
+        "duration": "3:18",
+        "src": "/music/dont-bryson-tiller.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/12/f8/63/12f86376-9b16-4206-fe19-bc74c6d77113/mzaf_15220743029863562895.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b6/80/3c/b6803c18-1285-3c66-ec98-5e423e7268f8/886445447828.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 36
+    },
+    {
+        "id": "top100-knife-talk-drake",
+        "title": "Knife Talk",
+        "artist": "Drake",
+        "duration": "4:03",
+        "src": "/music/knife-talk-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/74/85/0a/74850aac-0c38-9fba-56aa-376e6b7bafb3/mzaf_10040140038592228176.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/cb/6b/5f/cb6b5fc3-8d35-908a-18e6-6f8eda46ce11/21UM1IM07521.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 37
+    },
+    {
+        "id": "top100-march-madness-future",
+        "title": "March Madness",
+        "artist": "Future",
+        "duration": "4:04",
+        "src": "/music/march-madness-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5c/1f/14/5c1f1470-473d-fe73-672b-bcfa98fe08e0/mzaf_11991804174129562316.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/b0/ca/34/b0ca349f-d3ce-3734-a97f-31578f0b214e/886445475784.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 38
+    },
+    {
+        "id": "top100-girls-need-love-summer-walker",
+        "title": "Girls Need Love",
+        "artist": "Summer Walker",
+        "duration": "2:21",
+        "src": "/music/girls-need-love-summer-walker.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1b/cd/03/1bcd03ce-6c05-2af1-cafd-7a4d27723ddb/mzaf_16459878764527811594.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/1b/41/f6/1b41f601-5884-5f44-7ab1-321ffab0e891/23UM1IM28224.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 39
+    },
+    {
+        "id": "top100-controlla-drake",
+        "title": "Controlla",
+        "artist": "Drake",
+        "duration": "4:05",
+        "src": "/music/controlla-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/74/e8/e1/74e8e1a6-8727-10c1-635f-7fdb1fd6b299/mzaf_15372399470688006783.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/f5/87/95f587f7-21c3-d5f9-d81a-4350f9caa020/16UMGIM27643.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 40
+    },
+    {
+        "id": "top100-into-you-ariana-grande",
+        "title": "Into You",
+        "artist": "Ariana Grande",
+        "duration": "4:04",
+        "src": "/music/into-you-ariana-grande.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f2/7c/2a/f27c2ab0-6444-bcc7-4427-7b26cb9a9702/mzaf_4792198378212475357.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/59/66/c1/5966c16f-e06b-3e12-3eec-271479609f61/16UMGIM59808.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 41
+    },
+    {
+        "id": "top100-poetic-justice-kendrick-lamar",
+        "title": "Poetic Justice",
+        "artist": "Kendrick Lamar",
+        "duration": "5:00",
+        "src": "/music/poetic-justice-kendrick-lamar.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d8/ea/2a/d8ea2a90-86c8-5ff1-54cb-a87b34435bbe/mzaf_267293595076580687.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/36/86/ec/3686ec99-dec4-0a01-8b74-2d8a9a0263a7/12UMGIM52988.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 42
+    },
+    {
+        "id": "top100-wasted-on-you-morgan-wallen",
+        "title": "Wasted On You",
+        "artist": "Morgan Wallen",
+        "duration": "2:59",
+        "src": "/music/wasted-on-you-morgan-wallen.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f6/5c/50/f65c50e0-9a64-1c6c-a7af-85a54c223c51/mzaf_13516707549685492493.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/68/05/ab/6805abb2-10d1-35cb-aa84-71386b285b7d/00602435514642_Cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 43
+    },
+    {
+        "id": "top100-cowgirls-morgan-wallen",
+        "title": "Cowgirls",
+        "artist": "Morgan Wallen",
+        "duration": "3:02",
+        "src": "/music/cowgirls-morgan-wallen.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/86/53/64/865364f8-9795-0461-d49a-b41277b2faa6/mzaf_11050295687180336387.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 44
+    },
+    {
+        "id": "top100-thinkin-bout-me-morgan-wallen",
+        "title": "Thinkin' Bout Me",
+        "artist": "Morgan Wallen",
+        "duration": "2:57",
+        "src": "/music/thinkin-bout-me-morgan-wallen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 45
+    },
+    {
+        "id": "top100-puffin-on-zootiez-future",
+        "title": "PUFFIN ON ZOOTIEZ",
+        "artist": "Future",
+        "duration": "2:53",
+        "src": "/music/puffin-on-zootiez-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/66/9f/da/669fda6a-36c7-4692-7ee8-09e1a7fe354a/mzaf_7740878029521855446.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c8/4c/fa/c84cfa03-1916-89f1-5362-03425fbe2ff9/196589073709.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 46
+    },
+    {
+        "id": "top100-money-in-the-grave-drake",
+        "title": "Money In The Grave",
+        "artist": "Drake",
+        "duration": "3:25",
+        "src": "/music/money-in-the-grave-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/f5/04/07f50450-075d-8bd2-6a1e-78e03e0b31d1/mzaf_10966572582739386326.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/95/ed/ec/95edecd9-ae39-f81c-5c96-9f20957104ec/19UMGIM54645.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 47
+    },
+    {
+        "id": "top100-wants-and-needs-drake",
+        "title": "Wants and Needs",
+        "artist": "Drake",
+        "duration": "3:13",
+        "src": "/music/wants-and-needs-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/dc/d9/9b/dcd99bc8-a679-e12a-ce87-d97ef4193aba/mzaf_12330511370535298878.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9f/e2/93/9fe2935e-da8e-8951-26cc-3454c52a2831/21UMGIM18577.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 48
+    },
+    {
+        "id": "top100-in-a-minute-lil-baby",
+        "title": "In A Minute",
+        "artist": "Lil Baby",
+        "duration": "3:20",
+        "src": "/music/in-a-minute-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/46/02/e7/4602e7c2-6148-3322-0d7c-18ccdd4c1280/mzaf_4712580640846029656.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/27/05/fc/2705fce4-0bad-659d-74c1-6edcf9eff2d7/22UM1IM13099.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 49
+    },
+    {
+        "id": "top100-right-on-lil-baby",
+        "title": "Right On",
+        "artist": "Lil Baby",
+        "duration": "3:34",
+        "src": "/music/right-on-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/43/f2/91/43f29148-0345-9896-1c2c-7fc0f23505cd/mzaf_16156757352124126991.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/83/52/9b/83529b7b-2e37-a973-1c10-2342ffd0061b/22UMGIM37904.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 50
+    },
+    {
+        "id": "top100-sum-2-prove-lil-baby",
+        "title": "Sum 2 Prove",
+        "artist": "Lil Baby",
+        "duration": "3:26",
+        "src": "/music/sum-2-prove-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/87/f2/53/87f25377-bb81-bcfa-2d2b-fa3713b3a666/mzaf_12953726527852008086.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/03/73/c3/0373c310-69ad-747f-ae78-14cf03b0464b/20UMGIM30254.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 51
+    },
+    {
+        "id": "top100-cinderella-future",
+        "title": "Cinderella",
+        "artist": "Future, Metro Boomin & Travis Scott",
+        "duration": "2:50",
+        "src": "/music/cinderella-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/18/a0/9918a01d-2008-b1e8-2ba5-85792c198aaa/mzaf_4895288577312897576.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fe/b6/46/feb64670-4fe7-bbc0-1101-c5f11bfb6905/196871937399.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 52
+    },
+    {
+        "id": "top100-so-easy-to-fall-in-love-olivia-dean",
+        "title": "So Easy (To Fall In Love)",
+        "artist": "Olivia Dean",
+        "duration": "2:49",
+        "src": "/music/so-easy-to-fall-in-love-olivia-dean.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/0a/c0/b30ac06f-1b78-f579-8e72-e2fc9eb3a2c8/mzaf_7319723033619206839.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 53
+    },
+    {
+        "id": "top100-dont-we-morgan-wallen",
+        "title": "Don't We",
+        "artist": "Morgan Wallen",
+        "duration": "3:11",
+        "src": "/music/dont-we-morgan-wallen.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/10/6a/76106a13-68d2-2e7b-700d-8ab29a74fc78/mzaf_2926224850016162793.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fa/60/fe/fa60fe4a-4329-a0bb-eb7c-3b6094a4d831/25UMGIM46049.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 54
+    },
+    {
+        "id": "top100-stick-talk-future",
+        "title": "Stick Talk",
+        "artist": "Future",
+        "duration": "2:51",
+        "src": "/music/stick-talk-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/3f/11/5b3f117f-d9cb-0627-16d6-d16df5f3ea9c/mzaf_8883890289383858089.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/01/d0/2101d0ef-079a-974e-317a-780275f8c269/886445328547.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 55
+    },
+    {
+        "id": "top100-kacey-talk-youngboy-nba",
+        "title": "Kacey Talk",
+        "artist": "YoungBoy Never Broke Again",
+        "duration": "2:31",
+        "src": "/music/kacey-talk-youngboy-nba.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9c/cf/44/9ccf44fc-29aa-411f-f12f-2a0098a477ae/mzaf_11674315269429729817.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/e7/d8/80/e7d880c5-0a13-0da1-036c-2a35fca4c59d/075679803573.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 56
+    },
+    {
+        "id": "top100-vette-motors-youngboy-nba",
+        "title": "Vette Motors",
+        "artist": "YoungBoy Never Broke Again",
+        "duration": "2:53",
+        "src": "/music/vette-motors-youngboy-nba.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/93/a1/ab/93a1ab43-f95d-826b-ef85-d650f3ab0db3/mzaf_483236161695532160.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/80/9c/b0/809cb059-d7d7-9a1d-36d0-2c19b60c8bdf/075679750020.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 57
+    },
+    {
+        "id": "top100-no-flockin-kodak-black",
+        "title": "No Flockin",
+        "artist": "Kodak Black",
+        "duration": "2:45",
+        "src": "/music/no-flockin-kodak-black.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/fc/f6/31/fcf631e2-c318-fffc-5eb0-a1fefca7e88b/mzaf_3001449681515781992.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/9b/e7/7f/9be77f56-cb0c-e47c-5bda-15ff50b70cc4/mzm.mvaruvbi.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 58
+    },
+    {
+        "id": "top100-ambition-for-cash-key-glock",
+        "title": "Ambition For Cash",
+        "artist": "Key Glock",
+        "duration": "2:23",
+        "src": "/music/ambition-for-cash-key-glock.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/44/33/19/4433190f-d577-eb64-e37c-a185bfed3153/mzaf_2877616779271280184.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/81/92/69/81926910-f2d3-5b24-cd02-040d67578f3d/194690644481_cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 59
+    },
+    {
+        "id": "top100-whatever-she-wants-bryson-tiller",
+        "title": "Whatever She Wants",
+        "artist": "Bryson Tiller",
+        "duration": "2:41",
+        "src": "/music/whatever-she-wants-bryson-tiller.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/79/6a/3e/796a3e99-e51c-0523-56a7-1007d83b2da1/mzaf_1288575389303131974.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/df/5f/e4/df5fe44f-2d31-941e-e27f-4ca002f152b5/196871928267.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 60
+    },
+    {
+        "id": "top100-e85-don-toliver",
+        "title": "E85",
+        "artist": "Don Toliver",
+        "duration": "2:33",
+        "src": "/music/e85-don-toliver.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/17/68/e1/1768e109-c034-115d-affc-01a97c427142/mzaf_4718121937950048317.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/c1/dd/00c1dd09-3f86-7288-01dc-63b9f4262f57/075679599377.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 61
+    },
+    {
+        "id": "top100-tiramisu-don-toliver",
+        "title": "Tiramisu",
+        "artist": "Don Toliver",
+        "duration": "2:19",
+        "src": "/music/tiramisu-don-toliver.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/23/1f/ac/231fac57-b1eb-db74-2baa-bb3aa0a2ac53/mzaf_2356220023414939488.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dc/23/e6/dc23e6c0-07bd-0ce7-6ce5-18c8bf22ed77/075679600691.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 62
+    },
+    {
+        "id": "top100-body-don-toliver",
+        "title": "Body",
+        "artist": "Don Toliver",
+        "duration": "2:36",
+        "src": "/music/body-don-toliver.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a4/6b/e2/a46be242-f934-1876-06d1-fe4cedea4cdb/mzaf_16330599808244850326.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/00/c1/dd/00c1dd09-3f86-7288-01dc-63b9f4262f57/075679599377.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 63
+    },
+    {
+        "id": "top100-miss-my-dawg-yeat",
+        "title": "MISS MY DAWG",
+        "artist": "Yeat, Drake",
+        "duration": "3:09",
+        "src": "/music/miss-my-dawg-yeat.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 64
+    },
+    {
+        "id": "top100-like-me-future",
+        "title": "LIKE ME",
+        "artist": "Future, Metro Boomin & Kendrick Lamar",
+        "duration": "2:13",
+        "src": "/music/like-me-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/a1/62/f3a16204-9799-d6a6-1aa4-96ee3502471c/mzaf_13967808582282742708.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fe/b6/46/feb64670-4fe7-bbc0-1101-c5f11bfb6905/196871937399.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 65
+    },
+    {
+        "id": "top100-im-dat-na-future",
+        "title": "I'M DAT N***A",
+        "artist": "Future",
+        "duration": "4:32",
+        "src": "/music/im-dat-na-future.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f5/38/2f/f5382f03-fe49-c9aa-2906-878fd879f6ed/mzaf_12609981450441528232.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/62/d5/31/62d53149-d488-a115-4e3c-3c73972c24bb/196589180544.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 66
+    },
+    {
+        "id": "top100-now-who-youngboy-nba",
+        "title": "Now Who",
+        "artist": "YoungBoy Never Broke Again",
+        "duration": "3:05",
+        "src": "/music/now-who-youngboy-nba.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/27/e0/9927e0fc-3f96-8512-c0d9-06be341e45c1/mzaf_7325324054592300339.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2c/4e/61/2c4e61b1-2b49-1d67-b326-e38865801316/23UM1IM33448.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 67
+    },
+    {
+        "id": "top100-30-for-30-sza",
+        "title": "30 For 30",
+        "artist": "SZA",
+        "duration": "4:38",
+        "src": "/music/30-for-30-sza.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3d/c4/93/3dc4933b-0606-71f7-77c4-cffb45133d93/mzaf_10877822582411390422.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/50/fa/17/50fa1760-8a36-5cef-93bf-aab5b5257b18/196871766913.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rb",
+            "viral"
+        ],
+        "rank": 68
+    },
+    {
+        "id": "top100-shabang-drake",
+        "title": "Shabang",
+        "artist": "Drake",
+        "duration": "3:09",
+        "src": "/music/shabang-drake.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f5/5e/57/f55e579b-4598-e298-f585-03dfd3b9951c/mzaf_17667839459904209421.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/39/61/7f396123-be56-bc11-eaab-976441808e58/26UMGIM63622.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 69
+    },
+    {
+        "id": "top100-hate-that-i-made-you-love-me-ariana-grande",
+        "title": "hate that i made you love me",
+        "artist": "Ariana Grande",
+        "duration": "3:18",
+        "src": "/music/hate-that-i-made-you-love-me-ariana-grande.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/fb/65/cdfb65fe-7d80-abde-0153-d698d1e7bde1/mzaf_14991009929085569283.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/56/f4/96/56f49612-02dd-83f4-44fe-d2118cc70707/26UMGIM51129.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 70
+    },
+    {
+        "id": "top100-broken-window-serenade-whiskey-myers",
+        "title": "Broken Window Serenade",
+        "artist": "Whiskey Myers",
+        "duration": "5:46",
+        "src": "/music/broken-window-serenade-whiskey-myers.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/aa/06/99aa06cf-ee64-7022-bc3c-bacb5d696869/mzaf_12695967465468457006.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/cf/22/d0cf226c-607d-d97c-61d4-26eabde51f1d/886443002371_Cover.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "country",
+            "viral"
+        ],
+        "rank": 71
+    },
+    {
+        "id": "top100-orbiter-noah-kahan",
+        "title": "Orbiter",
+        "artist": "Noah Kahan",
+        "duration": "4:47",
+        "src": "/music/orbiter-noah-kahan.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/62/a9/34/62a93491-136b-4396-cacc-390f5e24f0a0/mzaf_16199650500860119333.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f9/aa/69/f9aa6992-40ca-a756-85ca-b27c48f7c720/26UMGIM02802.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "folk",
+            "viral"
+        ],
+        "rank": 72
+    },
+    {
+        "id": "top100-earrings-malcolm-todd",
+        "title": "Earrings",
+        "artist": "Malcolm Todd",
+        "duration": "2:31",
+        "src": "/music/earrings-malcolm-todd.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d4/97/06/d4970622-b87b-9af3-b375-21af92396852/mzaf_1443470814230920096.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "indie",
+            "viral"
+        ],
+        "rank": 73
+    },
+    {
+        "id": "top100-a-couple-minutes-olivia-dean",
+        "title": "A Couple Minutes",
+        "artist": "Olivia Dean",
+        "duration": "3:32",
+        "src": "/music/a-couple-minutes-olivia-dean.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/86/aa/c386aa57-9cd9-42d5-8406-7e805c33119e/mzaf_15443155590438636047.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 74
+    },
+    {
+        "id": "top100-man-i-need-olivia-dean",
+        "title": "Man I Need",
+        "artist": "Olivia Dean",
+        "duration": "3:04",
+        "src": "/music/man-i-need-olivia-dean.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/bb/5b/42bb5b21-2550-6205-bf3c-334b0e7d6199/mzaf_17462928687872215879.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "pop",
+            "viral"
+        ],
+        "rank": 75
+    },
+    {
+        "id": "top100-one-of-wun-gunna",
+        "title": "one of wun",
+        "artist": "Gunna",
+        "duration": "2:24",
+        "src": "/music/one-of-wun-gunna.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/01/3f/11/013f1120-893f-7b45-c53b-70339be94f3a/mzaf_15997137857898656795.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f6/84/c3/f684c30e-9ea6-7532-429d-de6d22345614/075679660343.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 76
+    },
+    {
+        "id": "top100-wont-stop-gunna",
+        "title": "won't stop",
+        "artist": "Gunna",
+        "duration": "3:02",
+        "src": "/music/wont-stop-gunna.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 77
+    },
+    {
+        "id": "top100-rodeo-dr-gunna",
+        "title": "rodeo dr",
+        "artist": "Gunna",
+        "duration": "2:57",
+        "src": "/music/rodeo-dr-gunna.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/5a/32/3a5a3207-9aab-fcd5-4fe8-76122ed9aae9/mzaf_4930074970639657330.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/af/f8/ef/aff8ef1c-e1e7-8c70-75fa-2201d8785f3d/075679678492.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 78
+    },
+    {
+        "id": "top100-just-say-dat-gunna",
+        "title": "just say dat",
+        "artist": "Gunna",
+        "duration": "2:04",
+        "src": "/music/just-say-dat-gunna.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d3/fc/d4/d3fcd49f-0009-4973-b87e-9425e453f6a7/mzaf_7995885437144148468.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/41/21/63/4121634b-1efc-95d4-7902-ff7b7a763e8f/075679606365.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 79
+    },
+    {
+        "id": "top100-sneaky-21-savage",
+        "title": "sneaky",
+        "artist": "21 Savage",
+        "duration": "3:22",
+        "src": "/music/sneaky-21-savage.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/77/f1/94/77f1940a-ec5a-fd6b-268f-6fbd59adc297/mzaf_14008227713738652802.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/77/84/5e/77845ee7-573c-efcc-4ce4-c9625fdce8c7/196871714556.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 80
+    },
+    {
+        "id": "top100-bodies-offset",
+        "title": "Bodies",
+        "artist": "Drowning Pool",
+        "duration": "2:59",
+        "src": "/music/bodies-offset.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bc/c4/7a/bcc47a04-0834-8be9-d87c-458496139769/mzaf_2657721567764663380.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/65/ed/24/65ed24a6-b0bb-85e9-88b1-fbe64708713d/14CMGIM00807.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 81
+    },
+    {
+        "id": "top100-different-species-offset",
+        "title": "Different Species",
+        "artist": "Offset, Gunna",
+        "duration": "3:04",
+        "src": "/music/different-species-offset.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 82
+    },
+    {
+        "id": "top100-something-i-need-offset",
+        "title": "Something I Need",
+        "artist": "Offset",
+        "duration": "2:25",
+        "src": "/music/something-i-need-offset.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e9/a3/b2/e9a3b2fb-0cca-b837-a719-d97b452b1ef8/mzaf_9610407514073041879.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5c/ff/2a/5cff2a73-c045-bfff-6a25-4f56da47f9e6/26UM1IM05094.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 83
+    },
+    {
+        "id": "top100-never-hating-lil-baby",
+        "title": "Never Hating",
+        "artist": "Lil Baby, Young Thug",
+        "duration": "2:41",
+        "src": "/music/never-hating-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 84
+    },
+    {
+        "id": "top100-outfit-lil-baby",
+        "title": "Outfit",
+        "artist": "Lil Baby, 21 Savage",
+        "duration": "2:57",
+        "src": "/music/outfit-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 85
+    },
+    {
+        "id": "top100-low-down-lil-baby",
+        "title": "Low Down",
+        "artist": "Lil Baby",
+        "duration": "2:25",
+        "src": "/music/low-down-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/95/a9/a3/95a9a380-a35c-1f02-37b1-0743eaea014c/mzaf_13684833519655215038.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/9b/60/27/9b60278b-be33-9726-84d7-322718eacc1a/20UMGIM30254.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 86
+    },
+    {
+        "id": "top100-frozen-lil-baby",
+        "title": "Frozen",
+        "artist": "Lil Baby",
+        "duration": "2:59",
+        "src": "/music/frozen-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/54/48/bf/5448bf21-4324-35ef-942b-7516387ead45/mzaf_10710077022326911656.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/97/d9/62/97d9621a-fd66-c72d-3741-5bcb56a256b9/22UMGIM45520.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 87
+    },
+    {
+        "id": "top100-dead-fresh-lil-baby",
+        "title": "Dead Fresh",
+        "artist": "Lil Baby",
+        "duration": "2:37",
+        "src": "/music/dead-fresh-lil-baby.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/35/88/12/35881205-766b-56f9-166a-e1e63f9a1b97/mzaf_2578337495798852482.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f4/00/dd/f400ddda-01b6-52ee-1888-477ffee6ed67/26UMGIM86003.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 88
+    },
+    {
+        "id": "top100-5am-lil-baby",
+        "title": "5AM",
+        "artist": "Lil Baby",
+        "duration": "1:42",
+        "src": "/music/5am-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 89
+    },
+    {
+        "id": "top100-insecurities-lil-baby",
+        "title": "Insecurities",
+        "artist": "Lil Baby",
+        "duration": "2:07",
+        "src": "/music/insecurities-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 90
+    },
+    {
+        "id": "top100-legends-quavo",
+        "title": "Legends",
+        "artist": "Quavo, Lil Baby",
+        "duration": "3:01",
+        "src": "/music/legends-quavo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 91
+    },
+    {
+        "id": "top100-patty-cake-quavo",
+        "title": "Patty Cake",
+        "artist": "Quavo, Takeoff",
+        "duration": "2:13",
+        "src": "/music/patty-cake-quavo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 92
+    },
+    {
+        "id": "top100-mad-max-lil-durk",
+        "title": "Mad Max",
+        "artist": "Lil Durk, Future",
+        "duration": "2:34",
+        "src": "/music/mad-max-lil-durk.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 93
+    },
+    {
+        "id": "top100-vanish-mode-lil-durk",
+        "title": "Vanish Mode",
+        "artist": "Lil Durk",
+        "duration": "2:03",
+        "src": "/music/vanish-mode-lil-durk.mp3",
+        "streamUrl": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/03/d0/9203d056-f926-b70e-9a95-39c471cc7b26/mzaf_14898483147623840917.plus.aac.p.m4a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b0/30/ec/b030ec14-b571-7136-394d-adaf6a202099/602507370862.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 94
+    },
+    {
+        "id": "top100-leave-me-alone-bigxthaplug",
+        "title": "Leave Me Alone",
+        "artist": "BigXthaPlug",
+        "duration": "2:23",
+        "src": "/music/leave-me-alone-bigxthaplug.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 95
+    },
+    {
+        "id": "top100-from-the-bottom-bigxthaplug",
+        "title": "From The Bottom",
+        "artist": "BigXthaPlug",
+        "duration": "2:02",
+        "src": "/music/from-the-bottom-bigxthaplug.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 96
+    },
+    {
+        "id": "top100-lite-bigxthaplug",
+        "title": "LITE",
+        "artist": "BigXthaPlug",
+        "duration": "2:58",
+        "src": "/music/lite-bigxthaplug.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 97
+    },
+    {
+        "id": "top100-get-in-with-me-bossman-dlow",
+        "title": "Get In With Me",
+        "artist": "Bossman Dlow",
+        "duration": "2:01",
+        "src": "/music/get-in-with-me-bossman-dlow.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 98
+    },
+    {
+        "id": "top100-motion-party-bossman-dlow",
+        "title": "Motion Party",
+        "artist": "Bossman Dlow",
+        "duration": "1:36",
+        "src": "/music/motion-party-bossman-dlow.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 99
+    },
+    {
+        "id": "top100-nothin-like-me-bossman-dlow",
+        "title": "Nothin Like Me",
+        "artist": "Bossman Dlow",
+        "duration": "2:12",
+        "src": "/music/nothin-like-me-bossman-dlow.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "top100",
+            "rap",
+            "viral"
+        ],
+        "rank": 100
+    },
+    {
+        "id": "song-i-knew-it-i-knew-you-taylor-swift",
+        "title": "I Knew It, I Knew You",
+        "artist": "Taylor Swift",
+        "duration": "2:58",
+        "src": "/music/i-knew-it-i-knew-you-taylor-swift.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 101
+    },
+    {
+        "id": "song-track-21-rod-wave",
+        "title": "Track 21",
+        "artist": "Rod Wave",
+        "duration": "3:00",
+        "src": "/music/track-21-rod-wave.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 102
+    },
+    {
+        "id": "song-great-expectation-sienna-spiro",
+        "title": "Great Expectation",
+        "artist": "SIENNA SPIRO",
+        "duration": "2:54",
+        "src": "/music/great-expectation-sienna-spiro.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 103
+    },
+    {
+        "id": "song-how-it-feels-lil-baby",
+        "title": "How It Feels",
+        "artist": "Lil Baby, Lil Durk",
+        "duration": "2:47",
+        "src": "/music/how-it-feels-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 104
+    },
+    {
+        "id": "song-aint-in-la-adla",
+        "title": "Ain't In LA",
+        "artist": "ADÉLA",
+        "duration": "3:05",
+        "src": "/music/aint-in-la-adla.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 105
+    },
+    {
+        "id": "song-jaded-koe-wetzel",
+        "title": "Jaded",
+        "artist": "Koe Wetzel, Ella Langley",
+        "duration": "3:05",
+        "src": "/music/jaded-koe-wetzel.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 106
+    },
+    {
+        "id": "song-off-the-hinge-future",
+        "title": "Off the Hinge",
+        "artist": "Future",
+        "duration": "2:52",
+        "src": "/music/off-the-hinge-future.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 107
+    },
+    {
+        "id": "song-janice-stfu-drake",
+        "title": "Janice STFU",
+        "artist": "Drake",
+        "duration": "3:57",
+        "src": "/music/janice-stfu-drake.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 108
+    },
+    {
+        "id": "song-call-spitta-est-gee",
+        "title": "CALL SPITTA",
+        "artist": "EST Gee",
+        "duration": "2:25",
+        "src": "/music/call-spitta-est-gee.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 109
+    },
+    {
+        "id": "song-no-jewelry-belly-gang-kushington",
+        "title": "No Jewelry",
+        "artist": "Belly Gang Kushington",
+        "duration": "2:28",
+        "src": "/music/no-jewelry-belly-gang-kushington.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 110
+    },
+    {
+        "id": "song-2-crash-outs-pluto",
+        "title": "2 Crash Outs",
+        "artist": "pluto, YoungBoy NBA",
+        "duration": "2:49",
+        "src": "/music/2-crash-outs-pluto.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 111
+    },
+    {
+        "id": "song-mrs-trendsetter-lil-baby",
+        "title": "Mrs. Trendsetter",
+        "artist": "Lil Baby",
+        "duration": "2:29",
+        "src": "/music/mrs-trendsetter-lil-baby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 112
+    },
+    {
+        "id": "song-excavator-don-toliver",
+        "title": "Excavator",
+        "artist": "Don Toliver",
+        "duration": "3:31",
+        "src": "/music/excavator-don-toliver.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 113
+    },
+    {
+        "id": "song-farmland-drew-baldridge",
+        "title": "Farmland",
+        "artist": "Drew Baldridge",
+        "duration": "3:13",
+        "src": "/music/farmland-drew-baldridge.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 114
+    },
+    {
+        "id": "song-unlearning-everything-martin-luke-brown",
+        "title": "unlearning everything",
+        "artist": "Martin Luke Brown",
+        "duration": "3:57",
+        "src": "/music/unlearning-everything-martin-luke-brown.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 115
+    },
+    {
+        "id": "song-this-mess-native-sun",
+        "title": "This Mess",
+        "artist": "Native Sun",
+        "duration": "2:40",
+        "src": "/music/this-mess-native-sun.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 116
+    },
+    {
+        "id": "song-crawl-gemm",
+        "title": "Crawl",
+        "artist": "GEMM",
+        "duration": "3:44",
+        "src": "/music/crawl-gemm.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 117
+    },
+    {
+        "id": "song-whats-left-to-hold-onto-tyla-rodrigues",
+        "title": "What's Left To Hold Onto",
+        "artist": "Tyla Rodrigues",
+        "duration": "3:09",
+        "src": "/music/whats-left-to-hold-onto-tyla-rodrigues.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 118
+    },
+    {
+        "id": "song-are-you-willing-wet",
+        "title": "Are You Willing",
+        "artist": "Wet",
+        "duration": "3:50",
+        "src": "/music/are-you-willing-wet.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 119
+    },
+    {
+        "id": "song-mainline-hellripper",
+        "title": "Mainline",
+        "artist": "Hellripper",
+        "duration": "1:19",
+        "src": "/music/mainline-hellripper.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 120
+    },
+    {
+        "id": "song-drain-me-humankind",
+        "title": "Drain Me",
+        "artist": "HumanKind",
+        "duration": "3:00",
+        "src": "/music/drain-me-humankind.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 121
+    },
+    {
+        "id": "song-no-reason-empty-shell-casing",
+        "title": "NO REASON",
+        "artist": "Empty Shell Casing",
+        "duration": "4:15",
+        "src": "/music/no-reason-empty-shell-casing.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 122
+    },
+    {
+        "id": "song-know-you-then-ratboys",
+        "title": "Know You Then",
+        "artist": "Ratboys, PUP",
+        "duration": "2:27",
+        "src": "/music/know-you-then-ratboys.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 123
+    },
+    {
+        "id": "song-frost-mental-cruelty",
+        "title": "Frost",
+        "artist": "Mental Cruelty",
+        "duration": "4:13",
+        "src": "/music/frost-mental-cruelty.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 124
+    },
+    {
+        "id": "song-master-and-slave-godflesh",
+        "title": "Master and Slave",
+        "artist": "Godflesh",
+        "duration": "8:45",
+        "src": "/music/master-and-slave-godflesh.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 125
+    },
+    {
+        "id": "song-tales-of-trees-enslaved",
+        "title": "Tales of Trees",
+        "artist": "Enslaved",
+        "duration": "4:43",
+        "src": "/music/tales-of-trees-enslaved.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 126
+    },
+    {
+        "id": "song-innocent-smile-skepta",
+        "title": "Innocent Smile",
+        "artist": "Skepta",
+        "duration": "2:40",
+        "src": "/music/innocent-smile-skepta.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "grime"
+        ],
+        "rank": 127
+    },
+    {
+        "id": "song-seriously-editors",
+        "title": "Seriously",
+        "artist": "Editors",
+        "duration": "4:09",
+        "src": "/music/seriously-editors.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 128
+    },
+    {
+        "id": "song-let-em-know-ti",
+        "title": "LET 'EM KNOW",
+        "artist": "T.I.",
+        "duration": "3:00",
+        "src": "/music/let-em-know-ti.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 129
+    },
+    {
+        "id": "song-put-it-on-hoodrich-pablo-juan",
+        "title": "Put It On",
+        "artist": "HoodRich Pablo Juan",
+        "duration": "1:40",
+        "src": "/music/put-it-on-hoodrich-pablo-juan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 130
+    },
+    {
+        "id": "song-konnichiwa-future",
+        "title": "Konnichiwa",
+        "artist": "Future",
+        "duration": "2:34",
+        "src": "/music/konnichiwa-future.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 131
+    },
+    {
+        "id": "song-woah-nav",
+        "title": "WOAH",
+        "artist": "NAV, Young Thug",
+        "duration": "2:25",
+        "src": "/music/woah-nav.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 132
+    },
+    {
+        "id": "song-onsra-comehelpglo",
+        "title": "onsra",
+        "artist": "comehelpglo",
+        "duration": "2:11",
+        "src": "/music/onsra-comehelpglo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 133
+    },
+    {
+        "id": "song-do-it-hit-boy",
+        "title": "DO IT",
+        "artist": "Hit Boy, Quavo",
+        "duration": "2:57",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdo-it-civ.mp3?alt=media&token=89709e80-149a-42ff-9435-3c4094803710",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/86/ae/20/86ae20c4-77ed-3531-5df2-5248116415b8/51575.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 134
+    },
+    {
+        "id": "song-bs-on-the-table-drake",
+        "title": "B's On The Table",
+        "artist": "Drake, 21 Savage",
+        "duration": "2:18",
+        "src": "/music/bs-on-the-table-drake.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 135
+    },
+    {
+        "id": "song-i-see-why-moneybagg-yo",
+        "title": "I See Why",
+        "artist": "Moneybagg Yo",
+        "duration": "3:03",
+        "src": "/music/i-see-why-moneybagg-yo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 136
+    },
+    {
+        "id": "song-ghost-jhen-aiko",
+        "title": "Ghost",
+        "artist": "Jhené Aiko",
+        "duration": "2:03",
+        "src": "/music/ghost-jhen-aiko.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 137
+    },
+    {
+        "id": "song-werent-for-the-wind-ella-langley",
+        "title": "weren't for the wind",
+        "artist": "Ella Langley",
+        "duration": "3:14",
+        "src": "/music/werent-for-the-wind-ella-langley.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 138
+    },
+    {
+        "id": "song-what-i-want-morgan-wallen",
+        "title": "What I Want",
+        "artist": "Morgan Wallen",
+        "duration": "3:05",
+        "src": "/music/what-i-want-morgan-wallen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 139
+    },
+    {
+        "id": "song-lilac-mrs-green-apple",
+        "title": "Lilac",
+        "artist": "Mrs. GREEN APPLE",
+        "duration": "4:48",
+        "src": "/music/lilac-mrs-green-apple.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 140
+    },
+    {
+        "id": "song-he-belongs-jhen-aiko",
+        "title": "He Belongs",
+        "artist": "Jhené Aiko",
+        "duration": "3:21",
+        "src": "/music/he-belongs-jhen-aiko.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 141
+    },
+    {
+        "id": "song-ash-hoarder-ocean-of-illusions",
+        "title": "Ash Hoarder",
+        "artist": "Ocean of Illusions",
+        "duration": "3:14",
+        "src": "/music/ash-hoarder-ocean-of-illusions.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 142
+    },
+    {
+        "id": "song-steel-of-swabia-kissin-dynamite",
+        "title": "Steel of Swabia",
+        "artist": "Kissin' Dynamite",
+        "duration": "3:58",
+        "src": "/music/steel-of-swabia-kissin-dynamite.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 143
+    },
+    {
+        "id": "song-fallen-angel-black-blood-sthlm",
+        "title": "Fallen Angel",
+        "artist": "Black Blood Sthlm",
+        "duration": "4:59",
+        "src": "/music/fallen-angel-black-blood-sthlm.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 144
+    },
+    {
+        "id": "song-tallahassee-jamie-t",
+        "title": "Tallahassee",
+        "artist": "Jamie T",
+        "duration": "4:25",
+        "src": "/music/tallahassee-jamie-t.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 145
+    },
+    {
+        "id": "song-and-then-some-adrien-nunez",
+        "title": "AND THEN SOME",
+        "artist": "Adrien Nunez",
+        "duration": "2:55",
+        "src": "/music/and-then-some-adrien-nunez.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 146
+    },
+    {
+        "id": "song-no-potty-train-iconic-savvy",
+        "title": "NO POTTY TRAIN",
+        "artist": "Iconic Savvy",
+        "duration": "1:55",
+        "src": "/music/no-potty-train-iconic-savvy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 147
+    },
+    {
+        "id": "song-where-the-goth-girls-at-queens-of-the-stone-age",
+        "title": "Where The Goth Girls At?",
+        "artist": "Queens of the Stone Age",
+        "duration": "3:28",
+        "src": "/music/where-the-goth-girls-at-queens-of-the-stone-age.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 148
+    },
+    {
+        "id": "song-queen-gus-dapperton",
+        "title": "Queen",
+        "artist": "Gus Dapperton",
+        "duration": "3:59",
+        "src": "/music/queen-gus-dapperton.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 149
+    },
+    {
+        "id": "song-god-knows-the-pineapple-thief",
+        "title": "God Knows",
+        "artist": "The Pineapple Thief",
+        "duration": "3:21",
+        "src": "/music/god-knows-the-pineapple-thief.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 150
+    },
+    {
+        "id": "song-about-you-the-pretty-reckless",
+        "title": "About You",
+        "artist": "The Pretty Reckless",
+        "duration": "4:27",
+        "src": "/music/about-you-the-pretty-reckless.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 151
+    },
+    {
+        "id": "song-gloria-hemlocke-springs",
+        "title": "gloria!",
+        "artist": "hemlocke springs",
+        "duration": "3:21",
+        "src": "/music/gloria-hemlocke-springs.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 152
+    },
+    {
+        "id": "song-hands-all-up-imperial-teen",
+        "title": "Hands All Up",
+        "artist": "Imperial Teen",
+        "duration": "2:37",
+        "src": "/music/hands-all-up-imperial-teen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 153
+    },
+    {
+        "id": "song-roses-a-killers-confession",
+        "title": "Roses",
+        "artist": "A Killer's Confession",
+        "duration": "3:10",
+        "src": "/music/roses-a-killers-confession.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 154
+    },
+    {
+        "id": "song-freak-show-marfa",
+        "title": "Freak Show",
+        "artist": "Marfa",
+        "duration": "3:08",
+        "src": "/music/freak-show-marfa.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 155
+    },
+    {
+        "id": "song-weight-of-it-all-selwyn",
+        "title": "Weight of It All",
+        "artist": "Selwyn",
+        "duration": "2:44",
+        "src": "/music/weight-of-it-all-selwyn.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 156
+    },
+    {
+        "id": "song-blink-twice-rose-gray",
+        "title": "Blink Twice",
+        "artist": "Rose Gray",
+        "duration": "3:20",
+        "src": "/music/blink-twice-rose-gray.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 157
+    },
+    {
+        "id": "song-making-a-fool-of-myself-the-milk-carton-kids",
+        "title": "Making A Fool Of Myself",
+        "artist": "The Milk Carton Kids",
+        "duration": "3:58",
+        "src": "/music/making-a-fool-of-myself-the-milk-carton-kids.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 158
+    },
+    {
+        "id": "song-source-of-life-tove-lo",
+        "title": "source of life",
+        "artist": "Tove Lo",
+        "duration": "2:11",
+        "src": "/music/source-of-life-tove-lo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 159
+    },
+    {
+        "id": "song-dropped-billboard-style",
+        "title": "Dropped",
+        "artist": "Billboard Style",
+        "duration": "3:09",
+        "src": "/music/dropped-billboard-style.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 160
+    },
+    {
+        "id": "song-rapture-accvsed",
+        "title": "Rapture",
+        "artist": "ACCVSED",
+        "duration": "4:09",
+        "src": "/music/rapture-accvsed.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 161
+    },
+    {
+        "id": "song-first-quarter-moon-county-fair",
+        "title": "First Quarter Moon",
+        "artist": "County Fair",
+        "duration": "3:34",
+        "src": "/music/first-quarter-moon-county-fair.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 162
+    },
+    {
+        "id": "song-gettin-down-coffin",
+        "title": "Gettin' Down",
+        "artist": "C.O.F.F.I.N",
+        "duration": "2:26",
+        "src": "/music/gettin-down-coffin.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 163
+    },
+    {
+        "id": "song-nobodys-bay-bay-helluva-boss",
+        "title": "Nobody's Bay Bay",
+        "artist": "Helluva Boss",
+        "duration": "2:01",
+        "src": "/music/nobodys-bay-bay-helluva-boss.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "soundtrack"
+        ],
+        "rank": 164
+    },
+    {
+        "id": "song-woman-to-blame-kenny-whitmire",
+        "title": "Woman To Blame",
+        "artist": "Kenny Whitmire",
+        "duration": "2:54",
+        "src": "/music/woman-to-blame-kenny-whitmire.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 165
+    },
+    {
+        "id": "song-vestige-mirrors",
+        "title": "Vestige",
+        "artist": "Mirrors",
+        "duration": "3:52",
+        "src": "/music/vestige-mirrors.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 166
+    },
+    {
+        "id": "song-too-heavy-aurora-view",
+        "title": "too heavy",
+        "artist": "Aurora View",
+        "duration": "3:17",
+        "src": "/music/too-heavy-aurora-view.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 167
+    },
+    {
+        "id": "song-lonely-boy-emily-ann-roberts",
+        "title": "Lonely Boy",
+        "artist": "Emily Ann Roberts",
+        "duration": "3:47",
+        "src": "/music/lonely-boy-emily-ann-roberts.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 168
+    },
+    {
+        "id": "song-prefab-ignea",
+        "title": "Prefab",
+        "artist": "Ignea",
+        "duration": "4:03",
+        "src": "/music/prefab-ignea.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 169
+    },
+    {
+        "id": "song-heaven-is-a-place-cleo-tighe",
+        "title": "Heaven Is A Place",
+        "artist": "Cleo Tighe",
+        "duration": "3:23",
+        "src": "/music/heaven-is-a-place-cleo-tighe.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 170
+    },
+    {
+        "id": "song-escatawpa-hollow-muscadine-bloodline",
+        "title": "Escatawpa Hollow",
+        "artist": "Muscadine Bloodline",
+        "duration": "3:14",
+        "src": "/music/escatawpa-hollow-muscadine-bloodline.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 171
+    },
+    {
+        "id": "song-tonight-talkin-smithfield",
+        "title": "Tonight Talkin'",
+        "artist": "Smithfield",
+        "duration": "3:27",
+        "src": "/music/tonight-talkin-smithfield.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 172
+    },
+    {
+        "id": "song-7-25-the-dogs",
+        "title": "7-25",
+        "artist": "The Dogs",
+        "duration": "2:44",
+        "src": "/music/7-25-the-dogs.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 173
+    },
+    {
+        "id": "song-polarized-as-i-lay-dying",
+        "title": "Polarized",
+        "artist": "As I Lay Dying",
+        "duration": "3:42",
+        "src": "/music/polarized-as-i-lay-dying.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 174
+    },
+    {
+        "id": "song-loved-one-julia-cole",
+        "title": "Loved One",
+        "artist": "Julia Cole",
+        "duration": "3:01",
+        "src": "/music/loved-one-julia-cole.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 175
+    },
+    {
+        "id": "song-bird",
+        "title": "Bird",
+        "artist": "@",
+        "duration": "3:22",
+        "src": "/music/bird.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 176
+    },
+    {
+        "id": "song-brief-flashes-of-light-jesus-jones",
+        "title": "Brief Flashes Of Light",
+        "artist": "Jesus Jones",
+        "duration": "3:08",
+        "src": "/music/brief-flashes-of-light-jesus-jones.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 177
+    },
+    {
+        "id": "song-b2tm-o-we-came-as-romans",
+        "title": "b2tm O",
+        "artist": "We Came As Romans",
+        "duration": "3:46",
+        "src": "/music/b2tm-o-we-came-as-romans.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metalcore"
+        ],
+        "rank": 178
+    },
+    {
+        "id": "song-picassos-wife-lael-neale",
+        "title": "Picasso’s Wife",
+        "artist": "Lael Neale",
+        "duration": "2:03",
+        "src": "/music/picassos-wife-lael-neale.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 179
+    },
+    {
+        "id": "song-dance-away-the-bends",
+        "title": "Dance Away",
+        "artist": "The Bends",
+        "duration": "3:34",
+        "src": "/music/dance-away-the-bends.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 180
+    },
+    {
+        "id": "song-riding-to-new-orleans-madison-hughes",
+        "title": "Riding to New Orleans",
+        "artist": "Madison Hughes",
+        "duration": "4:13",
+        "src": "/music/riding-to-new-orleans-madison-hughes.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 181
+    },
+    {
+        "id": "song-swallow-the-bomb-royal-blood",
+        "title": "Swallow The Bomb",
+        "artist": "Royal Blood",
+        "duration": "3:19",
+        "src": "/music/swallow-the-bomb-royal-blood.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 182
+    },
+    {
+        "id": "song-forced-to-stay-maelfy",
+        "title": "Forced To Stay",
+        "artist": "Maelføy",
+        "duration": "3:01",
+        "src": "/music/forced-to-stay-maelfy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 183
+    },
+    {
+        "id": "song-make-me-love-you-nickelback",
+        "title": "Make Me Love You",
+        "artist": "Nickelback",
+        "duration": "3:34",
+        "src": "/music/make-me-love-you-nickelback.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 184
+    },
+    {
+        "id": "song-american-smoke-valerie-ponzio",
+        "title": "American Smoke",
+        "artist": "Valerie Ponzio",
+        "duration": "3:54",
+        "src": "/music/american-smoke-valerie-ponzio.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 185
+    },
+    {
+        "id": "song-another-hostage-situation-less-than-jake",
+        "title": "Another Hostage Situation",
+        "artist": "Less Than Jake",
+        "duration": "2:34",
+        "src": "/music/another-hostage-situation-less-than-jake.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 186
+    },
+    {
+        "id": "song-boston-stella-lefty",
+        "title": "Boston",
+        "artist": "STELLA LEFTY",
+        "duration": "2:51",
+        "src": "/music/boston-stella-lefty.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 187
+    },
+    {
+        "id": "song-just-in-case-morgan-wallen",
+        "title": "Just In Case",
+        "artist": "Morgan Wallen",
+        "duration": "2:46",
+        "src": "/music/just-in-case-morgan-wallen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 188
+    },
+    {
+        "id": "song-wtf-goin-belly-gang-kushington",
+        "title": "WTF GOIN",
+        "artist": "Belly Gang Kushington",
+        "duration": "3:05",
+        "src": "/music/wtf-goin-belly-gang-kushington.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 189
+    },
+    {
+        "id": "song-im-spent-drake",
+        "title": "I'm Spent",
+        "artist": "Drake",
+        "duration": "2:25",
+        "src": "/music/im-spent-drake.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 190
+    },
+    {
+        "id": "song-nicole-kidman-adla",
+        "title": "Nicole Kidman",
+        "artist": "ADÉLA",
+        "duration": "3:01",
+        "src": "/music/nicole-kidman-adla.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 191
+    },
+    {
+        "id": "song-i-cant-love-you-anymore-ella-langley",
+        "title": "I Can't Love You Anymore",
+        "artist": "Ella Langley",
+        "duration": "3:49",
+        "src": "/music/i-cant-love-you-anymore-ella-langley.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 192
+    },
+    {
+        "id": "song-be-her-ella-langley",
+        "title": "Be Her",
+        "artist": "Ella Langley",
+        "duration": "3:37",
+        "src": "/music/be-her-ella-langley.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 193
+    },
+    {
+        "id": "song-so-good-jhen-aiko",
+        "title": "So Good",
+        "artist": "Jhené Aiko",
+        "duration": "3:57",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbabydoll-ari-abdul.mp3?alt=media&token=333b471e-816e-497a-9b75-5522a344f0ab",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/9e/2e/5b9e2e7c-a117-89ac-79c2-43fd866aad48/196874051207.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 194
+    },
+    {
+        "id": "song-stupid-song-olivia-rodrigo",
+        "title": "stupid song",
+        "artist": "Olivia Rodrigo",
+        "duration": "3:30",
+        "src": "/music/stupid-song-olivia-rodrigo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 195
+    },
+    {
+        "id": "song-dope-girl-rod-wave",
+        "title": "Dope Girl",
+        "artist": "Rod Wave",
+        "duration": "2:12",
+        "src": "/music/dope-girl-rod-wave.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 196
+    },
+    {
+        "id": "song-im-the-problem-morgan-wallen",
+        "title": "I'm The Problem",
+        "artist": "Morgan Wallen",
+        "duration": "2:58",
+        "src": "/music/im-the-problem-morgan-wallen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 197
+    },
+    {
+        "id": "song-the-cure-olivia-rodrigo",
+        "title": "the cure",
+        "artist": "Olivia Rodrigo",
+        "duration": "4:57",
+        "src": "/music/the-cure-olivia-rodrigo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 198
+    },
+    {
+        "id": "song-oh-yeah-steve-lacy",
+        "title": "oh yeah?",
+        "artist": "Steve Lacy",
+        "duration": "2:51",
+        "src": "/music/oh-yeah-steve-lacy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 199
+    },
+    {
+        "id": "song-petal-ariana-grande",
+        "title": "petal",
+        "artist": "Ariana Grande",
+        "duration": "3:04",
+        "src": "/music/petal-ariana-grande.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 200
+    },
+    {
+        "id": "song-the-rain-that-follows-me-love-is-noise",
+        "title": "the rain that follows me.",
+        "artist": "Love Is Noise",
+        "duration": "2:38",
+        "src": "/music/the-rain-that-follows-me-love-is-noise.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 201
+    },
+    {
+        "id": "song-let-me-have-this-dance-bryce-leatherwood",
+        "title": "Let Me Have This Dance",
+        "artist": "Bryce Leatherwood",
+        "duration": "3:50",
+        "src": "/music/let-me-have-this-dance-bryce-leatherwood.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 202
+    },
+    {
+        "id": "song-watch-you-dance-leon-bridges",
+        "title": "Watch You Dance",
+        "artist": "Leon Bridges",
+        "duration": "2:27",
+        "src": "/music/watch-you-dance-leon-bridges.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 203
+    },
+    {
+        "id": "song-tongue-tied-graveyard",
+        "title": "Tongue Tied",
+        "artist": "Graveyard",
+        "duration": "4:03",
+        "src": "/music/tongue-tied-graveyard.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 204
+    },
+    {
+        "id": "song-fray-greave",
+        "title": "Fray",
+        "artist": "greave.",
+        "duration": "4:10",
+        "src": "/music/fray-greave.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 205
+    },
+    {
+        "id": "song-lights-out-dirty-honey",
+        "title": "Lights Out",
+        "artist": "Dirty Honey",
+        "duration": "3:36",
+        "src": "/music/lights-out-dirty-honey.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 206
+    },
+    {
+        "id": "song-room-to-room-fenne-lily",
+        "title": "Room to Room",
+        "artist": "Fenne Lily",
+        "duration": "3:16",
+        "src": "/music/room-to-room-fenne-lily.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 207
+    },
+    {
+        "id": "song-saddest-song-bayside",
+        "title": "Saddest Song",
+        "artist": "Bayside",
+        "duration": "2:50",
+        "src": "/music/saddest-song-bayside.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 208
+    },
+    {
+        "id": "song-the-line-jawdropped",
+        "title": "The Line",
+        "artist": "Jawdropped",
+        "duration": "3:04",
+        "src": "/music/the-line-jawdropped.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 209
+    },
+    {
+        "id": "song-burn-black-hole",
+        "title": "Burn Black",
+        "artist": "Hole",
+        "duration": "4:59",
+        "src": "/music/burn-black-hole.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 210
+    },
+    {
+        "id": "song-carols-of-my-mind-elliott-skinner",
+        "title": "Carols of My Mind",
+        "artist": "Elliott Skinner",
+        "duration": "2:59",
+        "src": "/music/carols-of-my-mind-elliott-skinner.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 211
+    },
+    {
+        "id": "song-melancholic-beach-town-pool-girl",
+        "title": "Melancholic Beach Town",
+        "artist": "Pool Girl",
+        "duration": "3:38",
+        "src": "/music/melancholic-beach-town-pool-girl.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 212
+    },
+    {
+        "id": "song-blue-cikho",
+        "title": "Blue",
+        "artist": "cikho",
+        "duration": "2:33",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblue-billie-eilish.mp3?alt=media&token=e9e66541-ccc7-4154-a25a-daa516585b13",
+        "streamUrl": null,
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 213
+    },
+    {
+        "id": "song-by-way-of-alabama-wesko",
+        "title": "By Way Of Alabama",
+        "artist": "Wesko",
+        "duration": "2:55",
+        "src": "/music/by-way-of-alabama-wesko.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 214
+    },
+    {
+        "id": "song-take-me-back-to-bali-ochok",
+        "title": "Take Me Back to Bali",
+        "artist": "Ochok, Damon Sharpe",
+        "duration": "2:22",
+        "src": "/music/take-me-back-to-bali-ochok.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 215
+    },
+    {
+        "id": "song-crnerman-stephen-wilson-jr",
+        "title": "Cørnerman",
+        "artist": "Stephen Wilson Jr.",
+        "duration": "4:47",
+        "src": "/music/crnerman-stephen-wilson-jr.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 216
+    },
+    {
+        "id": "song-wolf-corella",
+        "title": "Wolf",
+        "artist": "Corella",
+        "duration": "2:52",
+        "src": "/music/wolf-corella.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 217
+    },
+    {
+        "id": "song-i-wanna-be-a-star-lydia-night",
+        "title": "I WANNA BE A STAR",
+        "artist": "Lydia Night",
+        "duration": "4:20",
+        "src": "/music/i-wanna-be-a-star-lydia-night.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 218
+    },
+    {
+        "id": "song-sentinel-serpentwithfeet",
+        "title": "sentinel",
+        "artist": "serpentwithfeet",
+        "duration": "3:26",
+        "src": "/music/sentinel-serpentwithfeet.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 219
+    },
+    {
+        "id": "song-rockstar-life-gavin-adcock",
+        "title": "Rockstar Life",
+        "artist": "Gavin Adcock",
+        "duration": "3:01",
+        "src": "/music/rockstar-life-gavin-adcock.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 220
+    },
+    {
+        "id": "song-constants-cartel",
+        "title": "Constants",
+        "artist": "Cartel",
+        "duration": "3:45",
+        "src": "/music/constants-cartel.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 221
+    },
+    {
+        "id": "song-wild-remix-jaguar",
+        "title": "WILD! (Remix)",
+        "artist": "Jaguar",
+        "duration": "3:52",
+        "src": "/music/wild-remix-jaguar.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "dance"
+        ],
+        "rank": 222
+    },
+    {
+        "id": "song-hold-on-the-bites",
+        "title": "Hold On",
+        "artist": "The Bites",
+        "duration": "2:58",
+        "src": "/music/hold-on-the-bites.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 223
+    },
+    {
+        "id": "song-mamas-lullaby-hillary-scott",
+        "title": "Mama's Lullaby",
+        "artist": "Hillary Scott",
+        "duration": "3:47",
+        "src": "/music/mamas-lullaby-hillary-scott.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 224
+    },
+    {
+        "id": "song-in-this-boat-dylan-marlowe",
+        "title": "In This Boat",
+        "artist": "Dylan Marlowe",
+        "duration": "2:54",
+        "src": "/music/in-this-boat-dylan-marlowe.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 225
+    },
+    {
+        "id": "song-sorry-much-honey-revenge",
+        "title": "Sorry Much",
+        "artist": "Honey Revenge",
+        "duration": "2:54",
+        "src": "/music/sorry-much-honey-revenge.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 226
+    },
+    {
+        "id": "song-roll-on-eric-clapton",
+        "title": "Roll On",
+        "artist": "Eric Clapton",
+        "duration": "3:45",
+        "src": "/music/roll-on-eric-clapton.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 227
+    },
+    {
+        "id": "song-open-season-rachel-rose",
+        "title": "Open Season",
+        "artist": "Rachel Rose",
+        "duration": "3:30",
+        "src": "/music/open-season-rachel-rose.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 228
+    },
+    {
+        "id": "song-i-do-olive-vox",
+        "title": "I Do",
+        "artist": "Olive Vox",
+        "duration": "2:55",
+        "src": "/music/i-do-olive-vox.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 229
+    },
+    {
+        "id": "song-somebody-to-hate-huddy",
+        "title": "Somebody To Hate",
+        "artist": "Huddy",
+        "duration": "3:26",
+        "src": "/music/somebody-to-hate-huddy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 230
+    },
+    {
+        "id": "song-what-you-saying-lil-uzi-vert",
+        "title": "What You Saying",
+        "artist": "Lil Uzi Vert",
+        "duration": "2:12",
+        "src": "/music/what-you-saying-lil-uzi-vert.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 231
+    },
+    {
+        "id": "song-underdog-roddy-ricch",
+        "title": "Underdog",
+        "artist": "Roddy Ricch",
+        "duration": "2:22",
+        "src": "/music/underdog-roddy-ricch.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 232
+    },
+    {
+        "id": "song-yk-where-its-goin-hurricane-wisdom",
+        "title": "YK Where It's Goin",
+        "artist": "Hurricane Wisdom",
+        "duration": "3:01",
+        "src": "/music/yk-where-its-goin-hurricane-wisdom.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 233
+    },
+    {
+        "id": "song-banks-house-fatt-smaxk",
+        "title": "BANKS HOUSE",
+        "artist": "Fatt Smaxk",
+        "duration": "2:05",
+        "src": "/music/banks-house-fatt-smaxk.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 234
+    },
+    {
+        "id": "song-500-horses-nipsey-hussle",
+        "title": "500 Horses",
+        "artist": "Nipsey Hussle",
+        "duration": "3:49",
+        "src": "/music/500-horses-nipsey-hussle.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 235
+    },
+    {
+        "id": "song-mvp-41",
+        "title": "MVP",
+        "artist": "41, Jenn Carter",
+        "duration": "3:09",
+        "src": "/music/mvp-41.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 236
+    },
+    {
+        "id": "song-fdo-pooh-shiesty",
+        "title": "FDO",
+        "artist": "Pooh Shiesty",
+        "duration": "5:19",
+        "src": "/music/fdo-pooh-shiesty.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 237
+    },
+    {
+        "id": "song-fine-sleepy-hallow",
+        "title": "Fine",
+        "artist": "Sleepy Hallow",
+        "duration": "1:57",
+        "src": "/music/fine-sleepy-hallow.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 238
+    },
+    {
+        "id": "song-omg-polo-g",
+        "title": "OMG",
+        "artist": "Polo G",
+        "duration": "2:58",
+        "src": "/music/omg-polo-g.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 239
+    },
+    {
+        "id": "song-party-troye-sivan",
+        "title": "Party",
+        "artist": "Troye Sivan",
+        "duration": "3:21",
+        "src": "/music/party-troye-sivan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 240
+    },
+    {
+        "id": "song-star-sign-boy-bear",
+        "title": "Star Sign",
+        "artist": "Boy & Bear",
+        "duration": "5:11",
+        "src": "/music/star-sign-boy-bear.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 241
+    },
+    {
+        "id": "song-ginger-inner-wave",
+        "title": "ginger",
+        "artist": "Inner Wave",
+        "duration": "2:10",
+        "src": "/music/ginger-inner-wave.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 242
+    },
+    {
+        "id": "song-hard-luck-woman-kiss",
+        "title": "Hard Luck Woman",
+        "artist": "Kiss",
+        "duration": "3:46",
+        "src": "/music/hard-luck-woman-kiss.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 243
+    },
+    {
+        "id": "song-comedy-show-lennon-stella",
+        "title": "Comedy Show",
+        "artist": "Lennon Stella",
+        "duration": "3:00",
+        "src": "/music/comedy-show-lennon-stella.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 244
+    },
+    {
+        "id": "song-summer-of-16-bea-miller",
+        "title": "summer of '16",
+        "artist": "Bea Miller",
+        "duration": "3:30",
+        "src": "/music/summer-of-16-bea-miller.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 245
+    },
+    {
+        "id": "song-two-things-can-be-true-miranda-lambert",
+        "title": "Two Things Can Be True",
+        "artist": "Miranda Lambert",
+        "duration": "3:18",
+        "src": "/music/two-things-can-be-true-miranda-lambert.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 246
+    },
+    {
+        "id": "song-product-of-pressure-set-for-the-fall",
+        "title": "Product Of Pressure",
+        "artist": "Set for the Fall",
+        "duration": "3:34",
+        "src": "/music/product-of-pressure-set-for-the-fall.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 247
+    },
+    {
+        "id": "song-heaven-holding-absence",
+        "title": "Heaven",
+        "artist": "Holding Absence",
+        "duration": "3:44",
+        "src": "/music/heaven-holding-absence.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 248
+    },
+    {
+        "id": "song-cowboy-take-me-away-morgxn",
+        "title": "COWBOY TAKE ME AWAY",
+        "artist": "MORGXN",
+        "duration": "3:30",
+        "src": "/music/cowboy-take-me-away-morgxn.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 249
+    },
+    {
+        "id": "song-bleed-empire-fall",
+        "title": "Bleed",
+        "artist": "Empire Fall",
+        "duration": "3:06",
+        "src": "/music/bleed-empire-fall.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 250
+    },
+    {
+        "id": "song-if-the-sun-burns-out-valorant-music",
+        "title": "If The Sun Burns Out",
+        "artist": "VALORANT Music",
+        "duration": "3:46",
+        "src": "/music/if-the-sun-burns-out-valorant-music.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 251
+    },
+    {
+        "id": "song-memories-n8noface",
+        "title": "Memories",
+        "artist": "N8NOFACE",
+        "duration": "3:15",
+        "src": "/music/memories-n8noface.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 252
+    },
+    {
+        "id": "song-arise-the-lemonheads",
+        "title": "Arise",
+        "artist": "The Lemonheads",
+        "duration": "4:23",
+        "src": "/music/arise-the-lemonheads.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 253
+    },
+    {
+        "id": "song-love-showed-up-andy-grammer",
+        "title": "Love Showed Up",
+        "artist": "Andy Grammer",
+        "duration": "2:50",
+        "src": "/music/love-showed-up-andy-grammer.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 254
+    },
+    {
+        "id": "song-everyone-jacques-greene",
+        "title": "Everyone",
+        "artist": "Jacques Greene",
+        "duration": "3:53",
+        "src": "/music/everyone-jacques-greene.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 255
+    },
+    {
+        "id": "song-agua-maluma",
+        "title": "AGUA",
+        "artist": "Maluma, Shakira",
+        "duration": "3:11",
+        "src": "/music/agua-maluma.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 256
+    },
+    {
+        "id": "song-curse-of-strahd-game-over",
+        "title": "Curse Of Strahd",
+        "artist": "Game Over",
+        "duration": "3:51",
+        "src": "/music/curse-of-strahd-game-over.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 257
+    },
+    {
+        "id": "song-if-i-had-the-hand-of-god-julia-jacklin",
+        "title": "If I Had The Hand Of God",
+        "artist": "Julia Jacklin",
+        "duration": "2:41",
+        "src": "/music/if-i-had-the-hand-of-god-julia-jacklin.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 258
+    },
+    {
+        "id": "song-red-car-slow-pulp",
+        "title": "Red Car",
+        "artist": "Slow Pulp",
+        "duration": "3:28",
+        "src": "/music/red-car-slow-pulp.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 259
+    },
+    {
+        "id": "song-colours-alice-merton",
+        "title": "Colours",
+        "artist": "Alice Merton",
+        "duration": "3:02",
+        "src": "/music/colours-alice-merton.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 260
+    },
+    {
+        "id": "song-hearst-castle-slothrust",
+        "title": "Hearst Castle",
+        "artist": "Slothrust",
+        "duration": "3:48",
+        "src": "/music/hearst-castle-slothrust.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 261
+    },
+    {
+        "id": "song-shut-out-porch-light",
+        "title": "Shut Out",
+        "artist": "Porch Light",
+        "duration": "3:57",
+        "src": "/music/shut-out-porch-light.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 262
+    },
+    {
+        "id": "song-funny-feeling-benjamin-ingrosso",
+        "title": "funny feeling",
+        "artist": "Benjamin Ingrosso",
+        "duration": "3:14",
+        "src": "/music/funny-feeling-benjamin-ingrosso.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 263
+    },
+    {
+        "id": "song-proxy-st-paul",
+        "title": "Proxy",
+        "artist": "St. Paul",
+        "duration": "2:59",
+        "src": "/music/proxy-st-paul.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 265
+    },
+    {
+        "id": "song-roadkill-baby-dovetail",
+        "title": "Roadkill Baby",
+        "artist": "Dovetail",
+        "duration": "4:16",
+        "src": "/music/roadkill-baby-dovetail.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 266
+    },
+    {
+        "id": "song-can-of-worms-wade-forster",
+        "title": "Can of Worms",
+        "artist": "Wade Forster",
+        "duration": "4:14",
+        "src": "/music/can-of-worms-wade-forster.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 267
+    },
+    {
+        "id": "song-god-speaks-through-the-radio-mo-pitney",
+        "title": "God Speaks Through the Radio",
+        "artist": "Mo Pitney",
+        "duration": "3:17",
+        "src": "/music/god-speaks-through-the-radio-mo-pitney.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 268
+    },
+    {
+        "id": "song-write-your-own-songs-ty-myers",
+        "title": "Write Your Own Songs",
+        "artist": "Ty Myers",
+        "duration": "3:21",
+        "src": "/music/write-your-own-songs-ty-myers.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 269
+    },
+    {
+        "id": "song-over-country-lizzy-mcalpine",
+        "title": "Over country",
+        "artist": "Lizzy McAlpine",
+        "duration": "5:05",
+        "src": "/music/over-country-lizzy-mcalpine.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 270
+    },
+    {
+        "id": "song-dont-you-forget-about-me-valley",
+        "title": "Don't You Forget About Me?",
+        "artist": "Valley",
+        "duration": "3:18",
+        "src": "/music/dont-you-forget-about-me-valley.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 271
+    },
+    {
+        "id": "song-louder-than-ignorance-pentastone",
+        "title": "Louder than Ignorance",
+        "artist": "Pentastone",
+        "duration": "3:21",
+        "src": "/music/louder-than-ignorance-pentastone.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 272
+    },
+    {
+        "id": "song-the-only-one-logic",
+        "title": "The Only One",
+        "artist": "Logic",
+        "duration": "10004:08",
+        "src": "/music/the-only-one-logic.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 273
+    },
+    {
+        "id": "song-spilt-milk-kate-nash",
+        "title": "Spilt Milk",
+        "artist": "Kate Nash",
+        "duration": "4:24",
+        "src": "/music/spilt-milk-kate-nash.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 274
+    },
+    {
+        "id": "song-la-theme-song-the-drop",
+        "title": "LA Theme Song",
+        "artist": "The Drop",
+        "duration": "1:05",
+        "src": "/music/la-theme-song-the-drop.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 275
+    },
+    {
+        "id": "song-machine-architects",
+        "title": "Machine",
+        "artist": "Architects",
+        "duration": "4:00",
+        "src": "/music/machine-architects.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 276
+    },
+    {
+        "id": "song-silver-beach-kristin-hersh",
+        "title": "Silver Beach",
+        "artist": "Kristin Hersh",
+        "duration": "3:10",
+        "src": "/music/silver-beach-kristin-hersh.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 277
+    },
+    {
+        "id": "song-bleeding-heart-vana",
+        "title": "Bleeding Heart",
+        "artist": "Vana",
+        "duration": "3:32",
+        "src": "/music/bleeding-heart-vana.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 278
+    },
+    {
+        "id": "song-american-roots-brandy-clark",
+        "title": "American Roots",
+        "artist": "Brandy Clark",
+        "duration": "3:45",
+        "src": "/music/american-roots-brandy-clark.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 279
+    },
+    {
+        "id": "song-isabelle-fly-the-lumineers",
+        "title": "Isabelle Fly",
+        "artist": "The Lumineers",
+        "duration": "3:29",
+        "src": "/music/isabelle-fly-the-lumineers.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 280
+    },
+    {
+        "id": "song-run-away-beck",
+        "title": "Run Away",
+        "artist": "Beck",
+        "duration": "3:39",
+        "src": "/music/run-away-beck.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 281
+    },
+    {
+        "id": "song-cult-of-celebrity-lambrini-girls",
+        "title": "Cult of Celebrity",
+        "artist": "Lambrini Girls",
+        "duration": "2:11",
+        "src": "/music/cult-of-celebrity-lambrini-girls.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 282
+    },
+    {
+        "id": "song-when-the-frost-looms-lathan-bryant",
+        "title": "When The Frost Looms",
+        "artist": "Lathan Bryant",
+        "duration": "3:08",
+        "src": "/music/when-the-frost-looms-lathan-bryant.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 283
+    },
+    {
+        "id": "song-roll-me-up-bby",
+        "title": "Roll Me Up",
+        "artist": "bby",
+        "duration": "1:57",
+        "src": "/music/roll-me-up-bby.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 284
+    },
+    {
+        "id": "song-danceteria-afterhours-madonna",
+        "title": "Danceteria Afterhours",
+        "artist": "Madonna",
+        "duration": "3:50",
+        "src": "/music/danceteria-afterhours-madonna.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 285
+    },
+    {
+        "id": "song-sexy-magic-ca7riel",
+        "title": "Sexy Magic",
+        "artist": "CA7RIEL",
+        "duration": "3:15",
+        "src": "/music/sexy-magic-ca7riel.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "latin"
+        ],
+        "rank": 286
+    },
+    {
+        "id": "song-lets-get-married-miley-cyrus",
+        "title": "Let’s Get Married",
+        "artist": "Miley Cyrus",
+        "duration": "3:36",
+        "src": "/music/lets-get-married-miley-cyrus.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 287
+    },
+    {
+        "id": "song-rhyno-travis-scott",
+        "title": "RHYNO",
+        "artist": "Travis Scott",
+        "duration": "3:00",
+        "src": "/music/rhyno-travis-scott.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 288
+    },
+    {
+        "id": "song-perfect-pinterest-garden-porter-robinson",
+        "title": "Perfect Pinterest Garden",
+        "artist": "Porter Robinson",
+        "duration": "2:50",
+        "src": "/music/perfect-pinterest-garden-porter-robinson.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 289
+    },
+    {
+        "id": "song-last-thing-you-need-morgan-wallen",
+        "title": "Last Thing You Need",
+        "artist": "Morgan Wallen",
+        "duration": "3:16",
+        "src": "/music/last-thing-you-need-morgan-wallen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 290
+    },
+    {
+        "id": "song-down-for-real-victor-victor",
+        "title": "Down For Real",
+        "artist": "Victor Victor",
+        "duration": "3:02",
+        "src": "/music/down-for-real-victor-victor.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 291
+    },
+    {
+        "id": "song-forever-montell-fish",
+        "title": "Forever",
+        "artist": "Montell Fish",
+        "duration": "3:11",
+        "src": "/music/forever-montell-fish.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 292
+    },
+    {
+        "id": "song-celebration-tomora",
+        "title": "Celebration",
+        "artist": "TOMORA",
+        "duration": "4:21",
+        "src": "/music/celebration-tomora.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 293
+    },
+    {
+        "id": "song-new-trick-ros",
+        "title": "new trick",
+        "artist": "ROSÉ",
+        "duration": "3:02",
+        "src": "/music/new-trick-ros.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 294
+    },
+    {
+        "id": "song-im-knowin-lakeyah",
+        "title": "I'M KNOWIN'",
+        "artist": "Lakeyah",
+        "duration": "3:21",
+        "src": "/music/im-knowin-lakeyah.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 295
+    },
+    {
+        "id": "song-the-comeback-eli",
+        "title": "The Comeback",
+        "artist": "Eli",
+        "duration": "2:39",
+        "src": "/music/the-comeback-eli.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 296
+    },
+    {
+        "id": "song-intro-ys",
+        "title": "Intro",
+        "artist": "YS, Rio Da Yung Og",
+        "duration": "1:56",
+        "src": "/music/intro-ys.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 297
+    },
+    {
+        "id": "song-someday-jp-saxe",
+        "title": "Someday",
+        "artist": "JP Saxe",
+        "duration": "3:02",
+        "src": "/music/someday-jp-saxe.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 298
+    },
+    {
+        "id": "song-write-me-a-letter-beabadoobee",
+        "title": "Write Me A Letter",
+        "artist": "beabadoobee",
+        "duration": "3:14",
+        "src": "/music/write-me-a-letter-beabadoobee.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 299
+    },
+    {
+        "id": "song-bp-truck-hunxho",
+        "title": "BP Truck",
+        "artist": "Hunxho",
+        "duration": "2:17",
+        "src": "/music/bp-truck-hunxho.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 300
+    },
+    {
+        "id": "song-get-this-started-jazzy",
+        "title": "Get This Started",
+        "artist": "Jazzy",
+        "duration": "2:39",
+        "src": "/music/get-this-started-jazzy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 301
+    },
+    {
+        "id": "song-small-town-dominic-fike",
+        "title": "Small Town",
+        "artist": "Dominic Fike",
+        "duration": "2:49",
+        "src": "/music/small-town-dominic-fike.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 302
+    },
+    {
+        "id": "song-stop-resisting-miquo",
+        "title": "STOP RESISTING",
+        "artist": "Miquo",
+        "duration": "3:00",
+        "src": "/music/stop-resisting-miquo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 303
+    },
+    {
+        "id": "song-perfect-man-teddy-swims",
+        "title": "Perfect Man",
+        "artist": "Teddy Swims",
+        "duration": "3:33",
+        "src": "/music/perfect-man-teddy-swims.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 304
+    },
+    {
+        "id": "song-politics-as-usual-toure",
+        "title": "Politics As Usual",
+        "artist": "Toure",
+        "duration": "2:57",
+        "src": "/music/politics-as-usual-toure.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 305
+    },
+    {
+        "id": "song-2loud-rei-ami",
+        "title": "2LOUD",
+        "artist": "REI AMI",
+        "duration": "2:30",
+        "src": "/music/2loud-rei-ami.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 306
+    },
+    {
+        "id": "song-nice-to-meet-you-minnie",
+        "title": "nice to meet you",
+        "artist": "MINNIE",
+        "duration": "2:47",
+        "src": "/music/nice-to-meet-you-minnie.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 307
+    },
+    {
+        "id": "song-waste-my-tears-james-arthur",
+        "title": "Waste My Tears",
+        "artist": "James Arthur",
+        "duration": "2:59",
+        "src": "/music/waste-my-tears-james-arthur.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 308
+    },
+    {
+        "id": "song-landmine-anna-shoemaker",
+        "title": "Landmine",
+        "artist": "Anna Shoemaker",
+        "duration": "3:24",
+        "src": "/music/landmine-anna-shoemaker.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 309
+    },
+    {
+        "id": "song-blood-oath-arms-akimbo",
+        "title": "Blood Oath",
+        "artist": "Arms Akimbo",
+        "duration": "3:19",
+        "src": "/music/blood-oath-arms-akimbo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 310
+    },
+    {
+        "id": "song-constant-companion-sam-smith",
+        "title": "Constant Companion",
+        "artist": "Sam Smith",
+        "duration": "4:54",
+        "src": "/music/constant-companion-sam-smith.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 311
+    },
+    {
+        "id": "song-cant-hardly-wait-downtown-boys",
+        "title": "Can't Hardly Wait",
+        "artist": "Downtown Boys",
+        "duration": "2:57",
+        "src": "/music/cant-hardly-wait-downtown-boys.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 312
+    },
+    {
+        "id": "song-psycho-on-the-loose-uncle-acid",
+        "title": "Psycho On The Loose",
+        "artist": "Uncle Acid",
+        "duration": "5:10",
+        "src": "/music/psycho-on-the-loose-uncle-acid.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 313
+    },
+    {
+        "id": "song-parade-of-loons-tom-petty",
+        "title": "Parade Of Loons",
+        "artist": "Tom Petty",
+        "duration": "3:03",
+        "src": "/music/parade-of-loons-tom-petty.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 314
+    },
+    {
+        "id": "song-birthday-crawlers",
+        "title": "BIRTHDAY",
+        "artist": "Crawlers",
+        "duration": "4:42",
+        "src": "/music/birthday-crawlers.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 315
+    },
+    {
+        "id": "song-keep-myself-from-dreaming-gareth",
+        "title": "Keep Myself from Dreaming",
+        "artist": "Gareth",
+        "duration": "2:46",
+        "src": "/music/keep-myself-from-dreaming-gareth.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 316
+    },
+    {
+        "id": "song-hope-is-the-thing-rhiannon-giddens",
+        "title": "Hope Is the Thing",
+        "artist": "Rhiannon Giddens",
+        "duration": "2:55",
+        "src": "/music/hope-is-the-thing-rhiannon-giddens.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 318
+    },
+    {
+        "id": "song-forget-about-you-kiana-v",
+        "title": "Forget About You",
+        "artist": "Kiana V",
+        "duration": "2:33",
+        "src": "/music/forget-about-you-kiana-v.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 319
+    },
+    {
+        "id": "song-georgia-heat-ava-hall",
+        "title": "Georgia Heat",
+        "artist": "Ava Hall",
+        "duration": "2:28",
+        "src": "/music/georgia-heat-ava-hall.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 320
+    },
+    {
+        "id": "song-requiem-villagers",
+        "title": "Requiem",
+        "artist": "Villagers",
+        "duration": "7:23",
+        "src": "/music/requiem-villagers.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 321
+    },
+    {
+        "id": "song-lost-in-the-dark-kalandra",
+        "title": "Lost in the Dark",
+        "artist": "Kalandra",
+        "duration": "4:25",
+        "src": "/music/lost-in-the-dark-kalandra.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 322
+    },
+    {
+        "id": "song-waste-my-time-benjamin-ingrosso",
+        "title": "waste my time",
+        "artist": "Benjamin Ingrosso",
+        "duration": "3:32",
+        "src": "/music/waste-my-time-benjamin-ingrosso.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 323
+    },
+    {
+        "id": "song-met-my-match-say-now",
+        "title": "Met my match",
+        "artist": "Say Now",
+        "duration": "2:45",
+        "src": "/music/met-my-match-say-now.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 324
+    },
+    {
+        "id": "song-i-liked-loving-you-luke-bryan",
+        "title": "I Liked Loving You",
+        "artist": "Luke Bryan",
+        "duration": "3:09",
+        "src": "/music/i-liked-loving-you-luke-bryan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 325
+    },
+    {
+        "id": "song-lab-rats-ran-echo-the-bunnymen",
+        "title": "Lab Rats Ran",
+        "artist": "Echo & The Bunnymen",
+        "duration": "3:15",
+        "src": "/music/lab-rats-ran-echo-the-bunnymen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 326
+    },
+    {
+        "id": "song-thats-it-yung-lean",
+        "title": "That's It",
+        "artist": "Yung Lean",
+        "duration": "2:41",
+        "src": "/music/thats-it-yung-lean.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 327
+    },
+    {
+        "id": "song-barbed-wire-fence-curreny",
+        "title": "Barbed Wire Fence",
+        "artist": "Curren$y",
+        "duration": "3:49",
+        "src": "/music/barbed-wire-fence-curreny.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 328
+    },
+    {
+        "id": "song-bite-jade-olivia",
+        "title": "Bite",
+        "artist": "Jade Olivia",
+        "duration": "4:07",
+        "src": "/music/bite-jade-olivia.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 329
+    },
+    {
+        "id": "song-jezebel-papoose",
+        "title": "Jezebel",
+        "artist": "Papoose",
+        "duration": "3:25",
+        "src": "/music/jezebel-papoose.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 330
+    },
+    {
+        "id": "song-finders-keepers-luke-bryan",
+        "title": "Finders Keepers",
+        "artist": "Luke Bryan",
+        "duration": "3:43",
+        "src": "/music/finders-keepers-luke-bryan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 331
+    },
+    {
+        "id": "song-april-suzanne-beach-house",
+        "title": "April Suzanne",
+        "artist": "Beach House",
+        "duration": "3:45",
+        "src": "/music/april-suzanne-beach-house.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 332
+    },
+    {
+        "id": "song-dont-stare-at-the-sun-when-in-rome",
+        "title": "Don't Stare at the Sun",
+        "artist": "When In Rome",
+        "duration": "4:36",
+        "src": "/music/dont-stare-at-the-sun-when-in-rome.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 333
+    },
+    {
+        "id": "song-nicotine-winter",
+        "title": "nicotine",
+        "artist": "Winter, Eyedress",
+        "duration": "3:18",
+        "src": "/music/nicotine-winter.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 334
+    },
+    {
+        "id": "song-red-eye-jaymin",
+        "title": "Red Eye",
+        "artist": "Jaymin",
+        "duration": "3:04",
+        "src": "/music/red-eye-jaymin.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 335
+    },
+    {
+        "id": "song-macacoa-2000-rauw-alejandro",
+        "title": "Macacoa 2000",
+        "artist": "Rauw Alejandro",
+        "duration": "2:53",
+        "src": "/music/macacoa-2000-rauw-alejandro.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "latin"
+        ],
+        "rank": 336
+    },
+    {
+        "id": "song-ten-pairs-of-boots-riley-green",
+        "title": "Ten Pairs Of Boots",
+        "artist": "Riley Green",
+        "duration": "3:42",
+        "src": "/music/ten-pairs-of-boots-riley-green.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 337
+    },
+    {
+        "id": "song-isolation-joy-division",
+        "title": "Isolation",
+        "artist": "Joy Division",
+        "duration": "3:37",
+        "src": "/music/isolation-joy-division.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 338
+    },
+    {
+        "id": "song-whateverrrr-spacey-jane",
+        "title": "Whateverrrr",
+        "artist": "Spacey Jane",
+        "duration": "3:02",
+        "src": "/music/whateverrrr-spacey-jane.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 339
+    },
+    {
+        "id": "song-faulty-boy-harsher",
+        "title": "Faulty",
+        "artist": "Boy Harsher",
+        "duration": "3:19",
+        "src": "/music/faulty-boy-harsher.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 340
+    },
+    {
+        "id": "song-the-river-cried-cyndi-lauper",
+        "title": "The River Cried",
+        "artist": "Cyndi Lauper",
+        "duration": "4:03",
+        "src": "/music/the-river-cried-cyndi-lauper.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 341
+    },
+    {
+        "id": "song-versailles-carly-rae-jepsen",
+        "title": "Versailles",
+        "artist": "Carly Rae Jepsen",
+        "duration": "3:14",
+        "src": "/music/versailles-carly-rae-jepsen.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 342
+    },
+    {
+        "id": "song-famous-south-arcade",
+        "title": "F.A.M.O.U.S",
+        "artist": "South Arcade",
+        "duration": "3:20",
+        "src": "/music/famous-south-arcade.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 343
+    },
+    {
+        "id": "song-tear-it-down-greta-van-fleet",
+        "title": "Tear It Down",
+        "artist": "Greta Van Fleet",
+        "duration": "4:23",
+        "src": "/music/tear-it-down-greta-van-fleet.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 344
+    },
+    {
+        "id": "song-the-storm-valhalore",
+        "title": "The Storm",
+        "artist": "Valhalore",
+        "duration": "5:27",
+        "src": "/music/the-storm-valhalore.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 345
+    },
+    {
+        "id": "song-into-your-heart-aj-mclean",
+        "title": "Into Your Heart",
+        "artist": "AJ McLean",
+        "duration": "2:28",
+        "src": "/music/into-your-heart-aj-mclean.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 346
+    },
+    {
+        "id": "song-catch-me-jastin-martin",
+        "title": "Catch Me",
+        "artist": "Jastin Martin",
+        "duration": "2:34",
+        "src": "/music/catch-me-jastin-martin.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 347
+    },
+    {
+        "id": "song-last-goodbye-kady-zadora",
+        "title": "Last Goodbye",
+        "artist": "Kady Zadora",
+        "duration": "3:27",
+        "src": "/music/last-goodbye-kady-zadora.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 348
+    },
+    {
+        "id": "song-rick-tank",
+        "title": "RICK",
+        "artist": "Tank",
+        "duration": "2:59",
+        "src": "/music/rick-tank.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rb"
+        ],
+        "rank": 349
+    },
+    {
+        "id": "song-fun-sasha-alex-sloan",
+        "title": "Fun",
+        "artist": "Sasha Alex Sloan",
+        "duration": "3:13",
+        "src": "/music/fun-sasha-alex-sloan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 350
+    },
+    {
+        "id": "song-silver-lining-games-we-play",
+        "title": "Silver Lining",
+        "artist": "Games We Play",
+        "duration": "2:47",
+        "src": "/music/silver-lining-games-we-play.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 351
+    },
+    {
+        "id": "song-greatest-love-briston-maroney",
+        "title": "Greatest Love",
+        "artist": "Briston Maroney",
+        "duration": "4:08",
+        "src": "/music/greatest-love-briston-maroney.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 352
+    },
+    {
+        "id": "song-convince-me-arankai",
+        "title": "Convince Me",
+        "artist": "Arankai",
+        "duration": "4:00",
+        "src": "/music/convince-me-arankai.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 353
+    },
+    {
+        "id": "song-the-message-the-love-buzz",
+        "title": "The Message",
+        "artist": "The Love Buzz",
+        "duration": "3:44",
+        "src": "/music/the-message-the-love-buzz.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 354
+    },
+    {
+        "id": "song-natural-high-perfume-genius",
+        "title": "Natural High",
+        "artist": "Perfume Genius",
+        "duration": "5:45",
+        "src": "/music/natural-high-perfume-genius.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 355
+    },
+    {
+        "id": "song-3rd-pike-the-drowns",
+        "title": "3rd & Pike",
+        "artist": "The Drowns",
+        "duration": "2:37",
+        "src": "/music/3rd-pike-the-drowns.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 356
+    },
+    {
+        "id": "song-private-eye-rise-against",
+        "title": "Private Eye",
+        "artist": "Rise Against",
+        "duration": "3:28",
+        "src": "/music/private-eye-rise-against.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 357
+    },
+    {
+        "id": "song-cowboy-from-la-aaron-watson",
+        "title": "Cowboy From LA",
+        "artist": "Aaron Watson",
+        "duration": "2:22",
+        "src": "/music/cowboy-from-la-aaron-watson.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 358
+    },
+    {
+        "id": "song-thai-angel-the-darkfm",
+        "title": "Thai Angel",
+        "artist": "THE DARK.FM",
+        "duration": "3:21",
+        "src": "/music/thai-angel-the-darkfm.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "indie"
+        ],
+        "rank": 359
+    },
+    {
+        "id": "song-fools-for-the-fleeting-katie-pruitt",
+        "title": "Fools for the Fleeting",
+        "artist": "Katie Pruitt",
+        "duration": "4:54",
+        "src": "/music/fools-for-the-fleeting-katie-pruitt.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 360
+    },
+    {
+        "id": "song-the-garden-jonathan-something",
+        "title": "The Garden",
+        "artist": "Jonathan Something",
+        "duration": "3:57",
+        "src": "/music/the-garden-jonathan-something.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 361
+    },
+    {
+        "id": "song-my-madness-david-byrne",
+        "title": "My Madness",
+        "artist": "David Byrne",
+        "duration": "3:33",
+        "src": "/music/my-madness-david-byrne.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 362
+    },
+    {
+        "id": "song-not-home-anymore-june-rest",
+        "title": "Not Home Anymore",
+        "artist": "June Rest",
+        "duration": "3:04",
+        "src": "/music/not-home-anymore-june-rest.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 363
+    },
+    {
+        "id": "song-hello-again-jim-caroline-rose",
+        "title": "Hello Again, Jim",
+        "artist": "Caroline Rose",
+        "duration": "3:26",
+        "src": "/music/hello-again-jim-caroline-rose.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 364
+    },
+    {
+        "id": "song-prometheus-protocol-dogbite",
+        "title": "PROMETHEUS PROTOCOL",
+        "artist": "DOGBITE",
+        "duration": "3:07",
+        "src": "/music/prometheus-protocol-dogbite.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 365
+    },
+    {
+        "id": "song-dislocate-voil",
+        "title": "Dislocate",
+        "artist": "VOILÀ",
+        "duration": "2:49",
+        "src": "/music/dislocate-voil.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 366
+    },
+    {
+        "id": "song-they-wont-come-the-brazen-youth",
+        "title": "They Won't Come",
+        "artist": "The Brazen Youth",
+        "duration": "6:16",
+        "src": "/music/they-wont-come-the-brazen-youth.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 367
+    },
+    {
+        "id": "song-crack-the-code-the-veer-union",
+        "title": "Crack The Code",
+        "artist": "The Veer Union",
+        "duration": "3:52",
+        "src": "/music/crack-the-code-the-veer-union.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 368
+    },
+    {
+        "id": "song-no-trouble-triggerfinger",
+        "title": "No Trouble",
+        "artist": "Triggerfinger",
+        "duration": "2:33",
+        "src": "/music/no-trouble-triggerfinger.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 369
+    },
+    {
+        "id": "song-better-way-the-creekers",
+        "title": "Better Way",
+        "artist": "The Creekers",
+        "duration": "3:46",
+        "src": "/music/better-way-the-creekers.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 370
+    },
+    {
+        "id": "song-walk-like-me-skuzland",
+        "title": "WALK LIKE ME",
+        "artist": "skuzland",
+        "duration": "2:44",
+        "src": "/music/walk-like-me-skuzland.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 371
+    },
+    {
+        "id": "song-final-warning-wraith",
+        "title": "Final Warning",
+        "artist": "Wraith",
+        "duration": "2:48",
+        "src": "/music/final-warning-wraith.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 372
+    },
+    {
+        "id": "song-run-out-of-road-orville-peck",
+        "title": "Run Out Of Road",
+        "artist": "Orville Peck",
+        "duration": "2:59",
+        "src": "/music/run-out-of-road-orville-peck.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 373
+    },
+    {
+        "id": "song-you-can-feel-bad-mae-estes",
+        "title": "You Can Feel Bad",
+        "artist": "Mae Estes",
+        "duration": "3:23",
+        "src": "/music/you-can-feel-bad-mae-estes.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 374
+    },
+    {
+        "id": "song-silencio-u",
+        "title": "Silencio",
+        "artist": "U",
+        "duration": "22:35",
+        "src": "/music/silencio-u.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 375
+    },
+    {
+        "id": "song-whole-damn-choir-holden-mcrae",
+        "title": "Whole Damn Choir",
+        "artist": "Holden McRae",
+        "duration": "3:10",
+        "src": "/music/whole-damn-choir-holden-mcrae.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 376
+    },
+    {
+        "id": "song-houston-josh-levi",
+        "title": "HOUSTON",
+        "artist": "Josh Levi",
+        "duration": "3:28",
+        "src": "/music/houston-josh-levi.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 377
+    },
+    {
+        "id": "song-slay-qbomb",
+        "title": "Slay",
+        "artist": "Qbomb",
+        "duration": "1:54",
+        "src": "/music/slay-qbomb.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "punk"
+        ],
+        "rank": 378
+    },
+    {
+        "id": "song-here-to-stay-hollywood-arts-cast",
+        "title": "Here To Stay",
+        "artist": "Hollywood Arts Cast",
+        "duration": "2:15",
+        "src": "/music/here-to-stay-hollywood-arts-cast.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 379
+    },
+    {
+        "id": "song-cold-mine-no-money-kids",
+        "title": "Cold Mine",
+        "artist": "No Money Kids",
+        "duration": "2:56",
+        "src": "/music/cold-mine-no-money-kids.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 380
+    },
+    {
+        "id": "song-the-burden-of-being-outer-heaven",
+        "title": "The Burden Of Being",
+        "artist": "Outer Heaven",
+        "duration": "4:00",
+        "src": "/music/the-burden-of-being-outer-heaven.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 381
+    },
+    {
+        "id": "song-2sided-arlo-parks",
+        "title": "2SIDED",
+        "artist": "Arlo Parks",
+        "duration": "3:51",
+        "src": "/music/2sided-arlo-parks.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 382
+    },
+    {
+        "id": "song-free-free-ladytron",
+        "title": "Free, Free",
+        "artist": "Ladytron",
+        "duration": "6:00",
+        "src": "/music/free-free-ladytron.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 383
+    },
+    {
+        "id": "song-dead-inside-of-me-trivium",
+        "title": "Dead Inside Of Me",
+        "artist": "Trivium",
+        "duration": "4:01",
+        "src": "/music/dead-inside-of-me-trivium.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 384
+    },
+    {
+        "id": "song-you-cant-stop-steel-midnight",
+        "title": "You Can't Stop Steel",
+        "artist": "Midnight",
+        "duration": "3:19",
+        "src": "/music/you-cant-stop-steel-midnight.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 385
+    },
+    {
+        "id": "song-run-from-the-sun-the-datsuns",
+        "title": "Run From The Sun",
+        "artist": "The Datsuns",
+        "duration": "3:14",
+        "src": "/music/run-from-the-sun-the-datsuns.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 386
+    },
+    {
+        "id": "song-hell-or-highwater-laci-kaye-booth",
+        "title": "Hell Or Highwater",
+        "artist": "Laci Kaye Booth",
+        "duration": "4:03",
+        "src": "/music/hell-or-highwater-laci-kaye-booth.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 387
+    },
+    {
+        "id": "song-party-in-the-sun-serious-black",
+        "title": "Party In The Sun",
+        "artist": "Serious Black",
+        "duration": "3:29",
+        "src": "/music/party-in-the-sun-serious-black.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 388
+    },
+    {
+        "id": "song-penn-station-old-crow-medicine-show",
+        "title": "Penn Station",
+        "artist": "Old Crow Medicine Show",
+        "duration": "3:15",
+        "src": "/music/penn-station-old-crow-medicine-show.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "folk"
+        ],
+        "rank": 389
+    },
+    {
+        "id": "song-never-tear-us-apart-sophia-laforteza",
+        "title": "Never Tear Us Apart",
+        "artist": "Sophia Laforteza",
+        "duration": "3:15",
+        "src": "/music/never-tear-us-apart-sophia-laforteza.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 390
+    },
+    {
+        "id": "song-trouble-in-mind-valerie-june",
+        "title": "Trouble In Mind",
+        "artist": "Valerie June",
+        "duration": "3:09",
+        "src": "/music/trouble-in-mind-valerie-june.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "blues"
+        ],
+        "rank": 391
+    },
+    {
+        "id": "song-crush-ray-noir",
+        "title": "Crush",
+        "artist": "Ray Noir",
+        "duration": "2:40",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcrush-feat-aturn-slevpy808.mp3?alt=media&token=635ca3c8-884c-4f5a-b37f-c34634611363",
+        "streamUrl": null,
+        "art": "/images/blank_cover.svg",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "electronic"
+        ],
+        "rank": 392
+    },
+    {
+        "id": "song-two-weeks-blood-red-shoes",
+        "title": "Two Weeks",
+        "artist": "Blood Red Shoes",
+        "duration": "3:03",
+        "src": "/music/two-weeks-blood-red-shoes.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 393
+    },
+    {
+        "id": "song-norwegian-wood-the-beatles",
+        "title": "Norwegian Wood",
+        "artist": "The Beatles",
+        "duration": "2:20",
+        "src": "/music/norwegian-wood-the-beatles.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 394
+    },
+    {
+        "id": "song-adrenaline-rush-rivals",
+        "title": "Adrenaline Rush",
+        "artist": "Rivals",
+        "duration": "3:35",
+        "src": "/music/adrenaline-rush-rivals.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 395
+    },
+    {
+        "id": "song-i-wish-i-never-met-you-nom",
+        "title": "I Wish I Never Met You",
+        "artist": "néomí",
+        "duration": "3:44",
+        "src": "/music/i-wish-i-never-met-you-nom.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 396
+    },
+    {
+        "id": "song-come-on-california-bernie-taupin",
+        "title": "Come On California",
+        "artist": "Bernie Taupin",
+        "duration": "4:59",
+        "src": "/music/come-on-california-bernie-taupin.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 397
+    },
+    {
+        "id": "song-online-bnxn",
+        "title": "Online",
+        "artist": "BNXN",
+        "duration": "2:52",
+        "src": "/music/online-bnxn.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 398
+    },
+    {
+        "id": "song-the-hollowed-bloodline-chabtan",
+        "title": "The Hollowed Bloodline",
+        "artist": "Chabtan",
+        "duration": "3:55",
+        "src": "/music/the-hollowed-bloodline-chabtan.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 399
+    },
+    {
+        "id": "song-her-portrait-in-black-atreyu",
+        "title": "Her Portrait In Black",
+        "artist": "Atreyu",
+        "duration": "4:02",
+        "src": "/music/her-portrait-in-black-atreyu.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "metal"
+        ],
+        "rank": 400
+    },
+    {
+        "id": "song-heart-stop-the-revivalists",
+        "title": "Heart Stop",
+        "artist": "The Revivalists",
+        "duration": "5:08",
+        "src": "/music/heart-stop-the-revivalists.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rock"
+        ],
+        "rank": 401
+    },
+    {
+        "id": "song-pop-dat-thang-dababy",
+        "title": "POP DAT THANG",
+        "artist": "DaBaby",
+        "duration": "2:18",
+        "src": "/music/pop-dat-thang-dababy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 402
+    },
+    {
+        "id": "song-screwed-up-destroy-lonely",
+        "title": "screwed up",
+        "artist": "Destroy Lonely",
+        "duration": "2:33",
+        "src": "/music/screwed-up-destroy-lonely.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 403
+    },
+    {
+        "id": "song-this-n-that-g-herbo",
+        "title": "This N That",
+        "artist": "G Herbo",
+        "duration": "3:18",
+        "src": "/music/this-n-that-g-herbo.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 404
+    },
+    {
+        "id": "song-errtime-cardi-b-jeezy",
+        "title": "ErrTime",
+        "artist": "Cardi B & Jeezy",
+        "duration": "3:16",
+        "src": "/music/errtime-cardi-b-jeezy.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 405
+    },
+    {
+        "id": "song-spend-dat-yung-miami",
+        "title": "Spend Dat",
+        "artist": "Yung Miami",
+        "duration": "3:02",
+        "src": "/music/spend-dat-yung-miami.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 406
+    },
+    {
+        "id": "song-eye-to-eye-future",
+        "title": "Eye To Eye",
+        "artist": "Future",
+        "duration": "2:25",
+        "src": "/music/eye-to-eye-future.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 407
+    },
+    {
+        "id": "song-take-me-back-cody-johnson",
+        "title": "Take Me Back",
+        "artist": "Cody Johnson",
+        "duration": "2:59",
+        "src": "/music/take-me-back-cody-johnson.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "country"
+        ],
+        "rank": 408
+    },
+    {
+        "id": "song-tp-rod-wave",
+        "title": "TP",
+        "artist": "Rod Wave",
+        "duration": "2:49",
+        "src": "/music/tp-rod-wave.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 409
+    },
+    {
+        "id": "song-ran-to-atlanta-drake",
+        "title": "Ran To Atlanta",
+        "artist": "Drake, Future",
+        "duration": "4:07",
+        "src": "/music/ran-to-atlanta-drake.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "rap"
+        ],
+        "rank": 410
+    },
+    {
+        "id": "song-its-me-illit",
+        "title": "It's Me",
+        "artist": "ILLIT",
+        "duration": "2:18",
+        "src": "/music/its-me-illit.mp3",
+        "streamUrl": null,
+        "art": "/images/medixly-logo.png",
+        "bpm": 120,
+        "energy": 0.7,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop"
+        ],
+        "rank": 411
+    },
     {
         "id": "kobzx2z-take-my-hand",
         "title": "take my hand",
@@ -97,21 +7250,6 @@ export const librarySongs = [
         "art": "/images/rockstar.jpg",
         "bpm": 90,
         "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "rap"
-        ]
-    },
-    {
-        "id": "dead-fresh",
-        "title": "Dead Fresh",
-        "artist": "Lil Baby",
-        "duration": "3:00",
-        "src": "/music/dead_fresh.mp3",
-        "art": "/images/dead_fresh.jpg",
-        "bpm": 120,
-        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
@@ -342,21 +7480,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "like-that-guitar-remix-aamadux",
-        "title": "Life Force (Slowed)",
-        "artist": "Aamadux",
-        "duration": "4:27",
-        "src": "/music/like-that-guitar-remix-aamadux.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/9e/25/079e25cf-7bd7-48ed-9d5e-84904eb8bc69/MOBX0879.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "loverboy-a-wall",
         "title": "Loverboy",
         "artist": "A-Wall",
@@ -423,21 +7546,6 @@ export const librarySongs = [
         "duration": "4:14",
         "src": "/music/505-arctic-monkeys.mp3",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/82/90/14/829014ad-a301-62ab-bee6-f4cca4457411/mzi.hozudery.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "7-rings-ariana-grande",
-        "title": "7 rings",
-        "artist": "Ariana Grande",
-        "duration": "2:59",
-        "src": "/music/7-rings-ariana-grande.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -567,42 +7675,12 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "automotivo-bibi-fogosa-slowed-reverb-bbygirl",
-        "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
-        "artist": "bbygirl",
-        "duration": "2:49",
-        "src": "/music/automotivo-bibi-fogosa-slowed-reverb-bbygirl.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "b2b-charli-xcx",
         "title": "B2b",
         "artist": "Charli xcx",
         "duration": "2:58",
         "src": "/music/b2b-charli-xcx.mp3",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/4e/63/884e6321-ad41-aab1-f6f0-20efcafcfd55/075679666130.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "babydoll-ari-abdul",
-        "title": "So Good",
-        "artist": "Ari Abdul",
-        "duration": "3:16",
-        "src": "/music/babydoll-ari-abdul.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/9e/2e/5b9e2e7c-a117-89ac-79c2-43fd866aad48/196874051207.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -723,36 +7801,6 @@ export const librarySongs = [
         "duration": "3:14",
         "src": "/music/bludlust-daegho-ngxt.mp3",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "blue-billie-eilish",
-        "title": "BLUE",
-        "artist": "Billie Eilish",
-        "duration": "5:43",
-        "src": "/music/blue-billie-eilish.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "body-cash-cobain-a-boogie-wit-da-hoodie",
-        "title": "Body",
-        "artist": "Cash Cobain A Boogie Wit Da Hoodie",
-        "duration": "3:12",
-        "src": "/music/body-feat-cash-cobain-a-boogie-wit-da-hoodie.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/45/4a/f6454ad2-87e7-473f-988d-f0005acffd9b/075679846686.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -948,21 +7996,6 @@ export const librarySongs = [
         "duration": "2:52",
         "src": "/music/death-is-no-more-slowed-blessed-mane.mp3",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/52/5c/10/525c109f-4387-a65b-0526-abe474708729/artwork.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "do-it-civ",
-        "title": "Do It",
-        "artist": "Civ",
-        "duration": "3:58",
-        "src": "/music/do-it-civ.mp3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/86/ae/20/86ae20c4-77ed-3531-5df2-5248116415b8/51575.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3058,21 +10091,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "100-am-civ",
-        "title": "Rockin' In the Free World",
-        "artist": "Neil Young",
-        "duration": "2:13",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F100-am-civ.mp3?alt=media&token=556907e1-7648-4573-97dc-63b603a12848",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/64/5f/36/645f3612-b2ba-8cf1-c814-cb9d3a2216c5/dj.lmxzvmtb.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "1093-yeat",
         "title": "1093 Yeat",
         "artist": "Unknown Artist",
@@ -3086,21 +10104,6 @@ export const librarySongs = [
         "tags": [
             "untagged",
             "viral"
-        ]
-    },
-    {
-        "id": "2-dangerous-brennan-story-rarin",
-        "title": "2 Dangerous Brennan Story Rarin",
-        "artist": "Unknown Artist",
-        "duration": "2:38",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F2-dangerous-brennan-story-rarin.mp3?alt=media&token=8df4a255-4891-428c-bf00-6a43c2489de6",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
         ]
     },
     {
@@ -3300,21 +10303,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "505-arctic-monkeys",
-        "title": "505",
-        "artist": "Arctic Monkeys",
-        "duration": "4:14",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F505-arctic-monkeys.mp3?alt=media&token=0fc55cb3-f181-45fb-a9a3-15ca6ed272e2",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/82/90/14/829014ad-a301-62ab-bee6-f4cca4457411/mzi.hozudery.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "679-i-got-a-glock-in-my-rari-sped-remix-dj-samentro",
         "title": "679 I Got A Glock In My Rari Sped Remix Dj Samentro",
         "artist": "Unknown Artist",
@@ -3336,21 +10324,6 @@ export const librarySongs = [
         "duration": "3:06",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F7-leere-zimmer-ufo361-henning-may.mp3?alt=media&token=e7cfc060-9c62-40da-83c9-c1297f92ccd2",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "7-rings-ariana-grande",
-        "title": "7 rings",
-        "artist": "Ariana Grande",
-        "duration": "2:59",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F7-rings-ariana-grande.mp3?alt=media&token=5b7408a1-c146-4e80-9ceb-345639f8d620",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3420,21 +10393,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "9pm-in-shibuya-432hz-adturnup",
-        "title": "9PM in Shibuya (432Hz)",
-        "artist": "ADTurnUp",
-        "duration": "2:31",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F9pm-in-shibuya-432hz-adturnup.mp3?alt=media&token=492ea2bf-7af2-47e6-b1cd-20eb1c8ac8e3",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b6/80/0c/b6800c25-ca27-f461-ed91-09e0eebef47f/artwork.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "a-birds-last-look-macabre-plaza",
         "title": "A Birds Last Look Macabre Plaza",
         "artist": "Unknown Artist",
@@ -3486,21 +10444,6 @@ export const librarySongs = [
         "duration": "7:17",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fa-new-kind-of-love-demo-guy-sigsworth-imogen-heap-frou-frou.mp3?alt=media&token=f3af8a60-5ab8-42ba-9386-8b5e0de31f6e",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "abismo-mixed-clap-freckles",
-        "title": "Abismo",
-        "artist": "Clap Freckles",
-        "duration": "1:03",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fabismo-mixed-clap-freckles.mp3?alt=media&token=d41c09d8-9e5f-4b62-8828-388311b3dbad",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2a/34/f5/2a34f542-cb50-b1bc-6014-7288ff990761/840200574327_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -3758,21 +10701,6 @@ export const librarySongs = [
         "duration": "1:55",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Falcoholics-pingmas.mp3?alt=media&token=27e9af3d-2631-4d46-87d2-9b07eef211a3",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "all-about-that-bass-chrxs-beats-bread-beatz",
-        "title": "All About That Bass",
-        "artist": "Chrxs Beats & Bread Beatz",
-        "duration": "2:16",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fall-about-that-bass-chrxs-beats-bread-beatz.mp3?alt=media&token=c09bb269-86fc-4816-bdb7-4b10fb90f3e6",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4a/94/e0/4a94e0d6-845d-3029-2b96-efbc5dddd05d/3104743.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4114,21 +11042,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "answer-to-everything-mixed-any-act",
-        "title": "The Answer to Everything",
-        "artist": "Hazel Taylor",
-        "duration": "1:57",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fanswer-to-everything-mixed-any-act.mp3?alt=media&token=60f7be9e-693d-401c-8a96-963af73a5d69",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/85/5e/57/855e57fe-9138-d7f9-bd2f-181b4a3377fb/196056327403_cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "antisocial-2-slump6s-yung-fazo-xhulooo-ssgkobe-tana",
         "title": "Antisocial 2",
         "artist": "Slump6s Yung Fazo Xhulooo Ssgkobe Tana",
@@ -4174,21 +11087,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "anything-adrianne-lenker",
-        "title": "anything",
-        "artist": "Adrianne Lenker",
-        "duration": "3:22",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fanything-adrianne-lenker.mp3?alt=media&token=f012d83f-f8b7-44a3-9912-4b9ecca8b025",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/70/f0/a6/70f0a6a5-cd71-9da2-174b-41927d331cdd/cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "apathy-neheart",
         "title": "Apathy øNeheart",
         "artist": "Unknown Artist",
@@ -4225,21 +11123,6 @@ export const librarySongs = [
         "duration": "3:06",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Farchangel-slowed-dj-anemia-crier-sixnite.mp3?alt=media&token=4f4b506f-de74-4689-b9fb-1c2cc958288d",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "are-you-falling-in-love-akucum",
-        "title": "Are You Falling In Love?",
-        "artist": "Akucum",
-        "duration": "4:19",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fare-you-falling-in-love-akucum.mp3?alt=media&token=40b4d420-a732-4f12-9504-63a7f3c59a42",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c9/d8/9b/c9d89b7a-ada8-6ffa-bf32-3afd4889db79/8790001426078_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4489,21 +11372,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "automotivo-bibi-fogosa-slowed-reverb-bbygirl",
-        "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
-        "artist": "bbygirl",
-        "duration": "2:49",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fautomotivo-bibi-fogosa-slowed-reverb-bbygirl.mp3?alt=media&token=f1fed8d2-7ea5-4e6e-9486-8c311dcd69cd",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "avangard-slowed-lonown",
         "title": "Avangard Slowed Lonown",
         "artist": "Unknown Artist",
@@ -4534,57 +11402,12 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "b2b-charli-xcx",
-        "title": "B2b",
-        "artist": "Charli xcx",
-        "duration": "2:58",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fb2b-charli-xcx.mp3?alt=media&token=bf943334-8213-471f-a10e-4f46b517f100",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/88/4e/63/884e6321-ad41-aab1-f6f0-20efcafcfd55/075679666130.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "baby-ludacris-justin-bieber",
-        "title": "Baby",
-        "artist": "Ludacris Justin Bieber",
-        "duration": "3:39",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbaby-feat-ludacris-justin-bieber.mp3?alt=media&token=2fb99e13-a77d-4984-836e-7c6f35254503",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "baby-im-yours-irfane-breakbot",
         "title": "Baby Im Yours",
         "artist": "Irfane Breakbot",
         "duration": "3:35",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbaby-im-yours-feat-irfane-breakbot.mp3?alt=media&token=0c58ab3a-2f05-4cd4-952b-3b07c05bddac",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "babydoll-ari-abdul",
-        "title": "So Good",
-        "artist": "Ari Abdul",
-        "duration": "3:16",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbabydoll-ari-abdul.mp3?alt=media&token=333b471e-816e-497a-9b75-5522a344f0ab",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/5b/9e/2e/5b9e2e7c-a117-89ac-79c2-43fd866aad48/196874051207.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -4659,21 +11482,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "2:28",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbad-bitch-41-jenn-carter-kyle-richh.mp3?alt=media&token=1470f0f9-a627-4715-9253-68db33d4167e",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "bad-bitch-axaero-aio-holmes",
-        "title": "Bad Bitch",
-        "artist": "Axaero Aio Holmes",
-        "duration": "2:27",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbad-bitch-feat-axaero-aio-holmes.mp3?alt=media&token=7e81f09c-d29b-4302-ba23-9568617c5b5e",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -5228,21 +12036,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "birds-of-a-feather-billie-eilish",
-        "title": "BIRDS OF A FEATHER",
-        "artist": "Billie Eilish",
-        "duration": "3:31",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbirds-of-a-feather-billie-eilish.mp3?alt=media&token=32fb7333-1c3c-4ca2-8745-316597cff410",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "bitch-dont-kill-my-vibe-kendrick-lamar",
         "title": "Bitch Dont Kill My Vibe Kendrick Lamar",
         "artist": "Unknown Artist",
@@ -5279,21 +12072,6 @@ export const librarySongs = [
         "duration": "3:47",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblack-out-days-phantogram.mp3?alt=media&token=72d3d9c1-fce7-43c8-a45a-3d4f9d903e1f",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "black-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-aw",
-        "title": "Black Out Days (Slowed + Reverb) - Tell Me All the Ways To Stay Away",
-        "artist": "Creamy, untrusted & 11:11 Music Group",
-        "duration": "4:22",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblack-out-days-slowed-reverb-tell-me-all-the-ways-to-stay-away-creamy-untrusted-1111-music-group.mp3?alt=media&token=fa69f1f7-d869-4951-a9b6-fcc34fd5d6ae",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/9b/bc/89/9bbc89c6-da6a-7142-991f-a04623ae1fed/5063113322105_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5363,21 +12141,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "bleach-blvck-svm",
-        "title": "Bleach Blvck Svm",
-        "artist": "Unknown Artist",
-        "duration": "2:37",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbleach-blvck-svm.mp3?alt=media&token=ce39e426-8bdc-4129-ac25-87027c607259",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "blinding-lights-the-weeknd",
         "title": "Blinding Lights The Weeknd",
         "artist": "Unknown Artist",
@@ -5423,41 +12186,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "blondie-current-joys",
-        "title": "Blondie",
-        "artist": "Current Joys",
-        "duration": "3:21",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblondie-current-joys.mp3?alt=media&token=552beb23-f7dd-4321-97a8-cfd7e76363a9",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/18/6c/4a/186c4a26-3ccf-65ce-2695-b15da578d0e4/617308019940.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "bloodonmyhands-flo-milli-tate-mcrae",
         "title": "Bloodonmyhands",
         "artist": "Flo Milli Tate Mcrae",
         "duration": "2:42",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbloodonmyhands-feat-flo-milli-tate-mcrae.mp3?alt=media&token=33628d39-c90c-43b7-98c5-b50ef00ecc88",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "bloodstained-shawty-ciscaux",
-        "title": "Bloodstained Shawty Ciscaux",
-        "artist": "Unknown Artist",
-        "duration": "1:49",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbloodstained-shawty-ciscaux.mp3?alt=media&token=2c37ccce-59f3-4c7c-88bd-eaead156beed",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -5534,36 +12267,6 @@ export const librarySongs = [
         "duration": "2:49",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblow-the-scene-up-feat-tsuyo-jixplosion-indxgo.mp3?alt=media&token=a22309b6-9200-43d1-a4a6-a5325051c70f",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "bludlust-daegho-ngxt",
-        "title": "Bludlust Daegho Ngxt",
-        "artist": "Unknown Artist",
-        "duration": "3:14",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbludlust-daegho-ngxt.mp3?alt=media&token=4cb3acd8-666c-40b6-ae58-d06849993409",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "blue-billie-eilish",
-        "title": "BLUE",
-        "artist": "Billie Eilish",
-        "duration": "5:43",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblue-billie-eilish.mp3?alt=media&token=e9e66541-ccc7-4154-a25a-daa516585b13",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -5678,21 +12381,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "body-cash-cobain-a-boogie-wit-da-hoodie",
-        "title": "Body",
-        "artist": "Cash Cobain A Boogie Wit Da Hoodie",
-        "duration": "3:12",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbody-feat-cash-cobain-a-boogie-wit-da-hoodie.mp3?alt=media&token=39bbc741-f3b3-4fab-a70e-be111f744c86",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/f6/45/4a/f6454ad2-87e7-473f-988d-f0005acffd9b/075679846686.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "body-remix-arrdee-e1-3x3-zt-3x3-bugzy-malone-buni-fivio-fore",
         "title": "Body Remix",
         "artist": "Arrdee E1 3x3 Zt 3x3 Bugzy Malone Buni Fivio Foreign Darkoo Tion Wayne Russ Millions",
@@ -5768,41 +12456,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "bop-aj-gravity",
-        "title": "Bop Aj Gravity",
-        "artist": "Unknown Artist",
-        "duration": "2:10",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbop-aj-gravity.mp3?alt=media&token=683a1fa9-394a-42df-a342-3775c2dac689",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "bop-dababy",
         "title": "Bop Dababy",
         "artist": "Unknown Artist",
         "duration": "2:39",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbop-dababy.mp3?alt=media&token=ea7aaf53-e0e9-42e0-b9c0-ae11b96e37eb",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "bop-it-aliyahs-interlude",
-        "title": "Bop It Aliyahs Interlude",
-        "artist": "Unknown Artist",
-        "duration": "2:43",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbop-it-aliyahs-interlude.mp3?alt=media&token=306258a1-5f53-4203-a8e1-438dcb1c8bb5",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -5903,21 +12561,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "brag-aj-gravity",
-        "title": "Brag Aj Gravity",
-        "artist": "Unknown Artist",
-        "duration": "2:40",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbrag-aj-gravity.mp3?alt=media&token=0bc027cd-3b97-4ed7-80d2-1f311726f458",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "brain-diplo-artemas-d00mscrvll",
         "title": "Brain Diplo Artemas D00mscrvll",
         "artist": "Unknown Artist",
@@ -5954,21 +12597,6 @@ export const librarySongs = [
         "duration": "1:35",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbreak-it-off-pinkpantheress.mp3?alt=media&token=a6c5bb04-ce63-4183-8284-ea72f3ba1f89",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "break-up-with-your-girlfriend-im-bored-ariana-grande",
-        "title": "break up with your girlfriend, i'm bored",
-        "artist": "Ariana Grande",
-        "duration": "3:24",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbreak-up-with-your-girlfriend-im-bored-ariana-grande.mp3?alt=media&token=56796add-359f-4f1b-a90c-781149560417",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6145,21 +12773,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "bubble-gum-clairo",
-        "title": "Bubble Gum",
-        "artist": "Clairo",
-        "duration": "2:55",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbubble-gum-clairo.mp3?alt=media&token=6749a948-82f7-47b4-bda5-02fa74b46093",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9b/f8/54/9bf854d7-cfec-6e5e-d42f-97a77fd358bb/5059033334878_cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "bully-freestyle-ice-spice",
         "title": "Bully Freestyle Ice Spice",
         "artist": "Unknown Artist",
@@ -6265,21 +12878,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "buster-atori-zoom",
-        "title": "Buster Atori Zoom",
-        "artist": "Unknown Artist",
-        "duration": "2:21",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbuster-atori-zoom.mp3?alt=media&token=a3c4b365-8c0a-4291-9a44-26ef9421d82a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "butterfly-effect-travis-scott",
         "title": "Butterfly Effect Travis Scott",
         "artist": "Unknown Artist",
@@ -6301,21 +12899,6 @@ export const librarySongs = [
         "duration": "1:56",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbyebyewav-sxcredmane.mp3?alt=media&token=166e8b64-a069-4a7d-8371-55d1378d6f53",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "cabo-bankrol-hayden",
-        "title": "Cabo",
-        "artist": "Bankrol Hayden",
-        "duration": "2:38",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcabo-bankrol-hayden.mp3?alt=media&token=bac2dc4f-6564-4dd0-8af7-0a4709a92915",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/cb/77/f9/cb77f98a-48b9-6438-0e6e-dbb18682730b/075679779212.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -6551,21 +13134,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "cant-feel-myself-dadanny",
-        "title": "Can’t Feel Myself (Slowed)",
-        "artist": "dadanny",
-        "duration": "3:44",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcant-feel-myself-dadanny.mp3?alt=media&token=a5cfeb10-892c-4d42-a6e7-3af8e82c6228",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/1a/ba/8a1aba40-a9e4-e11f-9e16-59144545a74d/198094906442.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "canta-la-kvrxd-wexwhvt",
         "title": "Canta La Kvrxd Wexwhvt",
         "artist": "Unknown Artist",
@@ -6752,21 +13320,6 @@ export const librarySongs = [
         "duration": "2:44",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fceilings-sped-up-reverb-pearl-fast-forward-tazzy.mp3?alt=media&token=0a7514eb-bd9a-4bee-b214-21e6733667fb",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "celestial-angels-slowed-andromeda",
-        "title": "Celestial Angels (Slowed)",
-        "artist": "Andromeda",
-        "duration": "4:29",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcelestial-angels-slowed-andromeda.mp3?alt=media&token=e42e77a1-c0b2-46b7-a21c-85f3de57acf7",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/69/a8/25/69a8250d-4c85-495c-4d04-27392f54871c/cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7032,21 +13585,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "cloud-9-beach-bunny",
-        "title": "Cloud 9",
-        "artist": "Beach Bunny",
-        "duration": "2:28",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcloud-9-beach-bunny.mp3?alt=media&token=dfa787b1-7b05-46c5-b29f-b2fc4f3705ed",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/39/0c/c4/390cc45e-4a1e-9821-4d14-2ce487d918fd/112177.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "cmon-yeat",
         "title": "Cmon Yeat",
         "artist": "Unknown Artist",
@@ -7259,21 +13797,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "congratulations-quavo-post-malone",
-        "title": "Congratulations",
-        "artist": "Quavo Post Malone",
-        "duration": "3:40",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcongratulations-feat-quavo-post-malone.mp3?alt=media&token=c2b13993-e354-4e56-8d63-309d57e17a7d",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "conversations-juice-wrld",
         "title": "Conversations Juice Wrld",
         "artist": "Unknown Artist",
@@ -7470,21 +13993,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "cross-my-heart-artemas",
-        "title": "cross my heart",
-        "artist": "Artemas",
-        "duration": "2:26",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcross-my-heart-artemas.mp3?alt=media&token=2f224e27-d241-4349-98fd-0c93c189993a",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bb/9c/4b/bb9c4b12-61a6-f6ff-5836-fea929212c97/198087623271.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "crossed-out-future-metro-boomin",
         "title": "Crossed Out Future Metro Boomin",
         "artist": "Unknown Artist",
@@ -7513,36 +14021,6 @@ export const librarySongs = [
         "tags": [
             "untagged",
             "viral"
-        ]
-    },
-    {
-        "id": "crush-aturn-slevpy808",
-        "title": "Crush",
-        "artist": "Aturn Slevpy808",
-        "duration": "2:21",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcrush-feat-aturn-slevpy808.mp3?alt=media&token=635ca3c8-884c-4f5a-b37f-c34634611363",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "cryst4l-darkxhawk",
-        "title": "CRYST4L",
-        "artist": "DARKXHAWK",
-        "duration": "2:20",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcryst4l-darkxhawk.mp3?alt=media&token=5efe2f6c-3e31-48fa-8041-ede7c2228d11",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/3b/b5/543bb530-6075-4e75-18ab-ad4f61718c83/cover.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
         ]
     },
     {
@@ -7687,21 +14165,6 @@ export const librarySongs = [
         "duration": "2:39",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdance-feat-ciscaux-wassup-rocker-1nonly.mp3?alt=media&token=4ede438c-1e59-47de-a5e1-0760eeb7e7f4",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "dancin-krono-remix-luvli-aaron-smith",
-        "title": "Dancin Krono Remix",
-        "artist": "Luvli Aaron Smith",
-        "duration": "4:03",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdancin-krono-remix-feat-luvli-aaron-smith.mp3?alt=media&token=6bf52ce0-ff30-4a13-ae5b-e8070c532563",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4b/2a/75/4b2a75c9-a545-87a1-20e7-bba1a3c03a79/199891879823_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -7906,21 +14369,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "death-is-no-more-slowed-blessed-mane",
-        "title": "Death Is No More",
-        "artist": "BLESSED MANE",
-        "duration": "2:52",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdeath-is-no-more-slowed-blessed-mane.mp3?alt=media&token=fa7650ee-81f2-4df2-8b0f-0339fbd72bea",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/52/5c/10/525c109f-4387-a65b-0526-abe474708729/artwork.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "death-lotto-ovg-grioten",
         "title": "Death Lotto Ovg Grioten",
         "artist": "Unknown Artist",
@@ -8071,21 +14519,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "deseo-insaciable-tessareims-ruido-con-h-remix-mixed-dj-fucci",
-        "title": "Deseo Insaciable",
-        "artist": "Tessareims Ruido Con H Remix Mixed Dj Fucci",
-        "duration": "30:23",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdeseo-insaciable-feat-tessareims-ruido-con-h-remix-mixed-dj-fucci.mp3?alt=media&token=4567dee0-9ac7-454e-a913-a02c1f7ccb54",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "dia-delcia-nakama-mc-staff-p",
         "title": "Dia DelíCia Nakama Mc Staff σP",
         "artist": "Unknown Artist",
@@ -8122,21 +14555,6 @@ export const librarySongs = [
         "duration": "4:10",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdiamondz-n-roses-vaporgod.mp3?alt=media&token=b1be8791-92f9-4a6f-bb61-edafea5228e0",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "did-i-tell-u-that-i-miss-u-adore",
-        "title": "did i tell u that i miss u",
-        "artist": "adore",
-        "duration": "1:55",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdid-i-tell-u-that-i-miss-u-adore.mp3?alt=media&token=3d93a342-ed04-438f-bbd1-5712ffc44413",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fe/8a/da/fe8ada16-a03f-9890-329c-cbb4208c2335/723277505657.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -8205,21 +14623,6 @@ export const librarySongs = [
         "tags": [
             "untagged",
             "viral"
-        ]
-    },
-    {
-        "id": "died-once-guitar-remix-aamadux",
-        "title": "Life Force (Slowed)",
-        "artist": "Aamadux",
-        "duration": "2:19",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdied-once-guitar-remix-aamadux.mp3?alt=media&token=cc38c311-8031-45f9-8e30-fcfbf5a1239b",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/9e/25/079e25cf-7bd7-48ed-9d5e-84904eb8bc69/MOBX0879.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
         ]
     },
     {
@@ -8313,21 +14716,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "do-it-civ",
-        "title": "Do It",
-        "artist": "Civ",
-        "duration": "3:58",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdo-it-civ.mp3?alt=media&token=89709e80-149a-42ff-9435-3c4094803710",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/86/ae/20/86ae20c4-77ed-3531-5df2-5248116415b8/51575.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "dont-copy-my-flow-luke-willies",
         "title": "Dont Copy My Flow Luke Willies",
         "artist": "Unknown Artist",
@@ -8378,21 +14766,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "3:43",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdont-make-them-like-me-isabel-larosa.mp3?alt=media&token=dc961fc8-2510-43f9-a43a-0c404e320e8b",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "dont-make-them-like-me",
-        "title": "Dont Make Them Like Me",
-        "artist": "Unknown Artist",
-        "duration": "3:29",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdont-make-them-like-me.mp3?alt=media&token=f8c9865e-8460-4534-95a9-12d6c8a41db1",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8599,21 +14972,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "dream-girl-crisaunt",
-        "title": "Dream Girl",
-        "artist": "Crisaunt",
-        "duration": "2:59",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdream-girl-crisaunt.mp3?alt=media&token=73432015-34ec-4b90-97fd-5ebc8c943502",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/25/13/cb/2513cb34-b006-87c7-d052-a6ff32c98e0b/194491915384.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "dream-girl-grioten-jelex",
         "title": "Dream Girl Grioten Jelex",
         "artist": "Unknown Artist",
@@ -8772,21 +15130,6 @@ export const librarySongs = [
         "duration": "0:00",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fduvet-b%C3%B4a.mp3?alt=media&token=00a838a9-8151-408a-91db-30f7adfeae4f",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "echo-the-boyz",
-        "title": "WATCH IT",
-        "artist": "THE BOYZ",
-        "duration": "3:45",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fecho-the-boyz.mp3?alt=media&token=a274ea32-5639-42fb-8d91-f143db798dcd",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/9b/28/62/9b286259-65bf-83ed-0d73-2f99a5b21ba9/cover_KM0018909_1.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -9006,21 +15349,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "emo-boy-ayesha-erotica",
-        "title": "Feel It",
-        "artist": "Ayesha Erotica",
-        "duration": "2:34",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Femo-boy-ayesha-erotica.mp3?alt=media&token=1d992093-f4c4-4385-8641-a535e5c87b9b",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/a9/e5/dca9e55f-7220-1741-893c-894b8452f334/255692.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "empire-ogryzek",
         "title": "Empire Ogryzek",
         "artist": "Unknown Artist",
@@ -9056,21 +15384,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "3:10",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Femptiness-nvd.mp3?alt=media&token=1501b3e6-9ae3-4d1a-b0fe-4230723601c0",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "empty-dreams-cypariss",
-        "title": "Empty Dreams Cypariss",
-        "artist": "Unknown Artist",
-        "duration": "2:15",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fempty-dreams-cypariss.mp3?alt=media&token=d3da3f23-7ac6-4828-af98-31a7c397d415",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -9592,21 +15905,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "fame-is-a-gun-addison-rae",
-        "title": "Fame is a Gun",
-        "artist": "Addison Rae",
-        "duration": "3:02",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffame-is-a-gun-addison-rae.mp3?alt=media&token=9173dcf5-3696-4cb7-bae7-85c1efdce558",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/cf/4a/e3/cf4ae3c9-3420-6021-f059-cc6c87cf11b2/196872958249.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "familia-yeat",
         "title": "Familia Yeat",
         "artist": "Unknown Artist",
@@ -9638,41 +15936,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "fantasy-bazzi",
-        "title": "Fantasy Bazzi",
-        "artist": "Unknown Artist",
-        "duration": "2:28",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffantasy-bazzi.mp3?alt=media&token=bd18c666-ea43-4e49-9caa-739e1f9e7254",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "fantasy-world-kid-sora-acoustic-version-miraie",
         "title": "Fantasy World",
         "artist": "Kid Sora Acoustic Version Miraie",
         "duration": "2:55",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffantasy-world-feat-kid-sora-acoustic-version-miraie.mp3?alt=media&token=79cfabe5-5580-4085-b0ce-93b7b92c90cd",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "fantasy-world-kid-sora-miraie",
-        "title": "Fantasy World",
-        "artist": "Kid Sora Miraie",
-        "duration": "2:55",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffantasy-world-feat-kid-sora-miraie.mp3?alt=media&token=71983b8e-107d-476f-8a31-20006710e042",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -9975,36 +16243,6 @@ export const librarySongs = [
         "duration": "3:20",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fflowers-miley-cyrus.mp3?alt=media&token=7366b00b-6467-465f-b820-88ac98f5a190",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "fluxxwave-8d-audio-clovis-reyes",
-        "title": "Fluxxwave (8D Audio)",
-        "artist": "Clovis Reyes",
-        "duration": "2:23",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffluxxwave-8d-audio-clovis-reyes.mp3?alt=media&token=025f919c-f9d2-47b2-acbb-7ffe7cc6b41e",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/dd/ce/e7/ddcee713-3b24-398c-9ab1-5f4124497c3d/1963621480660.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "fluxxwave-clovis-reyes",
-        "title": "Fluxxwave (Slowed + Reverb)",
-        "artist": "Clovis Reyes",
-        "duration": "2:30",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffluxxwave-clovis-reyes.mp3?alt=media&token=e39ad078-b058-4544-8201-a77ce6a83a97",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/6f/c2/d9/6fc2d9f9-c5ab-41d1-2bbc-ba84380e273e/197813827662.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -10511,21 +16749,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "gilded-lily-cults",
-        "title": "Gilded Lily",
-        "artist": "Cults",
-        "duration": "3:34",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgilded-lily-cults.mp3?alt=media&token=8f903957-8318-4594-abaf-8237f6b39256",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/5c/ee/77/5cee7770-c855-9e7e-f6d1-b0fc50bb82b6/196589778567.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "girl-of-my-dreams-guti",
         "title": "Girl Of My Dreams Guti",
         "artist": "Unknown Artist",
@@ -10829,21 +17052,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "government-hooker-bread-beatz",
-        "title": "Government Hooker Bread Beatz",
-        "artist": "Unknown Artist",
-        "duration": "2:24",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgovernment-hooker-bread-beatz.mp3?alt=media&token=58d7560f-8cb8-4360-aa3c-d25dbe510e1d",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "government-hooker-lady-gaga",
         "title": "Government Hooker Lady Gaga",
         "artist": "Unknown Artist",
@@ -10864,21 +17072,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "1:38",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgovernment-hooker-phonk-sped-up-fast-lane-driftmane-tazzy.mp3?alt=media&token=fd9e7708-7684-4c44-b1ca-5a2b14c139fc",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "government-hooker-slowed-bread-beatz",
-        "title": "Government Hooker Slowed Bread Beatz",
-        "artist": "Unknown Artist",
-        "duration": "3:01",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgovernment-hooker-slowed-bread-beatz.mp3?alt=media&token=b70c721c-6c02-4cff-965b-ff8b18d429f3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -10935,21 +17128,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "grove-cheryltje",
-        "title": "Grove Cheryltje",
-        "artist": "Unknown Artist",
-        "duration": "1:34",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgrove-cheryltje.mp3?alt=media&token=34748fe0-e6ee-48ea-b319-3169801218ea",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "gta-2-rarin",
         "title": "Gta 2 Rarin",
         "artist": "Unknown Artist",
@@ -10995,41 +17173,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "gta-iv-slowed-bianc0-stuck-in-98",
-        "title": "Gta Iv Slowed Bianc0 Stuck In 98",
-        "artist": "Unknown Artist",
-        "duration": "5:04",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgta-iv-slowed-bianc0-stuck-in-98.mp3?alt=media&token=9bfe61af-ab83-45e7-84f6-20066a448658",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "gta-king-von",
         "title": "Gta King Von",
         "artist": "Unknown Artist",
         "duration": "2:02",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgta-king-von.mp3?alt=media&token=88b155b9-7e1f-4cec-9efc-472cedd4cf2a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "guess-featuring-billie-eilish-charli-xcx-billie-eilish",
-        "title": "Guess Featuring Billie Eilish Charli Xcx Billie Eilish",
-        "artist": "Unknown Artist",
-        "duration": "2:23",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fguess-featuring-billie-eilish-charli-xcx-billie-eilish.mp3?alt=media&token=47ffde14-6ca0-457e-b7bf-cad431a14448",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -11145,36 +17293,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "hatchback-cochise",
-        "title": "Hatchback Cochise",
-        "artist": "Unknown Artist",
-        "duration": "2:29",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhatchback-cochise.mp3?alt=media&token=5981844a-d9e6-4b6a-8d12-71fb250414d1",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "hate-that-i-made-you-love-me-ariana-grande",
-        "title": "Hate That I Made You Love Me Ariana Grande",
-        "artist": "Unknown Artist",
-        "duration": "3:17",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhate-that-i-made-you-love-me-ariana-grande.mp3?alt=media&token=f937e22e-44a5-4eaf-9811-f4f7a402021b",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "hate-thxsomch",
         "title": "Hate Thxsomch",
         "artist": "Unknown Artist",
@@ -11196,21 +17314,6 @@ export const librarySongs = [
         "duration": "2:45",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhaza-slowed-udiennx.mp3?alt=media&token=194cba68-7f25-40c2-8d1e-19809fca9073",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "hdmi-bones",
-        "title": "Hdmi - Slowed + Reverb",
-        "artist": "Slo, Twilight & Tazzy",
-        "duration": "2:17",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhdmi-bones.mp3?alt=media&token=1eb4b138-7a9c-400a-ab73-7e6441e1111b",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/72/a0/37/72a03777-f0ad-92b0-92e0-0d4adaf72862/5063248587424_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -11520,21 +17623,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "hey-hi-hello-1nonly-lilbubblegum-ciscaux",
-        "title": "Hey Hi Hello",
-        "artist": "1nonly Lilbubblegum Ciscaux",
-        "duration": "2:28",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhey-hi-hello-feat-1nonly-lilbubblegum-ciscaux.mp3?alt=media&token=1c3d8f09-6e58-4ad8-a666-fe07dfa0dc70",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "hey-listen-ovg-draco-lyra",
         "title": "Hey Listen Ovg Draco Lyra",
         "artist": "Unknown Artist",
@@ -11642,42 +17730,12 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "honest-baby-keem",
-        "title": "Honest Baby Keem",
-        "artist": "Unknown Artist",
-        "duration": "3:49",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhonest-baby-keem.mp3?alt=media&token=c3c3ee21-2dd1-483a-84ab-9b8b2ac180a7",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "hope-xxxtentacion",
         "title": "Hope Xxxtentacion",
         "artist": "Unknown Artist",
         "duration": "1:50",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhope-xxxtentacion.mp3?alt=media&token=42e9ca9a-4dd2-4dd6-9252-6a0301a79d5f",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "hot-to-go-chappell-roan",
-        "title": "HOT TO GO!",
-        "artist": "Chappell Roan",
-        "duration": "3:04",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhot-to-go-chappell-roan.mp3?alt=media&token=21057a50-4fd4-43f1-803b-0f92ddb6039a",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/fb/65/cb/fb65cb0f-4260-d740-d6f5-bb80c9c27c1b/23UMGIM84225.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -11748,21 +17806,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "how-could-u-love-somebody-like-me-artemas",
-        "title": "How Could U Love Somebody Like Me Artemas",
-        "artist": "Unknown Artist",
-        "duration": "2:06",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhow-could-u-love-somebody-like-me-artemas.mp3?alt=media&token=2f1b2376-cd87-4464-8114-37e4bff17269",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "humble-kendrick-lamar",
         "title": "Humble Kendrick Lamar",
         "artist": "Unknown Artist",
@@ -11813,21 +17856,6 @@ export const librarySongs = [
         "artist": "Yoko Gold Tory Lanez Trippie Redd",
         "duration": "2:20",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhurts-me-feat-yoko-gold-tory-lanez-trippie-redd.mp3?alt=media&token=7b708c7c-c8df-4a70-b1b0-a1d3f8ba1e86",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "hydroplane-cochise",
-        "title": "Hydroplane Cochise",
-        "artist": "Unknown Artist",
-        "duration": "2:42",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhydroplane-cochise.mp3?alt=media&token=1905b85e-2449-43eb-bd41-2080a17878b5",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -11934,36 +17962,6 @@ export const librarySongs = [
         "duration": "1:28",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-dont-wanna-do-this-anymore-xxxtentacion.mp3?alt=media&token=a1bd9d93-f3d1-4682-892c-76db7b944dbc",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "i-feel-it-bryansanon",
-        "title": "I Feel It Bryansanon",
-        "artist": "Unknown Artist",
-        "duration": "2:03",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-feel-it-bryansanon.mp3?alt=media&token=218db174-06a4-4dbe-8248-b5ff0c6388c1",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "i-feel-lost-aaron-hibell",
-        "title": "I Feel Lost",
-        "artist": "Aaron Hibell",
-        "duration": "2:27",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-feel-lost-aaron-hibell.mp3?alt=media&token=652c5665-0143-4719-bf44-6c74b8fb605d",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/57/4b/a4/574ba412-c402-6de5-4fc2-283a67d6635b/artwork.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
         "inmixPoint": 10,
@@ -12124,21 +18122,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "i-like-the-way-you-kiss-me-artemas",
-        "title": "I Like The Way You Kiss Me Artemas",
-        "artist": "Unknown Artist",
-        "duration": "2:22",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-like-the-way-you-kiss-me-artemas.mp3?alt=media&token=2eba87ae-12c7-4987-8072-ce66e3cbafb7",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "i-love-freaks-lijay",
         "title": "I Love Freaks Lijay",
         "artist": "Unknown Artist",
@@ -12244,36 +18227,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "i-smoked-away-my-brain-im-god-x-demons-mashup-imogen-heap-cl",
-        "title": "I Smoked Away My Brain Im God X Demons Mashup",
-        "artist": "Imogen Heap Clams Casino Aap Rocky",
-        "duration": "3:11",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3?alt=media&token=5e541b97-f97d-4680-869a-8d4d93a33dc9",
-        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/64/8f/5f/648f5f68-3ffa-e33d-39d0-50210803074f/196871388221.jpg/600x600bb.jpg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "i-wait-for-you-alex-g-offline",
-        "title": "I Wait For You Alex G Offline",
-        "artist": "Unknown Artist",
-        "duration": "2:38",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-wait-for-you-alex_g_offline.mp3?alt=media&token=9b04c017-be74-4ad3-a7c3-cb81979a26d3",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "i-walk-this-earth-all-by-myself-ekkstacy",
         "title": "I Walk This Earth All By Myself Ekkstacy",
         "artist": "Unknown Artist",
@@ -12294,21 +18247,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "3:20",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-wanna-be-your-girlfriend-girl-in-red.mp3?alt=media&token=f9d5d8d9-9bff-4032-834d-0ff3b76b6ea2",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "i-wanna-be-yours-arctic-monkeys",
-        "title": "I Wanna Be Yours Arctic Monkeys",
-        "artist": "Unknown Artist",
-        "duration": "3:03",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-wanna-be-yours-arctic-monkeys.mp3?alt=media&token=e4e77e31-042b-4b73-a3e2-09ceb8494735",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -12364,51 +18302,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "id-rather-pretend-a-colors-show-bryant-barnes",
-        "title": "Id Rather Pretend A Colors Show Bryant Barnes",
-        "artist": "Unknown Artist",
-        "duration": "3:03",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fid-rather-pretend-a-colors-show-bryant-barnes.mp3?alt=media&token=acd22dd2-2774-4228-b69c-0d320cf0eb89",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "idfc-blackbear",
-        "title": "Idfc Blackbear",
-        "artist": "Unknown Artist",
-        "duration": "4:06",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fidfc-blackbear.mp3?alt=media&token=6bd2a5f9-f73f-44a3-8a48-fe607aa70da7",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "idfc-tarro-remix-blackbear",
-        "title": "Idfc Tarro Remix Blackbear",
-        "artist": "Unknown Artist",
-        "duration": "4:12",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fidfc-tarro-remix-blackbear.mp3?alt=media&token=1c3c0377-9aa3-407c-b307-87a81e3c773a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "idgaf-yeat-drake",
         "title": "Idgaf",
         "artist": "Yeat Drake",
@@ -12440,41 +18333,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "if-u-think-im-pretty-artemas",
-        "title": "If U Think Im Pretty Artemas",
-        "artist": "Unknown Artist",
-        "duration": "2:08",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fif-u-think-im-pretty-artemas.mp3?alt=media&token=b5c61061-2d4f-49bf-b976-fc418b4ce034",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "if-we-being-ral-yeat",
         "title": "If We Being RëAl Yeat",
         "artist": "Unknown Artist",
         "duration": "0:00",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fif-we-being-r%C3%ABal-yeat.mp3?alt=media&token=d912c496-1b81-4aeb-8cf5-d598b7a89948",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "if-you-care-akiaura-lonown-dj-pointless",
-        "title": "If You Care Akiaura Lonown Dj Pointless",
-        "artist": "Unknown Artist",
-        "duration": "2:51",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fif-you-care-akiaura-lonown-dj-pointless.mp3?alt=media&token=22ba7f9b-8444-44e0-892a-ac811774b8cb",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -12621,21 +18484,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "im-god-clams-casino-imogen-heap",
-        "title": "Im God Clams Casino Imogen Heap",
-        "artist": "Unknown Artist",
-        "duration": "4:33",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fim-god-clams-casino-imogen-heap.mp3?alt=media&token=47046310-b3ba-4499-9403-af94ad8b01e1",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "im-gone-rich-amiri",
         "title": "Im Gone Rich Amiri",
         "artist": "Unknown Artist",
@@ -12762,21 +18610,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "3:37",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fin-my-feelings-drake.mp3?alt=media&token=8aabfc09-bf30-4804-883a-bfaf57d20111",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "in-this-darkness-clara-la-san",
-        "title": "In This Darkness Clara La San",
-        "artist": "Unknown Artist",
-        "duration": "3:17",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fin-this-darkness-clara-la-san.mp3?alt=media&token=f2da90e0-7c93-429e-9de1-3f1b6032a432",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -13133,36 +18966,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "job-application-chase-icon",
-        "title": "Job Application Chase Icon",
-        "artist": "Unknown Artist",
-        "duration": "1:50",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fjob-application-chase-icon.mp3?alt=media&token=2d8be553-8de0-42c3-bb0c-3bc0f4889052",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "jug-a-jug-mixed-any-act",
-        "title": "Jug A Jug Mixed Any Act",
-        "artist": "Unknown Artist",
-        "duration": "4:40",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fjug-a-jug-mixed-any-act.mp3?alt=media&token=8e078c51-7116-4d93-9aa2-63df27d28a65",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "jumpman-tnt-x-guitar-remix-yungfuego",
         "title": "Jumpman",
         "artist": "Tnt X Guitar Remix Yungfuego",
@@ -13228,21 +19031,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "2:04",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fjust-wanna-rock-lil-uzi-vert.mp3?alt=media&token=0401cacb-6a77-4af8-8333-61a64166df4a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "just-want-u-to-feel-something-artemas",
-        "title": "Just Want U To Feel Something Artemas",
-        "artist": "Unknown Artist",
-        "duration": "2:50",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fjust-want-u-to-feel-something-artemas.mp3?alt=media&token=5c970525-581b-4be6-8750-de0225548d7d",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -13403,21 +19191,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "kerosene-crystal-castles",
-        "title": "Kerosene Crystal Castles",
-        "artist": "Unknown Artist",
-        "duration": "3:12",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkerosene-crystal-castles.mp3?alt=media&token=99d4cff7-00ee-495c-99eb-16e3215e665d",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "kevins-heart-j-cole",
         "title": "Kevins Heart J Cole",
         "artist": "Unknown Artist",
@@ -13483,36 +19256,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "4:52",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkirkhusa-mixed-rhyw.mp3?alt=media&token=ced7ec81-e6ad-4544-9b65-d31eebbb857a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "knicks-cochise",
-        "title": "Knicks Cochise",
-        "artist": "Unknown Artist",
-        "duration": "2:43",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fknicks-cochise.mp3?alt=media&token=0160dee0-cfd4-4e1f-9701-cce1b9fad986",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "knife-talk-21-savage-project-pat-drake",
-        "title": "Knife Talk",
-        "artist": "21 Savage Project Pat Drake",
-        "duration": "4:04",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fknife-talk-feat-21-savage-project-pat-drake.mp3?alt=media&token=421ec3e9-1971-49f7-a598-5d7b0b1708fb",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -13603,21 +19346,6 @@ export const librarySongs = [
         "artist": "Unknown Artist",
         "duration": "0:00",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fla-m%C3%BAsica-qmiir-akhmedov.mp3?alt=media&token=0cc1194d-452d-4ef4-85cb-15e8e893f924",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "laa-mixed-danny-l-harle",
-        "title": "Laa Mixed Danny L Harle",
-        "artist": "Unknown Artist",
-        "duration": "119:59",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flaa-mixed-danny-l-harle.mp3?alt=media&token=281a5f6a-8d4c-4e29-80cf-7a24d53ad13b",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -13748,41 +19476,11 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "legendary-lovers-x-save-me-aurelia-dopuu-b-star",
-        "title": "Legendary Lovers X Save Me Aurelia Dopuu B Star",
-        "artist": "Unknown Artist",
-        "duration": "2:57",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flegendary-lovers-x-save-me-aurelia-dopuu-b-star.mp3?alt=media&token=699112c6-4319-4c74-b1a6-1b2b5f094aaa",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "legends-juice-wrld",
         "title": "Legends Juice Wrld",
         "artist": "Unknown Artist",
         "duration": "3:11",
         "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flegends-juice-wrld.mp3?alt=media&token=50152115-ba57-40ef-80a7-88678526fe6c",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
-        "id": "les-childish-gambino",
-        "title": "Les Childish Gambino",
-        "artist": "Unknown Artist",
-        "duration": "5:17",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fles-childish-gambino.mp3?alt=media&token=3045c9f1-2cac-44ca-ba4a-f6353fa6880d",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -14045,22 +19743,6 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
-    },
-    {
-        "id": "like-me-42-dugg-lil-baby-future",
-        "title": "Like Me",
-        "artist": "42 Dugg Lil Baby Future",
-        "duration": "2:14",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flike-me-feat-42-dugg-lil-baby-future.mp3?alt=media&token=e89dd66c-ae0a-41e9-8df3-6b6046fa698b",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged",
-            "viral"
         ]
     },
     {
@@ -17345,21 +23027,6 @@ export const librarySongs = [
         ]
     },
     {
-        "id": "on-on-daniel-levi-cartoon-jja",
-        "title": "On On",
-        "artist": "Daniel Levi Cartoon JéJa",
-        "duration": "0:00",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fon-on-feat-daniel-levi-cartoon-j%C3%A9ja.mp3?alt=media&token=be658cad-e7da-4c81-8255-6172dccd28c4",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
-        ]
-    },
-    {
         "id": "on-tha-lin-yeat",
         "title": "On Tha Linë Yeat",
         "artist": "Unknown Artist",
@@ -17373,21 +23040,6 @@ export const librarySongs = [
         "tags": [
             "untagged",
             "viral"
-        ]
-    },
-    {
-        "id": "on-the-floor-pitbull-jennifer-lopez",
-        "title": "On The Floor",
-        "artist": "Pitbull Jennifer Lopez",
-        "duration": "4:44",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fon-the-floor-feat-pitbull-jennifer-lopez.mp3?alt=media&token=b7836e4a-2ef5-4ae5-a322-5501d43f901b",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged"
         ]
     },
     {
@@ -19043,22 +24695,6 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
-    },
-    {
-        "id": "rockstar-21-savage-post-malone",
-        "title": "Rockstar",
-        "artist": "21 Savage Post Malone",
-        "duration": "3:37",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Frockstar-feat-21-savage-post-malone.mp3?alt=media&token=cec7e16b-39db-4af6-a887-2577d566cab6",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
-        "inmixPoint": 10,
-        "outmixPoint": 10,
-        "tags": [
-            "untagged",
-            "viral"
         ]
     },
     {
@@ -23619,5 +29255,5 @@ export const librarySongs = [
 ];
 
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return librarySongs.find(song => song.id === id);
 }

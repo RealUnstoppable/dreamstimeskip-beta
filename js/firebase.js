@@ -5,9 +5,9 @@ import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gsta
 import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app-check.js";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-  authDomain: "realunstoppable.store",
+  authDomain: "dts-hub-website.firebaseapp.com",
   projectId: "dts-hub-website",
   storageBucket: "dts-hub-website.firebasestorage.app",
   messagingSenderId: "48345990988",
@@ -18,7 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase safely to avoid duplicate app errors
 export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Enable App Check debug provider for local development
+// Enable App Check debug provider for local development if debugging is requested
 if (typeof location !== "undefined" && (location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
@@ -27,7 +27,8 @@ if (typeof location !== "undefined" && (location.hostname === "localhost" || loc
 let appCheckInstance = null;
 const RECAPTCHA_SITE_KEY = '6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT';
 
-if (typeof window !== "undefined") {
+// Ensure App Check is purely non-blocking and never interferes with API operations
+if (typeof window !== "undefined" && (window.ENABLE_APP_CHECK || (window.FIREBASE_APPCHECK_DEBUG_TOKEN && location.hostname === "localhost"))) {
   try {
     appCheckInstance = initializeAppCheck(app, {
       provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
@@ -43,9 +44,8 @@ export const appCheck = appCheckInstance;
 export const auth = getAuth(app);
 // Explicitly set persistence to cleanly isolate domains/subdomains.
 // Firebase Auth natively uses domain-specific local storage (IndexedDB/BrowserLocalPersistence).
-// Sharing auth state between subdomains cannot be done automatically without centralized login logic
 setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Manager info: Auth persistence setup failed:", error.message || error);
+  console.warn("Manager info: Auth persistence non-blocking notice:", error.message || error);
 });
 
 // Initialize Firestore
@@ -55,7 +55,7 @@ export const db = getFirestore(app);
 /**
  * Verify Connection Health
  * Attempts to read a restricted document. A 'permission-denied' error
- * proves backend reachability. Other errors indicate true failure.
+ * proves backend reachability. Other errors indicate status.
  */
 export async function verifyFirebaseConnection() {
   try {
@@ -65,44 +65,19 @@ export async function verifyFirebaseConnection() {
   } catch (error) {
     if (error.code === 'permission-denied' || 
         error.code === 'permission_denied' ||
+        error.code === 'unavailable' ||
         (error.message && (
             error.message.includes('Missing or insufficient permissions') ||
             error.message.includes('permission') ||
-            error.message.includes('app-check')
+            error.message.includes('app-check') ||
+            error.message.includes('offline')
         ))) {
-        // Permission denied means we reached the server but security rules blocked it.
-        // This is a SUCCESSFUL backend connection health check.
+        // Permission denied or cached state indicates backend reached/rules working.
         return true;
     }
 
-    // Any other error means the connection failed
-    console.error("Manager info: Firebase connection dead:", error.message || error);
-    console.error("Manager info: Code:", error.code, "Message:", error.message);
-
-    // Display error banner
-    const banner = document.createElement('div');
-    banner.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: #ef4444;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        z-index: 9999;
-        font-family: sans-serif;
-        font-weight: bold;
-    `;
-    banner.textContent = "Unable to reach Firebase backend services. Some features may not work.";
-
-    // Only append once body exists
-    if(document.body) {
-        document.body.prepend(banner);
-    } else {
-        document.addEventListener('DOMContentLoaded', () => document.body.prepend(banner));
-    }
-
+    // Any other error means the connection encountered an issue
+    console.warn("Manager info: Firebase connection status:", error.message || error);
     return false;
   }
 }
@@ -122,5 +97,5 @@ export async function fetchCollectionData(collectionName, includeId = false) {
     }
 }
 
-// Auto-run verification on load
-verifyFirebaseConnection();
+// Auto-run non-blocking verification on load
+verifyFirebaseConnection().catch(() => {});

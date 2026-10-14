@@ -6,7 +6,7 @@ import { app, auth, db } from "./firebase.js";
 import { escapeHTML, getCachedUserProfile } from './utils.js';
 
 // Re-export instances for scripts that import from auth.js
-export { app, auth, db };
+export { app, auth, db, getCachedUserProfile };
 
 
 

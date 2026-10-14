@@ -32,10 +32,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-messaging-compat.js"></script>
+
+
 
     <style>
         :root {
@@ -1037,23 +1035,27 @@
         </div>
     </div>
 
-    <script>
-        // FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyBgrI9HwJPSc5b4pu2Egsv4DE7shNwptSw",
-            authDomain: "dts-hub-website.firebaseapp.com",
-            projectId: "dts-hub-website",
-            storageBucket: "dts-hub-website.firebasestorage.app",
-            messagingSenderId: "48345990988",
-            appId: "1:48345990988:web:e3662c9b508168546471e9",
-            measurementId: "G-ZN3YJPHVGX"
-        };
-
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        db.enablePersistence().catch(err => console.error("Offline sync error:", err));
+    <script type="module">
+        import { auth, db } from './js/firebase.js';
+        import { 
+            onAuthStateChanged, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut as firebaseSignOut, 
+            GoogleAuthProvider, 
+            signInWithPopup 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            arrayUnion, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
         let currentUser = null;
         let currentUserData = null;
@@ -1080,9 +1082,11 @@
             const navStatus = document.getElementById('navUserStatus');
 
             if (user) {
-                navStatus.innerText = "Manager: " + (user.displayName || "Online");
-                document.getElementById('profEmail').value = user.email;
-                document.getElementById('referralLink').value = `${window.location.origin}${window.location.pathname}?ref=${user.uid}`;
+                if (navStatus) navStatus.innerText = "Manager: " + (user.displayName || "Online");
+                const profEmail = document.getElementById('profEmail');
+                if (profEmail) profEmail.value = user.email || "";
+                const refLink = document.getElementById('referralLink');
+                if (refLink) refLink.value = `${window.location.origin}${window.location.pathname}?ref=${user.uid}`;
                 
                 const userDocRef = doc(db, "users", user.uid);
                 getDoc(userDocRef).then(docSnap => {
@@ -1092,13 +1096,16 @@
                         loadCustomPresets();
                         calculatePerformance();
                         syncDraftFromServer(); 
-                        if (document.querySelector('.view-section.active').id === 'view-auth') window.navTo('tracker');
+                        const activeView = document.querySelector('.view-section.active');
+                        if (activeView && activeView.id === 'view-auth') window.navTo('tracker');
                     } else {
                         window.navTo('setup');
                     }
+                }).catch(err => {
+                    console.warn("User profile fetch notice:", err.message);
                 });
             } else {
-                navStatus.innerText = "Login / Sign Up";
+                if (navStatus) navStatus.innerText = "Login / Sign Up";
                 currentUserData = null;
             }
         });
@@ -1125,7 +1132,7 @@
             if (e) e.preventDefault();
             isRegisterMode = !isRegisterMode;
             toggleAuthModeUI();
-        }
+        };
 
         window.handleAuth = function(e) {
             e.preventDefault();
@@ -1137,7 +1144,7 @@
             btn.innerText = 'Processing...';
 
             if (isRegisterMode) {
-                auth.createUserWithEmailAndPassword(email, pass)
+                createUserWithEmailAndPassword(auth, email, pass)
                     .then(() => window.navTo('setup'))
                     .catch(err => alert(err.message))
                     .finally(() => {
@@ -1145,14 +1152,14 @@
                         btn.innerText = originalText;
                     });
             } else {
-                auth.signInWithEmailAndPassword(email, pass)
+                signInWithEmailAndPassword(auth, email, pass)
                     .catch(err => alert(err.message))
                     .finally(() => {
                         btn.disabled = false;
                         btn.innerText = originalText;
                     });
             }
-        }
+        };
 
         window.signInWithGoogle = function() {
             const provider = new GoogleAuthProvider();
@@ -1162,16 +1169,18 @@
                     if(!docSnap.exists()) window.navTo('setup');
                 });
             }).catch(err => alert(err.message));
-        }
+        };
 
-        window.signOut = function() { firebaseSignOut(auth).then(() => window.location.reload()); }
+        window.signOut = function() { firebaseSignOut(auth).then(() => window.location.reload()); };
 
         window.completeSetup = function() {
             if (!currentUser) return;
-            const btn = document.querySelector('#view-setup button');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Saving...';
+            const btn = document.getElementById('finishSetupBtn') || document.querySelector('#view-setup button');
+            const originalText = btn ? btn.textContent : 'Complete Setup';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Saving...';
+            }
 
             const data = {
                 name: document.getElementById('setupName').value,
@@ -1185,30 +1194,27 @@
             };
 
             if (!data.name) {
-                btn.disabled = false;
-                btn.textContent = originalText;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
                 return alert("Name is required.");
-            }
-
-            const btn = document.getElementById('finishSetupBtn');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
-
-            if (btn) {
-                btn.disabled = true;
-                btn.innerText = 'Processing...';
             }
 
             const userDocRef = doc(db, "users", currentUser.uid);
             setDoc(userDocRef, data).then(() => {
-                document.getElementById('shiftManager').value = data.name;
+                const shiftManager = document.getElementById('shiftManager');
+                if (shiftManager) shiftManager.value = data.name;
                 window.navTo('tracker');
+            }).catch(err => {
+                alert("Setup save failed: " + err.message);
             }).finally(() => {
-                btn.disabled = false;
-                btn.innerText = originalText;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             });
-        }
+        };
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -1866,12 +1872,32 @@
             });
         }
 
+        window.navTo = navTo;
+        window.toggleSidebar = toggleSidebar;
+        window.toggleTheme = toggleTheme;
+        window.handleNavAccountClick = handleNavAccountClick;
+        window.toggleShiftTimer = toggleShiftTimer;
+        window.addDrawerItem = addDrawerItem;
+        window.calcDrawer = calcDrawer;
+        window.addDepositItem = addDepositItem;
+        window.addRoutineTask = addRoutineTask;
+        window.addInventoryItem = addInventoryItem;
+        window.getTrackerState = getTrackerState;
+        window.syncDraftFromServer = syncDraftFromServer;
+        window.fetchCloudHistory = fetchCloudHistory;
+        window.calculatePerformance = calculatePerformance;
+        window.loadPresetList = loadPresetList;
+        window.loadCustomPresets = loadCustomPresets;
+        window.loadProfileUI = loadProfileUI;
+
         window.onload = () => {
             if (localStorage.getItem('managerProTheme') === 'dark') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('themeToggle').checked = true;
             }
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') {
+                window.lucide.createIcons();
+            }
             initDefaults();
         };
 
