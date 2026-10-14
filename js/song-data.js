@@ -29254,6 +29254,10 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: O(1) lookup replaces O(N) Array.find() for faster song retrieval
+const songMap = new Map();
+librarySongs.forEach(song => songMap.set(song.id, song));
+
 export function getSongById(id) {
-    return librarySongs.find(song => song.id === id);
+    return songMap.get(id);
 }
