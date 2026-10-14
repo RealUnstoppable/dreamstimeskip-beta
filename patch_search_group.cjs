@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const searchOld = `        spotlightResults.innerHTML = matches.map(song => \`
             <div class="spotlight-result-row" tabindex="0" data-song-id="\${escapeHTML(song.id)}" role="button" aria-label="Play \${escapeHTML(song.title)}">
@@ -87,5 +87,5 @@ const tableNew = `        const groupedSongs = groupSongsByTitle(songs);
 
 js = js.replace(tableOld, tableNew);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched search and table groups");

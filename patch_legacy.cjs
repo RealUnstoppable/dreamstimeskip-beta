@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Update image
 js = js.replace(/id: 'pixy-legacy',[\s\S]*?art: "\/images\/dreams-lobby.jpg",/,
@@ -14,5 +14,5 @@ js = js.replace(/id: 'pixy-legacy',[\s\S]*?art: "\/images\/dreams-lobby.jpg",/,
 // Update color
 js = js.replace(/'pixy-legacy': '#19548a',      \/\/ Dim Blue/, "'pixy-legacy': '#5c4a3d',      // Warm Brown");
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 console.log("Patched Legacy image and color");

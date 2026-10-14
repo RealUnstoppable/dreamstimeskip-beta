@@ -18,6 +18,17 @@ const firebaseConfig = {
 // Initialize Firebase safely to avoid duplicate app errors
 export const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
+// Enable App Check debug provider for local development
+if (typeof location !== "undefined" && (location.hostname === "localhost" || location.hostname === "127.0.0.1")) {
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
+
+// Initialize App Check
+export const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider('YOUR_RECAPTCHA_V3_SITE_KEY_HERE'), // TODO: Replace with your actual ReCaptcha v3 site key
+  isTokenAutoRefreshEnabled: true
+});
+
 // Initialize Auth
 export const auth = getAuth(app);
 // Explicitly set persistence to cleanly isolate domains/subdomains.

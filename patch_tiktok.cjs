@@ -1,5 +1,5 @@
 const fs = require('fs');
-const file = 'js/harmonytunes.js';
+const file = 'js/medixly.js';
 let content = fs.readFileSync(file, 'utf8');
 
 const target = `                    <iframe src="https://www.tiktok.com/embed/v2/\${video.id}" 

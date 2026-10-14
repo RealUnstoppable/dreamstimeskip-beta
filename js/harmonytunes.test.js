@@ -39,7 +39,7 @@ Object.defineProperty(global, 'navigator', {
     configurable: true
 });
 
-const { formatTime, createSongCard } = await import('./harmonytunes.js');
+const { formatTime, createSongCard } = await import('./medixly.js');
 
 test('formatTime correctly formats normal values', () => {
     assert.strictEqual(formatTime(65), '1:05');

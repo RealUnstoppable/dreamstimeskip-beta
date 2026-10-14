@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const jsFiles = ['js/sitewide-player.js', 'js/harmonytunes.js'];
+const jsFiles = ['js/sitewide-player.js', 'js/medixly.js'];
 const now = Date.now().toString();
 
 for (const file of jsFiles) {

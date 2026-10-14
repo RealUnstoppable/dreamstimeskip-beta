@@ -2,7 +2,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const fs = require("fs");
 
-const dom = new JSDOM(fs.readFileSync("harmonytunes.html", "utf8"));
+const dom = new JSDOM(fs.readFileSync("medixly.html", "utf8"));
 const document = dom.window.document;
 
 function escapeHTML(str) {

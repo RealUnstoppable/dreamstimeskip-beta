@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // 1. Add URL parsing on load
 const urlParseLogic = `
@@ -119,5 +119,5 @@ const bindQctxShare = `
 `;
 js = js.replace(/document\.getElementById\('qctx-play-next'\)\?\.addEventListener\('click', \(\) => \{[\s\S]*?\}\);/, match => match + '\n' + bindQctxShare);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched JS for sharing");

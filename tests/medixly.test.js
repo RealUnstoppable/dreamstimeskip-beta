@@ -36,9 +36,9 @@ document.body.innerHTML = `
 
 
 // Import the script as ES module
-await import('../js/harmonytunes.js');
+await import('../js/medixly.js');
 // Import the script
-import '../js/harmonytunes.js';
+import '../js/medixly.js';
 
 // Dispatch DOMContentLoaded so the script actually runs its init block
 const event = new Event('DOMContentLoaded');

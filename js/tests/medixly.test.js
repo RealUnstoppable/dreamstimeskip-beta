@@ -7,7 +7,7 @@ const path = require('path');
 
 describe('loadSong bounds checking', () => {
     beforeEach(() => {
-        // Mock elements that harmonytunes.js interacts with
+        // Mock elements that medixly.js interacts with
         document.body.innerHTML = `
             <audio id="audio-player"></audio>
             <div id="player-song-title"></div>
@@ -40,7 +40,7 @@ describe('loadSong bounds checking', () => {
         window.db = {};
         window.onAuthStateChanged = () => {};
 
-        const scriptContent = fs.readFileSync(path.resolve(__dirname, '../harmonytunes.js'), 'utf-8');
+        const scriptContent = fs.readFileSync(path.resolve(__dirname, '../medixly.js'), 'utf-8');
 
         let modifiedScript = scriptContent
             .replace(/import { auth, db } from '\.\/auth\.js';/g, '')

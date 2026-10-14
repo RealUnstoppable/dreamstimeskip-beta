@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const tableClickOld = `            row.dataset.songId = song.id;
             
@@ -54,5 +54,5 @@ const spotlightClickNew = `            const activateFn = () => {
 
 js = js.replace(spotlightClickOld, spotlightClickNew);
 
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched table and search click logic");

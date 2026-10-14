@@ -1,4 +1,5 @@
-const functions = require("firebase-functions");
+const { onRequest } = require("firebase-functions/v2/https");
+const functions = require("firebase-functions/v1");
 const {onDocumentUpdated} = require("firebase-functions/v2/firestore");
 const {AggregateField} = require("firebase-admin/firestore");
 const admin = require("firebase-admin");
@@ -46,7 +47,7 @@ function getUserDocRef(uid) {
 // 🔹 Create Checkout Session
 
 // 🛡️ Admin Action Proxy
-exports.adminAction = functions.https.onRequest((req, res) => {
+exports.adminAction = onRequest((req, res) => {
   cors(req, res, async () => {
     const decodedToken = await authenticateRequest(req, res, admin);
     if (!decodedToken) return;
@@ -116,7 +117,7 @@ exports.adminAction = functions.https.onRequest((req, res) => {
   });
 });
 
-exports.createCheckoutSession = functions.https.onRequest((req, res) => {
+exports.createCheckoutSession = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -236,7 +237,7 @@ exports.onReviewWrite = functions.firestore
     });
 
 // 🔐 STRIPE WEBHOOK (SECURE)
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
 
@@ -302,7 +303,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 });
 
 // 🔻 Cancel Subscription Manually
-exports.cancelSubscription = functions.https.onRequest((req, res) => {
+exports.cancelSubscription = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -499,7 +500,7 @@ exports.onOrderCreated = onDocumentCreated("orders/{orderId}", async (event) => 
   }
 });
 
-exports.processOrderTransaction = functions.https.onRequest((req, res) => {
+exports.processOrderTransaction = onRequest((req, res) => {
   cors(req, res, async () => {
     try {
       const decodedToken = await authenticateRequest(req, res, admin);
@@ -589,7 +590,7 @@ exports.processOrderTransaction = functions.https.onRequest((req, res) => {
 
 
 // 📅 Daily Check-in Rewards
-exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
+exports.claimDailyCheckIn = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -681,7 +682,7 @@ exports.claimDailyCheckIn = functions.https.onRequest((req, res) => {
 });
 
 // 👍 Toggle Feature Upvote
-exports.toggleFeatureUpvote = functions.https.onRequest((req, res) => {
+exports.toggleFeatureUpvote = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
@@ -804,5 +805,76 @@ exports.processReferral = functions.https.onCall(async (data, context) => {
     } catch (error) {
       console.error("Manager info: Process Referral Error: [" + error.message + "]");
       throw new functions.https.HttpsError('internal', error.message);
+    }
+});
+
+
+// --- SONG PROCESSING BACKEND FUNCTION ---
+const ffmpeg = require("fluent-ffmpeg");
+const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+const os = require("os");
+const path = require("path");
+
+exports.processUploadedSong = onDocumentCreated("artist_tracks/{trackId}", async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+
+    const data = snap.data();
+    if (!data.audioUrl) return;
+
+    const trackId = event.params.trackId;
+    console.log(`Processing audio for track: ${trackId}`);
+
+    const tempFilePath = path.join(os.tmpdir(), `${trackId}.tmp`);
+
+    try {
+        // 1. Download the file
+        const response = await fetch(data.audioUrl);
+        if (!response.ok) throw new Error(`Failed to fetch audio: ${response.statusText}`);
+        
+        const buffer = await response.arrayBuffer();
+        fs.writeFileSync(tempFilePath, Buffer.from(buffer));
+
+        // 2. Process with ffmpeg to find inmixPoint
+        // We use silencedetect filter: -af silencedetect=noise=-50dB:d=0.1
+        const startOffset = await new Promise((resolve, reject) => {
+            let detectedOffset = 0;
+            ffmpeg(tempFilePath)
+                .audioFilters('silencedetect=noise=-40dB:d=0.1')
+                .format('null')
+                .on('stderr', (line) => {
+                    // ffmpeg outputs silencedetect results to stderr
+                    const match = line.match(/silence_end: ([0-9.]+)/);
+                    if (match && detectedOffset === 0) {
+                        detectedOffset = parseFloat(match[1]);
+                    }
+                })
+                .on('end', () => {
+                    resolve(detectedOffset);
+                })
+                .on('error', (err) => {
+                    console.error(`FFmpeg error for ${trackId}:`, err);
+                    resolve(0); // fallback
+                })
+                .save('pipe:1'); // output to null
+        });
+
+        console.log(`Detected inmixPoint for ${trackId}: ${startOffset}`);
+
+        // 3. Update the Firestore document
+        await snap.ref.update({
+            inmixPoint: startOffset || 0,
+            processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        
+        console.log(`Successfully processed and updated ${trackId}`);
+    } catch (err) {
+        console.error(`Error processing track ${trackId}:`, err);
+    } finally {
+        // Cleanup temp file
+        if (fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+        }
     }
 });

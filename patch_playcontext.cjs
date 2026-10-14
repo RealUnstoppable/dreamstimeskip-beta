@@ -1,5 +1,5 @@
 const fs = require('fs');
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 const oldLogic = `            activeAudio.src = song.src;
             const inmixPoint = songMetadata?.inmixPoint || 15;
@@ -12,5 +12,5 @@ const newLogic = `            activeAudio.src = song.src;
             }, { once: true });`;
 
 js = js.replace(oldLogic, newLogic);
-fs.writeFileSync('js/harmonytunes.js', js, 'utf8');
+fs.writeFileSync('js/medixly.js', js, 'utf8');
 console.log("Patched playContext");

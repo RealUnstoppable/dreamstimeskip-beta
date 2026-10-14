@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // 1. HTML
-let html = fs.readFileSync('harmonytunes.html', 'utf8');
+let html = fs.readFileSync('medixly.html', 'utf8');
 
 // Remove lyrics header
 html = html.replace(/<div class="lyrics-header">[\s\S]*?<\/div>/, '');
@@ -36,12 +36,12 @@ html = html.replace(/<div class="fs-player-options">([\s\S]*?)<\/div>\s*<!-- Mid
 });
 
 // Cache buster
-html = html.replace(/js\/harmonytunes\.js\?v=\d+/, `js/harmonytunes.js?v=${Date.now()}`);
-fs.writeFileSync('harmonytunes.html', html);
+html = html.replace(/js\/harmonytunes\.js\?v=\d+/, `js/medixly.js?v=${Date.now()}`);
+fs.writeFileSync('medixly.html', html);
 
 
 // 2. JS
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Lyrics background
 js = js.replace(/fsTitle\.textContent = song\.title;/, `fsTitle.textContent = song.title;
@@ -63,11 +63,11 @@ js = js.replace(/effects\.forEach\(effect => \{[\s\S]*?effect\.classList\.add\('
                             effect.classList.add('beat');
                         });`);
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 
 
 // 3. CSS
-let css = fs.readFileSync('css/harmonytunes.css', 'utf8');
+let css = fs.readFileSync('css/medixly.css', 'utf8');
 
 // Allow paintBeat to have randomized scale from CSS without hardcoding
 css = css.replace(/@keyframes paintBeat \{[\s\S]*?\}/,
@@ -89,6 +89,6 @@ css = css.replace(/@keyframes paintBeat \{[\s\S]*?\}/,
     }
 }`);
 
-fs.writeFileSync('css/harmonytunes.css', css);
+fs.writeFileSync('css/medixly.css', css);
 
 console.log("Patched fullscreen UI, paint spill JS, and lyrics bg.");

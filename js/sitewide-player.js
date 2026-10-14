@@ -2,7 +2,9 @@ import { escapeHTML } from "./utils.js";
 // js/sitewide-player.js
 // Sitewide music engine and Lexi floating mini-playerhead
 
-import { librarySongs, getSongById } from './song-data.js?v=1790377272083';
+import { mixEngine } from "./audio-engine.js";
+
+import { librarySongs, getSongById } from './song-data.js?v=1791167969660';
 
 const STORAGE_KEY = 'dts_music_state';
 
@@ -17,7 +19,7 @@ export const ICONS = {
 
 class SitewideMusicEngine {
     constructor() {
-        this.isHarmonyTunesPage = window.location.pathname.includes('harmonytunes.html');
+        this.isHarmonyTunesPage = window.location.pathname.includes('medixly');
         this.audio = null;
         this.state = this.loadState();
         this.listeners = new Set();
@@ -95,8 +97,15 @@ class SitewideMusicEngine {
         const song = this.getCurrentSong();
         this.audio = new Audio();
         this.audio.preload = 'auto';
+        this.audio.crossOrigin = 'anonymous'; // Important for Web Audio API
+        
+        // Initialize mixEngine for DSP routing
+        const dummyAudio = new Audio(); // Needed for deck B
+        dummyAudio.crossOrigin = 'anonymous';
+        mixEngine.init(this.audio, dummyAudio);
+        
         this.audio.src = song.src;
-        this.audio.volume = this.state.volume;
+        mixEngine.setDeckVolume('A', this.state.volume);
 
         // Calculate elapsed seconds since navigation started
         const elapsed = Math.max(0, (Date.now() - this.state.timestamp) / 1000);
@@ -110,20 +119,24 @@ class SitewideMusicEngine {
             }, { once: true });
 
             // Autoplay after user interaction in previous page
-            this.audio.play().then(() => {
-                this.saveState({ isPlaying: true });
-            }).catch(() => {
-                // Browser prevented unmuted autoplay without new gesture on this document
-                // Lexi will show play state and resume on first click
-                const resumeOnInteract = () => {
-                    if (this.state.isPlaying && this.audio.paused) {
-                        this.audio.play().catch(() => {});
-                    }
-                    document.removeEventListener('click', resumeOnInteract);
-                    document.removeEventListener('keydown', resumeOnInteract);
-                };
-                document.addEventListener('click', resumeOnInteract, { once: true });
-                document.addEventListener('keydown', resumeOnInteract, { once: true });
+            mixEngine.ensureRunning().then(() => {
+                this.audio.play().then(() => {
+                    this.saveState({ isPlaying: true });
+                }).catch(() => {
+                    // Browser prevented unmuted autoplay without new gesture on this document
+                    // Lexi will show play state and resume on first click
+                    const resumeOnInteract = () => {
+                        if (this.state.isPlaying && this.audio.paused) {
+                            mixEngine.ensureRunning().then(() => {
+                                this.audio.play().catch(() => {});
+                            });
+                        }
+                        document.removeEventListener('click', resumeOnInteract);
+                        document.removeEventListener('keydown', resumeOnInteract);
+                    };
+                    document.addEventListener('click', resumeOnInteract, { once: true });
+                    document.addEventListener('keydown', resumeOnInteract, { once: true });
+                });
             });
         }
 
@@ -175,7 +188,7 @@ class SitewideMusicEngine {
         });
     }
 
-    play() {
+    async play() {
         if (this.isHarmonyTunesPage) {
             if (window.playSong) window.playSong(this.state.songId);
             return;
@@ -186,6 +199,7 @@ class SitewideMusicEngine {
             this.audio.src = song.src;
             this.audio.currentTime = this.state.currentTime || 0;
         }
+        await mixEngine.ensureRunning();
         this.audio.play().then(() => {
             this.saveState({ isPlaying: true });
         }).catch(err => console.warn("Manager info: Audio play prevented:", err));
@@ -681,7 +695,7 @@ class SitewideMusicEngine {
                 <!-- Mini Playerhead Component -->
                 <div class="lexi-playerhead">
                     <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
-                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='harmonytunes.html'">
+                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='medixly.html'">
                         <div class="lexi-song-title">${escapeHTML(song.title)}</div>
                         <div class="lexi-song-artist">${escapeHTML(song.artist)}</div>
                     </div>

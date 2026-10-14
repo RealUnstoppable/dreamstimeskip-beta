@@ -28,8 +28,6 @@ export const librarySongs = [
             "pop"
         ]
     },
-
-
     {
         "id": "lil-tjay-calling-my-phone",
         "title": "Calling My Phone",
@@ -42,10 +40,10 @@ export const librarySongs = [
         "inmixPoint": 0,
         "outmixPoint": 170,
         "tags": [
-            "hiphop",
-            "viral"
+            "hiphop"
         ]
-    },    {
+    },
+    {
         "id": "summer-bummer",
         "title": "Summer Bummer (Lights On)",
         "artist": "Rhy Rhy",
@@ -2005,8 +2003,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -2096,8 +2093,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -2577,8 +2573,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -3043,7 +3038,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3058,8 +3054,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -3226,8 +3221,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -3859,8 +3853,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -3920,7 +3913,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -3995,7 +3989,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -4700,8 +4695,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -4956,7 +4950,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -5107,7 +5102,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -5903,8 +5899,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -6009,7 +6004,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6129,7 +6125,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -6174,8 +6171,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -6295,8 +6291,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -6371,8 +6366,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -6523,8 +6517,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -6554,8 +6547,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -7186,8 +7178,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -7217,7 +7208,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7383,7 +7375,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7473,8 +7466,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -7504,8 +7496,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -7520,7 +7511,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -7895,8 +7887,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -8694,7 +8685,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -8769,7 +8761,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9385,8 +9378,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -9626,7 +9618,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -9837,8 +9830,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -9958,8 +9950,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -10124,8 +10115,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -10471,8 +10461,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -10563,8 +10552,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -10805,7 +10793,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -10911,7 +10900,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11136,8 +11126,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -11572,7 +11561,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -11633,8 +11623,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -11724,7 +11713,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -12430,7 +12420,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -12475,8 +12466,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -13048,7 +13038,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -13273,8 +13264,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -13529,8 +13519,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -14070,7 +14059,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -14642,7 +14632,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -14913,7 +14904,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -15858,8 +15850,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -15874,7 +15865,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -15934,7 +15926,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -15949,7 +15942,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -16069,8 +16063,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -16400,8 +16393,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -16476,8 +16468,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -16763,7 +16754,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17594,7 +17586,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17671,8 +17664,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -17702,7 +17694,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -17732,8 +17725,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -18034,7 +18026,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18109,8 +18102,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -18125,7 +18117,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18231,7 +18224,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18246,7 +18240,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18322,7 +18317,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18802,7 +18798,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18832,7 +18829,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18847,7 +18845,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -18938,8 +18937,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -18999,8 +18997,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -19166,7 +19163,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19317,8 +19315,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -19679,7 +19676,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19739,7 +19737,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -19904,8 +19903,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -19965,7 +19963,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -20160,8 +20159,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -20553,8 +20551,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -20614,8 +20611,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -20871,8 +20867,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -20887,7 +20882,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21127,7 +21123,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21187,8 +21184,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -21279,8 +21275,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -21295,7 +21290,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21550,7 +21546,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21910,7 +21907,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -21971,7 +21969,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22736,7 +22735,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22781,7 +22781,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22796,7 +22797,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -22916,8 +22918,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -23085,8 +23086,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -23281,8 +23281,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -23297,7 +23296,8 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "untagged",
+            "viral"
         ]
     },
     {
@@ -23312,8 +23312,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {
@@ -23509,8 +23508,7 @@ export const librarySongs = [
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
-            "viral"
+            "untagged"
         ]
     },
     {

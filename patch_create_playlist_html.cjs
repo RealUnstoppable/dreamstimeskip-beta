@@ -1,5 +1,5 @@
 const fs = require('fs');
-let html = fs.readFileSync('harmonytunes.html', 'utf8');
+let html = fs.readFileSync('medixly.html', 'utf8');
 
 // Insert Create Playlist button
 const sectionMatch = /<h2>Playlists<\/h2>/;
@@ -31,5 +31,5 @@ const modalHtml = `
 `;
 html = html.replace('</body>', modalHtml + '\n</body>');
 
-fs.writeFileSync('harmonytunes.html', html, 'utf8');
-console.log("Patched harmonytunes.html for custom playlists");
+fs.writeFileSync('medixly.html', html, 'utf8');
+console.log("Patched medixly.html for custom playlists");

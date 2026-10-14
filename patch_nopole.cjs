@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-let js = fs.readFileSync('js/harmonytunes.js', 'utf8');
+let js = fs.readFileSync('js/medixly.js', 'utf8');
 
 // Update image
 js = js.replace(/id: 'no-pole-remix',[\s\S]*?art: "\/images\/MugAllBrands300x300.png",/,
@@ -14,5 +14,5 @@ js = js.replace(/id: 'no-pole-remix',[\s\S]*?art: "\/images\/MugAllBrands300x300
 // Update color
 js = js.replace(/'no-pole-remix': '#2e8a19',    \/\/ Dim Green/, "'no-pole-remix': '#a11f8b',    // Neon Magenta");
 
-fs.writeFileSync('js/harmonytunes.js', js);
+fs.writeFileSync('js/medixly.js', js);
 console.log("Patched No Pole image and color");

@@ -320,8 +320,8 @@ function initChatbot() {
                 for (const call of calls) {
                     let callResult = null;
                     if (call.name === "getCurrentlyPlayingSong") {
-                        if (window.HarmonyTunesAPI) {
-                            const song = window.HarmonyTunesAPI.getCurrentlyPlaying();
+                        if (window.MedixlyAPI) {
+                            const song = window.MedixlyAPI.getCurrentlyPlaying();
                             if (song) {
                                 callResult = { song: song.title, artist: song.artist };
                             } else {
@@ -334,29 +334,29 @@ function initChatbot() {
                             callResult = { error: "No music player active." };
                         }
                     } else if (call.name === "getHarmonyTunesQueue") {
-                        if (window.HarmonyTunesAPI) {
-                            const q = window.HarmonyTunesAPI.getQueue();
+                        if (window.MedixlyAPI) {
+                            const q = window.MedixlyAPI.getQueue();
                             callResult = { upcoming_songs: q.map(s => ({ title: s.title, artist: s.artist })) };
                         } else {
                             callResult = { error: "Music player not active on this page." };
                         }
                     } else if (call.name === "getHarmonyTunesHistory") {
-                        if (window.HarmonyTunesAPI) {
-                            const h = window.HarmonyTunesAPI.getHistory();
+                        if (window.MedixlyAPI) {
+                            const h = window.MedixlyAPI.getHistory();
                             callResult = { recently_played: h.map(s => ({ title: s.title, artist: s.artist })) };
                         } else {
                             callResult = { error: "Music player not active on this page." };
                         }
                     } else if (call.name === "getHarmonyTunesFavorites") {
-                        if (window.HarmonyTunesAPI) {
-                            const favs = window.HarmonyTunesAPI.getFavorites();
+                        if (window.MedixlyAPI) {
+                            const favs = window.MedixlyAPI.getFavorites();
                             callResult = { favorite_song_ids: favs };
                         } else {
                             callResult = { error: "Music player not active on this page." };
                         }
                     } else if (call.name === "playHarmonyTunesSong") {
-                        if (window.HarmonyTunesAPI) {
-                            window.HarmonyTunesAPI.playSong(call.args.songId);
+                        if (window.MedixlyAPI) {
+                            window.MedixlyAPI.playSong(call.args.songId);
                             callResult = { success: true, message: "Started playing song!" };
                         } else {
                             callResult = { error: "Music player not active on this page." };

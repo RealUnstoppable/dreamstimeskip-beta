@@ -35,7 +35,7 @@ document.body.innerHTML = `
 
 window.alert = jest.fn();
 
-await import('../js/harmonytunes.js');
+await import('../js/medixly.js');
 
 describe.skip('toggleFavorite unit tests', () => {
     beforeAll(() => {

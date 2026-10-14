@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <meta name="google-adsense-account" content="ca-pub-4254213062632381">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
+
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,9 +18,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/style.css?v=1790377266541">
-    <link rel="stylesheet" href="/css/themes.css?v=1790377266541">
-    <link rel="stylesheet" href="/css/chatbot.css?v=1790377266541_v3">
+    <link rel="stylesheet" href="/css/style.css?v=1791167958698">
+    <link rel="stylesheet" href="/css/themes.css?v=1791167958698">
+    <link rel="stylesheet" href="/css/chatbot.css?v=1791167958698_v3">
 
     <style>
         /* --- START: Pre-register Popup Styles --- */
@@ -119,6 +122,21 @@
 
         /* --- END: Pre-register Popup Styles --- */
     </style>
+
+    <!-- GPT SRA and Lazy Loading setup -->
+    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
+    <script>
+      window.googletag = window.googletag || {cmd: []};
+      googletag.cmd.push(function() {
+        googletag.defineSlot('/1234567/top_banner', [[728, 90], [320, 50]], 'div-gpt-ad-top-banner').addService(googletag.pubads());
+        googletag.defineSlot('/1234567/in_feed_1', [[300, 250], 'fluid'], 'div-gpt-ad-in-feed-1').addService(googletag.pubads());
+        googletag.defineSlot('/1234567/in_feed_2', [[300, 250], 'fluid'], 'div-gpt-ad-in-feed-2').addService(googletag.pubads());
+        googletag.defineSlot('/1234567/mobile_sticky', [320, 50], 'div-gpt-ad-mobile-sticky').addService(googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+        googletag.pubads().enableLazyLoad({ fetchMarginPercent: 500, renderMarginPercent: 200, mobileScaling: 2.0 });
+        googletag.enableServices();
+      });
+    </script>
 </head>
 
 <body>
@@ -155,7 +173,7 @@
                         <h3>Unstoppable</h3>
                         <p>High-tier gameplay & gaming content.</p>
                     </div>
-                    <img src="/images/un-logo-1.png" alt="Unstoppable Logo" loading="lazy">
+                    <img src="/images/unstoppable-logo.png" alt="Unstoppable Logo" loading="lazy">
                 </a>
                 <a href="dreamstimeskip.html" class="bento-card reveal" id="bento-dts">
                     <div class="card-content">
@@ -177,7 +195,7 @@
                         <h3>Medixly</h3>
                         <p>Your daily dose of trending music.</p>
                     </div>
-                    <img src="/images/harmony-tunes-card.jpg" alt="Medixly Card" loading="lazy">
+                    <img src="/images/medixly-logo.png" alt="Medixly Card" loading="lazy">
                 </a>
                 <a href="fotd.html" class="bento-card reveal" id="bento-fotd">
                     <div class="card-content">
@@ -262,11 +280,35 @@
                     <h2>Medixly</h2>
                     <p class="section-subtitle">Your daily dose of trending music. Follow us on TikTok for the most
                         popular songs, every single day. The official app is launching next year!</p>
-                    <a href="harmonytunes.html" class="cta-button">Explore Medixly</a>
+                    <a href="medixly.html" class="cta-button">Explore Medixly</a>
                 </div>
             </section>
         </div>
     </main>
+
+    
+    <!-- AD_SLOT_START -->
+    <div class="ad-container ad-mobile-sticky">
+        <div id="div-gpt-ad-mobile-sticky">
+            <script>
+                googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
+            </script>
+        </div>
+    </div>
+    <!-- AD_SLOT_END -->
+
+
+    
+    <!-- AD_SLOT_START -->
+    <div class="ad-container ad-mobile-sticky">
+        <div id="div-gpt-ad-mobile-sticky">
+            <script>
+                googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
+            </script>
+        </div>
+    </div>
+    <!-- AD_SLOT_END -->
+
 
     <footer class="main-footer"></footer>
 
@@ -296,8 +338,8 @@
     </div>
 
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=1790377266541';
-        import { loadFooter } from './js/footer.js?v=1790377266541'; 
+        import { loadNavbar } from './js/navbar.js?v=1791167958698';
+        import { loadFooter } from './js/footer.js?v=1791167958698'; 
         import { getFactForToday } from './js/fotd-data.js';
 
         loadNavbar();
@@ -307,12 +349,12 @@
         if (fotdEl) fotdEl.textContent = getFactForToday();
     </script>
 
-    <script type="module" src="/js/auth.js?v=1790377266541"></script>
+    <script type="module" src="/js/auth.js?v=1791167958698"></script>
     <script type="module">
         import { auth, db } from './js/auth.js';
     </script>
-    <script type="module" src="/js/script.js?v=1790377266541"></script>
-    <script type="module" src="/js/chatbot.js?v=1790377266541_v2"></script>
+    <script type="module" src="/js/script.js?v=1791167958698"></script>
+    <script type="module" src="/js/chatbot.js?v=1791167958698_v2"></script>
 
 
     <script>

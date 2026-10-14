@@ -18,7 +18,7 @@ export const products = [
         name: 'HarmonyTunes Cap',
         price: 24.99,
         description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
-        imageUrl: '/images/harmony-tunes-card.jpg'
+        imageUrl: '/images/medixly-logo.png'
     },
     {
         id: 'unstoppable-mousepad',
