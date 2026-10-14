@@ -5,11 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransactio
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
-<<<<<<< HEAD
 import { generateProductCardHtml } from "./ui-utils.js";
-=======
-import { generateProductCardHtml } from './ui-utils.js';
->>>>>>> origin/main
 
 let currentUser = null;
 let userCart = {};
@@ -261,86 +257,9 @@ function updateSummaryUI() {
 
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
-<<<<<<< HEAD
-    const orderDocId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    const fullOrder = {
-        orderId: orderDocId,
-        userId: uid || 'guest',
-        userEmail: orderDetails.email || '',
-        items: cart,
-        orderDate: serverTimestamp(),
-        status: 'Paid',
-        total: orderDetails.total || 0,
-        shippingInfo: orderDetails.shippingInfo,
-        paymentStatus: 'Paid via Stripe Test (Card ending in 4242)',
-        appliedPromo: orderDetails.appliedPromo || '',
-        pointsRedeemed: orderDetails.pointsRedeemed || 0,
-        earnedPoints: orderDetails.earnedPoints || 0
-    };
-
-    const effectiveUid = uid || (currentUser && currentUser.uid) || null;
-
-    // If signed in, write to Firestore
-    if (effectiveUid) {
-        try {
-            await addDoc(collection(db, 'orders'), fullOrder);
-            await setDoc(doc(db, 'carts', effectiveUid), { items: {} });
-
-            const userRef = doc(db, 'users', effectiveUid);
-            const userSnap = await getDoc(userRef);
-            const currentData = userSnap.exists() ? userSnap.data() : {};
-            const currentBal = currentData.pointsBalance || 0;
-            const currentEarned = currentData.loyaltyPoints || currentBal;
-            const earnedPts = orderDetails.earnedPoints || 0;
-            const redeemedPts = orderDetails.pointsRedeemed || 0;
-            const newBal = Math.max(0, currentBal - redeemedPts + earnedPts);
-            const newTotalEarned = currentEarned + earnedPts;
-
-            await setDoc(userRef, {
-                pointsBalance: newBal,
-                loyaltyPoints: newTotalEarned
-            }, { merge: true });
-
-            // Update session cache
-            const cacheKey = `profile_${effectiveUid}`;
-            const cachedStr = sessionStorage.getItem(cacheKey);
-            if (cachedStr) {
-                const uData = JSON.parse(cachedStr);
-                uData.pointsBalance = newBal;
-                uData.loyaltyPoints = newTotalEarned;
-                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
-            }
-
-            // Record points earned in loyalty_transactions
-            if (earnedPts > 0) {
-                await addDoc(collection(db, 'loyalty_transactions'), {
-                    userId: effectiveUid,
-                    description: `Order Purchase #${orderDocId} 🛍️`,
-                    points: earnedPts,
-                    type: 'earned',
-                    orderId: orderDocId,
-                    createdAt: serverTimestamp()
-                });
-            }
-
-            // Record points redeemed in loyalty_transactions
-            if (redeemedPts > 0) {
-                await addDoc(collection(db, 'loyalty_transactions'), {
-                    userId: effectiveUid,
-                    description: `Points Redeemed for Discount (Order #${orderDocId}) 🏷️`,
-                    points: -redeemedPts,
-                    type: 'redeemed',
-                    orderId: orderDocId,
-                    createdAt: serverTimestamp()
-                });
-            }
-        } catch (dbErr) {
-            console.warn("Manager info: Firestore order write warning:", dbErr);
-=======
     try {
         if (!currentUser) {
-            throw new Error('User must be logged in to process an order.');
->>>>>>> origin/main
+            throw new Error("User must be logged in to process an order.");
         }
 
         const token = await currentUser.getIdToken();
@@ -441,7 +360,7 @@ export async function handlePlaceOrder(e) {
                 <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 18px 20px; margin-bottom: 25px; text-align: left; font-size: 0.9rem;">
                     <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
                         <span style="color: var(--text-secondary, #888);">Order Reference:</span>
-                        <strong style="color: #00ffcc; font-family: monospace; letter-spacing: 1px;">#${orderId}</strong>
+                        <strong style="color: #00ffcc; font-family: monospace; letter-spacing: 1px;">#${escapeHTML(orderId)}</strong>
                     </div>
                     <div style="display:flex; justify-content:space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
                         <span style="color: var(--text-secondary, #888);">Payment Method:</span>
