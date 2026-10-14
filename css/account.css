@@ -1137,6 +1137,15 @@ input:checked + .slider:before {
     flex-shrink: 0;
 }
 
+.mc-item-socket img {
+    max-width: 32px;
+    max-height: 32px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
 .mc-header-title-text {
     margin: 0;
     font-size: 1.05rem;
@@ -1644,7 +1653,7 @@ input:checked + .slider:before {
 .mc-milestone-marker.m-7 { left: 23.33%; }
 .mc-milestone-marker.m-14 { left: 46.66%; }
 .mc-milestone-marker.m-21 { left: 70%; }
-.mc-milestone-marker.m-28 { left: 93.33%; }
+.mc-milestone-marker.m-28 { left: 81.5%; }
 .mc-milestone-marker.m-30 { left: 100%; transform: translateX(-100%); }
 
 .marker-dot {
@@ -1683,6 +1692,18 @@ input:checked + .slider:before {
     color: #a3a3a3;
     margin-top: 4px;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.mc-marker-icon-img {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: inline-block;
 }
 
 /* Legend */
@@ -1710,6 +1731,15 @@ input:checked + .slider:before {
     width: 10px;
     height: 10px;
     border-radius: 2px;
+    display: inline-block;
+}
+
+.mc-legend-icon-img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
     display: inline-block;
 }
 
