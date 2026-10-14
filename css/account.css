@@ -1070,62 +1070,414 @@ input:checked + .slider:before {
     letter-spacing: 0.5px;
 }
 
-/* Dashboard Check-in Card Enhancement */
-.checkin-card-content {
+/* Dashboard Check-in Card Enhancement (Authentic Minecraft GUI Panel) */
+.mc-checkin-card {
+    position: relative;
+    background: 
+        radial-gradient(circle at 0% 0%, rgba(85, 255, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, rgba(147, 51, 234, 0.08) 0%, transparent 40%),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0px, rgba(255, 255, 255, 0.018) 2px, transparent 2px, transparent 4px),
+        #141720;
+    border: 3px solid #000000;
+    border-radius: 3px;
+    box-shadow: 
+        inset 3px 3px 0 #4a5263, 
+        inset -3px -3px 0 #0a0c10, 
+        0 8px 32px rgba(0, 0, 0, 0.65);
+    padding: 22px 24px;
+    margin-top: 20px;
+    margin-bottom: 22px;
+    box-sizing: border-box;
+    color: #f3f4f6;
+}
+
+/* Subtle Diamond/Amethyst Trim Line */
+.mc-checkin-card::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    height: 2px;
+    background: linear-gradient(90deg, #55ffff 0%, rgba(85, 255, 255, 0.25) 25%, rgba(147, 51, 234, 0.25) 75%, #ffd700 100%);
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+/* Header */
+.mc-checkin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 12px;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #232834;
 }
 
-.checkin-streak-display {
+.mc-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
 }
 
-.checkin-streak-badge {
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.1rem;
-    padding: 6px 14px;
-    border-radius: 20px;
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.checkin-actions-row {
+/* Minecraft Recessed Item Frame Socket */
+.mc-item-socket {
+    width: 44px;
+    height: 44px;
+    background: #0d0f14;
+    border: 2px solid #000000;
+    box-shadow: inset 2px 2px 0 #1b1e27, inset -2px -2px 0 #3a4152;
+    border-radius: 2px;
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
 }
 
-.btn-mc-calendar {
-    background: #1f232b;
-    border: 2px solid #3c424f;
-    color: #55ffff !important;
+.mc-header-title-text {
+    margin: 0;
+    font-size: 1.05rem;
     font-weight: 700;
-    font-size: 0.9rem;
-    padding: 9px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.2s ease;
-    box-shadow: inset 1px 1px 0 #525969, inset -1px -1px 0 #111317;
+    color: #55ffff;
+    text-shadow: 2px 2px 0 #002b2b, 0 0 12px rgba(85, 255, 255, 0.4);
+    letter-spacing: 0.5px;
+    line-height: 1.25;
 }
 
-.btn-mc-calendar:hover {
-    background: #282d38;
+.mc-header-subtitle {
+    display: block;
+    font-size: 0.72rem;
+    color: #9ca3af;
+    margin-top: 3px;
+    letter-spacing: 0.5px;
+    font-family: 'Silkscreen', monospace;
+}
+
+/* Minecraft HUD Streak Counter */
+.mc-streak-hud-badge {
+    background: #0b0d12;
+    border: 2px solid #000000;
+    box-shadow: inset 2px 2px 0 #181b24, inset -2px -2px 0 #363e4f;
+    border-radius: 2px;
+    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+}
+
+.mc-streak-flame {
+    font-size: 1.25rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8));
+    animation: mcFlameFlicker 1.8s infinite alternate ease-in-out;
+}
+
+@keyframes mcFlameFlicker {
+    0% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.7)); }
+    100% { transform: scale(1.1) translateY(-1px); filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.95)); }
+}
+
+.mc-streak-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.mc-streak-count {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #ffaa00;
+    text-shadow: 2px 2px 0 #000000;
+    line-height: 1;
+}
+
+.mc-streak-label {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    letter-spacing: 0.6px;
+    margin-top: 2px;
+    text-transform: uppercase;
+}
+
+/* Lore & Artifacts Showcase */
+.mc-quest-banner {
+    margin-bottom: 16px;
+}
+
+.mc-quest-lead {
+    color: #d1d5db;
+    margin: 0 0 12px 0;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.mc-artifacts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+@media (max-width: 768px) {
+    .mc-artifacts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mc-artifact-card {
+    background: #0f1117;
+    border: 2px solid #232733;
+    box-shadow: inset 2px 2px 0 #2a3040, inset -2px -2px 0 #090a0d;
+    border-radius: 2px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+}
+
+.mc-artifact-card:hover {
     border-color: #55ffff;
-    box-shadow: 0 0 14px rgba(85, 255, 255, 0.35);
     transform: translateY(-1px);
+    box-shadow: inset 2px 2px 0 #414a5e, inset -2px -2px 0 #090a0d, 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.mc-artifact-card.rarity-legendary {
+    border-color: rgba(85, 255, 255, 0.5);
+}
+
+.mc-artifact-card.rarity-mythic {
+    border-color: rgba(147, 51, 234, 0.5);
+}
+
+.mc-artifact-card.rarity-elytra {
+    border-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Stack Count badge inside item slot */
+.mc-item-stack-count {
+    position: absolute;
+    bottom: 2px;
+    right: 3px;
+    font-family: 'Press Start 2P', 'Silkscreen', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000, -1px 1px 0 #000000;
+    pointer-events: none;
+    line-height: 1;
+}
+
+.mc-artifact-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    overflow: hidden;
+}
+
+.mc-artifact-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.mc-artifact-timing {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.mc-artifact-timing.legendary {
+    color: #55ffff;
+}
+
+.mc-artifact-timing.mythic {
+    color: #c084fc;
+}
+
+.mc-artifact-timing.grand {
+    color: #ffd700;
+}
+
+/* Minecraft GUI Buttons */
+.mc-actions-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.mc-pixel-btn {
+    font-family: 'Silkscreen', 'Press Start 2P', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 11px 18px;
+    border: 2px solid #000000;
+    border-radius: 2px;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.12s ease;
+    user-select: none;
+}
+
+/* Claim Button (Ready State) */
+.mc-pixel-btn-claim,
+#claim-checkin-btn:not(:disabled) {
+    background: #3c8527 !important;
+    border-color: #000000 !important;
+    color: #ffffff !important;
+    box-shadow: 
+        inset 2px 2px 0 #5eb33a, 
+        inset -2px -2px 0 #1c5212, 
+        0 4px 0 #000000,
+        0 6px 14px rgba(60, 133, 39, 0.4) !important;
+    text-shadow: 2px 2px 0 #1c5212 !important;
+}
+
+.mc-pixel-btn-claim:hover:not(:disabled),
+#claim-checkin-btn:hover:not(:disabled) {
+    background: #499e30 !important;
+    box-shadow: 
+        inset 2px 2px 0 #72d948, 
+        inset -2px -2px 0 #1c5212, 
+        0 4px 0 #000000,
+        0 8px 18px rgba(60, 133, 39, 0.6) !important;
+    transform: translateY(-1px);
+}
+
+.mc-pixel-btn-claim:active:not(:disabled),
+#claim-checkin-btn:active:not(:disabled) {
+    box-shadow: 
+        inset -2px -2px 0 #5eb33a, 
+        inset 2px 2px 0 #1c5212, 
+        0 2px 0 #000000 !important;
+    transform: translateY(2px);
+}
+
+/* Claim Button (Claimed Today State) */
+.mc-pixel-btn-claimed,
+#claim-checkin-btn:disabled {
+    background: #232731 !important;
+    border-color: #121418 !important;
+    color: #4ade80 !important;
+    box-shadow: 
+        inset 2px 2px 0 #363b48, 
+        inset -2px -2px 0 #101217, 
+        0 3px 0 #000000 !important;
+    text-shadow: 1px 1px 0 #000000 !important;
+    cursor: not-allowed !important;
+    opacity: 0.95 !important;
+    transform: none !important;
+}
+
+/* Calendar Button (Stone Deepslate Style) */
+.mc-pixel-btn-calendar,
+.btn-mc-calendar {
+    background: #313644;
+    border: 2px solid #000000;
+    color: #55ffff !important;
+    box-shadow: 
+        inset 2px 2px 0 #515a6e, 
+        inset -2px -2px 0 #16181f, 
+        0 4px 0 #000000;
+    text-shadow: 2px 2px 0 #0c1822;
+}
+
+.mc-pixel-btn-calendar:hover,
+.btn-mc-calendar:hover {
+    background: #3e4456;
+    border-color: #000000;
+    box-shadow: 
+        inset 2px 2px 0 #68738a, 
+        inset -2px -2px 0 #16181f, 
+        0 4px 0 #000000,
+        0 0 12px rgba(85, 255, 255, 0.35);
+    transform: translateY(-1px);
+}
+
+.mc-pixel-btn-calendar:active,
+.btn-mc-calendar:active {
+    box-shadow: 
+        inset -2px -2px 0 #515a6e, 
+        inset 2px 2px 0 #16181f, 
+        0 2px 0 #000000;
+    transform: translateY(2px);
+}
+
+/* Minecraft Action Bar / Dialogue Plate */
+.mc-actionbar-panel {
+    background: #0b0d13;
+    border: 2px solid #1c202a;
+    box-shadow: inset 2px 2px 0 #06070a, inset -2px -2px 0 #282e3c;
+    border-radius: 2px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.mc-actionbar-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.mc-actionbar-text {
+    margin: 0;
+    font-family: 'Silkscreen', 'Press Start 2P', monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    color: #e5e7eb;
+    min-height: 18px;
+    flex: 1;
+}
+
+/* Chat text colors matching Minecraft */
+.mc-chat-status.success {
+    color: #55ff55;
+    text-shadow: 1px 1px 0 #003300;
+    font-weight: 700;
+}
+
+.mc-chat-status.ready {
+    color: #f5bc18;
+    text-shadow: 1px 1px 0 #332200;
+    font-weight: 700;
+}
+
+.mc-chat-streak {
+    color: #ffaa00;
+    font-weight: 700;
+}
+
+.mc-chat-item {
+    color: #55ffff;
+    font-weight: 700;
+}
+
+.mc-chat-pts {
+    color: #fca5a5;
+    font-weight: 700;
 }
 
 /* --- Minecraft Modal Overlay --- */

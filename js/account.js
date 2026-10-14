@@ -1314,35 +1314,31 @@ export function updateCheckinUI(user, checkinData) {
         if (claimBtn) {
             claimBtn.disabled = true;
             claimBtn.innerHTML = '✓ Claimed Today';
-            claimBtn.className = 'btn';
-            claimBtn.style.background = 'rgba(34, 197, 94, 0.15)';
-            claimBtn.style.color = '#4ade80';
-            claimBtn.style.border = '1px solid #22c55e';
-            claimBtn.style.padding = '10px 18px';
-            claimBtn.style.fontWeight = '700';
+            claimBtn.className = 'mc-pixel-btn mc-pixel-btn-claimed';
+            claimBtn.removeAttribute('style');
         }
         if (modalClaimBtn) {
             modalClaimBtn.disabled = true;
             modalClaimBtn.textContent = '✓ Claimed Today';
         }
         if (checkinMessage) {
-            checkinMessage.innerHTML = `<span style="color: #4ade80;">✓ Today's check-in complete!</span> Streak: <strong>${streak} days</strong>. Next reward tomorrow: <strong>${escapeHTML(nextReward.name)}</strong> (+${nextReward.points} pts).`;
+            checkinMessage.innerHTML = `<span class="mc-chat-status success">✓ Today's check-in complete!</span> Streak: <span class="mc-chat-streak">${streak} days</span>. Next reward tomorrow: <span class="mc-chat-item">${escapeHTML(nextReward.name)}</span> <span class="mc-chat-pts">(+${nextReward.points} pts)</span>.`;
+            checkinMessage.removeAttribute('style');
         }
     } else {
         if (claimBtn) {
             claimBtn.disabled = false;
             claimBtn.innerHTML = '⚡ Claim Today\'s Reward';
-            claimBtn.className = 'cta-button';
-            claimBtn.style.padding = '10px 18px';
-            claimBtn.style.fontWeight = '700';
+            claimBtn.className = 'mc-pixel-btn mc-pixel-btn-claim';
+            claimBtn.removeAttribute('style');
         }
         if (modalClaimBtn) {
             modalClaimBtn.disabled = false;
             modalClaimBtn.textContent = '⚡ Claim Today\'s Reward';
         }
         if (checkinMessage) {
-            checkinMessage.innerHTML = `Ready to claim Day ${nextDayNum}: <strong>${escapeHTML(nextReward.name)}</strong> (+${nextReward.points} pts)!`;
-            checkinMessage.style.color = 'var(--text-primary)';
+            checkinMessage.innerHTML = `<span class="mc-chat-status ready">⚡ Ready to claim Day ${nextDayNum}:</span> <span class="mc-chat-item">${escapeHTML(nextReward.name)}</span> <span class="mc-chat-pts">(+${nextReward.points} pts)</span>!`;
+            checkinMessage.removeAttribute('style');
         }
     }
 
@@ -1712,6 +1708,9 @@ export function initAccountPage() {
             }
 
             const accentColor = isPremium ? customHex : '#00ffcc';
+            if (!isPremium && document.getElementById('custom-hex-color')) {
+                document.getElementById('custom-hex-color').value = accentColor;
+            }
 
             let origText = 'Save Theme';
             if (submitBtn) {
@@ -1751,6 +1750,74 @@ export function initAccountPage() {
                     submitBtn.removeAttribute('title');
                 }
             }
+        });
+
+        // Reset Theme Settings to Default
+        document.getElementById('reset-theme-btn')?.addEventListener('click', async (e) => {
+            const resetBtn = e.currentTarget;
+            const origText = resetBtn.textContent;
+            const notificationEl = document.getElementById('theme-notification');
+            const themeSelect = document.getElementById('theme-select');
+            const customHex = document.getElementById('custom-hex-color');
+
+            const defaultTheme = 'system';
+            const defaultAccent = '#00ffcc';
+
+            // Reset UI inputs
+            if (themeSelect) themeSelect.value = defaultTheme;
+            if (customHex) customHex.value = defaultAccent;
+
+            resetBtn.disabled = true;
+            resetBtn.textContent = 'Resetting...';
+            resetBtn.title = 'Resetting theme preferences...';
+
+            try {
+                if (user?.uid) {
+                    await updateDoc(doc(db, "users", user.uid), {
+                        theme: defaultTheme,
+                        accentColor: defaultAccent
+                    });
+                    if (userData) {
+                        userData.theme = defaultTheme;
+                        userData.accentColor = defaultAccent;
+                        sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+                    }
+                }
+
+                document.body.dataset.theme = defaultTheme;
+                document.documentElement.style.setProperty('--accent-color', defaultAccent);
+                localStorage.setItem('userTheme', defaultTheme);
+                localStorage.setItem('userAccent', defaultAccent);
+
+                if (typeof window.updateTheme === 'function') {
+                    window.updateTheme(defaultTheme, defaultAccent);
+                }
+
+                if (notificationEl) {
+                    notificationEl.textContent = 'Theme preferences reset to default successfully!';
+                    notificationEl.className = 'notification success';
+                    notificationEl.style.display = 'block';
+                    setTimeout(() => notificationEl.style.display = 'none', 3000);
+                }
+            } catch (err) {
+                console.error("Manager info: Error resetting theme:", err);
+                if (notificationEl) {
+                    notificationEl.textContent = `Error: ${err.message}`;
+                    notificationEl.className = 'notification error';
+                    notificationEl.style.display = 'block';
+                }
+            } finally {
+                resetBtn.disabled = false;
+                resetBtn.textContent = origText;
+                resetBtn.removeAttribute('title');
+            }
+        });
+
+        document.getElementById('theme-settings-form')?.addEventListener('reset', () => {
+            const themeSelect = document.getElementById('theme-select');
+            const customHex = document.getElementById('custom-hex-color');
+            if (themeSelect) themeSelect.value = 'system';
+            if (customHex) customHex.value = '#00ffcc';
         });
 
         // Password Reset Email
