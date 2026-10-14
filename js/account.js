@@ -1064,15 +1064,7 @@ export function getMinecraftItemSvg(icon) {
                 <rect x="15" y="18" width="3" height="2" fill="#dc2626"/>
             </svg>`;
         case 'elytra':
-            return `<svg viewBox="0 0 32 32" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 5 C12 6 7 13 7 21 C7 25 10 27 13 25 C15 22 16 16 16 9 Z" fill="#383d4c"/>
-                <path d="M14 7 C12 9 8 15 8 20 C9 22 11 22 13 19 C14 16 15 11 15 7 Z" fill="#606980"/>
-                <path d="M11 11 C10 13 9 17 9 19 C10 20 11 20 12 18 Z" fill="#55ffff"/>
-                <path d="M17 5 C20 6 25 13 25 21 C25 25 22 27 19 25 C17 22 16 16 16 9 Z" fill="#383d4c"/>
-                <path d="M18 7 C20 9 24 15 24 20 C23 22 21 22 19 19 C18 16 17 11 17 7 Z" fill="#606980"/>
-                <path d="M21 11 C22 13 23 17 23 19 C22 20 21 20 20 18 Z" fill="#c084fc"/>
-                <rect x="15" y="4" width="2" height="4" fill="#ffd700"/>
-            </svg>`;
+            return `<img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6f/Elytra_JE2_BE2.png/revision/latest?cb=20230930213939" alt="Elytra" class="mc-item-icon-img mc-elytra-img" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='images/elytra.png';" />`;
         case 'iron':
             return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="6" y="13" width="20" height="11" rx="2" fill="#8f939d"/>

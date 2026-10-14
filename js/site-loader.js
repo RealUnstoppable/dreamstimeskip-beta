@@ -121,10 +121,7 @@ export function hideSiteLoader(force = false) {
         return;
     }
 
-    const elapsed = Date.now() - shownTimestamp;
-    const remainingMinTime = (!force && elapsed < MIN_DISPLAY_MS) ? (MIN_DISPLAY_MS - elapsed) : 0;
-
-    setTimeout(() => {
+    const doDismiss = () => {
         isDismissed = true;
         isLoaderVisible = false;
 
@@ -137,7 +134,15 @@ export function hideSiteLoader(force = false) {
                 }
             }, FADE_OUT_DURATION_MS);
         }
-    }, remainingMinTime);
+    };
+
+    if (force) {
+        doDismiss();
+    } else {
+        const elapsed = Date.now() - shownTimestamp;
+        const remainingMinTime = (elapsed < MIN_DISPLAY_MS) ? (MIN_DISPLAY_MS - elapsed) : 0;
+        setTimeout(doDismiss, remainingMinTime);
+    }
 }
 
 /**
