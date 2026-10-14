@@ -309,6 +309,25 @@ function initHarmonyTunes() {
     const viewLyrics = document.getElementById('view-lyrics');
     const closeLyricsBtn = document.getElementById('close-lyrics-btn');
     const lyricsContent = document.getElementById('lyrics-content');
+
+    // ⚡ Bolt: Event Delegation for Lyrics
+    if (lyricsContent && !lyricsContent.dataset.lyricsDelegated) {
+        lyricsContent.dataset.lyricsDelegated = 'true';
+        lyricsContent.addEventListener('click', (e) => {
+            const line = e.target.closest('.lyric-line');
+            if (!line) return;
+            const start = parseFloat(line.getAttribute('data-start'));
+            if (!isNaN(start)) {
+                // Dynamically references the currently active player instance at click time
+                if (typeof activeAudio !== 'undefined' && activeAudio) {
+                    activeAudio.currentTime = start;
+                }
+                if (typeof playSong === 'function') {
+                    playSong();
+                }
+            }
+        });
+    }
     const lyricsContainer = document.getElementById('lyrics-container');
 
     // Player Bar Global Buttons
@@ -2074,17 +2093,7 @@ function initHarmonyTunes() {
             }))
         }));
 
-        // Seek on click
-        cachedLyricLines.forEach(lineData => {
-            const line = lineData.el;
-            line.addEventListener('click', () => {
-                const start = parseFloat(line.getAttribute('data-start'));
-                if (!isNaN(start)) {
-                    activeAudio.currentTime = start;
-                    playSong();
-                }
-            });
-        });
+
 
         // Cache DOM and timestamps
         cachedLyricsDOM = Array.from(lines).map(line => {
