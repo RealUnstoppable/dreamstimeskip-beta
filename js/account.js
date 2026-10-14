@@ -45,6 +45,22 @@ export function initTabNavigation() {
             sec.classList.toggle('active', '#' + sec.id === targetHash);
         });
 
+        // If user is loaded, refresh view when switching tabs
+        if (currentUser) {
+            if (targetHash === '#dashboard') {
+                const checkinData = getUserCheckinData(currentUser, currentUserData);
+                updateCheckinUI(currentUser, checkinData);
+            } else if (targetHash === '#orders') {
+                renderOrders(currentUser);
+            } else if (targetHash === '#rewards') {
+                renderRewards(currentUser, currentUserData);
+            } else if (targetHash === '#wishlist') {
+                loadWishlist(currentUser.uid);
+            } else if (targetHash === '#support') {
+                loadUserTickets(currentUser.uid);
+            }
+        }
+
         // Scroll to top of content on mobile
         if (window.innerWidth <= 768) {
             const mainContent = document.querySelector('.main-content');
@@ -53,6 +69,8 @@ export function initTabNavigation() {
             }
         }
     }
+
+    window.switchAccountTab = switchTab;
 
     // Attach click listeners to all nav links
     navLinks.forEach(link => {
@@ -64,6 +82,19 @@ export function initTabNavigation() {
                 switchTab(hash);
             }
         });
+    });
+
+    // Delegate any in-page anchor links to tabs (e.g. from orders to support)
+    document.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a[href^="#"]');
+        if (anchor && !anchor.closest('.sidebar-nav')) {
+            const hash = anchor.getAttribute('href');
+            if (hash && hash.length > 1 && document.querySelector(hash)) {
+                e.preventDefault();
+                history.pushState(null, '', hash);
+                switchTab(hash);
+            }
+        }
     });
 
     // Listen to browser forward/back buttons
@@ -279,38 +310,35 @@ export async function renderRewards(user, userData) {
             referralLinkInput.value = window.location.origin + '/sign in beta.html?ref=' + user.uid;
         }
 
-        const userRef = doc(db, 'users', user.uid);
-        let userSnap = null;
-
-        // Current points calculation
-        let points = 0;
+        // Current points calculation: read cache or defaults
+        let points = 50; // Standard Welcome Bonus
         if (userData && typeof userData.pointsBalance === 'number') {
             points = userData.pointsBalance;
         } else if (userData && typeof userData.loyaltyPoints === 'number') {
             points = userData.loyaltyPoints;
         } else {
-            const data = await getCachedUserProfile(user);
-            if (data) {
-                points = typeof data.pointsBalance === 'number' 
-                    ? data.pointsBalance 
-                    : (typeof data.loyaltyPoints === 'number' ? data.loyaltyPoints : 50);
-            } else {
-                points = 50; // Welcome Bonus
+            const localPts = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10);
+            if (!isNaN(localPts) && localPts >= 0) {
+                points = localPts;
             }
         }
 
-        // Update displays
+        // Update displays immediately so it never hangs on "Loading..."
         if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = points;
         if (userLoyaltyPoints) userLoyaltyPoints.textContent = points;
 
         // Fetch reward transactions (WITHOUT orderBy to prevent composite index errors)
-        const transactionsRef = collection(db, 'loyalty_transactions');
-        const q = query(transactionsRef, where("userId", "==", user.uid));
-        const snap = await getDocs(q);
+        let txs = [];
+        try {
+            const transactionsRef = collection(db, 'loyalty_transactions');
+            const q = query(transactionsRef, where("userId", "==", user.uid));
+            const snap = await getDocs(q);
+            txs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (dbErr) {
+            console.warn("Notice: loyalty_transactions query notice:", dbErr);
+        }
 
-        let txs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        // If no transactions exist, seed the welcome 50 points transaction into Firestore!
+        // If no transactions exist, seed the welcome 50 points transaction into Firestore
         if (txs.length === 0) {
             try {
                 const welcomeTx = {
@@ -321,7 +349,6 @@ export async function renderRewards(user, userData) {
                     createdAt: serverTimestamp()
                 };
                 await addDoc(collection(db, 'loyalty_transactions'), welcomeTx);
-                await setDoc(userRef, { pointsBalance: points, loyaltyPoints: points }, { merge: true });
                 txs.push({
                     id: 'tx_welcome',
                     description: 'Account Welcome Reward 🎉',
@@ -330,9 +357,30 @@ export async function renderRewards(user, userData) {
                     createdAt: new Date()
                 });
             } catch (seedErr) {
-                console.warn("Manager info: Could not seed welcome transaction:", seedErr);
+                console.warn("Notice: Could not seed welcome transaction:", seedErr);
+            }
+        } else {
+            // Calculate total points from all user transactions
+            let sum = 0;
+            txs.forEach(t => {
+                const p = typeof t.points === 'number' ? t.points : (typeof t.amount === 'number' ? t.amount : 0);
+                sum += p;
+            });
+            if (sum > 0) {
+                points = sum;
             }
         }
+
+        // Update cache and DOM with real computed points
+        localStorage.setItem(`dts_points_${user.uid}`, points);
+        if (userData) {
+            userData.pointsBalance = points;
+            userData.loyaltyPoints = points;
+            sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+        }
+
+        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = points;
+        if (userLoyaltyPoints) userLoyaltyPoints.textContent = points;
 
         // Sort client-side by date descending
         txs.sort((a, b) => {
@@ -344,7 +392,6 @@ export async function renderRewards(user, userData) {
             };
             return getTime(b.createdAt) - getTime(a.createdAt);
         });
-
 
         const createTransactionHtml = (tx, isCompact) => {
             const isPositive = (tx.points || 0) >= 0;
@@ -402,7 +449,10 @@ export async function renderRewards(user, userData) {
 
     } catch (err) {
         console.error("Error rendering rewards:", err);
-        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--accent-red);">Failed to load activity: ${err.message}</p>`;
+        const fallback = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10) || 50;
+        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = fallback;
+        if (userLoyaltyPoints) userLoyaltyPoints.textContent = fallback;
+        if (dashboardActivityList) dashboardActivityList.innerHTML = `<p style="color: var(--text-secondary); margin: 0;">No activity yet.</p>`;
     }
 }
 
@@ -622,23 +672,30 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 const currentPts = userData.pointsBalance || 0;
                 const newPts = currentPts + 100;
 
-                await updateDoc(userRef, {
-                    pointsBalance: newPts,
-                    loyaltyPoints: (userData.loyaltyPoints || 0) + 100,
-                    retentionDiscount: 'STAY10VIP',
-                    retentionDiscountPercent: 10
-                });
+                try {
+                    await updateDoc(userRef, {
+                        retentionDiscount: 'STAY10VIP',
+                        retentionDiscountPercent: 10
+                    });
+                } catch (updateErr) {
+                    console.warn("Notice: Retention discount update:", updateErr);
+                }
 
-                await addDoc(collection(db, 'loyalty_transactions'), {
-                    userId: user.uid,
-                    description: 'Retention Reward Bonus (+10% Discount Code STAY10VIP) 🎁',
-                    points: 100,
-                    type: 'earned',
-                    createdAt: serverTimestamp()
-                });
+                try {
+                    await addDoc(collection(db, 'loyalty_transactions'), {
+                        userId: user.uid,
+                        description: 'Retention Reward Bonus (+10% Discount Code STAY10VIP) 🎁',
+                        points: 100,
+                        type: 'earned',
+                        createdAt: serverTimestamp()
+                    });
+                } catch (txErr) {
+                    console.warn("Notice: Retention transaction log:", txErr);
+                }
 
                 userData.pointsBalance = newPts;
                 userData.loyaltyPoints = (userData.loyaltyPoints || 0) + 100;
+                localStorage.setItem(`dts_points_${user.uid}`, newPts);
                 sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 alert('🎉 Congratulations! Code STAY10VIP (10% OFF) has been applied to your account, and 100 bonus points have been added to your balance!');
@@ -752,34 +809,28 @@ export async function loadWishlist(userId) {
         const copyBtn = document.getElementById('copy-share-link-btn');
         const disableBtn = document.getElementById('disable-share-btn');
 
-        if (snap.exists()) {
-            const data = snap.data();
-            if (data.items && data.items.length > 0) {
-                if (data.isPublic && data.sharedId) {
-                    if (linkContainer) linkContainer.style.display = 'block';
-                    if (linkInput) linkInput.value = `${window.location.origin}/shared-wishlist.html?id=${data.sharedId}`;
-                    if (shareBtn) shareBtn.style.display = 'none';
-                } else {
-                    if (shareBtn) shareBtn.style.display = 'inline-block';
-                    if (linkContainer) linkContainer.style.display = 'none';
-                }
-                
-                // RENDER WISHLIST ITEMS
-                const itemsHtml = data.items.map(itemId => {
-                    const prod = productMap.get(itemId) || productMap[itemId];
-                    if (!prod) return '';
-                    return generateProductCardHtml(prod, 'wishlist-public');
-                }).join('');
-                
-                container.innerHTML = itemsHtml;
-                
-            } else {
-                if (shareBtn) shareBtn.style.display = 'none';
-                if (linkContainer) linkContainer.style.display = 'none';
-                container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
-            }
+        if (!snap.exists() || !snap.data().items || snap.data().items.length === 0) {
+            if (shareBtn) shareBtn.style.display = 'none';
+            if (linkContainer) linkContainer.style.display = 'none';
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed var(--border-color);">
+                    <div style="font-size: 2.5rem; margin-bottom: 12px;">❤️</div>
+                    <h4 style="margin: 0 0 8px 0; color: #fff;">Your Wishlist is Empty</h4>
+                    <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 20px;">Save your favorite apparel, posters, and collectibles to revisit anytime.</p>
+                    <a href="shop.html" class="btn btn-primary">Explore Shop →</a>
+                </div>
+            `;
+            return;
+        }
+
+        const data = snap.data();
+        if (data.isPublic && data.sharedId) {
+            if (linkContainer) linkContainer.style.display = 'block';
+            if (linkInput) linkInput.value = `${window.location.origin}/shared-wishlist.html?id=${data.sharedId}`;
+            if (shareBtn) shareBtn.style.display = 'none';
         } else {
-            container.innerHTML = '<p style="color: var(--text-secondary);">Your wishlist is empty. Head to the shop to add items!</p>';
+            if (shareBtn) shareBtn.style.display = 'inline-block';
+            if (linkContainer) linkContainer.style.display = 'none';
         }
 
         if (shareBtn) {
@@ -810,19 +861,7 @@ export async function loadWishlist(userId) {
             };
         }
 
-        if (!snap.exists() || !snap.data().items || snap.data().items.length === 0) {
-            container.innerHTML = `
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px dashed var(--border-color);">
-                    <div style="font-size: 2.5rem; margin-bottom: 12px;">❤️</div>
-                    <h4 style="margin: 0 0 8px 0; color: #fff;">Your Wishlist is Empty</h4>
-                    <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 20px;">Save your favorite apparel, posters, and collectibles to revisit anytime.</p>
-                    <a href="shop.html" class="btn btn-primary">Explore Shop →</a>
-                </div>
-            `;
-            return;
-        }
-
-        const items = snap.data().items;
+        const items = data.items;
         container.innerHTML = items.map(id => {
             const product = productMap.get(id);
             if (!product) return '';
@@ -904,7 +943,555 @@ export async function loadUserTickets(userId) {
 }
 
 /**
- * 9. MAIN ACCOUNT CONTROLLER INITIALIZATION
+ * 9. DREAMS TIMESKIP MINECRAFT DAILY CHECK-IN SYSTEM & 30-DAY CALENDAR
+ * - 30-Day Genshin-style monthly check-in board
+ * - Minecraft styled UI matching Dreams TimeSkip
+ * - 5x Diamonds (Legendary) on Wednesdays (Day 3, 10, 17, 24)
+ * - 1x Netherite Ingot (Mythic) once every 2 weeks (Day 14 and Day 28)
+ * - 1x Elytra (Grand Finale) for 30 consecutive days (Day 30)
+ * - Top Minecraft XP progress bar with milestone indicators
+ * - Cinematic Flare animation with number of days & reward unlock
+ * - Tied to user's account in Firestore & localStorage
+ */
+
+export const CHECKIN_SCHEDULE_30_DAYS = [
+    // Week 1
+    { day: 1, name: "10x Iron Ingots", rarity: "common", points: 20, icon: "iron", desc: "Solid starter resource for forging tools and protection." },
+    { day: 2, name: "15x Redstone Dust", rarity: "common", points: 25, icon: "redstone", desc: "Harness the pulsating energy of Minecraft contraptions." },
+    { day: 3, name: "5x Diamonds", rarity: "legendary", points: 100, icon: "diamond", isWednesday: true, desc: "LEGENDARY WEDNESDAY: Rare glistening cyan gems of supreme value!" },
+    { day: 4, name: "20x Lapis Lazuli", rarity: "common", points: 30, icon: "lapis", desc: "Mystic blue stones required to enchant powerful equipment." },
+    { day: 5, name: "8x Emeralds", rarity: "rare", points: 40, icon: "emerald", desc: "Valuable gemstone currency recognized across the realm." },
+    { day: 6, name: "1x Golden Apple", rarity: "rare", points: 50, icon: "golden_apple", desc: "Infused golden fruit providing Absorption & Regeneration." },
+    { day: 7, name: "1x Enchanted Book", rarity: "legendary", points: 75, icon: "book", desc: "WEEK 1 MILESTONE: Imbued with ancient spells for weapons." },
+
+    // Week 2
+    { day: 8, name: "15x Iron Ingots", rarity: "common", points: 25, icon: "iron", desc: "Refined smelting output for fortifying your base." },
+    { day: 9, name: "12x Gold Ingots", rarity: "common", points: 30, icon: "gold", desc: "Shining yellow metal loved by Nether Piglins." },
+    { day: 10, name: "5x Diamonds", rarity: "legendary", points: 100, icon: "diamond", isWednesday: true, desc: "LEGENDARY WEDNESDAY: Sparkling diamonds forged under extreme pressure!" },
+    { day: 11, name: "5x Ender Pearls", rarity: "rare", points: 45, icon: "ender_pearl", desc: "Dimension-bending mobility spheres harvested from the End." },
+    { day: 12, name: "10x Emeralds", rarity: "rare", points: 50, icon: "emerald", desc: "Hefty sack of emeralds for high-tier village trade." },
+    { day: 13, name: "2x Golden Apples", rarity: "rare", points: 60, icon: "golden_apple", desc: "Double enchanted apples for high-stakes survival battles." },
+    { day: 14, name: "1x Netherite Ingot", rarity: "mythic", points: 250, icon: "netherite", isBiweekly: true, desc: "MYTHIC BI-WEEKLY: Netherite ingot alloyed with ancient debris & gold!" },
+
+    // Week 3
+    { day: 15, name: "20x Iron Ingots", rarity: "common", points: 30, icon: "iron", desc: "Industrial stockpile for heavy rail lines and armor." },
+    { day: 16, name: "16x Gold Ingots", rarity: "common", points: 35, icon: "gold", desc: "Lustrous gold ingots for bartering and golden apples." },
+    { day: 17, name: "5x Diamonds", rarity: "legendary", points: 100, icon: "diamond", isWednesday: true, desc: "LEGENDARY WEDNESDAY: Pristine 5x diamond cache!" },
+    { day: 18, name: "30x Redstone Dust", rarity: "common", points: 40, icon: "redstone", desc: "High-grade redstone wiring for complex mechanics." },
+    { day: 19, name: "12x Emeralds", rarity: "rare", points: 55, icon: "emerald", desc: "Premium currency for master-tier weaponsmiths." },
+    { day: 20, name: "1x Totem of Undying", rarity: "legendary", points: 80, icon: "totem", desc: "Cheat death itself with second-chance immortality." },
+    { day: 21, name: "1x Enchanted Book (Mending)", rarity: "legendary", points: 90, icon: "book", desc: "WEEK 3 MILESTONE: Ancient book of Mending to repair tools." },
+
+    // Week 4
+    { day: 22, name: "25x Iron Ingots", rarity: "common", points: 35, icon: "iron", desc: "High-grade refined smelting output." },
+    { day: 23, name: "20x Gold Ingots", rarity: "common", points: 40, icon: "gold", desc: "Abundant gold stash for enchanted golden apples." },
+    { day: 24, name: "5x Diamonds", rarity: "legendary", points: 100, icon: "diamond", isWednesday: true, desc: "LEGENDARY WEDNESDAY: Gleaming diamonds for supreme equipment!" },
+    { day: 25, name: "8x Ender Pearls", rarity: "rare", points: 50, icon: "ender_pearl", desc: "Teleport instantly through enemy lines and dungeons." },
+    { day: 26, name: "15x Emeralds", rarity: "rare", points: 65, icon: "emerald", desc: "Top-tier village wealth and trading prestige." },
+    { day: 27, name: "3x Golden Apples", rarity: "rare", points: 70, icon: "golden_apple", desc: "Triple golden apple ration for intense boss fights." },
+    { day: 28, name: "1x Netherite Ingot", rarity: "mythic", points: 250, icon: "netherite", isBiweekly: true, desc: "MYTHIC BI-WEEKLY: Indestructible Netherite forged in the deepest nether depths!" },
+
+    // Grand Finale Days
+    { day: 29, name: "1x Nether Star", rarity: "legendary", points: 150, icon: "nether_star", desc: "Luminous core of the Wither, ready to empower a beacon." },
+    { day: 30, name: "1x Elytra", rarity: "elytra", points: 500, icon: "elytra", isGrandFinale: true, desc: "ULTRA GRAND PRIZE: Legendary Elytra wings to soar across Dreams TimeSkip!" }
+];
+
+export function getMinecraftItemSvg(icon) {
+    switch (icon) {
+        case 'diamond':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="4" width="10" height="2" fill="#55ffff"/>
+                <rect x="7" y="6" width="18" height="2" fill="#00aaaa"/>
+                <rect x="5" y="8" width="22" height="4" fill="#55ffff"/>
+                <rect x="7" y="12" width="18" height="4" fill="#00aaaa"/>
+                <rect x="9" y="16" width="14" height="4" fill="#008282"/>
+                <rect x="11" y="20" width="10" height="4" fill="#005555"/>
+                <rect x="13" y="24" width="6" height="3" fill="#003333"/>
+                <rect x="15" y="27" width="2" height="2" fill="#002222"/>
+                <rect x="9" y="8" width="4" height="2" fill="#ffffff"/>
+                <rect x="7" y="10" width="2" height="2" fill="#ffffff"/>
+                <rect x="18" y="9" width="3" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'netherite':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#312a2b"/>
+                <rect x="8" y="9" width="16" height="4" fill="#423b3c"/>
+                <rect x="6" y="13" width="20" height="3" fill="#5a4f50"/>
+                <rect x="6" y="21" width="20" height="3" fill="#1e191a"/>
+                <rect x="9" y="14" width="4" height="2" fill="#7d3b5b"/>
+                <rect x="19" y="15" width="3" height="2" fill="#9333ea"/>
+                <rect x="14" y="10" width="4" height="2" fill="#c084fc"/>
+                <rect x="15" y="18" width="3" height="2" fill="#dc2626"/>
+            </svg>`;
+        case 'elytra':
+            return `<svg viewBox="0 0 32 32" width="44" height="44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 5 C12 6 7 13 7 21 C7 25 10 27 13 25 C15 22 16 16 16 9 Z" fill="#383d4c"/>
+                <path d="M14 7 C12 9 8 15 8 20 C9 22 11 22 13 19 C14 16 15 11 15 7 Z" fill="#606980"/>
+                <path d="M11 11 C10 13 9 17 9 19 C10 20 11 20 12 18 Z" fill="#55ffff"/>
+                <path d="M17 5 C20 6 25 13 25 21 C25 25 22 27 19 25 C17 22 16 16 16 9 Z" fill="#383d4c"/>
+                <path d="M18 7 C20 9 24 15 24 20 C23 22 21 22 19 19 C18 16 17 11 17 7 Z" fill="#606980"/>
+                <path d="M21 11 C22 13 23 17 23 19 C22 20 21 20 20 18 Z" fill="#c084fc"/>
+                <rect x="15" y="4" width="2" height="4" fill="#ffd700"/>
+            </svg>`;
+        case 'iron':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#8f939d"/>
+                <rect x="8" y="9" width="16" height="4" fill="#b0b5c0"/>
+                <rect x="6" y="13" width="20" height="3" fill="#d2d7e2"/>
+                <rect x="6" y="21" width="20" height="3" fill="#666a74"/>
+                <rect x="9" y="10" width="6" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'gold':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#d99b16"/>
+                <rect x="8" y="9" width="16" height="4" fill="#f5bc18"/>
+                <rect x="6" y="13" width="20" height="3" fill="#fde047"/>
+                <rect x="6" y="21" width="20" height="3" fill="#a16207"/>
+                <rect x="9" y="10" width="6" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'emerald':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="5" width="10" height="22" rx="2" fill="#15803d"/>
+                <rect x="13" y="7" width="6" height="18" fill="#22c55e"/>
+                <rect x="14" y="9" width="4" height="14" fill="#86efac"/>
+                <rect x="14" y="10" width="2" height="4" fill="#ffffff"/>
+            </svg>`;
+        case 'golden_apple':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="18" r="9" fill="#f5bc18"/>
+                <ellipse cx="14" cy="16" rx="4" ry="5" fill="#fef08a"/>
+                <rect x="15" y="6" width="2" height="4" fill="#854d0e"/>
+                <path d="M17 7 C19 6 22 7 21 9" stroke="#22c55e" stroke-width="2" fill="none"/>
+            </svg>`;
+        case 'book':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="7" y="6" width="18" height="20" rx="2" fill="#78350f"/>
+                <rect x="9" y="8" width="14" height="16" fill="#fef3c7"/>
+                <line x1="16" y1="8" x2="16" y2="24" stroke="#d97706" stroke-width="2"/>
+                <rect x="11" y="14" width="10" height="3" fill="#9333ea"/>
+                <circle cx="16" cy="15.5" r="3" fill="#c084fc"/>
+            </svg>`;
+        case 'ender_pearl':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="9" fill="#064e3b"/>
+                <circle cx="16" cy="16" r="6" fill="#0d9488"/>
+                <circle cx="15" cy="14" r="3" fill="#5eead4"/>
+                <circle cx="14" cy="13" r="1.5" fill="#ffffff"/>
+            </svg>`;
+        case 'redstone':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="7" fill="#dc2626"/>
+                <circle cx="12" cy="20" r="4" fill="#ef4444"/>
+                <circle cx="21" cy="19" r="4" fill="#b91c1c"/>
+                <circle cx="14" cy="14" r="2.5" fill="#fca5a5"/>
+            </svg>`;
+        case 'lapis':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="9" width="14" height="14" rx="2" fill="#1e3a8a"/>
+                <rect x="11" y="11" width="10" height="10" fill="#2563eb"/>
+                <rect x="12" y="12" width="5" height="5" fill="#60a5fa"/>
+            </svg>`;
+        case 'totem':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="6" width="10" height="9" fill="#f5bc18"/>
+                <rect x="8" y="15" width="16" height="5" fill="#eab308"/>
+                <rect x="12" y="20" width="8" height="8" fill="#ca8a04"/>
+                <rect x="12" y="9" width="3" height="2" fill="#22c55e"/>
+                <rect x="17" y="9" width="3" height="2" fill="#22c55e"/>
+            </svg>`;
+        case 'nether_star':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="16,3 20,12 29,16 20,20 16,29 12,20 3,16 12,12" fill="#f8fafc"/>
+                <polygon points="16,7 18,13 25,16 18,19 16,25 14,19 7,16 14,13" fill="#38bdf8"/>
+                <circle cx="16" cy="16" r="3" fill="#ffffff"/>
+            </svg>`;
+        default:
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="10" fill="#55ffff"/></svg>`;
+    }
+}
+
+export function getUserCheckinData(user, userData) {
+    const today = new Date();
+    const currentCycle = today.toISOString().substring(0, 7); // e.g. "2026-10"
+    const localKey = `dts_checkin_${user.uid}`;
+    
+    let data = {
+        streak: 0,
+        lastClaimDate: null,
+        claimedDays: [],
+        currentMonth: currentCycle,
+        totalClaimed: 0,
+        inventory: []
+    };
+
+    try {
+        const stored = localStorage.getItem(localKey);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed && typeof parsed === 'object') {
+                data = { ...data, ...parsed };
+            }
+        }
+    } catch (_) {}
+
+    // Check Firestore user profile data if available
+    if (userData && userData.dailyCheckin) {
+        data = {
+            ...data,
+            ...userData.dailyCheckin
+        };
+    } else if (userData && typeof userData.checkInStreak === 'number') {
+        data.streak = userData.checkInStreak;
+        if (userData.lastCheckIn) {
+            const d = userData.lastCheckIn.toDate ? userData.lastCheckIn.toDate() : new Date(userData.lastCheckIn);
+            data.lastClaimDate = d.toISOString().split('T')[0];
+        }
+    }
+
+    // Reset claimed days if month has changed
+    if (data.currentMonth !== currentCycle) {
+        data.claimedDays = [];
+        data.currentMonth = currentCycle;
+    }
+
+    // Verify streak continuity: if last checkin was more than 1 day ago and not today, streak resets to 0
+    if (data.lastClaimDate) {
+        const todayStr = today.toISOString().split('T')[0];
+        if (data.lastClaimDate !== todayStr) {
+            const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
+            const lastMid = new Date(data.lastClaimDate + 'T00:00:00Z').getTime();
+            const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+            if (diffDays > 1) {
+                data.streak = 0;
+            }
+        }
+    }
+
+    return data;
+}
+
+export async function saveUserCheckinData(user, checkinData, pointsEarned, rewardItem) {
+    const localKey = `dts_checkin_${user.uid}`;
+    localStorage.setItem(localKey, JSON.stringify(checkinData));
+
+    // Update memory cache
+    if (currentUserData) {
+        currentUserData.dailyCheckin = checkinData;
+        currentUserData.checkInStreak = checkinData.streak;
+        currentUserData.pointsBalance = (currentUserData.pointsBalance || 0) + pointsEarned;
+        sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(currentUserData));
+    }
+
+    // Update user doc in Firestore (dailyCheckin and checkInStreak are allowed by security rules)
+    try {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+            dailyCheckin: checkinData,
+            checkInStreak: checkinData.streak,
+            lastCheckIn: serverTimestamp()
+        });
+    } catch (dbErr) {
+        console.warn("Notice: Saved check-in to cache, firestore sync note:", dbErr);
+    }
+
+    // Log transaction to loyalty_transactions
+    try {
+        await addDoc(collection(db, "loyalty_transactions"), {
+            userId: user.uid,
+            description: `Daily Check-in Day ${checkinData.streak}: ${rewardItem.name} 🎁`,
+            points: pointsEarned,
+            type: 'earned',
+            createdAt: serverTimestamp()
+        });
+    } catch (txErr) {
+        console.warn("Notice: Could not log check-in transaction:", txErr);
+    }
+
+    // Try background Cloud Function call if available
+    try {
+        if (typeof user.getIdToken === 'function') {
+            const token = await user.getIdToken();
+            fetch('https://us-central1-dts-hub-website.cloudfunctions.net/claimDailyCheckIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            }).catch(() => {});
+        }
+    } catch (_) {}
+}
+
+export function renderMinecraftGrid(user, checkinData) {
+    const gridEl = document.getElementById('mc-days-grid');
+    if (!gridEl) return;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isClaimedToday = checkinData.lastClaimDate === todayStr;
+    const nextAvailableDay = (checkinData.claimedDays.length % 30) + 1;
+
+    gridEl.innerHTML = CHECKIN_SCHEDULE_30_DAYS.map(item => {
+        const isClaimed = checkinData.claimedDays.includes(item.day);
+        const isTodayAvailable = !isClaimedToday && item.day === nextAvailableDay;
+
+        let rarityClass = `rarity-${item.rarity}`;
+        let badgeHtml = '';
+        if (item.rarity === 'legendary') {
+            badgeHtml = `<span class="mc-rarity-badge legendary">LEGENDARY</span>`;
+        } else if (item.rarity === 'mythic') {
+            badgeHtml = `<span class="mc-rarity-badge mythic">MYTHIC</span>`;
+        } else if (item.rarity === 'elytra') {
+            badgeHtml = `<span class="mc-rarity-badge grand">GRAND FINALE</span>`;
+        }
+
+        const stateClass = isClaimed ? 'claimed' : (isTodayAvailable ? 'today-available' : '');
+
+        return `
+            <div class="mc-day-card ${rarityClass} ${stateClass}" data-day="${item.day}" title="${escapeHTML(item.desc)}">
+                <div class="mc-day-card-header">
+                    <span class="mc-day-num">DAY ${item.day}</span>
+                    ${badgeHtml}
+                </div>
+                <div class="mc-item-icon-wrap">
+                    ${getMinecraftItemSvg(item.icon)}
+                </div>
+                <div class="mc-item-name">${escapeHTML(item.name)}</div>
+                <div class="mc-item-points">+${item.points} pts</div>
+            </div>
+        `;
+    }).join('');
+
+    // Clicking available day triggers claim
+    gridEl.querySelectorAll('.today-available').forEach(el => {
+        el.addEventListener('click', () => {
+            triggerCheckinClaim(user);
+        });
+    });
+}
+
+export function updateCheckinUI(user, checkinData) {
+    const streakDisplay = document.getElementById('check-in-streak');
+    const modalStreakDisplay = document.getElementById('mc-modal-streak-count');
+    const claimBtn = document.getElementById('claim-checkin-btn');
+    const modalClaimBtn = document.getElementById('mc-modal-claim-today-btn');
+    const checkinMessage = document.getElementById('checkin-message');
+    const progressFill = document.getElementById('mc-progress-bar-fill');
+    const progressDaysText = document.getElementById('mc-progress-days-text');
+
+    const streak = checkinData.streak || 0;
+    if (streakDisplay) streakDisplay.textContent = streak;
+    if (modalStreakDisplay) modalStreakDisplay.textContent = streak;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isClaimedToday = checkinData.lastClaimDate === todayStr;
+    const claimedCount = checkinData.claimedDays.length;
+    const nextDayNum = (claimedCount % 30) + 1;
+    const nextReward = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
+
+    // Progress bar
+    const percent = Math.min(100, Math.round((claimedCount / 30) * 100));
+    if (progressFill) progressFill.style.width = percent + '%';
+    if (progressDaysText) progressDaysText.textContent = `${claimedCount} / 30 DAYS`;
+
+    // Milestones
+    ['7', '14', '21', '28', '30'].forEach(dayNum => {
+        const dot = document.getElementById(`dot-m-${dayNum}`);
+        if (dot) {
+            dot.classList.toggle('reached', claimedCount >= parseInt(dayNum, 10));
+        }
+    });
+
+    if (isClaimedToday) {
+        if (claimBtn) {
+            claimBtn.disabled = true;
+            claimBtn.innerHTML = '✓ Claimed Today';
+            claimBtn.className = 'btn';
+            claimBtn.style.background = 'rgba(34, 197, 94, 0.15)';
+            claimBtn.style.color = '#4ade80';
+            claimBtn.style.border = '1px solid #22c55e';
+            claimBtn.style.padding = '10px 18px';
+            claimBtn.style.fontWeight = '700';
+        }
+        if (modalClaimBtn) {
+            modalClaimBtn.disabled = true;
+            modalClaimBtn.textContent = '✓ Claimed Today';
+        }
+        if (checkinMessage) {
+            checkinMessage.innerHTML = `<span style="color: #4ade80;">✓ Today's check-in complete!</span> Streak: <strong>${streak} days</strong>. Next reward tomorrow: <strong>${escapeHTML(nextReward.name)}</strong> (+${nextReward.points} pts).`;
+        }
+    } else {
+        if (claimBtn) {
+            claimBtn.disabled = false;
+            claimBtn.innerHTML = '⚡ Claim Today\'s Reward';
+            claimBtn.className = 'cta-button';
+            claimBtn.style.padding = '10px 18px';
+            claimBtn.style.fontWeight = '700';
+        }
+        if (modalClaimBtn) {
+            modalClaimBtn.disabled = false;
+            modalClaimBtn.textContent = '⚡ Claim Today\'s Reward';
+        }
+        if (checkinMessage) {
+            checkinMessage.innerHTML = `Ready to claim Day ${nextDayNum}: <strong>${escapeHTML(nextReward.name)}</strong> (+${nextReward.points} pts)!`;
+            checkinMessage.style.color = 'var(--text-primary)';
+        }
+    }
+
+    renderMinecraftGrid(user, checkinData);
+}
+
+export async function triggerCheckinClaim(user) {
+    if (!user) return;
+    const checkinData = getUserCheckinData(user, currentUserData);
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    if (checkinData.lastClaimDate === todayStr) {
+        alert("You have already claimed today's reward! Come back tomorrow.");
+        return;
+    }
+
+    // Streak calculation
+    let isConsecutive = false;
+    if (checkinData.lastClaimDate) {
+        const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
+        const lastMid = new Date(checkinData.lastClaimDate + 'T00:00:00Z').getTime();
+        const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+            isConsecutive = true;
+        }
+    }
+
+    const newStreak = isConsecutive ? (checkinData.streak + 1) : 1;
+    const nextDayNum = (checkinData.claimedDays.length % 30) + 1;
+    const rewardItem = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
+
+    checkinData.streak = newStreak;
+    checkinData.lastClaimDate = todayStr;
+    checkinData.claimedDays.push(nextDayNum);
+    checkinData.totalClaimed = (checkinData.totalClaimed || 0) + 1;
+    if (!checkinData.inventory) checkinData.inventory = [];
+    checkinData.inventory.push(`${rewardItem.name} (Claimed Day ${nextDayNum})`);
+
+    // Save and update user data
+    await saveUserCheckinData(user, checkinData, rewardItem.points, rewardItem);
+
+    // Update points displayed across the page immediately
+    const currentPts = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10) || 50;
+    const newTotalPoints = currentPts + rewardItem.points;
+    localStorage.setItem(`dts_points_${user.uid}`, newTotalPoints);
+
+    const pointsBalanceDisplay = document.getElementById('points-balance-display');
+    const userLoyaltyPoints = document.getElementById('user-loyalty-points');
+    if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = newTotalPoints;
+    if (userLoyaltyPoints) userLoyaltyPoints.textContent = newTotalPoints;
+
+    updateCheckinUI(user, checkinData);
+
+    // Trigger the Cinematic Flare Animation with day number & item!
+    triggerFlareAnimation(newStreak, rewardItem);
+}
+
+export function triggerFlareAnimation(streak, rewardItem) {
+    const flareModal = document.getElementById('mc-flare-modal');
+    if (!flareModal) return;
+
+    const streakNumberEl = document.getElementById('flare-streak-number');
+    const rarityPillEl = document.getElementById('flare-rarity-pill');
+    const iconContainerEl = document.getElementById('flare-icon-container');
+    const itemNameEl = document.getElementById('flare-item-name');
+    const pointsBonusEl = document.getElementById('flare-points-bonus');
+    const itemDescEl = document.getElementById('flare-item-desc');
+    const collectBtn = document.getElementById('flare-collect-btn');
+
+    if (streakNumberEl) streakNumberEl.textContent = streak;
+    if (itemNameEl) itemNameEl.textContent = rewardItem.name;
+    if (pointsBonusEl) pointsBonusEl.textContent = `+${rewardItem.points} Unstoppable Loyalty Points Added!`;
+    if (itemDescEl) itemDescEl.textContent = rewardItem.desc;
+
+    if (rarityPillEl) {
+        rarityPillEl.className = 'mc-flare-rarity-pill';
+        if (rewardItem.rarity === 'legendary') {
+            rarityPillEl.textContent = '💎 LEGENDARY REWARD';
+            rarityPillEl.classList.add('legendary');
+        } else if (rewardItem.rarity === 'mythic') {
+            rarityPillEl.textContent = '🛡️ MYTHIC REWARD';
+            rarityPillEl.classList.add('mythic');
+        } else if (rewardItem.rarity === 'elytra') {
+            rarityPillEl.textContent = '🪽 ULTRA GRAND FINALE';
+            rarityPillEl.classList.add('grand');
+        } else {
+            rarityPillEl.textContent = '✨ DAILY MINECRAFT TREASURE';
+        }
+    }
+
+    if (iconContainerEl) {
+        iconContainerEl.innerHTML = getMinecraftItemSvg(rewardItem.icon);
+    }
+
+    flareModal.style.display = 'flex';
+
+    if (collectBtn) {
+        collectBtn.onclick = () => {
+            flareModal.style.display = 'none';
+        };
+    }
+}
+
+export function initDailyCheckin(user, userData) {
+    const checkinData = getUserCheckinData(user, userData);
+    updateCheckinUI(user, checkinData);
+
+    // Daily Claim buttons
+    const claimBtn = document.getElementById('claim-checkin-btn');
+    if (claimBtn) {
+        claimBtn.onclick = () => triggerCheckinClaim(user);
+    }
+
+    const modalClaimBtn = document.getElementById('mc-modal-claim-today-btn');
+    if (modalClaimBtn) {
+        modalClaimBtn.onclick = () => triggerCheckinClaim(user);
+    }
+
+    // 30-Day Calendar Modal Open / Close
+    const calendarModal = document.getElementById('minecraft-checkin-modal');
+    const openCalendarBtn = document.getElementById('open-calendar-modal-btn');
+    const closeCalendarBtn = document.getElementById('close-mc-checkin-modal');
+
+    if (openCalendarBtn && calendarModal) {
+        openCalendarBtn.onclick = () => {
+            const currentData = getUserCheckinData(user, currentUserData);
+            renderMinecraftGrid(user, currentData);
+            calendarModal.style.display = 'flex';
+        };
+    }
+
+    if (closeCalendarBtn && calendarModal) {
+        closeCalendarBtn.onclick = () => {
+            calendarModal.style.display = 'none';
+        };
+    }
+
+    if (calendarModal) {
+        calendarModal.onclick = (e) => {
+            if (e.target === calendarModal) {
+                calendarModal.style.display = 'none';
+            }
+        };
+    }
+
+    // Flare Modal Outside Click Close
+    const flareModal = document.getElementById('mc-flare-modal');
+    if (flareModal) {
+        flareModal.onclick = (e) => {
+            if (e.target === flareModal || e.target.classList.contains('mc-flare-backdrop')) {
+                flareModal.style.display = 'none';
+            }
+        };
+    }
+}
+
+/**
+ * 10. MAIN ACCOUNT CONTROLLER INITIALIZATION
  */
 export function initAccountPage() {
     // Immediate tab setup so navigation is 100% interactive without waiting for auth
@@ -945,23 +1532,22 @@ export function initAccountPage() {
         let userData = await getCachedUserProfile(user);
 
         if (!userData) {
-            // Fallback initialization if profile doesn't exist at all yet
+            // Fallback initialization if profile doesn't exist at all yet (rules-compliant)
             userData = {
                 username: user.displayName || user.email?.split('@')[0] || 'User',
                 email: user.email,
-                membershipLevel: 'free',
-                pointsBalance: 50,
-                loyaltyPoints: 50,
-                isAdmin: false,
                 signupDate: new Date()
             };
             try {
                 const userDocRef = doc(db, "users", user.uid);
                 await setDoc(userDocRef, userData, { merge: true });
-                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
             } catch (err) {
-                console.error("Manager info: Profile init warning:", err);
+                console.warn("Notice: Profile init notice:", err);
             }
+            userData.membershipLevel = 'free';
+            userData.pointsBalance = 50;
+            userData.loyaltyPoints = 50;
+            sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
         }
 
         currentUserData = userData;
@@ -976,6 +1562,7 @@ export function initAccountPage() {
         renderBilling(user, userData);
         loadWishlist(user.uid);
         loadUserTickets(user.uid);
+        initDailyCheckin(user, userData);
 
         // Sign Out
         document.getElementById('sign-out')?.addEventListener('click', () => {
@@ -1133,7 +1720,15 @@ export function initAccountPage() {
             });
         }
 
-        // Support Ticket Form
+        // Support Ticket Form & Counter
+        const ticketMsgInput = document.getElementById('ticket-message');
+        const ticketCounterEl = document.getElementById('ticket-message-counter');
+        if (ticketMsgInput && ticketCounterEl) {
+            ticketMsgInput.addEventListener('input', () => {
+                ticketCounterEl.textContent = `${ticketMsgInput.value.length} / 500`;
+            });
+        }
+
         document.getElementById('support-ticket-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const subject = document.getElementById('ticket-subject').value.trim();
@@ -1154,6 +1749,7 @@ export function initAccountPage() {
                     setTimeout(() => notificationEl.style.display = 'none', 4000);
                 }
                 e.target.reset();
+                if (ticketCounterEl) ticketCounterEl.textContent = '0 / 500';
                 await loadUserTickets(user.uid);
             } catch (err) {
                 if (notificationEl) {
