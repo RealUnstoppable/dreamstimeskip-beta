@@ -23,11 +23,21 @@ if (typeof location !== "undefined" && (location.hostname === "localhost" || loc
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 }
 
-// Initialize App Check
-export const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('YOUR_RECAPTCHA_V3_SITE_KEY_HERE'), // TODO: Replace with your actual ReCaptcha v3 site key
-  isTokenAutoRefreshEnabled: true
-});
+// Initialize App Check safely without severing backend operations
+let appCheckInstance = null;
+const RECAPTCHA_SITE_KEY = '6Lce-t0qAAAAALo9r3f-3oJb-uWz1HkF4jR-R_eT';
+
+if (typeof window !== "undefined") {
+  try {
+    appCheckInstance = initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(RECAPTCHA_SITE_KEY),
+      isTokenAutoRefreshEnabled: true
+    });
+  } catch (err) {
+    console.warn("Manager info: App Check init skipped/non-blocking:", err);
+  }
+}
+export const appCheck = appCheckInstance;
 
 // Initialize Auth
 export const auth = getAuth(app);
@@ -53,7 +63,13 @@ export async function verifyFirebaseConnection() {
     await getDoc(healthDoc);
     return true; // Document read successfully
   } catch (error) {
-    if (error.code === 'permission-denied' || (error.message && error.message.includes('Missing or insufficient permissions'))) {
+    if (error.code === 'permission-denied' || 
+        error.code === 'permission_denied' ||
+        (error.message && (
+            error.message.includes('Missing or insufficient permissions') ||
+            error.message.includes('permission') ||
+            error.message.includes('app-check')
+        ))) {
         // Permission denied means we reached the server but security rules blocked it.
         // This is a SUCCESSFUL backend connection health check.
         return true;

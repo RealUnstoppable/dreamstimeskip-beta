@@ -9,7 +9,7 @@ export function initCookieConsent() {
     banner.className = 'cookie-banner';
     banner.innerHTML = `
         <div class="cookie-content">
-            <p>We use cookies to improve your experience, analyze traffic, and serve personalized ads. By using our site, you agree to our <a href="privacy.html">Privacy Policy</a>.</p>
+            <p>We use cookies to improve your experience, analyze traffic, and serve personalized ads. By using our site, you agree to our <a href="terms.html">Terms and Conditions</a> and <a href="privacy.html">Privacy Policy</a>.</p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="cookie-btn primary">Accept</button>
                 <button id="decline-cookies" class="cookie-btn secondary">Decline</button>

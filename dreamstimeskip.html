@@ -787,6 +787,208 @@
             font-family: var(--mc-font-sub);
         }
 
+        /* --- Minecraft Whitelist Modal Styles --- */
+        .mc-waitlist-modal {
+            max-width: 580px;
+            width: 94vw;
+        }
+
+        .wl-founder-banner {
+            background: linear-gradient(135deg, rgba(245, 188, 24, 0.16) 0%, rgba(60, 133, 39, 0.22) 100%);
+            border: 2px solid var(--mc-gold);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .wl-founder-badge {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.8rem;
+            color: var(--mc-gold-light);
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .wl-founder-text {
+            color: #f1f5f9;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .wl-field-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 16px;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 600px) {
+            .wl-field-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .wl-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            text-align: left;
+        }
+
+        .wl-input-group label {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.72rem;
+            color: #d1d5dc;
+            letter-spacing: 0.5px;
+        }
+
+        .wl-input-group .required {
+            color: #ff5555;
+        }
+
+        .wl-input-group .optional {
+            color: #8c96a4;
+            font-family: var(--mc-font-sub);
+            font-size: 0.75rem;
+        }
+
+        .wl-input-group input {
+            background: #101216;
+            border: 2px solid #2d3038;
+            color: #ffffff;
+            padding: 10px 12px;
+            font-family: var(--mc-font-sub);
+            font-size: 0.92rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .wl-input-group input:focus {
+            border-color: var(--mc-green);
+            box-shadow: 0 0 10px rgba(60, 133, 39, 0.4), inset 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .wl-mc-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #101216;
+            border: 2px solid #2d3038;
+            padding: 4px 8px;
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .wl-mc-input-wrap:focus-within {
+            border-color: var(--mc-green);
+            box-shadow: 0 0 10px rgba(60, 133, 39, 0.4), inset 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .wl-mc-input-wrap input {
+            background: transparent;
+            border: none;
+            padding: 6px 4px;
+            box-shadow: none;
+            flex-grow: 1;
+        }
+
+        .wl-mc-input-wrap input:focus {
+            border: none;
+            box-shadow: none;
+        }
+
+        .wl-mc-head {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #4a4d52;
+            image-rendering: pixelated;
+            flex-shrink: 0;
+            background: #181a1f;
+        }
+
+        .wl-help {
+            font-size: 0.76rem;
+            color: #8c96a4;
+            line-height: 1.35;
+        }
+
+        .wl-error-msg {
+            background: rgba(220, 38, 38, 0.2);
+            border: 1px solid #dc2626;
+            color: #fca5a5;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .wl-submit-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .wl-switch-link {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        .wl-switch-link a {
+            color: var(--mc-gold-light);
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .wl-switch-link a:hover {
+            color: #ffffff;
+        }
+
+        .wl-authed-user-card {
+            background: #15181d;
+            border: 2px solid #252830;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .wl-authed-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--mc-green);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .wl-success-card {
+            background: #14171c;
+            border: 2px solid var(--mc-green);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 16px auto;
+            max-width: 440px;
+            text-align: left;
+            box-shadow: 0 4px 16px rgba(60,133,39,0.25);
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .flip-card {
@@ -860,6 +1062,9 @@
                     <button class="mc-btn mc-btn-gold open-trailer-trigger">
                         ▶ Watch Trailer
                     </button>
+                    <button class="mc-btn mc-btn-green open-waitlist-trigger" id="hero-join-waitlist-btn">
+                        ⚔️ Join Whitelist
+                    </button>
                 </div>
 
                 <div class="mc-server-status">
@@ -902,9 +1107,12 @@
                     <div class="card-content">
                         <h3>Watch The Trailer</h3>
                         <p>Get a first look into the new world, custom biomes, and the adventure that awaits. Watch the official Dreams trailer now.</p>
-                        <div class="card-footer-cta">
+                        <div class="card-footer-cta" style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button class="mc-btn mc-btn-green open-trailer-trigger">
                                 ▶ Watch Now
+                            </button>
+                            <button class="mc-btn mc-btn-gold open-waitlist-trigger">
+                                ⚔️ Join Whitelist
                             </button>
                         </div>
                     </div>
@@ -940,7 +1148,10 @@
                     <div class="card-content">
                         <h3>Join The Community Realm</h3>
                         <p>Join hundreds of players in an unscripted persistent survival sandbox. Build kingdoms, trade rare loot, and forge your legacy.</p>
-                        <div class="card-footer-cta">
+                        <div class="card-footer-cta" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="mc-btn mc-btn-green open-waitlist-trigger">
+                                ⚔️ Join Whitelist
+                            </button>
                             <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-stone">
                                 Join Discord
                             </a>
@@ -1017,7 +1228,10 @@
                 <div id="countdown-2" class="countdown-container"></div>
 
                 <div class="hero-buttons">
-                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-green">
+                    <button type="button" class="mc-btn mc-btn-green open-waitlist-trigger">
+                        ⚔️ Claim Founder Whitelist
+                    </button>
+                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-dark">
                         Join Discord
                     </a>
                     <a href="new-dts.html" class="mc-btn mc-btn-gold">
@@ -1045,9 +1259,215 @@
         </div>
         <div class="mc-modal-footer">
             <span>Dreams OG — Official Minecraft Release October 20, 2026</span>
-            <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-green" style="padding: 8px 18px; font-size: 0.78rem;">
-                Join Whitelist
-            </a>
+            <button type="button" class="mc-btn mc-btn-green open-waitlist-trigger" style="padding: 8px 18px; font-size: 0.78rem;">
+                ⚔️ Join Whitelist
+            </button>
+        </div>
+    </dialog>
+
+    <!-- ========================================================
+         MINECRAFT WAITLIST & FOUNDER ACCESS MODAL
+         ======================================================== -->
+    <dialog id="waitlist-modal" class="mc-modal mc-waitlist-modal">
+        <div class="mc-modal-header">
+            <h3 id="wl-modal-title"><span>⚔️</span> DREAMS WHITELIST & FOUNDER ACCESS</h3>
+            <button class="mc-modal-close" id="close-waitlist-btn" aria-label="Close dialog">&times;</button>
+        </div>
+        <div class="mc-modal-body" style="padding: 20px 24px;">
+            <!-- Founder Reward Ribbon -->
+            <div class="wl-founder-banner">
+                <div class="wl-founder-badge">✨ LIMITED TIME FOUNDER PRIVILEGE</div>
+                <div class="wl-founder-text">
+                    Sign up before <strong>October 20, 2026</strong> to secure the permanent <span style="color: var(--mc-gold-light); font-weight: bold;">[Founder]</span> rank, day-one whitelist priority, and founder-exclusive cosmetic rewards!
+                </div>
+            </div>
+
+            <div id="wl-error-box" class="wl-error-msg" style="display: none;"></div>
+
+            <!-- VIEW 1: REGISTRATION & WHITELIST (Default for new users) -->
+            <form id="wl-register-form" class="wl-form-view" autocomplete="on">
+                <div class="wl-field-grid">
+                    <!-- Minecraft Username with Avatar Preview -->
+                    <div class="wl-input-group" style="grid-column: 1 / -1;">
+                        <label for="wl-mc-ign">Minecraft Username (IGN) <span class="required">*</span></label>
+                        <div class="wl-mc-input-wrap">
+                            <img id="wl-mc-head-reg" class="wl-mc-head" src="https://mc-heads.net/avatar/Steve/34" alt="Minecraft Skin Head">
+                            <input type="text" id="wl-mc-ign" name="minecraftUsername" placeholder="e.g. Dream / Notch" required autocomplete="off" maxlength="32">
+                        </div>
+                        <span class="wl-help">Enter your exact Java/Bedrock username for server whitelist access.</span>
+                    </div>
+
+                    <!-- Site Username -->
+                    <div class="wl-input-group">
+                        <label for="wl-site-username">Website Username <span class="required">*</span></label>
+                        <input type="text" id="wl-site-username" name="siteUsername" placeholder="e.g. EnderDragonHunter" required maxlength="30">
+                        <span class="wl-help">Your account handle on our website.</span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="wl-input-group">
+                        <label for="wl-email">Email Address <span class="required">*</span></label>
+                        <input type="email" id="wl-email" name="email" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="wl-input-group">
+                        <label for="wl-password">Password <span class="required">*</span></label>
+                        <input type="password" id="wl-password" name="password" placeholder="Min 6 characters" required minlength="6" autocomplete="new-password">
+                    </div>
+
+                    <!-- Discord Tag -->
+                    <div class="wl-input-group">
+                        <label for="wl-discord">Discord Username <span class="optional">(Optional)</span></label>
+                        <input type="text" id="wl-discord" name="discordUsername" placeholder="@yourhandle" maxlength="40">
+                        <span class="wl-help">For Discord whitelist role syncing.</span>
+                    </div>
+
+                    <!-- Birthday -->
+                    <div class="wl-input-group" style="grid-column: 1 / -1;">
+                        <label for="wl-birthday">Birthday <span class="optional">(Optional - For In-Game & Store Birthday Rewards!)</span></label>
+                        <input type="date" id="wl-birthday" name="birthday">
+                    </div>
+                </div>
+
+                <div class="wl-submit-wrap">
+                    <button type="submit" id="wl-register-submit-btn" class="mc-btn mc-btn-green w-100" style="padding: 14px; font-size: 0.95rem;">
+                        ⚔️ Create Account & Claim Whitelist
+                    </button>
+                    <div class="wl-switch-link">
+                        Already have a website account? <a id="switch-to-login-link">Sign In & Link Whitelist</a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- VIEW 2: SIGN IN & LINK WHITELIST -->
+            <form id="wl-login-form" class="wl-form-view" style="display: none;" autocomplete="on">
+                <div class="wl-field-grid">
+                    <!-- Email -->
+                    <div class="wl-input-group">
+                        <label for="wl-login-email">Account Email <span class="required">*</span></label>
+                        <input type="email" id="wl-login-email" name="email" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+
+                    <!-- Password -->
+                    <div class="wl-input-group">
+                        <label for="wl-login-password">Account Password <span class="required">*</span></label>
+                        <input type="password" id="wl-login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+
+                    <!-- Minecraft Username -->
+                    <div class="wl-input-group" style="grid-column: 1 / -1;">
+                        <label for="wl-login-mc-ign">Minecraft Username (IGN) <span class="required">*</span></label>
+                        <div class="wl-mc-input-wrap">
+                            <img id="wl-mc-head-login" class="wl-mc-head" src="https://mc-heads.net/avatar/Steve/34" alt="Minecraft Skin Head">
+                            <input type="text" id="wl-login-mc-ign" name="minecraftUsername" placeholder="e.g. Dream" required maxlength="32">
+                        </div>
+                    </div>
+
+                    <!-- Discord Tag -->
+                    <div class="wl-input-group">
+                        <label for="wl-login-discord">Discord Username <span class="optional">(Optional)</span></label>
+                        <input type="text" id="wl-login-discord" name="discordUsername" placeholder="@yourhandle" maxlength="40">
+                    </div>
+
+                    <!-- Birthday -->
+                    <div class="wl-input-group">
+                        <label for="wl-login-birthday">Birthday <span class="optional">(Optional rewards)</span></label>
+                        <input type="date" id="wl-login-birthday" name="birthday">
+                    </div>
+                </div>
+
+                <div class="wl-submit-wrap">
+                    <button type="submit" id="wl-login-submit-btn" class="mc-btn mc-btn-green w-100" style="padding: 14px; font-size: 0.95rem;">
+                        🔑 Sign In & Link To Whitelist
+                    </button>
+                    <div class="wl-switch-link">
+                        Don't have an account? <a id="switch-to-register-link">Create Account & Whitelist</a>
+                    </div>
+                </div>
+            </form>
+
+            <!-- VIEW 3: ALREADY AUTHENTICATED USER (LINK & ACTIVATE) -->
+            <form id="wl-authed-form" class="wl-form-view" style="display: none;">
+                <div class="wl-authed-user-card">
+                    <div class="wl-authed-avatar" id="wl-authed-initial">U</div>
+                    <div style="flex-grow: 1;">
+                        <div style="font-weight: bold; color: #fff; font-size: 0.95rem;" id="wl-authed-name">Signed In</div>
+                        <div style="color: #94a3b8; font-size: 0.8rem;" id="wl-authed-email">user@example.com</div>
+                    </div>
+                    <button type="button" id="wl-signout-btn" class="mc-btn mc-btn-dark" style="padding: 6px 12px; font-size: 0.75rem;">Switch</button>
+                </div>
+
+                <div class="wl-field-grid">
+                    <!-- Minecraft Username -->
+                    <div class="wl-input-group" style="grid-column: 1 / -1;">
+                        <label for="wl-authed-mc-ign">Minecraft Username (IGN) <span class="required">*</span></label>
+                        <div class="wl-mc-input-wrap">
+                            <img id="wl-mc-head-authed" class="wl-mc-head" src="https://mc-heads.net/avatar/Steve/34" alt="Minecraft Skin Head">
+                            <input type="text" id="wl-authed-mc-ign" name="minecraftUsername" placeholder="e.g. Dream" required maxlength="32">
+                        </div>
+                        <span class="wl-help">Your in-game name will be added directly to the server whitelist.</span>
+                    </div>
+
+                    <!-- Discord Tag -->
+                    <div class="wl-input-group">
+                        <label for="wl-authed-discord">Discord Username <span class="optional">(Optional)</span></label>
+                        <input type="text" id="wl-authed-discord" name="discordUsername" placeholder="@yourhandle" maxlength="40">
+                    </div>
+
+                    <!-- Birthday -->
+                    <div class="wl-input-group">
+                        <label for="wl-authed-birthday">Birthday <span class="optional">(Optional rewards)</span></label>
+                        <input type="date" id="wl-authed-birthday" name="birthday">
+                    </div>
+                </div>
+
+                <div class="wl-submit-wrap">
+                    <button type="submit" id="wl-authed-submit-btn" class="mc-btn mc-btn-green w-100" style="padding: 14px; font-size: 0.95rem;">
+                        ⚔️ Update & Confirm Whitelist
+                    </button>
+                </div>
+            </form>
+
+            <!-- VIEW 4: SUCCESS CONFIRMATION -->
+            <div id="wl-success-view" class="wl-form-view" style="display: none; text-align: center; padding: 10px 0;">
+                <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+                <h3 style="font-family: var(--mc-font-pixel); font-size: 1.3rem; color: #55ff55; text-shadow: 2px 2px 0 #000; margin-bottom: 10px;">
+                    YOU ARE ON THE WHITELIST!
+                </h3>
+                
+                <div class="wl-success-card">
+                    <img id="wl-success-head" src="https://mc-heads.net/avatar/Steve/54" alt="Minecraft Head" style="width: 54px; height: 54px; image-rendering: pixelated; border: 2px solid #55ff55; background: #000;">
+                    <div>
+                        <div style="font-family: var(--mc-font-pixel); font-size: 1rem; color: #ffffff;" id="wl-success-ign">Steve</div>
+                        <div id="wl-success-rank-badge" style="display: inline-block; background: #f5bc18; color: #000; font-family: var(--mc-font-pixel); font-size: 0.72rem; padding: 2px 8px; margin-top: 4px; font-weight: bold;">
+                            ⚔️ FOUNDER RANK
+                        </div>
+                        <div style="color: #94a3b8; font-size: 0.8rem; margin-top: 4px;" id="wl-success-details">Account linked & whitelisted</div>
+                    </div>
+                </div>
+
+                <p style="color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; max-width: 440px; margin: 12px auto 20px;">
+                    Your rank and whitelist slot have been locked in! Now <strong>join our official Discord</strong> to get your Founder role, chat with the community, and receive launch notifications on <strong>October 20th</strong>.
+                </p>
+
+                <div style="background: #111418; border: 2px dashed #3a3e47; padding: 10px; max-width: 440px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                    <div style="text-align: left;">
+                        <div style="font-size: 0.7rem; color: #8c96a4; font-family: var(--mc-font-pixel);">SERVER IP</div>
+                        <div style="font-family: var(--mc-font-sub); font-weight: bold; color: var(--mc-gold-light); font-size: 0.95rem;">dts.realunstoppable.store</div>
+                    </div>
+                    <button type="button" class="mc-btn mc-btn-dark" id="wl-copy-ip-btn" style="padding: 6px 12px; font-size: 0.75rem;">Copy IP</button>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; max-width: 440px; margin: 0 auto;">
+                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-green" style="padding: 14px; font-size: 0.95rem; text-decoration: none; display: block;">
+                        👉 Continue to Discord & Join Server
+                    </a>
+                    <button type="button" id="wl-success-close-btn" class="mc-btn mc-btn-dark" style="padding: 10px; font-size: 0.82rem;">
+                        Close Window
+                    </button>
+                </div>
+            </div>
         </div>
     </dialog>
 
@@ -1252,6 +1672,462 @@
         }
 
     });
+    </script>
+
+    <script type="module">
+        import { auth, db } from '/js/firebase.js';
+        import { 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { 
+            doc, 
+            setDoc, 
+            getDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const waitlistModal = document.getElementById('waitlist-modal');
+            const closeWaitlistBtn = document.getElementById('close-waitlist-btn');
+            const errorBox = document.getElementById('wl-error-box');
+
+            const registerForm = document.getElementById('wl-register-form');
+            const loginForm = document.getElementById('wl-login-form');
+            const authedForm = document.getElementById('wl-authed-form');
+            const successView = document.getElementById('wl-success-view');
+
+            const switchToLoginLink = document.getElementById('switch-to-login-link');
+            const switchToRegisterLink = document.getElementById('switch-to-register-link');
+            const signoutBtn = document.getElementById('wl-signout-btn');
+            const successCloseBtn = document.getElementById('wl-success-close-btn');
+
+            const regMcIgn = document.getElementById('wl-mc-ign');
+            const regHead = document.getElementById('wl-mc-head-reg');
+            const loginMcIgn = document.getElementById('wl-login-mc-ign');
+            const loginHead = document.getElementById('wl-mc-head-login');
+            const authedMcIgn = document.getElementById('wl-authed-mc-ign');
+            const authedHead = document.getElementById('wl-mc-head-authed');
+
+            let currentUser = null;
+            let currentUserProfile = null;
+
+            // --- Avatar Real-time Preview ---
+            function setupHeadPreview(inputEl, imgEl) {
+                if (!inputEl || !imgEl) return;
+                let timeout = null;
+                inputEl.addEventListener('input', () => {
+                    clearTimeout(timeout);
+                    const name = inputEl.value.trim();
+                    timeout = setTimeout(() => {
+                        if (name.length >= 2) {
+                            imgEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(name)}/34`;
+                        } else {
+                            imgEl.src = 'https://mc-heads.net/avatar/Steve/34';
+                        }
+                    }, 350);
+                });
+            }
+            setupHeadPreview(regMcIgn, regHead);
+            setupHeadPreview(loginMcIgn, loginHead);
+            setupHeadPreview(authedMcIgn, authedHead);
+
+            // --- View Switching ---
+            function showView(view) {
+                if (errorBox) {
+                    errorBox.style.display = 'none';
+                    errorBox.textContent = '';
+                }
+                if (registerForm) registerForm.style.display = (view === 'register') ? 'block' : 'none';
+                if (loginForm) loginForm.style.display = (view === 'login') ? 'block' : 'none';
+                if (authedForm) authedForm.style.display = (view === 'authed') ? 'block' : 'none';
+                if (successView) successView.style.display = (view === 'success') ? 'block' : 'none';
+            }
+
+            function showError(msg) {
+                if (errorBox) {
+                    errorBox.textContent = msg;
+                    errorBox.style.display = 'block';
+                    errorBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
+
+            if (switchToLoginLink) {
+                switchToLoginLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showView('login');
+                });
+            }
+
+            if (switchToRegisterLink) {
+                switchToRegisterLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showView('register');
+                });
+            }
+
+            if (signoutBtn) {
+                signoutBtn.addEventListener('click', async () => {
+                    try {
+                        await signOut(auth);
+                        currentUser = null;
+                        currentUserProfile = null;
+                        showView('register');
+                    } catch (e) {
+                        console.error('Sign out failed:', e);
+                    }
+                });
+            }
+
+            // --- Track Auth State ---
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                if (user) {
+                    try {
+                        const snap = await getDoc(doc(db, "users", user.uid));
+                        if (snap.exists()) {
+                            currentUserProfile = snap.data();
+                            const authedNameEl = document.getElementById('wl-authed-name');
+                            const authedEmailEl = document.getElementById('wl-authed-email');
+                            const authedInitialEl = document.getElementById('wl-authed-initial');
+
+                            if (authedNameEl) authedNameEl.textContent = currentUserProfile.username || user.displayName || 'Adventurer';
+                            if (authedEmailEl) authedEmailEl.textContent = user.email || '';
+                            if (authedInitialEl) authedInitialEl.textContent = ((currentUserProfile.username || user.email || 'U')[0]).toUpperCase();
+
+                            if (currentUserProfile.minecraftUsername && authedMcIgn) {
+                                authedMcIgn.value = currentUserProfile.minecraftUsername;
+                                if (authedHead) authedHead.src = `https://mc-heads.net/avatar/${encodeURIComponent(currentUserProfile.minecraftUsername)}/34`;
+                            }
+                            if (currentUserProfile.discordUsername) {
+                                const discordInp = document.getElementById('wl-authed-discord');
+                                if (discordInp) discordInp.value = currentUserProfile.discordUsername;
+                            }
+                            if (currentUserProfile.birthday) {
+                                const bdayInp = document.getElementById('wl-authed-birthday');
+                                if (bdayInp) bdayInp.value = currentUserProfile.birthday;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Could not load user profile:', err);
+                    }
+                } else {
+                    currentUserProfile = null;
+                }
+            });
+
+            // --- Open Whitelist Modal ---
+            const openTriggers = document.querySelectorAll('.open-waitlist-trigger');
+            openTriggers.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Close trailer modal if it was open
+                    const trailerModal = document.getElementById('trailer-modal');
+                    if (trailerModal && trailerModal.open) {
+                        trailerModal.close();
+                        const modalVideo = document.getElementById('modal-video');
+                        if (modalVideo) modalVideo.pause();
+                    }
+
+                    if (currentUser) {
+                        showView('authed');
+                    } else {
+                        showView('register');
+                    }
+                    if (waitlistModal) {
+                        waitlistModal.showModal();
+                    }
+                });
+            });
+
+            if (closeWaitlistBtn && waitlistModal) {
+                closeWaitlistBtn.addEventListener('click', () => waitlistModal.close());
+            }
+
+            if (successCloseBtn && waitlistModal) {
+                successCloseBtn.addEventListener('click', () => waitlistModal.close());
+            }
+
+            if (waitlistModal) {
+                waitlistModal.addEventListener('click', (e) => {
+                    const rect = waitlistModal.getBoundingClientRect();
+                    const inDialog = (
+                        rect.top <= e.clientY &&
+                        e.clientY <= rect.top + rect.height &&
+                        rect.left <= e.clientX &&
+                        e.clientX <= rect.left + rect.width
+                    );
+                    if (!inDialog) waitlistModal.close();
+                });
+            }
+
+            // --- Success View Presentation ---
+            function displaySuccess(ign, rank, isFounder) {
+                const ignEl = document.getElementById('wl-success-ign');
+                const headEl = document.getElementById('wl-success-head');
+                const badgeEl = document.getElementById('wl-success-rank-badge');
+                if (ignEl) ignEl.textContent = ign;
+                if (headEl) headEl.src = `https://mc-heads.net/avatar/${encodeURIComponent(ign)}/54`;
+                if (badgeEl) {
+                    if (isFounder) {
+                        badgeEl.textContent = '⚔️ FOUNDER RANK UNLOCKED';
+                        badgeEl.style.background = '#f5bc18';
+                        badgeEl.style.color = '#000';
+                    } else {
+                        badgeEl.textContent = '⚔️ MEMBER WHITELISTED';
+                        badgeEl.style.background = '#3c8527';
+                        badgeEl.style.color = '#fff';
+                    }
+                }
+                showView('success');
+            }
+
+            // Helper: Is registration before October 20, 2026?
+            function checkIsFounder() {
+                const cutoff = new Date('2026-10-20T00:00:00-04:00');
+                return new Date() < cutoff;
+            }
+
+            // --- FORM 1: REGISTER & WHITELIST ---
+            if (registerForm) {
+                registerForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitBtn = document.getElementById('wl-register-submit-btn');
+                    const origText = submitBtn.textContent;
+
+                    const mcUsername = regMcIgn.value.trim();
+                    const siteUsername = document.getElementById('wl-site-username').value.trim();
+                    const email = document.getElementById('wl-email').value.trim();
+                    const password = document.getElementById('wl-password').value;
+                    const discordUsername = document.getElementById('wl-discord').value.trim();
+                    const birthday = document.getElementById('wl-birthday').value;
+
+                    if (!mcUsername) {
+                        showError('Please enter your Minecraft username.');
+                        return;
+                    }
+                    if (!siteUsername) {
+                        showError('Please enter a website username.');
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⏳ Forging Whitelist Key...';
+
+                    try {
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        const user = userCredential.user;
+
+                        const isFounder = checkIsFounder();
+                        const rank = isFounder ? 'Founder' : 'Member';
+
+                        // 1. Write profile to users collection
+                        await setDoc(doc(db, "users", user.uid), {
+                            username: siteUsername,
+                            email: email,
+                            signupDate: serverTimestamp(),
+                            isBanned: false,
+                            isAdmin: false,
+                            membershipLevel: 'free',
+                            minecraftUsername: mcUsername,
+                            discordUsername: discordUsername || '',
+                            birthday: birthday || '',
+                            dtsRank: rank,
+                            isFounder: isFounder,
+                            isWhitelisted: true,
+                            whitelistedAt: serverTimestamp()
+                        });
+
+                        // 2. Write waitlist record to dts_waitlist collection
+                        await setDoc(doc(db, "dts_waitlist", user.uid), {
+                            uid: user.uid,
+                            email: email,
+                            siteUsername: siteUsername,
+                            minecraftUsername: mcUsername,
+                            discordUsername: discordUsername || '',
+                            birthday: birthday || '',
+                            rank: rank,
+                            isFounder: isFounder,
+                            createdAt: serverTimestamp(),
+                            serverIp: 'dts.realunstoppable.store'
+                        });
+
+                        displaySuccess(mcUsername, rank, isFounder);
+                    } catch (err) {
+                        console.error('Registration failed:', err);
+                        let message = err.message;
+                        if (err.code === 'auth/email-already-in-use') {
+                            message = 'This email is already registered. Please click "Sign In & Link Whitelist" below.';
+                        } else if (err.code === 'auth/weak-password') {
+                            message = 'Password is too weak. Please use at least 6 characters.';
+                        } else if (err.code === 'auth/invalid-email') {
+                            message = 'Please provide a valid email address.';
+                        }
+                        showError(message);
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = origText;
+                    }
+                });
+            }
+
+            // --- FORM 2: LOGIN & LINK WHITELIST ---
+            if (loginForm) {
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const submitBtn = document.getElementById('wl-login-submit-btn');
+                    const origText = submitBtn.textContent;
+
+                    const email = document.getElementById('wl-login-email').value.trim();
+                    const password = document.getElementById('wl-login-password').value;
+                    const mcUsername = loginMcIgn.value.trim();
+                    const discordUsername = document.getElementById('wl-login-discord').value.trim();
+                    const birthday = document.getElementById('wl-login-birthday').value;
+
+                    if (!mcUsername) {
+                        showError('Please enter your Minecraft username.');
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⏳ Verifying & Linking...';
+
+                    try {
+                        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                        const user = userCredential.user;
+
+                        const userDoc = await getDoc(doc(db, "users", user.uid));
+                        if (userDoc.exists() && userDoc.data().isBanned) {
+                            await signOut(auth);
+                            throw new Error('This account is suspended.');
+                        }
+
+                        const existingData = userDoc.exists() ? userDoc.data() : {};
+                        const isFounder = existingData.isFounder !== undefined ? existingData.isFounder : checkIsFounder();
+                        const rank = existingData.dtsRank || (isFounder ? 'Founder' : 'Member');
+
+                        const updatePayload = {
+                            minecraftUsername: mcUsername,
+                            isWhitelisted: true,
+                            dtsRank: rank,
+                            isFounder: isFounder,
+                            whitelistedAt: existingData.whitelistedAt || serverTimestamp()
+                        };
+                        if (discordUsername) updatePayload.discordUsername = discordUsername;
+                        if (birthday) updatePayload.birthday = birthday;
+
+                        await setDoc(doc(db, "users", user.uid), updatePayload, { merge: true });
+
+                        await setDoc(doc(db, "dts_waitlist", user.uid), {
+                            uid: user.uid,
+                            email: user.email,
+                            siteUsername: existingData.username || user.email.split('@')[0],
+                            minecraftUsername: mcUsername,
+                            discordUsername: discordUsername || existingData.discordUsername || '',
+                            birthday: birthday || existingData.birthday || '',
+                            rank: rank,
+                            isFounder: isFounder,
+                            createdAt: existingData.whitelistedAt || serverTimestamp(),
+                            serverIp: 'dts.realunstoppable.store'
+                        }, { merge: true });
+
+                        displaySuccess(mcUsername, rank, isFounder);
+                    } catch (err) {
+                        console.error('Sign in & link failed:', err);
+                        let message = err.message;
+                        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+                            message = 'Incorrect email or password.';
+                        }
+                        showError(message);
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = origText;
+                    }
+                });
+            }
+
+            // --- FORM 3: AUTHENTICATED USER LINK / UPDATE ---
+            if (authedForm) {
+                authedForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!currentUser) {
+                        showError('You must be signed in.');
+                        showView('login');
+                        return;
+                    }
+
+                    const submitBtn = document.getElementById('wl-authed-submit-btn');
+                    const origText = submitBtn.textContent;
+
+                    const mcUsername = authedMcIgn.value.trim();
+                    const discordUsername = document.getElementById('wl-authed-discord').value.trim();
+                    const birthday = document.getElementById('wl-authed-birthday').value;
+
+                    if (!mcUsername) {
+                        showError('Please enter your Minecraft username.');
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⏳ Saving Whitelist...';
+
+                    try {
+                        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                        const existingData = userDoc.exists() ? userDoc.data() : {};
+                        const isFounder = existingData.isFounder !== undefined ? existingData.isFounder : checkIsFounder();
+                        const rank = existingData.dtsRank || (isFounder ? 'Founder' : 'Member');
+
+                        const updatePayload = {
+                            minecraftUsername: mcUsername,
+                            isWhitelisted: true,
+                            dtsRank: rank,
+                            isFounder: isFounder,
+                            whitelistedAt: existingData.whitelistedAt || serverTimestamp()
+                        };
+                        if (discordUsername) updatePayload.discordUsername = discordUsername;
+                        if (birthday) updatePayload.birthday = birthday;
+
+                        await setDoc(doc(db, "users", currentUser.uid), updatePayload, { merge: true });
+
+                        await setDoc(doc(db, "dts_waitlist", currentUser.uid), {
+                            uid: currentUser.uid,
+                            email: currentUser.email,
+                            siteUsername: existingData.username || currentUser.email.split('@')[0],
+                            minecraftUsername: mcUsername,
+                            discordUsername: discordUsername || existingData.discordUsername || '',
+                            birthday: birthday || existingData.birthday || '',
+                            rank: rank,
+                            isFounder: isFounder,
+                            createdAt: existingData.whitelistedAt || serverTimestamp(),
+                            serverIp: 'dts.realunstoppable.store'
+                        }, { merge: true });
+
+                        displaySuccess(mcUsername, rank, isFounder);
+                    } catch (err) {
+                        console.error('Update whitelist failed:', err);
+                        showError(err.message || 'Failed to save whitelist info.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = origText;
+                    }
+                });
+            }
+
+            // Copy IP button inside Success modal
+            const copyIpWlBtn = document.getElementById('wl-copy-ip-btn');
+            if (copyIpWlBtn) {
+                copyIpWlBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText('dts.realunstoppable.store').then(() => {
+                        copyIpWlBtn.textContent = '✔ Copied!';
+                        setTimeout(() => { copyIpWlBtn.textContent = 'Copy IP'; }, 2000);
+                    }).catch(() => {
+                        prompt('Server IP:', 'dts.realunstoppable.store');
+                    });
+                });
+            }
+        });
     </script>
 
     <script type="module" src="/js/auth.js"></script>

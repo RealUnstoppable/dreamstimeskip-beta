@@ -9,6 +9,7 @@
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
+    "check:site": "node scripts/site-checker.js",
     "start": "node server.js",
     "build": "echo \"No build required\""
   },

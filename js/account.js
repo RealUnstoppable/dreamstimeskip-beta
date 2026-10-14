@@ -4,7 +4,6 @@ import { getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged, signOut, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap } from './products-data.js';
-import { generateProductCardHtml } from "./ui-utils.js";
 import { escapeHTML, formatDate } from './utils.js';
 import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';

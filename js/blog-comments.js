@@ -2,7 +2,6 @@ import { auth, db } from './auth.js';
 import { escapeHTML, getCachedUserProfile } from './utils.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { collection, addDoc, getDocs, doc, deleteDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { getCachedUserProfile } from './auth.js';
 
 const COMMENTS_COLLECTION = 'blog_comments';
 let currentUser = null;
@@ -129,42 +128,25 @@ async function loadComments(postId) {
             const comment = docSnap.data();
             const dateStr = comment.createdAt ? new Date(comment.createdAt.toMillis()).toLocaleDateString() : 'Just now';
 
-            // Allow deletion if the current user is the author (admin delete would require extra logic or just be done via console for now)
+            // Allow deletion if the current user is the author
             const canDelete = currentUser && currentUser.uid === comment.userId;
-            const deleteBtnHtml = canDelete ? \`<button class="delete-comment-btn" data-id="\${docSnap.id}" title="Delete comment" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>\` : '';
+            const deleteBtnHtml = canDelete ? `<button class="delete-comment-btn" data-id="${docSnap.id}" title="Delete comment" aria-label="Delete comment" style="background: none; border: none; color: var(--accent-red); cursor: pointer; font-size: 0.9em; text-decoration: underline; margin-left: auto;">Delete</button>` : '';
 
-            html += \`
+            html += `
                 <div class="comment-item" style="padding: 15px; border-radius: 8px; background: var(--primary-card-color); border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-weight: 600;">\${escapeHTML(comment.username || 'User')}</span>
-                        <span style="font-size: 0.85em; color: var(--text-secondary);">\${dateStr}</span>
+                        <span style="font-weight: 600;">${escapeHTML(comment.username || 'User')}</span>
+                        <span style="font-size: 0.85em; color: var(--text-secondary);">${dateStr}</span>
                     </div>
-                    <p style="margin: 0; line-height: 1.5;">\${escapeHTML(comment.content)}</p>
-                    \${deleteBtnHtml}
+                    <p style="margin: 0; line-height: 1.5;">${escapeHTML(comment.content)}</p>
+                    ${deleteBtnHtml}
                 </div>
-            \`;
+            `;
         });
 
         listContainer.innerHTML = html;
 
-        // Attach delete listeners
-<<<<<<< HEAD
-        listContainer.querySelectorAll('.delete-comment-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const commentId = e.target.dataset.id;
-                if (confirm('Are you sure you want to delete this comment?')) {
-                    try {
-                        e.target.disabled = true;
-                        e.target.textContent = 'Deleting...';
-                        await deleteDoc(doc(db, COMMENTS_COLLECTION, commentId));
-                        await loadComments(postId); // Refresh
-                    } catch (err) {
-                        console.error('Manager info: Error deleting comment', err);
-                        alert('Failed to delete comment.');
-                        e.target.disabled = false;
-                        e.target.textContent = 'Delete';
-=======
-        // ⚡ Bolt: Event Delegation for Delete Buttons
+        // ⚡ Event Delegation for Delete Buttons
         if (!listContainer.dataset.delegated) {
             listContainer.dataset.delegated = 'true';
             listContainer.addEventListener('click', async (e) => {
@@ -183,7 +165,6 @@ async function loadComments(postId) {
                             btn.disabled = false;
                             btn.textContent = 'Delete';
                         }
->>>>>>> origin/main
                     }
                 }
             });
@@ -195,15 +176,13 @@ async function loadComments(postId) {
     }
 }
 
-
-
 function showNotification(element, message, type) {
     if (!element) return;
     element.textContent = message;
     element.style.display = 'block';
     element.style.backgroundColor = type === 'error' ? 'rgba(255,0,0,0.1)' : 'rgba(0,255,0,0.1)';
     element.style.color = type === 'error' ? 'var(--accent-red)' : 'var(--accent-green)';
-    element.style.border = \`1px solid \${type === 'error' ? 'var(--accent-red)' : 'var(--accent-green)'}\`;
+    element.style.border = `1px solid ${type === 'error' ? 'var(--accent-red)' : 'var(--accent-green)'}`;
 
     setTimeout(() => { element.style.display = 'none'; }, 5000);
 }

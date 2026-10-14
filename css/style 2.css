@@ -358,8 +358,38 @@ p.section-subtitle {
 }
 
 .status-indicator.online {
-    color: #16A34A;
-    background-color: rgba(22, 163, 74, 0.1);
+    color: #10B981;
+    background-color: rgba(16, 185, 129, 0.15);
+}
+
+.status-indicator.maintenance,
+.status-indicator.degraded {
+    color: #F59E0B;
+    background-color: rgba(245, 158, 11, 0.15);
+}
+
+.status-indicator.offline,
+.status-indicator.down {
+    color: #EF4444;
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.status-issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.status-item.sub-status {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
 }
 
 #bento-founder p {

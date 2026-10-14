@@ -1,0 +1,85 @@
+{
+  "timestamp": "2026-10-14T03:27:47.631Z",
+  "dateFormatted": "Oct 13, 2026",
+  "overallStatus": "Operational",
+  "badgeClass": "online",
+  "systems": [
+    {
+      "id": "hub",
+      "name": "Unstoppable Hub",
+      "primaryPage": "index.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "dreamstimeskip",
+      "name": "Dreams TimeSkip",
+      "primaryPage": "dreamstimeskip.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "medixly",
+      "name": "Medixly Music",
+      "primaryPage": "medixly.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "unstoppable",
+      "name": "Unstoppable Gaming",
+      "primaryPage": "unstoppable.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "fotd",
+      "name": "Fact of the Day",
+      "primaryPage": "fotd.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "shop",
+      "name": "Unstoppable Shop",
+      "primaryPage": "shop.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "auth",
+      "name": "Accounts & Auth",
+      "primaryPage": "account.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "tracker",
+      "name": "ezManage Tracker",
+      "primaryPage": "tracker.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "support",
+      "name": "Support & Legal",
+      "primaryPage": "support.html",
+      "status": "Operational",
+      "issues": []
+    },
+    {
+      "id": "blog",
+      "name": "Community Blog",
+      "primaryPage": "blog.html",
+      "status": "Operational",
+      "issues": []
+    }
+  ],
+  "offlineSystems": [],
+  "totalSystems": 10,
+  "operationalCount": 10,
+  "offlineCount": 0,
+  "maintenanceCount": 0,
+  "durationMs": 478,
+  "allDiscoveredPagesCount": 31
+}

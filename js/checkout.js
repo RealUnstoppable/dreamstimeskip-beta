@@ -5,11 +5,7 @@ import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransactio
 import { products, productMap } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
-<<<<<<< HEAD
-import { generateProductCardHtml } from "./ui-utils.js";
-=======
 import { generateProductCardHtml } from './ui-utils.js';
->>>>>>> origin/main
 
 let currentUser = null;
 let userCart = {};
@@ -113,6 +109,7 @@ function renderCheckoutPage() {
                         <p style="margin: 0; color: #ffca2c; font-size: 0.9rem;"><strong>TEST MODE:</strong> Use the test card number 4242 4242 4242 4242 to simulate a successful payment.</p>
                     </div>
                     <button type="submit" class="cta-button place-order-button" id="place-order-btn">Pay Now</button>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary, #aaa); margin-top: 15px; text-align: center;">By clicking Pay Now, you agree to our <a href="terms.html" target="_blank" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" target="_blank" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Privacy Policy</a>.</p>
                     <div id="checkout-message"></div>
                 </form>
             </div>
@@ -261,7 +258,6 @@ function updateSummaryUI() {
 
 
 export async function processOrderTransaction(uid, cart, orderDetails) {
-<<<<<<< HEAD
     const orderDocId = 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const fullOrder = {
         orderId: orderDocId,
@@ -280,90 +276,65 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
 
     const effectiveUid = uid || (currentUser && currentUser.uid) || null;
 
-    // If signed in, write to Firestore
-    if (effectiveUid) {
-        try {
-            await addDoc(collection(db, 'orders'), fullOrder);
-            await setDoc(doc(db, 'carts', effectiveUid), { items: {} });
-
-            const userRef = doc(db, 'users', effectiveUid);
-            const userSnap = await getDoc(userRef);
-            const currentData = userSnap.exists() ? userSnap.data() : {};
-            const currentBal = currentData.pointsBalance || 0;
-            const currentEarned = currentData.loyaltyPoints || currentBal;
-            const earnedPts = orderDetails.earnedPoints || 0;
-            const redeemedPts = orderDetails.pointsRedeemed || 0;
-            const newBal = Math.max(0, currentBal - redeemedPts + earnedPts);
-            const newTotalEarned = currentEarned + earnedPts;
-
-            await setDoc(userRef, {
-                pointsBalance: newBal,
-                loyaltyPoints: newTotalEarned
-            }, { merge: true });
-
-            // Update session cache
-            const cacheKey = `profile_${effectiveUid}`;
-            const cachedStr = sessionStorage.getItem(cacheKey);
-            if (cachedStr) {
-                const uData = JSON.parse(cachedStr);
-                uData.pointsBalance = newBal;
-                uData.loyaltyPoints = newTotalEarned;
-                sessionStorage.setItem(cacheKey, JSON.stringify(uData));
-            }
-
-            // Record points earned in loyalty_transactions
-            if (earnedPts > 0) {
-                await addDoc(collection(db, 'loyalty_transactions'), {
-                    userId: effectiveUid,
-                    description: `Order Purchase #${orderDocId} 🛍️`,
-                    points: earnedPts,
-                    type: 'earned',
-                    orderId: orderDocId,
-                    createdAt: serverTimestamp()
-                });
-            }
-
-            // Record points redeemed in loyalty_transactions
-            if (redeemedPts > 0) {
-                await addDoc(collection(db, 'loyalty_transactions'), {
-                    userId: effectiveUid,
-                    description: `Points Redeemed for Discount (Order #${orderDocId}) 🏷️`,
-                    points: -redeemedPts,
-                    type: 'redeemed',
-                    orderId: orderDocId,
-                    createdAt: serverTimestamp()
-                });
-            }
-        } catch (dbErr) {
-            console.warn("Manager info: Firestore order write warning:", dbErr);
-=======
     try {
-        if (!currentUser) {
-            throw new Error('User must be logged in to process an order.');
->>>>>>> origin/main
+        // If signed in, write to Firestore
+        if (effectiveUid) {
+            try {
+                await addDoc(collection(db, 'orders'), fullOrder);
+                await setDoc(doc(db, 'carts', effectiveUid), { items: {} });
+
+                const userRef = doc(db, 'users', effectiveUid);
+                const userSnap = await getDoc(userRef);
+                const currentData = userSnap.exists() ? userSnap.data() : {};
+                const currentBal = currentData.pointsBalance || 0;
+                const currentEarned = currentData.loyaltyPoints || currentBal;
+                const earnedPts = orderDetails.earnedPoints || 0;
+                const redeemedPts = orderDetails.pointsRedeemed || 0;
+                const newBal = Math.max(0, currentBal - redeemedPts + earnedPts);
+                const newTotalEarned = currentEarned + earnedPts;
+
+                await setDoc(userRef, {
+                    pointsBalance: newBal,
+                    loyaltyPoints: newTotalEarned
+                }, { merge: true });
+
+                // Update session cache
+                const cacheKey = `profile_${effectiveUid}`;
+                const cachedStr = sessionStorage.getItem(cacheKey);
+                if (cachedStr) {
+                    const uData = JSON.parse(cachedStr);
+                    uData.pointsBalance = newBal;
+                    uData.loyaltyPoints = newTotalEarned;
+                    sessionStorage.setItem(cacheKey, JSON.stringify(uData));
+                }
+
+                // Record points earned in loyalty_transactions
+                if (earnedPts > 0) {
+                    await addDoc(collection(db, 'loyalty_transactions'), {
+                        userId: effectiveUid,
+                        description: `Order Purchase #${orderDocId} 🛍️`,
+                        points: earnedPts,
+                        type: 'earned',
+                        orderId: orderDocId,
+                        createdAt: serverTimestamp()
+                    });
+                }
+
+                // Record points redeemed in loyalty_transactions
+                if (redeemedPts > 0) {
+                    await addDoc(collection(db, 'loyalty_transactions'), {
+                        userId: effectiveUid,
+                        description: `Points Redeemed for Discount (Order #${orderDocId}) 🏷️`,
+                        points: -redeemedPts,
+                        type: 'redeemed',
+                        orderId: orderDocId,
+                        createdAt: serverTimestamp()
+                    });
+                }
+            } catch (dbErr) {
+                console.warn("Manager info: Firestore order write warning:", dbErr);
+            }
         }
-
-        const token = await currentUser.getIdToken();
-        const cloudFunctionUrl = window.location.hostname === 'localhost'
-            ? 'http://localhost:5001/dts-hub-website/us-central1/processOrderTransaction'
-            : 'https://us-central1-dts-hub-website.cloudfunctions.net/processOrderTransaction';
-
-        const response = await fetch(cloudFunctionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ cart, orderDetails, pointsToRedeem: orderDetails.pointsRedeemed })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || 'Server Error');
-        }
-
-        const data = await response.json();
-        const orderId = data.orderId || 'ORD-' + Math.random().toString(36).substring(2, 8).toUpperCase();
 
         // Always clear localStorage cart
         localStorage.removeItem('localCart');
@@ -375,7 +346,7 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
             window.updateLexiCartCount(0);
         }
 
-        return orderId;
+        return orderDocId;
     } catch (error) {
         console.error('Manager info: Error processing order transaction [' + error.message + ']');
         throw error;

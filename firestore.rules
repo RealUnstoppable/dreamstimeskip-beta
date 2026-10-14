@@ -6,7 +6,9 @@ service cloud.firestore {
       return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Users collection: Users can only read/write their own profile
+    // Users collection: Users can only read/write their own profile.
+    // Allows custom profile fields (e.g., minecraftUsername, discordUsername, birthday, dtsRank, isWhitelisted, whitelistedAt)
+    // while strictly prohibiting unauthorized modification of administrative and subscription fields.
     match /users/{userId} {
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow create: if request.auth != null && (
@@ -22,6 +24,18 @@ service cloud.firestore {
          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
         || isAdmin()
       );
+      allow delete: if isAdmin();
+    }
+
+    // Dreams TimeSkip waitlist collection (/dts_waitlist/{entryId})
+    match /dts_waitlist/{entryId} {
+      allow get: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if request.auth != null 
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.minecraftUsername is string
+                    && request.resource.data.minecraftUsername.size() > 0;
+      allow update: if request.auth != null && (resource.data.uid == request.auth.uid || isAdmin());
       allow delete: if isAdmin();
     }
 

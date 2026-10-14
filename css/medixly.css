@@ -2358,3 +2358,13 @@ body {
 }
 
 .modal-overlay.hidden { display: none !important; }
+
+/* ===== Medixly Navbar Logo Mobile Scale ===== */
+@media (max-width: 768px) {
+    #medixly-navbar-logo {
+        transform: scale(1.5);
+        -webkit-transform: scale(1.5);
+        transform-origin: left center;
+        -webkit-transform-origin: left center;
+    }
+}
