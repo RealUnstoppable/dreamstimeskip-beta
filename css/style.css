@@ -1846,3 +1846,209 @@ body.light-theme .ad-container {
 }
 @media (min-width: 1024px) { .ad-mobile-sticky { display: none; } }
 /* --- END: GLOBAL AD CONTAINER STYLES --- */
+
+/* ===== ROCKSTAR-STYLE "UN" SITE LOADER ===== */
+:root {
+  --un-loader-bg: radial-gradient(circle at 50% 50%, #111116 0%, #050507 100%);
+  --un-loader-mask: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANIAAACICAYAAACSjLXTAAAVzklEQVR42u1dC7hWUxrudM7pRLpIdDVoNB4hlwwiZMwMj2u5l7tRiMn9GmLcjUu5jQbjFlPuxp1ckkgKk0JiyhRKiVLSufTNeme/+5njzDnZ///vf33fOu31PO9jaqqz99rrXev73u+ymohIkwwZMhSGbBIyZMiIlCFDRqQMGTIiZciQISNShgwZkTJkyIiUIUNjwH8ATom8z/woAbYAAAAASUVORK5CYII=');
+}
+
+.un-site-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  background: var(--un-loader-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateZ(0);
+}
+
+.un-site-loader-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Ambient Breathing Halo */
+.un-loader-halo {
+  position: absolute;
+  width: 270px;
+  height: 270px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.26) 0%, rgba(59, 130, 246, 0.12) 45%, transparent 70%);
+  filter: blur(34px);
+  pointer-events: none;
+  animation: unHaloBreathe 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes unHaloBreathe {
+  0% { transform: scale(0.92); opacity: 0.55; }
+  100% { transform: scale(1.18); opacity: 0.95; }
+}
+
+/* Rockstar Rounded Badge Tile */
+.un-loader-badge {
+  position: relative;
+  width: 136px;
+  height: 136px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, #18181f 0%, #0a0a0d 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(110, 69, 226, 0.22),
+    inset 0 1px 1px rgba(255, 255, 255, 0.22),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+/* Surface Gleam across Badge */
+.un-loader-badge::before {
+  content: "";
+  position: absolute;
+  top: -60px;
+  bottom: -60px;
+  width: 70px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.16) 50%,
+    rgba(255, 255, 255, 0.03) 75%,
+    transparent 100%
+  );
+  transform: skewX(-16deg) translateX(-140px);
+  animation: unBadgeGleam 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  z-index: 2;
+}
+
+@keyframes unBadgeGleam {
+  0% { transform: skewX(-16deg) translateX(-140px); }
+  60%, 100% { transform: skewX(-16deg) translateX(190px); }
+}
+
+/* Logo Dimensions & Positioning */
+.un-loader-logo-wrap {
+  position: relative;
+  width: 100px;
+  height: 65px;
+  z-index: 1;
+}
+
+/* Base Muted "un" (touching stems) */
+.un-loader-logo-base {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.22);
+  -webkit-mask: var(--un-loader-mask, url('/images/un-logo-touching.png')) no-repeat center / contain;
+  mask: var(--un-loader-mask, url('/images/un-logo-touching.png')) no-repeat center / contain;
+}
+
+/* Masked Wave Container */
+.un-loader-wave-mask {
+  position: absolute;
+  inset: 0;
+  -webkit-mask: var(--un-loader-mask, url('/images/un-logo-touching.png')) no-repeat center / contain;
+  mask: var(--un-loader-mask, url('/images/un-logo-touching.png')) no-repeat center / contain;
+  overflow: hidden;
+}
+
+/* Sweeping Wave Beam with Glow */
+.un-loader-wave-beam {
+  position: absolute;
+  top: -20px;
+  bottom: -20px;
+  width: 55px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 25%,
+    #ffffff 50%,
+    rgba(255, 255, 255, 0.35) 75%,
+    transparent 100%
+  );
+  filter: drop-shadow(0 0 10px #ffffff)
+          drop-shadow(0 0 20px #8b5cf6)
+          drop-shadow(0 0 35px #3b82f6);
+  transform: skewX(-16deg) translateX(-90px);
+  animation: unLogoWave 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes unLogoWave {
+  0% { transform: skewX(-16deg) translateX(-90px); }
+  60%, 100% { transform: skewX(-16deg) translateX(150px); }
+}
+
+/* Caption */
+.un-loader-caption {
+  margin-top: 24px;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.un-loader-dots span {
+  animation: unDotBlink 1.4s infinite;
+  opacity: 0;
+}
+.un-loader-dots span:nth-child(1) { animation-delay: 0.0s; }
+.un-loader-dots span:nth-child(2) { animation-delay: 0.2s; }
+.un-loader-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes unDotBlink {
+  0%, 20% { opacity: 0; }
+  40% { opacity: 1; }
+  80%, 100% { opacity: 0; }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .un-loader-halo,
+  .un-loader-badge::before,
+  .un-loader-wave-beam,
+  .un-loader-dots span {
+    animation: none;
+  }
+  .un-loader-wave-beam {
+    transform: skewX(-16deg) translateX(25px);
+    opacity: 0.8;
+  }
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 480px) {
+  .un-loader-badge {
+    width: 118px;
+    height: 118px;
+    border-radius: 26px;
+  }
+  .un-loader-logo-wrap {
+    width: 86px;
+    height: 56px;
+  }
+  .un-loader-halo {
+    width: 220px;
+    height: 220px;
+  }
+}
+

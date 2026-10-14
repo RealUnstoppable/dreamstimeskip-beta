@@ -443,4 +443,30 @@ describe("adminAction", () => {
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({success: true});
   });
+
+  it("should sync stripe promo codes successfully", async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: true,
+      data: () => ({isAdmin: true}),
+    });
+
+    const req = mockReq({
+      method: "POST",
+      headers: {authorization: "Bearer valid-token"},
+      body: {action: "sync_stripe_promo_codes", collection: "promo_codes", docId: "all"},
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      adminAction(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      count: expect.any(Number),
+    }));
+  });
 });
+

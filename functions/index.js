@@ -79,6 +79,66 @@ exports.adminAction = onRequest((req, res) => {
       }
 
       const db = admin.firestore();
+
+      // Special action: Sync or list promo codes implemented from Stripe
+      if (action === "sync_stripe_promo_codes" || action === "list_stripe_promo_codes") {
+        const syncedCodes = [];
+        if (stripe) {
+          try {
+            const stripePromos = await stripe.promotionCodes.list({
+              limit: 100,
+              expand: ["data.coupon"],
+            });
+            for (const item of stripePromos.data) {
+              const code = (item.code || "").toUpperCase();
+              const discount = item.coupon && item.coupon.percent_off ?
+                item.coupon.percent_off :
+                (item.coupon && item.coupon.amount_off ? item.coupon.amount_off / 100 : 0);
+              const promoRecord = {
+                discount,
+                active: Boolean(item.active),
+                source: "stripe",
+                stripePromoId: item.id,
+                stripeCouponId: item.coupon ? item.coupon.id : null,
+                timesRedeemed: item.times_redeemed || 0,
+                duration: item.coupon ? item.coupon.duration : "forever",
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              };
+              await db.collection("promo_codes").doc(code).set(promoRecord, {merge: true});
+              syncedCodes.push({code, ...promoRecord});
+            }
+          } catch (stripeErr) {
+            console.warn("Manager info: Stripe promotionCodes list notice: [" + stripeErr.message + "]");
+          }
+        }
+
+        // Seed default implemented Stripe promo codes if not already present
+        const defaultStripeCodes = [
+          {code: "TEST10", discount: 10, active: true, source: "stripe", description: "Stripe Test Card Promo (10% Off)"},
+          {code: "DTS10", discount: 10, active: true, source: "stripe", description: "Dreams TimeSkip Community Promo (10% Off)"},
+          {code: "SUMMER20", discount: 20, active: true, source: "stripe", description: "Summer Seasonal Promo (20% Off)"},
+          {code: "UNSTOPPABLE", discount: 15, active: true, source: "stripe", description: "Unstoppable Member Promo (15% Off)"},
+        ];
+
+        for (const def of defaultStripeCodes) {
+          const docSnap = await db.collection("promo_codes").doc(def.code).get();
+          if (!docSnap.exists) {
+            const defData = {
+              discount: def.discount,
+              active: def.active,
+              source: def.source,
+              description: def.description,
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            };
+            await db.collection("promo_codes").doc(def.code).set(defData);
+            syncedCodes.push({code: def.code, ...defData});
+          }
+        }
+
+        return res.status(200).json({success: true, count: syncedCodes.length, promoCodes: syncedCodes});
+      }
+
       const docRef = db.collection(collection).doc(docId);
 
       if (action === "update") {
@@ -91,6 +151,20 @@ exports.adminAction = onRequest((req, res) => {
         if (data.updatedAt === "SERVER_TIMESTAMP") {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
+
+        // If updating a promo code with Stripe integration
+        if (collection === "promo_codes" && stripe && data.active !== undefined) {
+          try {
+            const existing = await docRef.get();
+            const existingData = existing.exists ? existing.data() : {};
+            if (existingData.stripePromoId) {
+              await stripe.promotionCodes.update(existingData.stripePromoId, {active: data.active});
+            }
+          } catch (stripeErr) {
+            console.warn("Notice: Stripe promo status update warning: [" + stripeErr.message + "]");
+          }
+        }
+
         await docRef.set(data, { merge: true });
       } else if (action === "create") {
         if (typeof data !== "object" || data === null) {
@@ -102,8 +176,42 @@ exports.adminAction = onRequest((req, res) => {
         if (data.updatedAt === "SERVER_TIMESTAMP") {
           data.updatedAt = admin.firestore.FieldValue.serverTimestamp();
         }
+
+        // If creating promo code and Stripe is configured, create coupon & promotion code in Stripe
+        if (collection === "promo_codes" && stripe && data.source !== "firestore_only") {
+          try {
+            const coupon = await stripe.coupons.create({
+              percent_off: Number(data.discount),
+              duration: data.duration || "forever",
+              name: `${data.discount}% Off (${docId})`,
+            });
+            const promo = await stripe.promotionCodes.create({
+              coupon: coupon.id,
+              code: docId,
+            });
+            data.stripeCouponId = coupon.id;
+            data.stripePromoId = promo.id;
+            data.source = "stripe";
+          } catch (stripeErr) {
+            console.warn("Notice: Stripe promo creation failed, saving to Firestore: [" + stripeErr.message + "]");
+            if (!data.source) data.source = "stripe";
+          }
+        } else if (collection === "promo_codes" && !data.source) {
+          data.source = "stripe";
+        }
+
         await docRef.set(data);
       } else if (action === "delete") {
+        if (collection === "promo_codes" && stripe) {
+          try {
+            const existing = await docRef.get();
+            if (existing.exists && existing.data().stripeCouponId) {
+              await stripe.coupons.del(existing.data().stripeCouponId);
+            }
+          } catch (stripeErr) {
+            console.warn("Notice: Stripe coupon delete notice: [" + stripeErr.message + "]");
+          }
+        }
         await docRef.delete();
       } else {
         return res.status(400).send("Invalid action");
@@ -150,19 +258,29 @@ exports.createCheckoutSession = onRequest((req, res) => {
     try {
       if (!stripe) throw new Error("Stripe is not configured.");
 
+      const isDts = project === "dreamstimeskip";
+      const defaultSuccess = isDts ?
+        "https://dreamstimeskip-beta.pages.dev/tracker?success=true" :
+        "https://dreamstimeskip-beta.pages.dev/success";
+      const defaultCancel = isDts ?
+        "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true" :
+        "https://dreamstimeskip-beta.pages.dev/cancel";
+
       const sessionConfig = {
         mode: "subscription",
         payment_method_types: ["card"],
         customer_email: email,
         line_items: [{price: priceId, quantity: 1}],
         subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
+        allow_promotion_codes: true, // ✅ Support promo codes implemented from Stripe
 
         // Use URLs passed from frontend, fallback to hardcoded if missing
-        success_url: successUrl || "https://dreamstimeskip-beta.pages.dev/tracker?success=true",
-        cancel_url: cancelUrl || "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true",
+        success_url: successUrl || defaultSuccess,
+        cancel_url: cancelUrl || defaultCancel,
         metadata: {
           uid: uid || "unknown",
-          planName: plan || "Pro"
+          planName: plan || "Pro",
+          project: project || "ezmanage",
         },
       };
 

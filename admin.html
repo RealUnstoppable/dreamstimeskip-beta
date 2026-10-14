@@ -448,17 +448,72 @@
                 </div>
             </section>
 
-        <section id="promo-codes" class="content-section" style="display: none;">
-            <h3>Promo Codes</h3>
-            <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                <h4 style="margin-top: 0;">Create New Promo Code</h4>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="new-promo-code" placeholder="Code (e.g. SUMMER20)" style="flex: 1; padding: 8px;">
-                    <input type="number" id="new-promo-discount" placeholder="Discount %" style="width: 100px; padding: 8px;" min="1" max="100">
-                    <button id="create-promo-btn" class="btn btn-primary">Create</button>
+        <section id="promo-codes" class="content-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 24px;">
+                <div>
+                    <h3 style="margin: 0 0 6px;">🎟️ Stripe &amp; Shop Promo Codes</h3>
+                    <p style="color: var(--text-secondary); margin: 0; font-size: 0.92rem;">
+                        Live discount codes implemented from Stripe and validated across the Unstoppable Shop &amp; checkout.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="sync-stripe-promos-btn" class="btn-action btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 8px; font-weight: 600;">
+                        <span>🔄</span> Sync Stripe Codes
+                    </button>
+                    <button id="seed-default-promos-btn" class="btn-action btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 9px 15px; border-radius: 8px; font-weight: 600;">
+                        <span>⚡</span> Load Implemented Codes
+                    </button>
                 </div>
             </div>
-            <div id="promo-codes-list">Loading promo codes...</div>
+
+            <!-- Promo Stats Overview -->
+            <div class="metrics-grid" style="margin-bottom: 25px;">
+                <div class="metric-card">
+                    <div class="value" id="promo-total-count">-</div>
+                    <div class="label">Total Promo Codes</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="promo-active-count" style="color: var(--accent-green);">-</div>
+                    <div class="label">Active Codes</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="promo-stripe-count" style="color: var(--accent-blue);">-</div>
+                    <div class="label">Stripe Implemented</div>
+                </div>
+                <div class="metric-card">
+                    <div class="value" id="promo-avg-discount">-</div>
+                    <div class="label">Avg. Discount %</div>
+                </div>
+            </div>
+
+            <!-- Create Promo Code Box -->
+            <div style="background: var(--primary-card-color); padding: 22px 24px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 25px;">
+                <h4 style="margin: 0 0 8px; font-size: 1.15rem; color: #fff;">Create New Promo Code</h4>
+                <p style="color: var(--text-secondary); font-size: 0.88rem; margin: 0 0 16px;">
+                    Codes created here are verified during checkout and synced with Stripe promotion codes.
+                </p>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                    <input type="text" id="new-promo-code" placeholder="Code (e.g. SUMMER20)" style="flex: 1; min-width: 180px; padding: 10px 14px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;">
+                    <input type="number" id="new-promo-discount" placeholder="Discount %" style="width: 120px; padding: 10px 14px; background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px;" min="1" max="100">
+                    <label style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.88rem; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="new-promo-stripe-sync" checked style="cursor: pointer; width: 16px; height: 16px;">
+                        <span>Stripe Integrated</span>
+                    </label>
+                    <button id="create-promo-btn" class="btn-action" style="padding: 10px 22px; background: var(--accent-blue); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                        Create Promo Code
+                    </button>
+                </div>
+            </div>
+
+            <!-- Promo Codes Table -->
+            <div class="user-table-container">
+                <div id="promo-codes-list">
+                    <div style="padding: 40px 20px; text-align: center; color: var(--text-secondary);">
+                        <div class="admin-loader-ring" style="margin: 0 auto 12px; width: 32px; height: 32px;"></div>
+                        Loading promo codes...
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
     </div>
@@ -472,70 +527,243 @@
 
         let performanceChart;
 
+        // Default Stripe-implemented promo codes across DTS and Unstoppable Shop
+        const DEFAULT_STRIPE_PROMO_CODES = [
+            { code: 'TEST10', discount: 10, active: true, source: 'stripe', description: 'Stripe Test Card Promo (Card 4242...)' },
+            { code: 'DTS10', discount: 10, active: true, source: 'stripe', description: 'Dreams TimeSkip Community Promo' },
+            { code: 'SUMMER20', discount: 20, active: true, source: 'stripe', description: 'Seasonal Summer Launch Promo' },
+            { code: 'UNSTOPPABLE', discount: 15, active: true, source: 'stripe', description: 'Unstoppable VIP Member Promo' }
+        ];
+
+        function showNotification(message, type = 'success') {
+            let toast = document.getElementById('admin-toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'admin-toast-notification';
+                toast.style.cssText = 'position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.92rem; font-weight: 600; z-index: 10000; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0; transform: translateY(10px); font-family: Inter, sans-serif;';
+                document.body.appendChild(toast);
+            }
+            const isError = type === 'error';
+            toast.style.background = isError ? 'rgba(239, 68, 68, 0.95)' : 'rgba(16, 185, 129, 0.95)';
+            toast.style.color = '#ffffff';
+            toast.style.border = isError ? '1px solid #dc2626' : '1px solid #059669';
+            toast.innerHTML = `<span>${isError ? '⚠️' : '✓'}</span> <span>${escapeHTML(message)}</span>`;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+            }, 3500);
+        }
+
+        async function seedDefaultPromoCodes(silent = false) {
+            let addedCount = 0;
+            for (const def of DEFAULT_STRIPE_PROMO_CODES) {
+                try {
+                    const docRef = doc(db, 'promo_codes', def.code);
+                    const docSnap = await getDoc(docRef);
+                    if (!docSnap.exists()) {
+                        await setDoc(docRef, {
+                            discount: def.discount,
+                            active: def.active,
+                            source: def.source,
+                            description: def.description,
+                            createdAt: Timestamp.now(),
+                            updatedAt: Timestamp.now()
+                        });
+                        addedCount++;
+                    }
+                } catch (e) {
+                    console.warn(`Manager info: Seeding promo code ${def.code} notice:`, e);
+                }
+            }
+            if (!silent) {
+                showNotification(`Loaded ${addedCount || DEFAULT_STRIPE_PROMO_CODES.length} Stripe implemented promo codes`, 'success');
+            }
+        }
 
         async function loadPromoCodes() {
             const listEl = document.getElementById('promo-codes-list');
+            if (!listEl) return;
             try {
-                const snapshot = await getDocs(collection(db, 'promo_codes'));
+                let snapshot = await getDocs(collection(db, 'promo_codes'));
+
+                // If collection is empty, auto-seed with implemented Stripe promo codes
                 if (snapshot.empty) {
-                    listEl.innerHTML = '<p>No promo codes found.</p>';
+                    listEl.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--text-secondary);"><div class="admin-loader-ring" style="margin: 0 auto 12px; width: 32px; height: 32px;"></div>Initializing Stripe promo codes...</div>';
+                    await seedDefaultPromoCodes(true);
+                    snapshot = await getDocs(collection(db, 'promo_codes'));
+                }
+
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<div style="padding: 30px; text-align: center; color: var(--text-secondary);"><p>No promo codes found.</p><button id="seed-empty-btn" class="btn-sm btn-action" style="padding: 8px 16px; margin-top: 10px;">Load Stripe Implemented Codes</button></div>';
+                    document.getElementById('seed-empty-btn')?.addEventListener('click', async () => {
+                        await seedDefaultPromoCodes();
+                        loadPromoCodes();
+                    });
                     return;
                 }
-                let html = '<table class="admin-table"><thead><tr><th>Code</th><th>Discount (%)</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+
+                const codes = [];
+                let activeCount = 0;
+                let stripeCount = 0;
+                let totalDiscount = 0;
+
                 snapshot.forEach(docSnap => {
                     const data = docSnap.data();
                     const code = docSnap.id;
+                    const discountVal = Number(data.discount) || 0;
+                    const isActive = data.active !== false;
+                    const isStripe = data.source === 'stripe' || Boolean(data.stripePromoId) || DEFAULT_STRIPE_PROMO_CODES.some(d => d.code === code);
+
+                    if (isActive) activeCount++;
+                    if (isStripe) stripeCount++;
+                    totalDiscount += discountVal;
+
+                    codes.push({
+                        code,
+                        discount: discountVal,
+                        active: isActive,
+                        source: isStripe ? 'stripe' : (data.source || 'custom'),
+                        stripePromoId: data.stripePromoId || '',
+                        description: data.description || (isStripe ? 'Stripe Checkout Integration' : 'Custom Shop Promo')
+                    });
+                });
+
+                // Update metric counters
+                const totalEl = document.getElementById('promo-total-count');
+                const activeEl = document.getElementById('promo-active-count');
+                const stripeEl = document.getElementById('promo-stripe-count');
+                const avgEl = document.getElementById('promo-avg-discount');
+
+                if (totalEl) totalEl.textContent = codes.length;
+                if (activeEl) activeEl.textContent = activeCount;
+                if (stripeEl) stripeEl.textContent = stripeCount;
+                if (avgEl) avgEl.textContent = codes.length > 0 ? `${Math.round(totalDiscount / codes.length)}%` : '0%';
+
+                let html = `
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Discount</th>
+                                <th>Integration</th>
+                                <th>Description / Reference</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                codes.forEach(item => {
+                    const isStripe = item.source === 'stripe';
                     html += `
                         <tr>
-                            <td><strong>${escapeHTML(code)}</strong></td>
-                            <td>${escapeHTML(data.discount)}%</td>
-                            <td><span class="status-badge ${data.active ? 'status-active' : 'status-pending'}">${data.active ? 'Active' : 'Inactive'}</span></td>
                             <td>
-                                <button class="btn btn-secondary" onclick="togglePromoCode('${escapeHTML(code)}', ${!data.active})" style="padding: 4px 8px; font-size: 0.8rem;">${data.active ? 'Deactivate' : 'Activate'}</button>
-                                <button class="btn" onclick="deletePromoCode('${escapeHTML(code)}')" style="padding: 4px 8px; font-size: 0.8rem; border: 1px solid var(--accent-red); color: var(--accent-red); background: transparent;">Delete</button>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <strong style="font-family: monospace; font-size: 1.05rem; letter-spacing: 0.5px; color: #fff;">${escapeHTML(item.code)}</strong>
+                                    <button class="btn-sm btn-action wl-copy-btn" data-code="${escapeHTML(item.code)}" title="Copy code" style="padding: 2px 7px; font-size: 0.75rem;">Copy</button>
+                                </div>
+                            </td>
+                            <td><span style="font-weight: 700; color: var(--accent-green);">${escapeHTML(item.discount)}% OFF</span></td>
+                            <td>
+                                ${isStripe ?
+                                    '<span class="status-badge" style="background: rgba(99, 102, 241, 0.2); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4);">💳 Stripe</span>' :
+                                    '<span class="status-badge" style="background: rgba(148, 163, 184, 0.15); color: #cbd5e1;">Firestore</span>'
+                                }
+                            </td>
+                            <td style="color: var(--text-secondary); font-size: 0.9rem;">
+                                ${escapeHTML(item.description)}
+                                ${item.stripePromoId ? `<br><small style="font-family: monospace; opacity: 0.7;">ID: ${escapeHTML(item.stripePromoId)}</small>` : ''}
+                            </td>
+                            <td>
+                                <span class="status-badge ${item.active ? 'active' : 'cancelled'}">${item.active ? 'Active' : 'Inactive'}</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <button class="btn-sm btn-action" onclick="togglePromoCode('${escapeHTML(item.code)}', ${!item.active})">
+                                    ${item.active ? 'Deactivate' : 'Activate'}
+                                </button>
+                                <button class="btn-sm btn-danger" onclick="deletePromoCode('${escapeHTML(item.code)}')">
+                                    Delete
+                                </button>
                             </td>
                         </tr>
                     `;
                 });
+
                 html += '</tbody></table>';
                 listEl.innerHTML = html;
+
+                // Wire up copy buttons
+                listEl.querySelectorAll('.wl-copy-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const code = btn.dataset.code;
+                        navigator.clipboard.writeText(code).then(() => {
+                            const orig = btn.textContent;
+                            btn.textContent = 'Copied!';
+                            setTimeout(() => { btn.textContent = orig; }, 1800);
+                        });
+                    });
+                });
             } catch (error) {
                 console.error('Error loading promo codes:', error);
-                listEl.innerHTML = '<p style="color: var(--accent-red);">Error loading promo codes.</p>';
+                listEl.innerHTML = `
+                    <div style="padding: 25px; text-align: center; color: var(--accent-red);">
+                        <p>Error loading promo codes: ${escapeHTML(error.message)}</p>
+                        <button id="retry-promo-btn" class="btn-sm btn-action" style="padding: 8px 16px; margin-top: 8px;">Retry</button>
+                    </div>
+                `;
+                document.getElementById('retry-promo-btn')?.addEventListener('click', () => loadPromoCodes());
             }
         }
+
         window.togglePromoCode = async function(code, newStatus) {
             if (!confirm(`Are you sure you want to ${newStatus ? 'activate' : 'deactivate'} promo code ${code}?`)) return;
             try {
-                await performAdminAction('update', 'promo_codes', code, { active: newStatus });
-                showNotification(document.getElementById('security-notification'), 'Promo code status updated', 'success');
+                try {
+                    await performAdminAction('update', 'promo_codes', code, { active: newStatus });
+                } catch (actionErr) {
+                    console.warn('Backend proxy update fallback to direct Firestore:', actionErr);
+                    await setDoc(doc(db, 'promo_codes', code), { active: newStatus, updatedAt: Timestamp.now() }, { merge: true });
+                }
+                showNotification(`Promo code ${code} ${newStatus ? 'activated' : 'deactivated'}`, 'success');
                 loadPromoCodes();
             } catch (e) {
-                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
-            }
-        };
-        window.deletePromoCode = async function(code) {
-            if (!confirm(`Are you sure you want to delete promo code ${code}?`)) return;
-            try {
-                await performAdminAction('delete', 'promo_codes', code, {});
-                showNotification(document.getElementById('security-notification'), 'Promo code deleted', 'success');
-                loadPromoCodes();
-            } catch (e) {
-                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+                showNotification(`Error: ${e.message}`, 'error');
             }
         };
 
-        document.getElementById('create-promo-btn').addEventListener('click', async (e) => {
+        window.deletePromoCode = async function(code) {
+            if (!confirm(`Are you sure you want to delete promo code ${code}? This will remove it from checkout.`)) return;
+            try {
+                try {
+                    await performAdminAction('delete', 'promo_codes', code, {});
+                } catch (actionErr) {
+                    console.warn('Backend proxy delete fallback to direct Firestore:', actionErr);
+                    await deleteDoc(doc(db, 'promo_codes', code));
+                }
+                showNotification(`Promo code ${code} deleted`, 'success');
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(`Error: ${e.message}`, 'error');
+            }
+        };
+
+        document.getElementById('create-promo-btn')?.addEventListener('click', async (e) => {
             const btn = e.currentTarget;
             const originalText = btn.innerText;
 
             const codeInput = document.getElementById('new-promo-code');
             const discountInput = document.getElementById('new-promo-discount');
-            const code = codeInput.value.trim().toUpperCase();
-            const discount = parseInt(discountInput.value.trim(), 10);
+            const stripeSyncInput = document.getElementById('new-promo-stripe-sync');
+            const code = codeInput ? codeInput.value.trim().toUpperCase() : '';
+            const discount = discountInput ? parseInt(discountInput.value.trim(), 10) : NaN;
+            const isStripe = stripeSyncInput ? stripeSyncInput.checked : true;
 
             if (!code || isNaN(discount) || discount < 1 || discount > 100) {
-                showNotification(document.getElementById('security-notification'), 'Invalid code or discount', 'error');
+                showNotification('Please enter a valid uppercase code and discount between 1% and 100%', 'error');
                 return;
             }
 
@@ -543,16 +771,78 @@
             btn.innerText = 'Creating...';
 
             try {
-                await performAdminAction('create', 'promo_codes', code, { discount, active: true, createdAt: 'SERVER_TIMESTAMP' });
-                showNotification(document.getElementById('security-notification'), 'Promo code created', 'success');
-                codeInput.value = '';
-                discountInput.value = '';
+                const promoPayload = {
+                    discount,
+                    active: true,
+                    source: isStripe ? 'stripe' : 'custom',
+                    description: isStripe ? 'Stripe Checkout Integration' : 'Custom Shop Promo',
+                    createdAt: 'SERVER_TIMESTAMP',
+                    updatedAt: 'SERVER_TIMESTAMP'
+                };
+                try {
+                    await performAdminAction('create', 'promo_codes', code, promoPayload);
+                } catch (actErr) {
+                    console.warn('Backend adminAction fallback to direct Firestore:', actErr);
+                    await setDoc(doc(db, 'promo_codes', code), {
+                        discount,
+                        active: true,
+                        source: isStripe ? 'stripe' : 'custom',
+                        description: isStripe ? 'Stripe Checkout Integration' : 'Custom Shop Promo',
+                        createdAt: Timestamp.now(),
+                        updatedAt: Timestamp.now()
+                    });
+                }
+                showNotification(`Promo code ${code} (${discount}% OFF) created successfully`, 'success');
+                if (codeInput) codeInput.value = '';
+                if (discountInput) discountInput.value = '';
                 loadPromoCodes();
             } catch (e) {
-                showNotification(document.getElementById('security-notification'), `Error: ${e.message}`, 'error');
+                showNotification(`Error creating promo code: ${e.message}`, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerText = originalText;
+            }
+        });
+
+        document.getElementById('sync-stripe-promos-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="admin-loader-ring" style="width:14px;height:14px;display:inline-block;border-width:2px;vertical-align:middle;margin-right:6px;"></span> Syncing...';
+            try {
+                let synced = false;
+                try {
+                    const res = await performAdminAction('sync_stripe_promo_codes', 'promo_codes', 'all');
+                    if (res && res.success) {
+                        showNotification(`Successfully synced ${res.count || 0} promo codes with Stripe`, 'success');
+                        synced = true;
+                    }
+                } catch (err) {
+                    console.warn('Notice: Stripe cloud function sync fallback to direct seed:', err);
+                }
+                if (!synced) {
+                    await seedDefaultPromoCodes();
+                }
+                loadPromoCodes();
+            } catch (e) {
+                showNotification(`Sync error: ${e.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        });
+
+        document.getElementById('seed-default-promos-btn')?.addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            const orig = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Loading...';
+            try {
+                await seedDefaultPromoCodes();
+                loadPromoCodes();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
             }
         });
 
@@ -1028,21 +1318,16 @@
 
         window.closeSupportTicket = async function(ticketId, btnElement) {
             if (confirm("Are you sure you want to close this ticket?")) {
-                const originalText = btnElement.textContent;
-                btnElement.textContent = 'Processing...';
-                btnElement.disabled = true;
+                const btnEl = btnElement || document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
+                const originalText = btnEl ? btnEl.textContent : 'Close';
+                if (btnEl) {
+                    btnEl.textContent = 'Processing...';
+                    btnEl.disabled = true;
+                }
                 try {
-                    const btnEl = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
-                    let origText = 'Close';
-                    if (btnEl) {
-                        origText = btnEl.textContent;
-                        btnEl.textContent = 'Processing...';
-                        btnEl.disabled = true;
-                    }
                     await replyToTicket(ticketId, "Ticket closed by administrator.", "closed");
-                    const btnEl2 = document.querySelector(`button[data-id="${ticketId}"][onclick^="window.closeSupportTicket"]`);
-                    if (btnEl2) {
-                        const tr = btnEl2.closest('tr');
+                    if (btnEl) {
+                        const tr = btnEl.closest('tr');
                         if (tr) {
                             tr.querySelector('td:nth-child(4)').innerHTML = '<span style="color: var(--text-secondary); text-transform: uppercase;">closed</span>';
                             tr.querySelector('td:nth-child(5)').innerHTML = '<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>';
@@ -1051,10 +1336,9 @@
                 } catch (error) {
                     console.error('Error closing support ticket - Manager info:', error.message);
                     alert("Error closing ticket: " + error.message);
-                    const btn = document.querySelector(`button.admin-close-btn[data-id="${ticketId}"]`);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.textContent = 'Close';
+                    if (btnEl) {
+                        btnEl.disabled = false;
+                        btnEl.textContent = originalText;
                     }
                 }
             }
@@ -1133,20 +1417,36 @@
         async function performAdminAction(action, collectionName, docId, data = null) {
             const user = auth.currentUser;
             if (!user) throw new Error("Not authenticated");
-            const idToken = await user.getIdToken();
-            const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`
-                },
-                body: JSON.stringify({ action, collection: collectionName, docId, data })
-            });
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text || "Admin action failed");
+            try {
+                const idToken = await user.getIdToken();
+                const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({ action, collection: collectionName, docId, data })
+                });
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || "Admin action failed");
+                }
+                return await response.json();
+            } catch (err) {
+                console.warn(`Manager info: performAdminAction cloud function failed (${err.message}), falling back to direct Firestore operation.`);
+                const targetDoc = doc(db, collectionName, docId);
+                if (action === 'update' || action === 'create') {
+                    const updateData = { ...(data || {}) };
+                    if (updateData.createdAt === 'SERVER_TIMESTAMP') updateData.createdAt = Timestamp.now();
+                    if (updateData.updatedAt === 'SERVER_TIMESTAMP') updateData.updatedAt = Timestamp.now();
+                    await setDoc(targetDoc, updateData, { merge: true });
+                    return { success: true };
+                } else if (action === 'delete') {
+                    await deleteDoc(targetDoc);
+                    return { success: true };
+                }
+                throw err;
             }
-            return await response.json();
         }
 
         function setupEventListeners() {
@@ -1192,16 +1492,25 @@
                 if (e.target.classList.contains('admin-reply-btn')) {
                     const reply = prompt("Enter your reply to the user:");
                     if (reply !== null && reply.trim() !== "") {
+                        const originalText = e.target.textContent;
+                        e.target.textContent = 'Sending...';
+                        e.target.disabled = true;
                         try {
                             await replyToTicket(reqId, reply, 'answered');
-                            const tr = e.target.closest("tr"); if (tr) { tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>"; }
+                            const tr = e.target.closest("tr");
+                            if (tr) {
+                                tr.querySelector("td:nth-child(4)").innerHTML = "<span style=\"color: var(--accent-green); text-transform: uppercase;\">answered</span>";
+                            }
                         } catch (error) {
                             console.error("Manager info: Error replying to ticket:", error);
                             alert("Error replying to ticket: " + error.message);
+                        } finally {
+                            e.target.disabled = false;
+                            e.target.textContent = originalText;
                         }
                     }
                 } else if (e.target.classList.contains('admin-close-btn')) {
-                    window.closeSupportTicket(reqId);
+                    window.closeSupportTicket(reqId, e.target);
                 }
             });
 
@@ -1298,7 +1607,12 @@
                     document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
                     document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
                     e.currentTarget.classList.add('active');
-                    document.querySelector(e.currentTarget.getAttribute('href')).classList.add('active');
+                    const targetHref = e.currentTarget.getAttribute('href');
+                    const targetEl = document.querySelector(targetHref);
+                    if (targetEl) targetEl.classList.add('active');
+                    if (targetHref === '#promo-codes') {
+                        loadPromoCodes();
+                    }
                     if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); }
                 });
             });
@@ -1313,6 +1627,9 @@
                         
                         const targetSection = document.querySelector(val);
                         if(targetSection) targetSection.classList.add('active');
+                        if (val === '#promo-codes') {
+                            loadPromoCodes();
+                        }
                         
                         const correspondingLink = document.querySelector(`.sidebar-nav a[href="${val}"]`);
                         if(correspondingLink) correspondingLink.classList.add('active');

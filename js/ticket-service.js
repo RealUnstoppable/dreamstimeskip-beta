@@ -93,33 +93,44 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
     }
 
     try {
-        const user = auth.currentUser;
-        if (!user) throw new Error("Not authenticated");
-        const idToken = await user.getIdToken();
-        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${idToken}`
-            },
-            body: JSON.stringify({
-                action: 'update',
-                collection: TICKETS_COLLECTION,
-                docId: ticketId,
-                data: {
-                    adminReply,
-                    status,
-                    updatedAt: 'SERVER_TIMESTAMP'
-                }
-            })
+        const ticketRef = doc(db, TICKETS_COLLECTION, ticketId);
+        await updateDoc(ticketRef, {
+            adminReply,
+            status,
+            updatedAt: serverTimestamp()
         });
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(text || "Admin action failed");
-        }
         return { success: true };
-    } catch (error) {
-        console.error('Manager info: Error replying to ticket: [' + error.message + ']');
-        throw error;
+    } catch (firestoreError) {
+        console.warn('Manager info: Direct Firestore update failed, attempting adminAction proxy: [' + firestoreError.message + ']');
+        try {
+            const user = auth.currentUser;
+            if (!user) throw firestoreError;
+            const idToken = await user.getIdToken();
+            const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/adminAction', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    action: 'update',
+                    collection: TICKETS_COLLECTION,
+                    docId: ticketId,
+                    data: {
+                        adminReply,
+                        status,
+                        updatedAt: 'SERVER_TIMESTAMP'
+                    }
+                })
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || "Admin action failed");
+            }
+            return { success: true };
+        } catch (cloudFnError) {
+            console.error('Manager info: Error replying to ticket: [' + firestoreError.message + ']');
+            throw firestoreError;
+        }
     }
 }
