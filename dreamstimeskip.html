@@ -858,7 +858,7 @@
                     <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-green">
                         Join Discord
                     </a>
-                    <button class="mc-btn mc-btn-stone" id="copy-server-ip-btn" data-ip="mc.dreamstimeskip.net">
+                    <button class="mc-btn mc-btn-stone" id="copy-server-ip-btn" data-ip="dts.realunstoppable.store">
                         <span class="btn-text">Copy Server IP</span>
                     </button>
                     <button class="mc-btn mc-btn-gold open-trailer-trigger">
@@ -872,7 +872,7 @@
                     <span>•</span>
                     <span>JAVA 26.3 & BEDROCK</span>
                     <span>•</span>
-                    <span class="mc-server-ip-text">mc.dreamstimeskip.net</span>
+                    <span class="mc-server-ip-text">dts.realunstoppable.store</span>
                 </div>
             </div>
         </section>
@@ -1193,7 +1193,7 @@
         const copyIpBtn = document.getElementById('copy-server-ip-btn');
         if (copyIpBtn) {
             copyIpBtn.addEventListener('click', () => {
-                const ip = copyIpBtn.getAttribute('data-ip') || 'mc.dreamstimeskip.net';
+                const ip = copyIpBtn.getAttribute('data-ip') || 'dts.realunstoppable.store';
                 navigator.clipboard.writeText(ip).then(() => {
                     const textSpan = copyIpBtn.querySelector('.btn-text');
                     const orig = textSpan ? textSpan.textContent : copyIpBtn.textContent;

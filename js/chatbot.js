@@ -17,8 +17,10 @@ CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 Brand Structure & Ventures under the Unstoppable Umbrella:
 - Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e).
 - Dreams: A product line under the Unstoppable Umbrella. 
-  1. Dreams TimeSkip (DTS): An upcoming product launching in about a year (there is a live countdown timer on the dreamstimeskip page!).
-  2. Dreams OG: A nostalgic trip down memory lane.
+  1. Dreams TimeSkip (DTS): An upcoming Minecraft server saga launching in 2027 (there is a live countdown timer on the dreamstimeskip page!).
+  2. Dreams OG: A nostalgic classic Minecraft SMP experience launching on October 20, 2026!
+  - Official Minecraft Server IP: **dts.realunstoppable.store** (supports Minecraft Java 26.3 and Bedrock).
+  - Server Status: The server is currently under maintenance until October 20, 2026, when Dreams OG launches.
 - Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella. The name changed because it is much more than just music now—it's a hub for editors, creators, and casual listeners to hear all their favorite songs or just specific parts of them. It's all up to the user, and the new brand better reflects this company purpose.
 - Merch Store: Official shop selling the 'Unstoppable Hoodie', 'Unstoppable Cap', and 'Unstoppable Mug'.
 - Blob Game: A super fun interactive minigame in the hub.
@@ -35,8 +37,9 @@ You have powerful tools to interact with the user's music experience in Medixly.
 - Use searchHarmonyTunesLibrary to find songs by artist or title when they ask about our library or ask you to play a song.
 - If they ask for a song we DO NOT have, you MUST automatically use requestSongAddition to leave a request for the admin. Tell the user you have done so!
 
-DREAMS TIMESKIP POWERS:
+DREAMS TIMESKIP & MINECRAFT POWERS:
 - Use getDreamsCountdowns to read the live countdown timers for the launch dates of Dreams OG and Dreams TimeSkip.
+- Server IP & Connection: When users ask about the server IP, address, how to connect, or server status for Dreams TimeSkip / Dreams OG, always tell them that the official server IP is **dts.realunstoppable.store**, running on Minecraft version 26.3 (Java & Bedrock compatible), and that the server is currently under maintenance until October 20, 2026!
 
 Formatting & Restrictions:
 - You may use **bold** text and * **bullet items**.
@@ -109,7 +112,7 @@ const tools = [
             },
             {
                 name: "getDreamsCountdowns",
-                description: "Get the official launch dates and live countdowns for Dreams OG and Dreams TimeSkip.",
+                description: "Get the official launch dates, server IP (dts.realunstoppable.store), server status (maintenance until Oct 20th), and live countdowns for Dreams OG and Dreams TimeSkip.",
                 parameters: {
                     type: "OBJECT",
                     properties: {}
@@ -363,7 +366,7 @@ function initChatbot() {
                         }
                     } else if (call.name === "getDreamsCountdowns") {
                         const now = new Date();
-                        const ogDate = new Date("2026-10-01T12:00:00-04:00");
+                        const ogDate = new Date("2026-10-20T00:00:00-04:00");
                         const tsDate = new Date("2027-01-15T12:00:00-05:00");
                         
                         const getDiff = (target) => {
@@ -376,8 +379,11 @@ function initChatbot() {
 
                         callResult = { 
                             currentDate: now.toISOString(),
+                            serverIP: "dts.realunstoppable.store",
+                            serverStatus: "Under maintenance until October 20, 2026",
+                            minecraftVersion: "26.3 (Java & Bedrock)",
                             dreamsOG: {
-                                launchDate: "October 1, 2026",
+                                launchDate: "October 20, 2026",
                                 countdown: getDiff(ogDate)
                             },
                             dreamsTimeSkip: {
