@@ -367,9 +367,11 @@ export async function toggleWishlist(productId) {
     // Instantly update heart buttons in the UI for instant feedback
     document.querySelectorAll(`.wishlist-btn[data-id="${productId}"]`).forEach(btn => {
         btn.classList.toggle('active', isNowWishlisted);
-        btn.textContent = isNowWishlisted ? '❤️' : '🤍';
         btn.title = isNowWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist';
         btn.setAttribute('aria-label', isNowWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist');
+        if (!btn.querySelector('.heart-icon')) {
+            btn.innerHTML = `<svg class="heart-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" pointer-events="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+        }
     });
 
     // Save to localStorage immediately so state survives refresh and works offline/logged-out
@@ -1153,6 +1155,17 @@ async function handleReviewSubmit(e) {
 }
 
 // --- INITIALIZATION ---
+// Initial localWishlist load so favorited hearts are red immediately
+try {
+    const localWishlistData = localStorage.getItem('localWishlist');
+    if (localWishlistData) {
+        const parsed = JSON.parse(localWishlistData);
+        if (Array.isArray(parsed)) {
+            wishlist = new Set(parsed);
+        }
+    }
+} catch (_) { /* ignore local storage error */ }
+
 // Render products immediately from local array
 renderProducts();
 setupEventListeners();
@@ -1186,6 +1199,14 @@ onAuthStateChanged(auth, async (user) => {
             } else {
                 wishlist = new Set();
             }
+            // Sync heart buttons to authenticated wishlist
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                const pid = btn.dataset.id;
+                const isItemWishlisted = wishlist.has(pid);
+                btn.classList.toggle('active', isItemWishlisted);
+                btn.title = isItemWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist';
+                btn.setAttribute('aria-label', isItemWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist');
+            });
         } catch (error) {
             console.error("Manager info: Error loading wishlist:", error);
         }
