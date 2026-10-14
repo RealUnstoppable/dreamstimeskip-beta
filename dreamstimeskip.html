@@ -317,56 +317,52 @@
             letter-spacing: 0.5px;
         }
 
-        /* --- Animated Subtitle (Preserved & Enhanced) --- */
+        /* --- Animated Subtitle (Transparent & Perfectly Centered) --- */
         .animated-words-wrapper {
             display: inline-block;
             position: relative;
             height: 1.6em;
+            width: 7ch;
+            max-width: 100%;
             overflow: hidden;
             vertical-align: middle;
-            transition: width 0.3s ease-in-out;
-        }
-
-        .animated-words-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, 
-                rgba(0,0,0,0.9) 0%, 
-                rgba(0,0,0,0) 25%, 
-                rgba(0,0,0,0) 75%, 
-                rgba(0,0,0,0.9) 100%
-            );
-            pointer-events: none;
+            text-align: center;
+            background: transparent;
+            margin: 0 2px;
         }
 
         .animated-words {
             display: block;
-            animation: slideUp 12.5s infinite ease-in-out;
+            animation: slideUp 12s infinite ease-in-out;
             white-space: nowrap;
         }
 
         .animated-words span {
             display: block;
+            width: 100%;
             height: 1.6em;
             line-height: 1.6em;
             color: #55ff55;
             font-family: var(--mc-font-pixel);
             font-weight: 700;
-            text-align: left;
+            text-align: center;
             text-shadow: 2px 2px 0 #000;
         }
 
         @keyframes slideUp {
-            0%, 16%   { transform: translateY(0); }
-            20%, 36%  { transform: translateY(-1.6em); }
-            40%, 56%  { transform: translateY(-3.2em); }
-            60%, 76%  { transform: translateY(-4.8em); }
-            80%, 96%  { transform: translateY(-6.4em); }
-            100%      { transform: translateY(-8.0em); }
+            0%, 13.5%      { transform: translateY(0); }
+            16.67%, 30.17% { transform: translateY(-1.6em); }
+            33.33%, 46.83% { transform: translateY(-3.2em); }
+            50.00%, 63.50% { transform: translateY(-4.8em); }
+            66.67%, 80.17% { transform: translateY(-6.4em); }
+            83.33%, 96.83% { transform: translateY(-8.0em); }
+            100%           { transform: translateY(-9.6em); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animated-words {
+                animation: none;
+            }
         }
 
         /* --- Minecraft Block Countdown Timer --- */
@@ -1006,11 +1002,13 @@
                     <span class="animated-words-wrapper">
                         <span class="animated-words">
                             <span>26.3</span>
-                            <span>&nbsp;&nbsp;FUN</span>
-                            <span>&nbsp;&nbsp;SMP</span>
-                            <span>&nbsp;story</span>
-                            <span>&nbsp;event</span>
-                            <span>&nbsp;&nbsp;PvP</span></span>
+                            <span>FUN</span>
+                            <span>SMP</span>
+                            <span>story</span>
+                            <span>event</span>
+                            <span>PvP</span>
+                            <span aria-hidden="true">26.3</span>
+                        </span>
                     </span>
                     server in Minecraft.
                 </p>
@@ -1251,36 +1249,6 @@
             trailerModal.addEventListener('close', () => {
                 if (modalVideo) modalVideo.pause();
             });
-        }
-
-        // --- Dynamic Width for Animated Words ---
-        const animatedWordsWrapper = document.querySelector('.animated-words-wrapper');
-        const animatedWords = document.querySelector('.animated-words');
-        if (animatedWords && animatedWordsWrapper) {
-            const words = Array.from(animatedWords.children);
-            let currentWordIndex = 0;
-            let animationDuration = 12.5;
-            let wordDisplayTime = animationDuration / words.length;
-
-            function updateWrapperWidth() {
-                const currentWord = words[currentWordIndex];
-                if (currentWord) {
-                    animatedWordsWrapper.style.width = currentWord.offsetWidth + 'px';
-                }
-            }
-
-            function cycleWords() {
-                updateWrapperWidth();
-                setInterval(() => {
-                    currentWordIndex = (currentWordIndex + 1) % words.length;
-                    updateWrapperWidth();
-                }, wordDisplayTime * 1000);
-            }
-            
-            window.addEventListener('load', cycleWords);
-            if (document.readyState === "interactive" || document.readyState === "complete") {
-                cycleWords();
-            }
         }
 
     });
