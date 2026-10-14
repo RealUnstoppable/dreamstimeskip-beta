@@ -16,7 +16,7 @@
     <link rel="preload" as="image" href="/images/Pencil-1-logo-light.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css?v=1791167958698">
     <link rel="stylesheet" href="/css/themes.css?v=1791167958698">
@@ -121,6 +121,103 @@
         }
 
         /* --- END: Pre-register Popup Styles --- */
+
+        /* --- START: Minecraft Themed Bento Card for Dreams TimeSkip --- */
+        #bento-dts {
+            background: linear-gradient(145deg, #181b20 0%, #101216 100%);
+            border: 2px solid #3c8527;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 2px 2px 0 rgba(94, 179, 58, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        #bento-dts::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 85% 20%, rgba(60, 133, 39, 0.2) 0%, transparent 55%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #bento-dts:hover {
+            border-color: #55ff55;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 24px rgba(60, 133, 39, 0.45);
+            transform: translateY(-8px);
+        }
+
+        .mc-bento-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Silkscreen', monospace;
+            font-size: 0.72rem;
+            color: #55ff55;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #3c8527;
+            padding: 4px 10px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            width: fit-content;
+        }
+
+        #bento-dts h3 {
+            font-family: 'Silkscreen', 'Press Start 2P', monospace;
+            font-size: 1.35rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 8px;
+        }
+
+        #bento-dts p {
+            color: #b0b8c2;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .mc-bento-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Silkscreen', monospace;
+            font-size: 0.78rem;
+            color: #ffffff;
+            background: #3c8527;
+            border-top: 2px solid #5eb33a;
+            border-left: 2px solid #5eb33a;
+            border-right: 2px solid #1c5212;
+            border-bottom: 3px solid #1c5212;
+            padding: 7px 14px;
+            box-shadow: 0 3px 0 #000;
+            text-shadow: 1px 1px 0 #18440f;
+            width: fit-content;
+            transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        #bento-dts:hover .mc-bento-cta {
+            background: #479e2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #000;
+        }
+
+        #bento-dts img {
+            border: 2px solid #2d3036;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        /* --- END: Minecraft Themed Bento Card --- */
     </style>
 
     <!-- GPT SRA and Lazy Loading setup -->
@@ -177,10 +274,12 @@
                 </a>
                 <a href="dreamstimeskip.html" class="bento-card reveal" id="bento-dts">
                     <div class="card-content">
+                        <div class="mc-bento-badge"><span>⚔️</span> MINECRAFT 26.3 • OCT 20</div>
                         <h3>Dreams TimeSkip</h3>
-                        <p>Season OG, Relive your childhood.</p>
+                        <p>Season OG • Maintenance until the 20th. Relive your childhood in classic SMP.</p>
+                        <span class="mc-bento-cta">EXPLORE REALM ▶</span>
                     </div>
-                    <img src="/images/dreams-lobby.jpg" alt="Dreams TimeSkip Lobby" loading="lazy">
+                    <img src="/images/Game Art.png" alt="Dreams TimeSkip Minecraft Art" loading="lazy">
                 </a>
                 <div class="bento-card reveal" id="bento-status">
                     <h4>Ecosystem Status</h4>
