@@ -8,3 +8,5 @@ export const getDocs = () => {};
 export const serverTimestamp = () => {};
 export const addDoc = () => {};
 export const updateDoc = () => {};
+export const arrayUnion = (...args) => args;
+export const arrayRemove = (...args) => args;

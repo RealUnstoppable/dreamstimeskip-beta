@@ -38,7 +38,11 @@ export class AudioMixEngine {
    */
   init(audioEl1, audioEl2) {
     if (!this.ctx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const AudioContext = typeof window !== 'undefined' ? (window.AudioContext || window.webkitAudioContext) : null;
+      if (!AudioContext) {
+        console.warn('AudioContext not supported in this environment');
+        return;
+      }
       this.ctx = new AudioContext({ latencyHint: 'interactive' });
       
       this.ctx.onstatechange = () => {
