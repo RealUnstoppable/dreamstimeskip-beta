@@ -464,11 +464,11 @@
     </div>
 
    <script type="module">
-        import { auth, db } from '/js/auth.js';
+        import { auth, db } from './js/auth.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-        import { getAllTickets, replyToTicket } from '/js/ticket-service.js';
-        import { fetchCollectionData, escapeHTML } from '/js/utils.js';
+        import { getAllTickets, replyToTicket } from './js/ticket-service.js';
+        import { fetchCollectionData, escapeHTML } from './js/utils.js';
 
         let performanceChart;
 
