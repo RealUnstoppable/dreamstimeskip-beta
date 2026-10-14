@@ -184,6 +184,7 @@
             font-size: 0.92rem;
             line-height: 1.5;
             margin-bottom: 16px;
+            max-width: 54%;
         }
 
         .mc-bento-cta {
@@ -215,7 +216,97 @@
             border: 2px solid #2d3036;
             box-shadow: 0 8px 24px rgba(0,0,0,0.7);
             object-fit: cover;
-            border-radius: 4px;
+            object-position: center center !important;
+            border-radius: 6px;
+        }
+
+        @media (max-width: 768px) {
+            #bento-dts {
+                padding: 24px 20px;
+                min-height: 220px;
+            }
+
+            #bento-dts .card-content {
+                width: 58%;
+                max-width: 58%;
+                z-index: 2;
+            }
+
+            #bento-dts p {
+                max-width: 100%;
+                font-size: 0.85rem;
+                line-height: 1.45;
+                margin-bottom: 12px;
+            }
+
+            #bento-dts h3 {
+                font-size: 1.15rem;
+            }
+
+            .mc-bento-badge {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+                margin-bottom: 8px;
+            }
+
+            .mc-bento-cta {
+                font-size: 0.72rem;
+                padding: 6px 12px;
+            }
+
+            #bento-dts img {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%) scale(0.9);
+                transform-origin: center right;
+                width: 38%;
+                max-width: 155px;
+                height: auto;
+                aspect-ratio: 16 / 10;
+                object-fit: cover;
+                object-position: center center !important;
+                border-radius: 6px;
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+            }
+
+            #bento-dts:hover img {
+                transform: translateY(-50%) scale(0.94);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #bento-dts {
+                padding: 20px 14px;
+                min-height: 210px;
+            }
+
+            #bento-dts .card-content {
+                width: 60%;
+                max-width: 60%;
+            }
+
+            #bento-dts p {
+                font-size: 0.8rem;
+                line-height: 1.4;
+            }
+
+            #bento-dts h3 {
+                font-size: 1.02rem;
+            }
+
+            #bento-dts img {
+                right: 10px;
+                width: 36%;
+                max-width: 120px;
+                transform: translateY(-50%) scale(0.85);
+                transform-origin: center right;
+                object-position: center center !important;
+            }
+
+            #bento-dts:hover img {
+                transform: translateY(-50%) scale(0.89);
+            }
         }
         /* --- END: Minecraft Themed Bento Card --- */
 
@@ -1000,7 +1091,7 @@
                     <div class="card-content">
                         <div class="mc-bento-badge"><span>⚔️</span> MINECRAFT 26.3 • OCT 20</div>
                         <h3>Dreams TimeSkip</h3>
-                        <p>Season OG • Maintenance until the 20th. Relive your childhood in classic SMP.</p>
+                        <p>Season OG • Maintenance until the 20th.<br>Relive your childhood<br><span style="white-space: nowrap;">in classic SMP.</span></p>
                         <span class="mc-bento-cta">EXPLORE REALM ▶</span>
                     </div>
                     <img src="/images/Game Art.png" alt="Dreams TimeSkip Minecraft Art" loading="lazy">

@@ -739,6 +739,10 @@ p.section-subtitle {
         grid-column: span 1;
     }
 
+    .bento-card img {
+        object-position: center center;
+    }
+
     .footer-bottom {
         justify-content: center;
         text-align: center;
