@@ -1,595 +1,1349 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>What's New - Patch Notes | Dreams TimeSkip</title>
+    <title>What's New in Dreams TimeSkip | Official Realm Info & Patch Notes</title>
+    <meta name="description" content="Official patch notes, lore chronicles, and gameplay mechanics for Dreams TimeSkip. Explore Gilded Netherite equipment, custom biomes, magic wands, furniture, and farming.">
+    
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
+
     <style>
-        /* Update Page Specific Styles */
-        .update-main {
-            max-width: 1000px;
+        /* ========================================================
+           MINECRAFT.NET THEME & DESIGN SYSTEM (MATCHING LAUNCH PAGE)
+           ======================================================== */
+        :root {
+            --mc-green: #3c8527;
+            --mc-green-light: #52a435;
+            --mc-green-border-top: #5eb33a;
+            --mc-green-border-bot: #1c5212;
+            --mc-stone: #4a4d52;
+            --mc-stone-border-top: #6c7178;
+            --mc-stone-border-bot: #27292c;
+            --mc-gold: #f5bc18;
+            --mc-gold-light: #ffff55;
+            --mc-gold-border-top: #ffd359;
+            --mc-gold-border-bot: #8a6500;
+            --mc-diamond: #55ffff;
+            --mc-dark-bg: #121417;
+            --mc-card-bg: #181b20;
+            --mc-card-border: #2d313a;
+            --mc-font-pixel: 'Silkscreen', 'Press Start 2P', monospace;
+            --mc-font-sub: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--mc-dark-bg);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(60, 133, 39, 0.12) 0%, transparent 60%),
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 28px 28px, 28px 28px;
+            color: #f1f4f8;
+            font-family: var(--mc-font-sub);
+            overflow-x: hidden;
+            line-height: 1.7;
+        }
+
+        /* --- Minecraft Announcement Bar --- */
+        .mc-announcement-bar {
+            background: #0d1013;
+            border-bottom: 2px solid var(--mc-green);
+            padding: 10px 20px;
+            text-align: center;
+            font-family: var(--mc-font-pixel);
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            color: #72e060;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 10;
+            margin-top: 64px;
+        }
+
+        .mc-announcement-pulse {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #55ff55;
+            box-shadow: 0 0 10px #55ff55;
+            animation: mcPulse 1.4s infinite;
+        }
+
+        @keyframes mcPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.75); }
+        }
+
+        /* --- Main Layout --- */
+        .patch-main {
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 120px 20px 60px;
+            padding: 40px 20px 80px;
         }
 
-        .page-title {
+        /* --- Header Section --- */
+        .patch-header {
             text-align: center;
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            margin-bottom: 20px;
-            background: linear-gradient(90deg, #16A34A, #f5f5f7);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #23272f;
         }
 
-        .page-subtitle {
-            text-align: center;
-            color: var(--text-secondary);
-            margin-bottom: 60px;
-            font-size: 1.2rem;
+        .patch-header h1 {
+            font-family: var(--mc-font-pixel);
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            color: #ffffff;
+            text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(0,0,0,0.6);
+            margin: 14px 0 16px;
+            line-height: 1.25;
         }
 
-        .update-section {
-            background-color: var(--primary-card-color);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            transition: border-color 0.3s ease;
+        .patch-header .subtitle {
+            color: #a8b2be;
+            font-size: 1.15rem;
+            max-width: 750px;
+            margin: 0 auto 25px;
+            line-height: 1.6;
         }
 
-        .update-section:hover {
-            border-color: var(--accent-green);
+        /* --- Minecraft Pixel Badges --- */
+        .mc-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 12px;
+            background: rgba(14, 16, 20, 0.95);
+            border: 2px solid var(--mc-green);
+            color: #55ff55;
+            font-family: var(--mc-font-pixel);
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(60, 133, 39, 0.3);
+            width: fit-content;
         }
 
-        .section-header {
+        .mc-badge-gold {
+            border-color: var(--mc-gold);
+            color: var(--mc-gold-light);
+            box-shadow: 0 2px 8px rgba(245, 188, 24, 0.3);
+        }
+
+        .mc-badge-diamond {
+            border-color: var(--mc-diamond);
+            color: var(--mc-diamond);
+            box-shadow: 0 2px 8px rgba(85, 255, 255, 0.3);
+        }
+
+        /* --- Quick Category Navigation Bar --- */
+        .quick-nav-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 35px;
+            padding: 16px;
+            background: #15181e;
+            border: 2px solid #282c35;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+        }
+
+        .quick-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            background: #23262d;
+            border: 1px solid #383c46;
+            color: #d1d8e0;
+            font-family: var(--mc-font-pixel);
+            font-size: 0.72rem;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.15s ease;
+        }
+
+        .quick-nav-link:hover {
+            background: var(--mc-green);
+            border-color: var(--mc-green-border-top);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .toggle-all-btn {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.75rem;
+            padding: 8px 16px;
+            background: var(--mc-stone);
+            color: #ffffff;
+            border: 2px solid #000;
+            border-top: 2px solid var(--mc-stone-border-top);
+            border-left: 2px solid var(--mc-stone-border-top);
+            border-right: 2px solid var(--mc-stone-border-bot);
+            border-bottom: 3px solid var(--mc-stone-border-bot);
+            cursor: pointer;
+            box-shadow: 0 2px 0 #000;
+        }
+
+        /* --- Minecraft 3D Block Buttons --- */
+        .mc-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 11px 24px;
+            font-family: var(--mc-font-pixel);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            border: 2px solid #000;
+            position: relative;
+            user-select: none;
+            transition: transform 0.08s ease, filter 0.15s ease;
+            box-sizing: border-box;
+        }
+
+        .mc-btn-green {
+            background: var(--mc-green);
+            color: #ffffff;
+            border-top: 3px solid var(--mc-green-border-top);
+            border-left: 3px solid var(--mc-green-border-top);
+            border-right: 3px solid var(--mc-green-border-bot);
+            border-bottom: 4px solid var(--mc-green-border-bot);
+            box-shadow: 0 3px 0 #000, 0 6px 14px rgba(0,0,0,0.4);
+            text-shadow: 1px 1px 0px #18440f;
+        }
+        .mc-btn-green:hover {
+            background: #469c2e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #000, 0 10px 18px rgba(0,0,0,0.5);
+            color: #ffffff;
+        }
+        .mc-btn-green:active {
+            border-top: 3px solid var(--mc-green-border-bot);
+            border-left: 3px solid var(--mc-green-border-bot);
+            border-right: 3px solid var(--mc-green-border-top);
+            border-bottom: 3px solid var(--mc-green-border-top);
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
+        .mc-btn-stone {
+            background: var(--mc-stone);
+            color: #ffffff;
+            border-top: 3px solid var(--mc-stone-border-top);
+            border-left: 3px solid var(--mc-stone-border-top);
+            border-right: 3px solid var(--mc-stone-border-bot);
+            border-bottom: 4px solid var(--mc-stone-border-bot);
+            box-shadow: 0 3px 0 #000, 0 6px 14px rgba(0,0,0,0.4);
+            text-shadow: 1px 1px 0px #1c1d20;
+        }
+        .mc-btn-stone:hover {
+            background: #565a61;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #000, 0 10px 18px rgba(0,0,0,0.5);
+            color: #ffffff;
+        }
+        .mc-btn-stone:active {
+            border-top: 3px solid var(--mc-stone-border-bot);
+            border-left: 3px solid var(--mc-stone-border-bot);
+            border-right: 3px solid var(--mc-stone-border-top);
+            border-bottom: 3px solid var(--mc-stone-border-top);
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
+        .mc-btn-gold {
+            background: #c68a18;
+            color: #ffffff;
+            border-top: 3px solid var(--mc-gold-border-top);
+            border-left: 3px solid var(--mc-gold-border-top);
+            border-right: 3px solid var(--mc-gold-border-bot);
+            border-bottom: 4px solid var(--mc-gold-border-bot);
+            box-shadow: 0 3px 0 #000, 0 6px 14px rgba(0,0,0,0.4);
+            text-shadow: 1px 1px 0px #5c3a00;
+        }
+        .mc-btn-gold:hover {
+            background: #d8961b;
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0 #000, 0 10px 18px rgba(0,0,0,0.5);
+            color: #ffffff;
+        }
+        .mc-btn-gold:active {
+            border-top: 3px solid var(--mc-gold-border-bot);
+            border-left: 3px solid var(--mc-gold-border-bot);
+            border-right: 3px solid var(--mc-gold-border-top);
+            border-bottom: 3px solid var(--mc-gold-border-top);
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
+        /* --- Section Block Container --- */
+        .patch-card {
+            background-color: var(--mc-card-bg);
+            border: 3px solid var(--mc-card-border);
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .patch-card:hover {
+            border-color: var(--mc-green);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.8), 0 0 18px rgba(60,133,39,0.25);
+        }
+
+        .patch-card-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
         }
 
-        .section-title {
-            font-size: 1.8rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
+        .patch-card-title {
+            font-family: var(--mc-font-pixel);
+            font-size: clamp(1.25rem, 3vw, 1.7rem);
+            color: #ffffff;
+            margin: 8px 0;
+            line-height: 1.35;
+            text-shadow: 2px 2px 0 #000;
         }
 
-        .section-summary {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            border-left: 3px solid var(--accent-green);
-            padding-left: 15px;
+        .patch-summary {
+            color: #d1d8e0;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 22px;
+            border-left: 4px solid var(--mc-green);
+            padding-left: 18px;
+            background: rgba(60, 133, 39, 0.06);
+            padding-top: 8px;
+            padding-bottom: 8px;
         }
 
-        .read-more-btn {
-            background-color: transparent;
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-            padding: 10px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        .read-more-btn:hover {
-            background-color: var(--accent-green);
-            color: #fff;
-        }
-
-        /* Hidden Content Styles */
+        /* --- Expandable Details --- */
         .full-details {
             display: none;
-            /* Hidden by default */
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid var(--border-color);
-            animation: fadeIn 0.5s ease;
+            margin-top: 28px;
+            padding-top: 28px;
+            border-top: 2px solid #262932;
+            animation: mcSlideDown 0.3s ease;
         }
 
         .full-details.open {
             display: block;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes mcSlideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Content Formatting */
         .full-details h3 {
-            color: var(--accent-blue);
-            font-size: 1.4rem;
-            margin-top: 25px;
-            margin-bottom: 15px;
+            font-family: var(--mc-font-pixel);
+            font-size: 1.15rem;
+            color: var(--mc-gold-light);
+            margin: 28px 0 14px;
+            text-shadow: 1px 1px 0 #000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .full-details h4 {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.95rem;
+            color: #55ff55;
+            margin: 20px 0 10px;
         }
 
         .full-details p,
         .full-details li {
-            color: #d1d5db;
-            line-height: 1.7;
-            margin-bottom: 15px;
+            color: #e2e8f0;
+            line-height: 1.75;
+            font-size: 1rem;
+            margin-bottom: 14px;
         }
 
         .full-details ul,
         .full-details ol {
-            margin-left: 20px;
-            margin-bottom: 20px;
+            margin-left: 24px;
+            margin-bottom: 22px;
+        }
+
+        .full-details li::marker {
+            color: var(--mc-green-light);
         }
 
         .full-details strong {
-            color: #fff;
+            color: #ffffff;
+            font-weight: 700;
         }
 
-        .update-image {
+        /* --- Image Presentation Styles --- */
+        .patch-img-hero {
             width: 100%;
             height: auto;
-            border-radius: 8px;
+            max-height: 480px;
+            object-fit: cover;
+            border: 2px solid #2d3038;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             margin: 20px 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .code-block {
-            background-color: #000;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: monospace;
-            color: var(--accent-green);
-            margin: 15px 0;
             display: block;
         }
 
-        .data-table {
+        .img-caption {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.72rem;
+            color: #8c96a4;
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Image Grids for Docx Assets --- */
+        .patch-image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin: 24px 0 30px;
+        }
+
+        .patch-image-card {
+            background: #14161a;
+            border: 2px solid #282c35;
+            padding: 12px;
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .patch-image-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--mc-gold);
+        }
+
+        .patch-image-card img {
             width: 100%;
-            border-collapse: collapse;
+            height: 180px;
+            object-fit: cover;
+            border: 1px solid #20232a;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .patch-image-card span {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.75rem;
+            color: #ffffff;
+            display: block;
+        }
+
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
             margin: 20px 0;
         }
 
-        .data-table th,
-        .data-table td {
-            border: 1px solid var(--border-color);
+        .recipe-card {
+            background: #131518;
+            border: 2px solid #252830;
             padding: 12px;
+            text-align: center;
+        }
+
+        .recipe-card img {
+            max-width: 100%;
+            height: auto;
+            max-height: 140px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .recipe-card p {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.72rem;
+            color: var(--mc-gold-light);
+            margin: 0;
+        }
+
+        /* --- Tables --- */
+        .mc-table-wrap {
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 2px solid #292d35;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .mc-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+            background: #14161b;
+        }
+
+        .mc-data-table th,
+        .mc-data-table td {
+            border: 1px solid #2a2e37;
+            padding: 12px 16px;
             text-align: left;
         }
 
-        .data-table th {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: var(--accent-blue);
+        .mc-data-table th {
+            background-color: #1f2229;
+            color: var(--mc-gold-light);
+            font-family: var(--mc-font-pixel);
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
         }
 
-        .btn-download-large {
-            background-color: var(--accent-green);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1rem;
-            display: inline-flex;
+        .mc-data-table tr:nth-child(even) td {
+            background-color: #181b21;
+        }
+
+        .mc-data-table tr:hover td {
+            background-color: rgba(60, 133, 39, 0.15);
+        }
+
+        /* --- Code & Command Block --- */
+        .mc-code-box {
+            background: #0d0e11;
+            border: 2px solid #23262f;
+            padding: 14px 18px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #55ff55;
+            display: flex;
             align-items: center;
-            gap: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-            border: none;
-            cursor: pointer;
+            justify-content: space-between;
+            margin: 16px 0;
+            box-shadow: inset 1px 1px 4px rgba(0,0,0,0.8);
         }
 
-        .btn-download-large:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(22, 163, 74, 0.4);
+        .mc-code-box code {
+            font-size: 0.95rem;
+        }
+
+        .copy-cmd-btn {
+            background: #252830;
+            border: 1px solid #3c404a;
+            color: #d1d8e0;
+            font-family: var(--mc-font-pixel);
+            font-size: 0.68rem;
+            padding: 4px 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .copy-cmd-btn:hover {
+            background: var(--mc-green);
+            color: #fff;
+        }
+
+        /* --- Two Column Feature List --- */
+        .split-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 16px 0;
+        }
+
+        .feature-subcard {
+            background: #14161a;
+            border: 2px solid #252830;
+            padding: 20px;
+        }
+
+        .feature-subcard h4 {
+            color: var(--mc-gold-light);
+            margin-top: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .patch-card {
+                padding: 22px 16px;
+            }
+            .patch-main {
+                padding: 20px 12px 60px;
+            }
+            .patch-card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .mc-announcement-bar {
+                margin-top: 56px;
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <header class="main-header">
+    <header class="main-header"></header>
 
-    </header>
-    <main class="update-main">
-        <h1 class="page-title">What's New in Dreams TimeSkip</h1>
-        <p class="page-subtitle">Full Patch Notes, Lore, and Mechanic Updates for the latest release.</p>
+    <!-- Top Minecraft Announcement Ribbon -->
+    <div class="mc-announcement-bar">
+        <span class="mc-announcement-pulse"></span>
+        <span>⚔️ DREAMS TIMESKIP REALM INFO • MINECRAFT 26.3 • SERVER: MAINTENANCE UNTIL OCT 20TH • IP: dts.realunstoppable.store ⚔️</span>
+    </div>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">The Legends of Time: Rise of the Exiles</h2>
-                <p class="section-summary">
-                    Welcome to Season 1. Centuries have passed since the Exiles forged the NeoCube. Now, three
-                    kingdoms—Wealth, Power, and Wisdom—defy the oppressive rule of an enigmatic figure. Will you rise as
-                    a conqueror?
+    <main class="patch-main">
+        <!-- Header -->
+        <header class="patch-header">
+            <div class="mc-badge mc-badge-diamond">
+                <span>✦</span> OFFICIAL PATCH NOTES & LORE ARCHIVE <span>✦</span>
+            </div>
+            <h1>WHAT'S NEW IN DREAMS TIMESKIP</h1>
+            <p class="subtitle">
+                The authoritative guide to all features, custom biomes, magical arts, gilded equipment, and realm lore extracted from the official Realm Info Sheet.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+                <a href="dreamstimeskip.html" class="mc-btn mc-btn-stone">
+                    ← Return to Launch Portal
+                </a>
+                <button id="toggle-all-sections-btn" class="mc-btn mc-btn-green">
+                    [+] Expand All Sections
+                </button>
+                <button id="copy-server-ip-btn" class="mc-btn mc-btn-gold" data-ip="dts.realunstoppable.store">
+                    <span class="btn-text">📋 Copy Server IP</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Quick Jump Filter Bar -->
+        <nav class="quick-nav-bar" aria-label="Patch Notes Navigation">
+            <a href="#lore" class="quick-nav-link">📖 Lore & Kingdoms</a>
+            <a href="#bugs" class="quick-nav-link">🐛 Patch Notes</a>
+            <a href="#gilded" class="quick-nav-link">⚔️ Gilded Gear</a>
+            <a href="#biomes" class="quick-nav-link">🌸 Biomania</a>
+            <a href="#magic" class="quick-nav-link">✨ Magic System</a>
+            <a href="#furniture" class="quick-nav-link">🪑 Furniture Mod</a>
+            <a href="#farming" class="quick-nav-link">🍎 Food & Crops</a>
+            <a href="#economy" class="quick-nav-link">🪙 Economy & Taxes</a>
+            <a href="#memberships" class="quick-nav-link">💎 Memberships</a>
+        </nav>
+
+        <!-- SECTION 1: LORE -->
+        <section class="patch-card" id="lore">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-gold">
+                        <span>📜</span> CHAPTER 1 LORE
+                    </div>
+                    <h2 class="patch-card-title">The Legends of Time: Rise of the Exiles</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('lore-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                Centuries have passed since the first Exiles forged the sacred NeoCube. Now, three defiant kingdoms—Wealth, Power, and Wisdom—challenge an oppressive ruler. Will you rise as a conqueror?
+            </p>
+
+            <img src="/images/minecraft-adventure.webp" alt="Minecraft Mesa Outpost & Beacon" class="patch-img-hero" loading="lazy">
+            <p class="img-caption">The Badlands Outpost — Beacon of the Exiles</p>
+
+            <div id="lore-details" class="full-details">
+                <h3>The Chronicles of the NeoCube</h3>
+                <p>
+                    Centuries have passed since the first exiles set foot in the mysterious lands of time. They, the pioneers who forged the <strong>NeoCube</strong>, a sacred artifact capable of bending reality itself, unknowingly unleashed a force that would shape the fate of kingdoms across generations.
                 </p>
-                <button class="read-more-btn" onclick="toggleSection('lore-details')">Read More</button>
-                <div class="ad-banner-container" data-ad-slot="1234567890" style="margin: 20px auto; text-align: center; width: 100%;"></div>
+                <p>
+                    With its discovery, an enigmatic figure emerged, wielding the NeoCube's power to control these lands and dictate the rise and fall of mighty realms. Yet, amidst this dominion, a glimmer of resistance remains. Three kingdoms, resolute in their defiance, defy the oppressive rule:
+                </p>
 
-                <div id="lore-details" class="full-details">
-                    <p><strong>Introduction:</strong></p>
-                    <p>Centuries have passed since the first exiles set foot in the mysterious lands of time. They, the
-                        pioneers who forged the NeoCube, a sacred artifact capable of bending reality itself,
-                        unknowingly unleashed a force that would shape the fate of kingdoms.</p>
-                    <p>With its discovery, an enigmatic figure emerged, wielding the NeoCube's power to control these
-                        lands and dictate the rise and fall of mighty realms. Yet, amidst this dominion, a glimmer of
-                        resistance remains. Three kingdoms, resolute in their defiance, defy the oppressive rule.</p>
-                    <ul>
-                        <li><strong>The Kingdom of Wealth:</strong> Where opulence and fortune thrive.</li>
-                        <li><strong>The Kingdom of Power:</strong> A bastion of strength and unyielding might.</li>
-                        <li><strong>The Kingdom of Wisdom:</strong> Where knowledge and intellect illuminate the path
-                            ahead.</li>
-                    </ul>
-                    <p>But their dominion is fragile, their thrones vacant, their rulers lost to the annals of history.
-                        Now, the remnants of noble bloodlines have splintered, each vying to forge their own kingdoms,
-                        their own legacies.</p>
-                    <p>As chaos consumes the realm, the lone Minister, unwavering in loyalty to the fallen King, watches
-                        from the Throne Room. Yet, a shadow looms from the underworld—an Overlord ascends.</p>
-                    <p>It falls to you, brave Exile, to gather your loyal subjects and claim your birthright as the
-                        Supreme King of the Land. Will you rise as a conqueror or succumb to the tempest?</p>
+                <div class="split-grid-2">
+                    <div class="feature-subcard">
+                        <h4>🪙 The Kingdom of Wealth</h4>
+                        <p>Where opulence, gold trade, and thriving bazaars drive unyielding merchant dynasties.</p>
+                    </div>
+                    <div class="feature-subcard">
+                        <h4>⚔️ The Kingdom of Power</h4>
+                        <p>A bastion of military discipline, veteran warriors, and impregnable stone fortifications.</p>
+                    </div>
+                    <div class="feature-subcard">
+                        <h4>🔮 The Kingdom of Wisdom</h4>
+                        <p>Where arcane knowledge, alchemical mastery, and ancient scholarship illuminate the path ahead.</p>
+                    </div>
+                    <div class="feature-subcard">
+                        <h4>👑 The Vacant Throne</h4>
+                        <p>Noble bloodlines have splintered. Gather your loyal subjects and claim your birthright as Supreme King.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">Patch Notes & Known Bugs</h2>
-                <p class="section-summary">
-                    We've squashed major bugs including the "missing legs" glitch and "deadly laser sun," though some
-                    issues with moon size and entity textures persist.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('bugs-details')">Read More</button>
-
-                <div id="bugs-details" class="full-details">
-                    <h3>Resolved Issues</h3>
-                    <ul>
-                        <li>Resolved an issue where players spawned without legs.</li>
-                        <li>Addressed a bug where shields failed to provide protection while sneaking.</li>
-                        <li>Corrected a bug preventing saturation restoration when eating while flying.</li>
-                        <li>Fixed Elytra activation with jump button causing unintended space propulsion.</li>
-                        <li>Eliminated a bug causing involuntary teleportation to coordinates -1287 89 324.</li>
-                        <li>Fixed inventory wipes upon consuming food.</li>
-                        <li>Ender pearls no longer cause fatal harm on ocean contact.</li>
-                        <li>NPC generation adjusted: NPCs no longer spawn in farming areas.</li>
-                    </ul>
-
-                    <h3>Known Bugs</h3>
-                    <ul>
-                        <li>Certain entities render without proper textures.</li>
-                        <li>Cows drop "Bucket of M!lk" instead of "Bucket of Milk".</li>
-                        <li>The sun is still a deadly laser.</li>
-                        <li>The moon appears larger than it should.</li>
-                        <li>Impossible to disengage Elytra in creative mode.</li>
-                        <li>Menu screens and UI are glitched.</li>
-                        <li>Excessive flowers spawning on mountains.</li>
-                    </ul>
+        <!-- SECTION 2: PATCH NOTES & BUGS -->
+        <section class="patch-card" id="bugs">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge">
+                        <span>🐛</span> VERSION 26.3
+                    </div>
+                    <h2 class="patch-card-title">Patch Notes & Known Issues</h2>
                 </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('bugs-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
             </div>
-        </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">New Gear: Gilded Items</h2>
-                <p class="section-summary">
-                    A new tier of equipment has arrived. Craft Gilded Netherite for superior durability and protection.
-                    Includes the all-new Mace weapon class!
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('gilded-details')">Read More</button>
+            <p class="patch-summary">
+                We've addressed critical glitches including player model leg rendering and shield collision failures, alongside ongoing monitoring of celestial rendering bugs.
+            </p>
 
-                <div id="gilded-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/2563EB?text=Gilded+Armor+Preview"
-                        alt="Gilded Armor Preview" class="update-image" loading="lazy">
-
-                    <h3>How to Craft</h3>
-                    <ol>
-                        <li><strong>Smelt:</strong> Burn Gilded Blackstone in a furnace or blast furnace to get Melted
-                            Gilded Blackstone.</li>
-                        <li><strong>Combine:</strong> Craft Gilded Netherite Ingots.</li>
-                        <li><strong>Apply:</strong> Combine directly with Netherite equipment in a crafting table.</li>
-                    </ol>
-                    <p><em>Bonus: 1+ piece of armor makes piglins ignore you. Full set grants +4 Extra Health.</em></p>
-
-                    <h3>Armor Stats</h3>
-                    <table class="data-table">
-                        <tr>
-                            <th>Item</th>
-                            <th>Protection</th>
-                            <th>Durability</th>
-                        </tr>
-                        <tr>
-                            <td>Gilded Helmet</td>
-                            <td>3 Bars</td>
-                            <td>543 (vs 407)</td>
-                        </tr>
-                        <tr>
-                            <td>Gilded Chestplate</td>
-                            <td>8 Bars</td>
-                            <td>789 (vs 592)</td>
-                        </tr>
-                        <tr>
-                            <td>Gilded Leggings</td>
-                            <td>6 Bars</td>
-                            <td>740 (vs 555)</td>
-                        </tr>
-                        <tr>
-                            <td>Gilded Boots</td>
-                            <td>3 Bars</td>
-                            <td>641 (vs 481)</td>
-                        </tr>
-                    </table>
-
-                    <h3>New Weapon: The Mace</h3>
-                    <p>Breaks cobwebs and bamboo instantly. Features a "Bash" attack (Right Click/Hold) that deals heavy
-                        durability damage to opponent armor.</p>
-                    <ul>
-                        <li><strong>Gilded Mace:</strong> 50 durability damage per bash.</li>
-                        <li><strong>Netherite Mace:</strong> 42 durability damage per bash.</li>
-                        <li><strong>Diamond Mace:</strong> 35 durability damage per bash.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">World Update: Biomania</h2>
-                <p class="section-summary">
-                    Explore the landscape with brand new biomes including the Cherry Blossom Grove and Shattered Taiga.
-                    New trees, plants, and blocks await.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('biomes-details')">Read More</button>
-
-                <div id="biomes-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/16A34A?text=Cherry+Blossom+Grove"
-                        alt="Cherry Blossom Grove" class="update-image" loading="lazy">
-
-                    <h3>New Biomes</h3>
-                    <ul>
-                        <li><strong>Cherry Blossom Grove:</strong> Full of pink petals, Cherry trees, and atmosphere
-                            fog.</li>
-                        <li><strong>Shattered Taiga:</strong> A chaotic, rugged landscape with massive cliffs.</li>
-                        <li><strong>Dunes:</strong> Vast sandy expanses with new "Dune Grass" vegetation.</li>
-                        <li><strong>Rainforest:</strong> Dense, lush, and dark forests.</li>
-                        <li><strong>Shrubland & Pumpkin Patch:</strong> New variations for gathering resources.</li>
-                    </ul>
-
-                    <h3>New Blocks & Particles</h3>
-                    <p>Added Cherry Sapling, Cherry Stairs, Dune Grass, Fluffy Cattail, and Sand Dust Particles for
-                        atmosphere.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">Magic System</h2>
-                <p class="section-summary">
-                    We've added 30 new wands and 10 magic classes. Master the elements, but choose wisely—you can only
-                    hold 2 magic classes at a time.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('magic-details')">Read More</button>
-
-                <div id="magic-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/9333EA?text=Magic+Wands" alt="Magic Wands"
-                        class="update-image" loading="lazy">
-
-                    <p>There is a leveling system to unlock new magic to prevent players from becoming too OP
-                        immediately. You will need to craft the <strong>Magic Book</strong> to get started.</p>
-
-                    <h3>Magic Classes</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr;">
+            <div id="bugs-details" class="full-details">
+                <div class="split-grid-2">
+                    <div class="feature-subcard" style="border-left: 4px solid var(--mc-green);">
+                        <h4 style="color: #55ff55;">✓ Resolved Fixes</h4>
                         <ul>
-                            <li>Wind</li>
-                            <li>Water</li>
-                            <li>Poison</li>
-                            <li>Necromancy</li>
-                            <li>Light</li>
+                            <li><strong>Model Rendering:</strong> Fixed issue where players spawned without legs.</li>
+                            <li><strong>Shield Mechanics:</strong> Fixed shields failing to block while sneaking.</li>
+                            <li><strong>Aerial Saturation:</strong> Corrected bug preventing hunger restoration when eating while flying.</li>
+                            <li><strong>Elytra Propulsion:</strong> Fixed jump button bug causing unintended launch into space.</li>
+                            <li><strong>Coordinate Glitch:</strong> Eliminated forced teleportation to coordinates <code>-1287, 89, 324</code>.</li>
+                            <li><strong>Inventory Protection:</strong> Fixed rare inventory loss bug upon consuming food.</li>
+                            <li><strong>Ender Pearls:</strong> No longer causes fatal impact damage on ocean surfaces.</li>
+                            <li><strong>NPC Spawns:</strong> NPCs properly restricted from crowding active farmland.</li>
                         </ul>
+                    </div>
+
+                    <div class="feature-subcard" style="border-left: 4px solid #f5bc18;">
+                        <h4 style="color: #ffdd44;">⚠ Known Bugs Being Monitored</h4>
                         <ul>
-                            <li>Ice</li>
-                            <li>Grass</li>
-                            <li>Fire</li>
-                            <li>Electric</li>
-                            <li>Death</li>
+                            <li>Certain custom entities render with fallback missing texture grids.</li>
+                            <li>Cows occasionally drop "Bucket of M!lk" instead of standard Milk.</li>
+                            <li>The sun remains a deadly laser in specific high-altitude biomes.</li>
+                            <li>The moon appears unusually enlarged during lunar transitions.</li>
+                            <li>Elytra disengage trigger delay in creative testing mode.</li>
+                            <li>Excessive wild flower clusters on high mountain slopes.</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">Furniture & Decor Mod</h2>
-                <p class="section-summary">
-                    Decorate your home with fully 3D modeled furniture. Includes functional chairs, tables, storage
-                    barrels, and more.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('decor-details')">Read More</button>
-
-                <div id="decor-details" class="full-details">
-                    <img src="https://placehold.co/800x400/141414/FBBF24?text=Furniture+Showcase"
-                        alt="Furniture Showcase" class="update-image" loading="lazy">
-
-                    <p>This addon adds many new blocks with all types of wood compatibility. Admin command to generate a
-                        showcase house: <span class="code-block">/function medieval_blocks</span></p>
-
-                    <h3>New Items</h3>
-                    <ul>
-                        <li><strong>Decorative Sticks & Beams:</strong> For adding detail to walls and roofs.</li>
-                        <li><strong>Bookshelves:</strong> 16 variants with different book patterns.</li>
-                        <li><strong>Storage:</strong> Crates, Barrels, and Baskets (display items like apples, fish,
-                            etc.).</li>
-                        <li><strong>Furniture:</strong> Tables, Stools, Cupboards, Desks.</li>
-                        <li><strong>Chairs:</strong> Fully functional! Sit down and relax.</li>
-                    </ul>
+        <!-- SECTION 3: GILDED NETHERITE & MACE -->
+        <section class="patch-card" id="gilded">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-gold">
+                        <span>⚔️</span> NEW EQUIPMENT
+                    </div>
+                    <h2 class="patch-card-title">New Gear: Gilded Netherite & The Mace</h2>
                 </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('gilded-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
             </div>
-        </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">New Foods & Farming</h2>
-                <p class="section-summary">
-                    A massive culinary update with 70+ new foods, 40+ new crops, and new kitchen machinery like blenders
-                    and ovens.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('food-details')">Read More</button>
+            <p class="patch-summary">
+                A new pinnacle of equipment has arrived. Forge Gilded Netherite for supreme durability, +4 bonus health, and piglin pacification. Features the high-impact Mace weapon class!
+            </p>
 
-                <div id="food-details" class="full-details">
-                    <h3>Crops & Trees</h3>
-                    <p>Trade with the <strong>Wandering Farmer</strong> to get seeds. Grow Maple (syrup!), Cherry, Palm
-                        (coconuts), Cinnamon, Orange, Lemon, Mango, and Peach trees.</p>
+            <!-- Real 3D Model Image from docx -->
+            <img src="/images/dts-info/image17.png" alt="Gilded Netherite Armor 3D Model" class="patch-img-hero" loading="lazy">
+            <p class="img-caption">3D In-Game Model — Gilded Netherite Armor (Designed by Catalin & Liz)</p>
 
-                    <h3>New Machinery</h3>
-                    <ul>
-                        <li><strong>Ovens:</strong> Cook food using cooking oil instead of coal.</li>
-                        <li><strong>Mill:</strong> Grind grains and fruits.</li>
-                        <li><strong>Presser:</strong> Make juice without fuel.</li>
-                        <li><strong>Brewer & Blender:</strong> Create sodas and smoothies.</li>
-                    </ul>
+            <div id="gilded-details" class="full-details">
+                <h3>Crafting Process</h3>
+                <ol>
+                    <li><strong>Smelt Blackstone:</strong> Smelt Gilded Blackstone in a standard or blast furnace to extract <em>Melted Gilded Blackstone</em>.</li>
+                    <li><strong>Forge Ingot:</strong> Combine with Netherite to craft <em>Gilded Netherite Ingots</em>.</li>
+                    <li><strong>Smithing Upgrade:</strong> Apply ingots to standard Netherite gear in a Smithing Table.</li>
+                </ol>
 
-                    <h3>New Dishes</h3>
-                    <p>Craft Kabobs (roast on campfire), Pies, Cakes, and various fruit dishes. Find the <strong>Aimless
-                            Baker</strong> roaming the world to buy supplies!</p>
+                <div class="split-grid-2" style="margin: 20px 0;">
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image1.png" alt="Smelting Gilded Blackstone">
+                        <p>Step 1: Smelt Gilded Blackstone</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image3.png" alt="Crafting Gilded Ingot">
+                        <p>Step 2: Forge Gilded Netherite Ingot</p>
+                    </div>
                 </div>
-            </div>
-        </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">Economy & Tax System</h2>
-                <p class="section-summary">
-                    We have revised the currency system and introduced a progressive tax bracket for shop owners based
-                    on monthly income.
-                </p>
-                <button class="read-more-btn" onclick="toggleSection('eco-details')">Read More</button>
-
-                <div id="eco-details" class="full-details">
-                    <h3>Currency Exchange Rates</h3>
-                    <table class="data-table">
-                        <tr>
-                            <td>1 Iron Ingot</td>
-                            <td>0.2 Gold</td>
-                        </tr>
-                        <tr>
-                            <td>1 Gold Nugget</td>
-                            <td>2 Gold</td>
-                        </tr>
-                        <tr>
-                            <td>1 Gold Bar</td>
-                            <td>20 Gold</td>
-                        </tr>
-                        <tr>
-                            <td>1 Diamond</td>
-                            <td>50 Gold</td>
-                        </tr>
-                        <tr>
-                            <td>1 Netherite Ingot</td>
-                            <td>100 Gold</td>
-                        </tr>
-                        <tr>
-                            <td>1 Netherite Block</td>
-                            <td>1000 Gold</td>
-                        </tr>
+                <h3>Equipment Stats Breakdown</h3>
+                <div class="mc-table-wrap">
+                    <table class="mc-data-table">
+                        <thead>
+                            <tr>
+                                <th>Armor Piece</th>
+                                <th>Protection</th>
+                                <th>Gilded Durability</th>
+                                <th>Vanilla Durability</th>
+                                <th>Set Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Gilded Helmet</strong></td>
+                                <td>3 Armor Bars</td>
+                                <td>543</td>
+                                <td>407</td>
+                                <td rowspan="4">1+ piece makes piglins neutral.<br><strong>Full Set Bonus: +4 Max Hearts (+2 extra hearts of HP).</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gilded Chestplate</strong></td>
+                                <td>8 Armor Bars</td>
+                                <td>789</td>
+                                <td>592</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gilded Leggings</strong></td>
+                                <td>6 Armor Bars</td>
+                                <td>740</td>
+                                <td>555</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gilded Boots</strong></td>
+                                <td>3 Armor Bars</td>
+                                <td>641</td>
+                                <td>481</td>
+                            </tr>
+                        </tbody>
                     </table>
-
-                    <h3>New Tax Brackets (Monthly)</h3>
-                    <ul>
-                        <li><strong>0 - 100 Gold Income:</strong> 5% Tax</li>
-                        <li><strong>100 - 500 Gold Income:</strong> 10% Tax</li>
-                        <li><strong>500 - 1000 Gold Income:</strong> 15% Tax</li>
-                        <li><strong>1000+ Gold Income:</strong> 20% Tax</li>
-                    </ul>
                 </div>
-            </div>
-        </section>
 
-        <section class="update-section">
-            <div class="section-content">
-                <h2 class="section-title">Membership Plans</h2>
-                <p class="section-summary">
-                    Support the realm with the "Poor Man's Plan" or upgrade to "Enhanced" for monthly shulker box gifts
-                    and special armor.
+                <h3>The Mace Weapon Class</h3>
+                <p>
+                    The Mace shatters cobwebs and bamboo instantaneously. In combat, executing a <strong>Bash Attack</strong> (Right Click or Hold on mobile) inflicts catastrophic durability damage to opponent armor:
                 </p>
-                <button class="read-more-btn" onclick="toggleSection('member-details')">Read More</button>
+                <ul>
+                    <li><strong>Gilded Netherite Mace:</strong> 50 durability damage per bash (2539 durability, 6 base attack damage).</li>
+                    <li><strong>Netherite Mace:</strong> 42 durability damage per bash.</li>
+                    <li><strong>Diamond Mace:</strong> 35 durability damage per bash.</li>
+                    <li><em>Attack Range:</em> ~2.9 blocks with a fast 0.5s attack cooldown.</li>
+                </ul>
 
-                <div id="member-details" class="full-details">
-                    <h3>Poor Man's Plan (1 Diamond/Month)</h3>
-                    <ul>
-                        <li>64x Steak Starter Pack</li>
-                        <li>Full set of Iron Tools</li>
-                        <li>1 Golden Apple</li>
-                    </ul>
-
-                    <h3>Enhanced Plan (10 Diamonds/Month)</h3>
-                    <ul>
-                        <li><strong>Monthly Gift:</strong> Shulker Box filled with surprise items.</li>
-                        <li><strong>Special Gear:</strong> Access to armor with unique abilities.</li>
-                        <li><strong>Priority:</strong> Access to events and community features.</li>
-                    </ul>
+                <h3>Official Crafting Recipes</h3>
+                <div class="recipe-grid">
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image18.png" alt="Gilded Sword Recipe">
+                        <p>Gilded Sword</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image19.png" alt="Gilded Pickaxe Recipe">
+                        <p>Gilded Pickaxe</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image20.png" alt="Gilded Axe Recipe">
+                        <p>Gilded Axe</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image23.png" alt="Gilded Mace Recipe">
+                        <p>Gilded Mace</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image24.png" alt="Gilded Helmet Recipe">
+                        <p>Gilded Helmet</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image25.png" alt="Gilded Chestplate Recipe">
+                        <p>Gilded Chestplate</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image26.png" alt="Gilded Leggings Recipe">
+                        <p>Gilded Leggings</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image27.png" alt="Gilded Boots Recipe">
+                        <p>Gilded Boots</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <div class="center-content" style="margin-top: 60px; margin-bottom: 40px; text-align: center;">
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                Credits: Liz (Furniture/Swords), Catalin (Magic), Jack (Medieval), Alexandra (Announcements).
+        <!-- SECTION 4: BIOMES -->
+        <section class="patch-card" id="biomes">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-diamond">
+                        <span>🌸</span> WORLD GENERATION
+                    </div>
+                    <h2 class="patch-card-title">World Update: Biomania</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('biomes-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                Traverse stunning new biomes with distinct atmospheres and dynamic musical scores, featuring Cherry Blossom Groves, soaring Shattered Taiga cliffs, and expansive Dunes.
             </p>
-            <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                Want to read this offline? Download the full original document below.
+
+            <!-- Real Biome Image from docx -->
+            <img src="/images/dts-info/image29.png" alt="Cherry Blossom Grove Biome" class="patch-img-hero" loading="lazy">
+            <p class="img-caption">The Cherry Blossom Grove — Filled with falling petals and custom ambient fog</p>
+
+            <div id="biomes-details" class="full-details">
+                <h3>Biome Field Guide</h3>
+                <div class="patch-image-grid">
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image29.png" alt="Cherry Blossom Grove" loading="lazy">
+                        <span>🌸 Cherry Blossom Grove</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Pink petal canopies, cherry wood set, and atmospheric mist.</p>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image31.png" alt="Shattered Taiga" loading="lazy">
+                        <span>🌲 Shattered Taiga</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Chaotic sheer cliffs, soaring pine pinnacles, and deep ravines.</p>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image30.png" alt="Dunes Biome" loading="lazy">
+                        <span>🏜️ Desert Dunes</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Sweeping sand ridges with native Dune Grass and sandstorm particles.</p>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image32.png" alt="Shrubland" loading="lazy">
+                        <span>🌾 Shrubland</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Rolling plains interspersed with berry bushes and open grasslands.</p>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image33.png" alt="Pumpkin Patch" loading="lazy">
+                        <span>🎃 Pumpkin Patch</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Rich agricultural meadows brimming with naturally occurring squash.</p>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image34.png" alt="Rainforest" loading="lazy">
+                        <span>🌴 Rainforest</span>
+                        <p style="font-size:0.85rem; color:#a0aec0; margin-top:6px;">Dense triple-canopy jungles with rare vines, bamboo, and exotic fauna.</p>
+                    </div>
+                </div>
+
+                <h3>New Blocks & Environmental Particles</h3>
+                <p>
+                    Craft new blocks with Cherry wood (Cherry Planks, Stairs, Slabs, Doors) alongside new decorative flora like <strong>Fluffy Cattails</strong>, <strong>Dune Grass</strong>, and dynamic windborne petal particles.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 5: MAGIC SYSTEM -->
+        <section class="patch-card" id="magic">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge">
+                        <span>✨</span> ARCANE ARTS
+                    </div>
+                    <h2 class="patch-card-title">Magic System & Elemental Wands</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('magic-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                Wield 30 custom crafted wands across 10 elemental schools. Craft the Magic Book to progress through tiered masteries while maintaining balanced survival PvP.
             </p>
-            <a href="DreamsTimeSkipRealmInfoSheet.docx" class="btn-download-large" download>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+            <!-- Real Magic Wands Image from docx -->
+            <img src="/images/dts-info/image37.png" alt="Magic Wands and Book Showcase" class="patch-img-hero" style="object-fit: contain; max-height: 280px; background: #0c0e12; padding: 15px;" loading="lazy">
+            <p class="img-caption">Official Elemental Wands & The Magic Spellbook (Catalin's Magic Addon)</p>
+
+            <div id="magic-details" class="full-details">
+                <h3>Elemental Schools</h3>
+                <p>
+                    To ensure balanced factions, each adventurer may specialize in a maximum of <strong>two magic schools</strong> simultaneously. Craft the <strong>Magic Book</strong> to initiate your studies.
+                </p>
+
+                <div class="split-grid-2">
+                    <div class="feature-subcard">
+                        <h4>Elemental Affinities</h4>
+                        <ul>
+                            <li><strong>💨 Wind:</strong> Mobility boosts, repelling gusts, and glider acceleration.</li>
+                            <li><strong>🌊 Water:</strong> Conduit healing, underwater agility, and tidal pushback.</li>
+                            <li><strong>🔥 Fire:</strong> Thermal projectile bursts, lingering flames, and area blaze.</li>
+                            <li><strong>⚡ Electric:</strong> Lightning strike summons and chain paralysis shock.</li>
+                            <li><strong>❄️ Ice:</strong> Frost paths, slowing blizzards, and glacial shields.</li>
+                        </ul>
+                    </div>
+                    <div class="feature-subcard">
+                        <h4>Occult & Natural Affinities</h4>
+                        <ul>
+                            <li><strong>🌿 Grass:</strong> Root snares, thorn retaliation, and rapid botanical growth.</li>
+                            <li><strong>🧪 Poison:</strong> Lingering decay clouds, hunger drain, and venom strikes.</li>
+                            <li><strong>✨ Light:</strong> Healing auras, darkness dispelling, and flash blinding.</li>
+                            <li><strong>💀 Necromancy:</strong> Minion reanimation, bone armor, and spectral sights.</li>
+                            <li><strong>☠️ Death:</strong> High-risk life drain, wither infliction, and soul sacrifices.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: FURNITURE & DECOR -->
+        <section class="patch-card" id="furniture">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-gold">
+                        <span>🪑</span> ARCHITECTURE
+                    </div>
+                    <h2 class="patch-card-title">Furniture & Medieval Decor Mod</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('furniture-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                Transform builds with detailed 3D furniture. Features functional seating, modular bookshelves, decorative timber beams, display barrels, and storage crates.
+            </p>
+
+            <!-- Real Furniture Showcase from docx -->
+            <img src="/images/dts-info/image39.jpeg" alt="Medieval Bookshelves Showcase" class="patch-img-hero" loading="lazy">
+            <p class="img-caption">Modular Bookshelves & Architectural Framing (Liz & Catalin's Medieval Addon)</p>
+
+            <div id="furniture-details" class="full-details">
+                <h3>Featured Furnishings</h3>
+                <div class="patch-image-grid">
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image40.png" alt="Storage Crates & Barrels">
+                        <span>📦 Storage Crates & Boxes</span>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image46.png" alt="Decorative Boxes">
+                        <span>🪵 Decorative Timber Props</span>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image48.png" alt="Functional Chairs & Stools">
+                        <span>🪑 Functional Chairs & Stools</span>
+                    </div>
+                    <div class="patch-image-card">
+                        <img src="/images/dts-info/image52.png" alt="Desks & Tables">
+                        <span>🏛️ Desks, Cupboards & Tables</span>
+                    </div>
+                </div>
+
+                <h3>Admin Showcase Command</h3>
+                <p>Generate a fully furnished showcase manor to preview every piece in creative mode:</p>
+                <div class="mc-code-box">
+                    <code>/function medieval_blocks</code>
+                    <button class="copy-cmd-btn" onclick="navigator.clipboard.writeText('/function medieval_blocks'); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 2000);">
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: FOOD & FARMING -->
+        <section class="patch-card" id="farming">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge">
+                        <span>🍎</span> CULINARY EXPANSION
+                    </div>
+                    <h2 class="patch-card-title">New Foods, Fruit Trees & Farming Machinery</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('food-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                A massive culinary overhaul introducing 70+ new gourmet foods, 40+ crops, wandering food merchants, and specialized kitchen machinery including ovens, presses, and blenders.
+            </p>
+
+            <!-- Real Food / Farmer image from docx -->
+            <img src="/images/dts-info/image121.png" alt="Wandering Farmer & Bakery" class="patch-img-hero" loading="lazy">
+            <p class="img-caption">The Wandering Farmer & Traveling Baker NPC Vendors</p>
+
+            <div id="food-details" class="full-details">
+                <div class="split-grid-2">
+                    <div class="feature-subcard">
+                        <h4>🌱 Crops & Orchard Trees</h4>
+                        <p>Trade with the roaming <strong>Wandering Farmer</strong> to acquire rare heirloom saplings and seeds:</p>
+                        <ul>
+                            <li><strong>Maple Trees:</strong> Tap tree trunks for fresh Maple Syrup.</li>
+                            <li><strong>Citrus Orchards:</strong> Orange, Lemon, Lime, and Grapefruit.</li>
+                            <li><strong>Tropical Fruit:</strong> Mango, Peach, Palm (Coconuts), and Banana.</li>
+                            <li><strong>Spices:</strong> Cinnamon bark, Vanilla pods, and Pepper vines.</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-subcard">
+                        <h4>🍳 Kitchen Appliances</h4>
+                        <p>Construct non-electric medieval kitchen apparatus:</p>
+                        <ul>
+                            <li><strong>Stone Oven:</strong> Bakes breads and roasts using cooking oils.</li>
+                            <li><strong>Grist Mill:</strong> Grinds wheat, maize, and sugar cane into fine flours.</li>
+                            <li><strong>Fruit Press:</strong> Cold-presses fresh juices without consuming fuel.</li>
+                            <li><strong>Churn & Blender:</strong> Mixes artisanal smoothies, butter, and sodas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="recipe-grid">
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image142.png" alt="Stone Oven Cooking">
+                        <p>Stone Oven Baking</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image124.png" alt="Fruit Processing">
+                        <p>Fruit Juicer & Press</p>
+                    </div>
+                    <div class="recipe-card">
+                        <img src="/images/dts-info/image138.png" alt="Campfire Skewers">
+                        <p>Campfire Kabobs</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: ECONOMY & TAXES -->
+        <section class="patch-card" id="economy">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-gold">
+                        <span>🪙</span> REALM COMMERCE
+                    </div>
+                    <h2 class="patch-card-title">Economy & Progressive Tax Brackets</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('economy-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                A stabilized currency economy tying raw ores to gold value, coupled with an equitable progressive tax system for registered merchant shopkeepers.
+            </p>
+
+            <div id="economy-details" class="full-details">
+                <h3>Official Currency Exchange Rates</h3>
+                <div class="mc-table-wrap">
+                    <table class="mc-data-table">
+                        <thead>
+                            <tr>
+                                <th>Resource / Ore</th>
+                                <th>Currency Valuation (Gold Standard)</th>
+                                <th>Trade Utility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1 Iron Ingot</td>
+                                <td><strong>0.2 Gold</strong></td>
+                                <td>Base construction material</td>
+                            </tr>
+                            <tr>
+                                <td>1 Gold Nugget</td>
+                                <td><strong>2 Gold</strong></td>
+                                <td>Fractional market change</td>
+                            </tr>
+                            <tr>
+                                <td>1 Gold Ingot</td>
+                                <td><strong>20 Gold</strong></td>
+                                <td>Standard merchant transaction</td>
+                            </tr>
+                            <tr>
+                                <td>1 Diamond</td>
+                                <td><strong>50 Gold</strong></td>
+                                <td>High-tier market reserve</td>
+                            </tr>
+                            <tr>
+                                <td>1 Netherite Ingot</td>
+                                <td><strong>100 Gold</strong></td>
+                                <td>Elite sovereign reserve</td>
+                            </tr>
+                            <tr>
+                                <td>1 Netherite Block</td>
+                                <td><strong>1,000 Gold</strong></td>
+                                <td>Kingdom treasury benchmark</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Monthly Merchant Tax Brackets</h3>
+                <p>Tax revenues fund community server events, road construction, and realm bounties:</p>
+                <div class="mc-table-wrap">
+                    <table class="mc-data-table">
+                        <thead>
+                            <tr>
+                                <th>Monthly Gold Income Bracket</th>
+                                <th>Tax Rate</th>
+                                <th>Tier Classification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0 — 100 Gold</td>
+                                <td><strong>5%</strong></td>
+                                <td>Apprentice Vendor</td>
+                            </tr>
+                            <tr>
+                                <td>101 — 500 Gold</td>
+                                <td><strong>10%</strong></td>
+                                <td>Established Merchant</td>
+                            </tr>
+                            <tr>
+                                <td>501 — 1,000 Gold</td>
+                                <td><strong>15%</strong></td>
+                                <td>Guild Master</td>
+                            </tr>
+                            <tr>
+                                <td>1,001+ Gold</td>
+                                <td><strong>20%</strong></td>
+                                <td>Baron of Commerce</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: MEMBERSHIPS -->
+        <section class="patch-card" id="memberships">
+            <div class="patch-card-header">
+                <div>
+                    <div class="mc-badge mc-badge-diamond">
+                        <span>💎</span> COMMUNITY SUPPORT
+                    </div>
+                    <h2 class="patch-card-title">Realm Membership Tiers</h2>
+                </div>
+                <button class="mc-btn mc-btn-stone" onclick="toggleSection('memberships-details')">
+                    <span class="toggle-text">Read Details</span>
+                </button>
+            </div>
+
+            <p class="patch-summary">
+                Support realm maintenance and community activities through optional in-game diamond subscriptions. Strictly non-pay-to-win.
+            </p>
+
+            <div id="memberships-details" class="full-details">
+                <div class="split-grid-2">
+                    <div class="feature-subcard" style="border: 2px solid #5eb33a;">
+                        <h4 style="color: #55ff55;">Poor Man's Plan</h4>
+                        <p style="font-family: var(--mc-font-pixel); color: var(--mc-gold-light);">Cost: 1 Diamond / Month</p>
+                        <ul>
+                            <li>64x Steak Starter Pack per cycle.</li>
+                            <li>Full set of iron field tools.</li>
+                            <li>1x Enchanted Golden Apple.</li>
+                            <li>Access to member Discord channels.</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-subcard" style="border: 2px solid var(--mc-gold);">
+                        <h4 style="color: var(--mc-gold-light);">Enhanced Plan</h4>
+                        <p style="font-family: var(--mc-font-pixel); color: var(--mc-gold-light);">Cost: 10 Diamonds / Month</p>
+                        <ul>
+                            <li><strong>Monthly Mystery Shulker:</strong> Packed with rare cosmetics and building supplies.</li>
+                            <li><strong>Commemorative Armor:</strong> Exclusive aesthetic trim set.</li>
+                            <li><strong>Event Priority:</strong> Reserved slots for community tournaments.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DOWNLOAD & NAVIGATION FOOTER -->
+        <div style="margin: 60px 0 40px; text-align: center;">
+            <p style="color: #8c96a4; margin-bottom: 12px; font-size: 0.95rem;">
+                Realm Contributors: Liz (Furniture/Weapons), Catalin (Magic/Design), Jack (Medieval Building), Alexandra (Public Relations).
+            </p>
+            <p style="color: #a8b2be; margin-bottom: 24px; font-size: 1.05rem;">
+                Want to read the full original document offline?
+            </p>
+            <a href="DreamsTimeSkipRealmInfoSheet.docx" class="mc-btn mc-btn-green" download style="padding: 15px 32px; font-size: 0.95rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="7 10 12 15 17 10"></polyline>
                     <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
-                Download Official Info Sheet
+                Download Official Info Sheet (.DOCX)
             </a>
         </div>
 
-        <div class="center-content" style="text-align: center; margin-bottom: 60px;">
-            <a href="dreamstimeskip.html" class="cta-button"
-                style="background-color: transparent; border: 1px solid var(--text-secondary);">Back to Launch Page</a>
+        <div style="text-align: center; margin-bottom: 60px;">
+            <a href="dreamstimeskip.html" class="mc-btn mc-btn-stone">
+                ← Back to Dreams TimeSkip Launch Portal
+            </a>
         </div>
-
     </main>
 
-    <footer class="main-footer">
-        <div class="footer-bottom">
-            <p>&copy; 2026 Unstoppable LLC. All Rights Reserved.</p>
-        </div>
-    </footer>
+    <footer class="main-footer"></footer>
 
-    <script src="/js/script.js"></script>
+    <!-- Scripts -->
     <script>
-        // Simple toggle function for Read More buttons
         function toggleSection(id) {
-            const element = document.getElementById(id);
-            const btn = element.parentElement.querySelector('.read-more-btn');
-
-            if (element.classList.contains('open')) {
-                element.classList.remove('open');
-                btn.textContent = "Read More";
+            const section = document.getElementById(id);
+            if (!section) return;
+            const parent = section.closest('.patch-card');
+            const btn = parent.querySelector('.toggle-text');
+            
+            if (section.classList.contains('open')) {
+                section.classList.remove('open');
+                if (btn) btn.textContent = 'Read Details';
             } else {
-                element.classList.add('open');
-                btn.textContent = "Show Less";
+                section.classList.add('open');
+                if (btn) btn.textContent = 'Show Less';
             }
+        }
+
+        const toggleAllBtn = document.getElementById('toggle-all-sections-btn');
+        if (toggleAllBtn) {
+            let allOpen = false;
+            toggleAllBtn.addEventListener('click', () => {
+                allOpen = !allOpen;
+                document.querySelectorAll('.full-details').forEach(el => {
+                    const parent = el.closest('.patch-card');
+                    const btn = parent.querySelector('.toggle-text');
+                    if (allOpen) {
+                        el.classList.add('open');
+                        if (btn) btn.textContent = 'Show Less';
+                    } else {
+                        el.classList.remove('open');
+                        if (btn) btn.textContent = 'Read Details';
+                    }
+                });
+                toggleAllBtn.textContent = allOpen ? '[-] Collapse All Sections' : '[+] Expand All Sections';
+            });
+        }
+
+        const copyIpBtn = document.getElementById('copy-server-ip-btn');
+        if (copyIpBtn) {
+            copyIpBtn.addEventListener('click', () => {
+                const ip = copyIpBtn.getAttribute('data-ip') || 'dts.realunstoppable.store';
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(ip).then(() => {
+                        const textSpan = copyIpBtn.querySelector('.btn-text');
+                        const orig = textSpan ? textSpan.textContent : copyIpBtn.textContent;
+                        if (textSpan) textSpan.textContent = '✔ IP Copied!';
+                        setTimeout(() => {
+                            if (textSpan) textSpan.textContent = orig;
+                        }, 2500);
+                    }).catch(() => {
+                        prompt('Copy Dreams TimeSkip server address:', ip);
+                    });
+                } else {
+                    prompt('Copy Dreams TimeSkip server address:', ip);
+                }
+            });
         }
     </script>
 
@@ -598,38 +1352,22 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
         import { doc, updateDoc, increment, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-        const authLink = document.getElementById('auth-link');
-
-        // Auth state listener
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                authLink.href = 'account.html';
-                authLink.textContent = "My Account";
-            } else {
-                authLink.href = 'sign in beta.html';
-                authLink.textContent = "Sign In / Sign Up";
-            }
-        });
-
         // Download Tracker Logic
-        const downloadBtn = document.querySelector('.btn-download-large');
-        if (downloadBtn) {
+        const downloadBtn = document.querySelector('a[download]');
+        if (downloadBtn && db) {
             downloadBtn.addEventListener('click', async () => {
-                const statsRef = doc(db, "site_stats", "downloads");
                 try {
-                    await updateDoc(statsRef, {
-                        infoSheet: increment(1)
-                    });
-                    console.log("Download counted.");
+                    const statsRef = doc(db, "site_stats", "downloads");
+                    await updateDoc(statsRef, { infoSheet: increment(1) });
                 } catch (e) {
-                    // If the document doesn't exist yet, create it
-                    await setDoc(statsRef, { infoSheet: 1 }, { merge: true });
-                    console.log("Download counter initialized.");
+                    try {
+                        const statsRef = doc(db, "site_stats", "downloads");
+                        await setDoc(statsRef, { infoSheet: 1 }, { merge: true });
+                    } catch(err) {}
                 }
             });
         }
     </script>
-    <script src="/js/script.js"></script>
 
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1791167958698';
@@ -638,8 +1376,6 @@
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();
     </script>
-
-
+    <script src="/js/script.js"></script>
 </body>
-
 </html>
