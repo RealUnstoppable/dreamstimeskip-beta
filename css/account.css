@@ -1765,6 +1765,12 @@ input:checked + .slider:before {
     .mc-grid-container {
         grid-template-columns: repeat(3, 1fr);
     }
+    .marker-label {
+        font-size: 0.55rem;
+    }
+    .mc-milestone-marker.m-28 {
+        left: 80%;
+    }
 }
 
 .mc-day-card {
@@ -1840,6 +1846,16 @@ input:checked + .slider:before {
     justify-content: center;
     margin: 4px 0;
     transition: transform 0.2s ease;
+}
+
+.mc-item-icon-wrap img,
+.mc-item-icon-img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .mc-day-card:hover .mc-item-icon-wrap {
@@ -2163,6 +2179,15 @@ input:checked + .slider:before {
     align-items: center;
     justify-content: center;
     animation: floatIcon 2.5s ease-in-out infinite;
+}
+
+.mc-flare-icon-container img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.7));
 }
 
 @keyframes floatIcon {
