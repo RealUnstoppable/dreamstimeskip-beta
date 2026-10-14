@@ -46,8 +46,8 @@ const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
 export function loadNavbar() {
     const isMedixlyPage = window.location.pathname.includes('medixly');
     const logoContent = isMedixlyPage
-        ? `<span class="un-letters">UN</span><span style="font-weight: 800; margin: 0 10px; font-size: 1.2rem; color: var(--text-primary);">x</span><img src="/images/medixly-logo.png" alt="Medixly" style="height: 54px; margin-top: 2px;" id="medixly-navbar-logo">`
-        : `<span class="un-letters">UN</span><span class="un-250">250</span>`;
+        ? `<span class="un-letters">un</span><span style="font-weight: 800; margin: 0 10px; font-size: 1.2rem; color: var(--text-primary);">x</span><img src="/images/medixly-logo.png" alt="Medixly" style="height: 54px; margin-top: 2px;" id="medixly-navbar-logo">`
+        : `<span class="un-letters">un</span><span class="un-250">250</span>`;
 
     const headerHTML = `
     <nav class="navbar">
@@ -105,7 +105,7 @@ export function loadUdsNavbar() {
     const headerHTML = `
     <nav class="navbar">
         <a href="index.html" class="nav-logo un-text-logo">
-            <span class="un-letters">UN</span><span class="un-250">250</span>
+            <span class="un-letters">un</span><span class="un-250">250</span>
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>

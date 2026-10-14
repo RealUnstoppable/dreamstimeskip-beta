@@ -933,13 +933,14 @@ textarea:focus-visible {
     line-height: 1;
 }
 
-/* "UN" — plain white, bold */
+/* "un" — plain white, bold, lowercase, letters touching */
 .un-letters {
     font-size: 1.25rem;
     font-weight: 800;
     color: #ffffff;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.06em;
     font-family: 'Inter', sans-serif;
+    text-transform: lowercase;
 }
 
 /* "250" — italic, USA flag clipped to the text */
