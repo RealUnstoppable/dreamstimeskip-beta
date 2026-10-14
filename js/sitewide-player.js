@@ -234,6 +234,47 @@ class SitewideMusicEngine {
         }
     }
 
+    async playSongById(songId) {
+        const song = getSongById(songId);
+        if (!song) return false;
+
+        let qIdx = this.state.queue.indexOf(songId);
+        if (qIdx === -1) {
+            this.state.queue.push(songId);
+            qIdx = this.state.queue.length - 1;
+        }
+
+        this.saveState({
+            songId: song.id,
+            queueIndex: qIdx,
+            currentTime: 0,
+            isPlaying: true
+        });
+
+        if (this.isHarmonyTunesPage) {
+            if (typeof window.playSongById === 'function' && window.playSongById !== this.playSongById) {
+                window.playSongById(songId);
+                return true;
+            }
+            if (typeof window.playSong === 'function') {
+                window.playSong(songId);
+                return true;
+            }
+        }
+
+        if (!this.audio) this.initBackgroundAudio();
+        if (this.audio) {
+            this.audio.src = song.src;
+            this.audio.currentTime = 0;
+            await mixEngine.ensureRunning().catch(() => {});
+            this.audio.play().then(() => {
+                this.saveState({ isPlaying: true });
+            }).catch(err => console.warn("Manager info: Audio play prevented:", err));
+        }
+        this.updateLexiUI();
+        return true;
+    }
+
     next() {
         let newIdx = this.state.queueIndex + 1;
         if (newIdx >= this.state.queue.length) newIdx = 0;
@@ -1058,6 +1099,18 @@ class SitewideMusicEngine {
 // Global Singleton
 export const sitewidePlayer = new SitewideMusicEngine();
 window.DTSMusic = sitewidePlayer;
+if (typeof window.playSongById !== 'function') {
+    window.playSongById = (id) => sitewidePlayer.playSongById(id);
+}
+if (!window.MedixlyAPI) {
+    window.MedixlyAPI = {
+        playSong: (id) => sitewidePlayer.playSongById(id),
+        getCurrentlyPlaying: () => sitewidePlayer.getCurrentSong(),
+        getQueue: () => sitewidePlayer.state.queue.map(id => getSongById(id)).filter(Boolean),
+        getHistory: () => [],
+        getFavorites: () => []
+    };
+}
 
 // Global helper to update cart count in Lexi across all pages
 window.updateLexiCartCount = function(count) {
