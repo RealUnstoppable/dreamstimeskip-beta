@@ -410,12 +410,50 @@ p.section-subtitle {
 }
 
 .status-indicator.online {
-    color: #16A34A;
-    background-color: rgba(22, 163, 74, 0.1);
+    color: #10B981;
+    background-color: rgba(16, 185, 129, 0.15);
+}
+
+.status-indicator.maintenance,
+.status-indicator.degraded {
+    color: #F59E0B;
+    background-color: rgba(245, 158, 11, 0.15);
+}
+
+.status-indicator.offline,
+.status-indicator.down {
+    color: #EF4444;
+    background-color: rgba(239, 68, 68, 0.15);
+}
+
+.status-issues-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 10px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.status-item.sub-status {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
 }
 
 #bento-founder p {
     font-style: italic;
+}
+
+#bento-founder img {
+    border-radius: 16px;
+    object-fit: cover;
+    aspect-ratio: 1;
+    width: auto;
+    max-width: 45%;
 }
 
 
@@ -922,6 +960,21 @@ textarea:focus-visible {
 /* Fallback hidden — no longer used */
 .nav-logo-img { display: none; }
 .nav-logo-fallback { display: none; }
+
+/* ===== Medixly Navbar Logo ===== */
+#medixly-navbar-logo {
+    height: 54px;
+    margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+    #medixly-navbar-logo {
+        transform: scale(1.5);
+        -webkit-transform: scale(1.5);
+        transform-origin: left center;
+        -webkit-transform-origin: left center;
+    }
+}
 
 
 
@@ -1641,12 +1694,20 @@ textarea:focus-visible {
 .cookie-btn:active {
     transform: scale(0.95);
 }
-.cookie-btn.primary {
-    background-color: #14b8a6;
-    color: #fff;
+.cookie-btn.primary,
+#accept-cookies {
+    background-color: #ffffff;
+    color: #000000;
 }
-.cookie-btn.primary:hover {
-    background-color: #0f9183;
+.cookie-btn.primary:hover,
+#accept-cookies:hover {
+    background-color: #e5e7eb;
+    color: #000000;
+}
+
+.btn-premium {
+    border: 2px solid #ffffff;
+    outline: 2px solid #ffffff;
 }
 .cookie-btn.secondary {
     background-color: transparent;
