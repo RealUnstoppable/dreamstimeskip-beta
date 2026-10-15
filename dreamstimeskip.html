@@ -187,6 +187,67 @@
             box-shadow: 0 1px 0 #000;
         }
 
+        /* --- Discord Minecraft 3D Block Button --- */
+        .mc-btn-discord,
+        #dts a[href*="discord"].mc-btn,
+        .hero-buttons a[href*="discord"].mc-btn {
+            background: #5865F2 !important;
+            color: #ffffff !important;
+            border-top: 3px solid #7983f5;
+            border-left: 3px solid #7983f5;
+            border-right: 3px solid #3c45a5;
+            border-bottom: 4px solid #3c45a5;
+            box-shadow: 0 4px 0 #000, 0 8px 16px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 0px #20245a;
+        }
+        .mc-btn-discord:hover,
+        #dts a[href*="discord"].mc-btn:hover,
+        .hero-buttons a[href*="discord"].mc-btn:hover {
+            background: #6975f5 !important;
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #000, 0 12px 20px rgba(0,0,0,0.6);
+            color: #ffffff !important;
+        }
+        .mc-btn-discord:active,
+        #dts a[href*="discord"].mc-btn:active,
+        .hero-buttons a[href*="discord"].mc-btn:active {
+            border-top: 3px solid #3c45a5;
+            border-left: 3px solid #3c45a5;
+            border-right: 3px solid #7983f5;
+            border-bottom: 3px solid #7983f5;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+            color: #ffffff !important;
+        }
+
+        /* --- Dark / Obsidian Minecraft 3D Block Button --- */
+        .mc-btn-dark {
+            background: #23272e;
+            color: #ffffff;
+            border-top: 3px solid #3d424e;
+            border-left: 3px solid #3d424e;
+            border-right: 3px solid #14161a;
+            border-bottom: 4px solid #14161a;
+            box-shadow: 0 4px 0 #000, 0 8px 16px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 0px #0e1012;
+        }
+        .mc-btn-dark:hover {
+            background: #2e333d;
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #000, 0 12px 20px rgba(0,0,0,0.6);
+            color: #ffffff;
+        }
+        .mc-btn-dark:active {
+            border-top: 3px solid #14161a;
+            border-left: 3px solid #14161a;
+            border-right: 3px solid #3d424e;
+            border-bottom: 3px solid #3d424e;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
         /* --- Minecraft Pixel Badges --- */
         .mc-badge {
             display: inline-flex;
@@ -238,9 +299,10 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            z-index: -2;
+            z-index: 0;
             transform: scale(1.02);
             filter: brightness(0.65) contrast(1.1);
+            pointer-events: none;
         }
 
         .hero-og-bg {
@@ -259,14 +321,17 @@
             height: 100%;
             background: radial-gradient(circle at center, rgba(14, 16, 20, 0.5) 0%, rgba(10, 12, 15, 0.88) 100%),
                         linear-gradient(to bottom, rgba(18,20,23,0.3) 0%, rgba(18,20,23,0.95) 100%);
-            z-index: -1;
+            z-index: 1;
+            pointer-events: none;
         }
 
         .hero-content {
-            z-index: 1;
+            position: relative;
+            z-index: 10;
             padding: 20px;
             max-width: 1100px;
             margin: 0 auto;
+            pointer-events: auto;
         }
 
         .hero-content h1 {
@@ -484,6 +549,31 @@
             gap: 16px;
             flex-wrap: wrap;
             margin-top: 10px;
+            position: relative;
+            z-index: 25;
+            pointer-events: auto;
+        }
+
+        .hero-buttons .mc-btn {
+            position: relative;
+            z-index: 26;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        #dts {
+            position: relative;
+            z-index: 2;
+            padding-bottom: 90px;
+        }
+
+        .siri-orb-wrapper {
+            pointer-events: none !important;
+        }
+
+        #siri-orb,
+        .sitewide-lexi-orb {
+            pointer-events: auto !important;
         }
 
         /* --- Minecraft.net Style News & Dispatches Grid --- */
@@ -1231,13 +1321,13 @@
                 <div id="countdown-2" class="countdown-container"></div>
 
                 <div class="hero-buttons">
-                    <button type="button" class="mc-btn mc-btn-green open-waitlist-trigger">
+                    <button type="button" class="mc-btn mc-btn-green open-waitlist-trigger" id="dts-join-waitlist-btn">
                         ⚔️ Claim Founder Whitelist
                     </button>
-                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-dark">
+                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-discord" id="dts-join-discord-btn">
                         Join Discord
                     </a>
-                    <a href="new-dts.html" class="mc-btn mc-btn-gold">
+                    <a href="new-dts.html" class="mc-btn mc-btn-gold" id="dts-whats-new-btn">
                         What's New in DTS
                     </a>
                 </div>
@@ -1508,7 +1598,7 @@
     </script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    function initLaunchFeatures() {
         
         // --- Countdown Timer Class ---
         class Countdown {
@@ -1690,7 +1780,30 @@
             });
         }
 
-    });
+        // Global delegation for opening trailer
+        document.addEventListener('click', (e) => {
+            const trailerTrigger = e.target.closest('.open-trailer-trigger');
+            if (trailerTrigger) {
+                e.preventDefault();
+                const modal = document.getElementById('trailer-modal');
+                const video = document.getElementById('modal-video');
+                if (modal) {
+                    if (typeof modal.showModal === 'function') modal.showModal();
+                    else modal.setAttribute('open', '');
+                    if (video) {
+                        video.currentTime = 0;
+                        video.play().catch(() => {});
+                    }
+                }
+            }
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLaunchFeatures);
+    } else {
+        initLaunchFeatures();
+    }
     </script>
 
     <script type="module">
@@ -1708,7 +1821,7 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
+        function initWaitlistModule() {
             const waitlistModal = document.getElementById('waitlist-modal');
             const closeWaitlistBtn = document.getElementById('close-waitlist-btn');
             const errorBox = document.getElementById('wl-error-box');
@@ -2146,7 +2259,41 @@
                     });
                 });
             }
-        });
+
+            // Global fallback delegation for all waitlist buttons (including Section 4 DTS launch)
+            document.addEventListener('click', (e) => {
+                const trigger = e.target.closest('.open-waitlist-trigger, #dts-join-waitlist-btn, #hero-join-waitlist-btn');
+                if (trigger) {
+                    e.preventDefault();
+                    const trailerModal = document.getElementById('trailer-modal');
+                    if (trailerModal && trailerModal.open) {
+                        trailerModal.close();
+                        const modalVideo = document.getElementById('modal-video');
+                        if (modalVideo) modalVideo.pause();
+                    }
+
+                    if (currentUser) {
+                        showView('authed');
+                    } else {
+                        showView('register');
+                    }
+                    const modal = document.getElementById('waitlist-modal');
+                    if (modal) {
+                        if (typeof modal.showModal === 'function') {
+                            modal.showModal();
+                        } else {
+                            modal.setAttribute('open', '');
+                        }
+                    }
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWaitlistModule);
+        } else {
+            initWaitlistModule();
+        }
     </script>
 
     <script type="module" src="/js/auth.js"></script>
