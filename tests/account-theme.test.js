@@ -28,14 +28,14 @@ describe('Appearance & Themes Settings in account.html', () => {
     });
 
     test('account.html has correct default color value for custom hex', () => {
-        expect(accountHtml).toContain('value="#00ffcc"');
+        expect(accountHtml).toContain('value="#2563EB"');
     });
 
     test('js/account.js includes reset-theme-btn handler that resets theme and accent color', () => {
         const accountJs = fs.readFileSync(path.join(ROOT_DIR, 'js', 'account.js'), 'utf-8');
         expect(accountJs).toContain('reset-theme-btn');
         expect(accountJs).toContain("defaultTheme = 'system'");
-        expect(accountJs).toContain("defaultAccent = '#00ffcc'");
+        expect(accountJs).toContain("defaultAccent = '#2563EB'");
         expect(accountJs).toContain('Theme preferences reset to default successfully!');
     });
 });
