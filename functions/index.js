@@ -736,35 +736,45 @@ exports.claimDailyCheckIn = onRequest((req, res) => {
 
         const now = admin.firestore.Timestamp.now();
         const nowDate = now.toDate();
-        // Convert to YYYY-MM-DD in UTC
-        const todayStr = nowDate.toISOString().split('T')[0];
+        // Use client local date if provided, otherwise UTC fallback YYYY-MM-DD
+        const todayStr = (req.body && typeof req.body.clientDate === 'string' && req.body.clientDate.length === 10)
+            ? req.body.clientDate
+            : nowDate.toISOString().split('T')[0];
 
         let lastCheckInStr = "";
         let isConsecutive = false;
 
-        if (lastCheckIn) {
+        if (data.lastClaimDate) {
+            lastCheckInStr = data.lastClaimDate;
+        } else if (lastCheckIn) {
             const lastDate = lastCheckIn.toDate();
             lastCheckInStr = lastDate.toISOString().split('T')[0];
+        }
 
+        if (lastCheckInStr) {
             if (todayStr === lastCheckInStr) {
                 // Already checked in today
-                return res.status(400).json({ error: "Already checked in today" });
+                return res.status(200).json({ success: true, message: "Already checked in today", currentStreak: streak });
             }
 
             // Check if it's consecutive (exactly 1 day diff)
-            const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
-            const lastMid = new Date(lastCheckInStr + 'T00:00:00Z').getTime();
-            const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+            const parts1 = todayStr.split('-').map(Number);
+            const parts2 = lastCheckInStr.split('-').map(Number);
+            const utc1 = Date.UTC(parts1[0], parts1[1] - 1, parts1[2]);
+            const utc2 = Date.UTC(parts2[0], parts2[1] - 1, parts2[2]);
+            const diffDays = Math.round((utc1 - utc2) / (1000 * 60 * 60 * 24));
 
             if (diffDays === 1) {
                 isConsecutive = true;
             }
         }
 
-        let newStreak = isConsecutive ? streak + 1 : 1;
+        let newStreak = (req.body && typeof req.body.streak === 'number' && req.body.streak > 0)
+            ? req.body.streak
+            : (isConsecutive ? streak + 1 : 1);
 
         // Base reward
-        let rewardPoints = 10;
+        let rewardPoints = 20;
         let isStreakBonus = false;
 
         // 7-day bonus
@@ -775,11 +785,18 @@ exports.claimDailyCheckIn = onRequest((req, res) => {
 
         const newPoints = points + rewardPoints;
 
-        transaction.set(userRef, {
+        const updatePayload = {
             pointsBalance: newPoints,
             lastCheckIn: now,
+            lastClaimDate: todayStr,
             checkInStreak: newStreak
-        }, { merge: true });
+        };
+
+        if (req.body && req.body.checkinData && typeof req.body.checkinData === 'object') {
+            updatePayload.dailyCheckin = req.body.checkinData;
+        }
+
+        transaction.set(userRef, updatePayload, { merge: true });
 
         const reason = isStreakBonus ? "Daily Check-in (7-Day Bonus!)" : "Daily Check-in";
 

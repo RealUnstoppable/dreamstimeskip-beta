@@ -440,13 +440,13 @@
     </div>
 
 
-    <!-- Cancellation Multi-Step Wizard Modal -->
-    <div id="cancel-membership-modal" class="cancel-modal-overlay" style="display: none;">
-        <div class="cancel-modal-card">
-            <button type="button" id="close-cancel-modal-btn" class="cancel-modal-close" aria-label="Close modal">&times;</button>
+    <!-- Deactivate Account Multi-Step Gauntlet Modal -->
+    <div id="deactivate-account-modal" class="deactivate-modal-overlay" style="display: none;">
+        <div class="deactivate-modal-card">
+            <button type="button" id="close-deactivate-modal-btn" class="deactivate-modal-close" aria-label="Close modal">&times;</button>
             
-            <div class="cancel-wizard-header">
-                <div class="cancel-step-indicator">
+            <div class="deactivate-wizard-header">
+                <div class="deactivate-step-indicator" id="deactivate-step-dots">
                     <span class="step-dot active" data-step="1">1</span>
                     <span class="step-line"></span>
                     <span class="step-dot" data-step="2">2</span>
@@ -456,14 +456,289 @@
                     <span class="step-dot" data-step="4">4</span>
                     <span class="step-line"></span>
                     <span class="step-dot" data-step="5">5</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="6">6</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="7">7</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="8">8</span>
                 </div>
-                <div id="cancel-step-indicator-text" class="cancel-step-title">Step 1 of 5: Reason for Leaving</div>
+                <div id="deactivate-step-title" class="deactivate-step-title">Step 1 of 8: Verify Account Email</div>
+                <p id="deactivate-step-subtitle" class="deactivate-step-subtitle">Security Protocol DTS-DEACT-01</p>
             </div>
 
-            <!-- Step 1: Reason -->
+            <!-- Step 1: Email -->
+            <div id="deactivate-step-1" class="deactivate-step-content">
+                <h4>Type Out Your Email Address</h4>
+                <p class="deactivate-step-desc">For critical security authentication, you must manually type out your registered account email address character-by-character.</p>
+                <div class="form-group">
+                    <label for="deactivate-email-input">Account Email Address</label>
+                    <input type="email" id="deactivate-email-input" placeholder="Enter your full account email" autocomplete="off" class="deactivate-input">
+                    <div id="deactivate-email-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-1">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-2-btn" class="btn btn-secondary-subdued">Verify Email & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Password -->
+            <div id="deactivate-step-2" class="deactivate-step-content" style="display: none;">
+                <h4>Enter Your Master Password</h4>
+                <p class="deactivate-step-desc">Enter your current master password to authorize security identity checks.</p>
+                <div class="form-group">
+                    <label for="deactivate-password-input">Account Password</label>
+                    <input type="password" id="deactivate-password-input" placeholder="Enter password" class="deactivate-input">
+                    <div id="deactivate-password-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-2">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-3-btn" class="btn btn-secondary-subdued">Continue to Confirm Password →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Confirm Password -->
+            <div id="deactivate-step-3" class="deactivate-step-content" style="display: none;">
+                <h4>Confirm Your Master Password</h4>
+                <p class="deactivate-step-desc">Re-enter your password to ensure zero typing errors before advancing.</p>
+                <div class="form-group">
+                    <label for="deactivate-confirm-password-input">Confirm Password</label>
+                    <input type="password" id="deactivate-confirm-password-input" placeholder="Re-enter password" class="deactivate-input">
+                    <div id="deactivate-confirm-password-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-3">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-4-btn" class="btn btn-secondary-subdued">Confirm Password →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Minecraft Username -->
+            <div id="deactivate-step-4" class="deactivate-step-content" style="display: none;">
+                <h4>Type Your Minecraft In-Game Name (IGN)</h4>
+                <p class="deactivate-step-desc">Required to de-synchronize your UUID from the DTS network and release in-game server claims.</p>
+                <div class="form-group">
+                    <label for="deactivate-mc-input">Minecraft Username</label>
+                    <input type="text" id="deactivate-mc-input" placeholder="e.g. UnstoppablePro" class="deactivate-input">
+                    <div id="deactivate-mc-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-4">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-5-btn" class="btn btn-secondary-subdued">Verify MC Username →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Discord Username -->
+            <div id="deactivate-step-5" class="deactivate-step-content" style="display: none;">
+                <h4>Type Your Discord Username / Tag</h4>
+                <p class="deactivate-step-desc">Required to revoke community role integrations, private channel privileges, and event whitelists.</p>
+                <div class="form-group">
+                    <label for="deactivate-discord-input">Discord Username / Tag</label>
+                    <input type="text" id="deactivate-discord-input" placeholder="e.g. unstoppable_player or user#0000" class="deactivate-input">
+                    <div id="deactivate-discord-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-5">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-6-btn" class="btn btn-secondary-subdued">Verify Discord Tag →</button>
+                </div>
+            </div>
+
+            <!-- Step 6: Last 4 Card Information -->
+            <div id="deactivate-step-6" class="deactivate-step-content" style="display: none;">
+                <h4>Enter Last 4 Digits of Payment Card</h4>
+                <p class="deactivate-step-desc">Anti-fraud identity check. Type the last 4 digits of the card linked to your account, or check below if you have never attached a payment card.</p>
+                <div class="form-group">
+                    <label for="deactivate-card-input">Last 4 Digits of Card</label>
+                    <input type="text" id="deactivate-card-input" maxlength="4" placeholder="•••• (e.g. 4242)" class="deactivate-input" style="font-family: monospace; letter-spacing: 4px; font-size: 1.2rem;">
+                    <label class="deactivate-checkbox-label">
+                        <input type="checkbox" id="deactivate-no-card-checkbox">
+                        <span>I do not have a payment card linked to this account (verify as 0000)</span>
+                    </label>
+                    <div id="deactivate-card-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-6">
+                    <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
+                    <button type="button" id="deactivate-to-step-7-btn" class="btn btn-secondary-subdued">Review Loss of Assets →</button>
+                </div>
+            </div>
+
+            <!-- Step 7: What You'll Lose (Retention Screen) -->
+            <div id="deactivate-step-7" class="deactivate-step-content" style="display: none;">
+                <h4>Review Everything You Will Lose</h4>
+                <p class="deactivate-step-desc">Closing or deactivating your DTS account will result in the immediate forfeiture of the following assets:</p>
+                <div class="cancel-warning-banner">
+                    <span class="warning-icon">⚠️</span>
+                    <div>
+                        <strong style="color: #ef4444; display: block; font-size: 0.95rem;">Irrevocable Loss of Account Standing</strong>
+                        <small style="color: #fca5a5;">Your profile status and assets cannot be recovered once deactivated.</small>
+                    </div>
+                </div>
+                <div class="cancel-perks-loss-grid">
+                    <div class="perk-loss-item">
+                        <span class="loss-icon">💎</span>
+                        <div>
+                            <strong>Minecraft Daily Streak & Artifacts</strong>
+                            <p>Your check-in streak, 5x Diamonds, Netherite Ingot, and Elytra progression are wiped.</p>
+                        </div>
+                    </div>
+                    <div class="perk-loss-item">
+                        <span class="loss-icon">✨</span>
+                        <div>
+                            <strong>Loyalty Points & Wallet Balance</strong>
+                            <p>All accumulated loyalty points and reward transactions will be terminated.</p>
+                        </div>
+                    </div>
+                    <div class="perk-loss-item">
+                        <span class="loss-icon">🛍️</span>
+                        <div>
+                            <strong>Order & Digital Purchase History</strong>
+                            <p>Access to order history, receipts, and digital product downloads will be severed.</p>
+                        </div>
+                    </div>
+                    <div class="perk-loss-item">
+                        <span class="loss-icon">🎨</span>
+                        <div>
+                            <strong>Themes & Personalization</strong>
+                            <p>Saved theme presets, custom hex accent palettes, and cloud configs are lost.</p>
+                        </div>
+                    </div>
+                    <div class="perk-loss-item">
+                        <span class="loss-icon">🛡️</span>
+                        <div>
+                            <strong>Server Whitelist & Community Rank</strong>
+                            <p>Your DTS network whitelist and Discord community rank will be revoked.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-7">
+                    <button type="button" id="deactivate-loss-goback-btn" class="btn tricky-goback-btn btn-ios-big-blue">Go Back (Keep My Account)</button>
+                    <button type="button" id="deactivate-loss-nothanks-btn" class="btn btn-secondary-subdued">No thanks, continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 8: Retention Offer: 10% OFF! -->
+            <div id="deactivate-step-8" class="deactivate-step-content" style="display: none;">
+                <div class="retention-voucher-card">
+                    <span class="voucher-badge">EXCLUSIVE RETENTION GIFT</span>
+                    <h4>Wait! Take 10% Off Everything & Stay</h4>
+                    <p>We value you immensely. If you stay with us today, we will apply an exclusive <strong>10% lifetime discount</strong> to all shop orders and memberships, plus grant <strong>100 free Loyalty Points</strong> immediately!</p>
+                    <div class="voucher-code-box">
+                        <span class="voucher-code">STAY10DTS</span>
+                        <span class="voucher-discount">10% OFF + 100 PTS</span>
+                    </div>
+                    <ul class="voucher-perks-list">
+                        <li>✨ 10% off all future store merchandise & subscriptions</li>
+                        <li>✨ +100 bonus loyalty points instantly deposited</li>
+                        <li>✨ Keep your Minecraft streak, themes, and community perks</li>
+                    </ul>
+                    <button type="button" id="deactivate-claim-10-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px;">
+                        Claim 10% Discount & Keep Account
+                    </button>
+                    <div>
+                        <button type="button" id="deactivate-proceed-to-popup-btn" class="cancel-text-link" style="color: #ef4444; font-size: 0.85rem;">
+                            No thanks, proceed to deactivate account →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Deactivation Popup 1: Are you sure? + Prompt Password -->
+    <div id="deactivate-confirm-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">⚠️</div>
+            <h4>Are you sure?</h4>
+            <p>Are you sure you want to deactivate your account? Please enter your master password to authorize this action.</p>
+            <div class="form-group" style="margin: 16px 0; text-align: left;">
+                <label for="deactivate-popup-password" style="font-size: 0.85rem; color: #a3a3a3; display: block; margin-bottom: 6px;">Account Password</label>
+                <input type="password" id="deactivate-popup-password" class="deactivate-input" placeholder="Enter password">
+                <div id="deactivate-popup-pwd-error" class="deactivate-error-msg" style="display: none;"></div>
+            </div>
+            <div class="deactivate-popup-actions tricky-actions" id="deactivate-popup-actions">
+                <button type="button" id="deactivate-popup-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">No</button>
+                <button type="button" id="deactivate-popup-yes-btn" class="btn btn-danger-subdued">Yes, Deactivate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivation Popup 2: If No -> Ask if they want to delete account instead -->
+    <div id="delete-ask-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">❓</div>
+            <h4>Delete Account Instead?</h4>
+            <p>You chose not to deactivate your account. Do you want to permanently DELETE your account instead?</p>
+            <div class="deactivate-popup-actions tricky-actions" id="delete-ask-actions">
+                <button type="button" id="delete-ask-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">No, Keep Account</button>
+                <button type="button" id="delete-ask-yes-btn" class="btn btn-danger-subdued">Yes, Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivation Popup 3: Confirm Delete -> Prompt Password -->
+    <div id="delete-confirm-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">🚨</div>
+            <h4>Are you sure?</h4>
+            <p>Are you absolutely sure you want to delete your account? Please enter your master password to authorize permanent deletion.</p>
+            <div class="form-group" style="margin: 16px 0; text-align: left;">
+                <label for="delete-popup-password" style="font-size: 0.85rem; color: #a3a3a3; display: block; margin-bottom: 6px;">Enter Password to Authorize Deletion</label>
+                <input type="password" id="delete-popup-password" class="deactivate-input" placeholder="Enter password">
+                <div id="delete-popup-pwd-error" class="deactivate-error-msg" style="display: none;"></div>
+            </div>
+            <div class="deactivate-popup-actions tricky-actions" id="delete-confirm-actions">
+                <button type="button" id="delete-confirm-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">Go Back</button>
+                <button type="button" id="delete-confirm-yes-btn" class="btn btn-danger-subdued">Proceed to Final Warning →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deactivation Popup 4: Final Warning -> This will delete your account forever -->
+    <div id="delete-forever-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card popup-severe">
+            <div class="popup-icon severe-icon">💀</div>
+            <h4 style="color: #ef4444;">THIS WILL DELETE YOUR ACCOUNT FOREVER</h4>
+            <p style="color: #fca5a5; font-size: 0.95rem;">This will delete your account forever. All items, check-ins, purchases, tickets, and data will be permanently wiped from our database right now. If you click Accept, there is no turning back.</p>
+            <div class="deactivate-popup-actions tricky-actions" id="delete-forever-actions" style="margin-top: 24px;">
+                <button type="button" id="delete-forever-goback-btn" class="btn tricky-goback-btn btn-ios-big-blue">Go Back</button>
+                <button type="button" id="delete-forever-accept-btn" class="btn btn-danger-severe">Accept (Delete Forever)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancellation Multi-Step Wizard Modal (Upgraded Gauntlet) -->
+    <div id="cancel-membership-modal" class="cancel-modal-overlay" style="display: none;">
+        <div class="cancel-modal-card">
+            <button type="button" id="close-cancel-modal-btn" class="cancel-modal-close" aria-label="Close modal">&times;</button>
+            
+            <div class="cancel-wizard-header">
+                <div class="cancel-step-indicator" id="cancel-step-dots">
+                    <span class="step-dot active" data-step="1">1</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="2">2</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="3">3</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="4">4</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="5">5</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="6">6</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="7">7</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="8">8</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="9">9</span>
+                </div>
+                <div id="cancel-step-indicator-text" class="cancel-step-title">Step 1 of 9: Reason for Leaving</div>
+                <p class="deactivate-step-subtitle">Subscription Cancellation Gauntlet</p>
+            </div>
+
+            <!-- Cancel Step 1: Reason -->
             <div id="cancel-step-1" class="cancel-step-content">
-                <h4>Why are you leaving?</h4>
-                <p class="cancel-step-desc">We're genuinely sorry to see you consider leaving. Please share what's prompting your decision:</p>
+                <h4>Why are you cancelling?</h4>
+                <p class="cancel-step-desc">We're genuinely sorry to see you consider cancelling. Please share what's prompting your decision:</p>
                 <div class="cancel-reasons-list">
                     <label class="cancel-reason-option">
                         <input type="radio" name="cancel_reason" value="too_expensive" checked>
@@ -486,14 +761,108 @@
                         <span>Other reason / temporary break</span>
                     </label>
                 </div>
-                <div class="cancel-modal-actions">
-                    <button type="button" class="btn cancel-keep-btn" style="background: rgba(255,255,255,0.08); color: #fff;">Never Mind, Keep Plan</button>
-                    <button type="button" id="cancel-to-step-2-btn" class="btn btn-danger">Continue →</button>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-1">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Never Mind, Keep Plan</button>
+                    <button type="button" id="cancel-to-step-2-btn" class="btn btn-secondary-subdued">Continue to Verification →</button>
                 </div>
             </div>
 
-            <!-- Step 2: Loss of Perks -->
+            <!-- Cancel Step 2: Email Verification -->
             <div id="cancel-step-2" class="cancel-step-content" style="display: none;">
+                <h4>Type Out Your Email Address</h4>
+                <p class="cancel-step-desc">Type your account email to verify authorization for subscription cancellation:</p>
+                <div class="form-group">
+                    <label for="cancel-email-input">Account Email Address</label>
+                    <input type="email" id="cancel-email-input" placeholder="Enter your full account email" autocomplete="off" class="deactivate-input">
+                    <div id="cancel-email-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-2">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-3-btn" class="btn btn-secondary-subdued">Verify Email & Continue →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 3: Password Verification -->
+            <div id="cancel-step-3" class="cancel-step-content" style="display: none;">
+                <h4>Enter Your Account Password</h4>
+                <p class="cancel-step-desc">Enter your account password to authorize subscription changes:</p>
+                <div class="form-group">
+                    <label for="cancel-password-input">Account Password</label>
+                    <input type="password" id="cancel-password-input" placeholder="Enter password" class="deactivate-input">
+                    <div id="cancel-password-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-3">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-4-btn" class="btn btn-secondary-subdued">Next: Confirm Password →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 4: Confirm Password -->
+            <div id="cancel-step-4" class="cancel-step-content" style="display: none;">
+                <h4>Confirm Your Account Password</h4>
+                <p class="cancel-step-desc">Re-enter your password to confirm:</p>
+                <div class="form-group">
+                    <label for="cancel-confirm-password-input">Confirm Password</label>
+                    <input type="password" id="cancel-confirm-password-input" placeholder="Re-enter password" class="deactivate-input">
+                    <div id="cancel-confirm-password-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-4">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-5-btn" class="btn btn-secondary-subdued">Confirm Password →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 5: Minecraft Username -->
+            <div id="cancel-step-5" class="cancel-step-content" style="display: none;">
+                <h4>Type Your Minecraft IGN</h4>
+                <p class="cancel-step-desc">Enter your Minecraft username to detach VIP server permissions:</p>
+                <div class="form-group">
+                    <label for="cancel-mc-input">Minecraft Username</label>
+                    <input type="text" id="cancel-mc-input" placeholder="e.g. UnstoppablePro" class="deactivate-input">
+                    <div id="cancel-mc-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-5">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-6-btn" class="btn btn-secondary-subdued">Verify MC Username →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 6: Discord Username -->
+            <div id="cancel-step-6" class="cancel-step-content" style="display: none;">
+                <h4>Type Your Discord Username / Tag</h4>
+                <p class="cancel-step-desc">Enter your Discord username to unlink VIP community channels:</p>
+                <div class="form-group">
+                    <label for="cancel-discord-input">Discord Username / Tag</label>
+                    <input type="text" id="cancel-discord-input" placeholder="e.g. unstoppable_player or user#0000" class="deactivate-input">
+                    <div id="cancel-discord-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-6">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-7-btn" class="btn btn-secondary-subdued">Verify Discord Tag →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 7: Last 4 Card Information -->
+            <div id="cancel-step-7" class="cancel-step-content" style="display: none;">
+                <h4>Enter Last 4 Digits of Payment Card</h4>
+                <p class="cancel-step-desc">Enter the last 4 digits of the card used for your subscription:</p>
+                <div class="form-group">
+                    <label for="cancel-card-input">Last 4 Digits of Card</label>
+                    <input type="text" id="cancel-card-input" maxlength="4" placeholder="•••• (e.g. 4242)" class="deactivate-input" style="font-family: monospace; letter-spacing: 4px; font-size: 1.2rem;">
+                    <label class="deactivate-checkbox-label">
+                        <input type="checkbox" id="cancel-no-card-checkbox">
+                        <span>I do not have a payment card linked (verify as 0000)</span>
+                    </label>
+                    <div id="cancel-card-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-7">
+                    <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-8-btn" class="btn btn-secondary-subdued">Review Loss of Perks →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 8: Loss of Perks -->
+            <div id="cancel-step-8" class="cancel-step-content" style="display: none;">
                 <h4>Review what you'll lose</h4>
                 <p class="cancel-step-desc">By canceling now, your account will immediately forfeit the following active perks:</p>
                 <div class="cancel-warning-banner">
@@ -540,14 +909,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="cancel-modal-actions">
-                    <button type="button" class="btn cancel-keep-btn btn-primary">Keep My Benefits</button>
-                    <button type="button" id="cancel-to-step-3-btn" class="btn btn-danger">I Understand, Continue →</button>
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-8">
+                    <button type="button" id="cancel-loss-goback-btn" class="btn cancel-keep-btn btn-ios-big-blue">Go Back (Keep My Benefits)</button>
+                    <button type="button" id="cancel-to-step-9-btn" class="btn btn-secondary-subdued">No thanks, continue cancellation →</button>
                 </div>
             </div>
 
-            <!-- Step 3: Retention Voucher -->
-            <div id="cancel-step-3" class="cancel-step-content" style="display: none;">
+            <!-- Cancel Step 9: Retention Voucher (10% OFF!) -->
+            <div id="cancel-step-9" class="cancel-step-content" style="display: none;">
                 <div class="retention-voucher-card">
                     <span class="voucher-badge">SPECIAL RETENTION OFFER</span>
                     <h4>Wait! Stay & Save 10% Every Month</h4>
@@ -564,63 +933,84 @@
                         <li>✨ Instant +100 bonus points credited to your rewards</li>
                     </ul>
 
-                    <button type="button" id="claim-voucher-stay-btn" class="btn-voucher">
+                    <button type="button" id="claim-voucher-stay-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px;">
                         Claim 10% Discount & 100 Points
                     </button>
-                    <div style="margin-top: 14px;">
-                        <button type="button" id="cancel-to-step-4-btn" class="cancel-text-link">No thanks, continue with cancellation →</button>
+                    <div>
+                        <button type="button" id="cancel-proceed-to-popup-btn" class="cancel-text-link" style="color: #ef4444; font-size: 0.85rem;">
+                            No thanks, proceed to cancel subscription →
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Step 4: Escalation / Support -->
-            <div id="cancel-step-4" class="cancel-step-content" style="display: none;">
-                <h4>Can we help solve the issue?</h4>
-                <p class="cancel-step-desc">Most issues can be solved immediately. Our team is standing by to resolve any problems you are encountering:</p>
-                <div class="cancel-support-options">
-                    <div class="support-card-option" id="cancel-open-lexi-btn">
-                        <span class="support-card-icon">🤖</span>
-                        <div>
-                            <strong>Chat with Lexi AI Support</strong>
-                            <p>Instant troubleshooting, billing inquiries, and server support 24/7.</p>
-                        </div>
-                    </div>
-                    <div class="support-card-option" id="cancel-open-ticket-btn">
-                        <span class="support-card-icon">🎫</span>
-                        <div>
-                            <strong>Submit Priority Ticket</strong>
-                            <p>Escalate directly to our administrative team with priority response.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="cancel-modal-actions">
-                    <button type="button" class="btn cancel-keep-btn" style="background: rgba(255,255,255,0.08); color: #fff;">Back to Safety</button>
-                    <button type="button" id="cancel-to-step-5-btn" class="btn btn-danger">Still Need to Cancel →</button>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <!-- Step 5: Final Confirmation -->
-            <div id="cancel-step-5" class="cancel-step-content" style="display: none;">
-                <div class="cancel-final-warning">
-                    <h4>Final Warning</h4>
-                    <p>This action is irreversible. Your membership benefits will cease immediately, and all pending perks will be forfeited.</p>
-                </div>
-                <div style="margin: 20px 0;">
-                    <label class="cancel-checkbox-label">
-                        <input type="checkbox" id="cancel-confirm-checkbox">
-                        <span>I understand that by checking this box, my subscription will be canceled and my account will be immediately downgraded to Standard (Free).</span>
-                    </label>
-                </div>
-                <div class="cancel-modal-actions">
-                    <button type="button" class="btn cancel-keep-btn btn-primary">Never Mind, Keep Plan</button>
-                    <button type="button" id="cancel-confirm-final-btn" class="btn btn-danger" disabled>Yes, Permanently Cancel</button>
-                </div>
+    <!-- Subscription Cancel Popup 1: Are you sure? + Prompt Password -->
+    <div id="sub-cancel-confirm-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">⚠️</div>
+            <h4>Are you sure?</h4>
+            <p>Are you sure you want to cancel your VIP subscription? Please enter your master password to confirm.</p>
+            <div class="form-group" style="margin: 16px 0; text-align: left;">
+                <label for="sub-cancel-popup-password" style="font-size: 0.85rem; color: #a3a3a3; display: block; margin-bottom: 6px;">Account Password</label>
+                <input type="password" id="sub-cancel-popup-password" class="deactivate-input" placeholder="Enter password">
+                <div id="sub-cancel-popup-pwd-error" class="deactivate-error-msg" style="display: none;"></div>
+            </div>
+            <div class="deactivate-popup-actions tricky-actions" id="sub-cancel-popup-actions">
+                <button type="button" id="sub-cancel-popup-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">No</button>
+                <button type="button" id="sub-cancel-popup-yes-btn" class="btn btn-danger-subdued">Yes, Cancel Subscription</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Cancel Popup 2: If No -> Terminate perks immediately instead? -->
+    <div id="sub-cancel-terminate-ask-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">❓</div>
+            <h4>Revoke All Perks Immediately?</h4>
+            <p>You chose not to cancel normally. Do you want to immediately terminate all membership perks and forfeit remaining VIP days right now?</p>
+            <div class="deactivate-popup-actions tricky-actions" id="sub-cancel-terminate-ask-actions">
+                <button type="button" id="sub-cancel-terminate-ask-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">No, Keep Plan</button>
+                <button type="button" id="sub-cancel-terminate-ask-yes-btn" class="btn btn-danger-subdued">Yes, Terminate All Perks</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Cancel Popup 3: Confirm Terminate -> Prompt Password -->
+    <div id="sub-cancel-terminate-confirm-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card">
+            <div class="popup-icon">🚨</div>
+            <h4>Are you sure?</h4>
+            <p>Are you sure you want to terminate your membership immediately? Enter your password to authorize this revocation:</p>
+            <div class="form-group" style="margin: 16px 0; text-align: left;">
+                <label for="sub-cancel-terminate-password" style="font-size: 0.85rem; color: #a3a3a3; display: block; margin-bottom: 6px;">Enter Password to Authorize</label>
+                <input type="password" id="sub-cancel-terminate-password" class="deactivate-input" placeholder="Enter password">
+                <div id="sub-cancel-terminate-pwd-error" class="deactivate-error-msg" style="display: none;"></div>
+            </div>
+            <div class="deactivate-popup-actions tricky-actions" id="sub-cancel-terminate-confirm-actions">
+                <button type="button" id="sub-cancel-terminate-confirm-no-btn" class="btn tricky-goback-btn btn-ios-big-blue">Go Back</button>
+                <button type="button" id="sub-cancel-terminate-confirm-yes-btn" class="btn btn-danger-subdued">Proceed to Final Warning →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Cancel Popup 4: Final Warning -> Revoke Forever -->
+    <div id="sub-cancel-terminate-forever-popup" class="deactivate-popup-overlay" style="display: none;">
+        <div class="deactivate-popup-card popup-severe">
+            <div class="popup-icon severe-icon">💀</div>
+            <h4 style="color: #ef4444;">REVOKE VIP PRIVILEGES FOREVER</h4>
+            <p style="color: #fca5a5; font-size: 0.95rem;">This will revoke your subscription privileges forever! All active multipliers, loot boxes, and badges will be deleted immediately. If you click Accept, your plan will be canceled forever or you can go back.</p>
+            <div class="deactivate-popup-actions tricky-actions" id="sub-cancel-terminate-forever-actions" style="margin-top: 24px;">
+                <button type="button" id="sub-cancel-terminate-forever-goback-btn" class="btn tricky-goback-btn btn-ios-big-blue">Go Back</button>
+                <button type="button" id="sub-cancel-terminate-forever-accept-btn" class="btn btn-danger-severe">Accept (Revoke Forever)</button>
             </div>
         </div>
     </div>
 
     <!-- Account Controller Script -->
-    <script type="module" src="/js/account.js?v=20261014_rev4"></script>
+    <script type="module" src="/js/account.js?v=20261015_rev2"></script>
     <footer class="main-footer"></footer>
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1791167958698';

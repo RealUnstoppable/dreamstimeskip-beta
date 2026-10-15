@@ -16,4 +16,9 @@ export const query = jest.fn();
 export const where = jest.fn();
 export const orderBy = jest.fn();
 export const limit = jest.fn();
+export const deleteDoc = jest.fn();
+export const Timestamp = {
+    now: jest.fn(() => ({ toDate: () => new Date() })),
+    fromDate: jest.fn((d) => ({ toDate: () => d }))
+};
 

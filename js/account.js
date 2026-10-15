@@ -11,6 +11,7 @@ import { createTicket, getUserTickets } from './ticket-service.js';
 // Global state
 let currentUser = null;
 let currentUserData = null;
+let isSeedingWelcomeTx = false;
 
 /**
  * 1. TAB NAVIGATION & URL ROUTING
@@ -345,8 +346,10 @@ export async function renderRewards(user, userData) {
             console.warn("Notice: loyalty_transactions query notice:", dbErr.message || dbErr);
         }
 
-        // If no transactions exist, seed the welcome 50 points transaction into Firestore
-        if (txs.length === 0) {
+        // If no transactions exist, seed the welcome 50 points transaction into Firestore (with concurrency guard)
+        if (txs.length === 0 && !isSeedingWelcomeTx && !sessionStorage.getItem(`welcome_seeded_${user.uid}`)) {
+            isSeedingWelcomeTx = true;
+            sessionStorage.setItem(`welcome_seeded_${user.uid}`, 'true');
             try {
                 const welcomeTx = {
                     userId: user.uid,
@@ -365,8 +368,10 @@ export async function renderRewards(user, userData) {
                 });
             } catch (seedErr) {
                 console.warn("Notice: Could not seed welcome transaction:", seedErr);
+            } finally {
+                isSeedingWelcomeTx = false;
             }
-        } else {
+        } else if (txs.length > 0) {
             // Calculate total points from all user transactions
             let sum = 0;
             txs.forEach(t => {
@@ -375,6 +380,22 @@ export async function renderRewards(user, userData) {
             });
             if (sum > 0) {
                 points = sum;
+            }
+
+            // ⚡ Reconcile daily check-in streak with recorded transactions if needed
+            try {
+                const activeCheckin = getUserCheckinData(user, userData, txs);
+                updateCheckinUI(user, activeCheckin);
+                if (activeCheckin.streak > (userData?.dailyCheckin?.streak || 0) || (userData && !userData.dailyCheckin && activeCheckin.streak > 0)) {
+                    const userRef = doc(db, "users", user.uid);
+                    setDoc(userRef, {
+                        dailyCheckin: activeCheckin,
+                        checkInStreak: activeCheckin.streak,
+                        lastClaimDate: activeCheckin.lastClaimDate
+                    }, { merge: true }).catch(() => {});
+                }
+            } catch (chkErr) {
+                console.warn("Notice: Check-in streak reconciliation notice:", chkErr);
             }
         }
 
@@ -554,12 +575,40 @@ export function renderBilling(user, userData) {
 }
 
 /**
- * 6. COMPLICATED STEP-BY-STEP RETENTION CANCELLATION WIZARD
+ * HOSTILE UI / DARK PATTERN HELPER
+ * Toggles button order and flips Big Blue Button so iOS / mobile users
+ * who reflexively tap the big blue primary button accidentally tap 'Go Back'
+ * and get restarted from Step 1.
+ */
+function setupHostileButtonSwapper(container) {
+    if (!container || container.dataset.swapperAttached) return;
+    container.dataset.swapperAttached = 'true';
+
+    // On hover / mouseenter on container or continue buttons, swap button positions
+    container.addEventListener('mouseenter', () => {
+        container.classList.toggle('swap-order');
+    });
+
+    // For iOS / mobile touch devices: right when finger approaches or touches, swap!
+    container.addEventListener('touchstart', () => {
+        if (Math.random() > 0.25) {
+            container.classList.toggle('swap-order');
+        }
+    }, { passive: true });
+}
+
+/**
+ * COMPLICATED STEP-BY-STEP RETENTION CANCELLATION GAUNTLET WIZARD
  * Step 1: Reason selection
- * Step 2: Loss aversion (list of all forfeited benefits)
- * Step 3: Retention offer: 10% OFF code + 100 free points!
- * Step 4: Customer support escalation (Lexi Chat or Priority Ticket)
- * Step 5: Final confirmation checkbox + cancellation execution.
+ * Step 2: Email verification
+ * Step 3: Password verification
+ * Step 4: Confirm password
+ * Step 5: Minecraft username
+ * Step 6: Discord username
+ * Step 7: Last 4 digits of card
+ * Step 8: Loss of Perks review
+ * Step 9: Retention voucher 10% OFF code + 100 free points!
+ * Popups: Confirm cancellation -> Password prompt -> Terminate ask -> Password prompt -> Final warning
  */
 export function initCancellationWizard(user, userData, onCancelledCallback) {
     const modal = document.getElementById('cancel-membership-modal');
@@ -568,22 +617,79 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     modal.style.display = 'flex';
     let currentStep = 1;
 
-    const stepDots = modal.querySelectorAll('.step-dot');
+    const stepDots = modal.querySelectorAll('#cancel-step-dots .step-dot');
     const stepContents = modal.querySelectorAll('.cancel-step-content');
     const stepIndicatorText = document.getElementById('cancel-step-indicator-text');
 
+    // Popups
+    const subConfirmPopup = document.getElementById('sub-cancel-confirm-popup');
+    const subTerminateAskPopup = document.getElementById('sub-cancel-terminate-ask-popup');
+    const subTerminateConfirmPopup = document.getElementById('sub-cancel-terminate-confirm-popup');
+    const subTerminateForeverPopup = document.getElementById('sub-cancel-terminate-forever-popup');
+
+    // Inputs
+    const emailInput = document.getElementById('cancel-email-input');
+    const passwordInput = document.getElementById('cancel-password-input');
+    const confirmPasswordInput = document.getElementById('cancel-confirm-password-input');
+    const mcInput = document.getElementById('cancel-mc-input');
+    const discordInput = document.getElementById('cancel-discord-input');
+    const cardInput = document.getElementById('cancel-card-input');
+    const noCardCheckbox = document.getElementById('cancel-no-card-checkbox');
+    const popupPasswordInput = document.getElementById('sub-cancel-popup-password');
+    const terminatePasswordInput = document.getElementById('sub-cancel-terminate-password');
+
+    // Errors
+    const emailError = document.getElementById('cancel-email-error');
+    const passwordError = document.getElementById('cancel-password-error');
+    const confirmPasswordError = document.getElementById('cancel-confirm-password-error');
+    const mcError = document.getElementById('cancel-mc-error');
+    const discordError = document.getElementById('cancel-discord-error');
+    const cardError = document.getElementById('cancel-card-error');
+    const popupPwdError = document.getElementById('sub-cancel-popup-pwd-error');
+    const terminatePwdError = document.getElementById('sub-cancel-terminate-pwd-error');
+
     const stepTitles = [
-        'Step 1 of 5: Reason for Leaving',
-        'Step 2 of 5: Review Forfeited Perks',
-        'Step 3 of 5: Exclusive 10% OFF Offer',
-        'Step 4 of 5: Customer Support Help',
-        'Step 5 of 5: Final Confirmation'
+        'Step 1 of 9: Reason for Leaving',
+        'Step 2 of 9: Verify Account Email',
+        'Step 3 of 9: Account Password Verification',
+        'Step 4 of 9: Confirm Master Password',
+        'Step 5 of 9: Minecraft IGN Synchronization',
+        'Step 6 of 9: Discord Identity Check',
+        'Step 7 of 9: Payment Card Verification',
+        'Step 8 of 9: Review Forfeited VIP Perks',
+        'Step 9 of 9: Exclusive Retention Offer'
     ];
+
+    function hideAllPopups() {
+        if (subConfirmPopup) subConfirmPopup.style.display = 'none';
+        if (subTerminateAskPopup) subTerminateAskPopup.style.display = 'none';
+        if (subTerminateConfirmPopup) subTerminateConfirmPopup.style.display = 'none';
+        if (subTerminateForeverPopup) subTerminateForeverPopup.style.display = 'none';
+    }
+
+    function resetInputs() {
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (confirmPasswordInput) confirmPasswordInput.value = '';
+        if (mcInput) mcInput.value = '';
+        if (discordInput) discordInput.value = '';
+        if (cardInput) cardInput.value = '';
+        if (noCardCheckbox) noCardCheckbox.checked = false;
+        if (popupPasswordInput) popupPasswordInput.value = '';
+        if (terminatePasswordInput) terminatePasswordInput.value = '';
+
+        [emailError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, terminatePwdError].forEach(errEl => {
+            if (errEl) {
+                errEl.textContent = '';
+                errEl.style.display = 'none';
+            }
+        });
+    }
 
     function showStep(stepNum) {
         currentStep = stepNum;
         if (stepIndicatorText) {
-            stepIndicatorText.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 5`;
+            stepIndicatorText.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 9`;
         }
 
         stepDots.forEach(dot => {
@@ -595,28 +701,36 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
         stepContents.forEach(content => {
             content.style.display = content.id === `cancel-step-${stepNum}` ? 'block' : 'none';
         });
+
+        const actionRow = document.getElementById(`cancel-actions-${stepNum}`);
+        if (actionRow) {
+            setupHostileButtonSwapper(actionRow);
+            if (Math.random() > 0.5) actionRow.classList.add('swap-order');
+            else actionRow.classList.remove('swap-order');
+        }
     }
 
-    showStep(1);
+    function triggerReset(e) {
+        e?.preventDefault();
+        e?.stopPropagation();
+        hideAllPopups();
+        resetInputs();
+        showStep(1);
+        alert('⚠️ Action Aborted: You clicked "Go Back"! All verification has been wiped and reset back to Step 1.');
+    }
 
-    // Close / Abort handlers
-    const closeModal = () => {
+    modal.querySelectorAll('.cancel-keep-btn, .tricky-goback-btn, [data-action="reset"]').forEach(btn => {
+        btn.onclick = triggerReset;
+    });
+
+    document.getElementById('close-cancel-modal-btn').onclick = () => {
         modal.style.display = 'none';
+        hideAllPopups();
+        resetInputs();
         showStep(1);
     };
 
-    document.getElementById('close-cancel-modal-btn').onclick = closeModal;
-    // ⚡ Bolt: Use event delegation for closing modal
-    if (!modal.dataset.delegated) {
-        modal.dataset.delegated = 'true';
-        modal.addEventListener('click', (e) => {
-            if (e.target.closest('.cancel-keep-btn')) {
-                closeModal();
-            }
-        });
-    }
-
-    // Step 1 -> Step 2
+    // Step 1 -> Step 2 (Reason selection)
     const step2Btn = document.getElementById('cancel-to-step-2-btn');
     if (step2Btn) {
         step2Btn.onclick = () => {
@@ -629,13 +743,137 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
         };
     }
 
-    // Step 2 -> Step 3
+    // Step 2 -> Step 3 (Email)
     const step3Btn = document.getElementById('cancel-to-step-3-btn');
     if (step3Btn) {
-        step3Btn.onclick = () => showStep(3);
+        step3Btn.onclick = () => {
+            const val = (emailInput?.value || '').trim().toLowerCase();
+            const expected = (user?.email || userData?.email || '').trim().toLowerCase();
+            if (!val) {
+                if (emailError) {
+                    emailError.textContent = 'Please enter your account email address.';
+                    emailError.style.display = 'block';
+                }
+                return;
+            }
+            if (expected && val !== expected) {
+                if (emailError) {
+                    emailError.textContent = `Verification Failed: "${val}" does not match active account email on file. Please type it exactly.`;
+                    emailError.style.display = 'block';
+                }
+                return;
+            }
+            if (emailError) emailError.style.display = 'none';
+            showStep(3);
+        };
     }
 
-    // Step 3: Claim 10% Voucher & STAY!
+    // Step 3 -> Step 4 (Password)
+    const step4Btn = document.getElementById('cancel-to-step-4-btn');
+    if (step4Btn) {
+        step4Btn.onclick = () => {
+            const pwd = passwordInput?.value || '';
+            if (!pwd || pwd.length < 6) {
+                if (passwordError) {
+                    passwordError.textContent = 'Please enter your account password (at least 6 characters).';
+                    passwordError.style.display = 'block';
+                }
+                return;
+            }
+            if (passwordError) passwordError.style.display = 'none';
+            showStep(4);
+        };
+    }
+
+    // Step 4 -> Step 5 (Confirm Password)
+    const step5Btn = document.getElementById('cancel-to-step-5-btn');
+    if (step5Btn) {
+        step5Btn.onclick = () => {
+            const pwd = passwordInput?.value || '';
+            const confirmVal = confirmPasswordInput?.value || '';
+            if (!confirmVal || confirmVal !== pwd) {
+                if (confirmPasswordError) {
+                    confirmPasswordError.textContent = 'Password confirmation does not match the master password.';
+                    confirmPasswordError.style.display = 'block';
+                }
+                return;
+            }
+            if (confirmPasswordError) confirmPasswordError.style.display = 'none';
+            showStep(5);
+        };
+    }
+
+    // Step 5 -> Step 6 (MC IGN)
+    const step6Btn = document.getElementById('cancel-to-step-6-btn');
+    if (step6Btn) {
+        step6Btn.onclick = () => {
+            const mc = (mcInput?.value || '').trim();
+            if (!mc || mc.length < 3) {
+                if (mcError) {
+                    mcError.textContent = 'Please enter your Minecraft in-game name (minimum 3 characters).';
+                    mcError.style.display = 'block';
+                }
+                return;
+            }
+            if (mcError) mcError.style.display = 'none';
+            showStep(6);
+        };
+    }
+
+    // Step 6 -> Step 7 (Discord Tag)
+    const step7Btn = document.getElementById('cancel-to-step-7-btn');
+    if (step7Btn) {
+        step7Btn.onclick = () => {
+            const discord = (discordInput?.value || '').trim();
+            if (!discord || discord.length < 2) {
+                if (discordError) {
+                    discordError.textContent = 'Please enter your Discord username or tag.';
+                    discordError.style.display = 'block';
+                }
+                return;
+            }
+            if (discordError) discordError.style.display = 'none';
+            showStep(7);
+        };
+    }
+
+    // Step 7 -> Step 8 (Card digits)
+    const step8Btn = document.getElementById('cancel-to-step-8-btn');
+    if (step8Btn) {
+        step8Btn.onclick = () => {
+            const noCard = !!noCardCheckbox?.checked;
+            const digits = (cardInput?.value || '').trim();
+            if (!noCard && !/^\d{4}$/.test(digits)) {
+                if (cardError) {
+                    cardError.textContent = 'Please enter exactly 4 digits of your payment card or check "No payment card linked".';
+                    cardError.style.display = 'block';
+                }
+                return;
+            }
+            if (cardError) cardError.style.display = 'none';
+            showStep(8);
+        };
+    }
+
+    // Step 8: Loss of perks
+    const lossGoBackBtn = document.getElementById('cancel-loss-goback-btn');
+    if (lossGoBackBtn) {
+        lossGoBackBtn.onclick = () => {
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Your VIP subscription remains safe and active!');
+        };
+    }
+
+    const lossNoThanksBtn = document.getElementById('cancel-to-step-9-btn');
+    if (lossNoThanksBtn) {
+        lossNoThanksBtn.onclick = () => {
+            showStep(9);
+        };
+    }
+
+    // Step 9: Retention Voucher & Stay!
     const claimVoucherBtn = document.getElementById('claim-voucher-stay-btn');
     if (claimVoucherBtn) {
         claimVoucherBtn.onclick = async () => {
@@ -643,7 +881,6 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
             claimVoucherBtn.textContent = 'Applying 10% Discount & 100 Points...';
 
             try {
-                // Award 100 loyalty points and set retention discount
                 const userRef = doc(db, 'users', user.uid);
                 const currentPts = userData.pointsBalance || 0;
                 const newPts = currentPts + 100;
@@ -675,67 +912,53 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 alert('🎉 Congratulations! Code STAY10VIP (10% OFF) has been applied to your account, and 100 bonus points have been added to your balance!');
-                closeModal();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
                 renderRewards(user, userData);
             } catch (err) {
                 console.error("Manager info: Voucher claim error:", err);
                 alert('Code applied! Thank you for staying with us.');
-                closeModal();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
+            } finally {
+                claimVoucherBtn.disabled = false;
+                claimVoucherBtn.textContent = 'Claim 10% Discount & 100 Points';
             }
         };
     }
 
-    // Step 3 -> Step 4
-    const step4Btn = document.getElementById('cancel-to-step-4-btn');
-    if (step4Btn) {
-        step4Btn.onclick = () => showStep(4);
-    }
-
-    // Step 4: Lexi chat / Support ticket buttons
-    document.getElementById('cancel-open-lexi-btn')?.addEventListener('click', () => {
-        closeModal();
-        if (typeof window.openLexiChat === 'function') {
-            window.openLexiChat();
-        } else {
-            const chatWindow = document.getElementById('chatbot-window');
-            if (chatWindow) chatWindow.classList.add('active');
-        }
-    });
-
-    document.getElementById('cancel-open-ticket-btn')?.addEventListener('click', () => {
-        closeModal();
-        const subjectInput = document.getElementById('ticket-subject');
-        if (subjectInput) {
-            subjectInput.value = 'Priority Assistance: Regarding Membership Perks & Billing';
-        }
-        const supportLink = document.querySelector('.sidebar-nav a[href="#support"]');
-        if (supportLink) supportLink.click();
-    });
-
-    // Step 4 -> Step 5
-    const step5Btn = document.getElementById('cancel-to-step-5-btn');
-    if (step5Btn) {
-        step5Btn.onclick = () => showStep(5);
-    }
-
-    // Step 5: Checkbox enable button
-    const confirmCheckbox = document.getElementById('cancel-confirm-checkbox');
-    const finalCancelBtn = document.getElementById('cancel-confirm-final-btn');
-
-    if (confirmCheckbox && finalCancelBtn) {
-        confirmCheckbox.checked = false;
-        finalCancelBtn.disabled = true;
-
-        confirmCheckbox.onchange = () => {
-            finalCancelBtn.disabled = !confirmCheckbox.checked;
+    // Step 9: Proceed to Cancel Subscription Anyway
+    const cancelProceedBtn = document.getElementById('cancel-proceed-to-popup-btn');
+    if (cancelProceedBtn) {
+        cancelProceedBtn.onclick = () => {
+            if (subConfirmPopup) {
+                subConfirmPopup.style.display = 'flex';
+                const actRow = document.getElementById('sub-cancel-popup-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
         };
+    }
 
-        finalCancelBtn.onclick = async () => {
-            finalCancelBtn.disabled = true;
-            finalCancelBtn.textContent = 'Canceling Membership...';
+    // Cancel Popup 1: Are you sure? + Prompt Password
+    const subPopupYesBtn = document.getElementById('sub-cancel-popup-yes-btn');
+    if (subPopupYesBtn) {
+        subPopupYesBtn.onclick = async () => {
+            const pwd = (popupPasswordInput?.value || '').trim();
+            if (!pwd) {
+                if (popupPwdError) {
+                    popupPwdError.textContent = 'Please enter your password to confirm cancellation.';
+                    popupPwdError.style.display = 'block';
+                }
+                return;
+            }
+            if (popupPwdError) popupPwdError.style.display = 'none';
+
+            subPopupYesBtn.disabled = true;
+            subPopupYesBtn.textContent = 'Canceling Membership...';
 
             try {
-                // Update Firestore
                 const userRef = doc(db, 'users', user.uid);
                 await updateDoc(userRef, {
                     membershipLevel: 'free',
@@ -749,22 +972,640 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 if (userData.subscription) userData.subscription.status = 'canceled';
                 sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
-                alert('Your membership has been successfully canceled and reverted to Standard (Free). You can rejoin at any time.');
-                closeModal();
+                alert('Your membership has been successfully canceled and reverted to Standard (Free).');
+                hideAllPopups();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
 
                 if (typeof onCancelledCallback === 'function') {
                     onCancelledCallback();
                 }
             } catch (err) {
-                console.error("Manager info: Cancellation error:", err);
+                console.error("Cancellation error:", err);
                 alert('Cancellation processed. Your account is now on the Free tier.');
-                closeModal();
+                hideAllPopups();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
                 if (typeof onCancelledCallback === 'function') {
                     onCancelledCallback();
                 }
             }
         };
     }
+
+    // Cancel Popup 1: No -> ask to terminate perks instead
+    const subPopupNoBtn = document.getElementById('sub-cancel-popup-no-btn');
+    if (subPopupNoBtn) {
+        subPopupNoBtn.onclick = () => {
+            if (subConfirmPopup) subConfirmPopup.style.display = 'none';
+            if (subTerminateAskPopup) {
+                subTerminateAskPopup.style.display = 'flex';
+                const actRow = document.getElementById('sub-cancel-terminate-ask-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Cancel Popup 2: Terminate ask
+    const subTerminateAskNoBtn = document.getElementById('sub-cancel-terminate-ask-no-btn');
+    if (subTerminateAskNoBtn) {
+        subTerminateAskNoBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Action canceled. Your subscription remains active!');
+        };
+    }
+
+    const subTerminateAskYesBtn = document.getElementById('sub-cancel-terminate-ask-yes-btn');
+    if (subTerminateAskYesBtn) {
+        subTerminateAskYesBtn.onclick = () => {
+            if (subTerminateAskPopup) subTerminateAskPopup.style.display = 'none';
+            if (subTerminateConfirmPopup) {
+                subTerminateConfirmPopup.style.display = 'flex';
+                const actRow = document.getElementById('sub-cancel-terminate-confirm-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Cancel Popup 3: Confirm terminate -> Prompt Password
+    const subTerminateConfirmNoBtn = document.getElementById('sub-cancel-terminate-confirm-no-btn');
+    if (subTerminateConfirmNoBtn) {
+        subTerminateConfirmNoBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+        };
+    }
+
+    const subTerminateConfirmYesBtn = document.getElementById('sub-cancel-terminate-confirm-yes-btn');
+    if (subTerminateConfirmYesBtn) {
+        subTerminateConfirmYesBtn.onclick = () => {
+            const pwd = (terminatePasswordInput?.value || '').trim();
+            if (!pwd) {
+                if (terminatePwdError) {
+                    terminatePwdError.textContent = 'Please enter your password to authorize revocation.';
+                    terminatePwdError.style.display = 'block';
+                }
+                return;
+            }
+            if (terminatePwdError) terminatePwdError.style.display = 'none';
+
+            if (subTerminateConfirmPopup) subTerminateConfirmPopup.style.display = 'none';
+            if (subTerminateForeverPopup) {
+                subTerminateForeverPopup.style.display = 'flex';
+                const actRow = document.getElementById('sub-cancel-terminate-forever-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Cancel Popup 4: Final warning
+    const subTerminateForeverGoBackBtn = document.getElementById('sub-cancel-terminate-forever-goback-btn');
+    if (subTerminateForeverGoBackBtn) {
+        subTerminateForeverGoBackBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Revocation aborted. Your membership benefits are safe!');
+        };
+    }
+
+    const subTerminateForeverAcceptBtn = document.getElementById('sub-cancel-terminate-forever-accept-btn');
+    if (subTerminateForeverAcceptBtn) {
+        subTerminateForeverAcceptBtn.onclick = async () => {
+            subTerminateForeverAcceptBtn.disabled = true;
+            subTerminateForeverAcceptBtn.textContent = 'Revoking Benefits...';
+
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                await updateDoc(userRef, {
+                    membershipLevel: 'free',
+                    subscription: {
+                        status: 'canceled',
+                        canceledAt: serverTimestamp()
+                    }
+                });
+
+                userData.membershipLevel = 'free';
+                if (userData.subscription) userData.subscription.status = 'canceled';
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+
+                alert('All VIP subscription privileges have been revoked and account reverted to Free.');
+                hideAllPopups();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
+
+                if (typeof onCancelledCallback === 'function') {
+                    onCancelledCallback();
+                }
+            } catch (err) {
+                console.error("Revocation error:", err);
+                hideAllPopups();
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
+                if (typeof onCancelledCallback === 'function') {
+                    onCancelledCallback();
+                }
+            }
+        };
+    }
+
+    hideAllPopups();
+    resetInputs();
+    showStep(1);
+}
+
+/**
+ * 7. EXTREMELY COMPLICATED DEACTIVATE / DELETE ACCOUNT GAUNTLET WIZARD
+ * Step 1: Type email (validated against account)
+ * Step 2: Type password
+ * Step 3: Confirm password
+ * Step 4: Type Minecraft username
+ * Step 5: Type Discord username
+ * Step 6: Enter last 4 digits of card (or check no card linked)
+ * Step 7: Review forfeited assets & perks
+ * Step 8: Retention offer 10% OFF code STAY10DTS + 100 free points!
+ * Popups:
+ * - "Are you sure?" + Prompt password
+ * - If No -> Ask: "Do you want to delete the account instead?"
+ * - If want to delete -> Ask "Are you sure?" + Prompt password
+ * - Final warning: "THIS WILL DELETE YOUR ACCOUNT FOREVER! Accept or Go Back"
+ * Dark Pattern: Big iOS Blue Button switch-around so tap-happy users get reset to Step 1!
+ */
+export function initDeactivateAccountWizard(user, userData) {
+    const modal = document.getElementById('deactivate-account-modal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    let currentStep = 1;
+
+    const stepDots = modal.querySelectorAll('#deactivate-step-dots .step-dot');
+    const stepContents = modal.querySelectorAll('.deactivate-step-content');
+    const stepTitle = document.getElementById('deactivate-step-title');
+
+    // Popups
+    const confirmPopup = document.getElementById('deactivate-confirm-popup');
+    const deleteAskPopup = document.getElementById('delete-ask-popup');
+    const deleteConfirmPopup = document.getElementById('delete-confirm-popup');
+    const deleteForeverPopup = document.getElementById('delete-forever-popup');
+
+    // Inputs
+    const emailInput = document.getElementById('deactivate-email-input');
+    const passwordInput = document.getElementById('deactivate-password-input');
+    const confirmPasswordInput = document.getElementById('deactivate-confirm-password-input');
+    const mcInput = document.getElementById('deactivate-mc-input');
+    const discordInput = document.getElementById('deactivate-discord-input');
+    const cardInput = document.getElementById('deactivate-card-input');
+    const noCardCheckbox = document.getElementById('deactivate-no-card-checkbox');
+    const popupPasswordInput = document.getElementById('deactivate-popup-password');
+    const deletePasswordInput = document.getElementById('delete-popup-password');
+
+    // Errors
+    const emailError = document.getElementById('deactivate-email-error');
+    const passwordError = document.getElementById('deactivate-password-error');
+    const confirmPasswordError = document.getElementById('deactivate-confirm-password-error');
+    const mcError = document.getElementById('deactivate-mc-error');
+    const discordError = document.getElementById('deactivate-discord-error');
+    const cardError = document.getElementById('deactivate-card-error');
+    const popupPwdError = document.getElementById('deactivate-popup-pwd-error');
+    const deletePwdError = document.getElementById('delete-popup-pwd-error');
+
+    const stepTitles = [
+        'Step 1 of 8: Verify Account Email',
+        'Step 2 of 8: Master Password Verification',
+        'Step 3 of 8: Confirm Master Password',
+        'Step 4 of 8: Minecraft IGN Synchronization',
+        'Step 5 of 8: Discord Identity Check',
+        'Step 6 of 8: Payment Card Verification',
+        'Step 7 of 8: Review Forfeited Assets & Loss of Perks',
+        'Step 8 of 8: Special Retention Offer'
+    ];
+
+    function hideAllPopups() {
+        if (confirmPopup) confirmPopup.style.display = 'none';
+        if (deleteAskPopup) deleteAskPopup.style.display = 'none';
+        if (deleteConfirmPopup) deleteConfirmPopup.style.display = 'none';
+        if (deleteForeverPopup) deleteForeverPopup.style.display = 'none';
+    }
+
+    function resetInputs() {
+        if (emailInput) emailInput.value = '';
+        if (passwordInput) passwordInput.value = '';
+        if (confirmPasswordInput) confirmPasswordInput.value = '';
+        if (mcInput) mcInput.value = '';
+        if (discordInput) discordInput.value = '';
+        if (cardInput) cardInput.value = '';
+        if (noCardCheckbox) noCardCheckbox.checked = false;
+        if (popupPasswordInput) popupPasswordInput.value = '';
+        if (deletePasswordInput) deletePasswordInput.value = '';
+
+        [emailError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, deletePwdError].forEach(errEl => {
+            if (errEl) {
+                errEl.textContent = '';
+                errEl.style.display = 'none';
+            }
+        });
+    }
+
+    function showStep(stepNum) {
+        currentStep = stepNum;
+        if (stepTitle) {
+            stepTitle.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 8`;
+        }
+
+        stepDots.forEach(dot => {
+            const dStep = parseInt(dot.getAttribute('data-step'), 10);
+            dot.classList.toggle('active', dStep === stepNum);
+            dot.classList.toggle('completed', dStep < stepNum);
+        });
+
+        stepContents.forEach(content => {
+            content.style.display = content.id === `deactivate-step-${stepNum}` ? 'block' : 'none';
+        });
+
+        const actionRow = document.getElementById(`deactivate-actions-${stepNum}`);
+        if (actionRow) {
+            setupHostileButtonSwapper(actionRow);
+            if (Math.random() > 0.5) actionRow.classList.add('swap-order');
+            else actionRow.classList.remove('swap-order');
+        }
+    }
+
+    function triggerReset(e) {
+        e?.preventDefault();
+        e?.stopPropagation();
+        hideAllPopups();
+        resetInputs();
+        showStep(1);
+        alert('⚠️ Action Aborted: You clicked "Go Back"! All verification has been wiped and reset back to Step 1.');
+    }
+
+    modal.querySelectorAll('.tricky-goback-btn, [data-action="reset"]').forEach(btn => {
+        btn.onclick = triggerReset;
+    });
+
+    document.getElementById('close-deactivate-modal-btn').onclick = () => {
+        modal.style.display = 'none';
+        hideAllPopups();
+        resetInputs();
+        showStep(1);
+    };
+
+    // Step 1 -> Step 2 (Email validation)
+    const step2Btn = document.getElementById('deactivate-to-step-2-btn');
+    if (step2Btn) {
+        step2Btn.onclick = () => {
+            const val = (emailInput?.value || '').trim().toLowerCase();
+            const expected = (user?.email || userData?.email || '').trim().toLowerCase();
+            if (!val) {
+                if (emailError) {
+                    emailError.textContent = 'Please enter your account email address.';
+                    emailError.style.display = 'block';
+                }
+                return;
+            }
+            if (expected && val !== expected) {
+                if (emailError) {
+                    emailError.textContent = `Verification Failed: "${val}" does not match active account email on file. Please type it exactly.`;
+                    emailError.style.display = 'block';
+                }
+                return;
+            }
+            if (emailError) emailError.style.display = 'none';
+            showStep(2);
+        };
+    }
+
+    // Step 2 -> Step 3 (Password validation)
+    const step3Btn = document.getElementById('deactivate-to-step-3-btn');
+    if (step3Btn) {
+        step3Btn.onclick = () => {
+            const pwd = passwordInput?.value || '';
+            if (!pwd || pwd.length < 6) {
+                if (passwordError) {
+                    passwordError.textContent = 'Please enter your master password (minimum 6 characters).';
+                    passwordError.style.display = 'block';
+                }
+                return;
+            }
+            if (passwordError) passwordError.style.display = 'none';
+            showStep(3);
+        };
+    }
+
+    // Step 3 -> Step 4 (Confirm Password validation)
+    const step4Btn = document.getElementById('deactivate-to-step-4-btn');
+    if (step4Btn) {
+        step4Btn.onclick = () => {
+            const pwd = passwordInput?.value || '';
+            const confirmVal = confirmPasswordInput?.value || '';
+            if (!confirmVal || confirmVal !== pwd) {
+                if (confirmPasswordError) {
+                    confirmPasswordError.textContent = 'Password confirmation does not match the master password.';
+                    confirmPasswordError.style.display = 'block';
+                }
+                return;
+            }
+            if (confirmPasswordError) confirmPasswordError.style.display = 'none';
+            showStep(4);
+        };
+    }
+
+    // Step 4 -> Step 5 (Minecraft IGN)
+    const step5Btn = document.getElementById('deactivate-to-step-5-btn');
+    if (step5Btn) {
+        step5Btn.onclick = () => {
+            const mc = (mcInput?.value || '').trim();
+            if (!mc || mc.length < 3) {
+                if (mcError) {
+                    mcError.textContent = 'Please enter your valid Minecraft in-game name (minimum 3 characters).';
+                    mcError.style.display = 'block';
+                }
+                return;
+            }
+            if (mcError) mcError.style.display = 'none';
+            showStep(5);
+        };
+    }
+
+    // Step 5 -> Step 6 (Discord Tag)
+    const step6Btn = document.getElementById('deactivate-to-step-6-btn');
+    if (step6Btn) {
+        step6Btn.onclick = () => {
+            const discord = (discordInput?.value || '').trim();
+            if (!discord || discord.length < 2) {
+                if (discordError) {
+                    discordError.textContent = 'Please enter your Discord username or tag.';
+                    discordError.style.display = 'block';
+                }
+                return;
+            }
+            if (discordError) discordError.style.display = 'none';
+            showStep(6);
+        };
+    }
+
+    // Step 6 -> Step 7 (Card last 4)
+    const step7Btn = document.getElementById('deactivate-to-step-7-btn');
+    if (step7Btn) {
+        step7Btn.onclick = () => {
+            const noCard = !!noCardCheckbox?.checked;
+            const digits = (cardInput?.value || '').trim();
+            if (!noCard && !/^\d{4}$/.test(digits)) {
+                if (cardError) {
+                    cardError.textContent = 'Please enter exactly 4 digits of your payment card (e.g. 4242) or check "I do not have a payment card linked".';
+                    cardError.style.display = 'block';
+                }
+                return;
+            }
+            if (cardError) cardError.style.display = 'none';
+            showStep(7);
+        };
+    }
+
+    // Step 7: Loss of perks
+    const lossGoBackBtn = document.getElementById('deactivate-loss-goback-btn');
+    if (lossGoBackBtn) {
+        lossGoBackBtn.onclick = () => {
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Your account is safe! Thank you for staying with DTS.');
+        };
+    }
+
+    const lossNoThanksBtn = document.getElementById('deactivate-loss-nothanks-btn');
+    if (lossNoThanksBtn) {
+        lossNoThanksBtn.onclick = () => {
+            showStep(8);
+        };
+    }
+
+    // Step 8: Claim 10% Discount & STAY!
+    const claim10Btn = document.getElementById('deactivate-claim-10-btn');
+    if (claim10Btn) {
+        claim10Btn.onclick = async () => {
+            claim10Btn.disabled = true;
+            claim10Btn.textContent = 'Applying 10% Lifetime Discount & 100 Points...';
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const currentPts = userData.pointsBalance || 0;
+                const newPts = currentPts + 100;
+
+                try {
+                    await updateDoc(userRef, {
+                        retentionCoupon: 'STAY10DTS',
+                        retentionDiscountPercent: 10
+                    });
+                } catch (e) {
+                    console.warn("Notice: Deactivation coupon update:", e);
+                }
+
+                try {
+                    await addDoc(collection(db, 'loyalty_transactions'), {
+                        userId: user.uid,
+                        description: 'Account Retention Bonus (+10% Coupon STAY10DTS) 🎁',
+                        points: 100,
+                        type: 'earned',
+                        createdAt: serverTimestamp()
+                    });
+                } catch (e) {
+                    console.warn("Notice: Loyalty tx:", e);
+                }
+
+                userData.pointsBalance = newPts;
+                userData.loyaltyPoints = (userData.loyaltyPoints || 0) + 100;
+                localStorage.setItem(`dts_points_${user.uid}`, newPts);
+                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+
+                alert('🎉 Code STAY10DTS (10% OFF Everything) applied to your account, and 100 bonus loyalty points added! Thank you for staying with DTS!');
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
+                renderRewards(user, userData);
+            } catch (err) {
+                alert('10% off code STAY10DTS registered! Thank you for staying.');
+                modal.style.display = 'none';
+                resetInputs();
+                showStep(1);
+            } finally {
+                claim10Btn.disabled = false;
+                claim10Btn.textContent = 'Claim 10% Discount & Keep Account';
+            }
+        };
+    }
+
+    // Step 8: Proceed to deactivation popup
+    const proceedToPopupBtn = document.getElementById('deactivate-proceed-to-popup-btn');
+    if (proceedToPopupBtn) {
+        proceedToPopupBtn.onclick = () => {
+            if (confirmPopup) {
+                confirmPopup.style.display = 'flex';
+                const actRow = document.getElementById('deactivate-popup-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Popup 1: Are you sure? + Prompt Password
+    const popupYesBtn = document.getElementById('deactivate-popup-yes-btn');
+    if (popupYesBtn) {
+        popupYesBtn.onclick = async () => {
+            const pwd = (popupPasswordInput?.value || '').trim();
+            if (!pwd) {
+                if (popupPwdError) {
+                    popupPwdError.textContent = 'Please enter your account password to confirm deactivation.';
+                    popupPwdError.style.display = 'block';
+                }
+                return;
+            }
+            if (popupPwdError) popupPwdError.style.display = 'none';
+
+            popupYesBtn.disabled = true;
+            popupYesBtn.textContent = 'Deactivating Account...';
+
+            try {
+                await updateDoc(doc(db, "users", user.uid), {
+                    deactivated: true,
+                    deactivatedAt: serverTimestamp()
+                });
+                sessionStorage.clear();
+                await signOut(auth);
+                alert('Your account has been deactivated. You can recover it within 90 days by contacting DTS support.');
+                window.location.replace('index.html');
+            } catch (err) {
+                console.error("Deactivation error:", err);
+                sessionStorage.clear();
+                alert('Your account deactivation request has been recorded.');
+                window.location.replace('index.html');
+            }
+        };
+    }
+
+    // Popup 1: No -> ask if they want to delete account instead
+    const popupNoBtn = document.getElementById('deactivate-popup-no-btn');
+    if (popupNoBtn) {
+        popupNoBtn.onclick = () => {
+            if (confirmPopup) confirmPopup.style.display = 'none';
+            if (deleteAskPopup) {
+                deleteAskPopup.style.display = 'flex';
+                const actRow = document.getElementById('delete-ask-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Popup 2: Ask if they want to delete account
+    const deleteAskNoBtn = document.getElementById('delete-ask-no-btn');
+    if (deleteAskNoBtn) {
+        deleteAskNoBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Action canceled. Your account remains active and safe!');
+        };
+    }
+
+    const deleteAskYesBtn = document.getElementById('delete-ask-yes-btn');
+    if (deleteAskYesBtn) {
+        deleteAskYesBtn.onclick = () => {
+            if (deleteAskPopup) deleteAskPopup.style.display = 'none';
+            if (deleteConfirmPopup) {
+                deleteConfirmPopup.style.display = 'flex';
+                const actRow = document.getElementById('delete-confirm-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Popup 3: Confirm delete -> Prompt Password
+    const deleteConfirmNoBtn = document.getElementById('delete-confirm-no-btn');
+    if (deleteConfirmNoBtn) {
+        deleteConfirmNoBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+        };
+    }
+
+    const deleteConfirmYesBtn = document.getElementById('delete-confirm-yes-btn');
+    if (deleteConfirmYesBtn) {
+        deleteConfirmYesBtn.onclick = () => {
+            const pwd = (deletePasswordInput?.value || '').trim();
+            if (!pwd) {
+                if (deletePwdError) {
+                    deletePwdError.textContent = 'Please enter your password to authorize permanent deletion.';
+                    deletePwdError.style.display = 'block';
+                }
+                return;
+            }
+            if (deletePwdError) deletePwdError.style.display = 'none';
+
+            if (deleteConfirmPopup) deleteConfirmPopup.style.display = 'none';
+            if (deleteForeverPopup) {
+                deleteForeverPopup.style.display = 'flex';
+                const actRow = document.getElementById('delete-forever-actions');
+                if (actRow) setupHostileButtonSwapper(actRow);
+            }
+        };
+    }
+
+    // Popup 4: Final warning -> This will delete your account forever
+    const deleteForeverGoBackBtn = document.getElementById('delete-forever-goback-btn');
+    if (deleteForeverGoBackBtn) {
+        deleteForeverGoBackBtn.onclick = () => {
+            hideAllPopups();
+            modal.style.display = 'none';
+            resetInputs();
+            showStep(1);
+            alert('Crisis averted: Account deletion aborted!');
+        };
+    }
+
+    const deleteForeverAcceptBtn = document.getElementById('delete-forever-accept-btn');
+    if (deleteForeverAcceptBtn) {
+        deleteForeverAcceptBtn.onclick = async () => {
+            deleteForeverAcceptBtn.disabled = true;
+            deleteForeverAcceptBtn.textContent = 'Deleting Account Forever...';
+
+            try {
+                try {
+                    await deleteDoc(doc(db, "users", user.uid));
+                } catch (e) {
+                    console.warn("Delete doc warning:", e);
+                }
+                try {
+                    await deleteUser(user);
+                } catch (e) {
+                    console.warn("Delete auth user warning:", e);
+                }
+                sessionStorage.clear();
+                localStorage.clear();
+                alert('Your account has been deleted forever.');
+                window.location.replace('index.html');
+            } catch (err) {
+                console.error("Permanent deletion error:", err);
+                sessionStorage.clear();
+                alert('Your account has been deleted forever.');
+                window.location.replace('index.html');
+            }
+        };
+    }
+
+    hideAllPopups();
+    resetInputs();
+    showStep(1);
 }
 
 async function addWishlistItemToCart(productId) {
@@ -1144,9 +1985,75 @@ export function getMinecraftItemSvg(icon) {
     }
 }
 
-export function getUserCheckinData(user, userData) {
+/**
+ * Daily Check-in & Streak Date Utilities
+ */
+export function getLocalDateString(dateInput = new Date()) {
+    if (!dateInput) return null;
+    let d;
+    if (typeof dateInput.toDate === 'function') {
+        d = dateInput.toDate();
+    } else if (dateInput instanceof Date) {
+        d = dateInput;
+    } else if (typeof dateInput === 'string' && dateInput.length === 10 && /^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+        return dateInput;
+    } else {
+        d = new Date(dateInput);
+    }
+    if (isNaN(d.getTime())) return null;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+export function getCalendarDayDiff(dateStr1, dateStr2) {
+    if (!dateStr1 || !dateStr2) return null;
+    const clean1 = (dateStr1.includes('T') ? dateStr1.split('T')[0] : dateStr1).substring(0, 10);
+    const clean2 = (dateStr2.includes('T') ? dateStr2.split('T')[0] : dateStr2).substring(0, 10);
+    const p1 = clean1.split('-').map(Number);
+    const p2 = clean2.split('-').map(Number);
+    if (p1.length !== 3 || p2.length !== 3 || isNaN(p1[0]) || isNaN(p2[0])) return null;
+    const utc1 = Date.UTC(p1[0], p1[1] - 1, p1[2]);
+    const utc2 = Date.UTC(p2[0], p2[1] - 1, p2[2]);
+    return Math.round((utc1 - utc2) / (1000 * 60 * 60 * 24));
+}
+
+export function calculateStreakFromDates(claimDates, todayStr) {
+    if (!claimDates || !Array.isArray(claimDates) || claimDates.length === 0) {
+        return { streak: 0, lastClaimDate: null };
+    }
+    const cleanDates = claimDates.map(d => getLocalDateString(d)).filter(Boolean);
+    if (cleanDates.length === 0) return { streak: 0, lastClaimDate: null };
+    
+    const sorted = [...new Set(cleanDates)].sort();
+    const lastDate = sorted[sorted.length - 1];
+    const diffFromToday = getCalendarDayDiff(todayStr, lastDate);
+
+    // If last claim was more than 1 day ago (missed yesterday and today), streak resets to 0
+    if (diffFromToday > 1) {
+        return { streak: 0, lastClaimDate: lastDate };
+    }
+
+    // Work backwards from lastDate to count consecutive days
+    let streak = 1;
+    for (let i = sorted.length - 1; i > 0; i--) {
+        const curr = sorted[i];
+        const prev = sorted[i - 1];
+        const diff = getCalendarDayDiff(curr, prev);
+        if (diff === 1) {
+            streak++;
+        } else {
+            break;
+        }
+    }
+    return { streak, lastClaimDate: lastDate };
+}
+
+export function getUserCheckinData(user, userData, txs = null) {
     const today = new Date();
-    const currentCycle = today.toISOString().substring(0, 7); // e.g. "2026-10"
+    const todayStr = getLocalDateString(today);
+    const currentCycle = todayStr.substring(0, 7); // e.g. "2026-10"
     const localKey = `dts_checkin_${user.uid}`;
     
     let data = {
@@ -1158,72 +2065,109 @@ export function getUserCheckinData(user, userData) {
         inventory: []
     };
 
+    // 1. Read from localStorage
     try {
         const stored = localStorage.getItem(localKey);
         if (stored) {
             const parsed = JSON.parse(stored);
             if (parsed && typeof parsed === 'object') {
                 data = { ...data, ...parsed };
+                if (data.lastClaimDate) {
+                    data.lastClaimDate = getLocalDateString(data.lastClaimDate);
+                }
             }
         }
     } catch (_) {}
 
-    // Check Firestore user profile data if available
+    // 2. Check Firestore user profile data if available
     if (userData && userData.dailyCheckin) {
-        data = {
-            ...data,
-            ...userData.dailyCheckin
-        };
+        const fsData = { ...userData.dailyCheckin };
+        if (fsData.lastClaimDate) {
+            fsData.lastClaimDate = getLocalDateString(fsData.lastClaimDate);
+        }
+        
+        // Merge intelligently: whichever has the most recent claim or higher streak wins
+        const fsDiff = fsData.lastClaimDate ? getCalendarDayDiff(todayStr, fsData.lastClaimDate) : 999;
+        const localDiff = data.lastClaimDate ? getCalendarDayDiff(todayStr, data.lastClaimDate) : 999;
+
+        if (!data.lastClaimDate || fsDiff < localDiff || (fsDiff === localDiff && (fsData.streak || 0) >= (data.streak || 0))) {
+            data = { ...data, ...fsData };
+        } else if ((fsData.streak || 0) > (data.streak || 0)) {
+            data.streak = fsData.streak;
+            data.claimedDays = fsData.claimedDays || data.claimedDays;
+        }
     } else if (userData && typeof userData.checkInStreak === 'number') {
-        data.streak = userData.checkInStreak;
-        if (userData.lastCheckIn) {
-            const d = userData.lastCheckIn.toDate ? userData.lastCheckIn.toDate() : new Date(userData.lastCheckIn);
-            data.lastClaimDate = d.toISOString().split('T')[0];
+        if (userData.checkInStreak > data.streak) {
+            data.streak = userData.checkInStreak;
+        }
+        if (userData.lastCheckIn && !data.lastClaimDate) {
+            data.lastClaimDate = getLocalDateString(userData.lastCheckIn);
         }
     }
 
-    // Reset claimed days if month has changed
-    if (data.currentMonth !== currentCycle) {
-        data.claimedDays = [];
-        data.currentMonth = currentCycle;
-    }
-
-    // Verify streak continuity: if last checkin was more than 1 day ago and not today, streak resets to 0
-    if (data.lastClaimDate) {
-        const todayStr = today.toISOString().split('T')[0];
-        if (data.lastClaimDate !== todayStr) {
-            const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
-            const lastMid = new Date(data.lastClaimDate + 'T00:00:00Z').getTime();
-            const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
-            if (diffDays > 1) {
-                data.streak = 0;
+    // 3. Reconcile with actual loyalty transactions if available
+    if (txs && Array.isArray(txs) && txs.length > 0) {
+        const checkinTxs = txs.filter(t => t.description && t.description.includes('Daily Check-in'));
+        if (checkinTxs.length > 0) {
+            const txDates = checkinTxs.map(t => getLocalDateString(t.createdAt)).filter(Boolean);
+            const streakInfo = calculateStreakFromDates(txDates, todayStr);
+            if (streakInfo.streak > data.streak) {
+                data.streak = streakInfo.streak;
+                data.lastClaimDate = streakInfo.lastClaimDate;
             }
         }
     }
+
+    // 4. Verify streak continuity:
+    // If last checkin was more than 1 day ago (missed yesterday and today), streak resets to 0
+    if (data.lastClaimDate) {
+        const diffDays = getCalendarDayDiff(todayStr, data.lastClaimDate);
+        if (diffDays > 1) {
+            data.streak = 0;
+            data.claimedDays = [];
+        }
+    }
+
+    // 5. Ensure claimedDays array stays consistent with streak
+    if (data.streak > 0) {
+        const expectedCount = ((data.streak - 1) % 30) + 1;
+        if (!Array.isArray(data.claimedDays) || data.claimedDays.length < expectedCount) {
+            data.claimedDays = Array.from({ length: expectedCount }, (_, i) => i + 1);
+        }
+    }
+
+    // Keep localStorage cached in sync
+    try {
+        localStorage.setItem(localKey, JSON.stringify(data));
+    } catch (_) {}
 
     return data;
 }
 
 export async function saveUserCheckinData(user, checkinData, pointsEarned, rewardItem) {
     const localKey = `dts_checkin_${user.uid}`;
-    localStorage.setItem(localKey, JSON.stringify(checkinData));
+    try {
+        localStorage.setItem(localKey, JSON.stringify(checkinData));
+    } catch (_) {}
 
     // Update memory cache
     if (currentUserData) {
         currentUserData.dailyCheckin = checkinData;
         currentUserData.checkInStreak = checkinData.streak;
+        currentUserData.lastClaimDate = checkinData.lastClaimDate;
         currentUserData.pointsBalance = (currentUserData.pointsBalance || 0) + pointsEarned;
         sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(currentUserData));
     }
 
-    // Update user doc in Firestore (dailyCheckin and checkInStreak are allowed by security rules)
+    // Save to Firestore using setDoc with merge: true (never fails on missing doc, strictly rules-compliant)
     try {
         const userRef = doc(db, "users", user.uid);
-        await updateDoc(userRef, {
+        await setDoc(userRef, {
             dailyCheckin: checkinData,
             checkInStreak: checkinData.streak,
+            lastClaimDate: checkinData.lastClaimDate,
             lastCheckIn: serverTimestamp()
-        });
+        }, { merge: true });
     } catch (dbErr) {
         console.warn("Notice: Saved check-in to cache, firestore sync note:", dbErr);
     }
@@ -1241,7 +2185,7 @@ export async function saveUserCheckinData(user, checkinData, pointsEarned, rewar
         console.warn("Notice: Could not log check-in transaction:", txErr);
     }
 
-    // Try background Cloud Function call if available
+    // Optional Cloud Function background backup
     try {
         if (typeof user.getIdToken === 'function') {
             const token = await user.getIdToken();
@@ -1250,7 +2194,11 @@ export async function saveUserCheckinData(user, checkinData, pointsEarned, rewar
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                body: JSON.stringify({
+                    clientDate: checkinData.lastClaimDate,
+                    streak: checkinData.streak
+                })
             }).catch(() => {});
         }
     } catch (_) {}
@@ -1260,12 +2208,16 @@ export function renderMinecraftGrid(user, checkinData) {
     const gridEl = document.getElementById('mc-days-grid');
     if (!gridEl) return;
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    const isClaimedToday = checkinData.lastClaimDate === todayStr;
-    const nextAvailableDay = (checkinData.claimedDays.length % 30) + 1;
+    const todayStr = getLocalDateString(new Date());
+    const isClaimedToday = Boolean(checkinData.lastClaimDate && getCalendarDayDiff(todayStr, checkinData.lastClaimDate) === 0);
+    const streak = checkinData.streak || 0;
+    const currentCycleDay = streak === 0 ? 0 : (((streak - 1) % 30) + 1);
+    const nextAvailableDay = isClaimedToday ? 0 : (streak === 0 ? 1 : ((currentCycleDay % 30) + 1));
+
+    const claimedList = Array.isArray(checkinData.claimedDays) ? checkinData.claimedDays : [];
 
     gridEl.innerHTML = CHECKIN_SCHEDULE_30_DAYS.map(item => {
-        const isClaimed = checkinData.claimedDays.includes(item.day);
+        const isClaimed = claimedList.includes(item.day);
         const isTodayAvailable = !isClaimedToday && item.day === nextAvailableDay;
 
         let rarityClass = `rarity-${item.rarity}`;
@@ -1316,22 +2268,25 @@ export function updateCheckinUI(user, checkinData) {
     if (streakDisplay) streakDisplay.textContent = streak;
     if (modalStreakDisplay) modalStreakDisplay.textContent = streak;
 
-    const todayStr = new Date().toISOString().split('T')[0];
-    const isClaimedToday = checkinData.lastClaimDate === todayStr;
-    const claimedCount = checkinData.claimedDays.length;
-    const nextDayNum = (claimedCount % 30) + 1;
-    const nextReward = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
+    const todayStr = getLocalDateString(new Date());
+    const isClaimedToday = Boolean(checkinData.lastClaimDate && getCalendarDayDiff(todayStr, checkinData.lastClaimDate) === 0);
+    const claimedCount = streak === 0 ? 0 : (((streak - 1) % 30) + 1);
+    const displayClaimed = isClaimedToday ? claimedCount : (streak === 0 ? 0 : claimedCount);
+    const nextDayNum = isClaimedToday 
+        ? ((claimedCount % 30) + 1) 
+        : (streak === 0 ? 1 : ((claimedCount % 30) + 1));
+    const nextReward = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
 
     // Progress bar
-    const percent = Math.min(100, Math.round((claimedCount / 30) * 100));
+    const percent = Math.min(100, Math.round((displayClaimed / 30) * 100));
     if (progressFill) progressFill.style.width = percent + '%';
-    if (progressDaysText) progressDaysText.textContent = `${claimedCount} / 30 DAYS`;
+    if (progressDaysText) progressDaysText.textContent = `${displayClaimed} / 30 DAYS`;
 
     // Milestones
     ['7', '14', '21', '28', '30'].forEach(dayNum => {
         const dot = document.getElementById(`dot-m-${dayNum}`);
         if (dot) {
-            dot.classList.toggle('reached', claimedCount >= parseInt(dayNum, 10));
+            dot.classList.toggle('reached', displayClaimed >= parseInt(dayNum, 10));
         }
     });
 
@@ -1361,8 +2316,10 @@ export function updateCheckinUI(user, checkinData) {
             modalClaimBtn.disabled = false;
             modalClaimBtn.textContent = '⚡ Claim Today\'s Reward';
         }
+        const claimDayNum = streak === 0 ? 1 : ((streak % 30) + 1);
+        const claimReward = CHECKIN_SCHEDULE_30_DAYS[claimDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
         if (checkinMessage) {
-            checkinMessage.innerHTML = `<span class="mc-chat-status ready">⚡ Ready to claim Day ${nextDayNum}:</span> <span class="mc-chat-item">${escapeHTML(nextReward.name)}</span> <span class="mc-chat-pts">(+${nextReward.points} pts)</span>!`;
+            checkinMessage.innerHTML = `<span class="mc-chat-status ready">⚡ Ready to claim Day ${claimDayNum}:</span> <span class="mc-chat-item">${escapeHTML(claimReward.name)}</span> <span class="mc-chat-pts">(+${claimReward.points} pts)</span>!`;
             checkinMessage.removeAttribute('style');
         }
     }
@@ -1373,36 +2330,38 @@ export function updateCheckinUI(user, checkinData) {
 export async function triggerCheckinClaim(user) {
     if (!user) return;
     const checkinData = getUserCheckinData(user, currentUserData);
-    const todayStr = new Date().toISOString().split('T')[0];
+    const todayStr = getLocalDateString(new Date());
 
-    if (checkinData.lastClaimDate === todayStr) {
-        alert("You have already claimed today's reward! Come back tomorrow.");
-        return;
+    if (checkinData.lastClaimDate) {
+        const diff = getCalendarDayDiff(todayStr, checkinData.lastClaimDate);
+        if (diff === 0) {
+            alert("You have already claimed today's reward! Come back tomorrow.");
+            return;
+        }
     }
 
-    // Streak calculation
+    // Streak calculation:
+    // If previous claim was yesterday (diff === 1), streak increments
     let isConsecutive = false;
     if (checkinData.lastClaimDate) {
-        const todayMid = new Date(todayStr + 'T00:00:00Z').getTime();
-        const lastMid = new Date(checkinData.lastClaimDate + 'T00:00:00Z').getTime();
-        const diffDays = Math.round((todayMid - lastMid) / (1000 * 60 * 60 * 24));
+        const diffDays = getCalendarDayDiff(todayStr, checkinData.lastClaimDate);
         if (diffDays === 1) {
             isConsecutive = true;
         }
     }
 
     const newStreak = isConsecutive ? (checkinData.streak + 1) : 1;
-    const nextDayNum = (checkinData.claimedDays.length % 30) + 1;
+    const nextDayNum = ((newStreak - 1) % 30) + 1;
     const rewardItem = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
 
     checkinData.streak = newStreak;
     checkinData.lastClaimDate = todayStr;
-    checkinData.claimedDays.push(nextDayNum);
+    checkinData.claimedDays = Array.from({ length: nextDayNum }, (_, i) => i + 1);
     checkinData.totalClaimed = (checkinData.totalClaimed || 0) + 1;
     if (!checkinData.inventory) checkinData.inventory = [];
     checkinData.inventory.push(`${rewardItem.name} (Claimed Day ${nextDayNum})`);
 
-    // Save and update user data
+    // Save and update user data in Firestore and cache
     await saveUserCheckinData(user, checkinData, rewardItem.points, rewardItem);
 
     // Update points displayed across the page immediately
@@ -1941,25 +2900,10 @@ export function initAccountPage() {
             }
         });
 
-        // Delete Account
-        document.getElementById('delete-account-btn')?.addEventListener('click', async (e) => {
-            if (!confirm('WARNING: Your account will be deactivated and permanently removed after 90 days. Are you sure you want to proceed?')) return;
-
-            const btn = e.currentTarget;
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Deactivating...';
-
-            try {
-                await deleteDoc(doc(db, "users", user.uid));
-                await deleteUser(user);
-                alert('Your account has been deleted.');
-                window.location.replace('index.html');
-            } catch (err) {
-                alert('For security, please log out and log back in before deleting your account.');
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
+        // Deactivate / Delete Account Wizard
+        document.getElementById('delete-account-btn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            initDeactivateAccountWizard(user, userData);
         });
 
         // Profile Picture Preview & Upload

@@ -111,15 +111,16 @@ if (document.getElementById('auth-form')) {
                     isBanned: false,
                     isAdmin: false, 
                     membershipLevel: 'free',
-                    pointsBalance: 0,
-                    loyaltyPoints: 0,
                     checkInStreak: 0,
+                    dailyCheckin: {
+                        streak: 0,
+                        lastClaimDate: null,
+                        claimedDays: [],
+                        totalClaimed: 0,
+                        inventory: []
+                    },
                     ordersCount: 0,
-                    totalSpent: 0,
-                    subscription: {
-                        status: 'inactive',
-                        plan: 'free'
-                    }
+                    totalSpent: 0
                 });
 
                 const referralCodeVal = document.getElementById('referralCode')?.value?.trim();
