@@ -4,57 +4,718 @@
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In / Sign Up</title>
+    <title>Sign In / Sign Up | Unstoppable Ecosystem</title>
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+
+    <!-- Modern Typography: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
     <style>
-        body {font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-primary); display: flex; flex-direction: column; min-height: 100vh; margin: 0;}
-        .container {max-width: 400px; width: 100%; padding: 20px; flex: 1; display: flex; align-items: center; justify-content: center; margin: 80px auto 40px;}
-        .form-container {width: 100%; background-color: var(--primary-card-color); padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-align: center;}
-        h1 {margin-bottom: 25px; color: #fff; font-weight: 600;}
-        .input-group {margin-bottom: 20px; text-align: left;}
-        label {display: block; margin-bottom: 8px; color: #a0a0a0; font-size: 14px;}
-        input {width: 100%; padding: 12px; border: 1px solid #333; background-color: #2c2c2c; color: #e0e0e0; border-radius: 5px; box-sizing: border-box; font-size: 16px;}
-        button {width: 100%; padding: 12px; border: none; background-color: var(--accent-color); color: #fff; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;}
-        button:hover:not(:disabled) {background-color: #0056b3;}
-        button:disabled {background-color: #555; cursor: not-allowed;}
-        .toggle-link {margin-top: 20px; color: var(--accent-color); cursor: pointer; font-size: 14px;}
-        #message {margin-top: 15px; color: #ff4d4d; font-size: 14px; height: 20px;}
+        :root {
+            --auth-font: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--auth-font);
+            background-color: var(--bg-color, #0a0a0c);
+            color: var(--text-primary, #f5f5f7);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Ambient Ecosystem Showcase Background */
+        .ecosystem-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .ambient-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(110px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .glow-1 {
+            top: -10%;
+            left: 10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(110, 69, 226, 0.45) 0%, transparent 70%);
+        }
+
+        .glow-2 {
+            bottom: -5%;
+            right: 10%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.4) 0%, transparent 70%);
+        }
+
+        .glow-3 {
+            top: 35%;
+            left: 45%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.25) 0%, transparent 70%);
+        }
+
+        .backdrop-grid-wall {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            opacity: 0.55;
+            transform: perspective(1200px) rotateX(2deg) scale(1.02);
+            transform-origin: center center;
+        }
+
+        .grid-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .col-1 { animation: floatCol1 16s ease-in-out infinite; }
+        .col-2 { animation: floatCol2 18s ease-in-out infinite; }
+        .col-3 { animation: floatCol1 20s ease-in-out infinite; }
+        .col-4 { animation: floatCol2 22s ease-in-out infinite; }
+
+        @keyframes floatCol1 {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-16px); }
+        }
+
+        @keyframes floatCol2 {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(16px); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .col-1, .col-2, .col-3, .col-4 {
+                animation: none !important;
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .backdrop-grid-wall {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .col-4 { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .backdrop-grid-wall {
+                grid-template-columns: repeat(2, 1fr);
+                opacity: 0.35;
+            }
+            .col-3, .col-4 { display: none; }
+        }
+
+        .ecosystem-card {
+            background: rgba(18, 18, 24, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .card-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #000;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .card-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .tag-red { background: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.4); }
+        .tag-purple { background: rgba(147, 51, 234, 0.2); color: #c084fc; border: 1px solid rgba(147, 51, 234, 0.4); }
+        .tag-cyan { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.4); }
+        .tag-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .tag-blue { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.4); }
+        .tag-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .tag-pink { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+        .tag-gold { background: rgba(234, 179, 8, 0.2); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.4); }
+        .tag-white { background: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); }
+        .tag-teal { background: rgba(20, 184, 166, 0.2); color: #5eead4; border: 1px solid rgba(20, 184, 166, 0.4); }
+
+        .card-body h4 {
+            margin: 0 0 4px 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .card-body p {
+            margin: 0;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .card-pill {
+            font-size: 11px;
+            font-weight: 500;
+            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2px 8px;
+            border-radius: 9999px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .backdrop-vignette-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(10, 10, 12, 0.72) 0%, rgba(10, 10, 12, 0.88) 55%, rgba(10, 10, 12, 0.98) 100%);
+            pointer-events: none;
+        }
+
+        /* Container & Auth Card */
+        .container {
+            max-width: 440px;
+            width: 100%;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 85px auto 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Back Button */
+        .back-button-bar {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(20, 20, 26, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 9999px;
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            text-decoration: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: rgba(35, 35, 45, 0.95);
+            border-color: rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            transform: translateX(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        .back-btn svg {
+            transition: transform 0.2s ease;
+        }
+
+        .back-btn:hover svg {
+            transform: translateX(-2px);
+        }
+
+        /* Form Container */
+        .form-container {
+            width: 100%;
+            background: rgba(18, 18, 24, 0.88);
+            padding: 38px 34px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.65), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        /* un250 Logo above Sign In */
+        .auth-brand-logo-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .un250-logo {
+            width: 68px;
+            height: 68px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 1.5px solid rgba(255, 255, 255, 0.22);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.08);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .un250-logo:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 24px rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.45);
+        }
+
+        h1 {
+            margin: 0 0 24px 0;
+            color: #ffffff;
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #a1a1aa;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background-color: rgba(26, 26, 32, 0.75);
+            color: #ffffff;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            background-color: rgba(32, 32, 40, 0.95);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.09);
+        }
+
+        /* Sign In Button with Small White Outline */
+        button, #submit-btn {
+            width: 100%;
+            padding: 13px 20px;
+            border: 1.5px solid #ffffff; /* Small white outline clearly visible without hover */
+            outline: none;
+            background-color: var(--accent-color, #2563EB);
+            color: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            letter-spacing: 0.01em;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        button:hover:not(:disabled), #submit-btn:hover:not(:disabled) {
+            background-color: #1d4ed8;
+            border-color: #ffffff;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.45), 0 6px 18px rgba(0, 0, 0, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button:active:not(:disabled), #submit-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:focus-visible, #submit-btn:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 3px;
+        }
+
+        button:disabled, #submit-btn:disabled {
+            opacity: 0.55;
+            border-color: rgba(255, 255, 255, 0.4);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Toggle Link - Underlined ONLY on hover */
+        .toggle-link, #toggle-form {
+            display: inline-block;
+            margin-top: 20px;
+            color: var(--accent-color, #38bdf8);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none; /* NOT underlined by default */
+            transition: color 0.2s ease, text-decoration 0.2s ease;
+        }
+
+        .toggle-link:hover, #toggle-form:hover,
+        .toggle-link:focus-visible, #toggle-form:focus-visible {
+            text-decoration: underline; /* Only become underlined on hover */
+            color: #ffffff;
+        }
+
+        #message {
+            margin-top: 15px;
+            color: #ff4d4d;
+            font-size: 14px;
+            min-height: 20px;
+            line-height: 1.4;
+        }
+
+        .terms-notice {
+            margin-top: 22px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .legal-link {
+            color: var(--accent-color, #14b8a6);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s ease;
+        }
+
+        .legal-link:hover {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
     <header class="main-header"></header>
 
+    <!-- Background showcase of all companies under the Unstoppable umbrella -->
+    <div class="ecosystem-backdrop" aria-hidden="true">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+
+        <div class="backdrop-grid-wall">
+            <!-- Column 1 -->
+            <div class="grid-column col-1">
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/unstoppable-logo.png" alt="" class="card-logo">
+                        <span class="card-tag tag-red">GAMING MEDIA</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Unstoppable</h4>
+                        <p>High-tier gameplay & competitive gaming culture.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">@Unstoppab1e</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/squishly_logo.jpg" alt="" class="card-logo">
+                        <span class="card-tag tag-purple">ARCADE BETA</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Squishly</h4>
+                        <p>Juicy, physics-driven ASMR arcade minigame.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🎮 Play Now</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/un-logo.png" alt="" class="card-logo">
+                        <span class="card-tag tag-cyan">AI LOGIC</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Unstoppable AI</h4>
+                        <p>Smart conversational assistant and ecosystem intelligence.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">⚡ Neural Powered</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="grid-column col-2">
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/Game Art.png" alt="" class="card-logo">
+                        <span class="card-tag tag-green">MINECRAFT SMP</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Dreams TimeSkip</h4>
+                        <p>Season OG classic realm with rich storyline & custom biomes.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">⚔️ 26.3 Release</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/ManagerPro.jpg" alt="" class="card-logo">
+                        <span class="card-tag tag-blue">OPERATIONS</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>ManagerPro</h4>
+                        <p>Ecosystem tracking, project management, and live status.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">📊 ezManage Beta</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/founder.jpg" alt="" class="card-logo">
+                        <span class="card-tag tag-amber">FOUNDER NOTE</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Catalin Andrian</h4>
+                        <p>Building the future of digital entertainment, one project at a time.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">✨ Vision</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="grid-column col-3">
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/medixly-logo.png" alt="" class="card-logo">
+                        <span class="card-tag tag-pink">AUDIO STREAMING</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Medixly</h4>
+                        <p>Lossless audio streaming and daily viral sound charts.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🎧 Now Streaming</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/Unstoppable Collection Logo.png" alt="" class="card-logo">
+                        <span class="card-tag tag-gold">APPAREL & TECH</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Unstoppable Collection</h4>
+                        <p>Exclusive streetwear drops, hoodies, and gaming gear.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🛍️ Shop Open</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/un250-flag.png" alt="" class="card-logo">
+                        <span class="card-tag tag-white">HERITAGE DROP</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>un250 Heritage</h4>
+                        <p>Milestone 250 edition celebrating unstoppable resilience.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🏴 Limited Edition</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 4 -->
+            <div class="grid-column col-4">
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/fotd.png" alt="" class="card-logo">
+                        <span class="card-tag tag-teal">DAILY TRIVIA</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Fact of the Day</h4>
+                        <p>Curated discoveries and mind-expanding insights daily.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">💡 Knowledge</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/minecraft-adventure.webp" alt="" class="card-logo">
+                        <span class="card-tag tag-green">ADVENTURE</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Adventure Realm</h4>
+                        <p>Immersive custom quests, NPC storylines and live events.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🗺️ Exploration</span>
+                    </div>
+                </div>
+
+                <div class="ecosystem-card">
+                    <div class="card-top">
+                        <img src="/images/un-logo-touching.png" alt="" class="card-logo">
+                        <span class="card-tag tag-cyan">ECOSYSTEM HUB</span>
+                    </div>
+                    <div class="card-body">
+                        <h4>Unstoppable Hub</h4>
+                        <p>Central platform unifying all brands, apps, and community.</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-pill">🌐 Connected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="backdrop-vignette-overlay"></div>
+    </div>
+
+    <!-- Main Content Container -->
     <div class="container">
-        <div class="form-container" id="form-container">
-            <h1 id="form-title">Sign In</h1>
-            <form id="auth-form">
-                <div class="input-group" id="username-group" style="display: none;">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username">
+        <div class="auth-wrapper">
+            <!-- Back Button -->
+            <div class="back-button-bar">
+                <a href="index.html" class="back-btn" id="back-btn" aria-label="Back to Home">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>Back to Home</span>
+                </a>
+            </div>
+
+            <!-- Auth Form Card -->
+            <div class="form-container" id="form-container">
+                <!-- un250 Logo above Sign In -->
+                <div class="auth-brand-logo-wrap">
+                    <a href="index.html" aria-label="Go to Homepage">
+                        <img src="/images/un250-flag.png" alt="un250 Logo" class="un250-logo" id="un250-logo">
+                    </a>
                 </div>
-                <div class="input-group" id="referral-group" style="display: none;">
-                    <label for="referralCode">Referral Code (Optional)</label>
-                    <input type="text" id="referralCode" name="referralCode">
-                </div>
-                <div class="input-group" id="email-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="input-group" id="password-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" id="submit-btn">Sign In</button>
-                <p id="message"></p>
-                <a href="#" class="toggle-link" id="toggle-form">Don't have an account? Sign Up</a>
-                <p class="terms-notice" style="margin-top: 20px; font-size: 0.8rem; color: #888; line-height: 1.4;">
-                    By creating an account or signing in, you agree to our <a href="terms.html" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Privacy Policy</a>.
-                </p>
-            </form>
+
+                <h1 id="form-title">Sign In</h1>
+                <form id="auth-form">
+                    <div class="input-group" id="username-group" style="display: none;">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username">
+                    </div>
+                    <div class="input-group" id="referral-group" style="display: none;">
+                        <label for="referralCode">Referral Code (Optional)</label>
+                        <input type="text" id="referralCode" name="referralCode">
+                    </div>
+                    <div class="input-group" id="email-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required autocomplete="email">
+                    </div>
+                    <div class="input-group" id="password-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" id="submit-btn">Sign In</button>
+                    <p id="message"></p>
+                    <a href="#" class="toggle-link" id="toggle-form">Don't have an account? Sign Up</a>
+                    <p class="terms-notice">
+                        By creating an account or signing in, you agree to our <a href="terms.html" class="legal-link">Terms and Conditions</a> and <a href="privacy.html" class="legal-link">Privacy Policy</a>.
+                    </p>
+                </form>
+            </div>
         </div>
     </div>
+
+    <!-- Smart Back Navigation Handler -->
+    <script>
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) {
+            backBtn.addEventListener('click', (e) => {
+                if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host)) {
+                    e.preventDefault();
+                    window.history.back();
+                }
+            });
+        }
+    </script>
+
     <script type="module">
         import { auth, db } from './js/auth.js';
         import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
