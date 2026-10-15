@@ -115,8 +115,8 @@ export function renderProfile(user, userData) {
 
     const welcomeHeader = document.getElementById('welcome-header');
     if (welcomeHeader) {
-        const displayName = data.username || user.displayName || user.email?.split('@')[0] || 'User';
-        welcomeHeader.textContent = `Welcome back, ${escapeHTML(displayName)}!`;
+        const displayName = data.username || user.displayName || user.email?.split('@')[0] || 'Unstoppable';
+        welcomeHeader.innerHTML = `<span class="welcome-prefix">Welcome back,</span> <span class="welcome-username">${escapeHTML(displayName)}!</span>`;
     }
 
     const emailSidebar = document.getElementById('user-email-sidebar');
@@ -146,6 +146,8 @@ export function renderProfile(user, userData) {
         customHex.title = isPremium ? 'Select custom accent color' : 'Requires Premium or Ultimate';
         if (userData.accentColor && userData.accentColor.startsWith('#')) {
             customHex.value = userData.accentColor;
+        } else {
+            customHex.value = '#2563EB';
         }
     }
 
@@ -1692,7 +1694,7 @@ export function initAccountPage() {
                 sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 const welcomeHeader = document.getElementById('welcome-header');
-                if (welcomeHeader) welcomeHeader.textContent = `Welcome back, ${newUsername}!`;
+                if (welcomeHeader) welcomeHeader.innerHTML = `<span class="welcome-prefix">Welcome back,</span> <span class="welcome-username">${escapeHTML(newUsername)}!</span>`;
 
                 if (notificationEl) {
                     notificationEl.textContent = 'Username updated successfully!';
@@ -1716,7 +1718,7 @@ export function initAccountPage() {
         document.getElementById('theme-settings-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const theme = document.getElementById('theme-select').value;
-            const customHex = document.getElementById('custom-hex-color')?.value || '#00ffcc';
+            const customHex = document.getElementById('custom-hex-color')?.value || '#2563EB';
             const notificationEl = document.getElementById('theme-notification');
             const submitBtn = e.target.querySelector('button[type="submit"]');
 
@@ -1730,7 +1732,7 @@ export function initAccountPage() {
                 return;
             }
 
-            const accentColor = isPremium ? customHex : '#00ffcc';
+            const accentColor = isPremium ? customHex : '#2563EB';
             if (!isPremium && document.getElementById('custom-hex-color')) {
                 document.getElementById('custom-hex-color').value = accentColor;
             }
@@ -1784,7 +1786,7 @@ export function initAccountPage() {
             const customHex = document.getElementById('custom-hex-color');
 
             const defaultTheme = 'system';
-            const defaultAccent = '#00ffcc';
+            const defaultAccent = '#2563EB';
 
             // Reset UI inputs
             if (themeSelect) themeSelect.value = defaultTheme;
@@ -1840,7 +1842,7 @@ export function initAccountPage() {
             const themeSelect = document.getElementById('theme-select');
             const customHex = document.getElementById('custom-hex-color');
             if (themeSelect) themeSelect.value = 'system';
-            if (customHex) customHex.value = '#00ffcc';
+            if (customHex) customHex.value = '#2563EB';
         });
 
         // Password Reset Email
