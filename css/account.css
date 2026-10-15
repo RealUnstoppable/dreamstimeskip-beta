@@ -2964,3 +2964,321 @@ input:checked + .slider:before {
     margin-top: 5px;
     line-height: 1.35;
 }
+
+/* ==========================================================================
+   Retention Rep Consultation, Price-Lock Guarantee & Penalty Box Styles
+   ========================================================================== */
+
+/* Rep Consultation Card */
+.rep-consultation-card {
+    background: rgba(18, 24, 38, 0.7);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    border-radius: 14px;
+    padding: 20px;
+    margin: 18px 0 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(59, 130, 246, 0.15);
+    text-align: left;
+}
+
+.rep-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.rep-avatar-wrapper {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+}
+
+.rep-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    border: 2px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+}
+
+.rep-online-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #22c55e;
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #22c55e;
+    animation: repDotPulse 2s infinite ease-in-out;
+}
+
+@keyframes repDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+}
+
+.rep-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rep-name {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+}
+
+.rep-badge {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.rep-title {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.rep-response-time {
+    font-size: 0.75rem;
+    color: #93c5fd;
+    font-weight: 600;
+}
+
+.rep-quote-bubble {
+    background: rgba(15, 23, 42, 0.7);
+    border-left: 3px solid #3b82f6;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 8px 0;
+}
+
+.rep-quote-bubble p {
+    color: #e2e8f0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin: 0;
+    font-style: italic;
+}
+
+.rep-live-status-notice {
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-top: 10px;
+    animation: fadeInNotice 0.3s ease-out;
+}
+
+@keyframes fadeInNotice {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Price Lock Guarantee Card (Subscription) */
+.price-lock-warning-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.45);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 18px 0;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.2);
+    text-align: left;
+}
+
+.price-lock-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.lock-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.lock-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #60a5fa;
+    text-transform: uppercase;
+    display: block;
+}
+
+.lock-status-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.25);
+    color: #93c5fd;
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.price-lock-desc {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0 0 12px 0;
+}
+
+.og-benefit-loss-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(220, 38, 38, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.og-alert-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* Scary Penalty Box (Account Deletion Surcharge $1.99 USD) */
+.deactivation-scary-penalty-box {
+    background: linear-gradient(145deg, rgba(70, 10, 10, 0.88) 0%, rgba(26, 8, 8, 0.95) 100%);
+    border: 2px solid rgba(239, 68, 68, 0.85);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 20px 0;
+    box-shadow: 0 0 30px rgba(220, 38, 38, 0.45), inset 0 0 16px rgba(220, 38, 38, 0.25);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+}
+
+.deactivation-scary-penalty-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #dc2626 0%, #ef4444 50%, #b91c1c 100%);
+}
+
+.scary-penalty-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.scary-skull-pulse {
+    font-size: 1.9rem;
+    line-height: 1;
+    display: inline-block;
+    animation: scarySkullPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes scarySkullPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
+    }
+    50% {
+        transform: scale(1.18);
+        filter: drop-shadow(0 0 16px rgba(239, 68, 68, 1));
+    }
+}
+
+.scary-penalty-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    color: #f87171;
+    text-transform: uppercase;
+    display: block;
+}
+
+.scary-penalty-title {
+    margin: 2px 0 0 0;
+    color: #ef4444;
+    font-size: 0.98rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.scary-warning-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.6);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.scary-penalty-lead {
+    color: #fca5a5;
+    font-size: 0.94rem;
+    line-height: 1.5;
+    margin: 0 0 10px 0;
+}
+
+.scary-penalty-lead strong {
+    color: #ffffff;
+}
+
+.scary-penalty-details {
+    color: #f87171;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
+    opacity: 0.92;
+}
+
+.scary-penalty-ticker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px dashed rgba(239, 68, 68, 0.5);
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: #fca5a5;
+    font-family: monospace;
+}
+
+.ticker-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    box-shadow: 0 0 6px #ef4444;
+    flex-shrink: 0;
+    animation: tickerBlink 1s infinite alternate;
+}
+
+@keyframes tickerBlink {
+    0% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
+

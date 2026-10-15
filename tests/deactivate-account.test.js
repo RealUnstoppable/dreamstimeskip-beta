@@ -160,4 +160,61 @@ describe('Extremely Complicated Deactivate / Delete Account Gauntlet in account.
             expect(accountJs).toContain('delete-forever-goback-btn');
         });
     });
+
+    describe('Representative Consultation & Enhanced Retention Clauses', () => {
+        test('both deactivation and cancellation feature "Talk With One of Our Representatives" before retention', () => {
+            // Deactivation Rep Step 8
+            expect(accountHtml).toContain('id="deactivate-step-8"');
+            expect(accountHtml).toContain('Talk With One of Our Representatives');
+            expect(accountHtml).toContain('id="deactivate-rep-chat-btn"');
+            expect(accountHtml).toContain('id="deactivate-to-step-9-btn"');
+            expect(accountHtml).toContain('Sarah Jenkins');
+
+            // Cancellation Rep Step 9
+            expect(accountHtml).toContain('id="cancel-step-9"');
+            expect(accountHtml).toContain('id="cancel-rep-chat-btn"');
+            expect(accountHtml).toContain('id="cancel-to-step-10-btn"');
+            expect(accountHtml).toContain('Marcus Vance');
+        });
+
+        test('subscription cancellation includes price-lock guarantee and loss of OG benefit 10% off clause', () => {
+            expect(accountHtml).toContain('id="cancel-step-10"');
+            expect(accountHtml).toContain('PRICE-LOCK GUARANTEE');
+            expect(accountHtml).toContain('locked in on a lower price');
+            expect(accountHtml).toContain('prices will go up in the future');
+            expect(accountHtml).toContain('lose your OG benefit (10% OFF)');
+            expect(accountHtml).toContain('OG member');
+        });
+
+        test('account deactivation includes scary 1.99 USD early cancellation surcharge notice', () => {
+            expect(accountHtml).toContain('id="deactivate-step-9"');
+            expect(accountHtml).toContain('deactivation-scary-penalty-box');
+            expect(accountHtml).toContain('MANDATORY EARLY CANCELLATION SURCHARGE: 1.99 USD');
+            expect(accountHtml).toContain('1.99 USD Early Cancellation Fee');
+            expect(accountHtml).toContain('ongoing subscriptions');
+            expect(accountHtml).toContain('scary-skull-pulse');
+            expect(accountHtml).toContain('Automated Billing Sentinel');
+        });
+
+        test('account.css includes styles for rep consultation, price-lock, and scary penalty box', () => {
+            expect(accountCss).toContain('.rep-consultation-card');
+            expect(accountCss).toContain('.rep-online-dot');
+            expect(accountCss).toContain('.price-lock-warning-card');
+            expect(accountCss).toContain('.og-benefit-loss-alert');
+            expect(accountCss).toContain('.deactivation-scary-penalty-box');
+            expect(accountCss).toContain('.scary-skull-pulse');
+            expect(accountCss).toContain('@keyframes scarySkullPulse');
+        });
+
+        test('js/account.js supports 9-step deactivation and 10-step cancellation with live rep chat', () => {
+            expect(accountJs).toContain('Step 8 of 9: Talk With One of Our Representatives');
+            expect(accountJs).toContain('Step 9 of 9: Special Retention Offer & Surcharge Notice');
+            expect(accountJs).toContain('Step 9 of 10: Talk With One of Our Representatives');
+            expect(accountJs).toContain('Step 10 of 10: Exclusive Retention Offer & Price Lock Guarantee');
+            expect(accountJs).toContain('deactivate-rep-chat-btn');
+            expect(accountJs).toContain('cancel-rep-chat-btn');
+            expect(accountJs).toContain('deactivate-to-step-9-btn');
+            expect(accountJs).toContain('cancel-to-step-10-btn');
+        });
+    });
 });

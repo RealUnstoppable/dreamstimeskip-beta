@@ -831,15 +831,16 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     const terminatePwdError = document.getElementById('sub-cancel-terminate-pwd-error');
 
     const stepTitles = [
-        'Step 1 of 9: Reason for Leaving',
-        'Step 2 of 9: Verify Account Email & Phone Number',
-        'Step 3 of 9: Account Password Verification',
-        'Step 4 of 9: Confirm Master Password',
-        'Step 5 of 9: Minecraft IGN Synchronization',
-        'Step 6 of 9: Discord Identity Check',
-        'Step 7 of 9: Payment Card Verification',
-        'Step 8 of 9: Review Forfeited VIP Perks',
-        'Step 9 of 9: Exclusive Retention Offer'
+        'Step 1 of 10: Reason for Leaving',
+        'Step 2 of 10: Verify Account Email & Phone Number',
+        'Step 3 of 10: Account Password Verification',
+        'Step 4 of 10: Confirm Master Password',
+        'Step 5 of 10: Minecraft IGN Synchronization',
+        'Step 6 of 10: Discord Identity Check',
+        'Step 7 of 10: Payment Card Verification',
+        'Step 8 of 10: Review Forfeited VIP Perks',
+        'Step 9 of 10: Talk With One of Our Representatives',
+        'Step 10 of 10: Exclusive Retention Offer & Price Lock Guarantee'
     ];
 
     function hideAllPopups() {
@@ -872,7 +873,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
     function showStep(stepNum) {
         currentStep = stepNum;
         if (stepIndicatorText) {
-            stepIndicatorText.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 9`;
+            stepIndicatorText.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 10`;
         }
 
         stepDots.forEach(dot => {
@@ -1085,7 +1086,28 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
         };
     }
 
-    // Step 9: Retention Voucher & Stay!
+    // Step 9: Talk With One of Our Representatives
+    const cancelRepChatBtn = document.getElementById('cancel-rep-chat-btn');
+    if (cancelRepChatBtn) {
+        cancelRepChatBtn.onclick = () => {
+            const statusEl = document.getElementById('cancel-rep-status');
+            const msgInput = document.getElementById('cancel-rep-message');
+            const userMsg = msgInput ? msgInput.value.trim() : '';
+            if (statusEl) {
+                statusEl.innerHTML = `🟢 <strong>Connected to Marcus Vance:</strong> <em>"Thank you for reaching out${userMsg ? ` regarding '${escapeHTML(userMsg.slice(0, 50))}'` : ''}! I am reviewing your account options right now. While I prepare your custom arrangement, take a look at our grandfathered price-lock and exclusive 10% discount on the next screen!"</em>`;
+                statusEl.style.display = 'block';
+            }
+        };
+    }
+
+    const cancelToStep10Btn = document.getElementById('cancel-to-step-10-btn');
+    if (cancelToStep10Btn) {
+        cancelToStep10Btn.onclick = () => {
+            showStep(10);
+        };
+    }
+
+    // Step 10: Retention Voucher, Price Lock Guarantee & Stay!
     const claimVoucherBtn = document.getElementById('claim-voucher-stay-btn');
     if (claimVoucherBtn) {
         claimVoucherBtn.onclick = async () => {
@@ -1394,14 +1416,15 @@ export function initDeactivateAccountWizard(user, userData) {
     const deletePwdError = document.getElementById('delete-popup-pwd-error');
 
     const stepTitles = [
-        'Step 1 of 8: Verify Account Email & Phone Number',
-        'Step 2 of 8: Master Password Verification',
-        'Step 3 of 8: Confirm Master Password',
-        'Step 4 of 8: Minecraft IGN Synchronization',
-        'Step 5 of 8: Discord Identity Check',
-        'Step 6 of 8: Payment Card Verification',
-        'Step 7 of 8: Review Forfeited Assets & Loss of Perks',
-        'Step 8 of 8: Special Retention Offer'
+        'Step 1 of 9: Verify Account Email & Phone Number',
+        'Step 2 of 9: Master Password Verification',
+        'Step 3 of 9: Confirm Master Password',
+        'Step 4 of 9: Minecraft IGN Synchronization',
+        'Step 5 of 9: Discord Identity Check',
+        'Step 6 of 9: Payment Card Verification',
+        'Step 7 of 9: Review Forfeited Assets & Loss of Perks',
+        'Step 8 of 9: Talk With One of Our Representatives',
+        'Step 9 of 9: Special Retention Offer & Surcharge Notice'
     ];
 
     function hideAllPopups() {
@@ -1434,7 +1457,7 @@ export function initDeactivateAccountWizard(user, userData) {
     function showStep(stepNum) {
         currentStep = stepNum;
         if (stepTitle) {
-            stepTitle.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 8`;
+            stepTitle.textContent = stepTitles[stepNum - 1] || `Step ${stepNum} of 9`;
         }
 
         stepDots.forEach(dot => {
@@ -1634,7 +1657,28 @@ export function initDeactivateAccountWizard(user, userData) {
         };
     }
 
-    // Step 8: Claim 10% Discount & STAY!
+    // Step 8: Talk With One of Our Representatives
+    const deactRepChatBtn = document.getElementById('deactivate-rep-chat-btn');
+    if (deactRepChatBtn) {
+        deactRepChatBtn.onclick = () => {
+            const statusEl = document.getElementById('deactivate-rep-status');
+            const msgInput = document.getElementById('deactivate-rep-message');
+            const userMsg = msgInput ? msgInput.value.trim() : '';
+            if (statusEl) {
+                statusEl.innerHTML = `🟢 <strong>Connected to Sarah Jenkins:</strong> <em>"Thank you for reaching out${userMsg ? ` regarding '${escapeHTML(userMsg.slice(0, 50))}'` : ''}! I am reviewing your account options right now. While I prepare your custom arrangement, take a look at your exclusive retention offer and important billing notices on the next screen!"</em>`;
+                statusEl.style.display = 'block';
+            }
+        };
+    }
+
+    const deactToStep9Btn = document.getElementById('deactivate-to-step-9-btn');
+    if (deactToStep9Btn) {
+        deactToStep9Btn.onclick = () => {
+            showStep(9);
+        };
+    }
+
+    // Step 9: Retention Voucher & Surcharge Notice
     const claim10Btn = document.getElementById('deactivate-claim-10-btn');
     if (claim10Btn) {
         claim10Btn.onclick = async () => {

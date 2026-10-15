@@ -627,8 +627,10 @@
                     <span class="step-dot" data-step="7">7</span>
                     <span class="step-line"></span>
                     <span class="step-dot" data-step="8">8</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="9">9</span>
                 </div>
-                <div id="deactivate-step-title" class="deactivate-step-title">Step 1 of 8: Verify Account Email</div>
+                <div id="deactivate-step-title" class="deactivate-step-title">Step 1 of 9: Verify Account Email</div>
                 <p id="deactivate-step-subtitle" class="deactivate-step-subtitle">Security Protocol DTS-DEACT-01</p>
             </div>
 
@@ -785,23 +787,92 @@
                 </div>
             </div>
 
-            <!-- Step 8: Retention Offer: 10% OFF! -->
+            <!-- Step 8: Talk with one of our representatives -->
             <div id="deactivate-step-8" class="deactivate-step-content" style="display: none;">
+                <h4>Talk With One of Our Representatives</h4>
+                <p class="deactivate-step-desc">Before closing your account, speak with a dedicated DTS Account Retention Specialist. We're here to resolve any issues or offer custom arrangements.</p>
+                
+                <div class="rep-consultation-card">
+                    <div class="rep-header">
+                        <div class="rep-avatar-wrapper">
+                            <div class="rep-avatar">👩‍💼</div>
+                            <span class="rep-online-dot" title="Specialist Online Now"></span>
+                        </div>
+                        <div class="rep-meta">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong class="rep-name">Sarah Jenkins</strong>
+                                <span class="rep-badge">🟢 Senior Member Specialist</span>
+                            </div>
+                            <span class="rep-title">DTS Account Solutions &amp; Member Relations</span>
+                            <span class="rep-response-time">⚡ Typical response: under 30 seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="rep-quote-bubble">
+                        <p>
+                            "Hello! I noticed you're preparing to deactivate your account. If you're experiencing technical problems, high costs, or need your server claims adjusted, I can personally assist you right now—without you having to delete your profile, stats, and rewards."
+                        </p>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 14px;">
+                        <label for="deactivate-rep-message" style="font-size: 0.85rem; color: #a3a3a3;">Send a quick message to Sarah (optional)</label>
+                        <textarea id="deactivate-rep-message" rows="2" class="deactivate-input" placeholder="e.g. Can I pause my account temporarily or get help with server perks?"></textarea>
+                    </div>
+
+                    <button type="button" id="deactivate-rep-chat-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 6px;">
+                        💬 Connect &amp; Chat Live With Representative Now
+                    </button>
+                    <div id="deactivate-rep-status" class="rep-live-status-notice" style="display: none;"></div>
+                </div>
+
+                <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-8">
+                    <button type="button" id="deactivate-rep-goback-btn" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back &amp; Keep My Account</button>
+                    <button type="button" id="deactivate-to-step-9-btn" class="btn btn-secondary-subdued">Decline Rep &amp; Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 9: Retention Offer & Mandatory Early Cancellation Surcharge Warning -->
+            <div id="deactivate-step-9" class="deactivate-step-content" style="display: none;">
                 <div class="retention-voucher-card">
                     <span class="voucher-badge">EXCLUSIVE RETENTION GIFT</span>
-                    <h4>Wait! Take 10% Off Everything & Stay</h4>
+                    <h4>Wait! Take 10% Off Everything &amp; Stay</h4>
                     <p>We value you immensely. If you stay with us today, we will apply an exclusive <strong>10% lifetime discount</strong> to all shop orders and memberships, plus grant <strong>100 free Loyalty Points</strong> immediately!</p>
                     <div class="voucher-code-box">
                         <span class="voucher-code">STAY10DTS</span>
                         <span class="voucher-discount">10% OFF + 100 PTS</span>
                     </div>
                     <ul class="voucher-perks-list">
-                        <li>✨ 10% off all future store merchandise & subscriptions</li>
+                        <li>✨ 10% off all future store merchandise &amp; subscriptions</li>
                         <li>✨ +100 bonus loyalty points instantly deposited</li>
                         <li>✨ Keep your Minecraft streak, themes, and community perks</li>
                     </ul>
-                    <button type="button" id="deactivate-claim-10-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px;">
-                        Claim 10% Discount & Keep Account
+
+                    <!-- Scary Early Cancellation Fee Warning -->
+                    <div class="deactivation-scary-penalty-box">
+                        <div class="scary-penalty-header">
+                            <span class="scary-skull-pulse">💀</span>
+                            <div style="flex: 1;">
+                                <span class="scary-penalty-tag">LEGAL LIABILITY &amp; SURCHARGE NOTICE</span>
+                                <h5 class="scary-penalty-title">MANDATORY EARLY CANCELLATION SURCHARGE: 1.99 USD</h5>
+                            </div>
+                            <span class="scary-warning-badge">⚠️ AUDIT ACTIVE</span>
+                        </div>
+                        <div class="scary-penalty-body">
+                            <p class="scary-penalty-lead">
+                                <strong>ATTENTION: You might be charged an immediate 1.99 USD Early Cancellation Fee for any ongoing subscriptions or active billing commitments!</strong>
+                            </p>
+                            <p class="scary-penalty-details">
+                                Pursuant to Section 8.4 (Liquidated Early Termination Damages) of the Master DTS Service Agreement, closing or deactivating an account with unfulfilled or ongoing subscription cycles automatically triggers an irrevocable, <strong>non-refundable 1.99 USD Early Cancellation &amp; Administrative Processing Surcharge</strong> charged directly to the payment method on file.
+                            </p>
+                            <div class="scary-penalty-ticker">
+                                <span class="ticker-dot"></span>
+                                <span>Automated Billing Sentinel: Pending Surcharge $1.99 USD queued upon account deactivation confirmation.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="deactivate-claim-10-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px; margin-top: 16px;">
+                        Claim 10% Discount &amp; Keep Account
                     </button>
                     <div>
                         <button type="button" id="deactivate-proceed-to-popup-btn" class="cancel-text-link" style="color: #ef4444; font-size: 0.85rem;">
@@ -900,8 +971,10 @@
                     <span class="step-dot" data-step="8">8</span>
                     <span class="step-line"></span>
                     <span class="step-dot" data-step="9">9</span>
+                    <span class="step-line"></span>
+                    <span class="step-dot" data-step="10">10</span>
                 </div>
-                <div id="cancel-step-indicator-text" class="cancel-step-title">Step 1 of 9: Reason for Leaving</div>
+                <div id="cancel-step-indicator-text" class="cancel-step-title">Step 1 of 10: Reason for Leaving</div>
                 <p class="deactivate-step-subtitle">Subscription Cancellation Gauntlet</p>
             </div>
 
@@ -1090,11 +1163,55 @@
                 </div>
             </div>
 
-            <!-- Cancel Step 9: Retention Voucher (10% OFF!) -->
+            <!-- Cancel Step 9: Talk with one of our representatives -->
             <div id="cancel-step-9" class="cancel-step-content" style="display: none;">
+                <h4>Talk With One of Our Representatives</h4>
+                <p class="cancel-step-desc">Speak directly with a VIP Subscription Specialist before canceling your perks. Our representatives are authorized to offer custom pricing and billing arrangements.</p>
+
+                <div class="rep-consultation-card">
+                    <div class="rep-header">
+                        <div class="rep-avatar-wrapper">
+                            <div class="rep-avatar">👨‍💼</div>
+                            <span class="rep-online-dot" title="Specialist Online Now"></span>
+                        </div>
+                        <div class="rep-meta">
+                            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                <strong class="rep-name">Marcus Vance</strong>
+                                <span class="rep-badge">🟢 Senior VIP Specialist</span>
+                            </div>
+                            <span class="rep-title">DTS VIP Member Solutions &amp; Billing Concierge</span>
+                            <span class="rep-response-time">⚡ Typical response: under 15 seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="rep-quote-bubble">
+                        <p>
+                            "Before you cancel your subscription, I can personally adjust your tier, pause your payments at $0 for up to 3 months, or tailor your VIP perks so you don't lose your progress. Let me know what you need or chat with me live right now!"
+                        </p>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 14px;">
+                        <label for="cancel-rep-message" style="font-size: 0.85rem; color: #a3a3a3;">Message to Marcus Vance (optional)</label>
+                        <textarea id="cancel-rep-message" rows="2" class="deactivate-input" placeholder="e.g. Can you lower my monthly rate or pause my subscription for next month?"></textarea>
+                    </div>
+
+                    <button type="button" id="cancel-rep-chat-btn" class="btn btn-primary" style="width: 100%; margin-bottom: 6px;">
+                        💬 Connect &amp; Chat Live With Representative Now
+                    </button>
+                    <div id="cancel-rep-status" class="rep-live-status-notice" style="display: none;"></div>
+                </div>
+
+                <div class="cancel-modal-actions tricky-actions" id="cancel-actions-9">
+                    <button type="button" id="cancel-rep-goback-btn" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Never Mind, Keep My Plan</button>
+                    <button type="button" id="cancel-to-step-10-btn" class="btn btn-secondary-subdued">Decline Rep &amp; Continue →</button>
+                </div>
+            </div>
+
+            <!-- Cancel Step 10: Retention Voucher & Price-Lock Guarantee -->
+            <div id="cancel-step-10" class="cancel-step-content" style="display: none;">
                 <div class="retention-voucher-card">
                     <span class="voucher-badge">SPECIAL RETENTION OFFER</span>
-                    <h4>Wait! Stay & Save 10% Every Month</h4>
+                    <h4>Wait! Stay &amp; Save 10% Every Month</h4>
                     <p>We value you as part of our core community. Accept this exclusive offer right now and we'll apply a <strong>permanent 10% discount</strong> to your subscription, plus credit <strong>100 bonus loyalty points</strong> to your wallet today!</p>
                     
                     <div class="voucher-code-box">
@@ -1108,8 +1225,32 @@
                         <li>✨ Instant +100 bonus points credited to your rewards</li>
                     </ul>
 
-                    <button type="button" id="claim-voucher-stay-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px;">
-                        Claim 10% Discount & 100 Points
+                    <!-- Price Lock Guarantee & Loss of OG Benefit Clause -->
+                    <div class="price-lock-warning-card">
+                        <div class="price-lock-header">
+                            <span class="lock-icon">🔒</span>
+                            <div style="flex: 1;">
+                                <span class="lock-tag">PRICE-LOCK GUARANTEE</span>
+                                <strong style="color: #60a5fa; font-size: 1rem; display: block;">Lower Price Grandfathered Rate</strong>
+                            </div>
+                            <span class="lock-status-pill">GUARANTEED</span>
+                        </div>
+                        <p class="price-lock-desc">
+                            Staying a subscriber will <strong>guarantee you are locked in on a lower price</strong> as subscription prices will go up in the future! If you cancel now, any future resubscription will be at the substantially higher rate.
+                        </p>
+                        <div class="og-benefit-loss-alert">
+                            <span class="og-alert-icon">⚠️</span>
+                            <div>
+                                <strong style="color: #f87171; display: block; font-size: 0.95rem;">PERMANENT BENEFIT FORFEITURE: You will lose your OG benefit (10% OFF)!</strong>
+                                <p style="margin: 3px 0 0; color: #fca5a5; font-size: 0.84rem;">
+                                    As an OG member, you enjoy a permanent 10% discount on your subscription. Canceling your membership immediately and irreversibly revokes your OG benefit (10% off), and it can never be restored under any circumstances.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" id="claim-voucher-stay-btn" class="btn-voucher btn-ios-big-blue" style="margin-bottom: 12px; margin-top: 16px;">
+                        Claim 10% Discount, Lock In Price &amp; Keep VIP
                     </button>
                     <div>
                         <button type="button" id="cancel-proceed-to-popup-btn" class="cancel-text-link" style="color: #ef4444; font-size: 0.85rem;">
