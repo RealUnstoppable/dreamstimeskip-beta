@@ -1,18 +1,33 @@
 let audioCtx = null;
+let currentSfxVolume = 1.0;
 
 export function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
     if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+        audioCtx.resume().catch(() => {});
     }
 }
 
+export function setSfxVolume(volume) {
+    currentSfxVolume = Math.max(0, Math.min(1, typeof volume === 'number' ? volume : (volume ? 1 : 0)));
+    if (pullGain && audioCtx) {
+        const peakGain = 0.3 * currentSfxVolume;
+        pullGain.gain.setTargetAtTime(peakGain, audioCtx.currentTime, 0.03);
+    }
+}
+
+export function getSfxVolume() {
+    return currentSfxVolume;
+}
+
 // Generates a satisfying, juicy "pop" sound
-export function playPopSound(enabled = true) {
-    if (!enabled) return;
+export function playPopSound(volume = currentSfxVolume) {
+    const effectiveVol = typeof volume === 'number' ? Math.max(0, Math.min(1, volume)) : (volume ? currentSfxVolume : 0);
+    if (effectiveVol <= 0) return;
     initAudio();
+    if (!audioCtx) return;
     
     const osc = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
@@ -23,9 +38,10 @@ export function playPopSound(enabled = true) {
     osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
     
     // Quick attack and quick decay for the snap
+    const peak = 0.8 * effectiveVol;
     gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    gainNode.gain.linearRampToValueAtTime(peak, audioCtx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(Math.max(0.0001, 0.01 * effectiveVol), audioCtx.currentTime + 0.1);
     
     osc.connect(gainNode);
     gainNode.connect(audioCtx.destination);
@@ -40,9 +56,11 @@ let pullGain = null;
 let pullFilter = null;
 
 // Starts the rubbery stretch sound
-export function startPullSound(enabled = true) {
-    if (!enabled) return;
+export function startPullSound(volume = currentSfxVolume) {
+    const effectiveVol = typeof volume === 'number' ? Math.max(0, Math.min(1, volume)) : (volume ? currentSfxVolume : 0);
+    if (effectiveVol <= 0) return;
     initAudio();
+    if (!audioCtx) return;
     if (pullOsc) return; // Already playing
     
     pullOsc = audioCtx.createOscillator();
@@ -57,8 +75,9 @@ export function startPullSound(enabled = true) {
     pullFilter.frequency.setValueAtTime(100, audioCtx.currentTime); // Starts muted
     pullFilter.Q.value = 10; // High resonance for that creamy squelch
     
+    const peak = 0.3 * effectiveVol;
     pullGain.gain.setValueAtTime(0, audioCtx.currentTime);
-    pullGain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05); // Fade in gently
+    pullGain.gain.linearRampToValueAtTime(peak, audioCtx.currentTime + 0.05); // Fade in gently
     
     pullOsc.connect(pullFilter);
     pullFilter.connect(pullGain);
@@ -68,8 +87,9 @@ export function startPullSound(enabled = true) {
 }
 
 // Modulates the sound based on stretch distance
-export function updatePullSound(distance, enabled = true) {
-    if (!enabled || !audioCtx || !pullFilter || !pullOsc) return;
+export function updatePullSound(distance, volume = currentSfxVolume) {
+    const effectiveVol = typeof volume === 'number' ? Math.max(0, Math.min(1, volume)) : (volume ? currentSfxVolume : 0);
+    if (effectiveVol <= 0 || !audioCtx || !pullFilter || !pullOsc) return;
     
     // As the user pulls further, open the filter (brighter sound) and raise pitch slightly (tension)
     // Toned down to make it less harsh

@@ -1,5 +1,5 @@
 import { saveScore, getTopScores, getLocalUsername, setLocalUsername } from './leaderboard.js';
-import { initAudio, playPopSound, startPullSound, updatePullSound, stopPullSound } from './audio-synth.js';
+import { initAudio, playPopSound, startPullSound, updatePullSound, stopPullSound, setSfxVolume } from './audio-synth.js';
 
 // Elements
 const uiLayer = document.getElementById('ui-layer');
@@ -16,12 +16,17 @@ const comboVal = document.getElementById('combo-val');
 const missesVal = document.getElementById('misses-val');
 
 // Options State
-let quality = 'ultra'; // 'ultra', 'high', 'medium', 'low'
-let sfxEnabled = true;
-let musicEnabled = true;
-let cinematicEnabled = true;
-let fpsLimit = 60;
-let fpsInterval = 1000 / 60;
+let quality = localStorage.getItem('blobgame_quality') || 'ultra'; // 'ultra', 'high', 'medium', 'low'
+let sfxVolume = parseFloat(localStorage.getItem('blobgame_sfx_vol') ?? '1.0');
+let musicVolume = parseFloat(localStorage.getItem('blobgame_music_vol') ?? '0.5');
+let sfxEnabled = sfxVolume > 0;
+let musicEnabled = musicVolume > 0;
+let cinematicEnabled = localStorage.getItem('blobgame_cinematic') !== 'false';
+let fpsLimit = parseInt(localStorage.getItem('blobgame_fps') || '60', 10);
+let fpsInterval = 1000 / fpsLimit;
+
+// Initialize synth volume
+setSfxVolume(sfxVolume);
 
 // Audio
 const bgmMusic = document.getElementById('bgm-music');
@@ -40,6 +45,17 @@ let score = 0;
 let combo = 1;
 let misses = 0;
 let timeScale = 1.0;
+
+// Screen Shake Helper
+function triggerScreenShake(amount = 5) {
+    if (!cinematicEnabled || !gameContainer) return;
+    gameContainer.classList.remove('screen-shake');
+    void gameContainer.offsetWidth; // Force DOM reflow
+    gameContainer.classList.add('screen-shake');
+    setTimeout(() => {
+        if (gameContainer) gameContainer.classList.remove('screen-shake');
+    }, 250);
+}
 
 // Setup Event Listeners
 function setupUI() {
@@ -61,38 +77,128 @@ function setupUI() {
     document.getElementById('btn-replay').addEventListener('click', startGame);
     document.getElementById('btn-go-menu').addEventListener('click', () => showMenu(menuMain));
 
-    // Options
+    // Options - Quality
+    const qualityDesc = document.getElementById('quality-desc');
+    const updateQualityDesc = (q) => {
+        if (!qualityDesc) return;
+        if (q === 'ultra') qualityDesc.textContent = 'Ultra: Maximum particles and effects.';
+        else if (q === 'high') qualityDesc.textContent = 'High: Animated blobs, massive dot explosions.';
+        else if (q === 'medium') qualityDesc.textContent = 'Med: Animated blobs, 25% fewer dots.';
+        else if (q === 'low') qualityDesc.textContent = 'Low: Static blobs, 50% fewer dots.';
+    };
+
     document.querySelectorAll('#quality-toggles .toggle-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        const val = btn.getAttribute('data-val');
+        if (val === quality) btn.classList.add('active');
+        else btn.classList.remove('active');
+
+        btn.addEventListener('click', () => {
             document.querySelectorAll('#quality-toggles .toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             quality = btn.getAttribute('data-val');
-            
-            const desc = document.getElementById('quality-desc');
-            if (quality === 'ultra') desc.textContent = 'Ultra: Maximum particles and effects.';
-            if (quality === 'high') desc.textContent = 'High: Animated blobs, massive dot explosions.';
-            if (quality === 'medium') desc.textContent = 'Med: Animated blobs, 25% fewer dots.';
-            if (quality === 'low') desc.textContent = 'Low: Static blobs, 50% fewer dots.';
+            localStorage.setItem('blobgame_quality', quality);
+            updateQualityDesc(quality);
+
+            // Update live blobs if in-game
+            blobs.forEach(b => {
+                if (quality === 'low') {
+                    b.el.classList.add('low-quality');
+                    b.el.classList.remove('ultra-quality');
+                } else if (quality === 'ultra') {
+                    b.el.classList.add('ultra-quality');
+                    b.el.classList.remove('low-quality');
+                } else {
+                    b.el.classList.remove('low-quality', 'ultra-quality');
+                }
+            });
         });
     });
+    updateQualityDesc(quality);
 
+    // Options - FPS
     document.querySelectorAll('#fps-toggles .toggle-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        const val = parseInt(btn.getAttribute('data-val'), 10);
+        if (val === fpsLimit) btn.classList.add('active');
+        else btn.classList.remove('active');
+
+        btn.addEventListener('click', () => {
             document.querySelectorAll('#fps-toggles .toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            fpsLimit = parseInt(btn.getAttribute('data-val'));
+            fpsLimit = parseInt(btn.getAttribute('data-val'), 10);
             fpsInterval = 1000 / fpsLimit;
+            localStorage.setItem('blobgame_fps', fpsLimit);
+            lastDrawTime = performance.now();
+            lastTime = performance.now();
         });
     });
 
-    document.getElementById('toggle-cinematic')?.addEventListener('change', (e) => cinematicEnabled = e.target.checked);
+    // Options - Cinematic
+    const toggleCinematic = document.getElementById('toggle-cinematic');
+    if (toggleCinematic) {
+        toggleCinematic.checked = cinematicEnabled;
+        toggleCinematic.addEventListener('change', (e) => {
+            cinematicEnabled = e.target.checked;
+            localStorage.setItem('blobgame_cinematic', cinematicEnabled);
+        });
+    }
 
-    document.getElementById('toggle-sfx').addEventListener('change', (e) => sfxEnabled = e.target.checked);
-    document.getElementById('toggle-music').addEventListener('change', (e) => {
-        musicEnabled = e.target.checked;
-        if (musicEnabled && isPlaying && !isPaused) bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
-        else bgmMusic.pause();
-    });
+    // Options - Audio Volume Sliders
+    const sfxSlider = document.getElementById('sfx-vol');
+    const sfxVal = document.getElementById('sfx-vol-val');
+    const musicSlider = document.getElementById('music-vol');
+    const musicVal = document.getElementById('music-vol-val');
+
+    if (sfxSlider) {
+        sfxSlider.value = sfxVolume;
+        if (sfxVal) sfxVal.textContent = `${Math.round(sfxVolume * 100)}%`;
+        sfxSlider.addEventListener('input', (e) => {
+            sfxVolume = parseFloat(e.target.value);
+            sfxEnabled = sfxVolume > 0;
+            setSfxVolume(sfxVolume);
+            if (sfxVal) sfxVal.textContent = `${Math.round(sfxVolume * 100)}%`;
+            localStorage.setItem('blobgame_sfx_vol', sfxVolume);
+            playPopSound(sfxVolume); // Auditory feedback
+        });
+    }
+
+    if (bgmMusic) bgmMusic.volume = musicVolume;
+    if (bgmMenu) bgmMenu.volume = musicVolume;
+
+    if (musicSlider) {
+        musicSlider.value = musicVolume;
+        if (musicVal) musicVal.textContent = `${Math.round(musicVolume * 100)}%`;
+        musicSlider.addEventListener('input', (e) => {
+            musicVolume = parseFloat(e.target.value);
+            musicEnabled = musicVolume > 0;
+            if (bgmMusic) bgmMusic.volume = musicVolume;
+            if (bgmMenu) bgmMenu.volume = musicVolume;
+            if (musicVal) musicVal.textContent = `${Math.round(musicVolume * 100)}%`;
+            localStorage.setItem('blobgame_music_vol', musicVolume);
+
+            if (!musicEnabled) {
+                if (bgmMusic) bgmMusic.pause();
+                if (bgmMenu) bgmMenu.pause();
+            } else {
+                if (isPlaying && !isPaused) {
+                    if (bgmMusic && bgmMusic.paused) {
+                        bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
+                    }
+                } else {
+                    if (bgmMenu && bgmMenu.paused) {
+                        bgmMenu.play().catch(e => console.log("Manager info: Audio play blocked:", e));
+                    }
+                }
+            }
+        });
+    }
+
+    // Initial play attempt for menu music on first page interaction
+    document.body.addEventListener('pointerdown', () => {
+        initAudio();
+        if (!isPlaying && musicEnabled && bgmMenu && bgmMenu.paused) {
+            bgmMenu.play().catch(() => {});
+        }
+    }, { once: true });
 
     // Pause functionality
     document.getElementById('btn-pause').addEventListener('click', pauseGame);
@@ -143,9 +249,11 @@ function showMenu(menuEl) {
     menuEl.classList.remove('hidden');
     
     // Crossfade to menu music
-    if (musicEnabled) {
-        bgmMusic.pause();
-        bgmMenu.play().catch(() => {});
+    if (musicEnabled && bgmMenu) {
+        if (bgmMusic) bgmMusic.pause();
+        if (bgmMenu.paused) {
+            bgmMenu.play().catch(() => {});
+        }
     }
 }
 
@@ -154,7 +262,7 @@ function showMenu(menuEl) {
 function pauseGame() {
     if (!isPlaying || isPaused) return;
     isPaused = true;
-    bgmMusic.pause();
+    if (bgmMusic) bgmMusic.pause();
     uiLayer.classList.remove('hidden');
     const mPause = document.getElementById('menu-pause');
     if (mPause) showMenu(mPause);
@@ -171,7 +279,8 @@ function resumeGame() {
     uiLayer.classList.add('hidden');
     lastTime = performance.now();
     lastDrawTime = performance.now();
-    if (musicEnabled) bgmMusic.play().catch(e => {});
+    if (bgmMenu) bgmMenu.pause();
+    if (musicEnabled && bgmMusic) bgmMusic.play().catch(e => {});
     animationFrameId = requestAnimationFrame(gameLoop);
 }
 
@@ -195,9 +304,11 @@ function startGame() {
     
     if (musicEnabled) {
         // Crossfade to game music
-        bgmMenu.pause();
-        bgmMusic.currentTime = 0;
-        bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
+        if (bgmMenu) bgmMenu.pause();
+        if (bgmMusic) {
+            bgmMusic.currentTime = 0;
+            bgmMusic.play().catch(e => console.log("Manager info: Audio play blocked:", e));
+        }
     }
 
     animationFrameId = requestAnimationFrame(gameLoop);
@@ -206,7 +317,7 @@ function startGame() {
 function gameOver() {
     isPlaying = false;
     cancelAnimationFrame(animationFrameId);
-    bgmMusic.pause();
+    if (bgmMusic) bgmMusic.pause();
 
     gameHud.classList.add('hidden');
     uiLayer.classList.remove('hidden');
@@ -286,6 +397,7 @@ function spawnBlob() {
     const el = document.createElement('div');
     el.classList.add('game-blob');
     if (quality === 'low') el.classList.add('low-quality');
+    if (quality === 'ultra') el.classList.add('ultra-quality');
     
     el.style.width = `${size}px`;
     el.style.height = `${size}px`;
@@ -323,12 +435,14 @@ function spawnBlob() {
             
             el.style.transform = `translate(${blobObj.x}px, ${blobObj.y}px) rotate(${angle}rad) scale(${scaleX}, ${scaleY})`;
             
-            if (quality !== 'low') {
+            if (quality === 'ultra') {
+                el.style.boxShadow = `0 0 ${dist / 1.5}px #fff, 0 0 ${dist}px #9333ea, 0 0 ${dist * 1.5}px #3b82f6`;
+            } else if (quality !== 'low') {
                 el.style.boxShadow = `0 0 ${dist / 2}px #fff`;
             }
 
-            startPullSound(sfxEnabled);
-            updatePullSound(dist, sfxEnabled);
+            startPullSound(sfxVolume);
+            updatePullSound(dist, sfxVolume);
 
             if (dist > 150) {
                 isDragging = false;
@@ -366,7 +480,12 @@ function popBlob(blobObj) {
         blobObj.el.remove();
 
         // Audio
-        playPopSound(sfxEnabled);
+        playPopSound(sfxVolume);
+
+        // Screen Shake
+        if (cinematicEnabled) {
+            triggerScreenShake(quality === 'ultra' ? 6 : 4);
+        }
 
         // VFX
         spawnExplosion(blobObj.x + blobObj.size/2, blobObj.y + blobObj.size/2, blobObj.size);
@@ -439,20 +558,34 @@ function spawnExplosion(x, y, size) {
     let baseParticles = size / 2; // e.g. 80px blob = 40 particles
     
     let multiplier = 1.0;
-    if (quality === 'medium') multiplier = 0.75;
-    if (quality === 'low') multiplier = 0.50;
+    if (quality === 'ultra') multiplier = 1.6;
+    else if (quality === 'medium') multiplier = 0.75;
+    else if (quality === 'low') multiplier = 0.50;
 
     const numParticles = Math.floor(baseParticles * multiplier);
     const particleColors = ['#9333EA', '#2563EB', '#EC4899', '#3B82F6', '#8B5CF6'];
 
     // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
     const fragment = document.createDocumentFragment();
+
+    // Ultra effect: expanding shockwave blast ring
+    if (quality === 'ultra') {
+        const shockwave = document.createElement('div');
+        shockwave.classList.add('game-shockwave');
+        shockwave.style.left = `${x}px`;
+        shockwave.style.top = `${y}px`;
+        shockwave.style.width = `${size}px`;
+        shockwave.style.height = `${size}px`;
+        fragment.appendChild(shockwave);
+        setTimeout(() => shockwave.remove(), 450);
+    }
+
     for (let i = 0; i < numParticles; i++) {
         const particle = document.createElement('div');
         particle.classList.add('game-particle');
         
         const angle = Math.random() * Math.PI * 2;
-        const distance = (size / 2) + Math.random() * size; 
+        const distance = (size / 2) + Math.random() * size * (quality === 'ultra' ? 1.3 : 1.0); 
         const tx = Math.cos(angle) * distance;
         const ty = Math.sin(angle) * distance;
         
@@ -462,11 +595,13 @@ function spawnExplosion(x, y, size) {
         particle.style.setProperty('--ty', `${ty}px`);
         
         particle.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
-        if (quality !== 'low') {
+        if (quality === 'ultra') {
+            particle.style.boxShadow = `0 0 12px ${particle.style.backgroundColor}, 0 0 20px #fff`;
+        } else if (quality !== 'low') {
             particle.style.boxShadow = `0 0 10px ${particle.style.backgroundColor}`;
         }
         
-        const pSize = 4 + Math.random() * 8;
+        const pSize = 4 + Math.random() * (quality === 'ultra' ? 10 : 8);
         particle.style.width = `${pSize}px`;
         particle.style.height = `${pSize}px`;
         

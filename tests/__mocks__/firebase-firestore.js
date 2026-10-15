@@ -15,4 +15,5 @@ export const arrayRemove = jest.fn((...args) => args);
 export const query = jest.fn();
 export const where = jest.fn();
 export const orderBy = jest.fn();
+export const limit = jest.fn();
 
