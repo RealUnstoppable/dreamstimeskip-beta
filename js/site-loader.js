@@ -43,7 +43,9 @@ function createLoaderDOM() {
         <div class="un-loader-halo"></div>
         <div class="un-loader-badge">
             <div class="un-loader-logo-wrap">
-                <div class="un-loader-logo-base"></div>
+                <div class="un-loader-logo-base">
+                    <img src="${LOGO_MASK_DATA}" alt="un" class="un-loader-logo-img" onerror="this.onerror=null;this.src='/images/un-logo-touching.png';" />
+                </div>
                 <div class="un-loader-wave-mask">
                     <div class="un-loader-wave-beam"></div>
                 </div>
@@ -153,12 +155,76 @@ export function isSiteLoaderActive() {
 }
 
 /**
- * Automatically initializes loader on page start
+ * Determines if site loader is eligible to run:
+ * - Only on index.html (or root '/')
+ * - Only when the user first loads the site in this session (not after navigation)
+ */
+export function isEligibleForLoader(customPathname = null) {
+    if (typeof window === 'undefined' && customPathname === null) return true;
+
+    // Check if current page is the index / home page
+    const pathname = customPathname !== null ? customPathname : ((window.location && window.location.pathname) ? window.location.pathname : '');
+    const isIndex = pathname === '' ||
+                    pathname === '/' ||
+                    pathname.endsWith('/') ||
+                    pathname.endsWith('/index.html') ||
+                    pathname.endsWith('/index.htm') ||
+                    pathname.endsWith('/index');
+    if (!isIndex) return false;
+
+    // Only for when the user first loads the site, not after every loading page
+    try {
+        if (typeof window.sessionStorage !== 'undefined' && window.sessionStorage) {
+            if (window.sessionStorage.getItem('un_site_loader_shown')) {
+                return false;
+            }
+        }
+    } catch (e) {
+        // Fallback gracefully if storage is restricted
+    }
+
+    return true;
+}
+
+/**
+ * Records that the loader has been shown for this session
+ */
+export function markLoaderAsShown() {
+    try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+            window.sessionStorage.setItem('un_site_loader_shown', 'true');
+        }
+    } catch (e) {
+        // Ignore storage exceptions
+    }
+}
+
+/**
+ * Resets the session flag (primarily for testing)
+ */
+export function resetLoaderSession() {
+    try {
+        if (typeof window !== 'undefined' && window.sessionStorage) {
+            window.sessionStorage.removeItem('un_site_loader_shown');
+        }
+    } catch (e) {
+        // Ignore storage exceptions
+    }
+}
+
+/**
+ * Automatically initializes loader on page start (only on first load of index.html)
  */
 export function initSiteLoader() {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
     if (window.__UN_SITE_LOADER_INITIALIZED__) return;
     window.__UN_SITE_LOADER_INITIALIZED__ = true;
+
+    // Guard: Only show when user first loads the site on index.html
+    if (!isEligibleForLoader()) {
+        return;
+    }
+    markLoaderAsShown();
 
     // Pre-create the element early
     if (document.readyState === 'loading') {
@@ -174,12 +240,8 @@ export function initSiteLoader() {
         return;
     }
 
-    // Schedule delayed show: only show if page load takes longer than SHOW_DELAY_MS
-    showTimer = setTimeout(() => {
-        if (document.readyState !== 'complete') {
-            showSiteLoader();
-        }
-    }, SHOW_DELAY_MS);
+    // Show immediately on first site load to keep users from leaving during load
+    showSiteLoader();
 
     // Dismiss when window load event fires
     const onLoadComplete = () => {
@@ -199,5 +261,8 @@ if (typeof window !== 'undefined') {
     window.showSiteLoader = showSiteLoader;
     window.hideSiteLoader = hideSiteLoader;
     window.isSiteLoaderActive = isSiteLoaderActive;
+    window.isEligibleForLoader = isEligibleForLoader;
+    window.markLoaderAsShown = markLoaderAsShown;
+    window.resetLoaderSession = resetLoaderSession;
     initSiteLoader();
 }

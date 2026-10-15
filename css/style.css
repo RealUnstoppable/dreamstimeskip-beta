@@ -2013,24 +2013,47 @@ body.light-theme .ad-container {
   width: 100px;
   height: 65px;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Base Muted "un" (touching stems) */
+/* Base "un" logo text element inside the box */
 .un-loader-logo-base {
   position: absolute;
   inset: 0;
-  background-color: rgba(255, 255, 255, 0.22);
-  -webkit-mask: var(--un-loader-mask, url('../images/un-logo-touching.png')) no-repeat center / contain;
-  mask: var(--un-loader-mask, url('../images/un-logo-touching.png')) no-repeat center / contain;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.un-loader-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  opacity: 0.88;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.45));
+  user-select: none;
+  pointer-events: none;
 }
 
 /* Masked Wave Container */
 .un-loader-wave-mask {
   position: absolute;
   inset: 0;
-  -webkit-mask: var(--un-loader-mask, url('../images/un-logo-touching.png')) no-repeat center / contain;
-  mask: var(--un-loader-mask, url('../images/un-logo-touching.png')) no-repeat center / contain;
+  -webkit-mask-image: var(--un-loader-mask, url('../images/un-logo-touching.png'));
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: var(--un-loader-mask, url('../images/un-logo-touching.png'));
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
   overflow: hidden;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* Sweeping Wave Beam with Glow */

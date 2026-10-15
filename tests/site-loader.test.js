@@ -51,6 +51,11 @@ describe('Site Loader & Rockstar UN Logo', () => {
         expect(loaderEl.querySelector('.un-loader-badge')).not.toBeNull();
         expect(loaderEl.querySelector('.un-loader-wave-beam')).not.toBeNull();
         expect(loaderEl.querySelector('.un-loader-logo-base')).not.toBeNull();
+        // The un text/logo image should show up in the box
+        const logoImg = loaderEl.querySelector('.un-loader-logo-img');
+        expect(logoImg).not.toBeNull();
+        expect(logoImg.getAttribute('alt')).toBe('un');
+        expect(logoImg.getAttribute('src')).toContain('data:image/png;base64,');
 
         hideSiteLoader(true); // force immediate hide
         expect(isSiteLoaderActive()).toBe(false);
@@ -77,11 +82,71 @@ describe('Site Loader & Rockstar UN Logo', () => {
         const cssPath = path.join(ROOT_DIR, 'css', 'style.css');
         const css = fs.readFileSync(cssPath, 'utf-8');
         expect(css).toContain(`--un-loader-mask: url('data:image/png;base64,${jsBase64}')`);
+        expect(css).toContain('.un-loader-logo-img');
     });
 
-    it('should be imported in js/theme-loader.js so all pages load it automatically', () => {
+    it('should only be loaded on index.html and NOT in theme-loader.js so it does not trigger on every page', () => {
         const themeLoaderPath = path.join(ROOT_DIR, 'js', 'theme-loader.js');
         const themeLoader = fs.readFileSync(themeLoaderPath, 'utf-8');
-        expect(themeLoader).toContain('site-loader.js');
+        expect(themeLoader).not.toContain('site-loader.js');
+
+        const indexPath = path.join(ROOT_DIR, 'index.html');
+        const indexHtml = fs.readFileSync(indexPath, 'utf-8');
+        expect(indexHtml).toContain('/js/site-loader.js');
+    });
+
+    it('should only be eligible for initial site load on index.html and not subsequent navigations', async () => {
+        const { isEligibleForLoader, resetLoaderSession, markLoaderAsShown } = await import('../js/site-loader.js');
+        
+        // Mock sessionStorage
+        const storage = {};
+        const mockSessionStorage = {
+            getItem: (key) => storage[key] || null,
+            setItem: (key, val) => { storage[key] = String(val); },
+            removeItem: (key) => { delete storage[key]; },
+            clear: () => { Object.keys(storage).forEach(k => delete storage[k]); }
+        };
+        Object.defineProperty(window, 'sessionStorage', { value: mockSessionStorage, writable: true, configurable: true });
+
+        // Mock window.location.pathname to allow route simulation in jsdom
+        let currentPathname = '/index.html';
+        try {
+            Object.defineProperty(window.location, 'pathname', {
+                get: () => currentPathname,
+                set: (val) => { currentPathname = val; },
+                configurable: true
+            });
+        } catch (e) {
+            // ignore if already defined
+        }
+
+        const setPath = (pathname) => {
+            currentPathname = pathname;
+            try {
+                window.history.pushState({}, '', pathname);
+            } catch (e) {}
+        };
+
+        // On index.html first load
+        setPath('/index.html');
+        resetLoaderSession();
+        expect(isEligibleForLoader()).toBe(true);
+
+        // After initial load has marked loader as shown
+        markLoaderAsShown();
+        expect(isEligibleForLoader()).toBe(false);
+
+        // On another page like shop.html
+        resetLoaderSession();
+        setPath('/shop.html');
+        expect(isEligibleForLoader()).toBe(false);
+
+        // On account page
+        setPath('/account.html');
+        expect(isEligibleForLoader()).toBe(false);
+
+        // On root URL '/'
+        setPath('/');
+        expect(isEligibleForLoader()).toBe(true);
     });
 });

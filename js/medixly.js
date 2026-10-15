@@ -2573,7 +2573,7 @@ function initHarmonyTunes() {
     const closeWhatsNewBtn = document.getElementById('close-whats-new-btn');
     const gotItBtn = document.getElementById('got-it-btn');
 
-    const WHAT_NEW_VERSION = 'harmonytunes_whatsnew_v1';
+    const WHAT_NEW_VERSION = 'medixly_whatsnew_v2';
     
     if (whatsNewOverlay && !localStorage.getItem(WHAT_NEW_VERSION)) {
         setTimeout(() => {

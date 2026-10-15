@@ -6,6 +6,7 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
 
     <script type="module" src="/js/theme-loader.js"></script>
+    <script type="module" src="/js/site-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DreamsTimeskip Hub | The Unstoppable Ecosystem (Beta)</title>
@@ -1014,8 +1015,30 @@
         /* --- END: Bento Music Pulse & Wave Background --- */
 
         @media (max-width: 600px) {
-            #dts-brand-content, #medixly-brand-content {
+            .brand-content, #dts-brand-content, #medixly-brand-content {
                 padding: 30px 18px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            #unstoppable {
+                padding: 80px 16px !important;
+            }
+            #unstoppable .youtube-container {
+                padding: 1.25rem 1rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            #unstoppable .video-wrapper {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            #unstoppable .coming-soon-videos {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            #unstoppable .coming-soon-videos div[style*="grid"] {
+                grid-template-columns: 1fr !important;
             }
             .mc-hero-features, .medixly-feature-pills {
                 gap: 6px;
@@ -1167,22 +1190,22 @@
         </section>
 
         <div class="scroll-container">
-            <section id="unstoppable" class="brand-section" style="height: auto; min-height: 100vh; padding: 100px 20px;">
+            <section id="unstoppable" class="brand-section" style="height: auto; min-height: 100vh; padding: 100px 20px; overflow: hidden; width: 100%; max-width: 100vw; box-sizing: border-box;">
                 <div class="section-background">
                     <iframe src="https://www.youtube.com/embed/-MfSBwzapaU?autoplay=1&mute=1&loop=1&playlist=-MfSBwzapaU&controls=0&showinfo=0&rel=0&playsinline=1&enablejsapi=1" title="Unstoppable Channel Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
                 <div class="section-overlay"
                     style="background: linear-gradient(0deg, rgba(80,80,80,0.4) 0%, rgba(20,20,20,0.6) 100%);"></div>
-                <div class="brand-content reveal">
+                <div class="brand-content reveal" style="max-width: 800px; width: 100%; box-sizing: border-box;">
                     <h2><span class="un-letters" style="font-size: 3rem; letter-spacing: -0.06em;">un</span></h2>
                     <p class="section-subtitle" style="margin-bottom: 2rem;">The ultimate destination for high-tier gameplay, deep dives, and gaming culture.</p>
                     
-                    <div class="youtube-container" style="display: flex; flex-direction: column; gap: 2rem; align-items: center; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
-                        <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div class="youtube-container" style="display: flex; flex-direction: column; gap: 2rem; align-items: center; background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 100%; box-sizing: border-box;">
+                        <div class="video-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; width: 100%; max-width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box;">
                             <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/-MfSBwzapaU" title="Unstoppable Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
                         
-                        <div class="youtube-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                        <div class="youtube-actions" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; max-width: 100%; box-sizing: border-box;">
                             <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" target="_blank" class="cta-button" style="background: #FF0000; color: white; display: flex; align-items: center; gap: 8px;">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                                 Subscribe to @Unstoppab1e
@@ -1190,9 +1213,9 @@
                             <a href="support.html" class="cta-button btn-support-blue" style="background: #0071e3; color: white; display: inline-flex; align-items: center; gap: 8px;">Support Us / Donate</a>
                         </div>
 
-                        <div class="coming-soon-videos" style="width: 100%; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
+                        <div class="coming-soon-videos" style="width: 100%; max-width: 100%; box-sizing: border-box; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
                             <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: #FFD700;"><span class="un-letters" style="font-size: 1.5rem; letter-spacing: -0.06em; color: #FFD700;">un</span> — Coming Soon</h3>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 1rem; width: 100%; box-sizing: border-box;">
                                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
                                     <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">Dreams OG Launch Trailer</h4>
                                     <p style="font-size: 0.9rem; color: #aaa; margin: 0;">An exclusive look into the upcoming realm.</p>
