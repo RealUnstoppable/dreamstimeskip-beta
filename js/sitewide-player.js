@@ -481,6 +481,7 @@ class SitewideMusicEngine {
             const handleDragStart = (clientX, clientY, e) => {
                 if (orb.classList.contains('expanded')) return;
                 if (e && e.target && e.target.closest('button, a')) return;
+                if (e && e.cancelable && e.type === 'mousedown') e.preventDefault();
 
                 isDragging = true;
                 hasDragged = false;

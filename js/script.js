@@ -301,7 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
             orb.style.transition = `${baseTransition}, box-shadow 0.1s ease`;
         };
         
-        orb.addEventListener('mousedown', (e) => handleDragStart(e.clientX, e.clientY));
+        orb.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            handleDragStart(e.clientX, e.clientY);
+        });
         orb.addEventListener('touchstart', (e) => {
             // Only handle single touch
             if (e.touches.length === 1) handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
