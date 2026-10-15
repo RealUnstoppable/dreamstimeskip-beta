@@ -488,6 +488,122 @@
             box-shadow: 0 1px 0 #000;
         }
 
+        .mc-btn-gold {
+            background: #c68a18;
+            color: #ffffff !important;
+            border-top: 3px solid #f6b437;
+            border-left: 3px solid #f6b437;
+            border-right: 3px solid #754f0a;
+            border-bottom: 4px solid #754f0a;
+            box-shadow: 0 4px 0 #000, 0 8px 16px rgba(0,0,0,0.5);
+            text-shadow: 2px 2px 0px #5c3a00;
+        }
+
+        .mc-btn-gold:hover {
+            background: #d8961b;
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #000, 0 12px 20px rgba(0,0,0,0.6);
+            color: #ffffff !important;
+        }
+
+        .mc-btn-gold:active {
+            border-top: 3px solid #754f0a;
+            border-left: 3px solid #754f0a;
+            border-right: 3px solid #f6b437;
+            border-bottom: 3px solid #f6b437;
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #000;
+        }
+
+        /* --- Interactive Minecraft Dialog Video Modal --- */
+        .mc-modal {
+            margin: auto;
+            padding: 0;
+            max-width: 960px;
+            width: 92vw;
+            background: #181a1f;
+            border: 3px solid #000;
+            box-shadow: inset 3px 3px 0 #3e424a, inset -3px -3px 0 #101114, 0 25px 60px rgba(0,0,0,0.95);
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        .mc-modal::backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .mc-modal-header {
+            background: #252830;
+            border-bottom: 3px solid #000;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mc-modal-header h3 {
+            font-family: 'Silkscreen', 'Press Start 2P', monospace;
+            font-size: 1rem;
+            color: #ffaa00;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .mc-modal-close {
+            background: #bd3232;
+            border: 2px solid #000;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            font-family: 'Silkscreen', 'Press Start 2P', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 1px 1px 0 #ff6e6e, inset -1px -1px 0 #6e1515;
+            transition: background 0.15s ease;
+        }
+
+        .mc-modal-close:hover {
+            background: #d83d3d;
+        }
+
+        .mc-modal-body {
+            padding: 16px;
+            background: #0e1013;
+        }
+
+        .mc-modal-body video {
+            width: 100%;
+            max-height: 70vh;
+            border: 2px solid #000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            display: block;
+            background: #000;
+        }
+
+        .mc-modal-footer {
+            padding: 14px 20px;
+            background: #1e2026;
+            border-top: 2px solid #2b2e35;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #9da6b2;
+            font-family: 'Inter', sans-serif;
+        }
+
         /* --- Medixly Red/Pink Pulsing Background & Premium Music Redesign --- */
         .medixly-section {
             position: relative;
@@ -1216,9 +1332,12 @@
                         <div class="coming-soon-videos" style="width: 100%; max-width: 100%; box-sizing: border-box; text-align: left; margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem;">
                             <h3 style="font-size: 1.5rem; margin-bottom: 1rem; color: #FFD700;"><span class="un-letters" style="font-size: 1.5rem; letter-spacing: -0.06em; color: #FFD700;">un</span> — Coming Soon</h3>
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 1rem; width: 100%; box-sizing: border-box;">
-                                <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
-                                    <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">Dreams OG Launch Trailer</h4>
-                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">An exclusive look into the upcoming realm.</p>
+                                <div class="open-trailer-trigger" style="background: rgba(255,255,255,0.06); padding: 1rem; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255, 215, 0, 0.25); transition: background 0.2s, transform 0.2s;" role="button" tabindex="0" title="Watch Official Dreams OG Launch Trailer">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <h4 style="font-size: 1.1rem; margin: 0; color: #FFD700;">Dreams OG Launch Trailer</h4>
+                                        <span style="font-size: 0.72rem; background: #c68a18; color: #fff; padding: 2px 8px; border-radius: 3px; font-weight: 700; font-family: 'Silkscreen', monospace;">▶ WATCH</span>
+                                    </div>
+                                    <p style="font-size: 0.9rem; color: #aaa; margin: 0;">An exclusive look into the upcoming realm. Watch the new official trailer now.</p>
                                 </div>
                                 <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px;">
                                     <h4 style="font-size: 1.1rem; margin: 0 0 0.5rem 0;">High-Tier Gameplay Montages</h4>
@@ -1231,7 +1350,11 @@
             </section>
 
             <section id="dts" class="brand-section">
-                <div class="section-background" style="background-image: url('/images/image4.jpg');"></div>
+                <div class="section-background" style="background-image: url('/images/image4.jpg'); overflow: hidden;">
+                    <video autoplay muted loop playsinline poster="/images/image4.jpg" class="dts-bg-video" style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); object-fit: cover; pointer-events: none; z-index: 0;">
+                        <source src="/video/dreams-trailer.mp4?v=20261015" type="video/mp4">
+                    </video>
+                </div>
                 <div class="section-overlay mc-dts-overlay"></div>
                 <div class="brand-content reveal" id="dts-brand-content">
                     <div class="mc-hero-badge">
@@ -1245,9 +1368,14 @@
                         <span class="mc-pill"><span>⚡</span> Live Events</span>
                         <span class="mc-pill"><span>🏰</span> Custom Biomes</span>
                     </div>
-                    <a href="dreamstimeskip.html" class="mc-btn mc-btn-green">
-                        Explore Dreams TimeSkip <span>▶</span>
-                    </a>
+                    <div class="mc-hero-actions" style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" class="mc-btn mc-btn-gold open-trailer-trigger" id="dts-watch-trailer-btn">
+                            ▶ Watch Trailer
+                        </button>
+                        <a href="dreamstimeskip.html" class="mc-btn mc-btn-green">
+                            Explore Dreams TimeSkip <span>▶</span>
+                        </a>
+                    </div>
                 </div>
             </section>
 
@@ -1415,6 +1543,107 @@
                 const fact = getFactForDate(dateString);
                 fotdTextEl.textContent = fact;
             }
+        });
+    </script>
+
+    <!-- ========================================================
+         INTERACTIVE TRAILER VIDEO MODAL (DREAMS OG)
+         ======================================================== -->
+    <dialog id="trailer-modal" class="mc-modal">
+        <div class="mc-modal-header">
+            <h3><span>⚔️</span> DREAMS OG OFFICIAL TRAILER</h3>
+            <button class="mc-modal-close" id="close-trailer-btn" aria-label="Close trailer dialog">&times;</button>
+        </div>
+        <div class="mc-modal-body">
+            <video id="modal-video" controls preload="auto" playsinline>
+                <source src="/video/dreams-trailer.mp4?v=20261015" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="mc-modal-footer">
+            <span>Dreams OG — Official Minecraft Release October 20, 2026</span>
+            <a href="dreamstimeskip.html" class="mc-btn mc-btn-green" style="padding: 8px 18px; font-size: 0.78rem; text-decoration: none;">
+                ⚔️ Explore Dreams TimeSkip
+            </a>
+        </div>
+    </dialog>
+
+    <script>
+        // --- Dreams OG Trailer Video Modal Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const trailerModal = document.getElementById('trailer-modal');
+            const modalVideo = document.getElementById('modal-video');
+            const openTrailerTriggers = document.querySelectorAll('.open-trailer-trigger');
+            const closeTrailerBtn = document.getElementById('close-trailer-btn');
+
+            const openTrailer = () => {
+                if (trailerModal) {
+                    if (typeof trailerModal.showModal === 'function') {
+                        trailerModal.showModal();
+                    } else {
+                        trailerModal.setAttribute('open', '');
+                    }
+                    if (modalVideo) {
+                        modalVideo.currentTime = 0;
+                        modalVideo.load();
+                        modalVideo.play().catch(() => {});
+                    }
+                }
+            };
+
+            const closeTrailer = () => {
+                if (trailerModal) {
+                    if (typeof trailerModal.close === 'function') {
+                        trailerModal.close();
+                    } else {
+                        trailerModal.removeAttribute('open');
+                    }
+                    if (modalVideo) modalVideo.pause();
+                }
+            };
+
+            openTrailerTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openTrailer();
+                });
+                trigger.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openTrailer();
+                    }
+                });
+            });
+
+            if (closeTrailerBtn) {
+                closeTrailerBtn.addEventListener('click', closeTrailer);
+            }
+
+            if (trailerModal) {
+                trailerModal.addEventListener('click', (e) => {
+                    const rect = trailerModal.getBoundingClientRect();
+                    const inDialog = (
+                        rect.top <= e.clientY &&
+                        e.clientY <= rect.top + rect.height &&
+                        rect.left <= e.clientX &&
+                        e.clientX <= rect.left + rect.width
+                    );
+                    if (!inDialog) closeTrailer();
+                });
+
+                trailerModal.addEventListener('close', () => {
+                    if (modalVideo) modalVideo.pause();
+                });
+            }
+
+            // Global click delegation
+            document.addEventListener('click', (e) => {
+                const trigger = e.target.closest('.open-trailer-trigger');
+                if (trigger) {
+                    e.preventDefault();
+                    openTrailer();
+                }
+            });
         });
     </script>
 </body>

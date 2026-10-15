@@ -1595,12 +1595,12 @@
          ======================================================== -->
     <dialog id="trailer-modal" class="mc-modal">
         <div class="mc-modal-header">
-            <h3><span>⚔️</span> DREAMS OFFICIAL TRAILER</h3>
+            <h3><span>⚔️</span> DREAMS OG OFFICIAL TRAILER</h3>
             <button class="mc-modal-close" id="close-trailer-btn" aria-label="Close trailer dialog">&times;</button>
         </div>
         <div class="mc-modal-body">
-            <video id="modal-video" controls preload="metadata" playsinline>
-                <source src="/video/dreams-trailer.mp4" type="video/mp4">
+            <video id="modal-video" controls preload="auto" playsinline>
+                <source src="/video/dreams-trailer.mp4?v=20261015" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -2184,6 +2184,7 @@
                     trailerModal.showModal();
                     if (modalVideo) {
                         modalVideo.currentTime = 0;
+                        modalVideo.load();
                         modalVideo.play().catch(() => {});
                     }
                 }
@@ -2229,6 +2230,7 @@
                     else modal.setAttribute('open', '');
                     if (video) {
                         video.currentTime = 0;
+                        video.load();
                         video.play().catch(() => {});
                     }
                 }
