@@ -3,7 +3,7 @@ import { app, db, auth } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { escapeHTML } from './utils.js';
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
-import { librarySongs, getSongById } from './song-data.js?v=20260920';
+import {librarySongs, getSongById, getSongIndexById} from './song-data.js?v=20260920';
 import { products, productMap } from './products-data.js';
 
 // ==========================================
@@ -1089,7 +1089,7 @@ export function initChatbot() {
 
             // Append interactive Song Play Card
             if (songIdToRender) {
-                const song = getSongById(songIdToRender) || librarySongs.find(s => s.id === songIdToRender) || librarySongs[0];
+                const song = getSongById(songIdToRender) || librarySongs[0];
                 const songCard = document.createElement('div');
                 songCard.className = 'chat-song-card';
                 songCard.innerHTML = `

@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 
-import { librarySongs, songColors, getSongById } from './song-data.js?v=1791167969660b';
+import {librarySongs, songColors, getSongById, getSongIndexById} from './song-data.js?v=1791167969660b';
 import { mixEngine } from "./audio-engine.js";
 
 
@@ -372,7 +372,7 @@ function initHarmonyTunes() {
         const activateResult = (row) => {
             if (!row) return;
             const songId = row.dataset.songId;
-            const idx = librarySongs.findIndex(s => s.id === songId);
+            const idx = getSongIndexById(songId);
             if (idx !== -1) {
                 currentQueue = [...librarySongs];
                 currentSongIndex = idx;
@@ -498,7 +498,7 @@ function initHarmonyTunes() {
         try {
             
             if (initialSongId) {
-                const sIndex = librarySongs.findIndex(s => s.id === initialSongId);
+                const sIndex = getSongIndexById(initialSongId);
                 if (sIndex !== -1) {
                     currentQueue = [...librarySongs];
                     currentSongIndex = sIndex;
@@ -947,7 +947,7 @@ function initHarmonyTunes() {
             if (viralPlayBtn) {
                 viralPlayBtn.addEventListener('click', () => {
                     if (!viralTargetSongId) return;
-                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
+                    const songIdx = getSongIndexById(viralTargetSongId);
                     if (songIdx !== -1) {
                         currentQueue = [...librarySongs];
                         currentSongIndex = songIdx;
@@ -1070,7 +1070,7 @@ function initHarmonyTunes() {
 
     window.playSongById = (id) => {
         __recordHistory();
-        const songIndex = librarySongs.findIndex(s => s.id === id);
+        const songIndex = getSongIndexById(id);
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
     
