@@ -110,7 +110,16 @@ if (document.getElementById('auth-form')) {
                     signupDate: serverTimestamp(),
                     isBanned: false,
                     isAdmin: false, 
-                    membershipLevel: 'free'
+                    membershipLevel: 'free',
+                    pointsBalance: 0,
+                    loyaltyPoints: 0,
+                    checkInStreak: 0,
+                    ordersCount: 0,
+                    totalSpent: 0,
+                    subscription: {
+                        status: 'inactive',
+                        plan: 'free'
+                    }
                 });
 
                 const referralCodeVal = document.getElementById('referralCode')?.value?.trim();

@@ -239,7 +239,16 @@
                             signupDate: serverTimestamp(),
                             isBanned: false,
                             isAdmin: false,
-                            membershipLevel: 'free'
+                            membershipLevel: 'free',
+                            pointsBalance: 0,
+                            loyaltyPoints: 0,
+                            checkInStreak: 0,
+                            ordersCount: 0,
+                            totalSpent: 0,
+                            subscription: {
+                                status: 'inactive',
+                                plan: 'free'
+                            }
                         });
                         
                         // Set session flag to trigger welcome message in dashboard

@@ -31,9 +31,177 @@
             padding: 100px 20px 40px;
         }
         
-        /* Mobile Hamburger Styles */
-        .mobile-header { display: none; width: 100%; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .hamburger-btn { background: none; border: none; color: var(--text-primary); font-size: 2rem; cursor: pointer; }
+        /* Mobile Admin Header & Navigation Styles */
+        .mobile-admin-bar {
+            display: none;
+            width: 100%;
+            position: relative;
+            z-index: 90;
+            margin-bottom: 24px;
+        }
+
+        .mobile-header {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-admin-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-admin-title {
+            margin: 0;
+            color: var(--accent-blue, #2563EB);
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .mobile-admin-badge {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--accent-blue, #2563EB);
+            border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+
+        .mobile-nav-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            background: var(--primary-card-color, #18181b);
+            color: var(--text-primary, #ffffff);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        }
+
+        .mobile-nav-toggle-btn:hover,
+        .mobile-nav-toggle-btn:focus-visible {
+            background: var(--secondary-card-color, #27272a);
+            border-color: var(--accent-blue, #2563EB);
+            outline: none;
+        }
+
+        .mobile-nav-toggle-icon {
+            font-size: 0.8rem;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
+
+        .mobile-nav-toggle-btn.is-open .mobile-nav-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .mobile-nav-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: var(--primary-card-color, #18181b);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            max-height: calc(100vh - 160px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            z-index: 100;
+        }
+
+        .mobile-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px 10px;
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            margin-bottom: 8px;
+        }
+
+        .mobile-dropdown-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary, #a1a1aa);
+        }
+
+        .mobile-user-email {
+            font-size: 0.8rem;
+            color: var(--text-secondary, #a1a1aa);
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mobile-dropdown-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mobile-dropdown-list a {
+            display: block;
+            padding: 11px 14px;
+            color: var(--text-secondary, #a1a1aa);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: background-color 0.15s, color 0.15s;
+        }
+
+        .mobile-dropdown-list a:hover,
+        .mobile-dropdown-list a:focus-visible {
+            background-color: var(--secondary-card-color, rgba(255, 255, 255, 0.08));
+            color: var(--text-primary, #ffffff);
+            outline: none;
+        }
+
+        .mobile-dropdown-list a.active {
+            background-color: var(--accent-blue, #2563EB);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .mobile-sign-out-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 11px 14px;
+            background-color: rgba(220, 38, 38, 0.12);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #f87171;
+            font-weight: 600;
+            font-size: 0.92rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .mobile-sign-out-btn:hover {
+            background-color: var(--accent-red, #DC2626);
+            color: #ffffff;
+            border-color: var(--accent-red, #DC2626);
+        }
         
         .admin-layout {
             display: flex;
@@ -84,36 +252,14 @@
         .btn-danger { background-color: rgba(220, 38, 38, 0.2); color: var(--accent-red); }
 
         @media (max-width: 768px) {
-            body { padding: 10px; flex-direction: column; }
-            .mobile-header { display: flex; }
-            .admin-layout { flex-direction: column; }
-            .sidebar { 
-                position: fixed; top: 0; left: -100%; height: 100vh; z-index: 1000;
-                background-color: var(--bg-color); width: 80%; max-width: 300px;
-                padding: 20px; border-right: 1px solid var(--border-color);
-                overflow-y: auto;
+            body {
+                padding: max(88px, calc(64px + env(safe-area-inset-top, 0px) + 20px)) 16px 40px;
+                flex-direction: column;
             }
-            .sidebar.open { transform: translateX(100%); }
-            
-            /* Mobile Dropdown Nav */
-            .mobile-nav-dropdown {
-                width: 100%;
-                padding: 10px;
-                background: var(--primary-card-color);
-                color: var(--text-primary);
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                font-size: 1rem;
-                margin-bottom: 20px;
-                display: none;
-            }
-            @media (max-width: 768px) {
-                .mobile-nav-dropdown { display: block; }
-                .mobile-header { flex-direction: column; align-items: flex-start; }
-                .hamburger-btn { display: none; }
-            }
+            .mobile-admin-bar { display: block; }
+            .admin-layout { flex-direction: column; gap: 0; }
+            .sidebar { display: none; }
         }
-    <style>
         /* ===== Admin Loading Screen ===== */
         #admin-loading-screen {
             position: fixed; inset: 0;
@@ -181,16 +327,44 @@
 
     <header class="main-header"></header>
  
-    <div class="mobile-header">
-        <h2 style="margin:0; color: var(--accent-blue);">Admin</h2>
-        <button class="hamburger-btn" aria-label="Open sidebar" title="Open sidebar" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <div class="mobile-admin-bar">
+        <div class="mobile-header">
+            <div class="mobile-admin-title-wrap">
+                <h2 class="mobile-admin-title">Admin</h2>
+                <span class="mobile-admin-badge">Dashboard</span>
+            </div>
+            <button id="mobile-nav-toggle" class="mobile-nav-toggle-btn" type="button" aria-expanded="false" aria-controls="mobile-nav-dropdown" aria-label="Toggle navigation menu">
+                <span class="mobile-nav-toggle-text">Menu</span>
+                <span class="mobile-nav-toggle-icon" aria-hidden="true">▾</span>
+            </button>
+        </div>
+
+        <div id="mobile-nav-dropdown" class="mobile-nav-dropdown" style="display: none;">
+            <div class="mobile-dropdown-header">
+                <span class="mobile-dropdown-title">Admin Navigation</span>
+                <span class="mobile-user-email" id="user-email-mobile"></span>
+            </div>
+            <ul class="mobile-dropdown-list">
+                <li><a href="index.html" class="mobile-nav-link">← Return to Home</a></li>
+                <li><a href="#performance" class="mobile-nav-link nav-link active">Performance</a></li>
+                <li><a href="#waitlist" class="mobile-nav-link nav-link">⚔️ DTS Whitelist</a></li>
+                <li><a href="#bookings" class="mobile-nav-link nav-link">Bookings</a></li>
+                <li><a href="#quotes" class="mobile-nav-link nav-link">Quotes</a></li>
+                <li><a href="#users" class="mobile-nav-link nav-link">User Management</a></li>
+                <li><a href="#support-tickets" class="mobile-nav-link nav-link">Support Tickets</a></li>
+                <li><a href="#promo-codes" class="mobile-nav-link nav-link">Promo Codes</a></li>
+                <li><a href="#featurerequests" class="mobile-nav-link nav-link">Feature Requests</a></li>
+                <li><a href="#downloads" class="mobile-nav-link nav-link">Downloads</a></li>
+                <li><a href="#newsletter" class="mobile-nav-link nav-link">Newsletter</a></li>
+                <li><a href="#account-settings" class="mobile-nav-link nav-link">Account Settings</a></li>
+                <li><a href="account.html" class="mobile-nav-link">Switch to User Profile</a></li>
+            </ul>
+            <button type="button" class="sign-out-btn admin-sign-out-btn mobile-sign-out-btn">Sign Out</button>
+        </div>
     </div>
 
     <div class="admin-layout">
         <aside class="sidebar" id="sidebar">
-            <div class="mobile-header" style="justify-content: flex-end;">
-                <button class="hamburger-btn" aria-label="Close sidebar" title="Close sidebar" onclick="document.getElementById('sidebar').classList.remove('open')">✕</button>
-            </div>
             <div class="sidebar-header">
                 <h2>Admin Panel</h2>
                 <p id="user-email-sidebar"></p>
@@ -212,22 +386,22 @@
                     <li><a href="account.html">Switch to User Profile</a></li>
                 </ul>
             </nav>
-            <button class="sign-out-btn" id="sign-out">Sign Out</button>
+            <button class="sign-out-btn admin-sign-out-btn" id="sign-out">Sign Out</button>
         </aside>
 
         <main class="main-content">
             <section id="performance" class="content-section active">
                 <h3>Performance Overview</h3>
                 <div class="metrics-grid">
-                    <div class="metric-card"><div class="value" id="total-revenue">$-</div><div class="label">Total Revenue</div></div>
-                    <div class="metric-card"><div class="value" id="total-purchases">-</div><div class="label">Total Purchases</div></div>
-                    <div class="metric-card"><div class="value" id="total-users">-</div><div class="label">Total Users</div></div>
-                    <div class="metric-card"><div class="value" id="new-signups">-</div><div class="label">New Sign-ups (24h)</div></div>
-                    <div class="metric-card"><div class="value" id="checkouts">-</div><div class="label">Completed Checkouts</div></div>
-                    <div class="metric-card"><div class="value" id="active-carts">-</div><div class="label">Users with Active Carts</div></div>
-                    <div class="metric-card"><div class="value" id="avg-orders">-</div><div class="label">Orders per User</div></div>
-                    <div class="metric-card"><div class="value" id="upcoming-bookings">-</div><div class="label">Upcoming Appts</div></div>
-                    <div class="metric-card"><div class="value" id="pending-quotes">-</div><div class="label">Pending Quotes</div></div>
+                    <div class="metric-card"><div class="value" id="total-revenue">$0.00</div><div class="label">Total Revenue</div></div>
+                    <div class="metric-card"><div class="value" id="total-purchases">0</div><div class="label">Total Purchases</div></div>
+                    <div class="metric-card"><div class="value" id="total-users">0</div><div class="label">Total Users</div></div>
+                    <div class="metric-card"><div class="value" id="new-signups">0</div><div class="label">New Sign-ups (24h)</div></div>
+                    <div class="metric-card"><div class="value" id="checkouts">0</div><div class="label">Completed Checkouts</div></div>
+                    <div class="metric-card"><div class="value" id="active-carts">0</div><div class="label">Users with Active Carts</div></div>
+                    <div class="metric-card"><div class="value" id="avg-orders">0</div><div class="label">Orders per User</div></div>
+                    <div class="metric-card"><div class="value" id="upcoming-bookings">0</div><div class="label">Upcoming Appts</div></div>
+                    <div class="metric-card"><div class="value" id="pending-quotes">0</div><div class="label">Pending Quotes</div></div>
                 </div>
 
                 <div class="graph-container">
@@ -343,19 +517,19 @@
                 <!-- Metrics Grid -->
                 <div class="metrics-grid">
                     <div class="metric-card">
-                        <div class="value" id="wl-metric-total">-</div>
+                        <div class="value" id="wl-metric-total">0</div>
                         <div class="label">Total Whitelist Sign-ups</div>
                     </div>
                     <div class="metric-card">
-                        <div class="value" id="wl-metric-founders" style="color: var(--accent-yellow);">-</div>
+                        <div class="value" id="wl-metric-founders" style="color: var(--accent-yellow);">0</div>
                         <div class="label">Founder Rank Holders</div>
                     </div>
                     <div class="metric-card">
-                        <div class="value" id="wl-metric-mc">-</div>
+                        <div class="value" id="wl-metric-mc">0</div>
                         <div class="label">Minecraft IGNs Linked</div>
                     </div>
                     <div class="metric-card">
-                        <div class="value" id="wl-metric-discord">-</div>
+                        <div class="value" id="wl-metric-discord">0</div>
                         <div class="label">Discord Handles Linked</div>
                     </div>
                 </div>
@@ -415,7 +589,7 @@
                 <h3>Download Statistics</h3>
                 <div class="metrics-grid">
                      <div class="metric-card">
-                        <div class="value" id="download-count-infosheet">-</div>
+                        <div class="value" id="download-count-infosheet">0</div>
                         <div class="label">Realm Info Sheet</div>
                     </div>
                 </div>
@@ -469,19 +643,19 @@
             <!-- Promo Stats Overview -->
             <div class="metrics-grid" style="margin-bottom: 25px;">
                 <div class="metric-card">
-                    <div class="value" id="promo-total-count">-</div>
+                    <div class="value" id="promo-total-count">0</div>
                     <div class="label">Total Promo Codes</div>
                 </div>
                 <div class="metric-card">
-                    <div class="value" id="promo-active-count" style="color: var(--accent-green);">-</div>
+                    <div class="value" id="promo-active-count" style="color: var(--accent-green);">0</div>
                     <div class="label">Active Codes</div>
                 </div>
                 <div class="metric-card">
-                    <div class="value" id="promo-stripe-count" style="color: var(--accent-blue);">-</div>
+                    <div class="value" id="promo-stripe-count" style="color: var(--accent-blue);">0</div>
                     <div class="label">Stripe Implemented</div>
                 </div>
                 <div class="metric-card">
-                    <div class="value" id="promo-avg-discount">-</div>
+                    <div class="value" id="promo-avg-discount">0%</div>
                     <div class="label">Avg. Discount %</div>
                 </div>
             </div>
@@ -526,6 +700,28 @@
         import { fetchCollectionData, escapeHTML } from './js/utils.js';
 
         let performanceChart;
+        let currentUsers = [];
+        let currentOrders = [];
+
+        function parseTimestampMillis(ts) {
+            if (!ts) return null;
+            if (typeof ts.toMillis === 'function') return ts.toMillis();
+            if (typeof ts.toDate === 'function') return ts.toDate().getTime();
+            if (typeof ts === 'number') return ts;
+            if (ts.seconds !== undefined) return ts.seconds * 1000 + (ts.nanoseconds ? ts.nanoseconds / 1e6 : 0);
+            const d = new Date(ts);
+            return isNaN(d.getTime()) ? null : d.getTime();
+        }
+
+        function formatMetricDate(ts) {
+            const ms = parseTimestampMillis(ts);
+            if (ms === null) return 'N/A';
+            try {
+                return new Date(ms).toLocaleDateString();
+            } catch {
+                return 'N/A';
+            }
+        }
 
         // Default Stripe-implemented promo codes across DTS and Unstoppable Shop
         const DEFAULT_STRIPE_PROMO_CODES = [
@@ -929,7 +1125,11 @@
 
 
         function initializeAdminPage(adminUser) {
-            document.getElementById('user-email-sidebar').textContent = adminUser.email;
+            const email = adminUser?.email || 'N/A';
+            const sidebarEmail = document.getElementById('user-email-sidebar');
+            if (sidebarEmail) sidebarEmail.textContent = email;
+            const mobileEmail = document.getElementById('user-email-mobile');
+            if (mobileEmail) mobileEmail.textContent = email;
             loadAdminData();
             setupEventListeners();
         }
@@ -946,11 +1146,13 @@
                     typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Manager info: [Error fetching support tickets]', e); return []; }) : Promise.resolve([]),
                     getDocs(collection(db, "feature_requests")).catch(e => {
                         console.log("Could not load feature requests. Missing Firestore rules?", e);
-                        document.getElementById('feature-request-list-body').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
+                        const body = document.getElementById('feature-request-list-body');
+                        if (body) body.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red);">Failed to load Feature Requests. Please check your Firebase Database Rules.</td></tr>`;
                         return null;
                     }),
                     getDoc(doc(db, "site_stats", "downloads")).catch(e => {
-                        document.getElementById('download-count-infosheet').textContent = "N/A";
+                        const dlEl = document.getElementById('download-count-infosheet');
+                        if (dlEl) dlEl.textContent = 0;
                         return null;
                     }),
                     getDocs(collection(db, "dts_waitlist")).catch(e => {
@@ -970,23 +1172,31 @@
                 let orders = ordersSnapshot ? ordersSnapshot.docs.map(d => d.data()) : [];
                 let subscribers = newsletterSnapshot ? newsletterSnapshot.docs.map(d => d.data()) : [];
                 let bookings = bookingsSnap ? bookingsSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
-                bookings.sort((a, b) => new Date(b.appointmentDate) - new Date(a.appointmentDate));
+                bookings.sort((a, b) => new Date(b.appointmentDate || 0) - new Date(a.appointmentDate || 0));
                 let quotes = quotesSnap ? quotesSnap.docs.map(d => ({ id: d.id, ...d.data() })) : [];
                 let waitlist = waitlistSnapshot ? waitlistSnapshot.docs.map(d => ({ id: d.id, ...d.data() })) : [];
 
-                // Core Calculations
-                const totalRevenue = orders.reduce((sum, o) => sum + (o.amount || 0), 0);
-                document.getElementById('total-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
-                document.getElementById('total-purchases').textContent = orders.length;
+                currentUsers = users;
+                currentOrders = orders;
 
-                renderSupportTicketsTable(tickets);
+                // Core Calculations with strict live fallback
+                const totalRevenue = orders.reduce((sum, o) => {
+                    const amt = Number(o.total !== undefined ? o.total : (o.amount !== undefined ? o.amount : 0));
+                    return sum + (isNaN(amt) ? 0 : amt);
+                }, 0);
+                const totalRevEl = document.getElementById('total-revenue');
+                if (totalRevEl) totalRevEl.textContent = `$${totalRevenue.toFixed(2)}`;
+                const totalPurchasesEl = document.getElementById('total-purchases');
+                if (totalPurchasesEl) totalPurchasesEl.textContent = orders.length || 0;
+
+                renderSupportTicketsTable(tickets || []);
 
                 // Renderers
                 renderUserTable(users);
                 renderWaitlistTable(waitlist, users);
                 renderNewsletterTable(subscribers); 
                 calculatePerformanceMetrics(users, carts, orders, bookings, quotes);
-                renderChart('summary', users);
+                renderChart('summary');
                 renderBookingsTable(bookings);
                 renderQuotesTable(quotes);
                 
@@ -994,15 +1204,31 @@
                 if (featureRequestsSnapshot) {
                     const requests = featureRequestsSnapshot.docs.map(d => ({ id: d.id, ...d.data() }));
                     renderFeatureRequestsTable(requests);
+                } else {
+                    renderFeatureRequestsTable([]);
                 }
                 
                 // Download Stats
+                let dlCount = 0;
                 if (statsDoc && statsDoc.exists()) {
-                    document.getElementById('download-count-infosheet').textContent = statsDoc.data().infoSheet || 0;
+                    const data = statsDoc.data() || {};
+                    dlCount = Number(data.infoSheet) || 0;
                 }
+                const dlEl = document.getElementById('download-count-infosheet');
+                if (dlEl) dlEl.textContent = dlCount;
 
             } catch (error) {
                 console.error("Error loading admin data - Manager info: [" + error.message + "]", error);
+                document.getElementById('total-revenue').textContent = '$0.00';
+                document.getElementById('total-purchases').textContent = 0;
+                document.getElementById('total-users').textContent = 0;
+                document.getElementById('new-signups').textContent = 0;
+                document.getElementById('checkouts').textContent = 0;
+                document.getElementById('active-carts').textContent = 0;
+                document.getElementById('avg-orders').textContent = 0;
+                document.getElementById('upcoming-bookings').textContent = 0;
+                document.getElementById('pending-quotes').textContent = 0;
+                document.getElementById('download-count-infosheet').textContent = 0;
             }
         }
 
@@ -1107,16 +1333,7 @@
                     ? `<span class="status-badge pro" style="border: 1px solid var(--accent-yellow); font-weight: bold;">⚔️ Founder</span>`
                     : `<span class="status-badge active">Member</span>`;
 
-                let dateStr = 'N/A';
-                if (item.createdAt) {
-                    if (typeof item.createdAt.toDate === 'function') {
-                        dateStr = item.createdAt.toDate().toLocaleDateString();
-                    } else if (item.createdAt.seconds) {
-                        dateStr = new Date(item.createdAt.seconds * 1000).toLocaleDateString();
-                    } else {
-                        dateStr = new Date(item.createdAt).toLocaleDateString();
-                    }
-                }
+                const dateStr = formatMetricDate(item.createdAt);
 
                 tr.innerHTML = `
                     <td>
@@ -1127,11 +1344,11 @@
                     </td>
                     <td>
                         <div>${escapeHTML(item.siteUsername || 'Player')}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHTML(item.email || '')}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${escapeHTML(item.email || 'N/A')}</div>
                     </td>
                     <td>${rankBadge}</td>
-                    <td>${item.discordUsername ? `<span style="color: #5865F2; font-weight: 500;">${escapeHTML(item.discordUsername)}</span>` : '<span style="color: var(--text-secondary);">-</span>'}</td>
-                    <td>${item.birthday ? escapeHTML(item.birthday) : '<span style="color: var(--text-secondary);">-</span>'}</td>
+                    <td>${item.discordUsername ? `<span style="color: #5865F2; font-weight: 500;">${escapeHTML(item.discordUsername)}</span>` : '<span style="color: var(--text-secondary);">N/A</span>'}</td>
+                    <td>${item.birthday ? escapeHTML(item.birthday) : '<span style="color: var(--text-secondary);">N/A</span>'}</td>
                     <td>${dateStr}</td>
                     <td>
                         <button class="btn-sm btn-action wl-copy-btn" data-ign="${escapeHTML(ign)}">Copy IGN</button>
@@ -1170,9 +1387,11 @@
 
         function renderBookingsTable(bookings) {
             const tbody = document.getElementById('bookings-list-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
-            if(bookings.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No bookings found.</td></tr>'; return;
+            if (!bookings || bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 24px;">No bookings found.</td></tr>';
+                return;
             }
             // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
             const fragment = document.createDocumentFragment();
@@ -1181,17 +1400,18 @@
                 const name = b.customerName || 'N/A';
                 const phone = b.customerPhone || 'N/A';
                 const email = b.customerEmail || 'N/A';
-                const formattedDate = new Date(b.appointmentDate).toLocaleString([], {weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'});
+                const vehicle = b.vehicle || 'N/A';
+                const formattedDate = b.appointmentDate ? formatMetricDate(b.appointmentDate) : 'N/A';
                 let badgeClass = 'active';
-                if(b.status === 'cancelled') badgeClass = 'cancelled';
-                if(b.status === 'completed') badgeClass = 'active'; 
+                if (b.status === 'cancelled') badgeClass = 'cancelled';
+                if (b.status === 'completed') badgeClass = 'active'; 
                 
                 row.innerHTML = `
                     <td><strong>${escapeHTML(name)}</strong></td>
                     <td>${escapeHTML(phone)}<br><span style="font-size:0.8rem; color:var(--text-secondary);">${escapeHTML(email)}</span></td>
-                    <td style="text-transform: capitalize;">${escapeHTML(b.vehicle)}</td>
+                    <td style="text-transform: capitalize;">${escapeHTML(vehicle)}</td>
                     <td>${formattedDate}</td>
-                    <td><span class="status-badge ${badgeClass}">${(escapeHTML(b.status) || 'unknown').replace('_', ' ')}</span></td>
+                    <td><span class="status-badge ${badgeClass}">${(escapeHTML(b.status) || 'N/A').replace('_', ' ')}</span></td>
                     <td>
                         ${b.status !== 'cancelled' ? `<button class="btn-sm btn-danger action-btn" data-type="booking" data-action="cancel" data-id="${escapeHTML(b.id)}">Cancel</button>` : ''}
                         ${b.status !== 'completed' && b.status !== 'cancelled' ? `<button class="btn-sm btn-action action-btn" data-type="booking" data-action="complete" data-id="${escapeHTML(b.id)}">Mark Done</button>` : ''}
@@ -1204,21 +1424,26 @@
 
         function renderQuotesTable(quotes) {
             const tbody = document.getElementById('quotes-list-body');
+            if (!tbody) return;
             tbody.innerHTML = '';
-            if(quotes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No quotes pending.</td></tr>'; return;
+            if (!quotes || quotes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--text-secondary); padding: 24px;">No quotes pending.</td></tr>';
+                return;
             }
             // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
             const fragment = document.createDocumentFragment();
             quotes.forEach(q => {
                 const row = document.createElement('tr');
-                const badgeClass = q.status === 'responded' ? 'active' : 'pending';
+                const email = q.email || 'N/A';
+                const details = q.details || 'N/A';
+                const status = q.status || 'pending';
+                const badgeClass = status === 'responded' ? 'active' : 'pending';
                 row.innerHTML = `
-                    <td>${escapeHTML(q.email)}</td>
-                    <td>${escapeHTML(q.details)}</td>
-                    <td><span class="status-badge ${badgeClass}">${escapeHTML(q.status) || 'pending'}</span></td>
+                    <td>${escapeHTML(email)}</td>
+                    <td>${escapeHTML(details)}</td>
+                    <td><span class="status-badge ${badgeClass}">${escapeHTML(status)}</span></td>
                     <td>
-                        ${q.status !== 'responded' ? `<button class="btn-sm btn-action action-btn" data-type="quote" data-action="responded" data-id="${escapeHTML(q.id)}">Responded</button>` : ''}
+                        ${status !== 'responded' ? `<button class="btn-sm btn-action action-btn" data-type="quote" data-action="responded" data-id="${escapeHTML(q.id)}">Responded</button>` : ''}
                         <button class="btn-sm btn-danger action-btn" data-type="quote" data-action="delete" data-id="${escapeHTML(q.id)}">Delete</button>
                     </td>
                 `;
@@ -1229,19 +1454,25 @@
 
         function renderUserTable(users) {
             const userListBody = document.getElementById('user-list-body');
+            if (!userListBody) return;
             userListBody.innerHTML = '';
+            const nonAdmins = (users || []).filter(user => !user.isAdmin);
+            if (nonAdmins.length === 0) {
+                userListBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 24px;">No users found.</td></tr>';
+                return;
+            }
             // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
             const fragment = document.createDocumentFragment();
-            users.filter(user => !user.isAdmin).forEach(user => {
+            nonAdmins.forEach(user => {
                 const row = document.createElement('tr');
                 const statusBadge = user.isBanned ? `<span class="status-badge banned">Banned</span>` : `<span class="status-badge active">Active</span>`;
                 const actionButton = user.isBanned ? `<button class="btn-sm btn-unban" data-id="${escapeHTML(user.id)}">Unban</button>` : `<button class="btn-sm btn-ban" data-id="${escapeHTML(user.id)}">Ban</button>`;
-                const signupDate = user.signupDate?.toDate().toLocaleDateString() || 'N/A';
+                const signupDate = formatMetricDate(user.signupDate);
                 const subStatus = user.subscription?.status === 'active' ? `<span class="subscription-text">Active Pro</span>` : `<span style="color: var(--text-secondary);">Free</span>`;
                 
                 row.innerHTML = `
                     <td>${escapeHTML(user.username || user.name || "N/A")}</td>
-                    <td>${escapeHTML(user.email)}</td>
+                    <td>${escapeHTML(user.email || "N/A")}</td>
                     <td>${signupDate}</td>
                     <td>${subStatus}</td>
                     <td>${statusBadge}</td>
@@ -1253,16 +1484,18 @@
 
         function renderFeatureRequestsTable(requests) {
             const listBody = document.getElementById('feature-request-list-body');
+            if (!listBody) return;
             listBody.innerHTML = '';
-            if(requests.length === 0) {
-                listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">No requests submitted yet.</td></tr>`; return;
+            if (!requests || requests.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary); padding: 24px;">No requests submitted yet.</td></tr>`;
+                return;
             }
             // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
             const fragment = document.createDocumentFragment();
-            requests.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-            requests.forEach(req => {
+            const sortedRequests = [...requests].sort((a,b) => (parseTimestampMillis(b.timestamp) || 0) - (parseTimestampMillis(a.timestamp) || 0));
+            sortedRequests.forEach(req => {
                 const row = document.createElement('tr');
-                const reqDate = req.timestamp ? new Date(req.timestamp).toLocaleDateString() : new Date().toLocaleDateString();
+                const reqDate = formatMetricDate(req.timestamp);
                 const tierBadge = req.isPro ? `<span class="status-badge pro">Priority (Pro)</span>` : `<span class="status-badge">Free Tier</span>`;
                 const isComplete = req.status === 'completed';
                 const statusStr = isComplete ? `<span style="color:var(--accent-green);">Completed</span>` : `<span style="color:var(--accent-yellow);">Pending</span>`;
@@ -1272,8 +1505,8 @@
                 
                 row.innerHTML = `
                     <td>${reqDate}</td>
-                    <td>${escapeHTML(req.email) || "Unknown User"}</td>
-                    <td style="max-width:300px; word-wrap:break-word;">${escapeHTML(req.message)}</td>
+                    <td>${escapeHTML(req.email || "N/A")}</td>
+                    <td style="max-width:300px; word-wrap:break-word;">${escapeHTML(req.message || "N/A")}</td>
                     <td>${tierBadge}</td>
                     <td>${statusStr}</td>
                     <td>${actionButton}</td>`;
@@ -1284,9 +1517,10 @@
 
         function renderSupportTicketsTable(tickets) {
             const listBody = document.getElementById('support-tickets-list-body');
+            if (!listBody) return;
             listBody.innerHTML = '';
-            if (tickets.length === 0) {
-                listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary);">No support tickets submitted yet.</td></tr>`;
+            if (!tickets || tickets.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); padding: 24px;">No support tickets submitted yet.</td></tr>`;
                 return;
             }
 
@@ -1294,20 +1528,21 @@
 
             tickets.forEach(ticket => {
                 const row = document.createElement('tr');
-                const reqDate = ticket.createdAt ? ticket.createdAt.toDate().toLocaleDateString() : new Date().toLocaleDateString();
-                const statusColor = ticket.status === 'open' ? 'var(--accent-yellow)' :
-                                  ticket.status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
-                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${escapeHTML(ticket.status)}</span>`;
+                const reqDate = formatMetricDate(ticket.createdAt);
+                const status = ticket.status || 'open';
+                const statusColor = status === 'open' ? 'var(--accent-yellow)' :
+                                  status === 'answered' ? 'var(--accent-green)' : 'var(--text-secondary)';
+                const statusBadge = `<span style="color: ${statusColor}; text-transform: uppercase;">${escapeHTML(status)}</span>`;
 
-                const replyAction = ticket.status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
-                const closeAction = ticket.status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
+                const replyAction = status !== 'closed' ? `<button class="btn-sm btn-unban admin-reply-btn" data-id="${escapeHTML(ticket.id)}" style="margin-right: 5px;">Reply</button>` : '';
+                const closeAction = status !== 'closed' ? `<button class="btn-sm admin-close-btn" style="background-color: var(--accent-red); color: white;" data-id="${escapeHTML(ticket.id)}">Close</button>` : `<button class="btn-sm" disabled style="opacity: 0.5;">Closed</button>`;
 
                 row.innerHTML = `
                     <td>${reqDate}</td>
-                    <td>${escapeHTML(ticket.userEmail) || "Unknown User"}</td>
+                    <td>${escapeHTML(ticket.userEmail || "N/A")}</td>
                     <td style="max-width:300px; word-wrap:break-word;">
-                        <strong>${escapeHTML(ticket.subject)}</strong><br>
-                        <span style="font-size: 0.85em; color: var(--text-secondary);">${escapeHTML(ticket.message)}</span>
+                        <strong>${escapeHTML(ticket.subject || "N/A")}</strong><br>
+                        <span style="font-size: 0.85em; color: var(--text-secondary);">${escapeHTML(ticket.message || "N/A")}</span>
                     </td>
                     <td>${statusBadge}</td>
                     <td>${replyAction}${closeAction}</td>`;
@@ -1346,70 +1581,184 @@
 
         function renderNewsletterTable(subscribers) {
             const newsletterListBody = document.getElementById('newsletter-list-body');
+            if (!newsletterListBody) return;
             newsletterListBody.innerHTML = '';
-            if(subscribers.length === 0) {
-                newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary);">No subscribers yet.</td></tr>`; return;
+            if (!subscribers || subscribers.length === 0) {
+                newsletterListBody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:var(--text-secondary); padding: 24px;">No subscribers yet.</td></tr>`;
+                return;
             }
             // ⚡ Bolt: Use DocumentFragment to batch DOM insertions and avoid reflows during loop
             const fragment = document.createDocumentFragment();
             subscribers.forEach(subscriber => {
                 const row = document.createElement('tr');
-                const subscriptionDate = subscriber.subscribedAt?.toDate().toLocaleDateString() || 'N/A';
-                row.innerHTML = `<td>${escapeHTML(subscriber.email)}</td><td>${subscriptionDate}</td>`;
+                const subscriptionDate = formatMetricDate(subscriber.subscribedAt);
+                row.innerHTML = `<td>${escapeHTML(subscriber.email || 'N/A')}</td><td>${subscriptionDate}</td>`;
                 fragment.appendChild(row);
             });
             newsletterListBody.appendChild(fragment);
         }
 
-        function calculatePerformanceMetrics(users, carts, orders = [], bookings = [], quotes = []) {
-            const twentyFourHoursAgo = Timestamp.fromMillis(Date.now() - (24 * 60 * 60 * 1000));
-            const newSignups = users.filter(u => u.signupDate && u.signupDate > twentyFourHoursAgo).length;
-            const activeCarts = carts.filter(c => c.items && Object.keys(c.items).length > 0).length;
+        function calculatePerformanceMetrics(users = [], carts = [], orders = [], bookings = [], quotes = []) {
+            const nowMs = Date.now();
+            const twentyFourHoursAgoMs = nowMs - (24 * 60 * 60 * 1000);
+            const newSignups = (users || []).filter(u => {
+                const ms = parseTimestampMillis(u.signupDate || u.createdAt);
+                return ms !== null && ms >= twentyFourHoursAgoMs;
+            }).length;
 
-            const totalOrders = orders.length;
-            const totalUsers = users.length;
+            const activeCarts = (carts || []).filter(c => c.items && typeof c.items === 'object' && Object.keys(c.items).length > 0).length;
+
+            const totalOrders = (orders || []).length;
+            const totalUsers = (users || []).length;
             const avgOrders = totalUsers > 0 ? (totalOrders / totalUsers).toFixed(2) : 0;
 
-            const now = new Date();
-            const upcoming = bookings.filter(b => b.status !== 'cancelled' && new Date(b.appointmentDate) >= now);
-            const pendingQuotes = quotes.filter(q => q.status === 'pending');
+            const upcoming = (bookings || []).filter(b => {
+                if (b.status === 'cancelled') return false;
+                const bDateMs = parseTimestampMillis(b.appointmentDate);
+                return bDateMs !== null ? bDateMs >= nowMs : false;
+            }).length;
 
-            document.getElementById('total-users').textContent = totalUsers;
-            document.getElementById('new-signups').textContent = newSignups;
-            document.getElementById('checkouts').textContent = totalOrders;
-            document.getElementById('active-carts').textContent = activeCarts;
-            document.getElementById('avg-orders').textContent = avgOrders;
-            document.getElementById('upcoming-bookings').textContent = upcoming.length;
-            document.getElementById('pending-quotes').textContent = pendingQuotes.length;
+            const pendingQuotes = (quotes || []).filter(q => (q.status || 'pending') === 'pending').length;
+
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = (val !== undefined && val !== null && !isNaN(val)) ? val : 0;
+            };
+
+            setVal('total-users', totalUsers);
+            setVal('new-signups', newSignups);
+            setVal('checkouts', totalOrders);
+            setVal('active-carts', activeCarts);
+            setVal('avg-orders', avgOrders);
+            setVal('upcoming-bookings', upcoming);
+            setVal('pending-quotes', pendingQuotes);
         }
 
-        function renderChart(view, usersData) {
-            const ctx = document.getElementById('performance-chart').getContext('2d');
+        function getLast7DaysData(items, dateField) {
+            const labels = [];
+            const counts = [0, 0, 0, 0, 0, 0, 0];
+            const dayKeys = [];
+            const now = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                const dayKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                dayKeys.push(dayKey);
+                labels.push(d.toLocaleDateString(undefined, { weekday: 'short' }));
+            }
+
+            (items || []).forEach(item => {
+                const val = item[dateField] || item.createdAt || item.timestamp || item.signupDate;
+                const ms = parseTimestampMillis(val);
+                if (ms !== null) {
+                    const itemDate = new Date(ms);
+                    const itemKey = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}-${String(itemDate.getDate()).padStart(2, '0')}`;
+                    const idx = dayKeys.indexOf(itemKey);
+                    if (idx !== -1) {
+                        counts[idx]++;
+                    }
+                }
+            });
+            return { labels, counts };
+        }
+
+        function renderChart(view) {
+            const chartCanvas = document.getElementById('performance-chart');
+            if (!chartCanvas) return;
+            const ctx = chartCanvas.getContext('2d');
             const graphTitleEl = document.getElementById('graph-title');
-            
-            graphTitleEl.textContent = document.querySelector(`#graph-selector option[value=${view}]`).textContent;
+            const selectorOpt = document.querySelector(`#graph-selector option[value="${view}"]`);
+            if (graphTitleEl && selectorOpt) {
+                graphTitleEl.textContent = selectorOpt.textContent;
+            }
             if (performanceChart) performanceChart.destroy();
 
             let chartConfig;
             switch(view) {
-                case 'signups':
-                    chartConfig = { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'New Sign-ups', data: [5, 9, 3, 5, 2, 3, 7], borderColor: '#2563EB', fill: true, backgroundColor: 'rgba(37, 99, 235, 0.2)' }] }, options: getChartOptions(false) };
+                case 'signups': {
+                    const { labels, counts } = getLast7DaysData(currentUsers, 'signupDate');
+                    chartConfig = {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'New Sign-ups',
+                                data: counts,
+                                borderColor: '#2563EB',
+                                fill: true,
+                                backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                                tension: 0.3
+                            }]
+                        },
+                        options: getChartOptions(false)
+                    };
                     break;
-                case 'purchases':
-                    chartConfig = { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Purchases', data: [12, 19, 8, 15, 10, 13, 17], borderColor: '#16A34A', fill: true, backgroundColor: 'rgba(22, 163, 74, 0.2)' }] }, options: getChartOptions(false) };
+                }
+                case 'purchases': {
+                    const { labels, counts } = getLast7DaysData(currentOrders, 'createdAt');
+                    chartConfig = {
+                        type: 'line',
+                        data: {
+                            labels,
+                            datasets: [{
+                                label: 'Purchases',
+                                data: counts,
+                                borderColor: '#16A34A',
+                                fill: true,
+                                backgroundColor: 'rgba(22, 163, 74, 0.2)',
+                                tension: 0.3
+                            }]
+                        },
+                        options: getChartOptions(false)
+                    };
                     break;
-                default: 
-                    chartConfig = { type: 'doughnut', data: { labels: ['Total Sign-ups', 'Total Purchases'], datasets: [{ data: [296, 173], backgroundColor: ['rgba(37, 99, 235, 0.8)', 'rgba(22, 163, 74, 0.8)'], borderColor: ['#2563EB', '#16A34A'], borderWidth: 2 }] }, options: getChartOptions(true) };
+                }
+                default: {
+                    const totalSignups = currentUsers.length || 0;
+                    const totalPurchases = currentOrders.length || 0;
+                    chartConfig = {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Total Sign-ups', 'Total Purchases'],
+                            datasets: [{
+                                data: [totalSignups, totalPurchases],
+                                backgroundColor: ['rgba(37, 99, 235, 0.8)', 'rgba(22, 163, 74, 0.8)'],
+                                borderColor: ['#2563EB', '#16A34A'],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: getChartOptions(true)
+                    };
                     break;
+                }
             }
             performanceChart = new Chart(ctx, chartConfig);
         }
 
         function getChartOptions(isPieChart = false) {
             return {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { position: isPieChart ? 'top' : 'bottom', labels: { color: 'white' } } },
-                scales: !isPieChart ? { y: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: 'white' } }, x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: 'white' } } } : {}
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: isPieChart ? 'top' : 'bottom',
+                        labels: { color: 'white' }
+                    }
+                },
+                scales: !isPieChart ? {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white',
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: 'white' }
+                    }
+                } : {}
             };
         }
     
@@ -1446,6 +1795,71 @@
                     return { success: true };
                 }
                 throw err;
+            }
+        }
+
+        function toggleMobileNav() {
+            const dropdown = document.getElementById('mobile-nav-dropdown');
+            const toggleBtn = document.getElementById('mobile-nav-toggle');
+            if (!dropdown || !toggleBtn) return;
+            const isOpen = dropdown.style.display !== 'none';
+            if (isOpen) {
+                closeMobileNav();
+            } else {
+                openMobileNav();
+            }
+        }
+
+        function openMobileNav() {
+            const dropdown = document.getElementById('mobile-nav-dropdown');
+            const toggleBtn = document.getElementById('mobile-nav-toggle');
+            if (!dropdown || !toggleBtn) return;
+            dropdown.style.display = 'block';
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            toggleBtn.classList.add('is-open');
+        }
+
+        function closeMobileNav() {
+            const dropdown = document.getElementById('mobile-nav-dropdown');
+            const toggleBtn = document.getElementById('mobile-nav-toggle');
+            if (!dropdown || !toggleBtn) return;
+            dropdown.style.display = 'none';
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.classList.remove('is-open');
+        }
+
+        function switchSection(targetHref) {
+            if (!targetHref || !targetHref.startsWith('#')) return;
+
+            // Sync active state in desktop sidebar
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === targetHref);
+            });
+
+            // Sync active state in mobile dropdown
+            document.querySelectorAll('.mobile-dropdown-list a').forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === targetHref);
+            });
+
+            // Switch active content section
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetSection = document.querySelector(targetHref);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            if (targetHref === '#promo-codes') {
+                loadPromoCodes();
+            }
+
+            // Always close mobile dropdown on selection
+            closeMobileNav();
+
+            // Smoothly scroll to top on mobile viewports
+            if (window.innerWidth <= 768) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
@@ -1600,46 +2014,65 @@
                 }
             });
 
-            // Navigation
-            document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(link => {
-                link.addEventListener('click', e => {
-                    e.preventDefault();
-                    document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
-                    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                    e.currentTarget.classList.add('active');
-                    const targetHref = e.currentTarget.getAttribute('href');
-                    const targetEl = document.querySelector(targetHref);
-                    if (targetEl) targetEl.classList.add('active');
-                    if (targetHref === '#promo-codes') {
-                        loadPromoCodes();
+            // Mobile Navigation Toggle
+            const mobileNavToggleBtn = document.getElementById('mobile-nav-toggle');
+            if (mobileNavToggleBtn) {
+                mobileNavToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMobileNav();
+                });
+            }
+
+            // Close mobile dropdown when tapping outside
+            document.addEventListener('click', (e) => {
+                const dropdown = document.getElementById('mobile-nav-dropdown');
+                if (dropdown && dropdown.style.display !== 'none') {
+                    const mobileBar = document.querySelector('.mobile-admin-bar');
+                    if (mobileBar && !mobileBar.contains(e.target)) {
+                        closeMobileNav();
                     }
-                    if (window.innerWidth <= 768) { document.getElementById('sidebar').classList.remove('open'); }
+                }
+            });
+
+            // Close mobile dropdown on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeMobileNav();
+                }
+            });
+
+            // Navigation - Desktop Sidebar Hash Links
+            document.querySelectorAll('.sidebar-nav a[href^="#"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchSection(link.getAttribute('href'));
                 });
             });
 
-            const mobileNavSelect = document.getElementById('mobile-nav-select');
-            if (mobileNavSelect) {
-                mobileNavSelect.addEventListener('change', (e) => {
-                    const val = e.target.value;
-                    if (val.startsWith('#')) {
-                        document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
-                        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                        
-                        const targetSection = document.querySelector(val);
-                        if(targetSection) targetSection.classList.add('active');
-                        if (val === '#promo-codes') {
-                            loadPromoCodes();
-                        }
-                        
-                        const correspondingLink = document.querySelector(`.sidebar-nav a[href="${val}"]`);
-                        if(correspondingLink) correspondingLink.classList.add('active');
-                    } else if (val === 'signout') {
-                        signOut(auth);
-                    } else {
-                        window.location.href = val;
-                    }
+            // Navigation - Mobile Dropdown Hash Links
+            document.querySelectorAll('.mobile-dropdown-list a[href^="#"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchSection(link.getAttribute('href'));
                 });
+            });
+
+            // Navigation - Mobile Dropdown External/Non-Hash Links (Home, Account)
+            document.querySelectorAll('.mobile-dropdown-list a:not([href^="#"])').forEach(link => {
+                link.addEventListener('click', () => {
+                    closeMobileNav();
+                });
+            });
+
+            // Handle Initial Hash on Load & hashchange
+            if (window.location.hash && document.querySelector(window.location.hash)) {
+                switchSection(window.location.hash);
             }
+            window.addEventListener('hashchange', () => {
+                if (window.location.hash && document.querySelector(window.location.hash)) {
+                    switchSection(window.location.hash);
+                }
+            });
             // Whitelist Controls & Actions
             document.getElementById('wl-search-input')?.addEventListener('input', () => filterAndDisplayWaitlist());
             document.getElementById('wl-rank-filter')?.addEventListener('change', () => filterAndDisplayWaitlist());
@@ -1684,8 +2117,13 @@
                 }
             });
 
-            document.getElementById('graph-selector').addEventListener('change', (e) => { renderChart(e.target.value); });
-            document.getElementById('sign-out').addEventListener('click', () => { signOut(auth); });
+            document.getElementById('graph-selector')?.addEventListener('change', (e) => { renderChart(e.target.value); });
+            document.querySelectorAll('.admin-sign-out-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    closeMobileNav();
+                    signOut(auth);
+                });
+            });
 
             // Account Settings
             document.getElementById('admin-change-password-btn')?.addEventListener('click', async (e) => {

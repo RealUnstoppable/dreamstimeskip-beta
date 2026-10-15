@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Load CSS if not already present
 if (!document.querySelector('link[href*="onboarding.css"]')) {
@@ -228,7 +228,20 @@ function createOnboardingUI() {
                 email: email,
                 dob: dob,
                 pfpUrl: selectedPfpBase64 || "",
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                signupDate: serverTimestamp(),
+                isBanned: false,
+                isAdmin: false,
+                membershipLevel: 'free',
+                pointsBalance: 0,
+                loyaltyPoints: 0,
+                checkInStreak: 0,
+                ordersCount: 0,
+                totalSpent: 0,
+                subscription: {
+                    status: 'inactive',
+                    plan: 'free'
+                }
             });
             
             // Wait a moment then dismiss the overlay
