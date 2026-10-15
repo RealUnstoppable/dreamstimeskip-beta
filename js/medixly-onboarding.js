@@ -2,12 +2,13 @@ import { auth, db } from './auth.js';
 import { onAuthStateChanged, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// Load CSS
-const link = document.createElement('link');
-link.rel = 'stylesheet';
-link.href = '/css/onboarding.css';
-document.head.appendChild(link);
-
+// Load CSS if not already present
+if (!document.querySelector('link[href*="onboarding.css"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/css/onboarding.css';
+    document.head.appendChild(link);
+}
 
 // Anti-Bypass System
 let antiBypassInterval;
@@ -32,52 +33,138 @@ function liftAntiBypass() {
     if (antiBypassInterval) clearInterval(antiBypassInterval);
 }
 
+// Ensure animated background waves are active
+function ensureWaveBackground() {
+    if (document.querySelector('.page-wave-bg')) return;
+    const waveContainer = document.createElement('div');
+    waveContainer.className = 'music-wave-bg page-wave-bg';
+    waveContainer.setAttribute('aria-hidden', 'true');
+    waveContainer.innerHTML = `
+        <div class="music-glow-orb orb-primary"></div>
+        <div class="music-glow-orb orb-secondary"></div>
+        <svg class="music-waves-svg" viewBox="0 0 1200 300" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#ff1744" stop-opacity="0.35"/>
+                    <stop offset="50%" stop-color="#9b51e0" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#00d2ff" stop-opacity="0.35"/>
+                </linearGradient>
+                <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.3"/>
+                    <stop offset="50%" stop-color="#ec4899" stop-opacity="0.22"/>
+                    <stop offset="100%" stop-color="#9b51e0" stop-opacity="0.3"/>
+                </linearGradient>
+                <linearGradient id="waveGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#9b51e0" stop-opacity="0.22"/>
+                    <stop offset="50%" stop-color="#00f2fe" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#ff2d87" stop-opacity="0.28"/>
+                </linearGradient>
+            </defs>
+            <path class="wave-layer wave-1" d="M0,150 C300,280, 450,20, 750,160 C1050,300, 1100,60, 1200,130 L1200,300 L0,300 Z" fill="url(#waveGrad1)"></path>
+            <path class="wave-layer wave-2" d="M0,120 C220,30, 460,250, 780,110 C980,10, 1100,210, 1200,170 L1200,300 L0,300 Z" fill="url(#waveGrad2)"></path>
+            <path class="wave-layer wave-3" d="M0,190 C280,90, 520,270, 840,140 C1040,70, 1140,210, 1200,180 L1200,300 L0,300 Z" fill="url(#waveGrad3)"></path>
+        </svg>
+    `;
+    document.body.prepend(waveContainer);
+}
+
 function createOnboardingUI() {
+    ensureWaveBackground();
+
     const overlay = document.createElement('div');
     overlay.className = 'medixly-onboarding-overlay';
     overlay.id = 'medixly-onboarding';
     
     overlay.innerHTML = `
         <div class="medixly-onboarding-card">
-            <h2>Welcome to Medixly</h2>
-            <p>Create an account to start listening to your favorite tracks.</p>
+            <div class="onboarding-header">
+                <span class="onboarding-badge">WELCOME TO</span>
+                <div class="onboarding-logo-wrapper">
+                    <img src="/images/medixly-logo.png" alt="Medixly" class="onboarding-brand-logo">
+                </div>
+                <h2 class="sr-only">Welcome to Medixly</h2>
+                <p class="onboarding-subtitle">Create an account to start listening to your favorite tracks.</p>
+            </div>
             
             <form id="medixly-onboarding-form">
                 <div class="onboarding-pfp-select">
-                    <div class="onboarding-pfp-preview" id="ob-pfp-preview">
-                        👤
+                    <div class="onboarding-pfp-preview" id="ob-pfp-preview" title="Profile picture preview">
+                        <svg class="onboarding-pfp-default-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
                     </div>
-                    <div style="text-align: left;">
-                        <label for="ob-pfp" style="font-size: 12px; color: #ccc; cursor: pointer; text-decoration: underline;">Upload Profile Picture (Optional)</label>
+                    <div class="onboarding-pfp-info">
+                        <label for="ob-pfp" class="onboarding-upload-label">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Upload Profile Picture</span>
+                        </label>
+                        <span class="onboarding-upload-hint">Optional • Max 1MB</span>
                         <input type="file" id="ob-pfp" accept="image/*" style="display: none;">
                     </div>
                 </div>
                 
                 <div class="onboarding-form-group">
-                    <label>Username</label>
-                    <input type="text" id="ob-username" required placeholder="cool_dj_99">
+                    <label for="ob-username">Username</label>
+                    <div class="onboarding-input-box">
+                        <svg class="onboarding-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" id="ob-username" required placeholder="cool_dj_99" autocomplete="username">
+                    </div>
                 </div>
                 
                 <div class="onboarding-form-group">
-                    <label>Email</label>
-                    <input type="email" id="ob-email" required placeholder="you@example.com">
+                    <label for="ob-email">Email</label>
+                    <div class="onboarding-input-box">
+                        <svg class="onboarding-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="ob-email" required placeholder="you@example.com" autocomplete="email">
+                    </div>
                 </div>
                 
                 <div class="onboarding-form-group">
-                    <label>Date of Birth</label>
-                    <input type="date" id="ob-dob" required>
+                    <label for="ob-dob">Date of Birth</label>
+                    <div class="onboarding-input-box">
+                        <svg class="onboarding-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <input type="date" id="ob-dob" required>
+                    </div>
                 </div>
                 
                 <div class="onboarding-form-group">
-                    <label>Password</label>
-                    <input type="password" id="ob-password" required placeholder="••••••••">
+                    <label for="ob-password">Password</label>
+                    <div class="onboarding-input-box">
+                        <svg class="onboarding-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="ob-password" required placeholder="••••••••" autocomplete="new-password">
+                    </div>
                 </div>
                 
-                <button type="submit" class="onboarding-btn" id="ob-submit">Create Account</button>
+                <button type="submit" class="onboarding-btn" id="ob-submit">
+                    <span>Create Account</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
                 <div class="onboarding-error" id="ob-error"></div>
             </form>
-            <div style="margin-top: 15px; font-size: 13px; color: #aaa;">
-                Already have an account? <a href="/sign in beta.html?redirect=medixly.html" style="color: #bb86fc;">Sign in</a>
+            <div class="onboarding-footer">
+                Already have an account? <a href="/sign in beta.html?redirect=medixly.html" class="onboarding-signin-link">Sign in</a>
             </div>
         </div>
     `;
@@ -103,7 +190,7 @@ function createOnboardingUI() {
             const reader = new FileReader();
             reader.onload = (ev) => {
                 selectedPfpBase64 = ev.target.result;
-                pfpPreview.innerHTML = `<img src="${selectedPfpBase64}">`;
+                pfpPreview.innerHTML = `<img src="${selectedPfpBase64}" alt="Profile Preview">`;
             };
             reader.readAsDataURL(file);
         }
@@ -123,7 +210,7 @@ function createOnboardingUI() {
         }
         
         submitBtn.disabled = true;
-        submitBtn.textContent = "Creating Account...";
+        submitBtn.innerHTML = `<span>Creating Account...</span>`;
         errorDiv.textContent = "";
         
         try {
@@ -145,8 +232,10 @@ function createOnboardingUI() {
             });
             
             // Wait a moment then dismiss the overlay
-            submitBtn.textContent = "Welcome to Medixly!";
+            submitBtn.innerHTML = `<span>Welcome to Medixly!</span>`;
             submitBtn.style.background = "#50fa7b";
+            submitBtn.style.color = "#000";
+            submitBtn.style.boxShadow = "0 6px 20px rgba(80, 250, 123, 0.45)";
             liftAntiBypass();
             
             setTimeout(() => {
@@ -158,7 +247,13 @@ function createOnboardingUI() {
             console.error("Manager info: ", err);
             errorDiv.textContent = err.message;
             submitBtn.disabled = false;
-            submitBtn.textContent = "Create Account";
+            submitBtn.innerHTML = `
+                <span>Create Account</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            `;
         }
     });
 }

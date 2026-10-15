@@ -11,6 +11,7 @@ body {
     padding-bottom: 120px;
     font-family: 'Inter', sans-serif;
     color: #ffffff;
+    min-height: 100vh;
 }
 
 .spotify-layout {
@@ -21,14 +22,119 @@ body {
     overflow: hidden;
     padding-top: 64px;
     min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    background: transparent;
 }
 
 
 .harmony-main {
     flex-grow: 1;
-    background: var(--bg-color, #0A0A0A);
+    background: transparent;
     padding: 16px;
     width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== Background Waves from Index ===== */
+.music-wave-bg.page-wave-bg {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+    background: 
+        radial-gradient(circle at 85% 20%, rgba(255, 45, 135, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 15% 85%, rgba(0, 210, 255, 0.14) 0%, transparent 60%),
+        var(--bg-color, #0A0A0A);
+}
+
+.music-wave-bg.page-wave-bg .music-glow-orb.orb-primary {
+    position: absolute;
+    top: 35%;
+    right: 20%;
+    width: 340px;
+    height: 340px;
+    background: radial-gradient(circle, rgba(255, 45, 135, 0.32) 0%, rgba(0, 210, 255, 0.18) 50%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+    filter: blur(55px);
+    pointer-events: none;
+    animation: pageOrbPulse 2.4s ease-in-out infinite;
+}
+
+.music-wave-bg.page-wave-bg .music-glow-orb.orb-secondary {
+    position: absolute;
+    bottom: 25%;
+    left: 10%;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(circle, rgba(0, 210, 255, 0.22) 0%, rgba(155, 81, 224, 0.2) 50%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-30%, 30%);
+    filter: blur(50px);
+    pointer-events: none;
+    animation: pageOrbPulse 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes pageOrbPulse {
+    0%, 100% { transform: scale(0.88); opacity: 0.55; }
+    50% { transform: scale(1.18); opacity: 0.9; }
+}
+
+.music-wave-bg.page-wave-bg .music-waves-svg {
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 200%;
+    height: 55vh;
+    min-height: 280px;
+    max-height: 540px;
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.wave-layer {
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+.wave-1 {
+    animation: waveDrift1 7s ease-in-out infinite alternate, wavePulse 2.2s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+.wave-2 {
+    animation: waveDrift2 9s ease-in-out infinite alternate, wavePulse 2.2s ease-in-out infinite 0.5s;
+    transform-origin: bottom center;
+}
+
+.wave-3 {
+    animation: waveDrift3 11s ease-in-out infinite alternate, wavePulse 2.2s ease-in-out infinite 1s;
+    transform-origin: bottom center;
+}
+
+@keyframes waveDrift1 {
+    0% { transform: translateX(0) scaleY(1); }
+    100% { transform: translateX(-25%) scaleY(1.25); }
+}
+
+@keyframes waveDrift2 {
+    0% { transform: translateX(-20%) scaleY(1.1); }
+    100% { transform: translateX(5%) scaleY(0.9); }
+}
+
+@keyframes waveDrift3 {
+    0% { transform: translateX(0) scaleY(0.95); }
+    100% { transform: translateX(-15%) scaleY(1.2); }
+}
+
+@keyframes wavePulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
 }
 
 /* ===== Spotlight Search Overlay ===== */
