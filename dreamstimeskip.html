@@ -1419,6 +1419,13 @@
                         <input type="email" id="wl-email" name="email" placeholder="you@example.com" required autocomplete="email">
                     </div>
 
+                    <!-- Phone Number -->
+                    <div class="wl-input-group">
+                        <label for="wl-phone">Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="wl-phone" name="phone" placeholder="(555) 123-4567" required autocomplete="tel">
+                        <span class="wl-help">For account security & whitelist SMS alerts.</span>
+                    </div>
+
                     <!-- Password -->
                     <div class="wl-input-group">
                         <label for="wl-password">Password <span class="required">*</span></label>
@@ -2032,6 +2039,7 @@
                     const mcUsername = regMcIgn.value.trim();
                     const siteUsername = document.getElementById('wl-site-username').value.trim();
                     const email = document.getElementById('wl-email').value.trim();
+                    const phone = document.getElementById('wl-phone')?.value?.trim() || '';
                     const password = document.getElementById('wl-password').value;
                     const discordUsername = document.getElementById('wl-discord').value.trim();
                     const birthday = document.getElementById('wl-birthday').value;
@@ -2042,6 +2050,10 @@
                     }
                     if (!siteUsername) {
                         showError('Please enter a website username.');
+                        return;
+                    }
+                    if (!phone) {
+                        showError('Please enter your phone number.');
                         return;
                     }
 
@@ -2059,6 +2071,7 @@
                         await setDoc(doc(db, "users", user.uid), {
                             username: siteUsername,
                             email: email,
+                            phone: phone,
                             signupDate: serverTimestamp(),
                             isBanned: false,
                             isAdmin: false,
@@ -2085,6 +2098,7 @@
                         await setDoc(doc(db, "dts_waitlist", user.uid), {
                             uid: user.uid,
                             email: email,
+                            phone: phone,
                             siteUsername: siteUsername,
                             minecraftUsername: mcUsername,
                             discordUsername: discordUsername || '',

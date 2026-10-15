@@ -664,6 +664,7 @@ p.section-subtitle {
 
 .signup-form {
     display: flex;
+    flex-direction: column;
     gap: 10px;
 }
 

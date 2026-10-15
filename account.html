@@ -278,6 +278,10 @@
                             <input type="text" id="update-username" required>
                         </div>
                         <div class="form-group">
+                            <label for="update-phone">Phone Number</label>
+                            <input type="tel" id="update-phone" placeholder="(555) 123-4567" autocomplete="tel">
+                        </div>
+                        <div class="form-group">
                             <label for="update-email">Email (Cannot be changed)</label>
                             <input type="email" id="update-email" disabled title="Your email address cannot be changed">
                         </div>
@@ -475,6 +479,11 @@
                     <label for="deactivate-email-input">Account Email Address</label>
                     <input type="email" id="deactivate-email-input" placeholder="Enter your full account email" autocomplete="off" class="deactivate-input">
                     <div id="deactivate-email-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="deactivate-phone-input">Account Phone Number</label>
+                    <input type="tel" id="deactivate-phone-input" placeholder="Enter your registered phone number" autocomplete="tel" class="deactivate-input">
+                    <div id="deactivate-phone-error" class="deactivate-error-msg" style="display: none;"></div>
                 </div>
                 <div class="deactivate-modal-actions tricky-actions" id="deactivate-actions-1">
                     <button type="button" class="btn tricky-goback-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep Account Safe</button>
@@ -775,6 +784,11 @@
                     <label for="cancel-email-input">Account Email Address</label>
                     <input type="email" id="cancel-email-input" placeholder="Enter your full account email" autocomplete="off" class="deactivate-input">
                     <div id="cancel-email-error" class="deactivate-error-msg" style="display: none;"></div>
+                </div>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="cancel-phone-input">Account Phone Number</label>
+                    <input type="tel" id="cancel-phone-input" placeholder="Enter your registered phone number" autocomplete="tel" class="deactivate-input">
+                    <div id="cancel-phone-error" class="deactivate-error-msg" style="display: none;"></div>
                 </div>
                 <div class="cancel-modal-actions tricky-actions" id="cancel-actions-2">
                     <button type="button" class="btn cancel-keep-btn btn-ios-big-blue" data-action="reset">← Go Back & Keep My Plan</button>

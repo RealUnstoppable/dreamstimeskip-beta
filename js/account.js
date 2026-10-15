@@ -130,6 +130,11 @@ export function renderProfile(user, userData) {
         usernameInput.value = userData.username || user.displayName || '';
     }
 
+    const phoneInput = document.getElementById('update-phone');
+    if (phoneInput) {
+        phoneInput.value = userData.phone || '';
+    }
+
     const emailInput = document.getElementById('update-email');
     if (emailInput) {
         emailInput.value = user.email || '';
@@ -629,6 +634,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
 
     // Inputs
     const emailInput = document.getElementById('cancel-email-input');
+    const phoneInput = document.getElementById('cancel-phone-input');
     const passwordInput = document.getElementById('cancel-password-input');
     const confirmPasswordInput = document.getElementById('cancel-confirm-password-input');
     const mcInput = document.getElementById('cancel-mc-input');
@@ -640,6 +646,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
 
     // Errors
     const emailError = document.getElementById('cancel-email-error');
+    const phoneError = document.getElementById('cancel-phone-error');
     const passwordError = document.getElementById('cancel-password-error');
     const confirmPasswordError = document.getElementById('cancel-confirm-password-error');
     const mcError = document.getElementById('cancel-mc-error');
@@ -650,7 +657,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
 
     const stepTitles = [
         'Step 1 of 9: Reason for Leaving',
-        'Step 2 of 9: Verify Account Email',
+        'Step 2 of 9: Verify Account Email & Phone Number',
         'Step 3 of 9: Account Password Verification',
         'Step 4 of 9: Confirm Master Password',
         'Step 5 of 9: Minecraft IGN Synchronization',
@@ -669,6 +676,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
 
     function resetInputs() {
         if (emailInput) emailInput.value = '';
+        if (phoneInput) phoneInput.value = '';
         if (passwordInput) passwordInput.value = '';
         if (confirmPasswordInput) confirmPasswordInput.value = '';
         if (mcInput) mcInput.value = '';
@@ -678,7 +686,7 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
         if (popupPasswordInput) popupPasswordInput.value = '';
         if (terminatePasswordInput) terminatePasswordInput.value = '';
 
-        [emailError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, terminatePwdError].forEach(errEl => {
+        [emailError, phoneError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, terminatePwdError].forEach(errEl => {
             if (errEl) {
                 errEl.textContent = '';
                 errEl.style.display = 'none';
@@ -764,6 +772,35 @@ export function initCancellationWizard(user, userData, onCancelledCallback) {
                 return;
             }
             if (emailError) emailError.style.display = 'none';
+
+            // Phone verification (right after email)
+            const phoneVal = (phoneInput?.value || '').trim();
+            const cleanPhone = phoneVal.replace(/\D/g, '');
+            const expectedPhone = (userData?.phone || '').trim().replace(/\D/g, '');
+
+            if (!phoneVal) {
+                if (phoneError) {
+                    phoneError.textContent = 'Please enter your account phone number.';
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (cleanPhone.length < 7) {
+                if (phoneError) {
+                    phoneError.textContent = 'Please enter a valid phone number (at least 7 digits).';
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (expectedPhone && cleanPhone !== expectedPhone) {
+                if (phoneError) {
+                    phoneError.textContent = `Verification Failed: "${phoneVal}" does not match the active phone number on file. Please type it exactly.`;
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (phoneError) phoneError.style.display = 'none';
+
             showStep(3);
         };
     }
@@ -1160,6 +1197,7 @@ export function initDeactivateAccountWizard(user, userData) {
 
     // Inputs
     const emailInput = document.getElementById('deactivate-email-input');
+    const phoneInput = document.getElementById('deactivate-phone-input');
     const passwordInput = document.getElementById('deactivate-password-input');
     const confirmPasswordInput = document.getElementById('deactivate-confirm-password-input');
     const mcInput = document.getElementById('deactivate-mc-input');
@@ -1171,6 +1209,7 @@ export function initDeactivateAccountWizard(user, userData) {
 
     // Errors
     const emailError = document.getElementById('deactivate-email-error');
+    const phoneError = document.getElementById('deactivate-phone-error');
     const passwordError = document.getElementById('deactivate-password-error');
     const confirmPasswordError = document.getElementById('deactivate-confirm-password-error');
     const mcError = document.getElementById('deactivate-mc-error');
@@ -1180,7 +1219,7 @@ export function initDeactivateAccountWizard(user, userData) {
     const deletePwdError = document.getElementById('delete-popup-pwd-error');
 
     const stepTitles = [
-        'Step 1 of 8: Verify Account Email',
+        'Step 1 of 8: Verify Account Email & Phone Number',
         'Step 2 of 8: Master Password Verification',
         'Step 3 of 8: Confirm Master Password',
         'Step 4 of 8: Minecraft IGN Synchronization',
@@ -1199,6 +1238,7 @@ export function initDeactivateAccountWizard(user, userData) {
 
     function resetInputs() {
         if (emailInput) emailInput.value = '';
+        if (phoneInput) phoneInput.value = '';
         if (passwordInput) passwordInput.value = '';
         if (confirmPasswordInput) confirmPasswordInput.value = '';
         if (mcInput) mcInput.value = '';
@@ -1208,7 +1248,7 @@ export function initDeactivateAccountWizard(user, userData) {
         if (popupPasswordInput) popupPasswordInput.value = '';
         if (deletePasswordInput) deletePasswordInput.value = '';
 
-        [emailError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, deletePwdError].forEach(errEl => {
+        [emailError, phoneError, passwordError, confirmPasswordError, mcError, discordError, cardError, popupPwdError, deletePwdError].forEach(errEl => {
             if (errEl) {
                 errEl.textContent = '';
                 errEl.style.display = 'none';
@@ -1281,6 +1321,35 @@ export function initDeactivateAccountWizard(user, userData) {
                 return;
             }
             if (emailError) emailError.style.display = 'none';
+
+            // Phone number verification (right after email)
+            const phoneVal = (phoneInput?.value || '').trim();
+            const cleanPhone = phoneVal.replace(/\D/g, '');
+            const expectedPhone = (userData?.phone || '').trim().replace(/\D/g, '');
+
+            if (!phoneVal) {
+                if (phoneError) {
+                    phoneError.textContent = 'Please enter your account phone number.';
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (cleanPhone.length < 7) {
+                if (phoneError) {
+                    phoneError.textContent = 'Please enter a valid phone number (minimum 7 digits).';
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (expectedPhone && cleanPhone !== expectedPhone) {
+                if (phoneError) {
+                    phoneError.textContent = `Verification Failed: "${phoneVal}" does not match active account phone on file. Please type it exactly.`;
+                    phoneError.style.display = 'block';
+                }
+                return;
+            }
+            if (phoneError) phoneError.style.display = 'none';
+
             showStep(2);
         };
     }
@@ -2636,10 +2705,11 @@ export function initAccountPage() {
             signOut(auth).then(() => window.location.replace('index.html'));
         });
 
-        // Update Username Form
+        // Update Profile Form
         document.getElementById('update-profile-form')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const newUsername = document.getElementById('update-username').value.trim();
+            const newPhone = document.getElementById('update-phone')?.value?.trim() || '';
             const notificationEl = document.getElementById('profile-notification');
             const submitBtn = e.target.querySelector('button[type="submit"]');
 
@@ -2648,15 +2718,16 @@ export function initAccountPage() {
             submitBtn.textContent = 'Saving...';
 
             try {
-                await updateDoc(doc(db, "users", user.uid), { username: newUsername });
+                await updateDoc(doc(db, "users", user.uid), { username: newUsername, phone: newPhone });
                 userData.username = newUsername;
+                userData.phone = newPhone;
                 sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 
                 const welcomeHeader = document.getElementById('welcome-header');
                 if (welcomeHeader) welcomeHeader.innerHTML = `<span class="welcome-prefix">Welcome back,</span> <span class="welcome-username">${escapeHTML(newUsername)}!</span>`;
 
                 if (notificationEl) {
-                    notificationEl.textContent = 'Username updated successfully!';
+                    notificationEl.textContent = 'Profile updated successfully!';
                     notificationEl.className = 'notification success';
                     notificationEl.style.display = 'block';
                     setTimeout(() => notificationEl.style.display = 'none', 3000);

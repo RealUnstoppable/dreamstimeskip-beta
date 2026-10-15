@@ -33,6 +33,8 @@ describe('Extremely Complicated Deactivate / Delete Account Gauntlet in account.
         test('includes all required inputs for account deactivation gauntlet', () => {
             // Email input
             expect(accountHtml).toContain('id="deactivate-email-input"');
+            // Phone input (asked after email)
+            expect(accountHtml).toContain('id="deactivate-phone-input"');
             // Password input
             expect(accountHtml).toContain('id="deactivate-password-input"');
             // Confirm password input
@@ -84,6 +86,7 @@ describe('Extremely Complicated Deactivate / Delete Account Gauntlet in account.
         test('includes similar gauntlet feature for cancelling subscription', () => {
             expect(accountHtml).toContain('id="cancel-membership-modal"');
             expect(accountHtml).toContain('id="cancel-email-input"');
+            expect(accountHtml).toContain('id="cancel-phone-input"');
             expect(accountHtml).toContain('id="cancel-password-input"');
             expect(accountHtml).toContain('id="cancel-confirm-password-input"');
             expect(accountHtml).toContain('id="cancel-mc-input"');
@@ -135,6 +138,10 @@ describe('Extremely Complicated Deactivate / Delete Account Gauntlet in account.
             expect(accountJs).toContain('deactivate-to-step-6-btn');
             expect(accountJs).toContain('deactivate-to-step-7-btn');
             expect(accountJs).toContain('deactivate-loss-nothanks-btn');
+            // Validates phone number after email
+            expect(accountJs).toContain('Please enter your account phone number.');
+            expect(accountJs).toContain('cancel-phone-input');
+            expect(accountJs).toContain('deactivate-phone-input');
         });
 
         test('clicking tricky Go Back button wipes verification and resets back to Step 1', () => {

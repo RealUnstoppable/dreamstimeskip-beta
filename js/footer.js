@@ -51,6 +51,7 @@ export function loadFooter() {
                     <p>Sign up for news, announcements, and exclusive beta access.</p>
                     <form class="signup-form">
                         <input type="email" placeholder="your.email@example.com" required title="Email for newsletter" aria-label="Email for newsletter">
+                        <input type="tel" placeholder="Your phone number" title="Phone number for updates" aria-label="Phone number for updates">
                         <button type="submit">Sign Up</button>
                     </form>
                 </div>

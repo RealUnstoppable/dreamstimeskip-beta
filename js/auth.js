@@ -65,6 +65,7 @@ if (document.getElementById('auth-form')) {
     const toggleLink = document.getElementById('toggle-form');
     const usernameGroup = document.getElementById('username-group');
     const referralGroup = document.getElementById('referral-group');
+    const phoneGroup = document.getElementById('phone-group');
     const messageEl = document.getElementById('message');
 
     let isSignUp = false;
@@ -73,7 +74,10 @@ if (document.getElementById('auth-form')) {
         formTitle.textContent = isSignUp ? 'Sign Up' : 'Sign In';
         usernameGroup.style.display = isSignUp ? 'block' : 'none';
         if (referralGroup) referralGroup.style.display = isSignUp ? 'block' : 'none';
+        if (phoneGroup) phoneGroup.style.display = isSignUp ? 'block' : 'none';
         document.getElementById('username').required = isSignUp;
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) phoneInput.required = isSignUp;
         submitBtn.textContent = isSignUp ? 'Sign Up' : 'Sign In';
         toggleLink.textContent = isSignUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up";
         messageEl.textContent = '';
@@ -90,6 +94,7 @@ if (document.getElementById('auth-form')) {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const username = document.getElementById('username').value.trim();
+        const phone = document.getElementById('phone')?.value?.trim() || '';
 
         messageEl.textContent = '';
         const originalBtnText = submitBtn.textContent;
@@ -99,7 +104,7 @@ if (document.getElementById('auth-form')) {
 
         try {
             if (isSignUp) {
-                if (!username || !email || !password) {
+                if (!username || !email || !password || !phone) {
                     showMessage("All fields are required.");
                     return;
                 }
@@ -107,6 +112,7 @@ if (document.getElementById('auth-form')) {
                 await setDoc(doc(db, "users", userCredential.user.uid), {
                     username: username || "User",
                     email: email,
+                    phone: phone,
                     signupDate: serverTimestamp(),
                     isBanned: false,
                     isAdmin: false, 
