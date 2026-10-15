@@ -239,18 +239,179 @@
             <section id="settings" class="content-section">
                 <h3>Settings</h3>
                 
+                <!-- Enhanced Security Action Sign -->
+                <div class="card glass-card security-action-sign-card" id="security-action-sign">
+                    <div class="security-sign-header">
+                        <div class="security-sign-badge" id="security-sign-badge">
+                            <span class="security-badge-icon" id="security-badge-icon">⚠️</span>
+                            <span class="security-badge-text" id="security-badge-text">Action Recommended: Enhanced Security</span>
+                        </div>
+                        <div class="security-sign-score">
+                            <span id="security-score-text">1 / 3 Steps Completed</span>
+                        </div>
+                    </div>
+                    <div class="security-progress-track">
+                        <div class="security-progress-bar" id="security-progress-bar" style="width: 33%;"></div>
+                    </div>
+                    <p class="security-sign-desc" id="security-sign-desc">
+                        Complete all 3 security safeguards to activate Enhanced Security status and safeguard your account, rewards, and inventory.
+                    </p>
+                    <div class="security-checklist" id="security-checklist">
+                        <div class="security-checklist-item" id="security-check-email">
+                            <span class="checklist-status-icon" id="email-check-icon">✅</span>
+                            <div class="checklist-info">
+                                <strong>Primary Email Registered</strong>
+                                <span class="checklist-subtext" id="security-email-subtext">Verified account email</span>
+                            </div>
+                            <span class="checklist-badge completed" id="email-check-badge">Verified</span>
+                        </div>
+                        <div class="security-checklist-item" id="security-check-phone">
+                            <span class="checklist-status-icon" id="phone-check-icon">⚠️</span>
+                            <div class="checklist-info">
+                                <strong>Recovery &amp; Security Phone</strong>
+                                <span class="checklist-subtext" id="security-phone-subtext">Add a phone number for SMS recovery and alerts</span>
+                            </div>
+                            <a href="#security-phone-input" class="checklist-badge action-needed" id="phone-check-badge">Add Phone</a>
+                        </div>
+                        <div class="security-checklist-item" id="security-check-2fa">
+                            <span class="checklist-status-icon" id="twofa-check-icon">⚠️</span>
+                            <div class="checklist-info">
+                                <strong>Two-Factor Authentication (2FA)</strong>
+                                <span class="checklist-subtext" id="security-2fa-subtext">Protect your login with two-factor verification</span>
+                            </div>
+                            <a href="#toggle-2fa" class="checklist-badge action-needed" id="twofa-check-badge">Enable 2FA</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card glass-card">
                     <h4>Security</h4>
                     <form id="security-settings-form">
                         <button type="button" id="change-password-btn" class="btn btn-primary" style="margin-bottom: 20px;">Send Password Reset Email</button>
-                        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                            <label for="toggle-2fa" style="margin: 0;">Enable Two-Factor Authentication (2FA)</label>
-                            <label class="toggle-switch" for="toggle-2fa">
-                                <input type="checkbox" id="toggle-2fa">
-                                <span class="slider"></span>
-                            </label>
+
+                        <div class="security-section-divider">
+                            <h5>Security &amp; Recovery Phone Number</h5>
+                            <p class="security-field-hint">Your phone number is used for account recovery, SMS two-factor authentication, and security alerts during critical actions.</p>
+                            <div class="phone-action-row">
+                                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                    <label for="security-phone-input">Phone Number</label>
+                                    <input type="tel" id="security-phone-input" placeholder="(555) 123-4567" autocomplete="tel">
+                                </div>
+                                <button type="button" id="save-security-phone-btn" class="btn btn-primary" style="align-self: flex-end; height: 46px;">Save Phone</button>
+                            </div>
+                            <div id="security-phone-notification" class="notification" style="margin-top: 12px;"></div>
+                        </div>
+
+                        <div class="security-section-divider">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <h5 style="margin: 0;">Two-Factor Authentication (2FA)</h5>
+                                    <span class="badge" id="two-factor-status-pill">Inactive</span>
+                                </div>
+                                <label class="toggle-switch" for="toggle-2fa">
+                                    <input type="checkbox" id="toggle-2fa">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <p class="security-field-hint">Require a verification code when signing in from an unrecognized device or performing high-impact actions.</p>
+
+                            <div class="form-group" id="two-factor-method-group" style="margin-top: 14px;">
+                                <label for="two-factor-method-select">2FA Verification Method</label>
+                                <select id="two-factor-method-select">
+                                    <option value="sms">📱 SMS Text Message (Uses Security Phone)</option>
+                                    <option value="authenticator">🔐 Authenticator App (TOTP / Google Authenticator)</option>
+                                    <option value="email">✉️ Email One-Time Code</option>
+                                </select>
+                            </div>
                         </div>
                         <div id="security-notification" class="notification" style="margin-top: 15px;"></div>
+                    </form>
+                </div>
+
+                <!-- Socials & Gaming Profiles Card -->
+                <div class="card glass-card" id="socials-settings-card">
+                    <div class="socials-header">
+                        <div>
+                            <h4>Socials &amp; Gaming Profiles</h4>
+                            <p class="card-subtitle">Connect your gaming handles and socials to unlock community badges, sync Minecraft rewards, and link your creator channels.</p>
+                        </div>
+                        <span class="socials-status-pill" id="socials-status-pill">🎮 DTS Community Hub</span>
+                    </div>
+
+                    <form id="socials-settings-form">
+                        <div class="socials-grid">
+                            <div class="form-group social-form-group">
+                                <label for="social-minecraft">
+                                    <span class="social-icon">⛏️</span> Minecraft IGN
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">IGN:</span>
+                                    <input type="text" id="social-minecraft" placeholder="e.g. Dreamer_99" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Links to Minecraft server perks &amp; daily check-in</span>
+                            </div>
+
+                            <div class="form-group social-form-group">
+                                <label for="social-discord">
+                                    <span class="social-icon">💬</span> Discord Tag
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">@</span>
+                                    <input type="text" id="social-discord" placeholder="username or user#0000" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Used for Discord role sync and community chat</span>
+                            </div>
+
+                            <div class="form-group social-form-group">
+                                <label for="social-tiktok">
+                                    <span class="social-icon">🎵</span> TikTok
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">@</span>
+                                    <input type="text" id="social-tiktok" placeholder="tiktok_handle" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Feature your clips with the DTS community</span>
+                            </div>
+
+                            <div class="form-group social-form-group">
+                                <label for="social-youtube">
+                                    <span class="social-icon">▶️</span> YouTube Channel
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">@</span>
+                                    <input type="text" id="social-youtube" placeholder="channel_name" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Feature your gameplay videos &amp; highlights</span>
+                            </div>
+
+                            <div class="form-group social-form-group">
+                                <label for="social-twitch">
+                                    <span class="social-icon">🟣</span> Twitch
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">twitch.tv/</span>
+                                    <input type="text" id="social-twitch" placeholder="streamer_name" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Live stream community shoutouts</span>
+                            </div>
+
+                            <div class="form-group social-form-group">
+                                <label for="social-twitter">
+                                    <span class="social-icon">✖️</span> X (Twitter)
+                                </label>
+                                <div class="social-input-wrapper">
+                                    <span class="social-prefix">@</span>
+                                    <input type="text" id="social-twitter" placeholder="handle" autocomplete="off" spellcheck="false">
+                                </div>
+                                <span class="social-help-text">Connect with creators &amp; platform updates</span>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; align-items: center; margin-top: 18px; flex-wrap: wrap;">
+                            <button type="submit" id="save-socials-btn" class="btn btn-primary">Save Social Profiles</button>
+                            <span id="socials-last-saved" style="color: var(--text-secondary); font-size: 0.85rem;"></span>
+                        </div>
+                        <div id="socials-notification" class="notification" style="margin-top: 15px;"></div>
                     </form>
                 </div>
 

@@ -127,12 +127,17 @@ export function renderProfile(user, userData) {
 
     const usernameInput = document.getElementById('update-username');
     if (usernameInput) {
-        usernameInput.value = userData.username || user.displayName || '';
+        usernameInput.value = data.username || user.displayName || '';
     }
 
     const phoneInput = document.getElementById('update-phone');
     if (phoneInput) {
-        phoneInput.value = userData.phone || '';
+        phoneInput.value = data.phone || '';
+    }
+
+    const secPhoneInput = document.getElementById('security-phone-input');
+    if (secPhoneInput) {
+        secPhoneInput.value = data.phone || '';
     }
 
     const emailInput = document.getElementById('update-email');
@@ -142,25 +147,195 @@ export function renderProfile(user, userData) {
 
     const themeSelect = document.getElementById('theme-select');
     if (themeSelect) {
-        themeSelect.value = userData.theme || 'system';
+        themeSelect.value = data.theme || 'system';
     }
 
-    const isPremium = userData.membershipLevel === 'premium' || userData.membershipLevel === 'ultimate' || userData.isAdmin;
+    const isPremium = data.membershipLevel === 'premium' || data.membershipLevel === 'ultimate' || data.isAdmin;
     const customHex = document.getElementById('custom-hex-color');
     if (customHex) {
         customHex.disabled = !isPremium;
         customHex.title = isPremium ? 'Select custom accent color' : 'Requires Premium or Ultimate';
-        if (userData.accentColor && userData.accentColor.startsWith('#')) {
-            customHex.value = userData.accentColor;
+        if (data.accentColor && data.accentColor.startsWith('#')) {
+            customHex.value = data.accentColor;
         } else {
             customHex.value = '#2563EB';
         }
     }
 
-    if (userData.isAdmin) {
+    if (data.isAdmin) {
         const adminBtn = document.getElementById('admin-back-button');
         if (adminBtn) adminBtn.style.display = 'block';
     }
+
+    // 2FA Controls & Methods
+    const toggle2FA = document.getElementById('toggle-2fa');
+    if (toggle2FA) {
+        toggle2FA.checked = !!data.twoFactorEnabled;
+    }
+    const methodSelect = document.getElementById('two-factor-method-select');
+    if (methodSelect && data.twoFactorMethod) {
+        methodSelect.value = data.twoFactorMethod;
+    }
+
+    // Socials & Gaming Profiles Pre-population
+    const socials = data.socials || {};
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || '';
+    };
+    setVal('social-minecraft', socials.minecraft || data.minecraft || '');
+    setVal('social-discord', socials.discord || data.discord || '');
+    setVal('social-tiktok', socials.tiktok || data.tiktok || '');
+    setVal('social-youtube', socials.youtube || data.youtube || '');
+    setVal('social-twitch', socials.twitch || data.twitch || '');
+    setVal('social-twitter', socials.twitter || data.twitter || '');
+
+    // Update Security Action Sign Banner
+    updateSecurityActionSign(user, data);
+}
+
+/**
+ * Updates the Enhanced Security Action Sign banner, progress bar, and checklist
+ */
+export function updateSecurityActionSign(user, userData) {
+    const data = userData || {};
+    const email = user?.email || data.email || '';
+    const phone = (data.phone || '').trim();
+    const twoFactorEnabled = !!data.twoFactorEnabled;
+
+    const hasEmail = !!email;
+    const hasPhone = phone.length >= 7;
+    const has2FA = twoFactorEnabled;
+
+    let completedCount = 0;
+    if (hasEmail) completedCount++;
+    if (hasPhone) completedCount++;
+    if (has2FA) completedCount++;
+
+    const isFullySecured = completedCount === 3;
+
+    // Outer card styling
+    const cardEl = document.getElementById('security-action-sign');
+    if (cardEl) {
+        if (isFullySecured) {
+            cardEl.classList.add('fully-secured');
+        } else {
+            cardEl.classList.remove('fully-secured');
+        }
+    }
+
+    // Badge and text
+    const badgeEl = document.getElementById('security-sign-badge');
+    const badgeIconEl = document.getElementById('security-badge-icon');
+    const badgeTextEl = document.getElementById('security-badge-text');
+    const scoreTextEl = document.getElementById('security-score-text');
+    const descEl = document.getElementById('security-sign-desc');
+    const progressBar = document.getElementById('security-progress-bar');
+
+    if (badgeEl && badgeIconEl && badgeTextEl) {
+        if (isFullySecured) {
+            badgeEl.className = 'security-sign-badge fully-secured';
+            badgeIconEl.textContent = '🛡️';
+            badgeTextEl.textContent = 'Enhanced Security Active';
+            if (descEl) {
+                descEl.textContent = 'Your account is fully protected with multi-layered verification and active recovery safeguards.';
+            }
+        } else {
+            badgeEl.className = 'security-sign-badge';
+            badgeIconEl.textContent = '⚠️';
+            const remaining = 3 - completedCount;
+            badgeTextEl.textContent = `Action Recommended: ${remaining} Step${remaining > 1 ? 's' : ''} Remaining`;
+            if (descEl) {
+                descEl.textContent = 'Complete all 3 security safeguards to activate Enhanced Security status and safeguard your account, rewards, and inventory.';
+            }
+        }
+    }
+
+    if (scoreTextEl) {
+        scoreTextEl.textContent = `${completedCount} / 3 Steps Completed${isFullySecured ? ' (Fully Secured)' : ''}`;
+    }
+
+    if (progressBar) {
+        const pct = Math.round((completedCount / 3) * 100);
+        progressBar.style.width = `${pct}%`;
+        if (isFullySecured) {
+            progressBar.classList.add('completed');
+        } else {
+            progressBar.classList.remove('completed');
+        }
+    }
+
+    // Email Checklist Item
+    const emailItem = document.getElementById('security-check-email');
+    const emailSubtext = document.getElementById('security-email-subtext');
+    if (emailItem) {
+        if (hasEmail) {
+            emailItem.classList.add('is-completed');
+            if (emailSubtext) emailSubtext.textContent = `Verified: ${email}`;
+        } else {
+            emailItem.classList.remove('is-completed');
+        }
+    }
+
+    // Phone Checklist Item
+    const phoneItem = document.getElementById('security-check-phone');
+    const phoneIcon = document.getElementById('phone-check-icon');
+    const phoneSubtext = document.getElementById('security-phone-subtext');
+    const phoneBadge = document.getElementById('phone-check-badge');
+    if (phoneItem && phoneIcon && phoneBadge) {
+        if (hasPhone) {
+            phoneItem.classList.add('is-completed');
+            phoneIcon.textContent = '✅';
+            if (phoneSubtext) phoneSubtext.textContent = `Active Recovery: ${phone}`;
+            phoneBadge.textContent = 'Added';
+            phoneBadge.className = 'checklist-badge completed';
+            phoneBadge.removeAttribute('href');
+        } else {
+            phoneItem.classList.remove('is-completed');
+            phoneIcon.textContent = '⚠️';
+            if (phoneSubtext) phoneSubtext.textContent = 'Add a phone number for SMS recovery and alerts';
+            phoneBadge.textContent = 'Add Phone';
+            phoneBadge.className = 'checklist-badge action-needed';
+            phoneBadge.setAttribute('href', '#security-phone-input');
+        }
+    }
+
+    // 2FA Checklist Item
+    const twofaItem = document.getElementById('security-check-2fa');
+    const twofaIcon = document.getElementById('twofa-check-icon');
+    const twofaSubtext = document.getElementById('security-2fa-subtext');
+    const twofaBadge = document.getElementById('twofa-check-badge');
+    if (twofaItem && twofaIcon && twofaBadge) {
+        if (has2FA) {
+            twofaItem.classList.add('is-completed');
+            twofaIcon.textContent = '✅';
+            if (twofaSubtext) twofaSubtext.textContent = 'Two-factor protection enabled';
+            twofaBadge.textContent = 'Enabled';
+            twofaBadge.className = 'checklist-badge completed';
+            twofaBadge.removeAttribute('href');
+        } else {
+            twofaItem.classList.remove('is-completed');
+            twofaIcon.textContent = '⚠️';
+            if (twofaSubtext) twofaSubtext.textContent = 'Protect your login with two-factor verification';
+            twofaBadge.textContent = 'Enable 2FA';
+            twofaBadge.className = 'checklist-badge action-needed';
+            twofaBadge.setAttribute('href', '#toggle-2fa');
+        }
+    }
+
+    // 2FA Status Pill in Security Card
+    const statusPill = document.getElementById('two-factor-status-pill');
+    if (statusPill) {
+        if (has2FA) {
+            statusPill.textContent = 'Active';
+            statusPill.classList.add('active');
+        } else {
+            statusPill.textContent = 'Inactive';
+            statusPill.classList.remove('active');
+        }
+    }
+
+    return { completedCount, isFullySecured };
 }
 
 /**
@@ -2726,6 +2901,10 @@ export function initAccountPage() {
                 const welcomeHeader = document.getElementById('welcome-header');
                 if (welcomeHeader) welcomeHeader.innerHTML = `<span class="welcome-prefix">Welcome back,</span> <span class="welcome-username">${escapeHTML(newUsername)}!</span>`;
 
+                const secPhoneInput = document.getElementById('security-phone-input');
+                if (secPhoneInput) secPhoneInput.value = newPhone;
+                updateSecurityActionSign(user, userData);
+
                 if (notificationEl) {
                     notificationEl.textContent = 'Profile updated successfully!';
                     notificationEl.className = 'notification success';
@@ -2910,20 +3089,164 @@ export function initAccountPage() {
             });
         }
 
-        // 2FA Toggle
+        // Security & Recovery Phone Save Button
+        const saveSecPhoneBtn = document.getElementById('save-security-phone-btn');
+        if (saveSecPhoneBtn && !saveSecPhoneBtn.dataset.bound) {
+            saveSecPhoneBtn.dataset.bound = 'true';
+            saveSecPhoneBtn.addEventListener('click', async () => {
+                const phoneInput = document.getElementById('security-phone-input');
+                const notif = document.getElementById('security-phone-notification');
+                const newPhone = phoneInput ? phoneInput.value.trim() : '';
+
+                saveSecPhoneBtn.disabled = true;
+                const origText = saveSecPhoneBtn.textContent;
+                saveSecPhoneBtn.textContent = 'Saving...';
+
+                try {
+                    await updateDoc(doc(db, "users", user.uid), { phone: newPhone });
+                    if (userData) {
+                        userData.phone = newPhone;
+                        sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+                    }
+
+                    const profilePhone = document.getElementById('update-phone');
+                    if (profilePhone) profilePhone.value = newPhone;
+
+                    updateSecurityActionSign(user, userData);
+
+                    if (notif) {
+                        notif.textContent = 'Security phone number saved successfully!';
+                        notif.className = 'notification success';
+                        notif.style.display = 'block';
+                        setTimeout(() => notif.style.display = 'none', 3500);
+                    }
+                } catch (err) {
+                    if (notif) {
+                        notif.textContent = `Error: ${err.message}`;
+                        notif.className = 'notification error';
+                        notif.style.display = 'block';
+                    }
+                } finally {
+                    saveSecPhoneBtn.disabled = false;
+                    saveSecPhoneBtn.textContent = origText;
+                }
+            });
+        }
+
+        // 2FA Toggle & Method Selector
         const toggle2FA = document.getElementById('toggle-2fa');
-        if (toggle2FA) {
+        if (toggle2FA && !toggle2FA.dataset.bound) {
+            toggle2FA.dataset.bound = 'true';
             toggle2FA.checked = !!userData.twoFactorEnabled;
             toggle2FA.addEventListener('change', async (e) => {
                 const isEnabled = e.target.checked;
+                const notif = document.getElementById('security-notification');
                 try {
                     await updateDoc(doc(db, "users", user.uid), { twoFactorEnabled: isEnabled });
                     userData.twoFactorEnabled = isEnabled;
                     sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
-                    alert(`Two-Factor Authentication (2FA) is now ${isEnabled ? 'enabled' : 'disabled'}.`);
+                    updateSecurityActionSign(user, userData);
+                    if (notif) {
+                        notif.textContent = `Two-Factor Authentication (2FA) is now ${isEnabled ? 'enabled' : 'disabled'}.`;
+                        notif.className = 'notification success';
+                        notif.style.display = 'block';
+                        setTimeout(() => notif.style.display = 'none', 3500);
+                    }
                 } catch (err) {
                     e.target.checked = !isEnabled;
-                    alert('Error updating 2FA settings.');
+                    if (notif) {
+                        notif.textContent = `Error updating 2FA settings: ${err.message}`;
+                        notif.className = 'notification error';
+                        notif.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        const methodSelect = document.getElementById('two-factor-method-select');
+        if (methodSelect && !methodSelect.dataset.bound) {
+            methodSelect.dataset.bound = 'true';
+            if (userData.twoFactorMethod) {
+                methodSelect.value = userData.twoFactorMethod;
+            }
+            methodSelect.addEventListener('change', async (e) => {
+                const newMethod = e.target.value;
+                try {
+                    await updateDoc(doc(db, "users", user.uid), { twoFactorMethod: newMethod });
+                    userData.twoFactorMethod = newMethod;
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+                } catch (err) {
+                    console.warn("Notice: 2FA method update notice:", err);
+                }
+            });
+        }
+
+        // Socials & Gaming Profiles Form
+        const socialsForm = document.getElementById('socials-settings-form');
+        if (socialsForm && !socialsForm.dataset.bound) {
+            socialsForm.dataset.bound = 'true';
+            socialsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const submitBtn = document.getElementById('save-socials-btn');
+                const notif = document.getElementById('socials-notification');
+                const lastSaved = document.getElementById('socials-last-saved');
+
+                const getVal = (id) => (document.getElementById(id)?.value || '').trim();
+                const minecraftVal = getVal('social-minecraft');
+                const discordVal = getVal('social-discord');
+                const tiktokVal = getVal('social-tiktok');
+                const youtubeVal = getVal('social-youtube');
+                const twitchVal = getVal('social-twitch');
+                const twitterVal = getVal('social-twitter');
+
+                const socials = {
+                    minecraft: minecraftVal,
+                    discord: discordVal,
+                    tiktok: tiktokVal,
+                    youtube: youtubeVal,
+                    twitch: twitchVal,
+                    twitter: twitterVal,
+                    updatedAt: new Date().toISOString()
+                };
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
+                }
+
+                try {
+                    await updateDoc(doc(db, "users", user.uid), {
+                        socials,
+                        minecraft: minecraftVal,
+                        discord: discordVal
+                    });
+
+                    userData.socials = socials;
+                    userData.minecraft = minecraftVal;
+                    userData.discord = discordVal;
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+
+                    if (lastSaved) {
+                        lastSaved.textContent = `Saved at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                    }
+
+                    if (notif) {
+                        notif.textContent = 'Social profiles & gaming handles updated successfully!';
+                        notif.className = 'notification success';
+                        notif.style.display = 'block';
+                        setTimeout(() => notif.style.display = 'none', 3500);
+                    }
+                } catch (err) {
+                    if (notif) {
+                        notif.textContent = `Error: ${err.message}`;
+                        notif.className = 'notification error';
+                        notif.style.display = 'block';
+                    }
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Save Social Profiles';
+                    }
                 }
             });
         }
