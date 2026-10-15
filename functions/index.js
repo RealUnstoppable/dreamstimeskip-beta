@@ -868,6 +868,87 @@ exports.toggleFeatureUpvote = onRequest((req, res) => {
 });
 
 
+
+// 🎮 Minecraft Username Availability & Uniqueness Check
+exports.checkMinecraftLink = onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST" && req.method !== "GET") {
+      return res.status(405).json({error: "Method Not Allowed"});
+    }
+
+    try {
+      const username = (req.method === "POST" ? req.body && req.body.username : req.query && req.query.username) || "";
+      const currentUid = (req.method === "POST" ? req.body && req.body.currentUid : req.query && req.query.currentUid) || null;
+
+      const trimmed = (typeof username === "string" ? username : "").trim();
+      if (!trimmed) {
+        return res.status(400).json({available: false, error: "Username is required"});
+      }
+
+      const normalizedKey = trimmed.toLowerCase();
+      const db = admin.firestore();
+
+      // 1. Check primary registry: minecraft_links collection
+      const linkDoc = await db.collection("minecraft_links").doc(normalizedKey).get();
+      if (linkDoc.exists) {
+        const linkData = linkDoc.data() || {};
+        if (linkData.uid && linkData.uid !== currentUid) {
+          return res.status(200).json({
+            available: false,
+            linkedToOther: true,
+            ownerUid: linkData.uid,
+            message: "This Minecraft username is already linked to a different account. If you think this is a mistake, contact us."
+          });
+        }
+      }
+
+      // 2. Check users collection for existing linked profile
+      const userMatches = await db.collection("users")
+        .where("minecraftUsername", "==", trimmed)
+        .limit(2)
+        .get();
+
+      for (const uDoc of userMatches.docs) {
+        if (uDoc.id !== currentUid) {
+          return res.status(200).json({
+            available: false,
+            linkedToOther: true,
+            ownerUid: uDoc.id,
+            message: "This Minecraft username is already linked to a different account. If you think this is a mistake, contact us."
+          });
+        }
+      }
+
+      // 3. Check dts_waitlist collection
+      const waitlistMatches = await db.collection("dts_waitlist")
+        .where("minecraftUsername", "==", trimmed)
+        .limit(2)
+        .get();
+
+      for (const wDoc of waitlistMatches.docs) {
+        const wData = wDoc.data() || {};
+        const ownerUid = wData.uid || wDoc.id;
+        if (ownerUid !== currentUid) {
+          return res.status(200).json({
+            available: false,
+            linkedToOther: true,
+            ownerUid: ownerUid,
+            message: "This Minecraft username is already linked to a different account. If you think this is a mistake, contact us."
+          });
+        }
+      }
+
+      return res.status(200).json({
+        available: true,
+        message: "Username is available."
+      });
+    } catch (error) {
+      console.error("Manager info: Check Minecraft Link Error: [" + error.message + "]");
+      return res.status(500).json({error: error.message});
+    }
+  });
+});
+
 // 🏆 Process Referral
 exports.processReferral = functions.https.onCall(async (data, context) => {
     if (!context.auth) {

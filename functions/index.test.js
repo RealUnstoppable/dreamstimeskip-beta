@@ -94,7 +94,7 @@ jest.mock("firebase-functions/v2/firestore", () => {
 });
 
 // Import functions after mocks
-const {createCheckoutSession, adminAction} = require("./index.js");
+const {createCheckoutSession, adminAction, checkMinecraftLink} = require("./index.js");
 
 describe("createCheckoutSession", () => {
   beforeEach(() => {
@@ -469,4 +469,124 @@ describe("adminAction", () => {
     }));
   });
 });
+
+describe("checkMinecraftLink", () => {
+  let mockGetDoc;
+  let mockWhereGet;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetDoc = jest.fn();
+    mockWhereGet = jest.fn().mockResolvedValue({ docs: [] });
+
+    require("firebase-admin").firestore().collection.mockReturnValue({
+      doc: jest.fn().mockReturnValue({
+        get: mockGetDoc,
+      }),
+      where: jest.fn().mockReturnValue({
+        limit: jest.fn().mockReturnValue({
+          get: mockWhereGet,
+        }),
+        get: mockWhereGet,
+      }),
+    });
+  });
+
+  it("should return 405 Method Not Allowed for non-POST and non-GET requests", async () => {
+    const req = mockReq({ method: "DELETE" });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      checkMinecraftLink(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(405);
+    expect(res.json).toHaveBeenCalledWith({ error: "Method Not Allowed" });
+  });
+
+  it("should return 400 if username is missing", async () => {
+    const req = mockReq({ method: "POST", body: { username: "" } });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      checkMinecraftLink(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: "Username is required" }));
+  });
+
+  it("should return available: false if username is linked to another user in minecraft_links", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ uid: "other-user-99", minecraftUsername: "Dream" }),
+    });
+
+    const req = mockReq({
+      method: "POST",
+      body: { username: "Dream", currentUid: "my-user-1" },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      checkMinecraftLink(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      available: false,
+      linkedToOther: true,
+      message: "This Minecraft username is already linked to a different account. If you think this is a mistake, contact us.",
+    }));
+  });
+
+  it("should return available: true if username is linked to the current user themselves", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: true,
+      data: () => ({ uid: "my-user-1", minecraftUsername: "Dream" }),
+    });
+
+    const req = mockReq({
+      method: "POST",
+      body: { username: "Dream", currentUid: "my-user-1" },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      checkMinecraftLink(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      available: true,
+    }));
+  });
+
+  it("should return available: true if username is completely free", async () => {
+    mockGetDoc.mockResolvedValueOnce({
+      exists: false,
+    });
+
+    const req = mockReq({
+      method: "POST",
+      body: { username: "AvailablePlayer", currentUid: null },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      checkMinecraftLink(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      available: true,
+    }));
+  });
+});
+
 

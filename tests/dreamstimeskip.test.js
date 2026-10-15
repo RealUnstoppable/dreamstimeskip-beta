@@ -85,4 +85,94 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         expect(html).toContain('.mc-btn-streak.claimed');
         expect(html).toContain('.og-reward-card-mini');
     });
+
+    it('styles .info-card-wide to extend across free space in the grid', () => {
+        expect(html).toContain('.info-card.info-card-wide');
+        expect(html).toContain('grid-column: 1 / -1');
+        expect(html).toContain('grid-template-columns: 440px 1fr');
+    });
+
+    it('renders the LINK MINECRAFT IGN & START STREAK cta and unlinked status badge', () => {
+        expect(html).toContain('⚔️ LINK MINECRAFT IGN &amp; START STREAK');
+        expect(html).toContain('Link your Minecraft IGN to start earning pre-launch streak rewards!');
+    });
+
+    describe('Streak button & status conditional behavior based on account settings', () => {
+        let dom;
+        let getEffectiveLinkedUser;
+        let updatePreLaunchStreakUI;
+
+        beforeEach(() => {
+            // Setup DOM environment matching dreamstimeskip.html
+            document.body.innerHTML = `
+                <div class="og-streak-callout" id="og-streak-callout-box">
+                    <div id="og-streak-card-status" class="og-streak-status-badge">Link your Minecraft IGN to start earning pre-launch streak rewards!</div>
+                </div>
+                <button id="og-unlock-streak-btn" class="mc-btn mc-btn-streak" type="button">⚔️ LINK MINECRAFT IGN &amp; START STREAK</button>
+            `;
+
+            // Extract the function implementation from dreamstimeskip.html
+            const funcMatch = html.match(/function getEffectiveLinkedUser[\s\S]*?return \{[\s\S]*?\};?\s*\}/);
+            const updateMatch = html.match(/function updatePreLaunchStreakUI[\s\S]*?\n        \}/);
+            
+            expect(funcMatch).not.toBeNull();
+            expect(updateMatch).not.toBeNull();
+
+            // Evaluate functions in test scope
+            const evalFn = new Function(funcMatch[0] + '\n' + updateMatch[0] + '\nreturn { getEffectiveLinkedUser, updatePreLaunchStreakUI };');
+            const funcs = evalFn();
+            getEffectiveLinkedUser = funcs.getEffectiveLinkedUser;
+            updatePreLaunchStreakUI = funcs.updatePreLaunchStreakUI;
+        });
+
+        test('unlinked user / signed out: shows link callout and LINK MINECRAFT IGN & START STREAK button', () => {
+            updatePreLaunchStreakUI(null, null);
+
+            const btn = document.getElementById('og-unlock-streak-btn');
+            const cardStatus = document.getElementById('og-streak-card-status');
+
+            expect(btn.innerHTML).toContain('LINK MINECRAFT IGN');
+            expect(cardStatus.style.display).not.toBe('none');
+            expect(cardStatus.textContent).toContain('Link your Minecraft IGN');
+        });
+
+        test('user with username in settings: shows View Streak and hides link account section', () => {
+            const mockUser = { uid: 'user_123', email: 'test@example.com' };
+            const mockProfile = { username: 'Dreamer_01' };
+
+            updatePreLaunchStreakUI(mockUser, mockProfile);
+
+            const btn = document.getElementById('og-unlock-streak-btn');
+            const cardStatus = document.getElementById('og-streak-card-status');
+
+            expect(btn.innerHTML).toContain('View Streak');
+            expect(cardStatus.style.display).toBe('none');
+        });
+
+        test('user with minecraft username in settings (socials.minecraft or minecraft): shows View Streak and hides link section', () => {
+            const mockUser = { uid: 'user_456' };
+            const mockProfile = { socials: { minecraft: 'Notch_OG' } };
+
+            updatePreLaunchStreakUI(mockUser, mockProfile);
+
+            const btn = document.getElementById('og-unlock-streak-btn');
+            const cardStatus = document.getElementById('og-streak-card-status');
+
+            expect(btn.innerHTML).toContain('View Streak');
+            expect(cardStatus.style.display).toBe('none');
+        });
+
+        test('user with empty settings profile: remains unlinked with link account prompt', () => {
+            const mockUser = { uid: 'user_789' };
+            const mockProfile = { username: '', minecraft: '' };
+
+            updatePreLaunchStreakUI(mockUser, mockProfile);
+
+            const btn = document.getElementById('og-unlock-streak-btn');
+            const cardStatus = document.getElementById('og-streak-card-status');
+
+            expect(btn.innerHTML).toContain('LINK MINECRAFT IGN');
+            expect(cardStatus.style.display).not.toBe('none');
+        });
+    });
 });

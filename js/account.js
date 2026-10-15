@@ -183,7 +183,7 @@ export function renderProfile(user, userData) {
         const el = document.getElementById(id);
         if (el) el.value = val || '';
     };
-    setVal('social-minecraft', socials.minecraft || data.minecraft || '');
+    setVal('social-minecraft', socials.minecraft || data.minecraft || data.minecraftUsername || '');
     setVal('social-discord', socials.discord || data.discord || '');
     setVal('social-tiktok', socials.tiktok || data.tiktok || '');
     setVal('social-youtube', socials.youtube || data.youtube || '');
@@ -3262,11 +3262,13 @@ export function initAccountPage() {
                     await updateDoc(doc(db, "users", user.uid), {
                         socials,
                         minecraft: minecraftVal,
+                        minecraftUsername: minecraftVal,
                         discord: discordVal
                     });
 
                     userData.socials = socials;
                     userData.minecraft = minecraftVal;
+                    userData.minecraftUsername = minecraftVal;
                     userData.discord = discordVal;
                     sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
 

@@ -629,6 +629,73 @@
             transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
+        .info-card.info-card-wide {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .info-card.info-card-wide {
+                grid-column: 1 / -1;
+                display: grid;
+                grid-template-columns: 440px 1fr;
+            }
+
+            .info-card.info-card-wide .card-image-wrap {
+                height: 100%;
+                min-height: 360px;
+                border-bottom: none;
+                border-right: 3px solid var(--mc-card-border);
+            }
+
+            .info-card.info-card-wide .card-content {
+                padding: 28px 32px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .info-card.info-card-wide .card-content h3 {
+                font-size: 1.45rem;
+                margin-bottom: 8px;
+            }
+
+            .info-card.info-card-wide .card-content > p {
+                font-size: 0.98rem;
+                line-height: 1.6;
+                margin-bottom: 16px;
+            }
+
+            .info-card.info-card-wide .og-streak-callout {
+                margin-bottom: 18px;
+                padding: 14px 18px;
+            }
+
+            .info-card.info-card-wide .card-footer-cta {
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+                align-items: center;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .info-card.info-card-wide .card-footer-cta .mc-btn-streak {
+                width: auto;
+                flex: 1 1 auto;
+                min-width: 280px;
+            }
+
+            .info-card.info-card-wide .card-footer-cta .mc-btn-stone {
+                width: auto;
+                padding: 12px 24px;
+            }
+        }
+
         .info-card:hover {
             transform: translateY(-8px);
             border-color: var(--mc-green);
@@ -1337,6 +1404,43 @@
             </div>
 
             <div class="info-grid">
+                <!-- FEATURED CARD: EVERYTHING NEW IN OG & PRE-LAUNCH STREAK (EXTENDED TO THE RIGHT) -->
+                <div class="info-card info-card-wide" id="og-featured-card">
+                    <div class="card-image-wrap">
+                        <img src="/images/dreams-12-days-to-release.png" alt="Dreams OG - 12 Days to Release" class="card-image" loading="lazy">
+                        <div class="card-badge card-badge-gold">
+                            [ RELEASING OCT 20, 2026 ]
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Everything New in OG</h3>
+                        <p>From custom biomes to revamped quests and new bosses, discover all the updates that make October 20 the ultimate OG experience. Featuring overhauled survival progression, handcrafted biomes, custom quest trees, and high-stakes world boss events.</p>
+                        
+                        <!-- Pre-Launch Streak Callout -->
+                        <div class="og-streak-callout" id="og-streak-callout-box">
+                            <div class="og-streak-header">
+                                <span class="og-streak-tag">🔥 PRE-LAUNCH STREAK</span>
+                                <span class="og-streak-release">DELIVERY OCT 20</span>
+                            </div>
+                            <p class="og-streak-desc">
+                                Start earning daily streaks before the server opens! All rewards will be received in-game on <strong>October 20th</strong>.
+                            </p>
+                            <div id="og-streak-card-status" class="og-streak-status-badge">
+                                <span>⚔️</span> Link your Minecraft IGN to start earning pre-launch streak rewards!
+                            </div>
+                        </div>
+
+                        <div class="card-footer-cta">
+                            <button id="og-unlock-streak-btn" class="mc-btn mc-btn-streak" type="button" aria-label="Unlock Pre-Launch Streak">
+                                ⚔️ LINK MINECRAFT IGN &amp; START STREAK
+                            </button>
+                            <a href="#features" class="mc-btn mc-btn-stone">
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- CARD 1: WATCH THE TRAILER (Uses Game Art.png and /video/dreams-trailer.mp4) -->
                 <div class="info-card">
                     <div class="card-image-wrap open-trailer-trigger" role="button" tabindex="0" aria-label="Open trailer video">
@@ -1364,42 +1468,7 @@
                     </div>
                 </div>
 
-                <!-- CARD 2: EVERYTHING NEW / COMING SOON (Uses dreams-12-days-to-release.png) -->
-                <div class="info-card">
-                    <div class="card-image-wrap">
-                        <img src="/images/dreams-12-days-to-release.png" alt="Dreams OG - 12 Days to Release" class="card-image" loading="lazy">
-                        <div class="card-badge card-badge-gold">
-                            [ RELEASING OCT 20, 2026 ]
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <h3>Everything New in OG</h3>
-                        <p>From custom biomes to revamped quests and new bosses, discover all the updates that make October 20 the ultimate OG experience.</p>
-                        
-                        <!-- Pre-Launch Streak Callout -->
-                        <div class="og-streak-callout">
-                            <div class="og-streak-header">
-                                <span class="og-streak-tag">🔥 PRE-LAUNCH STREAK</span>
-                                <span class="og-streak-release">DELIVERY OCT 20</span>
-                            </div>
-                            <p class="og-streak-desc">
-                                Start earning daily streaks before the server opens! All rewards will be received in-game on <strong>October 20th</strong>.
-                            </p>
-                            <div id="og-streak-card-status" class="og-streak-status-badge" style="display: none;"></div>
-                        </div>
-
-                        <div class="card-footer-cta" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-                            <button id="og-unlock-streak-btn" class="mc-btn mc-btn-streak" type="button">
-                                🔥 Unlock Pre-Launch Streak
-                            </button>
-                            <a href="#features" class="mc-btn mc-btn-stone">
-                                Learn More
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CARD 3: REALM ADVENTURE & WHITELIST -->
+                <!-- CARD 2: REALM ADVENTURE & WHITELIST -->
                 <div class="info-card">
                     <div class="card-image-wrap">
                         <img src="/images/minecraft-adventure.webp" alt="Minecraft Adventure" class="card-image" loading="lazy">
@@ -2891,24 +2960,63 @@
             return { success: true, rewardItem, streak: newStreak, data };
         }
 
+        function getEffectiveLinkedUser(user, profile) {
+            let p = profile;
+            if (!p && user?.uid && typeof sessionStorage !== 'undefined') {
+                try {
+                    const cached = sessionStorage.getItem(`profile_${user.uid}`);
+                    if (cached) p = JSON.parse(cached);
+                } catch (e) {}
+            }
+            if (!p && typeof sessionStorage !== 'undefined') {
+                try {
+                    for (let i = 0; i < sessionStorage.length; i++) {
+                        const k = sessionStorage.key(i);
+                        if (k && k.startsWith('profile_')) {
+                            const raw = sessionStorage.getItem(k);
+                            if (raw) {
+                                p = JSON.parse(raw);
+                                break;
+                            }
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            const ign = (
+                p?.minecraftUsername ||
+                p?.minecraft ||
+                p?.socials?.minecraft ||
+                ''
+            ).trim();
+
+            const username = (
+                p?.username ||
+                p?.displayName ||
+                user?.displayName ||
+                ''
+            ).trim();
+
+            const isLinked = Boolean((user || p) && (ign || username));
+            return {
+                isLinked,
+                ign: ign || username,
+                username,
+                profile: p
+            };
+        }
+
         function updatePreLaunchStreakUI(user, profile) {
             const btn = document.getElementById('og-unlock-streak-btn');
             const cardStatus = document.getElementById('og-streak-card-status');
             if (!btn) return;
 
-            if (!user) {
-                btn.innerHTML = '🔥 Unlock Pre-Launch Streak';
-                btn.className = 'mc-btn mc-btn-streak';
-                if (cardStatus) {
-                    cardStatus.style.display = 'none';
-                    cardStatus.innerHTML = '';
-                }
-                return;
-            }
+            const linkedInfo = getEffectiveLinkedUser(user, profile);
 
-            const ign = profile?.minecraftUsername;
-            if (!ign) {
-                btn.innerHTML = '⚔️ Link Minecraft IGN & Start Streak';
+            if (!linkedInfo.isLinked) {
+                // User does not have a linked account:
+                // Pre-launch section shows link prompt and button to link IGN
+                btn.innerHTML = '⚔️ LINK MINECRAFT IGN &amp; START STREAK';
                 btn.className = 'mc-btn mc-btn-streak';
                 if (cardStatus) {
                     cardStatus.style.display = 'flex';
@@ -2917,28 +3025,13 @@
                 return;
             }
 
-            const data = getCheckinData(user, profile);
-            const todayStr = getLocalDateString(new Date());
-            const isClaimedToday = Boolean(data.lastClaimDate && getCalendarDayDiff(todayStr, data.lastClaimDate) === 0);
-            const streak = data.streak || 0;
-            const currentCycleDay = streak === 0 ? 0 : (((streak - 1) % 30) + 1);
-            const nextDayNum = isClaimedToday ? ((currentCycleDay % 30) + 1) : (streak === 0 ? 1 : ((currentCycleDay % 30) + 1));
-            const nextReward = PRELAUNCH_REWARDS[nextDayNum - 1] || PRELAUNCH_REWARDS[0];
-
-            if (isClaimedToday) {
-                btn.innerHTML = `✓ Streak: ${streak} Day${streak === 1 ? '' : 's'} 🔥 (Claimed)`;
-                btn.className = 'mc-btn mc-btn-streak claimed';
-                if (cardStatus) {
-                    cardStatus.style.display = 'flex';
-                    cardStatus.innerHTML = `<span>✓</span> Today's pre-launch reward claimed! All items received on Oct 20th.`;
-                }
-            } else {
-                btn.innerHTML = streak === 0 ? '🔥 Unlock Pre-Launch Streak' : `⚡ Claim Day ${nextDayNum} Streak (+${nextReward.points} pts)`;
-                btn.className = 'mc-btn mc-btn-streak';
-                if (cardStatus) {
-                    cardStatus.style.display = 'flex';
-                    cardStatus.innerHTML = `<span>⚡</span> Ready to claim Day ${nextDayNum}: <strong>${escapeHtml(nextReward.name)}</strong>! (Drop on Oct 20)`;
-                }
+            // User already has a username / linked Minecraft account in settings:
+            // "it should say view streak, and the pre launch should just say what is says without the link account section"
+            btn.innerHTML = '🔥 View Streak';
+            btn.className = 'mc-btn mc-btn-streak';
+            if (cardStatus) {
+                cardStatus.style.display = 'none';
+                cardStatus.innerHTML = '';
             }
         }
 
@@ -3080,19 +3173,28 @@
                     if (modalVideo) modalVideo.pause();
                 }
 
-                if (!currentUser) {
+                const linkedInfo = getEffectiveLinkedUser(currentUser, currentUserProfile);
+
+                if (!currentUser && !linkedInfo.profile) {
                     showStreakView('auth');
-                } else if (!currentUserProfile?.minecraftUsername) {
+                } else if (!linkedInfo.isLinked) {
                     showStreakView('link');
                     const userEmailEl = document.getElementById('og-link-user-email');
                     const userNameEl = document.getElementById('og-link-user-name');
                     const userInitialEl = document.getElementById('og-link-initial');
-                    if (userEmailEl) userEmailEl.textContent = currentUser.email || '';
-                    if (userNameEl) userNameEl.textContent = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'Adventurer';
-                    if (userInitialEl) userInitialEl.textContent = ((currentUserProfile?.username || currentUser.email || 'U')[0]).toUpperCase();
+                    if (userEmailEl) userEmailEl.textContent = currentUser?.email || '';
+                    if (userNameEl) userNameEl.textContent = linkedInfo.username || currentUser?.email?.split('@')[0] || 'Adventurer';
+                    if (userInitialEl) userInitialEl.textContent = ((linkedInfo.username || currentUser?.email || 'U')[0]).toUpperCase();
                 } else {
+                    if (currentUserProfile) {
+                        if (!currentUserProfile.minecraftUsername) {
+                            currentUserProfile.minecraftUsername = linkedInfo.ign;
+                        }
+                    } else if (linkedInfo.profile) {
+                        currentUserProfile = { ...linkedInfo.profile, minecraftUsername: linkedInfo.ign };
+                    }
                     showStreakView('dash');
-                    renderStreakDashboard(currentUser, currentUserProfile);
+                    renderStreakDashboard(currentUser || { uid: 'cached' }, currentUserProfile);
                 }
 
                 if (typeof streakModal.showModal === 'function') {
@@ -3370,6 +3472,9 @@
                     }
                 });
             }
+
+            // Initial UI sync for streak card
+            updatePreLaunchStreakUI(currentUser, currentUserProfile);
         }
 
         if (document.readyState === 'loading') {
