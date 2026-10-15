@@ -294,5 +294,15 @@ describe('Account Settings: Security Action Sign, Phone & 2FA, and Socials Profi
             expect(accountJs).toContain('socials-notification');
             expect(accountJs).toMatch(/await\s+updateDoc\(doc\(db,\s*"users",\s*user\.uid\),\s*\{[^}]*socials/);
         });
+
+        test('validates Minecraft username uniqueness before saving and links to minecraft_links registry', () => {
+            expect(accountHtml).toContain('id="social-minecraft-error"');
+            expect(accountHtml).toContain('class="mc-ign-validation-msg"');
+            expect(accountCss).toContain('.mc-ign-validation-msg');
+            expect(accountJs).toContain('checkMinecraftAvailability');
+            expect(accountJs).toContain('claimMinecraftLink');
+            expect(accountJs).toContain('MC_ALREADY_LINKED_MESSAGE');
+            expect(accountJs).toContain('social-minecraft-error');
+        });
     });
 });

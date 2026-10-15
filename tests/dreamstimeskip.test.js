@@ -175,4 +175,41 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(cardStatus.style.display).not.toBe('none');
         });
     });
+
+    describe('Sitewide Minecraft Username Uniqueness & Account Linking Protection', () => {
+        it('imports checkMinecraftAvailability, claimMinecraftLink, and MC_ALREADY_LINKED_MESSAGE from minecraft-link-service.js', () => {
+            expect(html).toContain("from './js/minecraft-link-service.js'");
+            expect(html).toContain('checkMinecraftAvailability');
+            expect(html).toContain('claimMinecraftLink');
+        });
+
+        it('verifies username availability before creating account in waitlist registration form (#wl-register-form)', () => {
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, null');
+            expect(html).toContain('claimMinecraftLink(db, user.uid, mcUsername');
+        });
+
+        it('verifies username availability before linking in waitlist login form (#wl-login-form)', () => {
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, user.uid');
+            expect(html).toContain('claimMinecraftLink(db, user.uid, mcUsername');
+        });
+
+        it('verifies username availability in authenticated waitlist form (#wl-authed-form)', () => {
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, currentUser.uid');
+        });
+
+        it('verifies username availability before creating account in streak registration form (#og-streak-register-form)', () => {
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, null');
+            expect(html).toContain('claimMinecraftLink(db, user.uid, mcUsername');
+        });
+
+        it('verifies username availability in streak login and link forms', () => {
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, user.uid');
+            expect(html).toContain('checkMinecraftAvailability(mcUsername, currentUser.uid');
+        });
+
+        it('displays the exact required collision message when taken', () => {
+            expect(html).toContain('This Minecraft username is already linked to a different account. If you think this is a mistake, contact us.');
+        });
+    });
 });
+

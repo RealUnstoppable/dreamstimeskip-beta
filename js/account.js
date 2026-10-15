@@ -7,6 +7,13 @@ import { productMap } from './products-data.js';
 import { escapeHTML, formatDate } from './utils.js';
 import { createTransactionHtml, generateProductCardHtml } from './ui-utils.js';
 import { createTicket, getUserTickets } from './ticket-service.js';
+import {
+    checkMinecraftAvailability,
+    claimMinecraftLink,
+    releaseMinecraftLink,
+    MC_ALREADY_LINKED_MESSAGE,
+    MC_ALREADY_LINKED_HTML
+} from './minecraft-link-service.js';
 
 // Global state
 let currentUser = null;
@@ -3243,6 +3250,41 @@ export function initAccountPage() {
                 const twitchVal = getVal('social-twitch');
                 const twitterVal = getVal('social-twitter');
 
+                const mcErrEl = document.getElementById('social-minecraft-error');
+                if (mcErrEl) {
+                    mcErrEl.style.display = 'none';
+                    mcErrEl.innerHTML = '';
+                }
+
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Saving...';
+                }
+
+                // Check Minecraft username uniqueness sitewide
+                if (minecraftVal) {
+                    const checkResult = await checkMinecraftAvailability(minecraftVal, user.uid, { dbInstance: db });
+                    if (!checkResult.available || checkResult.linkedToOther) {
+                        const errMsg = checkResult.message || MC_ALREADY_LINKED_MESSAGE;
+                        const errHtml = checkResult.htmlMessage || MC_ALREADY_LINKED_HTML;
+
+                        if (mcErrEl) {
+                            mcErrEl.innerHTML = errHtml;
+                            mcErrEl.style.display = 'block';
+                        }
+                        if (notif) {
+                            notif.innerHTML = errHtml;
+                            notif.className = 'notification error';
+                            notif.style.display = 'block';
+                        }
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Save Social Profiles';
+                        }
+                        return;
+                    }
+                }
+
                 const socials = {
                     minecraft: minecraftVal,
                     discord: discordVal,
@@ -3253,11 +3295,6 @@ export function initAccountPage() {
                     updatedAt: new Date().toISOString()
                 };
 
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Saving...';
-                }
-
                 try {
                     await updateDoc(doc(db, "users", user.uid), {
                         socials,
@@ -3265,6 +3302,14 @@ export function initAccountPage() {
                         minecraftUsername: minecraftVal,
                         discord: discordVal
                     });
+
+                    // Update the global minecraft_links registry
+                    const priorIgn = userData.minecraft || userData.minecraftUsername || null;
+                    if (minecraftVal) {
+                        await claimMinecraftLink(db, user.uid, minecraftVal, { oldIgn: priorIgn, email: user.email });
+                    } else if (priorIgn) {
+                        await releaseMinecraftLink(db, priorIgn);
+                    }
 
                     userData.socials = socials;
                     userData.minecraft = minecraftVal;
@@ -3295,6 +3340,32 @@ export function initAccountPage() {
                     }
                 }
             });
+
+            // Inline blur verification for Minecraft username input
+            const mcInputEl = document.getElementById('social-minecraft');
+            if (mcInputEl && !mcInputEl.dataset.uniquenessBound) {
+                mcInputEl.dataset.uniquenessBound = 'true';
+                mcInputEl.addEventListener('blur', async () => {
+                    const val = mcInputEl.value.trim();
+                    const errEl = document.getElementById('social-minecraft-error');
+                    if (!val) {
+                        if (errEl) errEl.style.display = 'none';
+                        return;
+                    }
+                    const checkResult = await checkMinecraftAvailability(val, user.uid, { dbInstance: db });
+                    if (!checkResult.available || checkResult.linkedToOther) {
+                        if (errEl) {
+                            errEl.innerHTML = checkResult.htmlMessage || MC_ALREADY_LINKED_HTML;
+                            errEl.style.display = 'block';
+                        }
+                    } else {
+                        if (errEl) {
+                            errEl.style.display = 'none';
+                            errEl.innerHTML = '';
+                        }
+                    }
+                });
+            }
         }
 
         // Support Ticket Form & Counter
