@@ -59,6 +59,12 @@ export function loadNavbar() {
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
+            <li>
+                <a href="cart.html" id="nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
+                    <span>Cart</span>
+                    <span id="nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
+                </a>
+            </li>
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
@@ -97,6 +103,7 @@ export function loadNavbar() {
         attachNavEvents();
         attachNotificationEvents();
         updateAuthLink();
+        initNavbarCart();
     }
     initCookieConsent();
 }
@@ -112,6 +119,12 @@ export function loadUdsNavbar() {
             <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
+            <li>
+                <a href="cart.html" id="uds-nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
+                    <span>Cart</span>
+                    <span id="uds-nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
+                </a>
+            </li>
             <li class="nav-dropdown-wrapper">
                 <a href="#" style="cursor: default;">Autolux ▾</a>
                 <div class="nav-dropdown">
@@ -154,8 +167,68 @@ export function loadUdsNavbar() {
         attachNavEvents();
         attachNotificationEvents();
         updateAuthLink();
+        initNavbarCart();
     }
     initCookieConsent();
+}
+
+export function updateNavbarCartBadge(count) {
+    const badges = [
+        document.getElementById('nav-cart-badge'),
+        document.getElementById('uds-nav-cart-badge')
+    ];
+    badges.forEach(badge => {
+        if (badge) {
+            const validCount = Math.max(0, parseInt(count, 10) || 0);
+            if (validCount > 0) {
+                badge.style.display = 'inline-flex';
+                badge.textContent = validCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    });
+}
+
+function initNavbarCart() {
+    let count = 0;
+    try {
+        const stored = localStorage.getItem('cartItemCount');
+        if (stored !== null && stored !== '') {
+            count = parseInt(stored, 10) || 0;
+        } else {
+            const raw = localStorage.getItem('localCart');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                count = Object.values(parsed).reduce((sum, q) => sum + (parseInt(q, 10) || 0), 0);
+            }
+        }
+    } catch (_) {}
+    updateNavbarCartBadge(count);
+
+    if (typeof window !== 'undefined' && !window._navbarCartListenerAttached) {
+        window._navbarCartListenerAttached = true;
+        window.addEventListener('cartUpdated', (e) => {
+            let c = 0;
+            if (e.detail && typeof e.detail.itemCount === 'number') {
+                c = e.detail.itemCount;
+            } else {
+                try {
+                    c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                } catch (_) {}
+            }
+            updateNavbarCartBadge(c);
+        });
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'localCart' || e.key === 'cartItemCount') {
+                let c = 0;
+                try {
+                    c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                } catch (_) {}
+                updateNavbarCartBadge(c);
+            }
+        });
+    }
 }
 
 function attachNavEvents() {

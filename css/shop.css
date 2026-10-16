@@ -1289,3 +1289,58 @@ textarea#review-text:focus {
     color: #fff;
 }
 
+/* Shop Header Cart CTA */
+.shop-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.shop-header-text h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.shop-header-text p {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.shop-cart-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    background: var(--accent-color, #2563EB);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shop-cart-cta-btn:hover {
+    transform: translateY(-2px);
+    background: #1d4ed8;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+}
+
+.shop-cart-cta-btn .cart-badge-count {
+    background: #fff;
+    color: var(--accent-color, #2563EB);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+

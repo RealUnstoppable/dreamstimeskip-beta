@@ -803,10 +803,15 @@ function setupEventListeners() {
         });
     }
     
+    if (cartButton) {
+        cartButton.addEventListener('click', (e) => {
+            window.location.href = 'cart.html';
+        });
+    }
+
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
-            // Updated to point to the new checkout.html page
-            window.location.href = 'checkout.html';
+            window.location.href = 'cart.html';
         });
     }
 

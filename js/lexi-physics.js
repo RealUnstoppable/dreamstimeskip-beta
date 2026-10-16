@@ -138,7 +138,7 @@ export function initLexiPhysics() {
 
     if (dragCart) {
         dragCart.addEventListener('click', () => {
-            window.location.href = 'shop.html#cart';
+            window.location.href = 'cart.html';
         });
     }
     if (dragChat) {

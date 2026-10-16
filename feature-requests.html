@@ -169,6 +169,13 @@
     <footer class="main-footer"></footer>
 
     <script src="/js/script.js"></script>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+
+        loadNavbar();
+        loadFooter();
+    </script>
     <script type="module" src="/js/feature-requests.js"></script>
 
 </body>

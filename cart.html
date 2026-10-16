@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | DTS HUB</title>
+    <meta name="description" content="Review your selected items, apply promo codes, and proceed to secure checkout.">
+    
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/cart.css">
+
+    <meta name="google-adsense-account" content="ca-pub-4254213062632381">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <header class="main-header"></header>
+
+    <main class="cart-main-container">
+        <!-- Page Header & Stepper -->
+        <div class="cart-page-header">
+            <div class="cart-header-top">
+                <div>
+                    <h1 class="cart-page-title">Your Cart</h1>
+                    <p class="cart-page-subtitle">Review your items before proceeding to secure checkout.</p>
+                </div>
+                <div class="cart-stepper-nav" aria-label="Checkout Progress">
+                    <div class="cart-step-node active">
+                        <span class="cart-step-badge">1</span>
+                        <span>1. Cart</span>
+                    </div>
+                    <div class="cart-step-divider"></div>
+                    <div class="cart-step-node">
+                        <span class="cart-step-badge">2</span>
+                        <span>2. Shipping &amp; Payment</span>
+                    </div>
+                    <div class="cart-step-divider"></div>
+                    <div class="cart-step-node">
+                        <span class="cart-step-badge">3</span>
+                        <span>3. Confirmation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2-Column Cart Grid Layout -->
+        <div class="cart-layout-grid">
+            <!-- Left Column: Itemized List & Trust Card -->
+            <div class="cart-items-column" id="cart-items-column">
+                <!-- Itemized Cart List -->
+                <div id="cart-items-list" class="cart-items-column"></div>
+
+                <!-- Clean Empty Cart State -->
+                <div id="cart-empty-view" class="cart-empty-state" style="display: none;">
+                    <span class="cart-empty-icon" aria-hidden="true">🛍️</span>
+                    <h2 class="cart-empty-title">Your cart is empty</h2>
+                    <p class="cart-empty-desc">You haven't added any gear, music, or perks to your cart yet. Explore our official collection to find something you like.</p>
+                    <a href="shop.html" class="cart-explore-btn">
+                        <span>Explore the Shop</span>
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
+
+                <!-- Trust & Fulfillment Clarity Card -->
+                <div class="cart-trust-card">
+                    <h2 class="cart-trust-card-title">
+                        <span>🛡️</span>
+                        <span>Order Guarantee &amp; Fulfillment</span>
+                    </h2>
+                    <div class="cart-trust-row">
+                        <div class="cart-trust-icon" aria-hidden="true">⚡</div>
+                        <div class="cart-trust-info">
+                            <div class="cart-trust-info-heading">Instant Realm &amp; Digital Access</div>
+                            <p class="cart-trust-info-text">Digital perks, whitelist roles, and VIP subscription privileges activate immediately on your account upon checkout completion.</p>
+                        </div>
+                    </div>
+                    <div class="cart-trust-row">
+                        <div class="cart-trust-icon" aria-hidden="true">📦</div>
+                        <div class="cart-trust-info">
+                            <div class="cart-trust-info-heading">Tracked Physical Merchandise</div>
+                            <p class="cart-trust-info-text">Apparel, vinyls, and accessories ship in 3–5 business days with direct tracking updates delivered to your account email.</p>
+                        </div>
+                    </div>
+                    <div class="cart-trust-row">
+                        <div class="cart-trust-icon" aria-hidden="true">🔒</div>
+                        <div class="cart-trust-info">
+                            <div class="cart-trust-info-heading">Verified Secure Stripe Checkout</div>
+                            <p class="cart-trust-info-text">Payment information is processed using bank-grade 256-bit SSL encryption. We never store raw card numbers.</p>
+                        </div>
+                    </div>
+                    <div class="cart-trust-row">
+                        <div class="cart-trust-icon" aria-hidden="true">💬</div>
+                        <div class="cart-trust-info">
+                            <div class="cart-trust-info-heading">Direct Customer Support</div>
+                            <p class="cart-trust-info-text">Questions about an item or order? <a href="account.html#support">Open a support ticket</a> or chat with Lexi anytime.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sticky Upfront Order Summary -->
+            <div class="cart-summary-column">
+                <div class="cart-order-summary-card">
+                    <h2 class="cart-summary-title">Order Summary</h2>
+
+                    <div class="cart-summary-row">
+                        <span>Subtotal</span>
+                        <span class="val" id="cart-summary-subtotal">$0.00</span>
+                    </div>
+
+                    <!-- Promo Code Box -->
+                    <div class="cart-promo-container">
+                        <label for="cart-promo-input" class="cart-promo-label">Promo Code</label>
+                        <div class="cart-promo-input-group">
+                            <input type="text" id="cart-promo-input" class="cart-promo-input" placeholder="e.g. STAY10DTS" autocomplete="off" spellcheck="false" aria-label="Promo code">
+                            <button type="button" id="cart-apply-promo-btn" class="cart-promo-apply-btn" aria-label="Apply promo code">Apply</button>
+                        </div>
+                        <div id="cart-promo-feedback" class="cart-promo-feedback" aria-live="polite"></div>
+                    </div>
+
+                    <!-- Discount Row -->
+                    <div class="cart-summary-row discount-row" id="cart-summary-discount-row" style="display: none;">
+                        <span>Discount<span id="discount-code-tag"></span></span>
+                        <span class="val" id="cart-summary-discount">-$0.00</span>
+                    </div>
+
+                    <!-- Upfront Fee Transparency Breakdown -->
+                    <div class="cart-summary-row">
+                        <span>Estimated Taxes (8%)</span>
+                        <span class="val" id="cart-summary-tax">$0.00</span>
+                    </div>
+
+                    <div class="cart-summary-row">
+                        <span>Delivery</span>
+                        <span class="free-tag">FREE</span>
+                    </div>
+
+                    <div class="cart-transparency-notice">
+                        <span class="cart-transparency-icon" aria-hidden="true">✓</span>
+                        <span>All taxes and delivery fees are calculated upfront. No surprise fees at checkout.</span>
+                    </div>
+
+                    <div class="cart-summary-row total-row">
+                        <span>Estimated Total</span>
+                        <span class="total-amount" id="cart-summary-total">$0.00</span>
+                    </div>
+
+                    <!-- High-Contrast Primary CTA -->
+                    <a href="checkout.html" id="cart-checkout-btn" class="cart-primary-checkout-btn checkout-btn" data-telemetry-cta="checkout" aria-label="Proceed to Checkout">
+                        <span>Proceed to Checkout</span>
+                        <span aria-hidden="true" style="margin-left: 8px;">&rarr;</span>
+                    </a>
+
+                    <!-- Secondary Return Path -->
+                    <a href="shop.html" class="cart-continue-shopping-link" aria-label="Continue Shopping">
+                        <span aria-hidden="true">&larr;</span>
+                        <span>Continue Shopping</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conversion-Safe Ad Slot (Placed below cart fold to prevent CLS and avoid checkout interference) -->
+        <!-- AD_SLOT_START -->
+        <section class="site-ad-section cart-ad-section" style="max-width: 728px; min-height: 90px; margin: 50px auto 20px; text-align: center;" aria-label="Sponsored Content">
+            <div class="site-ad-label" style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px;">Sponsored</div>
+            <div class="ad-container ad-bottom-banner cart-ad-container" data-ad-slot="cart-bottom-slot" style="min-height: 90px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-4254213062632381"
+                     data-ad-slot="9876543210"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </section>
+        <!-- AD_SLOT_END -->
+    </main>
+
+    <!-- Mobile Sticky Checkout Bar (Stacked View) -->
+    <div class="cart-mobile-sticky-bar" id="cart-mobile-sticky-bar" aria-label="Quick Checkout">
+        <div>
+            <div class="mobile-sticky-total-label">Estimated Total</div>
+            <div class="mobile-sticky-total-price" id="mobile-sticky-total">$0.00</div>
+        </div>
+        <a href="checkout.html" class="mobile-sticky-checkout-btn checkout-btn" data-telemetry-cta="checkout">
+            <span>Checkout &rarr;</span>
+        </a>
+    </div>
+
+    <footer class="main-footer"></footer>
+
+    <!-- Sitewide Layout Scripts -->
+    <script src="/js/script.js"></script>
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js';
+        import { loadFooter } from './js/footer.js';
+
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+    <script type="module" src="/js/cart.js"></script>
+</body>
+
+</html>

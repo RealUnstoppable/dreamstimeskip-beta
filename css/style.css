@@ -107,6 +107,28 @@ body {
     color: var(--text-primary);
 }
 
+.nav-cart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+.nav-cart-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--accent-color, #2563EB);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
 .cta-button {
     display: inline-block;
     background-color: var(--accent-color);

@@ -98,6 +98,14 @@ export function getPageContext() {
             isCheckout: true
         };
     }
+    if (path.includes('cart')) {
+        return {
+            id: 'cart',
+            title: 'Your Cart',
+            tag: '🛒 Cart',
+            isCart: true
+        };
+    }
     if (path.includes('medixly')) {
         return {
             id: 'medixly',
@@ -442,6 +450,21 @@ export function generateOfflineResponse(userInput) {
             return res;
         }
 
+        if (pageCtx.isCart) {
+            let res = `You are viewing **Your Cart**!\n\n`;
+            if (cart.empty) {
+                res += `Your cart is currently empty. Explore our collection to find apparel, music, and accessories!\n[VIEW_SHOP]`;
+            } else {
+                res += `Here is your current cart breakdown:\n`;
+                cart.items.forEach(item => {
+                    res += `* **${item.qty}x ${escapeHTML(item.name)}** - $${item.total.toFixed(2)}\n`;
+                });
+                res += `\n**Estimated Subtotal:** $${cart.subtotal.toFixed(2)} (plus tax)\n` +
+                    `You can adjust quantities, apply promo codes, or proceed directly to checkout:\n[CHECKOUT_BUTTON]`;
+            }
+            return res;
+        }
+
         if (pageCtx.isMedixly) {
             const currentSong = getCurrentlyPlaying();
             return `You are in **Medixly** (formerly HarmonyTunes) — the creative sound & music hub under the Unstoppable Umbrella!\n\n` +
@@ -760,7 +783,8 @@ export function initChatbot() {
                         <button class="chat-chip" data-prompt="Play a song">🎵 Play a Song</button>
                         <button class="chat-chip" data-prompt="DTS Countdowns">⏳ DTS Countdowns</button>
                         ${pageCtx.isAccount ? '<button class="chat-chip" data-prompt="My Points & Streak">🏆 My Points & Streak</button>' : ''}
-                        ${cartSnapshot.count > 0 ? '<button class="chat-chip" data-prompt="What is in my cart?">🛒 View Cart (' + cartSnapshot.count + ')</button>' : ''}
+                        ${pageCtx.isCart ? '<button class="chat-chip" data-prompt="Proceed to checkout">💳 Proceed to checkout</button>' : ''}
+                        ${cartSnapshot.count > 0 && !pageCtx.isCart ? '<button class="chat-chip" data-prompt="What is in my cart?">🛒 View Cart (' + cartSnapshot.count + ')</button>' : ''}
                     </div>
                 </div>
             </div>
@@ -911,11 +935,7 @@ export function initChatbot() {
 
         const openCartBtn = e.target.closest('.chat-open-cart-action');
         if (openCartBtn) {
-            if (window.DTSMusic && typeof window.DTSMusic.openSitewideLexiCart === 'function') {
-                window.DTSMusic.openSitewideLexiCart();
-            } else {
-                window.location.href = 'shop.html';
-            }
+            window.location.href = 'cart.html';
             return;
         }
 
