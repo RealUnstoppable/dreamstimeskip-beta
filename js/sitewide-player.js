@@ -850,7 +850,7 @@ class SitewideMusicEngine {
             cartBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 this.collapseLexi(orb);
-                window.location.href = 'cart.html';
+                window.location.href = 'https://realunstoppable.store/cart.html';
             });
         }
 
@@ -862,7 +862,7 @@ class SitewideMusicEngine {
     }
 
     openSitewideLexiCart() {
-        window.location.href = 'cart.html';
+        window.location.href = 'https://realunstoppable.store/cart.html';
     }
 
     collapseLexi(orb) {

@@ -935,7 +935,7 @@ export function initChatbot() {
 
         const openCartBtn = e.target.closest('.chat-open-cart-action');
         if (openCartBtn) {
-            window.location.href = 'cart.html';
+            window.location.href = 'https://realunstoppable.store/cart.html';
             return;
         }
 

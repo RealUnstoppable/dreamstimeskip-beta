@@ -61,10 +61,21 @@ describe('Dedicated High-Converting Cart Page & Conversion UX Standards', () => 
 
     it('includes trust badges, SSL/Stripe security notes, and fulfillment expectations', () => {
         expect(cartHtml).toContain('cart-trust-card');
+        expect(cartHtml).toContain('cart-card-header');
+        expect(cartHtml).toContain('cart-card-subtitle');
+        expect(cartHtml).toContain('Order Guarantee &amp; Fulfillment');
         expect(cartHtml).toContain('Secure Stripe Checkout');
         expect(cartHtml).toContain('Instant Realm &amp; Digital Access');
         expect(cartHtml).toContain('256-bit SSL encryption');
         expect(cartHtml).toContain('Open a support ticket');
+    });
+
+    it('matches Your Cart bold typography across Order Summary and Order Guarantee titles', () => {
+        expect(cartCss).toContain('.cart-summary-title,');
+        expect(cartCss).toContain('.cart-trust-card-title {');
+        expect(cartCss).toContain('font-size: 1.85rem');
+        expect(cartCss).toContain('font-weight: 800');
+        expect(cartCss).toContain('letter-spacing: -0.5px');
     });
 
     it('places conversion-safe ad unit below the cart fold to prevent layout shift', () => {
@@ -311,17 +322,17 @@ describe('Navbar Cart Badge Updates (js/navbar.js)', () => {
 });
 
 describe('Lexi Chatbot Cart Routing Integration', () => {
-    it('verifies openSitewideLexiCart routes directly to cart.html', () => {
+    it('verifies openSitewideLexiCart routes directly to https://realunstoppable.store/cart.html', () => {
         const sitewidePlayerJs = fs.readFileSync(path.join(ROOT_DIR, 'js/sitewide-player.js'), 'utf8');
         expect(sitewidePlayerJs).toContain("openSitewideLexiCart() {");
-        expect(sitewidePlayerJs).toContain("window.location.href = 'cart.html'");
+        expect(sitewidePlayerJs).toContain("window.location.href = 'https://realunstoppable.store/cart.html'");
         expect(sitewidePlayerJs).not.toContain("alert('Lexi is sleeping')");
     });
 
-    it('verifies chatbot open cart action routes directly to cart.html', () => {
+    it('verifies chatbot open cart action routes directly to https://realunstoppable.store/cart.html', () => {
         const chatbotJs = fs.readFileSync(path.join(ROOT_DIR, 'js/chatbot.js'), 'utf8');
         expect(chatbotJs).toContain("const openCartBtn = e.target.closest('.chat-open-cart-action')");
-        expect(chatbotJs).toContain("window.location.href = 'cart.html'");
+        expect(chatbotJs).toContain("window.location.href = 'https://realunstoppable.store/cart.html'");
     });
 
     it('verifies shop.html and js/shop.js route cart buttons to cart.html', () => {

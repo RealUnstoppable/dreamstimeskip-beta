@@ -138,7 +138,7 @@ export function initLexiPhysics() {
 
     if (dragCart) {
         dragCart.addEventListener('click', () => {
-            window.location.href = 'cart.html';
+            window.location.href = 'https://realunstoppable.store/cart.html';
         });
     }
     if (dragChat) {
