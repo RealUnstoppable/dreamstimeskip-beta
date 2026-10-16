@@ -3,6 +3,11 @@
 // Automatically initialize the newsletter logic on any page that loads this footer
 if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
     import('./newsletter.js');
+    import('../dist/components/PrivacyConsentManager.js').then((m) => {
+        if (m && typeof m.initPrivacyConsentManager === 'function') {
+            m.initPrivacyConsentManager();
+        }
+    }).catch(() => {});
 }
 
 export function loadFooter() {
@@ -44,6 +49,7 @@ export function loadFooter() {
                         <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="terms.html">Terms of Service</a></li>
+                        <li><button type="button" id="footer-privacy-choices" class="footer-privacy-choices-btn" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:left;">Your Privacy Choices / Do Not Sell or Share My Personal Information</button></li>
                     </ul>
                 </div>
                 <div class="footer-column footer-newsletter">
@@ -67,5 +73,15 @@ export function loadFooter() {
     const footer = document.querySelector('.main-footer');
     if (footer) {
         footer.innerHTML = footerHTML;
+        if (typeof footer.querySelector === 'function') {
+            const privacyBtn = footer.querySelector('#footer-privacy-choices');
+            if (privacyBtn) {
+                privacyBtn.addEventListener('click', () => {
+                    if (typeof window !== 'undefined' && typeof window.openPrivacyChoices === 'function') {
+                        window.openPrivacyChoices();
+                    }
+                });
+            }
+        }
     }
 }

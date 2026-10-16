@@ -4,6 +4,8 @@ import Stripe from "stripe";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs/promises";
+import { handleTelemetryIngest, handleConsentRecord } from "./dist/lib/telemetry-server.js";
+import { getExportableAudienceCohort } from "./dist/lib/google-ads-sync.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,7 +20,24 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json());
+app.use(express.json({ limit: "64kb" }));
+
+// First-Party Telemetry & Consent Pipeline Endpoints
+app.post("/api/v1/telemetry", handleTelemetryIngest);
+app.post("/api/v1/consent", handleConsentRecord);
+app.get("/api/v1/audiences/:segment", async (req, res) => {
+  try {
+    const cohort = await getExportableAudienceCohort(req.params.segment);
+    if (req.query.format === "csv") {
+      res.setHeader("Content-Type", "text/csv");
+      res.send(cohort.csv);
+    } else {
+      res.json(cohort);
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Helper to parse cookies
 function parseCookies(request) {

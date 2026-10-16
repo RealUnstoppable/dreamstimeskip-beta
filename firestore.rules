@@ -2,29 +2,67 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ===============================================================
+    // Assumed Data Model & Access Control
+    // ===============================================================
+    //
+    // Collection: users/{uid}
+    //   - First-party user profile & telemetry summary
+    //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
+    //
+    // Subcollection: users/{uid}/consents/{consentId}
+    //   - Immutable consent ledger records
+    //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
+    //
+    // Collection: sessions/{sessionId}
+    //   - First-party telemetry session records
+    //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
+    //
+    // Subcollection: sessions/{sessionId}/eventBatches/{batchId}
+    //   - Telemetry batched event logs
+    //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
+    //
+    // Preserved Application Collections:
+    //   - /dts_waitlist, /minecraft_links, /carts, /wishlists, /loyalty_transactions,
+    //     /orders, /support_tickets, /blog_comments, /reviews, /product_stats,
+    //     /product_questions, /product_reviews, /bookings, /inquiries, /faqs,
+    //     /feature_requests, /newsletterSubscribers, /reward_transactions,
+    //     /notifications, /artist_tracks, /promo_codes
+    // ===============================================================
+
     function isAdmin() {
-      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      return request.auth != null && (
+        request.auth.token.get('admin', false) == true ||
+        request.auth.token.get('isAdmin', false) == true ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true)
+      );
     }
 
-    // Users collection: Users can only read/write their own profile.
-    // Allows custom profile fields (e.g., minecraftUsername, discordUsername, birthday, dtsRank, isWhitelisted, whitelistedAt)
-    // while strictly prohibiting unauthorized modification of administrative and subscription fields.
-    match /users/{userId} {
-      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
-      allow create: if request.auth != null && (
-        (request.auth.uid == userId
-         && request.resource.data.get('isAdmin', false) == false
-         && request.resource.data.get('isBanned', false) == false
-         && request.resource.data.get('membershipLevel', 'free') == 'free'
-         && !request.resource.data.keys().hasAny(['plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
-        || isAdmin()
-      );
-      allow update: if request.auth != null && (
-        (request.auth.uid == userId
-         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
-        || isAdmin()
-      );
-      allow delete: if isAdmin();
+    // ===============================================================
+    // Telemetry and Consent Ledger Collections
+    // All writes occur exclusively via the trusted Admin SDK backend endpoint.
+    // Client SDK reads are restricted: disallowed for general users, accessible only by authenticated admins.
+    // ===============================================================
+
+    match /users/{uid} {
+      allow read: if isAdmin();
+      allow write: if false;
+
+      match /consents/{consentId} {
+        allow read: if isAdmin();
+        allow write: if false;
+      }
+    }
+
+    match /sessions/{sessionId} {
+      allow read: if isAdmin();
+      allow write: if false;
+
+      match /eventBatches/{batchId} {
+        allow read: if isAdmin();
+        allow write: if false;
+      }
     }
 
     // Dreams TimeSkip waitlist collection (/dts_waitlist/{entryId})
@@ -80,7 +118,6 @@ service cloud.firestore {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
     }
 
-
     // Support tickets collection
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
@@ -92,7 +129,7 @@ service cloud.firestore {
     match /blog_comments/{commentId} {
       allow read: if true;
       allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
     // Reviews collection: Anyone can read, but only authenticated users can create
@@ -102,12 +139,12 @@ service cloud.firestore {
                     && request.resource.data.rating is number
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
-      allow update: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true)
+      allow update: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin())
                     && request.resource.data.userId == resource.data.userId
                     && request.resource.data.rating is number
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
-      allow delete: if request.auth != null && (request.auth.uid == resource.data.userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+      allow delete: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
     }
 
     // Product stats collection: Anyone can read, only backend can write
@@ -115,7 +152,6 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
-
 
     // Product Q&A Collection
     match /product_questions/{questionId} {
@@ -150,7 +186,6 @@ service cloud.firestore {
                     && request.resource.data.rating <= 5;
       allow delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
-
 
     // Autolux Collections
     match /bookings/{bookingId} {
@@ -208,13 +243,14 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && (resource.data.artistId == request.auth.uid || isAdmin());
     }
 
-    // Deny all other access by default
-        // Promo codes collection: Anyone can read, only admin can write
+    // Promo codes collection: Anyone can read, only admin can write
     match /promo_codes/{codeId} {
       allow get: if true;
       allow list: if isAdmin();
       allow write: if isAdmin();
     }
+
+    // Deny all other access by default
     match /{document=**} {
       allow read, write: if false;
     }

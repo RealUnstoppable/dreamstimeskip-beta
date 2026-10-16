@@ -276,14 +276,15 @@
                 <li><a href="#section-1">1. Information We Collect</a></li>
                 <li><a href="#section-2">2. Google AdSense &amp; Advertising Cookies</a></li>
                 <li><a href="#section-3">3. Cookies &amp; Local Storage</a></li>
-                <li><a href="#section-4">4. Third-Party Integrations</a></li>
-                <li><a href="#section-5">5. How We Use Your Information</a></li>
-                <li><a href="#section-6">6. Data Security &amp; Protection</a></li>
-                <li><a href="#section-7">7. Data Retention &amp; Deletion</a></li>
-                <li><a href="#section-8">8. Your Rights &amp; Choices</a></li>
-                <li><a href="#section-9">9. Children's Privacy</a></li>
-                <li><a href="#section-10">10. Updates to This Policy</a></li>
-                <li><a href="#section-11">11. Contact &amp; Privacy Requests</a></li>
+                <li><a href="#section-telemetry">4. Automated Telemetry, Behavioral Analytics, and Commercial Data Monetization</a></li>
+                <li><a href="#section-4">5. Third-Party Integrations</a></li>
+                <li><a href="#section-5">6. How We Use Your Information</a></li>
+                <li><a href="#section-6">7. Data Security &amp; Protection</a></li>
+                <li><a href="#section-7">8. Data Retention &amp; Deletion</a></li>
+                <li><a href="#section-8">9. Your Rights &amp; Choices</a></li>
+                <li><a href="#section-9">10. Children's Privacy</a></li>
+                <li><a href="#section-10">11. Updates to This Policy</a></li>
+                <li><a href="#section-11">12. Contact &amp; Privacy Requests</a></li>
             </ol>
         </nav>
 
@@ -319,8 +320,32 @@
             </ul>
         </section>
 
+        <section id="section-telemetry" class="legal-section">
+            <h2><span class="section-num">4.</span> Automated Telemetry, Behavioral Analytics, and Commercial Data Monetization</h2>
+            <p>To deliver high-performance user experiences, diagnose user friction, optimize conversion funnels, and power first-party attribution modeling for <code>https://realunstoppable.store</code>, we deploy advanced first-party client-side telemetry collectors and server-side ingestion pipelines backed by Google Cloud Firestore.</p>
+
+            <h3>4.1 Scope of Telemetry &amp; Micro-Interaction Signals</h3>
+            <p>When you browse our storefront and web applications, our first-party collectors systematically record granular engagement metrics, including:</p>
+            <ul>
+                <li><strong>Micro-Interactions &amp; Friction Diagnostics:</strong> Scroll depth thresholds (25%, 50%, 75%, 100%), cumulative visible dwell duration, call-to-action (CTA) hover durations (&gt;400ms), rage clicks (rapid successive clicks within a confined pixel radius indicative of broken UX), dead clicks (clicks yielding no DOM mutation or state update within 500ms), and promotional code copy/paste activities.</li>
+                <li><strong>Catalog &amp; Commerce Telemetry:</strong> Product SKU impressions (observed via viewport intersection with dwell &gt;1000ms), cart mutations, checkout step completions, and purchase confirmations.</li>
+                <li><strong>Cross-Browser Technical Environment:</strong> Client screen dimensions, device pixel ratios, viewport metrics, color depth, hardware concurrency, device memory hints, client time zone, browser language preferences, effective network connection types, and high-entropy Client Hints where permitted.</li>
+            </ul>
+
+            <h3>4.2 Strict Privacy Guardrails &amp; Exclusion of Sensitive Inputs</h3>
+            <p>Our telemetry collectors operate under strict data hygiene rules: <strong>we strictly prohibit and never capture the raw values of passwords (<code>&lt;input type="password"&gt;</code>), payment card numbers, card expiration dates, card verification codes (CVV/CVC), Social Security Numbers (SSN), or sensitive personal communications</strong>. On non-sensitive form inputs, we only log field focus timing, duration, and boolean completion/abandonment indicators.</p>
+
+            <h3>4.3 Pseudonymization, Cryptographic Hashing &amp; Google Ads Attribution</h3>
+            <p>All direct personally identifiable information (PII)—including email addresses and telephone numbers captured during checkout or newsletter signups—is sanitized, lowercased, and cryptographically hashed using industry-standard SHA-256 before any transmission or storage in our telemetry ledger. We leverage first-party identifiers (<code>ru_uid</code> and rolling session <code>ru_sid</code>) and HTTP-only cookies to enable Google Consent Mode v2 and Google Ads Enhanced Conversions without relying on third-party tracking cookies.</p>
+
+            <h3>4.4 Commercial Data Monetization, Cohort Licensing &amp; State Privacy Opt-Outs</h3>
+            <p>We analyze telemetry patterns to synthesize aggregated, pseudonymous behavioral audience cohorts (such as <code>high_intent_viewer</code>, <code>cart_abandoner</code>, <code>repeat_buyer</code>, and <code>promo_seeker</code>). Subject to applicable legal authorizations and your affirmative consent choices, such pseudonymous audience cohorts may be shared, licensed, or utilized in commercial advertising syndication and Google Ads Customer Match campaigns.</p>
+            <p><strong>Your Privacy Choices &amp; Global Privacy Control (GPC):</strong> In strict compliance with the California Consumer Privacy Act as amended by the CPRA (Cal. Civ. Code § 1798.100 et seq.), Colorado Privacy Act (CPA), Virginia Consumer Data Protection Act (VCDPA), and other comprehensive state privacy statutes, you possess the absolute right to opt out of the sale or sharing of your personal data for cross-context behavioral advertising. Our platform automatically recognizes and honors the Global Privacy Control (GPC) signal (transmitted via browser header <code>Sec-GPC: 1</code> or JavaScript property <code>navigator.globalPrivacyControl === true</code>). When GPC is active or when you select "Do Not Sell or Share" in our privacy modal, commercial data sharing and targeted advertising are instantly revoked and locked to denied across our systems.</p>
+            <p>You can adjust your granular preferences or exercise your opt-out rights at any time by clicking the <button type="button" class="btn-legal-secondary" style="display:inline;padding:2px 8px;font-size:0.85rem;cursor:pointer;" onclick="window.openPrivacyChoices ? window.openPrivacyChoices() : null">Your Privacy Choices / Do Not Sell or Share My Personal Information</button> button in our website footer.</p>
+        </section>
+
         <section id="section-4" class="legal-section">
-            <h2><span class="section-num">4.</span> Third-Party Integrations</h2>
+            <h2><span class="section-num">5.</span> Third-Party Integrations</h2>
             <p>To deliver modern web experiences, our platforms integrate trusted third-party services which may process data subject to their respective privacy terms:</p>
             <ul>
                 <li><strong>Google Firebase:</strong> Used for secure user authentication, Cloud Firestore database synchronization, and hosting infrastructure.</li>
@@ -331,7 +356,7 @@
         </section>
 
         <section id="section-5" class="legal-section">
-            <h2><span class="section-num">5.</span> How We Use Your Information</h2>
+            <h2><span class="section-num">6.</span> How We Use Your Information</h2>
             <p>We process the information we collect for the following legitimate purposes:</p>
             <ul>
                 <li>To operate, maintain, and enhance the Unstoppable Hub, Medixly, and Dreams TimeSkip.</li>
@@ -343,18 +368,18 @@
         </section>
 
         <section id="section-6" class="legal-section">
-            <h2><span class="section-num">6.</span> Data Security &amp; Protection</h2>
+            <h2><span class="section-num">7.</span> Data Security &amp; Protection</h2>
             <p>We implement industry-standard organizational and technical security measures designed to protect your personal information against unauthorized access, alteration, disclosure, or destruction. All data transmission between your browser and our servers is encrypted using modern TLS (HTTPS) protocols.</p>
             <p>Access to user records is restricted to authorized personnel with a legitimate administrative need, and sensitive payment data is isolated entirely within Stripe's certified environment.</p>
         </section>
 
         <section id="section-7" class="legal-section">
-            <h2><span class="section-num">7.</span> Data Retention &amp; Deletion</h2>
+            <h2><span class="section-num">8.</span> Data Retention &amp; Deletion</h2>
             <p>We retain your personal information for as long as your account remains active or as needed to provide you with ecosystem services. You may request the permanent deletion of your account and associated records at any time by contacting our support team.</p>
         </section>
 
         <section id="section-8" class="legal-section">
-            <h2><span class="section-num">8.</span> Your Rights &amp; Choices</h2>
+            <h2><span class="section-num">9.</span> Your Rights &amp; Choices</h2>
             <p>Depending on your jurisdiction (including rights under the CCPA, GDPR, and other applicable regional privacy laws), you have specific rights regarding your personal data:</p>
             <ul>
                 <li><strong>Right to Access:</strong> Request a copy of the personal information we hold about you.</li>
@@ -365,17 +390,17 @@
         </section>
 
         <section id="section-9" class="legal-section">
-            <h2><span class="section-num">9.</span> Children's Privacy</h2>
+            <h2><span class="section-num">10.</span> Children's Privacy</h2>
             <p>Our Site and Services are designed for general audiences and are not directed to children under the age of 13. We do not knowingly collect personal data from children under 13 without verified parental consent. If we become aware that personal information has been inadvertently collected from a child under 13, we will promptly delete such data from our records.</p>
         </section>
 
         <section id="section-10" class="legal-section">
-            <h2><span class="section-num">10.</span> Updates to This Policy</h2>
+            <h2><span class="section-num">11.</span> Updates to This Policy</h2>
             <p>We may update this Privacy Policy periodically to reflect changes in our operational practices, services, or legal obligations. When changes are made, we will revise the "Last Updated" date at the top of this page. Your continued use of the Site after revisions become effective constitutes acknowledgment and acceptance of the revised policy.</p>
         </section>
 
         <section id="section-11" class="legal-section">
-            <h2><span class="section-num">11.</span> Contact &amp; Privacy Requests</h2>
+            <h2><span class="section-num">12.</span> Contact &amp; Privacy Requests</h2>
             <p>If you have any questions, concerns, feedback, or requests regarding this Privacy Policy or your personal information, please reach out to us:</p>
             <ul>
                 <li><strong>Entity:</strong> Unstoppable LLC</li>
