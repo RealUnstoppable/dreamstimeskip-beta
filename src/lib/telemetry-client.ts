@@ -488,6 +488,9 @@ export class TelemetryCollector {
 
     // 7. Promo copy / paste
     this.initPromoCopy();
+
+    // 8. Universal Video Engagement Tracker (Dreams OG Trailer & site videos)
+    this.initVideoTracking();
   }
 
   private trackPageView(): void {
@@ -776,6 +779,173 @@ export class TelemetryCollector {
 
     document.addEventListener('copy', (e) => handlePromoEvent(e, 'copy'));
     document.addEventListener('paste', (e) => handlePromoEvent(e, 'paste'));
+  }
+
+  private initVideoTracking(): void {
+    if (typeof document === 'undefined') return;
+
+    const trackedVideos = new WeakSet<HTMLVideoElement>();
+
+    const attachVideoListeners = (video: HTMLVideoElement) => {
+      if (trackedVideos.has(video)) return;
+      trackedVideos.add(video);
+
+      const videoId =
+        video.id ||
+        video.getAttribute('data-telemetry-video') ||
+        'vid_' + Math.random().toString(36).substring(2, 8);
+
+      const getVideoTitle = (): string => {
+        const explicit = video.getAttribute('data-telemetry-video');
+        if (explicit) return explicit;
+        if (video.id === 'modal-video') {
+          return document.title.includes('Dreams') ? 'Dreams OG Official Trailer' : 'Site Feature Trailer';
+        }
+        if (video.classList.contains('dts-bg-video')) return 'DTS Background Visual';
+        const src = video.currentSrc || video.querySelector('source')?.getAttribute('src') || '';
+        if (src.includes('dreams-trailer')) return 'Dreams OG Official Trailer';
+        if (src) {
+          const parts = src.split('/');
+          return parts[parts.length - 1].split('?')[0];
+        }
+        return video.id || 'Site Video';
+      };
+
+      const firedMilestones = new Set<number>();
+      let playStartMs = 0;
+      let totalWatchedSec = 0;
+
+      video.addEventListener('play', () => {
+        playStartMs = Date.now();
+        this.enqueue('video_engagement', {
+          videoId,
+          videoTitle: getVideoTitle(),
+          action: 'start',
+          currentTime: Math.round(video.currentTime || 0),
+          duration: Math.round(video.duration || 0),
+          percent: video.duration ? Math.round((video.currentTime / video.duration) * 100) : 0,
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
+        });
+      });
+
+      video.addEventListener('timeupdate', () => {
+        if (!video.duration || isNaN(video.duration)) return;
+        const pct = Math.round((video.currentTime / video.duration) * 100);
+        const milestones = [25, 50, 75];
+        for (const m of milestones) {
+          if (pct >= m && !firedMilestones.has(m)) {
+            firedMilestones.add(m);
+            this.enqueue('video_engagement', {
+              videoId,
+              videoTitle: getVideoTitle(),
+              action: `progress_${m}`,
+              currentTime: Math.round(video.currentTime),
+              duration: Math.round(video.duration),
+              percent: pct,
+              page: typeof window !== 'undefined' ? window.location.pathname : '',
+            });
+          }
+        }
+      });
+
+      video.addEventListener('ended', () => {
+        if (playStartMs > 0) {
+          totalWatchedSec += Math.round((Date.now() - playStartMs) / 1000);
+          playStartMs = 0;
+        }
+        this.enqueue('video_engagement', {
+          videoId,
+          videoTitle: getVideoTitle(),
+          action: 'complete',
+          currentTime: Math.round(video.duration || video.currentTime || 0),
+          duration: Math.round(video.duration || video.currentTime || 0),
+          percent: 100,
+          totalWatchedSec,
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
+        });
+      });
+
+      video.addEventListener('pause', () => {
+        if (video.ended) return;
+        if (playStartMs > 0) {
+          totalWatchedSec += Math.round((Date.now() - playStartMs) / 1000);
+          playStartMs = 0;
+        }
+        this.enqueue('video_engagement', {
+          videoId,
+          videoTitle: getVideoTitle(),
+          action: 'pause',
+          currentTime: Math.round(video.currentTime || 0),
+          duration: Math.round(video.duration || 0),
+          percent: video.duration ? Math.round((video.currentTime / video.duration) * 100) : 0,
+          totalWatchedSec,
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
+        });
+      });
+    };
+
+    const scanVideos = () => {
+      document.querySelectorAll('video').forEach((v) => attachVideoListeners(v));
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scanVideos);
+    } else {
+      scanVideos();
+    }
+
+    if (typeof MutationObserver !== 'undefined' && document.body) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((m) => {
+          m.addedNodes.forEach((node) => {
+            if (node instanceof HTMLVideoElement) {
+              attachVideoListeners(node);
+            } else if (node instanceof HTMLElement) {
+              node.querySelectorAll('video').forEach((v) => attachVideoListeners(v));
+            }
+          });
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    // YouTube Iframe PostMessage Listener
+    window.addEventListener('message', (e) => {
+      if (typeof e.data === 'string') {
+        try {
+          const parsed = JSON.parse(e.data);
+          if (parsed.event === 'infoDelivery' && parsed.info?.playerState !== undefined) {
+            const state = parsed.info.playerState;
+            let action: string | null = null;
+            if (state === 1) action = 'start';
+            else if (state === 0) action = 'complete';
+            else if (state === 2) action = 'pause';
+
+            if (action) {
+              this.enqueue('video_engagement', {
+                videoId: 'youtube_player',
+                videoTitle: 'Unstoppable YouTube Channel Video',
+                action,
+                currentTime: Math.round(parsed.info.currentTime || 0),
+                duration: Math.round(parsed.info.duration || 0),
+                percent: parsed.info.duration ? Math.round((parsed.info.currentTime / parsed.info.duration) * 100) : 0,
+                page: window.location.pathname,
+              });
+            }
+          }
+        } catch {
+          // not youtube JSON
+        }
+      }
+    });
+  }
+
+  public trackVideo(videoId: string, action: string, metadata: Record<string, unknown> = {}): void {
+    this.enqueue('video_engagement', {
+      videoId,
+      action,
+      ...metadata,
+    });
   }
 
   public enqueue(type: string, payload: Record<string, unknown> = {}): void {

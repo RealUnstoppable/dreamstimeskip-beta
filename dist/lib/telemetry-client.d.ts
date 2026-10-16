@@ -121,6 +121,8 @@ export declare class TelemetryCollector {
     private initCtaHover;
     private initFormTracking;
     private initPromoCopy;
+    private initVideoTracking;
+    trackVideo(videoId: string, action: string, metadata?: Record<string, unknown>): void;
     enqueue(type: string, payload?: Record<string, unknown>): void;
     trackCommerceEvent(type: 'view_item' | 'add_to_cart' | 'remove_from_cart' | 'begin_checkout' | 'purchase', payload: CommercePayload): Promise<void>;
     flush(): void;

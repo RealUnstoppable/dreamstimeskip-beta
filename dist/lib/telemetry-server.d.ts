@@ -41,3 +41,4 @@ export declare function deriveSegments(events: Array<{
 }>): string[];
 export declare function handleTelemetryIngest(req: IngestRequest, res: IngestResponse): Promise<void>;
 export declare function handleConsentRecord(req: IngestRequest, res: IngestResponse): Promise<void>;
+export declare function handleAdminPerformanceMetrics(req: IngestRequest, res: IngestResponse): Promise<void>;

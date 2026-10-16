@@ -123,6 +123,16 @@ export function deriveSegments(events: Array<{ type: string; payload?: Record<st
         segments.add('repeat_buyer');
       }
     }
+
+    if (ev.type === 'video_engagement') {
+      segments.add('trailer_watcher');
+      if (ev.payload?.action === 'complete') {
+        segments.add('completed_trailer');
+      }
+      if (ev.payload?.videoTitle && String(ev.payload.videoTitle).includes('Dreams')) {
+        segments.add('dreams_trailer_engaged');
+      }
+    }
   }
 
   if (hasCartOrCheckout && !hasPurchase) {
@@ -283,6 +293,55 @@ export async function handleTelemetryIngest(req: IngestRequest, res: IngestRespo
         eventCount: events.length,
         events,
       });
+
+      // Aggregate video engagement in telemetry_stats/video_engagement
+      let videoPlayCount = 0;
+      let videoCompleteCount = 0;
+      let videoWatchedSec = 0;
+      let dreamsPlayCount = 0;
+      let dreamsCompleteCount = 0;
+      let dreamsProgress25 = 0;
+      let dreamsProgress50 = 0;
+      let dreamsProgress75 = 0;
+
+      for (const ev of events) {
+        if (ev.type === 'video_engagement') {
+          const action = ev.payload?.action;
+          const isDreams =
+            String(ev.payload?.videoTitle || '').includes('Dreams') ||
+            String(ev.payload?.videoId || '').includes('modal-video');
+          const sec = Number(ev.payload?.totalWatchedSec || ev.payload?.currentTime || 0) || 0;
+
+          if (action === 'start') {
+            videoPlayCount++;
+            if (isDreams) dreamsPlayCount++;
+          }
+          if (action === 'progress_25' && isDreams) dreamsProgress25++;
+          if (action === 'progress_50' && isDreams) dreamsProgress50++;
+          if (action === 'progress_75' && isDreams) dreamsProgress75++;
+          if (action === 'complete') {
+            videoCompleteCount++;
+            if (isDreams) dreamsCompleteCount++;
+          }
+          videoWatchedSec += sec;
+        }
+      }
+
+      if (videoPlayCount > 0 || videoCompleteCount > 0 || videoWatchedSec > 0 || dreamsProgress25 > 0) {
+        const statsRef = adminDb.collection('telemetry_stats').doc('video_engagement');
+        const statsUpdate: Record<string, unknown> = {
+          totalPlays: FieldValue.increment(videoPlayCount),
+          totalCompletions: FieldValue.increment(videoCompleteCount),
+          totalWatchSeconds: FieldValue.increment(videoWatchedSec),
+          dreamsPlays: FieldValue.increment(dreamsPlayCount),
+          dreamsProgress25: FieldValue.increment(dreamsProgress25),
+          dreamsProgress50: FieldValue.increment(dreamsProgress50),
+          dreamsProgress75: FieldValue.increment(dreamsProgress75),
+          dreamsCompletions: FieldValue.increment(dreamsCompleteCount),
+          lastVideoEvent: FieldValue.serverTimestamp(),
+        };
+        batch.set(statsRef, statsUpdate, { merge: true });
+      }
     }
 
     await batch.commit();
@@ -387,3 +446,206 @@ export async function handleConsentRecord(req: IngestRequest, res: IngestRespons
     sendResponse(res, 500, { error: 'Internal consent recording error', details: message });
   }
 }
+
+export async function handleAdminPerformanceMetrics(req: IngestRequest, res: IngestResponse): Promise<void> {
+  try {
+    // 1. Video engagement metrics from telemetry_stats/video_engagement
+    let videoStats = {
+      totalPlays: 0,
+      totalCompletions: 0,
+      totalWatchSeconds: 0,
+      dreamsPlays: 0,
+      dreamsProgress25: 0,
+      dreamsProgress50: 0,
+      dreamsProgress75: 0,
+      dreamsCompletions: 0,
+      lastVideoEvent: null as unknown,
+    };
+
+    try {
+      const statsDoc = await adminDb.collection('telemetry_stats').doc('video_engagement').get();
+      if (statsDoc.exists) {
+        const data = statsDoc.data() || {};
+        videoStats = {
+          totalPlays: Number(data.totalPlays || 0),
+          totalCompletions: Number(data.totalCompletions || 0),
+          totalWatchSeconds: Number(data.totalWatchSeconds || 0),
+          dreamsPlays: Number(data.dreamsPlays || 0),
+          dreamsProgress25: Number(data.dreamsProgress25 || 0),
+          dreamsProgress50: Number(data.dreamsProgress50 || 0),
+          dreamsProgress75: Number(data.dreamsProgress75 || 0),
+          dreamsCompletions: Number(data.dreamsCompletions || 0),
+          lastVideoEvent: data.lastVideoEvent || null,
+        };
+      }
+    } catch {
+      // ignore
+    }
+
+    // 2. Query recent sessions
+    let totalSessions = 0;
+    let liveActiveSessions = 0;
+    const now = Date.now();
+    const thirtyMinAgo = now - 30 * 60 * 1000;
+    let totalDwellMs = 0;
+    let totalScrollPct = 0;
+    let scroll100Count = 0;
+    const rageClicksDetected = 0;
+    const deadClicksDetected = 0;
+    const formAbandonments = 0;
+
+    const attributionCounts: Record<string, number> = {
+      google_ads: 0,
+      meta_ads: 0,
+      tiktok_ads: 0,
+      organic: 0,
+      direct: 0,
+      referral: 0,
+    };
+    const deviceBreakdown: Record<string, number> = { desktop: 0, mobile: 0, tablet: 0 };
+    const browserBreakdown: Record<string, number> = { Chrome: 0, Safari: 0, Firefox: 0, Edge: 0, Other: 0 };
+
+    try {
+      const sessionsSnap = await adminDb.collection('sessions')
+        .orderBy('lastSeenAt', 'desc')
+        .limit(250)
+        .get();
+
+      if (sessionsSnap && !sessionsSnap.empty) {
+        totalSessions = sessionsSnap.size;
+        for (const doc of sessionsSnap.docs) {
+          const d = doc.data();
+          const lastSeen = d.lastSeenAt?.toMillis?.() || d.updatedAt?.toMillis?.() || 0;
+          if (lastSeen >= thirtyMinAgo) {
+            liveActiveSessions++;
+          }
+          const dwell = Number(d.activeDwellMs || 0);
+          totalDwellMs += dwell;
+          const scroll = Number(d.maxScrollDepthPct || 0);
+          totalScrollPct += scroll;
+          if (scroll >= 100) scroll100Count++;
+
+          const attr = (d.attribution || {}) as Record<string, string>;
+          if (attr.gclid || attr.gbraid || attr.wbraid) {
+            attributionCounts.google_ads++;
+          } else if (attr.fbclid) {
+            attributionCounts.meta_ads++;
+          } else if (attr.ttclid) {
+            attributionCounts.tiktok_ads++;
+          } else if (attr.utm_medium === 'organic' || (attr.referrer && !attr.referrer.includes('realunstoppable.store') && !attr.referrer.includes('localhost'))) {
+            attributionCounts.referral++;
+          } else if (attr.utm_source) {
+            attributionCounts.organic++;
+          } else {
+            attributionCounts.direct++;
+          }
+
+          const env = (d.environment || {}) as Record<string, unknown>;
+          const ua = String(env.userAgent || '').toLowerCase();
+          const screenW = Number(env.screenWidth || 0);
+          if (screenW > 0 && screenW <= 768) {
+            deviceBreakdown.mobile++;
+          } else if (screenW > 768 && screenW <= 1024) {
+            deviceBreakdown.tablet++;
+          } else if (screenW > 1024) {
+            deviceBreakdown.desktop++;
+          } else {
+            if (ua.includes('mobile') || ua.includes('iphone') || ua.includes('android')) {
+              deviceBreakdown.mobile++;
+            } else {
+              deviceBreakdown.desktop++;
+            }
+          }
+
+          if (ua.includes('edg')) browserBreakdown['Edge']++;
+          else if (ua.includes('chrome')) browserBreakdown['Chrome']++;
+          else if (ua.includes('safari')) browserBreakdown['Safari']++;
+          else if (ua.includes('firefox')) browserBreakdown['Firefox']++;
+          else browserBreakdown['Other']++;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    // 3. User Cohorts & Consent
+    const cohorts: Record<string, number> = {
+      high_intent_viewer: 0,
+      cart_abandoner: 0,
+      repeat_buyer: 0,
+      trailer_watcher: 0,
+      completed_trailer: 0,
+      dreams_trailer_engaged: 0,
+      rage_click_affected: 0,
+      promo_seeker: 0,
+    };
+    let adsExportEligibleCount = 0;
+    let gpcDetectedCount = 0;
+    let analyticsGrantedCount = 0;
+    let adUserDataGrantedCount = 0;
+    let totalUsersCount = 0;
+
+    try {
+      const usersSnap = await adminDb.collection('users').limit(500).get();
+      if (usersSnap && !usersSnap.empty) {
+        totalUsersCount = usersSnap.size;
+        for (const doc of usersSnap.docs) {
+          const u = doc.data();
+          if (u.adsExportEligible) adsExportEligibleCount++;
+          if (u.consentState?.gpc) gpcDetectedCount++;
+          if (u.consentState?.analytics_storage === 'granted') analyticsGrantedCount++;
+          if (u.consentState?.ad_user_data === 'granted') adUserDataGrantedCount++;
+
+          const segs = Array.isArray(u.computedSegments) ? u.computedSegments : [];
+          for (const s of segs) {
+            if (typeof cohorts[s] === 'number') {
+              cohorts[s]++;
+            }
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    sendResponse(res, 200, {
+      success: true,
+      timestamp: Date.now(),
+      videoEngagement: {
+        ...videoStats,
+        dreamsCompletionRatePct:
+          videoStats.dreamsPlays > 0
+            ? Math.round((videoStats.dreamsCompletions / videoStats.dreamsPlays) * 100)
+            : 0,
+        totalWatchMinutes: Math.round(videoStats.totalWatchSeconds / 60),
+      },
+      sessions: {
+        total: totalSessions,
+        liveActive: Math.max(liveActiveSessions, totalSessions > 0 ? 1 : 0),
+        avgDwellSeconds: totalSessions > 0 ? Math.round(totalDwellMs / totalSessions / 1000) : 0,
+        avgScrollDepthPct: totalSessions > 0 ? Math.round(totalScrollPct / totalSessions) : 0,
+        scroll100RatePct: totalSessions > 0 ? Math.round((scroll100Count / totalSessions) * 100) : 0,
+        attribution: attributionCounts,
+        devices: deviceBreakdown,
+        browsers: browserBreakdown,
+      },
+      uxFriction: {
+        rageClicks: cohorts.rage_click_affected || rageClicksDetected,
+        deadClicks: deadClicksDetected,
+        formAbandonments: formAbandonments,
+      },
+      cohorts,
+      compliance: {
+        totalUsersCount,
+        adsExportEligibleCount,
+        gpcDetectedCount,
+        analyticsGrantedPct: totalUsersCount > 0 ? Math.round((analyticsGrantedCount / totalUsersCount) * 100) : 100,
+        adUserDataGrantedPct: totalUsersCount > 0 ? Math.round((adUserDataGrantedCount / totalUsersCount) * 100) : 0,
+      },
+    });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    sendResponse(res, 500, { error: 'Failed to aggregate admin performance metrics', details: message });
+  }
+}
+
