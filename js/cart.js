@@ -157,6 +157,7 @@ export function renderCart() {
                     <div class="cart-item-details">
                         <span class="cart-item-category-badge">${escapeHTML(category)}</span>
                         <h2 class="cart-item-title">${escapeHTML(product.name)}</h2>
+                        <p class="cart-item-desc">${escapeHTML(product.description || '')}</p>
                         <p class="cart-item-unit-price">$${product.price.toFixed(2)} each</p>
                     </div>
                     <div class="cart-item-actions">

@@ -279,6 +279,21 @@ describe('Cart Business Logic, Pricing & Promo Codes (js/cart.js)', () => {
         expect(list.innerHTML).toContain('aria-label="Decrease quantity of Unstoppable Hoodie"');
         expect(list.innerHTML).toContain('aria-label="Increase quantity of Unstoppable Hoodie"');
     });
+
+    it('renders HarmonyTunes Cap and catalog items with natural, human descriptions and typography', () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'harmonytunes-shirt': 1
+        }));
+        cartModule.loadCartFromStorage();
+        cartModule.renderCart();
+
+        const list = document.getElementById('cart-items-list');
+        expect(list.innerHTML).toContain('HarmonyTunes Cap');
+        expect(list.innerHTML).toContain('cart-item-desc');
+        expect(list.innerHTML).toContain('Low-profile');
+        expect(list.innerHTML).not.toContain('Dark cap with the HarmonyTunes logo. Perfect for music lovers.');
+        expect(list.innerHTML).toContain('$24.99 each');
+    });
 });
 
 describe('Navbar Cart Badge Updates (js/navbar.js)', () => {

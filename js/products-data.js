@@ -5,7 +5,7 @@ export const products = [
         price: 59.99,
         originalPrice: 80.99,
         salePrice: 60.74,
-        description: 'Premium black hoodie with the Unstoppable logo. Built for comfort and style.',
+        description: 'Heavyweight 400 GSM black fleece hoodie with embroidered brand crest and double-lined hood.',
         imageUrl: '/images/UnstoppableHoodieModel300x300.png',
         extraImages: [
             '/images/UnstoppableHoodieModel300x300.png',
@@ -19,7 +19,7 @@ export const products = [
         price: 24.99,
         originalPrice: 33.74,
         salePrice: 25.30,
-        description: 'Iconic tee featuring the official Dreams TimeSkip character art.',
+        description: '100% combed ring-spun cotton tee with screenprinted Dreams TimeSkip character graphics.',
         imageUrl: '/images/dreams-lobby.jpg',
         extraImages: [
             '/images/dreams-lobby.jpg',
@@ -33,7 +33,7 @@ export const products = [
         price: 24.99,
         originalPrice: 33.74,
         salePrice: 25.30,
-        description: 'Dark cap with the HarmonyTunes logo. Perfect for music lovers.',
+        description: 'Low-profile 6-panel unstructured black cotton cap with embroidered soundwave emblem and adjustable brass strap.',
         imageUrl: '/images/medixly-logo.png',
         extraImages: [
             '/images/medixly-logo.png',
@@ -46,7 +46,7 @@ export const products = [
         price: 19.99,
         originalPrice: 26.99,
         salePrice: 20.24,
-        description: 'High-performance mousepad for gaming precision and speed.',
+        description: 'Micro-weave gaming desk mat with precision anti-fray stitched borders and non-slip rubber backing.',
         imageUrl: '/images/MugAllBrands300x300.png',
         extraImages: [
             '/images/MugAllBrands300x300.png',
@@ -60,7 +60,7 @@ export const products = [
         price: 14.99,
         originalPrice: 20.24,
         salePrice: 15.18,
-        description: 'Matte black ceramic coffee mug featuring all official brand emblems.',
+        description: '11oz matte black ceramic coffee mug with heat-set brand insignia. Dishwasher safe.',
         imageUrl: '/images/MugAllBrands300x300.png',
         extraImages: [
             '/images/MugAllBrands300x300.png',
@@ -74,7 +74,7 @@ export const products = [
         price: 34.99,
         originalPrice: 47.24,
         salePrice: 35.43,
-        description: 'Limited edition 180g heavyweight vinyl featuring the top viral chart hits.',
+        description: "180g heavyweight collector's vinyl pressed on black wax with full-color gatefold artwork.",
         imageUrl: '/images/legacy_cover.jpg',
         extraImages: [
             '/images/legacy_cover.jpg',
@@ -88,7 +88,7 @@ export const products = [
         price: 19.99,
         originalPrice: 26.99,
         salePrice: 20.24,
-        description: "Official 18x24 archival metallic print for 'Don't Make Them Like Me'.",
+        description: "Official 18x24 archival exhibition print on 300 GSM metallic pearl paper.",
         imageUrl: '/images/isabel_larosa_cover.jpg',
         extraImages: [
             '/images/isabel_larosa_cover.jpg',
@@ -101,7 +101,7 @@ export const products = [
         price: 29.99,
         originalPrice: 40.49,
         salePrice: 30.36,
-        description: 'Commemorative 250 celebration tee with woven USA flag emblem.',
+        description: 'Heavyweight vintage-wash cotton tee with woven USA flag emblem and distressed hem tag.',
         imageUrl: '/images/un250-flag.png',
         extraImages: [
             '/images/un250-flag.png',
