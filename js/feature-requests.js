@@ -115,68 +115,66 @@ async function fetchAndRenderRequests() {
             requestsList.innerHTML = html;
         }
 
-        // Attach event listeners to upvote buttons
-        document.querySelectorAll('.upvote-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if (!currentUser) return;
-
-                const button = e.currentTarget;
-                if (button.disabled) return;
-
-                const requestId = button.getAttribute('data-id');
-                const countSpan = button.querySelector('.upvote-count');
-                const svg = button.querySelector('svg');
-                let count = parseInt(countSpan.textContent, 10);
-                const isCurrentlyUpvoted = button.classList.contains('upvoted');
-
-                // Optimistic UI Update
-                button.disabled = true;
-                if (isCurrentlyUpvoted) {
-                    button.classList.remove('upvoted');
-                    svg.classList.remove('filled');
-                    countSpan.textContent = count - 1;
-                } else {
-                    button.classList.add('upvoted');
-                    svg.classList.add('filled');
-                    countSpan.textContent = count + 1;
-                }
-
-                try {
-                    const token = await currentUser.getIdToken();
-                    const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/toggleFeatureUpvote', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({ requestId })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to toggle upvote');
-                    }
-                } catch (err) {
-                    console.error("Manager info: Upvote error:", err.message || err);
-                    // Revert optimistic update
-                    if (isCurrentlyUpvoted) {
-                        button.classList.add('upvoted');
-                        svg.classList.add('filled');
-                        countSpan.textContent = count;
-                    } else {
-                        button.classList.remove('upvoted');
-                        svg.classList.remove('filled');
-                        countSpan.textContent = count;
-                    }
-                } finally {
-                    button.disabled = false;
-                }
-            });
-        });
-
     } catch (error) {
         if (error.code !== "permission-denied" && !error.message.includes("Missing or insufficient permissions")) { console.error("Manager info: Error fetching feature requests:", error.message || error); }
         requestsList.innerHTML = '<p style="text-align: center; color: var(--accent-red);">Failed to load feature requests. Please try again later.</p>';
     }
+}
+
+// Event Delegation for upvotes
+if (requestsList) {
+    requestsList.addEventListener('click', async (e) => {
+        const button = e.target.closest('.upvote-btn');
+        if (!button || button.disabled || !currentUser) return;
+
+        const requestId = button.getAttribute('data-id');
+        const countSpan = button.querySelector('.upvote-count');
+        const svg = button.querySelector('svg');
+        let count = parseInt(countSpan.textContent, 10);
+        const isCurrentlyUpvoted = button.classList.contains('upvoted');
+
+        // Optimistic UI Update
+        button.disabled = true;
+        if (isCurrentlyUpvoted) {
+            button.classList.remove('upvoted');
+            svg.classList.remove('filled');
+            countSpan.textContent = count - 1;
+        } else {
+            button.classList.add('upvoted');
+            svg.classList.add('filled');
+            countSpan.textContent = count + 1;
+        }
+
+        try {
+            const token = await currentUser.getIdToken();
+            const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/toggleFeatureUpvote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ requestId })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to toggle upvote');
+            }
+        } catch (err) {
+            console.error("Manager info: Upvote error:", err.message || err);
+            // Revert optimistic update
+            if (isCurrentlyUpvoted) {
+                button.classList.add('upvoted');
+                svg.classList.add('filled');
+                countSpan.textContent = count;
+            } else {
+                button.classList.remove('upvoted');
+                svg.classList.remove('filled');
+                countSpan.textContent = count;
+            }
+        } finally {
+            button.disabled = false;
+        }
+    });
 }
 
 // Check auth state
