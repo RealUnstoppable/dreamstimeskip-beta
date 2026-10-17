@@ -1,0 +1,5 @@
+
+## 2024-05-18 - Fix path traversal bypassing regex normalization
+**Vulnerability:** A path traversal vulnerability in `server.js` was exploitable because the code relied on `path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '')` to sanitize paths. This could be bypassed using URL encoding (like `%2e%2e/%2e%2e/etc/passwd`) or null bytes, because Express does not always decode traversing parts fully when `req.path` is accessed, or the regex fails to catch encoded or deeply embedded traversal characters.
+**Learning:** Using regex to strip directory traversal sequences is fundamentally flawed and easily bypassed. Furthermore, `path.normalize` combined with string replacement is not a secure boundary check.
+**Prevention:** Always decode the URI component, reject null bytes (`\0`), resolve to an absolute path using `path.resolve(path.join(__dirname, decodedPath))`, and enforce directory boundaries strictly using `if (!filePath.startsWith(__dirname + path.sep) && filePath !== __dirname) return res.status(403);`.
