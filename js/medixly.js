@@ -86,6 +86,7 @@ function initHarmonyTunes() {
     // --- STATE ---
     // ⚡ Bolt: Pre-computed Map for O(1) library lookups, avoiding O(N) array search on play clicks
     const librarySongsMap = new Map(librarySongs.map(s => [s.id, s]));
+    const librarySongsIdMap = new Map(librarySongs.map((s, i) => [s.id, i]));
 
     // TikTok videos — using direct iframe embed (no embed.js needed, always works after dynamic injection)
     const tiktokVideos = [
@@ -372,7 +373,7 @@ function initHarmonyTunes() {
         const activateResult = (row) => {
             if (!row) return;
             const songId = row.dataset.songId;
-            const idx = librarySongs.findIndex(s => s.id === songId);
+            const idx = librarySongsIdMap.get(songId) ?? -1;
             if (idx !== -1) {
                 currentQueue = [...librarySongs];
                 currentSongIndex = idx;
@@ -498,7 +499,7 @@ function initHarmonyTunes() {
         try {
             
             if (initialSongId) {
-                const sIndex = librarySongs.findIndex(s => s.id === initialSongId);
+                const sIndex = librarySongsIdMap.get(initialSongId) ?? -1;
                 if (sIndex !== -1) {
                     currentQueue = [...librarySongs];
                     currentSongIndex = sIndex;
@@ -947,7 +948,7 @@ function initHarmonyTunes() {
             if (viralPlayBtn) {
                 viralPlayBtn.addEventListener('click', () => {
                     if (!viralTargetSongId) return;
-                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
+                    const songIdx = librarySongsIdMap.get(viralTargetSongId) ?? -1;
                     if (songIdx !== -1) {
                         currentQueue = [...librarySongs];
                         currentSongIndex = songIdx;
@@ -1070,7 +1071,7 @@ function initHarmonyTunes() {
 
     window.playSongById = (id) => {
         __recordHistory();
-        const songIndex = librarySongs.findIndex(s => s.id === id);
+        const songIndex = librarySongsIdMap.get(id) ?? -1;
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
     
