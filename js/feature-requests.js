@@ -194,6 +194,23 @@ onAuthStateChanged(auth, (user) => {
     fetchAndRenderRequests();
 });
 
+
+// Setup character counter for description
+const descriptionInputGlobal = document.getElementById('request-description');
+if (descriptionInputGlobal) {
+    const counterEl = document.getElementById('request-description-counter');
+    if (counterEl) {
+        const updateCounter = () => {
+            const count = descriptionInputGlobal.value.length;
+            counterEl.textContent = `${count} / 500`;
+            counterEl.style.color = count >= 490 ? 'var(--accent-red)' : 'var(--text-secondary)';
+        };
+        descriptionInputGlobal.addEventListener('input', updateCounter);
+        // Initialize on load
+        updateCounter();
+    }
+}
+
 // Handle form submission
 if (requestForm) {
     requestForm.addEventListener('submit', async (e) => {
@@ -231,6 +248,12 @@ if (requestForm) {
 
             titleInput.value = '';
             descriptionInput.value = '';
+            const counterEl = document.getElementById('request-description-counter');
+            if (counterEl) {
+                counterEl.textContent = '0 / 500';
+                counterEl.style.color = 'var(--text-secondary)';
+            }
+
 
             formMessage.textContent = 'Feature request submitted successfully!';
             formMessage.style.color = 'var(--accent-green)';

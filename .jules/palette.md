@@ -1,0 +1,3 @@
+## 2026-10-09 - Dynamic Character Counter for Open-Ended Inputs
+**Learning:** Adding a dynamic visual character counter with `aria-live="polite"` to textareas, alongside changing its color when approaching the limit, significantly improves the user experience. Without it, users only realize they have hit the limit when they can't type anymore or the form fails to submit, which is frustrating.
+**Action:** When implementing open-ended text inputs with a character limit, always include a visual counter that updates on user input and provides a visual cue (like changing to a red color) when close to the limit. Initialize the counter on page load to handle pre-filled data.
