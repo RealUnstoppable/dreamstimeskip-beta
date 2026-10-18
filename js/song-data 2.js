@@ -23620,6 +23620,12 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: O(1) hash map lookup to prevent O(N) array search on massive librarySongs array
+const songMap = new Map();
+for (const song of librarySongs) {
+    songMap.set(song.id, song);
+}
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    return songMap.get(id) || null;
 }
