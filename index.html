@@ -24,104 +24,280 @@
     <link rel="stylesheet" href="/css/chatbot.css?v=1791167958698_v3">
 
     <style>
-        /* --- START: Pre-register Popup Styles --- */
-        #preregister-popup-overlay {
+        /* --- START: Pre-register Bottom Tray Styles --- */
+        .pencil-tray-backdrop {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1001;
-            /* Higher than the Siri orb */
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            pointer-events: none;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 10000;
         }
 
-        #preregister-popup-overlay.visible {
+        .pencil-tray-backdrop.active {
             opacity: 1;
             visibility: visible;
+            pointer-events: auto;
         }
 
-        .popup-content {
-            background-color: #111;
-            padding: 2.5rem;
-            border-radius: 16px;
-            text-align: center;
-            max-width: 450px;
-            width: 90%;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transform: scale(0.95);
+        .pencil-bottom-tray {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translate3d(-50%, calc(100% - 56px), 0);
+            width: min(440px, calc(100vw - 24px));
+            background: rgba(18, 18, 22, 0.96);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-bottom: none;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.2);
+            z-index: 10001;
             opacity: 0;
-            transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            visibility: hidden;
+            pointer-events: none;
+            touch-action: pan-y;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 88vh;
         }
 
-        #preregister-popup-overlay.visible .popup-content {
-            transform: scale(1);
+        .pencil-bottom-tray.visible {
             opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
         }
 
-        .popup-content img {
-            max-width: 80%;
-            height: auto;
-            margin-bottom: 1.5rem;
-            border-radius: 16px;
+        .pencil-bottom-tray.visible.collapsed {
+            transform: translate3d(-50%, calc(100% - 56px), 0);
         }
 
-        .popup-content h2 {
-            font-family: 'Inter', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: #fff;
-            margin: 0 0 1.5rem 0;
-            line-height: 1.3;
+        .pencil-bottom-tray.visible.expanded {
+            transform: translate3d(-50%, 0, 0);
+            box-shadow: 0 -16px 50px rgba(0, 0, 0, 0.8), 0 0 1px rgba(255, 255, 255, 0.3);
         }
 
-        .popup-preregister-btn {
+        .pencil-bottom-tray.dismissed {
+            transform: translate3d(-50%, 120%, 0) !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .pencil-bottom-tray.is-dragging {
+            transition: none !important;
+        }
+
+        /* Tray Header & Drag Handle */
+        .tray-header {
+            padding: 8px 14px 10px;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            touch-action: none;
+        }
+
+        .pencil-bottom-tray.is-dragging .tray-header {
+            cursor: grabbing;
+        }
+
+        .tray-handle-bar {
+            width: 38px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 2px;
+            margin: 0 auto 8px;
+            transition: background 0.2s ease, width 0.2s ease;
+        }
+
+        .tray-header:hover .tray-handle-bar {
+            background: rgba(255, 255, 255, 0.6);
+            width: 44px;
+        }
+
+        .tray-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            min-height: 28px;
+        }
+
+        .tray-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        /* Red Notification Circle */
+        .tray-notif-circle {
             display: inline-block;
-            background: linear-gradient(90deg, #6e45e2, #88d3ce);
-            color: #fff;
+            width: 10px;
+            height: 10px;
+            min-width: 10px;
+            min-height: 10px;
+            background-color: #ff3b30;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.35), 0 0 10px #ff3b30;
+            flex-shrink: 0;
+            animation: trayPulseGlow 2.5s infinite ease-in-out;
+        }
+
+        @keyframes trayPulseGlow {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 2px rgba(255, 59, 48, 0.4), 0 0 8px #ff3b30;
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 0 0 5px rgba(255, 59, 48, 0.08), 0 0 14px #ff3b30;
+            }
+        }
+
+        .tray-header-label {
             font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
             font-weight: 600;
-            font-size: 1rem;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -0.01em;
         }
 
-        .popup-preregister-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(110, 69, 226, 0.4);
+        .tray-header-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
         }
 
-        .popup-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 20px;
+        .tray-chevron-btn,
+        .tray-close-btn {
             background: none;
             border: none;
-            color: #888;
-            font-size: 2rem;
-            line-height: 1;
+            color: rgba(255, 255, 255, 0.65);
+            padding: 4px 6px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: color 0.3s ease, transform 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
         }
 
-        .popup-close-btn:hover {
-            color: #fff;
-            transform: rotate(90deg);
+        .tray-chevron-btn:hover,
+        .tray-close-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
         }
 
-        /* --- END: Pre-register Popup Styles --- */
+        .tray-chevron-svg {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .pencil-bottom-tray.expanded .tray-chevron-svg {
+            transform: rotate(180deg);
+        }
+
+        .tray-close-btn {
+            font-size: 1.4rem;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+        }
+
+        /* Tray Content */
+        .tray-content {
+            padding: 20px 24px 28px;
+            overflow-y: auto;
+            text-align: center;
+            overscroll-behavior: contain;
+        }
+
+        .tray-content-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .tray-pencil-img {
+            max-width: 82%;
+            height: auto;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            display: block;
+        }
+
+        .tray-content-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+        }
+
+        /* Button: No gradient, pure white background with black text */
+        .popup-preregister-btn,
+        .tray-preregister-btn {
+            display: inline-block;
+            background: #ffffff !important;
+            color: #000000 !important;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 13px 32px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+            margin-top: 4px;
+        }
+
+        .popup-preregister-btn:hover,
+        .tray-preregister-btn:hover {
+            background: #ededed !important;
+            color: #000000 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.22);
+        }
+
+        .popup-preregister-btn:active,
+        .tray-preregister-btn:active {
+            transform: translateY(0);
+            background: #dbdbdb !important;
+        }
+
+        @media (max-width: 480px) {
+            .pencil-bottom-tray {
+                width: calc(100vw - 16px);
+                border-radius: 18px 18px 0 0;
+            }
+            .tray-content {
+                padding: 16px 16px 24px;
+            }
+            .tray-content-title {
+                font-size: 1.3rem;
+            }
+        }
+        /* --- END: Pre-register Bottom Tray Styles --- */
 
         /* --- START: Minecraft Themed Bento Card for Dreams TimeSkip --- */
         #bento-dts {
@@ -1185,14 +1361,34 @@
 
 <body>
 
-    <div id="preregister-popup-overlay">
-        <div class="popup-content">
-            <button class="popup-close-btn" aria-label="Close popup" title="Close popup">&times;</button>
-            <img src="/images/Pencil-1-logo-light.png" alt="A sleek, modern digital pencil">
-            <h2>The last pencil you'll ever buy.</h2>
-            <a href="sign in beta.html" class="popup-preregister-btn">Pre-register Now</a>
+    <!-- Bottom Tray: Pencil 1 Pre-register -->
+    <div id="pencil-bottom-tray" class="pencil-bottom-tray collapsed" role="region" aria-label="Unstoppable Pencil preview tray" aria-expanded="false">
+        <div class="tray-header" id="tray-drag-header">
+            <div class="tray-handle-bar" aria-hidden="true"></div>
+            <div class="tray-header-row">
+                <div class="tray-header-left">
+                    <span class="tray-notif-circle" aria-label="Notification alert"></span>
+                    <span class="tray-header-label">The last pencil you'll ever buy.</span>
+                </div>
+                <div class="tray-header-right">
+                    <button type="button" class="tray-chevron-btn" aria-label="Expand or collapse tray" title="Expand">
+                        <svg viewBox="0 0 24 24" class="tray-chevron-svg" width="18" height="18" aria-hidden="true">
+                            <path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="tray-close-btn popup-close-btn" aria-label="Dismiss tray" title="Dismiss">&times;</button>
+                </div>
+            </div>
+        </div>
+        <div class="tray-content">
+            <div class="tray-content-inner">
+                <img src="/images/Pencil-1-logo-light.png" alt="A sleek, modern digital pencil" class="tray-pencil-img" loading="lazy">
+                <h2 class="tray-content-title">The last pencil you'll ever buy.</h2>
+                <a href="https://realunstoppable.store/sign%20in%20beta.html" class="popup-preregister-btn tray-preregister-btn">Pre-register Now</a>
+            </div>
         </div>
     </div>
+    <div id="pencil-tray-backdrop" class="pencil-tray-backdrop" aria-hidden="true"></div>
 
     <header class="main-header"></header>
 
@@ -1466,45 +1662,205 @@
 
 
     <script>
-        // --- START: Pre-register Popup Script ---
+        // --- START: Pre-register Bottom Tray Script ---
         document.addEventListener('DOMContentLoaded', () => {
-            const popupOverlay = document.getElementById('preregister-popup-overlay');
-            const closeBtn = popupOverlay.querySelector('.popup-close-btn');
-            const preregisterBtn = popupOverlay.querySelector('.popup-preregister-btn');
+            const tray = document.getElementById('pencil-bottom-tray');
+            if (!tray) return;
 
-            // Function to show the popup
-            const showPopup = () => {
-                popupOverlay.classList.add('visible');
+            const header = document.getElementById('tray-drag-header');
+            const chevronBtn = tray.querySelector('.tray-chevron-btn');
+            const closeBtn = tray.querySelector('.tray-close-btn');
+            const preregisterBtn = tray.querySelector('.tray-preregister-btn');
+            const backdrop = document.getElementById('pencil-tray-backdrop');
+
+            let isExpanded = false;
+            let isDragging = false;
+            let startY = 0;
+            let currentY = 0;
+            let startTranslateY = 0;
+            let startTime = 0;
+
+            const PEEK_HEIGHT = 56;
+
+            const getCollapsedTranslateY = () => {
+                const totalHeight = tray.offsetHeight;
+                return Math.max(0, totalHeight - PEEK_HEIGHT);
             };
 
-            // Function to hide the popup
-            const hidePopup = () => {
-                popupOverlay.classList.remove('visible');
-                // Store in sessionStorage that the popup has been seen
+            const setTranslateY = (val, withTransition = false) => {
+                if (withTransition) {
+                    tray.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+                } else {
+                    tray.style.transition = 'none';
+                }
+                tray.style.transform = `translate3d(-50%, ${val}px, 0)`;
+            };
+
+            const expandTray = () => {
+                isExpanded = true;
+                tray.classList.add('expanded');
+                tray.classList.remove('collapsed');
+                tray.setAttribute('aria-expanded', 'true');
+                if (chevronBtn) chevronBtn.setAttribute('title', 'Collapse');
+                setTranslateY(0, true);
+                if (backdrop) backdrop.classList.add('active');
+            };
+
+            const collapseTray = () => {
+                isExpanded = false;
+                tray.classList.remove('expanded');
+                tray.classList.add('collapsed');
+                tray.setAttribute('aria-expanded', 'false');
+                if (chevronBtn) chevronBtn.setAttribute('title', 'Expand');
+                const collapsedY = getCollapsedTranslateY();
+                setTranslateY(collapsedY, true);
+                if (backdrop) backdrop.classList.remove('active');
+            };
+
+            const toggleTray = () => {
+                if (isExpanded) {
+                    collapseTray();
+                } else {
+                    expandTray();
+                }
+            };
+
+            const dismissTray = () => {
+                tray.classList.add('dismissed');
+                tray.classList.remove('visible');
+                sessionStorage.setItem('pencilTrayDismissed', 'true');
                 sessionStorage.setItem('popupShown', 'true');
+                if (backdrop) backdrop.classList.remove('active');
             };
 
-            // Show the popup after a short delay, but only if it hasn't been shown in this session
-            if (!sessionStorage.getItem('popupShown')) {
-                setTimeout(showPopup, 1000); // 1-second delay
+            // Drag Handlers via Pointer Events (Touch, Mouse, Pen)
+            const onPointerDown = (e) => {
+                // If user tapped a button or link inside header, let that click trigger
+                if (e.target.closest('.tray-close-btn') || e.target.closest('.tray-preregister-btn')) {
+                    return;
+                }
+                isDragging = true;
+                startY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                currentY = startY;
+                startTime = Date.now();
+                const collapsedY = getCollapsedTranslateY();
+                startTranslateY = isExpanded ? 0 : collapsedY;
+                tray.style.transition = 'none';
+                tray.classList.add('is-dragging');
+
+                window.addEventListener('pointermove', onPointerMove, { passive: false });
+                window.addEventListener('pointerup', onPointerUp);
+                window.addEventListener('pointercancel', onPointerUp);
+            };
+
+            const onPointerMove = (e) => {
+                if (!isDragging) return;
+                currentY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                const deltaY = currentY - startY;
+                const collapsedY = getCollapsedTranslateY();
+
+                let newTranslateY = startTranslateY + deltaY;
+
+                // Rubber-band resistance at top and bottom bounds
+                if (newTranslateY < 0) {
+                    newTranslateY = newTranslateY * 0.25;
+                } else if (newTranslateY > collapsedY) {
+                    newTranslateY = collapsedY + (newTranslateY - collapsedY) * 0.25;
+                }
+
+                tray.style.transform = `translate3d(-50%, ${newTranslateY}px, 0)`;
+            };
+
+            const onPointerUp = (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                tray.classList.remove('is-dragging');
+                window.removeEventListener('pointermove', onPointerMove);
+                window.removeEventListener('pointerup', onPointerUp);
+                window.removeEventListener('pointercancel', onPointerUp);
+
+                const deltaY = currentY - startY;
+                const deltaTime = Math.max(1, Date.now() - startTime);
+                const velocity = deltaY / deltaTime; // px/ms
+                const collapsedY = getCollapsedTranslateY();
+
+                // If small movement (< 6px), treat as tap/toggle
+                if (Math.abs(deltaY) < 6) {
+                    toggleTray();
+                    return;
+                }
+
+                // Swiped up or dragged significantly up
+                if (deltaY < -40 || velocity < -0.3) {
+                    expandTray();
+                } else if (deltaY > 40 || velocity > 0.3) {
+                    collapseTray();
+                } else {
+                    const currentTranslateY = startTranslateY + deltaY;
+                    if (currentTranslateY < collapsedY / 2) {
+                        expandTray();
+                    } else {
+                        collapseTray();
+                    }
+                }
+            };
+
+            if (header) {
+                header.addEventListener('pointerdown', onPointerDown);
             }
 
-            // Event listeners to close the popup
-            closeBtn.addEventListener('click', hidePopup);
-            preregisterBtn.addEventListener('click', (e) => {
-                // e.preventDefault(); // Uncomment this if you want to stop the link from navigating
-                console.log('Pre-register button clicked!');
-                hidePopup();
-            });
+            if (closeBtn) {
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    dismissTray();
+                });
+            }
 
-            // Also close if the user clicks on the dark overlay
-            popupOverlay.addEventListener('click', (event) => {
-                if (event.target === popupOverlay) {
-                    hidePopup();
+            if (chevronBtn) {
+                chevronBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleTray();
+                });
+            }
+
+            if (backdrop) {
+                backdrop.addEventListener('click', () => {
+                    collapseTray();
+                });
+            }
+
+            if (preregisterBtn) {
+                preregisterBtn.addEventListener('click', () => {
+                    console.log('Pre-register button clicked!');
+                    sessionStorage.setItem('pencilTrayDismissed', 'true');
+                    sessionStorage.setItem('popupShown', 'true');
+                });
+            }
+
+            // Keyboard navigation (Escape to collapse)
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isExpanded) {
+                    collapseTray();
                 }
             });
+
+            // Handle window resizing to keep collapsed position accurate
+            window.addEventListener('resize', () => {
+                if (!isExpanded && tray.classList.contains('visible')) {
+                    const collapsedY = getCollapsedTranslateY();
+                    setTranslateY(collapsedY, false);
+                }
+            });
+
+            // Show tray at bottom in collapsed state after brief delay unless dismissed
+            if (!sessionStorage.getItem('pencilTrayDismissed') && !sessionStorage.getItem('popupShown')) {
+                setTimeout(() => {
+                    tray.classList.add('visible');
+                    collapseTray();
+                }, 800);
+            }
         });
-        // --- END: Pre-register Popup Script ---
+        // --- END: Pre-register Bottom Tray Script ---
     </script>
 
     <script type="module">
