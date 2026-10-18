@@ -1,0 +1,4 @@
+## 2024-05-18 - Path Traversal bypass via encoded URI components
+**Vulnerability:** The application was vulnerable to path traversal (e.g. `/%2e%2e%2fetc/passwd`) because it performed security checks directly on `req.path` without decoding it first. It also relied on a weak regex `replace(/^(\.\.[\/\\])+/, '')` which is easily bypassed.
+**Learning:** `req.path` in Express does not automatically decode URL-encoded slashes (`%2f`) or backslashes (`%5c`). Naive regex sanitization is brittle because traversal segments can appear anywhere in the path, or be prefixed with dummy directories (e.g., `/public/../../`).
+**Prevention:** Always decode user-supplied paths using `decodeURIComponent()`, reject null bytes (`\0`), and resolve absolute paths using `path.resolve(__dirname, '.' + decodedPath)`. Enforce boundaries using `filePath.startsWith(__dirname + path.sep)`.
