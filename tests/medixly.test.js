@@ -1,4 +1,4 @@
-// import { jest } from '@jest/globals';
+import { jest } from '@jest/globals';
 // Set up minimal DOM before requiring the script
 document.body.innerHTML = `
     <div id="view-home"></div>
@@ -35,8 +35,6 @@ document.body.innerHTML = `
 `;
 
 
-// Import the script as ES module
-await import('../js/medixly.js');
 // Import the script
 import '../js/medixly.js';
 
@@ -44,7 +42,7 @@ import '../js/medixly.js';
 const event = new Event('DOMContentLoaded');
 document.dispatchEvent(event);
 
-describe.skip('loadPlaylistView error handling', () => {
+describe('loadPlaylistView error handling', () => {
   beforeEach(() => {
     // Reset the UI before each test
     document.getElementById('playlist-title').textContent = '';
@@ -52,18 +50,18 @@ describe.skip('loadPlaylistView error handling', () => {
     document.getElementById('song-list-body').innerHTML = '';
   });
 
-  it.skip('should handle null/undefined type by defaulting to Main Library', () => {
+  it('should handle null/undefined type by defaulting to Main Library', () => {
     window.loadPlaylistView(null);
     expect(document.getElementById('playlist-title').textContent).toBe('All Available Tracks');
   });
 
-  it.skip('should gracefully handle empty or missing favorites', () => {
+  it('should gracefully handle empty or missing favorites', () => {
     window.loadPlaylistView('favorites');
     expect(document.getElementById('playlist-title').textContent).toBe('Liked Songs');
     expect(document.getElementById('song-list-body').innerHTML).toContain('No songs found.');
   });
 
-  it.skip('should display error state if data fetching throws an error', () => {
+  it('should display error state if data fetching throws an error', () => {
     const descEl = document.getElementById('playlist-desc');
     const originalDescriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
 
@@ -90,5 +88,27 @@ describe.skip('loadPlaylistView error handling', () => {
     } else {
         delete descEl.textContent;
     }
+  });
+});
+
+describe('Medixly HTML Audio & Footer Configuration', () => {
+  it('ensures audio players do not enforce crossorigin="anonymous" which blocks playback', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
+    expect(html).not.toMatch(/<audio id="audio-player"[^>]*crossorigin/);
+    expect(html).not.toMatch(/<audio id="audio-player-2"[^>]*crossorigin/);
+  });
+
+  it('ensures main-footer and footer.js script are present in medixly.html', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
+    expect(html).toContain('<footer class="main-footer"></footer>');
+    expect(html).toMatch(/<script\s+type="module"\s+src="\/js\/footer\.js/);
+  });
+
+  it('exposes window.playSongById function for playing tracks in library context', () => {
+    expect(typeof window.playSongById).toBe('function');
   });
 });

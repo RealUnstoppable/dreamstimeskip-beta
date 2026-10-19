@@ -861,88 +861,97 @@ function initHarmonyTunes() {
     }
 
     function loadPlaylistView(type) {
-        viewHome.style.display = 'none';
-        viewPlaylist.style.display = 'block';
+        const homeEl = viewHome || document.getElementById('view-home');
+        const playlistEl = viewPlaylist || document.getElementById('view-playlist');
+        if (homeEl) homeEl.style.display = 'none';
+        if (playlistEl) playlistEl.style.display = 'block';
         
         try {
             const delBtn = document.getElementById('delete-playlist-btn');
             if (delBtn) delBtn.style.display = 'none';
             const coverImg = document.getElementById('playlist-cover-image');
+            const titleEl = playlistTitleEl || document.getElementById('playlist-title');
+            const descEl = playlistDescEl || document.getElementById('playlist-desc');
+            const playBtn = playlistPlayBtn || document.getElementById('playlist-play-btn');
 
             if (type === 'favorites') {
-                playlistTitleEl.textContent = "Liked Songs";
-                playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
+                if (titleEl) titleEl.textContent = "Liked Songs";
+                if (descEl) descEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Guest'}'s Favorites • ${userFavorites.length} songs`;
                 if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                 renderSongTable(userFavorites);
-                playlistPlayBtn.onclick = () => {
+                if (playBtn) playBtn.onclick = () => {
                     if (userFavorites.length > 0) playContext(userFavorites, 0);
                 };
             } else if (type === 'top100' || type === 'top-100') {
                 const top100Songs = librarySongs
                     .filter(s => s.tags && s.tags.includes('top100'))
                     .sort((a, b) => (a.rank || 999) - (b.rank || 999));
-                playlistTitleEl.textContent = "Top 100";
-                playlistDescEl.textContent = `Medixly Official Top 100 • 100 ranked songs • Updated Daily`;
+                if (titleEl) titleEl.textContent = "Top 100";
+                if (descEl) descEl.textContent = `Medixly Official Top 100 • 100 ranked songs • Updated Daily`;
                 if (coverImg) coverImg.src = "/images/medixly-logo.png";
                 renderSongTable(top100Songs);
-                playlistPlayBtn.onclick = () => {
+                if (playBtn) playBtn.onclick = () => {
                     if (top100Songs.length > 0) playContext(top100Songs, 0);
                 };
             } else if (type === 'hiphop') {
                 const hiphopSongs = librarySongs.filter(s => s.tags && (s.tags.includes('hiphop') || s.tags.includes('rap')));
-                playlistTitleEl.textContent = "Rap Caviar";
-                playlistDescEl.textContent = `Top Tier Rap • ${hiphopSongs.length} songs`;
+                if (titleEl) titleEl.textContent = "Rap Caviar";
+                if (descEl) descEl.textContent = `Top Tier Rap • ${hiphopSongs.length} songs`;
                 if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                 renderSongTable(hiphopSongs);
-                playlistPlayBtn.onclick = () => {
+                if (playBtn) playBtn.onclick = () => {
                     if (hiphopSongs.length > 0) playContext(hiphopSongs, 0);
                 };
             } else if (type === 'viral') {
                 const viralSongs = librarySongs.filter(s => s.tags && s.tags.includes('viral'));
-                playlistTitleEl.textContent = "Viral Hits";
-                playlistDescEl.textContent = `Trending on TikTok • ${viralSongs.length} songs`;
+                if (titleEl) titleEl.textContent = "Viral Hits";
+                if (descEl) descEl.textContent = `Trending on TikTok • ${viralSongs.length} songs`;
                 if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                 renderSongTable(viralSongs);
-                playlistPlayBtn.onclick = () => {
+                if (playBtn) playBtn.onclick = () => {
                     if (viralSongs.length > 0) playContext(viralSongs, 0);
                 };
             } else if (type === 'chill') {
                 const chillSongs = librarySongs.filter(s => s.tags && (s.tags.includes('chill') || s.tags.includes('r&b') || s.tags.includes('indie')));
-                playlistTitleEl.textContent = "Late Night";
-                playlistDescEl.textContent = `Chill Vibes • ${chillSongs.length} songs`;
+                if (titleEl) titleEl.textContent = "Late Night";
+                if (descEl) descEl.textContent = `Chill Vibes • ${chillSongs.length} songs`;
                 if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                 renderSongTable(chillSongs);
-                playlistPlayBtn.onclick = () => {
+                if (playBtn) playBtn.onclick = () => {
                     if (chillSongs.length > 0) playContext(chillSongs, 0);
                 };
             } else {
                 const customPl = customPlaylists.find(p => p.id === type);
                 if (customPl) {
-                    playlistTitleEl.textContent = customPl.title;
-                    playlistDescEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Custom'} • ${customPl.songs.length} songs`;
+                    if (titleEl) titleEl.textContent = customPl.title;
+                    if (descEl) descEl.textContent = `${currentUser ? currentUser.displayName || 'User' : 'Custom'} • ${customPl.songs.length} songs`;
                     if (delBtn) delBtn.style.display = 'inline-block';
                     if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                     renderSongTable(customPl.songs);
-                    playlistPlayBtn.onclick = () => {
+                    if (playBtn) playBtn.onclick = () => {
                         if (customPl.songs.length > 0) playContext(customPl.songs, 0);
                     };
                 } else {
                     // Default Main
-                    playlistTitleEl.textContent = "All Available Tracks";
-                    playlistDescEl.textContent = `Unstoppable Media • Official Library • ${librarySongs.length} songs`;
+                    if (titleEl) titleEl.textContent = "All Available Tracks";
+                    if (descEl) descEl.textContent = `Unstoppable Media • Official Library • ${librarySongs.length} songs`;
                     if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
                     renderSongTable(librarySongs);
-                    playlistPlayBtn.onclick = () => {
+                    if (playBtn) playBtn.onclick = () => {
                         playContext(librarySongs, 0);
                     };
                 }
             }
         } catch (error) {
             console.error("Error loading playlist - Manager info:", error);
-            try { playlistTitleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
-            try { playlistDescEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
-            try { songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
-            try { playlistPlayBtn.onclick = null; } catch (e) { /* ignore missing element */ }
+            const titleEl = playlistTitleEl || document.getElementById('playlist-title');
+            const descEl = playlistDescEl || document.getElementById('playlist-desc');
+            const listBody = songListBody || document.getElementById('song-list-body');
+            const playBtn = playlistPlayBtn || document.getElementById('playlist-play-btn');
+            try { if (titleEl) titleEl.textContent = "Error"; } catch (e) { /* ignore missing element */ }
+            try { if (descEl) descEl.innerHTML = "Could not load playlist data."; } catch (e) { /* ignore missing element */ }
+            try { if (listBody) listBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px; color: red;">Failed to load playlist. Please try again later.</td></tr>`; } catch (e) { /* ignore missing element */ }
+            try { if (playBtn) playBtn.onclick = null; } catch (e) { /* ignore missing element */ }
         }
     }
 
@@ -1166,8 +1175,7 @@ function initHarmonyTunes() {
                 }
                 const songId = card?.dataset.songId;
                 if (songId) {
-                    const song = librarySongsMap.get(songId);
-                    if (song) playContext([song], 0);
+                    window.playSongById(songId);
                 }
                 return;
             }
@@ -1292,7 +1300,8 @@ function initHarmonyTunes() {
             fragment.appendChild(row);
         }
 
-        songListBody.appendChild(fragment);
+        const body = songListBody || document.getElementById('song-list-body');
+        if (body) body.appendChild(fragment);
         currentRenderIndex = endIndex;
         
         if (currentRenderIndex < currentGroupedSongs.length) {
@@ -1301,16 +1310,20 @@ function initHarmonyTunes() {
     }
     
     function setupIntersectionObserver() {
+        if (typeof IntersectionObserver === 'undefined') return;
         if (intersectionObserver) {
             intersectionObserver.disconnect();
         }
         
+        const body = songListBody || document.getElementById('song-list-body');
+        if (!body || !body.parentElement) return;
+
         let sentinel = document.getElementById('table-sentinel-new');
         if (!sentinel) {
             sentinel = document.createElement('div');
             sentinel.id = 'table-sentinel-new';
             sentinel.style.height = '1px';
-            songListBody.parentElement.appendChild(sentinel);
+            body.parentElement.appendChild(sentinel);
         }
         
         intersectionObserver = new IntersectionObserver((entries) => {
@@ -1323,13 +1336,14 @@ function initHarmonyTunes() {
     }
 
     function renderSongTable(songs) {
-        songListBody.innerHTML = '';
+        const body = songListBody || document.getElementById('song-list-body');
+        if (body) body.innerHTML = '';
         if (intersectionObserver) {
             intersectionObserver.disconnect();
         }
         
         if (songs.length === 0) {
-            songListBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
+            if (body) body.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 20px;">No songs found.</td></tr>`;
             return;
         }
 
@@ -1380,16 +1394,25 @@ function initHarmonyTunes() {
             const targetAudioSrc = song.src || song.audioUrl || song.url || song.streamUrl;
             activeAudio.src = targetAudioSrc;
             activeAudio.onerror = () => {
-                if (activeAudio.crossOrigin) {
+                const onPlaybackRecovered = () => {
+                    isPlaying = true;
+                    saveSitewideMusicState({ isPlaying: true });
+                    if (playIcon) playIcon.style.display = 'none';
+                    if (pauseIcon) pauseIcon.style.display = 'block';
+                    if (fsPlayIcon) fsPlayIcon.style.display = 'none';
+                    if (fsPauseIcon) fsPauseIcon.style.display = 'block';
+                };
+
+                if (activeAudio.crossOrigin || activeAudio.hasAttribute('crossorigin')) {
                     activeAudio.removeAttribute('crossorigin');
                     activeAudio.src = targetAudioSrc;
-                    activeAudio.play().catch(()=>{});
+                    activeAudio.play().then(onPlaybackRecovered).catch(()=>{});
                     return;
                 }
                 if (song.streamUrl && activeAudio.src !== song.streamUrl) {
                     console.warn(`Local audio unavailable for ${song.title}, falling back to streamUrl...`);
                     activeAudio.src = song.streamUrl;
-                    activeAudio.play().catch(()=>{});
+                    activeAudio.play().then(onPlaybackRecovered).catch(()=>{});
                 } else if (!song.streamUrl && song.title) {
                     const query = `${song.title} ${song.artist || ''}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`)
@@ -1398,7 +1421,7 @@ function initHarmonyTunes() {
                             if (data.results && data.results[0] && data.results[0].previewUrl) {
                                 song.streamUrl = data.results[0].previewUrl;
                                 activeAudio.src = song.streamUrl;
-                                activeAudio.play().catch(()=>{});
+                                activeAudio.play().then(onPlaybackRecovered).catch(()=>{});
                             }
                         })
                         .catch(()=>{});
@@ -1507,12 +1530,12 @@ function initHarmonyTunes() {
 
         nextAudio.pause(); // Ensure next audio is stopped if we cancelled a crossfade
 
-        await mixEngine.ensureRunning();
+        await mixEngine.ensureRunning().catch(() => {});
 
         const deck = activeAudio === audioPlayer1 ? 'A' : 'B';
 
         activeAudio.volume = 1;
-        mixEngine.setDeckVolume(deck, 0);
+        mixEngine.setDeckVolume(deck, 1);
 
         activeAudio.play().then(() => {
             isPlaying = true;
@@ -1521,9 +1544,14 @@ function initHarmonyTunes() {
             pauseIcon.style.display = 'block';
             if(fsPlayIcon) fsPlayIcon.style.display = 'none';
             if(fsPauseIcon) fsPauseIcon.style.display = 'block';
-            
-            mixEngine.fadeIn(deck, 0.5, 1);
-        }).catch(e => console.error("Manager info:", e));
+        }).catch(e => {
+            console.error("Manager info:", e);
+            isPlaying = false;
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            if(fsPlayIcon) fsPlayIcon.style.display = 'block';
+            if(fsPauseIcon) fsPauseIcon.style.display = 'none';
+        });
     }
 
     function pauseSong() {
@@ -1549,18 +1577,25 @@ function initHarmonyTunes() {
         });
     }
 
-    let hasUnlockedAudio = false;
     async function togglePlayPause() {
-        if (!hasUnlockedAudio) {
-            hasUnlockedAudio = true;
-            await mixEngine.ensureRunning();
-            if (audioPlayer1.paused) audioPlayer1.play().catch(()=>{});
-            if (audioPlayer2.paused) audioPlayer2.play().catch(()=>{});
-            if (activeAudio !== audioPlayer1) audioPlayer1.pause();
-            if (activeAudio !== audioPlayer2) audioPlayer2.pause();
+        if (!currentQueue || currentQueue.length === 0) {
+            currentQueue = [...librarySongs];
+            currentSongIndex = 0;
+            if (currentQueue.length > 0) {
+                loadSong(0);
+            }
         }
-        if (activeAudio.paused) playSong();
-        else pauseSong();
+        if ((!activeAudio.src || activeAudio.src === '' || activeAudio.src === window.location.href) && currentQueue[currentSongIndex]) {
+            loadSong(currentSongIndex);
+        }
+
+        await mixEngine.ensureRunning().catch(() => {});
+
+        if (!activeAudio.paused && isPlaying) {
+            pauseSong();
+        } else {
+            playSong();
+        }
     }
 
     function nextSong() {

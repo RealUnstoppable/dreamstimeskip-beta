@@ -1,8 +1,8 @@
 // js/footer.js
 
-// Automatically initialize the newsletter logic on any page that loads this footer
-if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
-    import('./newsletter.js');
+// Automatically initialize the newsletter logic on any page that loads this footer (browser only)
+if (typeof window !== 'undefined' && (typeof process === 'undefined' || process.env?.NODE_ENV !== 'test')) {
+    import('./newsletter.js').catch(() => {});
     import('../dist/components/PrivacyConsentManager.js').then((m) => {
         if (m && typeof m.initPrivacyConsentManager === 'function') {
             m.initPrivacyConsentManager();
@@ -84,4 +84,17 @@ export function loadFooter() {
             }
         }
     }
+}
+
+// Auto-initialize when DOM is loaded or ready
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => loadFooter());
+    } else {
+        loadFooter();
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.loadFooter = loadFooter;
 }

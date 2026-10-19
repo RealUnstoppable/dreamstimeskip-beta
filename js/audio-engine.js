@@ -68,7 +68,6 @@ export class AudioMixEngine {
     }
 
     // Connect Deck A
-    audioEl1.crossOrigin = 'anonymous';
     if (!this.elementSources.has(audioEl1)) {
       try {
         const sourceA = this.ctx.createMediaElementSource(audioEl1);
@@ -79,12 +78,15 @@ export class AudioMixEngine {
       }
     } else {
       const sourceA = this.elementSources.get(audioEl1);
-      sourceA.disconnect();
-      sourceA.connect(this.deckAGain);
+      try {
+        sourceA.disconnect();
+        sourceA.connect(this.deckAGain);
+      } catch (err) {
+        console.warn('AudioMixEngine: Deck A reconnect note', err);
+      }
     }
 
     // Connect Deck B
-    audioEl2.crossOrigin = 'anonymous';
     if (!this.elementSources.has(audioEl2)) {
       try {
         const sourceB = this.ctx.createMediaElementSource(audioEl2);
@@ -95,8 +97,12 @@ export class AudioMixEngine {
       }
     } else {
       const sourceB = this.elementSources.get(audioEl2);
-      sourceB.disconnect();
-      sourceB.connect(this.deckBGain);
+      try {
+        sourceB.disconnect();
+        sourceB.connect(this.deckBGain);
+      } catch (err) {
+        console.warn('AudioMixEngine: Deck B reconnect note', err);
+      }
     }
   }
 
