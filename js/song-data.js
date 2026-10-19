@@ -14,6 +14,61 @@ export const songColors = {
 
 export const librarySongs = [
     {
+        "id": "dead-fresh",
+        "title": "Dead Fresh",
+        "artist": "Lil Baby",
+        "duration": "2:37",
+        "src": "/music/dead-fresh-lil-baby.mp3",
+        "streamUrl": "/music/dead_fresh.mp3",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f4/00/dd/f400ddda-01b6-52ee-1888-477ffee6ed67/26UMGIM86003.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "viral",
+            "rap",
+            "hiphop"
+        ]
+    },
+    {
+        "id": "like-that-guitar-remix-aamadux",
+        "title": "Like That (Guitar Remix)",
+        "artist": "Aamadux",
+        "duration": "2:45",
+        "src": "/music/like-that-guitar-remix-aamadux.mp3",
+        "streamUrl": "/music/like-that-future.mp3",
+        "art": "/images/harmony-tunes-card.jpg",
+        "bpm": 140,
+        "energy": 0.85,
+        "inmixPoint": 0,
+        "outmixPoint": 165,
+        "tags": [
+            "remix",
+            "guitar",
+            "viral",
+            "hiphop"
+        ]
+    },
+    {
+        "id": "sunflower-post-malone-swae-lee",
+        "title": "Sunflower",
+        "artist": "Post Malone & Swae Lee",
+        "duration": "2:38",
+        "src": "/music/sunflower-post-malone-swae-lee.mp3",
+        "streamUrl": "/music/sunflower-post-malone.mp3",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/4b/30/2c/4b302cb6-7a14-5464-4e97-0577e9d0be49/18UMGIM82277.rgb.jpg/600x600bb.jpg",
+        "bpm": 120,
+        "energy": 0.8,
+        "inmixPoint": 10,
+        "outmixPoint": 10,
+        "tags": [
+            "pop",
+            "viral",
+            "soundtrack"
+        ]
+    },
+    {
         "id": "top100-blinding-lights-the-weeknd",
         "title": "Blinding Lights",
         "artist": "The Weeknd",
@@ -7200,8 +7255,8 @@ export const librarySongs = [
         "id": "summer-bummer",
         "title": "Summer Bummer (Lights On)",
         "artist": "Rhy Rhy",
-        "duration": "4:20",
-        "src": "/music/summer bummer (lights on).mp3",
+        "duration": "3:03",
+        "src": "/music/summer_bummer_rhy_rhy.mp3",
         "art": "/images/summer_bummer_rhy_rhy.jpg",
         "bpm": 100,
         "energy": 0.6,
@@ -8501,10 +8556,10 @@ export const librarySongs = [
     },
     {
         "id": "im-god-clams-casino-imogen-heap",
-        "title": "Im God Clams Casino Imogen Heap",
-        "artist": "Unknown Artist",
+        "title": "I Smoked Away My Brain (I'm God x Demons Mashup)",
+        "artist": "A$AP Rocky, Clams Casino, Imogen Heap",
         "duration": "4:33",
-        "src": "/music/im-god-clams-casino-imogen-heap.mp3",
+        "src": "/music/i-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -12142,17 +12197,19 @@ export const librarySongs = [
     },
     {
         "id": "blinding-lights-the-weeknd",
-        "title": "Blinding Lights The Weeknd",
-        "artist": "Unknown Artist",
-        "duration": "3:23",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblinding-lights-the-weeknd.mp3?alt=media&token=3a416be2-09e4-4e5f-a243-1308dd6ed9f2",
-        "art": "/images/blank_cover.svg",
+        "title": "Blinding Lights",
+        "artist": "The Weeknd",
+        "duration": "3:22",
+        "src": "/music/blinding-lights-the-weeknd.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblinding-lights-the-weeknd.mp3?alt=media&token=3a416be2-09e4-4e5f-a243-1308dd6ed9f2",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
-        "energy": 0.7,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "pop",
+            "viral"
         ]
     },
     {
@@ -12247,10 +12304,11 @@ export const librarySongs = [
     },
     {
         "id": "blow-kesha",
-        "title": "Blow Kesha",
-        "artist": "Unknown Artist",
+        "title": "Blow",
+        "artist": "Kesha",
         "duration": "3:40",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblow-kesha.mp3?alt=media&token=676a8589-d265-4b0c-94ae-8cb5b4ad5de8",
+        "src": "/music/Blow - Kesha.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblow-kesha.mp3?alt=media&token=676a8589-d265-4b0c-94ae-8cb5b4ad5de8",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -14340,10 +14398,11 @@ export const librarySongs = [
     },
     {
         "id": "dead-fresh-lil-baby",
-        "title": "Dead Fresh Lil Baby",
-        "artist": "Unknown Artist",
-        "duration": "2:49",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdead-fresh-lil-baby.mp3?alt=media&token=3f2e100a-c7c8-4492-a962-ea54fa713c37",
+        "title": "Dead Fresh",
+        "artist": "Lil Baby",
+        "duration": "2:37",
+        "src": "/music/dead-fresh-lil-baby.mp3",
+        "streamUrl": "/music/dead_fresh.mp3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -16478,10 +16537,11 @@ export const librarySongs = [
     },
     {
         "id": "fukumean-gunna",
-        "title": "Fukumean Gunna",
-        "artist": "Unknown Artist",
+        "title": "fukumean",
+        "artist": "Gunna",
         "duration": "2:05",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffukumean-gunna.mp3?alt=media&token=0ef259b1-27fc-49cb-a5ca-5cc72743234e",
+        "src": "/music/fukumean-gunna.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffukumean-gunna.mp3?alt=media&token=0ef259b1-27fc-49cb-a5ca-5cc72743234e",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -16900,10 +16960,11 @@ export const librarySongs = [
     },
     {
         "id": "gods-plan-drake",
-        "title": "Gods Plan Drake",
-        "artist": "Unknown Artist",
+        "title": "God's Plan",
+        "artist": "Drake",
         "duration": "3:18",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgods-plan-drake.mp3?alt=media&token=eadb0776-dbd2-4ee6-88fb-2aef3d6863cd",
+        "src": "/music/gods-plan-drake.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgods-plan-drake.mp3?alt=media&token=eadb0776-dbd2-4ee6-88fb-2aef3d6863cd",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -18469,17 +18530,18 @@ export const librarySongs = [
     },
     {
         "id": "im-dat-na-future",
-        "title": "Im Dat Na Future",
-        "artist": "Unknown Artist",
+        "title": "IM DAT N****",
+        "artist": "Future",
         "duration": "4:33",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fim-dat-na-future.mp3?alt=media&token=6053c77d-fd0e-4174-ab56-f98a96d748e5",
+        "src": "/music/im-dat-na-future.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fim-dat-na-future.mp3?alt=media&token=6053c77d-fd0e-4174-ab56-f98a96d748e5",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
-        "energy": 0.7,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
+            "hip-hop",
             "viral"
         ]
     },
@@ -22622,17 +22684,20 @@ export const librarySongs = [
     },
     {
         "id": "not-like-us-kendrick-lamar",
-        "title": "Not Like Us Kendrick Lamar",
-        "artist": "Unknown Artist",
+        "title": "Not Like Us",
+        "artist": "Kendrick Lamar",
         "duration": "4:33",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fnot-like-us-kendrick-lamar.mp3?alt=media&token=900d2ae7-de5e-43f8-8d94-f78e68901f52",
-        "art": "/images/blank_cover.svg",
+        "src": "/music/not-like-us-kendrick-lamar.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fnot-like-us-kendrick-lamar.mp3?alt=media&token=900d2ae7-de5e-43f8-8d94-f78e68901f52",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bf/b7/c1/bfb7c1ea-9f87-63e5-c1fa-39c4d271926b/24UMGIM54530.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
-        "energy": 0.7,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "hip-hop",
+            "rap",
+            "viral"
         ]
     },
     {
@@ -23488,17 +23553,20 @@ export const librarySongs = [
     },
     {
         "id": "passionfruit-drake",
-        "title": "Passionfruit Drake",
-        "artist": "Unknown Artist",
+        "title": "Passionfruit",
+        "artist": "Drake",
         "duration": "4:58",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpassionfruit-drake.mp3?alt=media&token=06bc44f9-aaf3-4a1b-8ad4-c1d7c112484a",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
+        "src": "/music/passionfruit-drake.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpassionfruit-drake.mp3?alt=media&token=06bc44f9-aaf3-4a1b-8ad4-c1d7c112484a",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/64/08/96/64089602-555e-04f7-ad54-8c081e7d2350/00602557579471.rgb.jpg/600x600bb.jpg",
+        "bpm": 112,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "r-b",
+            "hip-hop",
+            "viral"
         ]
     },
     {
@@ -25151,17 +25219,20 @@ export const librarySongs = [
     },
     {
         "id": "shabang-drake",
-        "title": "Shabang Drake",
-        "artist": "Unknown Artist",
+        "title": "Shabang",
+        "artist": "Drake",
         "duration": "2:48",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fshabang-drake.mp3?alt=media&token=bd7d4e8e-32f6-41db-89db-6affefc36c8a",
+        "src": "/music/shabang-drake.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fshabang-drake.mp3?alt=media&token=bd7d4e8e-32f6-41db-89db-6affefc36c8a",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
-        "energy": 0.7,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "hip-hop",
+            "rap",
+            "viral"
         ]
     },
     {
@@ -25695,17 +25766,19 @@ export const librarySongs = [
     },
     {
         "id": "snooze-sza",
-        "title": "Snooze Sza",
-        "artist": "Unknown Artist",
-        "duration": "3:23",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsnooze-sza.mp3?alt=media&token=15a42e1f-393d-4ce2-b7d3-1d1d39833346",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
+        "title": "Snooze",
+        "artist": "SZA",
+        "duration": "3:21",
+        "src": "/music/snooze-sza.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsnooze-sza.mp3?alt=media&token=15a42e1f-393d-4ce2-b7d3-1d1d39833346",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/90/a6/5e/90a65e71-4654-e0b6-1607-df08e9b46513/196589558876.jpg/600x600bb.jpg",
+        "bpm": 143,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "r-b",
+            "viral"
         ]
     },
     {
@@ -25785,17 +25858,20 @@ export const librarySongs = [
     },
     {
         "id": "stick-talk-future",
-        "title": "Stick Talk Future",
-        "artist": "Unknown Artist",
+        "title": "Stick Talk",
+        "artist": "Future",
         "duration": "2:52",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fstick-talk-future.mp3?alt=media&token=c7d7cc4e-dff0-49fe-a421-1bf3ce6beae8",
+        "src": "/music/stick-talk-future.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fstick-talk-future.mp3?alt=media&token=c7d7cc4e-dff0-49fe-a421-1bf3ce6beae8",
         "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
+        "bpm": 150,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "hip-hop",
+            "rap",
+            "viral"
         ]
     },
     {
@@ -26162,10 +26238,11 @@ export const librarySongs = [
     },
     {
         "id": "sweater-weather-the-neighbourhood",
-        "title": "Sweater Weather The Neighbourhood",
-        "artist": "Unknown Artist",
+        "title": "Sweater Weather",
+        "artist": "The Neighbourhood",
         "duration": "4:00",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsweater-weather-the-neighbourhood.mp3?alt=media&token=8a849d46-20d1-4847-ab02-57d5ecce05f5",
+        "src": "/music/sweater-weather-the-neighbourhood.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsweater-weather-the-neighbourhood.mp3?alt=media&token=8a849d46-20d1-4847-ab02-57d5ecce05f5",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -28621,26 +28698,28 @@ export const librarySongs = [
     },
     {
         "id": "wicked-games-the-weeknd",
-        "title": "Wicked Games The Weeknd",
-        "artist": "Unknown Artist",
+        "title": "Wicked Games",
+        "artist": "The Weeknd",
         "duration": "5:24",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwicked-games-the-weeknd.mp3?alt=media&token=f839aa9d-65a2-485e-bfd4-e6ff7ab3526e",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
+        "src": "/music/wicked-games-the-weeknd.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwicked-games-the-weeknd.mp3?alt=media&token=f839aa9d-65a2-485e-bfd4-e6ff7ab3526e",
+        "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/4a/04/e4/4a04e4a6-7786-90be-d24d-6bc6b9ee27b1/00602537233775.rgb.jpg/600x600bb.jpg",
+        "bpm": 115,
+        "energy": 0.8,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged",
+            "r-b",
             "viral"
         ]
     },
     {
         "id": "wildflower-billie-eilish",
-        "title": "Wildflower Billie Eilish",
-        "artist": "Unknown Artist",
+        "title": "WILDFLOWER",
+        "artist": "Billie Eilish",
         "duration": "4:21",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwildflower-billie-eilish.mp3?alt=media&token=1537d185-b39c-48a4-91ef-5d0802730192",
+        "src": "/music/wildflower-billie-eilish.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwildflower-billie-eilish.mp3?alt=media&token=1537d185-b39c-48a4-91ef-5d0802730192",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -29255,5 +29334,8 @@ export const librarySongs = [
 ];
 
 export function getSongById(id) {
-    return librarySongs.find(song => song.id === id);
+    if (!id) return null;
+    return librarySongs.find(song => song.id === id) ||
+           librarySongs.find(song => song.id === `top100-${id}`) ||
+           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
 }

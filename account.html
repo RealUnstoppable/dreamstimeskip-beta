@@ -79,11 +79,16 @@
                                 <span class="mc-header-subtitle">Minecraft Quest & Daily Artifacts</span>
                             </div>
                         </div>
-                        <div class="mc-streak-hud-badge" title="Consecutive Daily Check-in Streak">
-                            <span class="mc-streak-flame">🔥</span>
-                            <div class="mc-streak-info">
-                                <span id="check-in-streak" class="mc-streak-count mc-pixel-font">0</span>
-                                <span class="mc-streak-label mc-pixel-font">Day Streak</span>
+                        <div class="mc-streak-hud-group">
+                            <button type="button" id="streak-sound-toggle-btn" class="mc-sound-toggle-btn" title="Toggle Streak Sounds" aria-label="Toggle Streak Sounds">
+                                <span id="streak-sound-icon">🔊</span>
+                            </button>
+                            <div class="mc-streak-hud-badge" title="Consecutive Daily Check-in Streak">
+                                <span class="mc-streak-flame" id="dashboard-flame-icon">🔥</span>
+                                <div class="mc-streak-info">
+                                    <span id="check-in-streak" class="mc-streak-count mc-pixel-font">0</span>
+                                    <span class="mc-streak-label mc-pixel-font">Day Streak</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -147,9 +152,12 @@
                                 </div>
                             </div>
                         </div>
+                    <div class="dashboard-weekly-hotbar-container" id="dashboard-weekly-hotbar">
+                        <!-- Populated with 7-Day Minecraft Hotbar -->
                     </div>
                     <div class="mc-actions-row">
                         <button id="claim-checkin-btn" type="button" class="mc-pixel-btn mc-pixel-btn-claim">⚡ Claim Today's Reward</button>
+                        <button id="replay-streak-btn" type="button" class="mc-pixel-btn mc-pixel-btn-replay" style="display: none;">✨ Replay Celebration</button>
                         <button id="open-calendar-modal-btn" type="button" class="mc-pixel-btn mc-pixel-btn-calendar">🗓️ Open 30-Day Check-in Calendar</button>
                     </div>
                     <div class="mc-actionbar-panel">
@@ -583,25 +591,60 @@
         </div>
     </div>
 
-    <!-- Minecraft Daily Check-in Flare Animation Modal -->
-    <div id="mc-flare-modal" class="mc-flare-overlay" style="display: none;">
+    <!-- Minecraft Daily Check-in Duolingo x Minecraft Voxel Streak Celebration Modal -->
+    <div id="mc-flare-modal" class="mc-flare-overlay" style="display: none;" role="dialog" aria-modal="true" aria-label="Daily Streak Celebration">
+        <canvas id="mc-celebration-canvas" class="mc-celebration-canvas"></canvas>
         <div class="mc-flare-backdrop"></div>
+        <div class="mc-flare-heat-bloom bloom-idle" id="mc-flare-heat-bloom"></div>
         <div class="mc-flare-rays"></div>
-        <div class="mc-flare-ring"></div>
+        <div class="mc-shockwave-ring" id="mc-shockwave-ring"></div>
         
         <div class="mc-flare-card">
-            <div class="mc-flare-streak-banner">
-                <span class="mc-flare-days-count" id="flare-streak-number">1</span>
-                <span class="mc-flare-days-label">DAY STREAK!</span>
+            <!-- Modal Audio Toggle -->
+            <button type="button" id="flare-sound-toggle-btn" class="mc-sound-toggle-btn modal-sound-toggle" title="Toggle Streak Celebration Audio" aria-label="Toggle Streak Celebration Audio">
+                <span class="flare-sound-icon">🔊</span>
+            </button>
+
+            <!-- Voxel Flame Emblem (Scalable Pixel-Art SVG) -->
+            <div id="flare-voxel-flame-container" class="flare-voxel-flame-container dormant">
+                <!-- SVG dynamically populated -->
             </div>
-            <div class="mc-flare-rarity-pill" id="flare-rarity-pill">LEGENDARY REWARD</div>
-            <div class="mc-flare-icon-container" id="flare-icon-container">
-                <!-- SVG Icon populated dynamically -->
+
+            <!-- Rolling Odometer Streak Counter -->
+            <div id="flare-streak-odometer-container" class="flare-streak-odometer-container">
+                <div class="odometer-window">
+                    <span id="flare-streak-roll-prev" class="odometer-digit digit-prev">0</span>
+                    <span id="flare-streak-roll-next" class="odometer-digit digit-next prepare-bottom">1</span>
+                </div>
+                <span class="flare-days-label mc-pixel-font">DAY STREAK!</span>
+                <!-- Hidden fallback element for backwards compatibility -->
+                <span class="mc-flare-days-count" id="flare-streak-number" style="display: none;">1</span>
             </div>
-            <h3 class="mc-flare-item-name" id="flare-item-name">5x Diamonds</h3>
-            <p class="mc-flare-points-bonus" id="flare-points-bonus">+100 Unstoppable Loyalty Points</p>
-            <p class="mc-flare-desc" id="flare-item-desc">Crafted from the deepest caves of Dreams TimeSkip.</p>
-            <button type="button" id="flare-collect-btn" class="mc-button mc-button-collect">COLLECT REWARD</button>
+
+            <!-- 7-Day Weekly Hotbar Slot Row -->
+            <div id="flare-weekly-hotbar-container" class="flare-weekly-hotbar-wrap"></div>
+
+            <!-- Reward Details Card -->
+            <div class="flare-reward-card">
+                <div class="mc-flare-rarity-pill" id="flare-rarity-pill">LEGENDARY REWARD</div>
+                <div class="mc-flare-icon-container" id="flare-icon-container">
+                    <!-- SVG Icon populated dynamically -->
+                </div>
+                <h3 class="mc-flare-item-name" id="flare-item-name">5x Diamonds</h3>
+                <p class="mc-flare-points-bonus" id="flare-points-bonus">+100 Unstoppable Loyalty Points</p>
+                <p class="mc-flare-desc" id="flare-item-desc">Crafted from the deepest caves of Dreams TimeSkip.</p>
+            </div>
+
+            <!-- Celebratory Sub-Message Banner -->
+            <div id="flare-celebration-banner" class="flare-celebration-banner mc-pixel-font">
+                STREAK IGNITED! Keep the furnace burning tomorrow!
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="flare-actions-container" class="flare-actions-row">
+                <button type="button" id="flare-collect-btn" class="mc-button mc-button-collect mc-pixel-btn-claim">⚡ AWESOME / KEEP IT BURNING</button>
+                <button type="button" id="flare-replay-btn" class="mc-button mc-button-replay">🔄 REPLAY CELEBRATION</button>
+            </div>
         </div>
     </div>
 

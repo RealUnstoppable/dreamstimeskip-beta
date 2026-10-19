@@ -123,6 +123,14 @@ publishBtn.addEventListener('click', async () => {
         // Sort lyrics by time
         lyrics.sort((a, b) => a.time - b.time);
 
+        let duration = "3:30";
+        if (audioPreview && !isNaN(audioPreview.duration) && audioPreview.duration > 0) {
+            const totalSecs = Math.round(audioPreview.duration);
+            const mins = Math.floor(totalSecs / 60);
+            const secs = totalSecs % 60;
+            duration = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
         const trackData = {
             artistId: currentUser.uid,
             artistName: currentUser.displayName || "Unknown Artist",
@@ -131,6 +139,7 @@ publishBtn.addEventListener('click', async () => {
             audioUrl,
             artUrl,
             lyrics,
+            duration,
             isHidden: false,
             createdAt: serverTimestamp()
         };

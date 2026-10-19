@@ -1,6 +1,6 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1791167969660b';
@@ -22,6 +22,131 @@ function escapeHTML(str) {
 function initHarmonyTunes() {
 
     let customPlaylists = [];
+
+    // ===== Artist Uploaded Tracks Integration =====
+    function addOrUpdateArtistTrack(docSnap) {
+        const data = docSnap.data();
+        if (!data || !data.audioUrl) return;
+
+        const songObj = {
+            id: docSnap.id,
+            title: data.title || "Untitled Track",
+            artist: data.artistName || data.credits || "Community Artist",
+            duration: data.duration || "3:00",
+            src: data.audioUrl,
+            audioUrl: data.audioUrl,
+            streamUrl: data.audioUrl,
+            art: data.artUrl || "/images/medixly-logo.png",
+            bpm: typeof data.bpm === 'number' ? data.bpm : 120,
+            energy: typeof data.energy === 'number' ? data.energy : 0.8,
+            inmixPoint: typeof data.inmixPoint === 'number' ? data.inmixPoint : 0,
+            outmixPoint: typeof data.outmixPoint === 'number' ? data.outmixPoint : 0,
+            tags: ["artist", "upload", "community", ...(Array.isArray(data.tags) ? data.tags : [])],
+            lyrics: data.lyrics || [],
+            isArtistTrack: true,
+            isHidden: !!data.isHidden
+        };
+
+        // If lyrics provided, format and cache in lyricsData
+        if (Array.isArray(data.lyrics) && data.lyrics.length > 0) {
+            lyricsData[docSnap.id] = data.lyrics.map((line, idx, arr) => {
+                const start = typeof line.time === 'number' ? line.time : parseFloat(line.time) || 0;
+                const nextStart = arr[idx + 1] ? (typeof arr[idx + 1].time === 'number' ? arr[idx + 1].time : parseFloat(arr[idx + 1].time) || (start + 4)) : start + 4;
+                const words = (line.text || "").split(/\s+/).filter(Boolean).map((w, wIdx, wArr) => ({
+                    text: w,
+                    start: start + (wIdx / (wArr.length || 1)) * (nextStart - start)
+                }));
+                return {
+                    start: start,
+                    end: nextStart,
+                    trending: false,
+                    words: words
+                };
+            });
+        }
+
+        const existingIdx = librarySongs.findIndex(s => s.id === docSnap.id);
+        if (existingIdx !== -1) {
+            librarySongs[existingIdx] = songObj;
+        } else {
+            librarySongs.unshift(songObj);
+        }
+        librarySongsMap.set(docSnap.id, songObj);
+
+        // If search is currently open with a query, refresh spotlight results
+        const spotlightInputEl = document.getElementById('global-search');
+        if (spotlightInputEl && spotlightInputEl.value.trim() && typeof runSpotlightSearch === 'function') {
+            runSpotlightSearch(spotlightInputEl.value);
+        }
+    }
+
+    function removeArtistTrack(trackId) {
+        const idx = librarySongs.findIndex(s => s.id === trackId);
+        if (idx !== -1) {
+            librarySongs.splice(idx, 1);
+        }
+        librarySongsMap.delete(trackId);
+        const spotlightInputEl = document.getElementById('global-search');
+        if (spotlightInputEl && spotlightInputEl.value.trim() && typeof runSpotlightSearch === 'function') {
+            runSpotlightSearch(spotlightInputEl.value);
+        }
+    }
+
+    async function loadArtistTracks() {
+        try {
+            const tracksRef = collection(db, "artist_tracks");
+            if (typeof onSnapshot === 'function') {
+                onSnapshot(tracksRef, (snapshot) => {
+                    if (!snapshot) return;
+                    if (typeof snapshot.docChanges === 'function') {
+                        snapshot.docChanges().forEach((change) => {
+                            const docSnap = change.doc;
+                            const data = docSnap.data();
+                            const trackId = docSnap.id;
+                            if (change.type === 'removed' || (data && data.isHidden)) {
+                                removeArtistTrack(trackId);
+                            } else if (change.type === 'added' || change.type === 'modified') {
+                                addOrUpdateArtistTrack(docSnap);
+                            }
+                        });
+                    } else if (snapshot.docs) {
+                        snapshot.docs.forEach(docSnap => {
+                            const data = docSnap.data();
+                            if (data && data.isHidden) removeArtistTrack(docSnap.id);
+                            else if (data) addOrUpdateArtistTrack(docSnap);
+                        });
+                    }
+                }, (err) => {
+                    console.warn("Notice: Real-time listener on artist_tracks failed, falling back to getDocs:", err.message || err);
+                    fetchArtistTracksOnce();
+                });
+            } else {
+                fetchArtistTracksOnce();
+            }
+        } catch (e) {
+            console.warn("Notice: loadArtistTracks error:", e.message || e);
+            fetchArtistTracksOnce();
+        }
+    }
+
+    async function fetchArtistTracksOnce() {
+        try {
+            if (typeof getDocs !== 'function') return;
+            const snap = await getDocs(collection(db, "artist_tracks"));
+            if (snap && snap.docs) {
+                snap.docs.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data && !data.isHidden) {
+                        addOrUpdateArtistTrack(docSnap);
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn("Notice: One-time fetch of artist tracks failed:", err.message || err);
+        }
+    }
+
+    loadArtistTracks();
 
     async function loadCustomPlaylists() {
         if (!currentUser) return;
@@ -335,9 +460,18 @@ function initHarmonyTunes() {
             return;
         }
 
-        const matches = librarySongs.filter(s =>
-            s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q) || (s.lyrics && s.lyrics.toLowerCase().includes(q))
-        );
+        const matches = librarySongs.filter(s => {
+            if (s.isHidden) return false;
+            const title = (s.title || '').toLowerCase();
+            const artist = (s.artist || '').toLowerCase();
+            if (title.includes(q) || artist.includes(q)) return true;
+            if (typeof s.lyrics === 'string') {
+                return s.lyrics.toLowerCase().includes(q);
+            } else if (Array.isArray(s.lyrics)) {
+                return s.lyrics.some(l => (typeof l === 'string' ? l : (l && l.text) || '').toLowerCase().includes(q));
+            }
+            return false;
+        });
 
         if (matches.length === 0) {
             spotlightResults.innerHTML = `<div class="spotlight-no-results">No results for "<strong>${escapeHTML(query)}</strong>"</div>`;
@@ -352,9 +486,10 @@ function initHarmonyTunes() {
                     group.versions.map(v => `<option value="${escapeHTML(v.id)}">${escapeHTML(v.versionName)}</option>`).join('') +
                 `</select>`;
             }
+            const artUrl = group.baseSong.art || '/images/medixly-logo.png';
             return `
             <div class="spotlight-result-row" tabindex="0" data-song-id="${escapeHTML(group.baseSong.id)}" role="button" aria-label="Play ${escapeHTML(group.baseTitle)}">
-                <img class="spotlight-result-art" src="${escapeHTML(group.baseSong.art)}" alt="" loading="lazy">
+                <img class="spotlight-result-art" src="${escapeHTML(artUrl)}" alt="" loading="lazy">
                 <div class="spotlight-result-info">
                     <div class="spotlight-result-title">${highlightMatch(group.baseTitle, query)}</div>
                     <div class="spotlight-result-artist">${highlightMatch(group.baseSong.artist, query)}</div>
@@ -374,15 +509,14 @@ function initHarmonyTunes() {
             const songId = row.dataset.songId;
             const idx = librarySongs.findIndex(s => s.id === songId);
             if (idx !== -1) {
-                currentQueue = [...librarySongs];
-                currentSongIndex = idx;
-                loadSong(idx);
-                if (!isPlaying) togglePlayPause();
+                playContext(librarySongs, idx);
             }
             closeSpotlight();
         };
 
         spotlightResults.addEventListener('click', (e) => {
+            if (e.target.closest('.card-more-btn')) return;
+            if (e.target.closest('.version-select')) return;
             activateResult(e.target.closest('.spotlight-result-row'));
         });
 
@@ -949,10 +1083,7 @@ function initHarmonyTunes() {
                     if (!viralTargetSongId) return;
                     const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
                     if (songIdx !== -1) {
-                        currentQueue = [...librarySongs];
-                        currentSongIndex = songIdx;
-                        loadSong(songIdx);
-                        if (!isPlaying) togglePlayPause();
+                        playContext(librarySongs, songIdx);
                     }
                     closeViralStats();
                 });
@@ -973,7 +1104,9 @@ function initHarmonyTunes() {
 
         // 2. Recommended
         if (containerRecommended) {
-            const recommended = [...librarySongs].sort(() => 0.5 - Math.random());
+            const recommended = [...librarySongs]
+                .filter(s => !s.isHidden && (s.src && (s.src.startsWith('http') || (s.src.startsWith('/music/') && !s.id.startsWith('song-')))))
+                .sort(() => 0.5 - Math.random());
             containerRecommended.innerHTML = recommended.slice(0, 30).map(song => createSongCard(song)).join('');
             let existingShowMore = document.getElementById('show-more-recommended');
             if (!existingShowMore) {
@@ -1244,18 +1377,37 @@ function initHarmonyTunes() {
         if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
         if (activeAudio) {
-            activeAudio.src = song.src;
+            const targetAudioSrc = song.src || song.audioUrl || song.url || song.streamUrl;
+            activeAudio.src = targetAudioSrc;
             activeAudio.onerror = () => {
+                if (activeAudio.crossOrigin) {
+                    activeAudio.removeAttribute('crossorigin');
+                    activeAudio.src = targetAudioSrc;
+                    activeAudio.play().catch(()=>{});
+                    return;
+                }
                 if (song.streamUrl && activeAudio.src !== song.streamUrl) {
                     console.warn(`Local audio unavailable for ${song.title}, falling back to streamUrl...`);
                     activeAudio.src = song.streamUrl;
                     activeAudio.play().catch(()=>{});
+                } else if (!song.streamUrl && song.title) {
+                    const query = `${song.title} ${song.artist || ''}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
+                    fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.results && data.results[0] && data.results[0].previewUrl) {
+                                song.streamUrl = data.results[0].previewUrl;
+                                activeAudio.src = song.streamUrl;
+                                activeAudio.play().catch(()=>{});
+                            }
+                        })
+                        .catch(()=>{});
                 }
             };
         }
         if (playerTitle) { playerTitle.textContent = song.title; checkMarquee(); checkMarquee(); }
         if (playerArtist) playerArtist.textContent = song.artist;
-        if (playerArt) playerArt.src = song.art;
+        if (playerArt) playerArt.src = song.art || '/images/medixly-logo.png';
         document.documentElement.style.setProperty('--lyrics-color', songColors[song.id] || '#2d1445');
         
         const paintSpillEffects = document.querySelectorAll('.paint-spill-effect');
@@ -1900,10 +2052,21 @@ function initHarmonyTunes() {
             globalSearchTimeout = setTimeout(() => {
                 const query = e.target.value.toLowerCase().trim();
                 if (viewPlaylist.style.display !== 'none' && playlistTitleEl.textContent === "Liked Songs") {
-                    const filtered = userFavorites.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    const filtered = userFavorites.filter(s => (s.title || '').toLowerCase().includes(query) || (s.artist || '').toLowerCase().includes(query));
                     renderSongTable(filtered);
                 } else if (viewHome.style.display !== 'none') {
-                    const filtered = librarySongs.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+                    const filtered = librarySongs.filter(s => {
+                        if (s.isHidden) return false;
+                        const title = (s.title || '').toLowerCase();
+                        const artist = (s.artist || '').toLowerCase();
+                        if (title.includes(query) || artist.includes(query)) return true;
+                        if (typeof s.lyrics === 'string') {
+                            return s.lyrics.toLowerCase().includes(query);
+                        } else if (Array.isArray(s.lyrics)) {
+                            return s.lyrics.some(l => (typeof l === 'string' ? l : (l && l.text) || '').toLowerCase().includes(query));
+                        }
+                        return false;
+                    });
                     
                     if (filtered.length === 0) {
                         document.getElementById('container-jumpback').innerHTML = '<p style="padding:20px;color:#888;">No results found.</p>';
@@ -2303,7 +2466,7 @@ function initHarmonyTunes() {
             }
 
             if (preloadedNextSongObj) {
-                nextAudio.src = preloadedNextSongObj.src;
+                nextAudio.src = preloadedNextSongObj.src || preloadedNextSongObj.audioUrl || preloadedNextSongObj.streamUrl;
                 const songMetadata = librarySongsMap.get(preloadedNextSongObj.id);
                 
                 nextAudio.addEventListener('loadedmetadata', () => {
@@ -2334,7 +2497,7 @@ function initHarmonyTunes() {
                 if(nextUserSong) {
                     currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
                     preloadedNextSongObj = nextUserSong;
-                    nextAudio.src = nextUserSong.src;
+                    nextAudio.src = nextUserSong.src || nextUserSong.audioUrl || nextUserSong.streamUrl;
                     const meta = librarySongsMap.get(nextUserSong.id);
                     nextAudio.currentTime = meta?.inmixPoint || 15;
                 }
@@ -2347,7 +2510,7 @@ function initHarmonyTunes() {
                     if (currentSongIndex + 1 < currentQueue.length) {
                         nextIndex = currentSongIndex + 1;
                         preloadedNextSongObj = currentQueue[nextIndex];
-                        nextAudio.src = preloadedNextSongObj.src;
+                        nextAudio.src = preloadedNextSongObj.src || preloadedNextSongObj.audioUrl || preloadedNextSongObj.streamUrl;
                     } else {
                         isCrossfading = false;
                         mixerBtn.classList.remove('pulsing');

@@ -14,6 +14,8 @@ import {
     MC_ALREADY_LINKED_MESSAGE,
     MC_ALREADY_LINKED_HTML
 } from './minecraft-link-service.js';
+import { streakCelebration, getWeeklyHotbarHtml, getVoxelFlameSvg } from './streakCelebration.js';
+import { streakAudio } from './streakSoundEngine.js';
 
 // Global state
 let currentUser = null;
@@ -2550,6 +2552,8 @@ export function renderMinecraftGrid(user, checkinData) {
     });
 }
 
+let isCheckinClaimInProgress = false;
+
 export function updateCheckinUI(user, checkinData) {
     const streakDisplay = document.getElementById('check-in-streak');
     const modalStreakDisplay = document.getElementById('mc-modal-streak-count');
@@ -2558,6 +2562,9 @@ export function updateCheckinUI(user, checkinData) {
     const checkinMessage = document.getElementById('checkin-message');
     const progressFill = document.getElementById('mc-progress-bar-fill');
     const progressDaysText = document.getElementById('mc-progress-days-text');
+    const weeklyHotbarEl = document.getElementById('dashboard-weekly-hotbar');
+    const dashboardFlameIcon = document.getElementById('dashboard-flame-icon');
+    const replayStreakBtn = document.getElementById('replay-streak-btn');
 
     const streak = checkinData.streak || 0;
     if (streakDisplay) streakDisplay.textContent = streak;
@@ -2571,6 +2578,27 @@ export function updateCheckinUI(user, checkinData) {
         ? ((claimedCount % 30) + 1) 
         : (streak === 0 ? 1 : ((claimedCount % 30) + 1));
     const nextReward = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
+
+    // Update 7-Day Hotbar on Dashboard
+    if (weeklyHotbarEl) {
+        weeklyHotbarEl.innerHTML = getWeeklyHotbarHtml(streak, isClaimedToday);
+    }
+
+    // Update Dashboard Flame Icon
+    if (dashboardFlameIcon) {
+        if (isClaimedToday) {
+            dashboardFlameIcon.textContent = streak >= 30 ? '💠' : '🔥';
+            dashboardFlameIcon.title = streak >= 30 ? '30-Day Soul Fire Streak Ignited!' : 'Streak Ignited Today!';
+        } else {
+            dashboardFlameIcon.textContent = '🔥';
+            dashboardFlameIcon.title = 'Streak Waiting to Ignite';
+        }
+    }
+
+    // Update Replay Celebration button visibility
+    if (replayStreakBtn) {
+        replayStreakBtn.style.display = isClaimedToday ? 'inline-block' : 'none';
+    }
 
     // Progress bar
     const percent = Math.min(100, Math.round((displayClaimed / 30) * 100));
@@ -2623,7 +2651,7 @@ export function updateCheckinUI(user, checkinData) {
 }
 
 export async function triggerCheckinClaim(user) {
-    if (!user) return;
+    if (!user || isCheckinClaimInProgress) return;
     const checkinData = getUserCheckinData(user, currentUserData);
     const todayStr = getLocalDateString(new Date());
 
@@ -2635,50 +2663,66 @@ export async function triggerCheckinClaim(user) {
         }
     }
 
-    // Streak calculation:
-    // If previous claim was yesterday (diff === 1), streak increments
-    let isConsecutive = false;
-    if (checkinData.lastClaimDate) {
-        const diffDays = getCalendarDayDiff(todayStr, checkinData.lastClaimDate);
-        if (diffDays === 1) {
-            isConsecutive = true;
+    // Spam-click lock
+    isCheckinClaimInProgress = true;
+    const claimBtn = document.getElementById('claim-checkin-btn');
+    const modalClaimBtn = document.getElementById('mc-modal-claim-today-btn');
+    if (claimBtn) claimBtn.disabled = true;
+    if (modalClaimBtn) modalClaimBtn.disabled = true;
+
+    try {
+        const previousStreak = checkinData.streak || 0;
+
+        // Streak calculation:
+        // If previous claim was yesterday (diff === 1), streak increments
+        let isConsecutive = false;
+        if (checkinData.lastClaimDate) {
+            const diffDays = getCalendarDayDiff(todayStr, checkinData.lastClaimDate);
+            if (diffDays === 1) {
+                isConsecutive = true;
+            }
         }
+
+        const newStreak = isConsecutive ? (checkinData.streak + 1) : 1;
+        const nextDayNum = ((newStreak - 1) % 30) + 1;
+        const rewardItem = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
+
+        checkinData.streak = newStreak;
+        checkinData.lastClaimDate = todayStr;
+        checkinData.claimedDays = Array.from({ length: nextDayNum }, (_, i) => i + 1);
+        checkinData.totalClaimed = (checkinData.totalClaimed || 0) + 1;
+        if (!checkinData.inventory) checkinData.inventory = [];
+        checkinData.inventory.push(`${rewardItem.name} (Claimed Day ${nextDayNum})`);
+
+        // Save and update user data in Firestore and cache
+        await saveUserCheckinData(user, checkinData, rewardItem.points, rewardItem);
+
+        // Update points displayed across the page immediately
+        const currentPts = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10) || 50;
+        const newTotalPoints = currentPts + rewardItem.points;
+        localStorage.setItem(`dts_points_${user.uid}`, newTotalPoints);
+
+        const pointsBalanceDisplay = document.getElementById('points-balance-display');
+        const userLoyaltyPoints = document.getElementById('user-loyalty-points');
+        if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = newTotalPoints;
+        if (userLoyaltyPoints) userLoyaltyPoints.textContent = newTotalPoints;
+
+        updateCheckinUI(user, checkinData);
+
+        // Trigger the Duolingo x Minecraft Voxel Streak Celebration!
+        triggerFlareAnimation(newStreak, rewardItem, previousStreak);
+    } catch (err) {
+        console.error('Check-in claim error:', err);
+    } finally {
+        isCheckinClaimInProgress = false;
     }
-
-    const newStreak = isConsecutive ? (checkinData.streak + 1) : 1;
-    const nextDayNum = ((newStreak - 1) % 30) + 1;
-    const rewardItem = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1];
-
-    checkinData.streak = newStreak;
-    checkinData.lastClaimDate = todayStr;
-    checkinData.claimedDays = Array.from({ length: nextDayNum }, (_, i) => i + 1);
-    checkinData.totalClaimed = (checkinData.totalClaimed || 0) + 1;
-    if (!checkinData.inventory) checkinData.inventory = [];
-    checkinData.inventory.push(`${rewardItem.name} (Claimed Day ${nextDayNum})`);
-
-    // Save and update user data in Firestore and cache
-    await saveUserCheckinData(user, checkinData, rewardItem.points, rewardItem);
-
-    // Update points displayed across the page immediately
-    const currentPts = parseInt(localStorage.getItem(`dts_points_${user.uid}`), 10) || 50;
-    const newTotalPoints = currentPts + rewardItem.points;
-    localStorage.setItem(`dts_points_${user.uid}`, newTotalPoints);
-
-    const pointsBalanceDisplay = document.getElementById('points-balance-display');
-    const userLoyaltyPoints = document.getElementById('user-loyalty-points');
-    if (pointsBalanceDisplay) pointsBalanceDisplay.textContent = newTotalPoints;
-    if (userLoyaltyPoints) userLoyaltyPoints.textContent = newTotalPoints;
-
-    updateCheckinUI(user, checkinData);
-
-    // Trigger the Cinematic Flare Animation with day number & item!
-    triggerFlareAnimation(newStreak, rewardItem);
 }
 
-export function triggerFlareAnimation(streak, rewardItem) {
+export function triggerFlareAnimation(streak, rewardItem, previousStreak = Math.max(0, streak - 1)) {
     const flareModal = document.getElementById('mc-flare-modal');
     if (!flareModal) return;
 
+    // Legacy and backward-compatible element updates
     const streakNumberEl = document.getElementById('flare-streak-number');
     const rarityPillEl = document.getElementById('flare-rarity-pill');
     const iconContainerEl = document.getElementById('flare-icon-container');
@@ -2712,11 +2756,17 @@ export function triggerFlareAnimation(streak, rewardItem) {
         iconContainerEl.innerHTML = getMinecraftItemSvg(rewardItem.icon);
     }
 
-    flareModal.style.display = 'flex';
+    // Trigger full 5-stage Duolingo x Minecraft celebration sequence!
+    streakCelebration.triggerCelebration({
+        previousStreak,
+        newStreak: streak,
+        rewardItem,
+        isReplay: false
+    });
 
     if (collectBtn) {
         collectBtn.onclick = () => {
-            flareModal.style.display = 'none';
+            streakCelebration.closeModal();
         };
     }
 }
@@ -2725,15 +2775,63 @@ export function initDailyCheckin(user, userData) {
     const checkinData = getUserCheckinData(user, userData);
     updateCheckinUI(user, checkinData);
 
+    // Audio Mute/Unmute state synchronization
+    const syncAudioButtons = () => {
+        const isMuted = streakAudio.getMuted();
+        const iconText = isMuted ? '🔇' : '🔊';
+        const soundIcon = document.getElementById('streak-sound-icon');
+        const flareSoundIcon = document.querySelector('.flare-sound-icon');
+        const soundBtn = document.getElementById('streak-sound-toggle-btn');
+        const flareSoundBtn = document.getElementById('flare-sound-toggle-btn');
+
+        if (soundIcon) soundIcon.textContent = iconText;
+        if (flareSoundIcon) flareSoundIcon.textContent = iconText;
+        if (soundBtn) soundBtn.classList.toggle('muted', isMuted);
+        if (flareSoundBtn) flareSoundBtn.classList.toggle('muted', isMuted);
+    };
+
+    const handleSoundToggle = () => {
+        streakAudio.ensureContext();
+        streakAudio.toggleMute();
+        syncAudioButtons();
+    };
+
+    const soundBtn = document.getElementById('streak-sound-toggle-btn');
+    if (soundBtn) soundBtn.onclick = handleSoundToggle;
+
+    const flareSoundBtn = document.getElementById('flare-sound-toggle-btn');
+    if (flareSoundBtn) flareSoundBtn.onclick = handleSoundToggle;
+
+    syncAudioButtons();
+
+    // Replay Celebration Button Handler
+    const replayStreakBtn = document.getElementById('replay-streak-btn');
+    if (replayStreakBtn) {
+        replayStreakBtn.onclick = () => {
+            streakAudio.ensureContext();
+            const currentData = getUserCheckinData(user, currentUserData);
+            const currentStreak = currentData.streak || 1;
+            const currentDayNum = ((currentStreak - 1) % 30) + 1;
+            const currentReward = CHECKIN_SCHEDULE_30_DAYS[currentDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
+            triggerFlareAnimation(currentStreak, currentReward, Math.max(0, currentStreak - 1));
+        };
+    }
+
     // Daily Claim buttons
     const claimBtn = document.getElementById('claim-checkin-btn');
     if (claimBtn) {
-        claimBtn.onclick = () => triggerCheckinClaim(user);
+        claimBtn.onclick = () => {
+            streakAudio.ensureContext();
+            triggerCheckinClaim(user);
+        };
     }
 
     const modalClaimBtn = document.getElementById('mc-modal-claim-today-btn');
     if (modalClaimBtn) {
-        modalClaimBtn.onclick = () => triggerCheckinClaim(user);
+        modalClaimBtn.onclick = () => {
+            streakAudio.ensureContext();
+            triggerCheckinClaim(user);
+        };
     }
 
     // 30-Day Calendar Modal Open / Close
@@ -2768,7 +2866,7 @@ export function initDailyCheckin(user, userData) {
     if (flareModal) {
         flareModal.onclick = (e) => {
             if (e.target === flareModal || e.target.classList.contains('mc-flare-backdrop')) {
-                flareModal.style.display = 'none';
+                streakCelebration.closeModal();
             }
         };
     }

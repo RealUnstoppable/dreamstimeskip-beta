@@ -14,3 +14,4 @@ yt-dlp.exe
 *.mp3
 *.webm*
 scratch/
+.DS_Store
