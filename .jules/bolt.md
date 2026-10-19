@@ -1,3 +1,7 @@
 ## 2024-05-24 - [Micro-UX Event Delegation]
 **Learning:** In highly interactive dynamic lists like Lyrics and Spotlight search, repeated event listeners can cause huge memory bloat. Furthermore, modifying DOM instances iteratively inside functions like `renderLyrics()` can create stale closure bugs.
 **Action:** Applied Event Delegation using dataset checks (`dataset.delegated = "true"`) to attach single event listeners on parent containers and check `e.target.closest()`. The listener is attached globally (e.g., inside `initHarmonyTunes`) and reads dependencies like `activeAudio` dynamically at execution time, which decreases listener bloat and runs significantly faster without stale closure issues.
+
+## 2024-05-14 - Map Values Fallback Array Allocation
+**Learning:** When using a `Map` to cache and optimize lookups for large static arrays (like `librarySongs`), using `Array.from(map.values()).find(...)` in fallback search paths inside frequently called functions is a massive anti-pattern. This approach allocates a massive new array in memory (e.g. 30,000 items) on every single execution, causing severe CPU spikes and memory regressions due to excessive garbage collection.
+**Action:** When implementing an O(1) hash map optimization, always iterate over the *original* static array directly for any necessary O(N) fallback logic instead of constructing a new array from the map's values.
