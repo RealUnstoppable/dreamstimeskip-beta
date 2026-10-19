@@ -2564,7 +2564,6 @@ export function updateCheckinUI(user, checkinData) {
     const progressDaysText = document.getElementById('mc-progress-days-text');
     const weeklyHotbarEl = document.getElementById('dashboard-weekly-hotbar');
     const dashboardFlameIcon = document.getElementById('dashboard-flame-icon');
-    const replayStreakBtn = document.getElementById('replay-streak-btn');
 
     const streak = checkinData.streak || 0;
     if (streakDisplay) streakDisplay.textContent = streak;
@@ -2579,9 +2578,9 @@ export function updateCheckinUI(user, checkinData) {
         : (streak === 0 ? 1 : ((claimedCount % 30) + 1));
     const nextReward = CHECKIN_SCHEDULE_30_DAYS[nextDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
 
-    // Update 7-Day Hotbar on Dashboard
+    // Update 7-Day Hotbar on Dashboard (aligned to exact todayStr calendar date)
     if (weeklyHotbarEl) {
-        weeklyHotbarEl.innerHTML = getWeeklyHotbarHtml(streak, isClaimedToday);
+        weeklyHotbarEl.innerHTML = getWeeklyHotbarHtml(streak, isClaimedToday, null, todayStr);
     }
 
     // Update Dashboard Flame Icon
@@ -2593,11 +2592,6 @@ export function updateCheckinUI(user, checkinData) {
             dashboardFlameIcon.textContent = '🔥';
             dashboardFlameIcon.title = 'Streak Waiting to Ignite';
         }
-    }
-
-    // Update Replay Celebration button visibility
-    if (replayStreakBtn) {
-        replayStreakBtn.style.display = isClaimedToday ? 'inline-block' : 'none';
     }
 
     // Progress bar
@@ -2775,47 +2769,7 @@ export function initDailyCheckin(user, userData) {
     const checkinData = getUserCheckinData(user, userData);
     updateCheckinUI(user, checkinData);
 
-    // Audio Mute/Unmute state synchronization
-    const syncAudioButtons = () => {
-        const isMuted = streakAudio.getMuted();
-        const iconText = isMuted ? '🔇' : '🔊';
-        const soundIcon = document.getElementById('streak-sound-icon');
-        const flareSoundIcon = document.querySelector('.flare-sound-icon');
-        const soundBtn = document.getElementById('streak-sound-toggle-btn');
-        const flareSoundBtn = document.getElementById('flare-sound-toggle-btn');
-
-        if (soundIcon) soundIcon.textContent = iconText;
-        if (flareSoundIcon) flareSoundIcon.textContent = iconText;
-        if (soundBtn) soundBtn.classList.toggle('muted', isMuted);
-        if (flareSoundBtn) flareSoundBtn.classList.toggle('muted', isMuted);
-    };
-
-    const handleSoundToggle = () => {
-        streakAudio.ensureContext();
-        streakAudio.toggleMute();
-        syncAudioButtons();
-    };
-
-    const soundBtn = document.getElementById('streak-sound-toggle-btn');
-    if (soundBtn) soundBtn.onclick = handleSoundToggle;
-
-    const flareSoundBtn = document.getElementById('flare-sound-toggle-btn');
-    if (flareSoundBtn) flareSoundBtn.onclick = handleSoundToggle;
-
-    syncAudioButtons();
-
-    // Replay Celebration Button Handler
-    const replayStreakBtn = document.getElementById('replay-streak-btn');
-    if (replayStreakBtn) {
-        replayStreakBtn.onclick = () => {
-            streakAudio.ensureContext();
-            const currentData = getUserCheckinData(user, currentUserData);
-            const currentStreak = currentData.streak || 1;
-            const currentDayNum = ((currentStreak - 1) % 30) + 1;
-            const currentReward = CHECKIN_SCHEDULE_30_DAYS[currentDayNum - 1] || CHECKIN_SCHEDULE_30_DAYS[0];
-            triggerFlareAnimation(currentStreak, currentReward, Math.max(0, currentStreak - 1));
-        };
-    }
+    // Daily Claim buttons (AudioContext resumed on user click without toggle button)
 
     // Daily Claim buttons
     const claimBtn = document.getElementById('claim-checkin-btn');

@@ -208,13 +208,23 @@
             const createAccount = document.getElementById('create-account-cb').checked;
             const password = document.getElementById('b-password').value;
 
-            // Time Validation
-            const dateObj = new Date(dtValue);
-            const day = dateObj.getDay(); 
-            const hour = dateObj.getHours();
+            // Time Validation (Strict local date/time extraction to avoid timezone shifts on Tuesdays and Thursdays)
+            let day = -1;
+            let hour = -1;
+            if (dtValue && dtValue.includes('T')) {
+                const [dPart, tPart] = dtValue.split('T');
+                const [y, m, d] = dPart.split('-').map(Number);
+                const [hr, min] = (tPart || '0:0').split(':').map(Number);
+                const dateObj = new Date(y, m - 1, d, hr || 0, min || 0);
+                day = dateObj.getDay();
+                hour = dateObj.getHours();
+            } else {
+                const dateObj = new Date(dtValue);
+                day = dateObj.getDay();
+                hour = dateObj.getHours();
+            }
 
             if ((day === 2 || day === 4) && (hour >= 7 && hour < 15)) {
-                msg.style.color = "var(--accent)"; // Red color from CSS wouldn't pop as well in dark mode, let's use a bright red.
                 msg.style.color = "#ef4444"; 
                 msg.textContent = "Error: Tuesdays and Thursdays between 7:00 AM and 3:00 PM are unavailable.";
                 submitBtn.disabled = false;

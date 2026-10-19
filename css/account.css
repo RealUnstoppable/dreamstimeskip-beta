@@ -2135,82 +2135,9 @@ input:checked + .slider:before {
     opacity: 1 !important;
 }
 
-/* Layer 3: Rotating Pixel Sunburst / God-Rays */
+/* Layer 3: Rotating Pixel Sunburst / God-Rays (Disabled per user request) */
 .mc-flare-rays {
-    position: absolute;
-    width: 960px;
-    height: 960px;
-    border-radius: 50%;
-    opacity: 0.08;
-    background: conic-gradient(
-        from 0deg,
-        rgba(255, 106, 0, 0.8) 0deg 15deg,
-        transparent 15deg 30deg,
-        rgba(255, 170, 0, 0.8) 30deg 45deg,
-        transparent 45deg 60deg,
-        rgba(255, 216, 61, 0.8) 60deg 75deg,
-        transparent 75deg 90deg,
-        rgba(255, 106, 0, 0.8) 90deg 105deg,
-        transparent 105deg 120deg,
-        rgba(255, 170, 0, 0.8) 120deg 135deg,
-        transparent 135deg 150deg,
-        rgba(255, 216, 61, 0.8) 150deg 165deg,
-        transparent 165deg 180deg,
-        rgba(255, 106, 0, 0.8) 180deg 195deg,
-        transparent 195deg 210deg,
-        rgba(255, 170, 0, 0.8) 210deg 225deg,
-        transparent 225deg 240deg,
-        rgba(255, 216, 61, 0.8) 240deg 255deg,
-        transparent 255deg 270deg,
-        rgba(255, 106, 0, 0.8) 270deg 285deg,
-        transparent 285deg 300deg,
-        rgba(255, 170, 0, 0.8) 300deg 315deg,
-        transparent 315deg 330deg,
-        rgba(255, 216, 61, 0.8) 330deg 345deg,
-        transparent 345deg 360deg
-    );
-    animation: spinFlareRays 25s linear infinite;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.mc-flare-overlay.soul-fire-theme .mc-flare-rays {
-    background: conic-gradient(
-        from 0deg,
-        rgba(0, 240, 255, 0.8) 0deg 15deg,
-        transparent 15deg 30deg,
-        rgba(0, 151, 167, 0.8) 30deg 45deg,
-        transparent 45deg 60deg,
-        rgba(224, 247, 250, 0.8) 60deg 75deg,
-        transparent 75deg 90deg,
-        rgba(0, 240, 255, 0.8) 90deg 105deg,
-        transparent 105deg 120deg,
-        rgba(0, 151, 167, 0.8) 120deg 135deg,
-        transparent 135deg 150deg,
-        rgba(224, 247, 250, 0.8) 150deg 165deg,
-        transparent 165deg 180deg,
-        rgba(0, 240, 255, 0.8) 180deg 195deg,
-        transparent 195deg 210deg,
-        rgba(0, 151, 167, 0.8) 210deg 225deg,
-        transparent 225deg 240deg,
-        rgba(0, 240, 255, 0.8) 240deg 255deg,
-        transparent 255deg 270deg,
-        rgba(0, 151, 167, 0.8) 270deg 285deg,
-        transparent 285deg 300deg,
-        rgba(224, 247, 250, 0.8) 300deg 315deg,
-        transparent 315deg 330deg,
-        rgba(0, 240, 255, 0.8) 330deg 345deg,
-        transparent 345deg 360deg
-    );
-}
-
-@keyframes spinFlareRays {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.mc-flare-overlay.streak-active .mc-flare-rays {
-    opacity: 0.16;
+    display: none !important;
 }
 
 /* Layer 4: Voxel Particle Canvas */
@@ -2525,6 +2452,23 @@ input:checked + .slider:before {
     letter-spacing: 0.5px;
 }
 
+.slot-date-num {
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.52rem;
+    color: #6B7280;
+    margin-top: -2px;
+    line-height: 1;
+}
+
+.mc-hotbar-slot.today .slot-date-num {
+    color: #FFFF55;
+    font-weight: bold;
+}
+
+.mc-hotbar-slot.claimed .slot-date-num {
+    color: #D1D5DB;
+}
+
 .slot-socket {
     height: 22px;
     display: flex;
@@ -2721,62 +2665,10 @@ input:checked + .slider:before {
 }
 
 .mc-button-replay,
-.mc-pixel-btn-replay {
-    background: #252a36 !important;
-    border: 2px solid #000 !important;
-    border-bottom: 6px solid #11141a !important;
-    color: #cbd5e0 !important;
-    box-shadow: inset 2px 2px 0 #3b4255, inset -2px -2px 0 #151821, 0 4px 0 #000000 !important;
-    font-family: 'Silkscreen', monospace !important;
-    padding: 11px 16px !important;
-    font-size: 0.88rem !important;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: background 0.1s ease;
-}
-
-.mc-button-replay:hover,
-.mc-pixel-btn-replay:hover {
-    background: #323949 !important;
-    color: #ffffff !important;
-}
-
-.mc-button-replay:active,
-.mc-pixel-btn-replay:active {
-    border-bottom-width: 2px !important;
-    transform: translateY(4px) !important;
-}
-
-/* Sound Toggle Button */
-.mc-sound-toggle-btn {
-    background: #1b1e26;
-    border: 2px solid #000;
-    border-bottom: 4px solid #0d0f13;
-    box-shadow: inset 1px 1px 0 #2d3342, inset -1px -1px 0 #101217;
-    padding: 5px 9px;
-    border-radius: 2px;
-    cursor: pointer;
-    color: #f3f4f6;
-    font-size: 0.95rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-
-.mc-sound-toggle-btn:hover {
-    background: #282c38;
-}
-
-.mc-sound-toggle-btn:active {
-    border-bottom-width: 2px;
-    transform: translateY(2px);
-}
-
-.mc-sound-toggle-btn.muted {
-    opacity: 0.65;
-    filter: grayscale(80%);
+.mc-pixel-btn-replay,
+.mc-sound-toggle-btn,
+.modal-sound-toggle {
+    display: none !important;
 }
 
 /* Dashboard Streak HUD Group */

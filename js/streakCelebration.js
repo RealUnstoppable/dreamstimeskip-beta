@@ -359,18 +359,37 @@ export function getVoxelFlameSvg(state = 'ignited', size = 80) {
  * 3. 7-DAY MINECRAFT HOTBAR / WEEKLY PROGRESS ROW GENERATOR
  * Generates an authentic Minecraft hotbar row with 7 slots (Mon-Sun).
  */
-export function getWeeklyHotbarHtml(streak = 0, isClaimedToday = false, todaySlotIndex = null) {
+export function getWeeklyHotbarHtml(streak = 0, isClaimedToday = false, todaySlotIndex = null, referenceDate = null) {
     const dayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
     
-    // Determine today's day of week: 0 = Mon, ..., 6 = Sun
-    const now = new Date();
-    const jsDay = now.getDay(); // 0 is Sunday, 1 is Monday
-    const currentDayIndex = todaySlotIndex !== null ? todaySlotIndex : (jsDay === 0 ? 6 : jsDay - 1);
+    // Resolve reference date cleanly (handles Date object, 'YYYY-MM-DD' string, or current local date)
+    let refDate;
+    if (referenceDate instanceof Date) {
+        refDate = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+    } else if (typeof referenceDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(referenceDate)) {
+        const [y, m, d] = referenceDate.split('-').map(Number);
+        refDate = new Date(y, m - 1, d);
+    } else {
+        const now = new Date();
+        refDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
 
-    // Calculate how many days of the current 7-day period are completed
+    const jsDay = refDate.getDay(); // 0 is Sunday, 1 is Monday, 2 is Tuesday, etc.
+    const currentDayIndex = todaySlotIndex !== null 
+        ? todaySlotIndex 
+        : (jsDay === 0 ? 6 : jsDay - 1); // 0 = Mon, 1 = Tue, 2 = Wed, 3 = Thu, 4 = Fri, 5 = Sat, 6 = Sun
+
+    // Calculate Monday of the current week (refDate - currentDayIndex days)
+    const mondayDate = new Date(refDate.getFullYear(), refDate.getMonth(), refDate.getDate() - currentDayIndex);
+
     let html = `<div class="mc-weekly-hotbar" id="mc-weekly-hotbar" role="region" aria-label="7-Day Streak Progress">`;
 
     for (let i = 0; i < 7; i++) {
+        const slotDate = new Date(mondayDate.getFullYear(), mondayDate.getMonth(), mondayDate.getDate() + i);
+        const slotDayNum = slotDate.getDate();
+        const dateFormatted = `${slotDate.getMonth() + 1}/${slotDayNum}`;
+        const isoDateStr = `${slotDate.getFullYear()}-${String(slotDate.getMonth() + 1).padStart(2, '0')}-${String(slotDayNum).padStart(2, '0')}`;
+
         const isPastDay = i < currentDayIndex;
         const isToday = i === currentDayIndex;
         const isFutureDay = i > currentDayIndex;
@@ -386,32 +405,33 @@ export function getWeeklyHotbarHtml(streak = 0, isClaimedToday = false, todaySlo
             if (wasClaimedInStreak) {
                 slotClass += ' claimed';
                 statusIcon = `<span class="slot-mini-flame">🔥</span><span class="slot-check">✓</span>`;
-                statusTitle = `${dayNames[i]}: Streak Maintained`;
+                statusTitle = `${dayNames[i]} (${dateFormatted}): Streak Maintained`;
             } else {
                 slotClass += ' missed';
                 statusIcon = `<span class="slot-missed">✕</span>`;
-                statusTitle = `${dayNames[i]}: Missed`;
+                statusTitle = `${dayNames[i]} (${dateFormatted}): Missed`;
             }
         } else if (isToday) {
             if (isClaimedToday) {
                 slotClass += ' claimed today';
                 statusIcon = `<span class="slot-mini-flame today-ignited">🔥</span><span class="slot-check">✓</span>`;
-                statusTitle = `Today (${dayNames[i]}): Claimed!`;
+                statusTitle = `Today (${dayNames[i]} ${dateFormatted}): Claimed!`;
             } else {
                 slotClass += ' pending-today';
                 statusIcon = `<span class="slot-mini-flame dormant">🔥</span>`;
-                statusTitle = `Today (${dayNames[i]}): Ready to Claim!`;
+                statusTitle = `Today (${dayNames[i]} ${dateFormatted}): Ready to Claim!`;
             }
         } else {
             // Future day
             slotClass += ' future';
             statusIcon = `<span class="slot-lock">🔒</span>`;
-            statusTitle = `${dayNames[i]}: Upcoming`;
+            statusTitle = `${dayNames[i]} (${dateFormatted}): Upcoming`;
         }
 
         html += `
-        <div class="${slotClass}" data-day-index="${i}" title="${statusTitle}">
+        <div class="${slotClass}" data-day-index="${i}" data-date="${isoDateStr}" title="${statusTitle}">
             <span class="slot-day-label">${dayNames[i]}</span>
+            <span class="slot-date-num">${slotDayNum}</span>
             <div class="slot-socket">
                 ${statusIcon}
             </div>
@@ -589,7 +609,6 @@ export class StreakCelebrationController {
 
         // Action buttons
         const collectBtn = document.getElementById('flare-collect-btn');
-        const replayBtn = document.getElementById('flare-replay-btn');
         const actionsContainer = document.getElementById('flare-actions-container');
         if (actionsContainer) actionsContainer.classList.remove('visible');
 
@@ -713,18 +732,6 @@ export class StreakCelebrationController {
         if (collectBtn) {
             collectBtn.onclick = () => {
                 this.closeModal();
-            };
-        }
-
-        if (replayBtn) {
-            replayBtn.onclick = () => {
-                this.triggerCelebration({
-                    previousStreak: Math.max(0, newStreak - 1),
-                    newStreak,
-                    rewardItem,
-                    isReplay: true,
-                    onComplete
-                });
             };
         }
     }

@@ -320,6 +320,17 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
             expect(htmlPending).toContain('class="mc-hotbar-slot pending-today"');
             expect(htmlPending).toContain('slot-mini-flame dormant');
         });
+
+        test('accurately calculates and formats calendar dates for Tuesday without timezone offset drift', () => {
+            // Reference date: Tuesday, Oct 20, 2026
+            const refTuesday = '2026-10-20';
+            const html = getWeeklyHotbarHtml(2, true, null, refTuesday);
+            expect(html).toContain('TUE');
+            expect(html).toContain('data-day-index="1"');
+            expect(html).toContain('data-date="2026-10-20"');
+            expect(html).toContain('<span class="slot-date-num">20</span>');
+            expect(html).toContain('Today (TUE 10/20): Claimed!');
+        });
     });
 
     // ========================================================
@@ -334,7 +345,6 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
                 <div id="mc-flare-modal" class="mc-flare-overlay" style="display: none;">
                     <canvas id="mc-celebration-canvas"></canvas>
                     <div id="mc-flare-heat-bloom" class="mc-flare-heat-bloom"></div>
-                    <div class="mc-flare-rays"></div>
                     <div id="mc-shockwave-ring" class="mc-shockwave-ring"></div>
                     <div class="mc-flare-card">
                         <div id="flare-voxel-flame-container" class="flare-voxel-flame-container"></div>
@@ -352,7 +362,6 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
                         <div id="flare-celebration-banner"></div>
                         <div id="flare-actions-container">
                             <button id="flare-collect-btn"></button>
-                            <button id="flare-replay-btn"></button>
                         </div>
                     </div>
                 </div>
@@ -434,13 +443,15 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
             expect(banner.textContent).toContain('SOUL FIRE UNLOCKED');
         });
 
-        test('Replay mode can be triggered without error and resets sequence cleanly', () => {
+        test('Collect button cleanly closes modal and halts animation', () => {
             controller.triggerCelebration({ previousStreak: 0, newStreak: 1 });
             jest.advanceTimersByTime(1600);
 
-            const replayBtn = document.getElementById('flare-replay-btn');
-            expect(replayBtn).toBeDefined();
-            expect(() => replayBtn.click()).not.toThrow();
+            const collectBtn = document.getElementById('flare-collect-btn');
+            expect(collectBtn).toBeDefined();
+            collectBtn.click();
+            expect(controller.isAnimating).toBe(false);
+            expect(document.getElementById('mc-flare-modal').style.display).toBe('none');
         });
     });
 
@@ -448,17 +459,19 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
     // 6. ACCOUNT HTML & CSS INTEGRATION AUDIT
     // ========================================================
     describe('6. HTML & CSS Integration Audit', () => {
-        test('account.html contains sound toggle, 7-day hotbar, and replay streak button', () => {
-            expect(accountHtml).toContain('id="streak-sound-toggle-btn"');
+        test('account.html has removed sound toggle, replay streak button, and background spinner rays', () => {
+            expect(accountHtml).not.toContain('id="streak-sound-toggle-btn"');
+            expect(accountHtml).not.toContain('id="flare-sound-toggle-btn"');
+            expect(accountHtml).not.toContain('id="replay-streak-btn"');
+            expect(accountHtml).not.toContain('id="flare-replay-btn"');
+            expect(accountHtml).not.toContain('class="mc-flare-rays"');
             expect(accountHtml).toContain('id="dashboard-weekly-hotbar"');
-            expect(accountHtml).toContain('id="replay-streak-btn"');
             expect(accountHtml).toContain('id="mc-celebration-canvas"');
             expect(accountHtml).toContain('id="flare-voxel-flame-container"');
             expect(accountHtml).toContain('id="flare-streak-roll-prev"');
             expect(accountHtml).toContain('id="flare-streak-roll-next"');
             expect(accountHtml).toContain('id="flare-weekly-hotbar-container"');
             expect(accountHtml).toContain('id="flare-celebration-banner"');
-            expect(accountHtml).toContain('id="flare-replay-btn"');
         });
 
         test('css/account.css defines Obsidian/Nether canvas with 16px pixelated grid and 3D beveled dark-stone border', () => {
@@ -477,9 +490,9 @@ describe('Duolingo x Minecraft Voxel Streak Celebration Suite', () => {
             expect(accountCss).toContain('animation: heatBloomBreathe 4s ease-in-out infinite');
         });
 
-        test('css/account.css defines rotating pixel god-rays (25s linear infinite)', () => {
-            expect(accountCss).toContain('animation: spinFlareRays 25s linear infinite');
-            expect(accountCss).toContain('opacity: 0.08');
+        test('css/account.css disables rotating pixel god-rays spinner per user specification', () => {
+            expect(accountCss).toContain('.mc-flare-rays');
+            expect(accountCss).toContain('display: none !important');
         });
 
         test('css/account.css includes 6px solid bottom border on tactile buttons that depresses on :active', () => {
