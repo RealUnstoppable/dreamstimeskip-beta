@@ -23620,6 +23620,14 @@ export const librarySongs = [
     }
 ];
 
+const songMap = new Map();
+for (const song of librarySongs) {
+    songMap.set(song.id, song);
+}
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    if (!id) return null;
+    return songMap.get(id) ||
+           songMap.get(`top100-${id}`) ||
+           songMap.get(id.replace(/^top100-/, '')) || null;
 }
