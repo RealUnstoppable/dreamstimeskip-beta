@@ -29333,9 +29333,16 @@ export const librarySongs = [
     }
 ];
 
+const songMap = new Map();
+// Defer map population to prevent blocking main thread heavily at init if not needed
+// but doing it synchronously is usually fine for a few thousand items.
+for (const song of librarySongs) {
+    songMap.set(song.id, song);
+}
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+    return songMap.get(id) ||
+           songMap.get(`top100-${id}`) ||
+           songMap.get(id.replace(/^top100-/, '')) || null;
 }
