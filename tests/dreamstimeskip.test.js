@@ -213,12 +213,12 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
     });
 
     describe('Dreams OG Launch Countdown Configuration', () => {
-        it('configures the Dreams OG countdown for 4:00 PM EDT on October 20, 2026', () => {
-            expect(html).toContain('new Countdown("2026-10-20T16:00:00-04:00", "countdown-1")');
+        it('configures the Dreams OG countdown for 11:59 PM EDT on October 20, 2026', () => {
+            expect(html).toContain('new Countdown("2026-10-20T23:59:00-04:00", "countdown-1")');
         });
 
-        it('sets the Founder whitelist cutoff to 4:00 PM EDT launch on October 20, 2026', () => {
-            expect(html).toContain("const cutoff = new Date('2026-10-20T16:00:00-04:00');");
+        it('sets the Founder whitelist cutoff to 11:59 PM EDT launch on October 20, 2026', () => {
+            expect(html).toContain("const cutoff = new Date('2026-10-20T23:59:00-04:00');");
         });
     });
 });
