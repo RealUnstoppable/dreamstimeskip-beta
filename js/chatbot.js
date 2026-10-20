@@ -320,7 +320,7 @@ export function getCartSnapshot() {
 
 export function getDreamsCountdownsData() {
     const now = new Date();
-    const ogDate = new Date("2026-10-20T15:00:00-04:00");
+    const ogDate = new Date("2026-10-20T16:00:00-04:00");
     const tsDate = new Date("2027-01-15T12:00:00-05:00");
 
     const formatDiff = (target) => {

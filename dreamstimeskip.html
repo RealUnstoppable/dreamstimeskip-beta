@@ -1377,7 +1377,7 @@
                     Relive your childhood in the classic Minecraft SMP era. Unfiltered survival, legendary player battles, custom biomes, and memories that last forever.
                 </p>
 
-                <!-- Countdown 1: Target Oct 20 2026 at 3:00 PM EDT -->
+                <!-- Countdown 1: Target Oct 20 2026 at 4:00 PM EDT -->
                 <div id="countdown-1" class="countdown-container"></div>
 
                 <div class="hero-buttons">
@@ -2157,8 +2157,8 @@
         }
 
         // Initialize Countdowns:
-        // Dreams OG launches October 20, 2026 at 3:00 PM EDT (15:00)
-        new Countdown("2026-10-20T15:00:00-04:00", "countdown-1");
+        // Dreams OG launches October 20, 2026 at 4:00 PM EDT (16:00)
+        new Countdown("2026-10-20T16:00:00-04:00", "countdown-1");
         // Dreams TimeSkip launches January 15, 2027
         new Countdown("2027-01-15T12:00:00-05:00", "countdown-2", true);
 
@@ -2281,9 +2281,9 @@
         let currentUser = null;
         let currentUserProfile = null;
 
-        // Helper: Is registration before October 20, 2026 3:00 PM EDT launch?
+        // Helper: Is registration before October 20, 2026 4:00 PM EDT launch?
         function checkIsFounder() {
-            const cutoff = new Date('2026-10-20T15:00:00-04:00');
+            const cutoff = new Date('2026-10-20T16:00:00-04:00');
             return new Date() < cutoff;
         }
 
@@ -2502,9 +2502,9 @@
                 showView('success');
             }
 
-            // Helper: Is registration before October 20, 2026 3:00 PM EDT launch?
+            // Helper: Is registration before October 20, 2026 4:00 PM EDT launch?
             function checkIsFounder() {
-                const cutoff = new Date('2026-10-20T15:00:00-04:00');
+                const cutoff = new Date('2026-10-20T16:00:00-04:00');
                 return new Date() < cutoff;
             }
 
