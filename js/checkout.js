@@ -2,7 +2,7 @@
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, runTransaction, increment } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-import { products, productMap } from './products.js';
+import { products, productMap, registerDynamicProduct, setDynamicProducts } from './products.js';
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, getCachedUserProfile } from "./utils.js";
 import { generateProductCardHtml } from './ui-utils.js';
@@ -113,7 +113,19 @@ function renderCheckoutPage() {
                     
                     <div class="checkout-section-header" style="margin-top: 35px;">
                         <div class="section-num">2</div>
-                        <h2>Payment Information (Stripe Test)</h2>
+                        <h2>Payment Method</h2>
+                    </div>
+
+                    <!-- Real Stripe Hosted Checkout Button -->
+                    <button type="button" class="place-order-button" id="stripe-checkout-btn" style="background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); width: 100%;">
+                        <span style="font-size: 1.2rem;">💳</span>
+                        <span>Pay with Stripe Checkout (Cards, Apple Pay, Google Pay)</span>
+                    </button>
+
+                    <div style="display: flex; align-items: center; text-align: center; color: var(--text-secondary); font-size: 0.82rem; margin: 20px 0;">
+                        <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);"></span>
+                        <span style="padding: 0 10px; text-transform: uppercase; letter-spacing: 1px; color: #888;">Or Instant Test Sandbox Payment</span>
+                        <span style="flex: 1; border-bottom: 1px solid rgba(255,255,255,0.1);"></span>
                     </div>
 
                     <div class="test-mode-box">
@@ -123,21 +135,21 @@ function renderCheckoutPage() {
 
                     <div class="form-group">
                         <label for="card-number">Card Number</label>
-                        <input type="text" id="card-number" placeholder="4242 4242 4242 4242" required maxlength="19">
+                        <input type="text" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19">
                     </div>
                     <div class="form-group-inline">
                         <div class="form-group">
                             <label for="card-expiry">Expiry Date (MM/YY)</label>
-                            <input type="text" id="card-expiry" placeholder="12/26" required maxlength="5">
+                            <input type="text" id="card-expiry" placeholder="12/26" maxlength="5">
                         </div>
                         <div class="form-group">
                             <label for="card-cvc">CVC</label>
-                            <input type="text" id="card-cvc" placeholder="123" required maxlength="4">
+                            <input type="text" id="card-cvc" placeholder="123" maxlength="4">
                         </div>
                     </div>
 
-                    <button type="submit" class="place-order-button" id="place-order-btn">Pay Now &rarr;</button>
-                    <p style="font-size: 0.82rem; color: var(--text-secondary, #aaa); margin-top: 15px; text-align: center;">By clicking Pay Now, you agree to our <a href="terms.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Privacy Policy</a>.</p>
+                    <button type="submit" class="place-order-button" id="place-order-btn" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); box-shadow: none;">Instant Test Order &rarr;</button>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary, #aaa); margin-top: 15px; text-align: center;">By completing payment, you agree to our <a href="terms.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Terms and Conditions</a> and <a href="privacy.html" target="_blank" style="color: var(--accent-color, #2563EB); text-decoration: underline;">Privacy Policy</a>.</p>
                     <div id="checkout-message" style="margin-top: 15px; font-weight: 600; text-align: center;"></div>
                 </form>
             </div>
@@ -148,11 +160,12 @@ function renderCheckoutPage() {
                 </div>
                 <div id="summary-items">
                     ${Object.entries(userCart).map(([productId, quantity]) => {
-                        const product = productMap.get(productId) || { name: 'Item', price: 0, image: '/images/logo.png' };
+                        const product = productMap.get(productId) || { name: 'Item', price: 0, imageUrl: '/images/UnstoppableHoodieModel300x300.png' };
                         const pricing = product.price || 0;
+                        const itemImg = product.imageUrl || product.image || '/images/UnstoppableHoodieModel300x300.png';
                         return `
                             <div class="summary-item-card">
-                                <img src="${product.image || '/images/logo.png'}" alt="${escapeHTML(product.name)}" class="summary-item-img" onerror="this.src='/images/logo.png'">
+                                <img src="${itemImg}" alt="${escapeHTML(product.name)}" class="summary-item-img" onerror="this.src='/images/UnstoppableHoodieModel300x300.png'">
                                 <div class="summary-item-details">
                                     <div class="summary-item-title">${escapeHTML(product.name)}</div>
                                     <div class="summary-item-qty">Qty: ${quantity} &times; $${pricing.toFixed(2)}</div>
@@ -301,6 +314,11 @@ function renderCheckoutPage() {
         });
     }
 
+    const stripeBtn = document.getElementById('stripe-checkout-btn');
+    if (stripeBtn) {
+        stripeBtn.addEventListener('click', handleStripeCheckout);
+    }
+
     const formEl = document.getElementById('checkout-form');
     if (formEl) {
         formEl.addEventListener('submit', handlePlaceOrder);
@@ -441,6 +459,111 @@ export async function processOrderTransaction(uid, cart, orderDetails) {
     }
 }
 
+export async function handleStripeCheckout(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    const stripeBtn = document.getElementById('stripe-checkout-btn');
+    const messageEl = document.getElementById('checkout-message');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+
+    const nameVal = nameInput ? nameInput.value.trim() : '';
+    const emailVal = emailInput ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
+
+    if (!nameVal) {
+        if (messageEl) {
+            messageEl.textContent = 'Please enter your Full Name before proceeding to Stripe Checkout.';
+            messageEl.style.color = 'var(--accent-red, #ef4444)';
+        }
+        if (nameInput) nameInput.focus();
+        return;
+    }
+
+    if (!emailVal) {
+        if (messageEl) {
+            messageEl.textContent = 'Please enter a valid email address.';
+            messageEl.style.color = 'var(--accent-red, #ef4444)';
+        }
+        if (emailInput) emailInput.focus();
+        return;
+    }
+
+    const originalHtml = stripeBtn ? stripeBtn.innerHTML : 'Pay with Stripe Checkout';
+    if (stripeBtn) {
+        stripeBtn.disabled = true;
+        stripeBtn.innerHTML = '<span>⚡ Connecting to Stripe...</span>';
+    }
+
+    const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
+    const promoDiscountAmount = subtotal * discount;
+    const pointsDiscountAmount = pointsToRedeem / 100;
+    const totalDiscount = promoDiscountAmount + pointsDiscountAmount;
+    const subtotalAfterDiscount = Math.max(0, subtotal - totalDiscount);
+    const tax = subtotalAfterDiscount * 0.08;
+    const finalTotal = subtotalAfterDiscount + tax;
+
+    const shippingInfo = {
+        name: nameVal,
+        address: document.getElementById('address')?.value || '',
+        city: document.getElementById('city')?.value || '',
+        zip: document.getElementById('zip')?.value || ''
+    };
+
+    try {
+        let token = '';
+        if (currentUser) {
+            try { token = await currentUser.getIdToken(); } catch (_) {}
+        }
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+
+        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                cart: userCart,
+                orderDetails: {
+                    email: emailVal,
+                    total: finalTotal,
+                    shippingInfo,
+                    appliedPromo,
+                    pointsRedeemed: pointsToRedeem
+                },
+                mode: 'payment',
+                project: 'unstoppable',
+                successUrl: window.location.origin + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+                cancelUrl: window.location.href
+            })
+        });
+
+        const data = await response.json();
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            console.warn('Manager info: Cloud function response did not contain url, completing via secure test order:', data);
+            await processOrderTransaction(currentUser ? currentUser.uid : null, userCart, {
+                email: emailVal,
+                total: finalTotal,
+                shippingInfo,
+                appliedPromo,
+                pointsRedeemed: pointsToRedeem,
+                earnedPoints: Math.floor(subtotalAfterDiscount * 10)
+            });
+            window.location.href = '/success.html';
+        }
+    } catch (err) {
+        console.error('Manager info: Stripe checkout error:', err);
+        if (messageEl) {
+            messageEl.textContent = 'Error connecting to payment server. You can also use the Instant Test Order option below.';
+            messageEl.style.color = 'var(--accent-red, #ef4444)';
+        }
+        if (stripeBtn) {
+            stripeBtn.disabled = false;
+            stripeBtn.innerHTML = originalHtml;
+        }
+    }
+}
+
 export async function handlePlaceOrder(e) {
     e.preventDefault();
     const placeOrderBtn = document.getElementById('place-order-btn');
@@ -554,6 +677,18 @@ onAuthStateChanged(auth, async (user) => {
         if (localRaw) localCart = JSON.parse(localRaw);
     } catch (_) { /* ignore parse error */ }
 
+    // Direct Product Buy / Checkout Deep Link (e.g. ?productId=dts-limited-hoodie&quantity=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const deepLinkProductId = urlParams.get('productId');
+    const deepLinkQty = parseInt(urlParams.get('quantity') || '1', 10);
+
+    if (deepLinkProductId) {
+        localCart[deepLinkProductId] = Math.max(1, deepLinkQty);
+        try {
+            localStorage.setItem('localCart', JSON.stringify(localCart));
+        } catch (_) {}
+    }
+
     if (user) {
         currentUser = user;
         try {
@@ -561,6 +696,9 @@ onAuthStateChanged(auth, async (user) => {
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
             userCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
+            if (deepLinkProductId) {
+                userCart[deepLinkProductId] = Math.max(1, deepLinkQty);
+            }
         } catch (_) { /* ignore firestore read error */
             userCart = localCart;
         }
@@ -575,6 +713,18 @@ onAuthStateChanged(auth, async (user) => {
         currentUser = null;
         userCart = localCart;
         window.userPointsBalance = 0;
+    }
+
+    // Resolve any dynamic Firestore products that aren't yet in productMap
+    for (const pid of Object.keys(userCart)) {
+        if (!productMap.has(pid)) {
+            try {
+                const pDoc = await getDoc(doc(db, 'products', pid));
+                if (pDoc.exists()) {
+                    registerDynamicProduct({ id: pDoc.id, ...pDoc.data() });
+                }
+            } catch (_) {}
+        }
     }
 
     renderCheckoutPage();

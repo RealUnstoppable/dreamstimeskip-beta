@@ -34,6 +34,7 @@ const mockRes = () => {
   const res = {};
   res.setHeader = jest.fn();
   res.getHeader = jest.fn();
+  res.on = jest.fn();
   res.status = jest.fn().mockReturnValue(res);
   res.json = jest.fn().mockReturnValue(res);
   res.send = jest.fn().mockReturnValue(res);
@@ -94,7 +95,7 @@ jest.mock("firebase-functions/v2/firestore", () => {
 });
 
 // Import functions after mocks
-const {createCheckoutSession, adminAction, checkMinecraftLink} = require("./index.js");
+const {createCheckoutSession, adminAction, checkMinecraftLink, createProduct} = require("./index.js");
 
 describe("createCheckoutSession", () => {
   beforeEach(() => {
@@ -588,5 +589,90 @@ describe("checkMinecraftLink", () => {
     }));
   });
 });
+
+describe("createProduct", () => {
+  const mockSetDoc = jest.fn().mockResolvedValue({});
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    require("firebase-admin").firestore().collection().doc.mockReturnValue({
+      set: mockSetDoc,
+      get: jest.fn().mockResolvedValue({ exists: false }),
+    });
+  });
+
+  it("should return 405 Method Not Allowed for non-POST requests", async () => {
+    const req = mockReq({ method: "GET" });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createProduct(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(405);
+  });
+
+  it("should return 401 Unauthorized if API key is invalid or missing", async () => {
+    const req = mockReq({
+      method: "POST",
+      headers: { "x-unstoppable-api-key": "invalid-key" },
+      body: { id: "test-prod", name: "Test Product", price: 29.99 },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createProduct(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(401);
+  });
+
+  it("should return 400 Bad Request if missing required fields", async () => {
+    const req = mockReq({
+      method: "POST",
+      headers: { "x-unstoppable-api-key": "unstoppable-store-secret-2026" },
+      body: { id: "test-prod" }, // missing name and price
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createProduct(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
+
+  it("should create or update product when valid API key is provided", async () => {
+    const req = mockReq({
+      method: "POST",
+      headers: { "x-unstoppable-api-key": "unstoppable-store-secret-2026" },
+      body: {
+        id: "dts-limited-hoodie",
+        name: "Dreams TimeSkip Collector Hoodie",
+        price: 64.99,
+        description: "Official limited-edition hoodie from Dreams TimeSkip.",
+        imageUrl: "https://your-site.com/images/hoodie.png",
+        category: "merch",
+        sourceSite: "dreamstimeskip",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createProduct(req, res);
+    });
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+      success: true,
+      productId: "dts-limited-hoodie",
+    }));
+  });
+});
+
 
 

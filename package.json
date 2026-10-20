@@ -11,7 +11,8 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
     "check:site": "node scripts/site-checker.js",
     "start": "node server.js",
-    "build": "tsc && node scripts/copy-static.js"
+    "build": "tsc && node scripts/copy-static.js",
+    "sync:stripe": "node scripts/sync-stripe-products.js"
   },
   "repository": {
     "type": "git",

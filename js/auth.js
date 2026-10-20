@@ -142,13 +142,23 @@ if (document.getElementById('auth-form')) {
                 }
 
                 sessionStorage.setItem('newUser', 'true');
-                window.location.replace('account.html');
+                const redirectParam = urlParams.get('redirect');
+                const allowedRedirects = ['medixly.html', 'index.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
+                const cleanParam = redirectParam ? redirectParam.replace(/^\/+/, '') : '';
+                const destination = (cleanParam && allowedRedirects.includes(cleanParam)) ? cleanParam : 'account.html';
+                window.location.replace(destination);
             } else {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
 
                 if (userDoc.exists() && !userDoc.data().isBanned) {
-                    const destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    const redirectParam = urlParams.get('redirect');
+                    const allowedRedirects = ['medixly.html', 'index.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
+                    const cleanParam = redirectParam ? redirectParam.replace(/^\/+/, '') : '';
+                    let destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
+                    if (cleanParam && !userDoc.data().isAdmin && allowedRedirects.includes(cleanParam)) {
+                        destination = cleanParam;
+                    }
                     window.location.replace(destination);
                 } else {
                     await signOut(auth);

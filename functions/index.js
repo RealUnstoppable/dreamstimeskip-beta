@@ -73,12 +73,69 @@ exports.adminAction = onRequest((req, res) => {
       }
 
       // Allowed collections for admin actions via this endpoint
-      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets", "promo_codes"];
+      const allowedCollections = ["users", "bookings", "quotes", "feature_requests", "support_tickets", "promo_codes", "products"];
       if (!allowedCollections.includes(collection)) {
         return res.status(400).send("Invalid collection");
       }
 
       const db = admin.firestore();
+
+      // Special action: Sync or list products with Stripe & Firestore
+      if (action === "sync_stripe_products" || action === "list_stripe_products") {
+        const defaultStoreProducts = [
+          { id: "unstoppable-hoodie", name: "Unstoppable Hoodie", price: 59.99, originalPrice: 80.99, salePrice: 60.74, description: "Heavyweight 400 GSM black fleece hoodie with embroidered brand crest and double-lined hood.", imageUrl: "/images/UnstoppableHoodieModel300x300.png", category: "apparel", sourceSite: "unstoppable" },
+          { id: "dts-model-tee", name: "DTS Model Tee", price: 24.99, originalPrice: 33.74, salePrice: 25.30, description: "100% combed ring-spun cotton tee with screenprinted Dreams TimeSkip character graphics.", imageUrl: "/images/dreams-lobby.jpg", category: "apparel", sourceSite: "dreamstimeskip" },
+          { id: "harmonytunes-shirt", name: "HarmonyTunes Cap", price: 24.99, originalPrice: 33.74, salePrice: 25.30, description: "Low-profile 6-panel unstructured black cotton cap with embroidered soundwave emblem and adjustable brass strap.", imageUrl: "/images/medixly-logo.png", category: "accessories", sourceSite: "harmonytunes" },
+          { id: "unstoppable-mousepad", name: "Unstoppable Mousepad", price: 19.99, originalPrice: 26.99, salePrice: 20.24, description: "Micro-weave gaming desk mat with precision anti-fray stitched borders and non-slip rubber backing.", imageUrl: "/images/MugAllBrands300x300.png", category: "accessories", sourceSite: "unstoppable" },
+          { id: "dts-ceramic-mug", name: "Unstoppable Ceramic Mug", price: 14.99, originalPrice: 20.24, salePrice: 15.18, description: "11oz matte black ceramic coffee mug with heat-set brand insignia. Dishwasher safe.", imageUrl: "/images/MugAllBrands300x300.png", category: "accessories", sourceSite: "dreamstimeskip" },
+          { id: "harmonytunes-vinyl", name: "HarmonyTunes Vinyl LP", price: 34.99, originalPrice: 47.24, salePrice: 35.43, description: "180g heavyweight collector's vinyl pressed on black wax with full-color gatefold artwork.", imageUrl: "/images/legacy_cover.jpg", category: "music", sourceSite: "harmonytunes" },
+          { id: "isabel-larosa-poster", name: "Isabel LaRosa Art Print", price: 19.99, originalPrice: 26.99, salePrice: 20.24, description: "Official 18x24 archival exhibition print on 300 GSM metallic pearl paper.", imageUrl: "/images/isabel_larosa_cover.jpg", category: "art", sourceSite: "harmonytunes" },
+          { id: "un250-heritage-tee", name: "UN 250 Heritage Special Tee", price: 29.99, originalPrice: 40.49, salePrice: 30.36, description: "Heavyweight vintage-wash cotton tee with woven USA flag emblem and distressed hem tag.", imageUrl: "/images/un250-flag.png", category: "apparel", sourceSite: "unstoppable" },
+          { id: "dts-membership-premium", name: "Dreams TimeSkip Premium Membership", price: 10.86, originalPrice: 14.49, salePrice: 10.86, description: "Full themes access, 25% merch store discount, exclusive badge, Discord roles & monthly loot boxes", category: "membership", sourceSite: "dreamstimeskip" },
+          { id: "dts-membership-ultimate", name: "Dreams TimeSkip Ultimate Membership", price: 14.13, originalPrice: 18.84, salePrice: 14.13, description: "Ad-free experience, custom theme creator, supporter status & badge, 8 mystery boxes/month", category: "membership", sourceSite: "dreamstimeskip" },
+        ];
+
+        const syncedProducts = [];
+        for (const item of defaultStoreProducts) {
+          const pDoc = await db.collection("products").doc(item.id).get();
+          if (!pDoc.exists) {
+            let stripeProductId = null;
+            let stripePriceId = null;
+            if (stripe) {
+              try {
+                const sprod = await stripe.products.create({
+                  name: item.name,
+                  description: item.description,
+                  metadata: { productId: item.id, sourceSite: item.sourceSite },
+                });
+                const sprice = await stripe.prices.create({
+                  product: sprod.id,
+                  unit_amount: Math.round(item.price * 100),
+                  currency: "usd",
+                });
+                stripeProductId = sprod.id;
+                stripePriceId = sprice.id;
+              } catch (sErr) {
+                console.warn("Notice: Stripe product sync notice: [" + sErr.message + "]");
+              }
+            }
+
+            const pRecord = {
+              ...item,
+              active: true,
+              stripeProductId,
+              stripePriceId,
+              createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            };
+            await db.collection("products").doc(item.id).set(pRecord);
+            syncedProducts.push({ id: item.id, ...pRecord });
+          } else {
+            syncedProducts.push({ id: item.id, ...pDoc.data() });
+          }
+        }
+        return res.status(200).json({ success: true, count: syncedProducts.length, products: syncedProducts });
+      }
 
       // Special action: Sync or list promo codes implemented from Stripe
       if (action === "sync_stripe_promo_codes" || action === "list_stripe_promo_codes") {
@@ -225,6 +282,112 @@ exports.adminAction = onRequest((req, res) => {
   });
 });
 
+// 📦 Create / Sync Product (Unstoppable Store Architecture)
+exports.createProduct = onRequest((req, res) => {
+  cors(req, res, async () => {
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method Not Allowed" });
+    }
+
+    // 1. Verify Secret API Key from other sites or admin token
+    const apiKey = req.headers["x-unstoppable-api-key"];
+    const configuredKey = process.env.STORE_API_KEY || "unstoppable-store-secret-2026";
+    let isAuthorized = Boolean(apiKey && apiKey === configuredKey);
+
+    if (!isAuthorized) {
+      // Check Bearer token for admin authorization
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        try {
+          const token = authHeader.split("Bearer ")[1];
+          const decoded = await admin.auth().verifyIdToken(token);
+          const userDoc = await getUserDocRef(decoded.uid).get();
+          if (userDoc.exists && userDoc.data().isAdmin) {
+            isAuthorized = true;
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (!isAuthorized) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const {
+      id,
+      name,
+      price,
+      originalPrice,
+      salePrice,
+      description,
+      imageUrl,
+      extraImages,
+      category,
+      sourceSite,
+      active = true,
+      stripePriceId,
+      stripeProductId,
+    } = req.body || {};
+
+    if (!id || !name || price == null) {
+      return res.status(400).json({ error: "Missing required fields (id, name, price)" });
+    }
+
+    try {
+      const db = admin.firestore();
+      const productRef = db.collection("products").doc(id);
+
+      // Optional Stripe product sync if stripe is initialized and no priceId given
+      let resolvedStripePriceId = stripePriceId || null;
+      let resolvedStripeProductId = stripeProductId || null;
+
+      if (stripe && !resolvedStripePriceId) {
+        try {
+          const stripeProd = await stripe.products.create({
+            name: name,
+            description: description || undefined,
+            images: (imageUrl && imageUrl.startsWith("http")) ? [imageUrl] : undefined,
+            metadata: { productId: id, sourceSite: sourceSite || "external" },
+          });
+          const stripePrice = await stripe.prices.create({
+            product: stripeProd.id,
+            unit_amount: Math.round(Number(price) * 100),
+            currency: "usd",
+          });
+          resolvedStripeProductId = stripeProd.id;
+          resolvedStripePriceId = stripePrice.id;
+        } catch (sErr) {
+          console.warn("Notice: Stripe product creation notice: [" + sErr.message + "]");
+        }
+      }
+
+      const numPrice = Number(price);
+      const productRecord = {
+        id,
+        name,
+        price: numPrice,
+        originalPrice: originalPrice != null ? Number(originalPrice) : Number((numPrice * 1.35).toFixed(2)),
+        salePrice: salePrice != null ? Number(salePrice) : Number(price),
+        description: description || "",
+        imageUrl: imageUrl || "",
+        extraImages: Array.isArray(extraImages) ? extraImages : (imageUrl ? [imageUrl] : []),
+        category: category || "general",
+        sourceSite: sourceSite || "external",
+        active: active !== false,
+        stripeProductId: resolvedStripeProductId,
+        stripePriceId: resolvedStripePriceId,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      await productRef.set(productRecord, { merge: true });
+      return res.status(200).json({ success: true, productId: id, product: productRecord });
+    } catch (error) {
+      console.error("Manager info: createProduct error: [" + error.message + "]");
+      return res.status(500).json({ error: error.message });
+    }
+  });
+});
+
 exports.createCheckoutSession = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
@@ -237,7 +400,10 @@ exports.createCheckoutSession = onRequest((req, res) => {
     const uid = decodedToken.uid;
     const email = decodedToken.email;
 
-    const {plan, project, successUrl, cancelUrl} = req.body;
+    const {plan, project, cart, orderDetails, successUrl, cancelUrl} = req.body;
+
+    // Check if this is a shop cart order
+    const isShopOrder = Boolean(cart && typeof cart === "object" && Object.keys(cart).length > 0);
 
     // Determine Price ID based on project
     let priceId;
@@ -266,23 +432,78 @@ exports.createCheckoutSession = onRequest((req, res) => {
         "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true" :
         "https://dreamstimeskip-beta.pages.dev/cancel";
 
-      const sessionConfig = {
-        mode: "subscription",
-        payment_method_types: ["card"],
-        customer_email: email,
-        line_items: [{price: priceId, quantity: 1}],
-        subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
-        allow_promotion_codes: true, // ✅ Support promo codes implemented from Stripe
+      let sessionConfig;
 
-        // Use URLs passed from frontend, fallback to hardcoded if missing
-        success_url: successUrl || defaultSuccess,
-        cancel_url: cancelUrl || defaultCancel,
-        metadata: {
-          uid: uid || "unknown",
-          planName: plan || "Pro",
-          project: project || "ezmanage",
-        },
-      };
+      if (isShopOrder) {
+        const db = admin.firestore();
+        const lineItems = [];
+
+        for (const [productId, quantity] of Object.entries(cart)) {
+          const qty = Math.max(1, parseInt(quantity, 10) || 1);
+          let productName = productId;
+          let unitAmount = 2000;
+          let images = [];
+
+          try {
+            const pDoc = await db.collection("products").doc(productId).get();
+            if (pDoc.exists) {
+              const pData = pDoc.data();
+              productName = pData.name || productId;
+              unitAmount = Math.round(Number(pData.price || 20) * 100);
+              if (pData.imageUrl && pData.imageUrl.startsWith("http")) {
+                images = [pData.imageUrl];
+              }
+            }
+          } catch (_) {}
+
+          lineItems.push({
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: productName,
+                images: images.length > 0 ? images : undefined,
+              },
+              unit_amount: unitAmount,
+            },
+            quantity: qty,
+          });
+        }
+
+        sessionConfig = {
+          mode: "payment",
+          payment_method_types: ["card"],
+          customer_email: email,
+          line_items: lineItems,
+          allow_promotion_codes: true,
+          success_url: successUrl || (defaultSuccess + "?session_id={CHECKOUT_SESSION_ID}"),
+          cancel_url: cancelUrl || defaultCancel,
+          metadata: {
+            uid: uid || "unknown",
+            orderType: "shop",
+            project: project || "unstoppable",
+            cart: JSON.stringify(cart),
+            orderDetails: JSON.stringify(orderDetails || {}),
+          },
+        };
+      } else {
+        sessionConfig = {
+          mode: "subscription",
+          payment_method_types: ["card"],
+          customer_email: email,
+          line_items: [{price: priceId, quantity: 1}],
+          subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
+          allow_promotion_codes: true, // ✅ Support promo codes implemented from Stripe
+
+          // Use URLs passed from frontend, fallback to hardcoded if missing
+          success_url: successUrl || defaultSuccess,
+          cancel_url: cancelUrl || defaultCancel,
+          metadata: {
+            uid: uid || "unknown",
+            planName: plan || "Pro",
+            project: project || "ezmanage",
+          },
+        };
+      }
 
       const session = await stripe.checkout.sessions.create(sessionConfig);
 
@@ -370,11 +591,78 @@ exports.stripeWebhook = onRequest(async (req, res) => {
   // 🎯 Handle Events
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
-    const uid = session.metadata.uid;
-    const planName = session.metadata.planName || "Pro";
-    const project = session.metadata.project || "ezmanage";
+    const metadata = session.metadata || {};
+    const uid = metadata.uid;
+    const planName = metadata.planName || "Pro";
+    const project = metadata.project || "ezmanage";
+    const isShopOrder = metadata.orderType === "shop" || Boolean(metadata.cart);
 
-    if (uid && uid !== "unknown") {
+    if (isShopOrder) {
+      try {
+        let cart = {};
+        let orderDetails = {};
+        if (metadata.cart) {
+          try { cart = JSON.parse(metadata.cart); } catch (_) {}
+        }
+        if (metadata.orderDetails) {
+          try { orderDetails = JSON.parse(metadata.orderDetails); } catch (_) {}
+        }
+        const orderId = "ORD-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+        const total = session.amount_total ? session.amount_total / 100 : (orderDetails.total || 0);
+
+        const fullOrder = {
+          orderId,
+          userId: uid || "guest",
+          userEmail: session.customer_details?.email || session.customer_email || orderDetails.email || "",
+          items: cart,
+          orderDate: admin.firestore.FieldValue.serverTimestamp(),
+          status: "Paid",
+          total: total,
+          shippingInfo: orderDetails.shippingInfo || session.shipping_details || {},
+          paymentStatus: "Paid via Stripe Checkout (" + (session.payment_intent || session.id) + ")",
+          stripeSessionId: session.id,
+          appliedPromo: orderDetails.appliedPromo || "",
+          earnedPoints: Math.floor(total * 10),
+          sourceSite: metadata.project || "unstoppable",
+        };
+
+        const db = admin.firestore();
+        await db.collection("orders").doc(`${uid || "guest"}_${Date.now()}`).set(fullOrder);
+
+        // Update product ordered counts
+        for (const [productId, quantity] of Object.entries(cart)) {
+          const qty = parseInt(quantity, 10) || 1;
+          const statRef = db.collection("product_stats").doc(productId);
+          await statRef.set({
+            orderedCount: admin.firestore.FieldValue.increment(qty),
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+          }, { merge: true });
+        }
+
+        // If user is authenticated, award loyalty points & clear cart
+        if (uid && uid !== "unknown" && uid !== "guest") {
+          const userRef = getUserDocRef(uid);
+          const earnedPts = Math.floor(total * 10);
+          await userRef.set({
+            pointsBalance: admin.firestore.FieldValue.increment(earnedPts),
+            loyaltyPoints: admin.firestore.FieldValue.increment(earnedPts),
+          }, { merge: true });
+
+          await db.collection("carts").doc(uid).set({ items: {} });
+
+          await db.collection("loyalty_transactions").add({
+            userId: uid,
+            description: `Order Purchase #${orderId} 🛍️`,
+            points: earnedPts,
+            type: "earned",
+            orderId: orderId,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (err) {
+        console.error("Manager info: Error saving shop order from stripe webhook: [" + err.message + "]");
+      }
+    } else if (uid && uid !== "unknown") {
       try {
         const updateData = {
           plan: planName, // Original ezManage field

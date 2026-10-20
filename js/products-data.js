@@ -11,7 +11,10 @@ export const products = [
             '/images/UnstoppableHoodieModel300x300.png',
             '/images/unstoppable-logo.png',
             '/images/Unstoppable Collection Logo.png'
-        ]
+        ],
+        category: 'apparel',
+        sourceSite: 'unstoppable',
+        active: true
     },
     {
         id: 'dts-model-tee',
@@ -25,7 +28,10 @@ export const products = [
             '/images/dreams-lobby.jpg',
             '/images/dreams-timeskip.png',
             '/images/dreams-12-days-to-release.png'
-        ]
+        ],
+        category: 'apparel',
+        sourceSite: 'dreamstimeskip',
+        active: true
     },
     {
         id: 'harmonytunes-shirt',
@@ -38,7 +44,10 @@ export const products = [
         extraImages: [
             '/images/medixly-logo.png',
             '/images/harmony-tunes-card.jpg'
-        ]
+        ],
+        category: 'accessories',
+        sourceSite: 'harmonytunes',
+        active: true
     },
     {
         id: 'unstoppable-mousepad',
@@ -52,7 +61,10 @@ export const products = [
             '/images/MugAllBrands300x300.png',
             '/images/un-logo.png',
             '/images/unstoppable-logo.png'
-        ]
+        ],
+        category: 'accessories',
+        sourceSite: 'unstoppable',
+        active: true
     },
     {
         id: 'dts-ceramic-mug',
@@ -66,7 +78,10 @@ export const products = [
             '/images/MugAllBrands300x300.png',
             '/images/un-logo-1.png',
             '/images/Unstoppable Collection Logo.png'
-        ]
+        ],
+        category: 'accessories',
+        sourceSite: 'dreamstimeskip',
+        active: true
     },
     {
         id: 'harmonytunes-vinyl',
@@ -80,7 +95,10 @@ export const products = [
             '/images/legacy_cover.jpg',
             '/images/astrophage_cover.jpg',
             '/images/blow_cover.jpg'
-        ]
+        ],
+        category: 'music',
+        sourceSite: 'harmonytunes',
+        active: true
     },
     {
         id: 'isabel-larosa-poster',
@@ -93,7 +111,10 @@ export const products = [
         extraImages: [
             '/images/isabel_larosa_cover.jpg',
             '/images/summer_bummer_rhy_rhy.jpg'
-        ]
+        ],
+        category: 'art',
+        sourceSite: 'harmonytunes',
+        active: true
     },
     {
         id: 'un250-heritage-tee',
@@ -107,7 +128,10 @@ export const products = [
             '/images/un250-flag.png',
             '/images/unstoppable-logo.png',
             '/images/un-logo.png'
-        ]
+        ],
+        category: 'apparel',
+        sourceSite: 'unstoppable',
+        active: true
     }
 ];
 
@@ -119,4 +143,46 @@ export function getProductPricing(product) {
 }
 
 export const productMap = new Map(products.map(p => [p.id, p]));
+
+/**
+ * Dynamically register or update a product from Firestore into the global catalog
+ */
+export function registerDynamicProduct(product) {
+    if (!product || !product.id) return null;
+    const price = Number(product.price) || 0;
+    const origPrice = product.originalPrice != null ? Number(product.originalPrice) : Number((price * 1.35).toFixed(2));
+    const sPrice = product.salePrice != null ? Number(product.salePrice) : Number(price);
+
+    const normalized = {
+        ...product,
+        id: String(product.id),
+        name: product.name || 'Product',
+        price: price,
+        originalPrice: origPrice,
+        salePrice: sPrice,
+        description: product.description || '',
+        imageUrl: product.imageUrl || product.image || '/images/UnstoppableHoodieModel300x300.png',
+        extraImages: Array.isArray(product.extraImages) ? product.extraImages : (product.imageUrl ? [product.imageUrl] : []),
+        category: product.category || 'general',
+        sourceSite: product.sourceSite || 'unstoppable',
+        active: product.active !== false
+    };
+
+    productMap.set(normalized.id, normalized);
+    const existingIndex = products.findIndex(p => p.id === normalized.id);
+    if (existingIndex >= 0) {
+        products[existingIndex] = { ...products[existingIndex], ...normalized };
+    } else {
+        products.push(normalized);
+    }
+    return normalized;
+}
+
+/**
+ * Bulk registers dynamic products from Firestore into catalog
+ */
+export function setDynamicProducts(newProducts) {
+    if (!Array.isArray(newProducts) || newProducts.length === 0) return;
+    newProducts.forEach(p => registerDynamicProduct(p));
+}
 

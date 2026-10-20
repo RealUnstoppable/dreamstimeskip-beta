@@ -736,9 +736,10 @@
                     let destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
                     if (redirectParam && !userDoc.data().isAdmin) {
                         // Sanitize redirect to prevent open redirects
-                        const allowedRedirects = ['medixly.html', 'index.html', 'shop.html'];
-                        if (allowedRedirects.includes(redirectParam)) {
-                            destination = redirectParam;
+                        const allowedRedirects = ['medixly.html', 'index.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
+                        const cleanParam = redirectParam.replace(/^\/+/, '');
+                        if (allowedRedirects.includes(cleanParam)) {
+                            destination = cleanParam;
                         }
                     }
 

@@ -192,16 +192,16 @@
                 <div class="checkout-summary-card">
                     <h2>Order Summary</h2>
                     <div class="summary-item">
-                        <span>Ultimate Membership (Monthly)</span>
-                        <span>$9.99</span>
+                        <span>Ultimate Membership (Monthly - 25% OFF)</span>
+                        <span>$14.13</span>
                     </div>
                     <div class="summary-item">
-                        <span>Taxes (Est.)</span>
-                        <span>$0.70</span>
+                        <span>Taxes (Est. 8%)</span>
+                        <span>$1.13</span>
                     </div>
                     <div class="summary-total">
                         <span>Total</span>
-                        <span>$10.69</span>
+                        <span>$15.26</span>
                     </div>
                     
                     <form class="promo-form" id="promo-form">
@@ -216,7 +216,7 @@
                 <div class="checkout-payment-card">
                     <h2>Payment Details</h2>
                     
-                    <button class="payment-btn btn-stripe">Pay $10.69 with Card</button>
+                    <button class="payment-btn btn-stripe">Pay $15.26 with Card (Stripe)</button>
                     
                     <div class="payment-separator">OR</div>
                     
@@ -279,7 +279,7 @@
                 return;
             }
             const stripeBtn = document.querySelector('.btn-stripe');
-            const originalText = stripeBtn ? stripeBtn.textContent : 'Pay $10.69 with Card';
+            const originalText = stripeBtn ? stripeBtn.textContent : 'Pay $15.26 with Card (Stripe)';
             if (stripeBtn) {
                 stripeBtn.textContent = 'Redirecting to checkout...';
                 stripeBtn.disabled = true;

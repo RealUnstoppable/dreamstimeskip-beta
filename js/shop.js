@@ -5,8 +5,40 @@ import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, w
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
 import { generateProductCardHtml } from './ui-utils.js';
-import { products, productMap } from './products-data.js';
+import { products, productMap, registerDynamicProduct, setDynamicProducts } from './products-data.js';
 import { getAverageRating } from './review-service.js';
+
+// URL parameters for deep links and source site filtering
+const urlParams = new URLSearchParams(window.location.search);
+export let activeSource = (urlParams.get('source') || '').toLowerCase().trim();
+export let activeCategory = (urlParams.get('category') || '').toLowerCase().trim();
+export const deepLinkProductId = urlParams.get('productId');
+
+// Fetch products dynamically from Firestore with local fallback
+export async function fetchProducts() {
+    try {
+        const q = query(collection(db, "products"), where("active", "==", true));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+            const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setDynamicProducts(list);
+            return list;
+        }
+    } catch (err) {
+        console.warn("Manager info: Falling back to local product definitions", err.message || err);
+    }
+    return products;
+}
+
+export function setSourceFilter(source) {
+    activeSource = (source || '').toLowerCase().trim();
+    renderProducts(productSearchInput ? productSearchInput.value : '');
+}
+
+export function setCategoryFilter(category) {
+    activeCategory = (category || '').toLowerCase().trim();
+    renderProducts(productSearchInput ? productSearchInput.value : '');
+}
 
 // --- STATE MANAGEMENT ---
 export let cart = {}; // { productId: quantity, ... }
@@ -144,6 +176,25 @@ export function renderProducts(searchQuery = '') {
     const feedbackContainer = document.getElementById('search-feedback-container');
 
     const filtered = products.filter(product => {
+        if (product.active === false) return false;
+
+        // Partner / Source Site filter
+        if (activeSource) {
+            const pSource = (product.sourceSite || '').toLowerCase();
+            const pId = (product.id || '').toLowerCase();
+            if (pSource !== activeSource && !pId.includes(activeSource) && !pSource.includes(activeSource)) {
+                return false;
+            }
+        }
+
+        // Category filter
+        if (activeCategory) {
+            const pCat = (product.category || '').toLowerCase();
+            if (pCat !== activeCategory) {
+                return false;
+            }
+        }
+
         if (!query) return true;
         const nameMatch = product.name.toLowerCase().includes(query);
         const descMatch = product.description.toLowerCase().includes(query);
@@ -151,49 +202,73 @@ export function renderProducts(searchQuery = '') {
         return nameMatch || descMatch || idMatch;
     });
 
-    if (query) {
-        if (filtered.length > 0) {
-            if (feedbackContainer) {
-                feedbackContainer.style.display = 'flex';
+    const filterBadgeHtml = (activeSource || activeCategory) ? `
+        <div class="active-source-pill" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(37,99,235,0.15); border: 1px solid rgba(37,99,235,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.88rem; color: #93c5fd;">
+            <span>Partner / Category: <strong>${escapeHTML(activeSource || activeCategory)}</strong></span>
+            <button type="button" id="clear-source-filter-btn" style="background: none; border: none; color: #fff; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; padding: 0 4px;" title="Clear filter" aria-label="Clear filter">&times;</button>
+        </div>
+    ` : '';
+
+    if (query || activeSource || activeCategory) {
+        if (feedbackContainer) {
+            feedbackContainer.style.display = 'flex';
+            feedbackContainer.style.flexWrap = 'wrap';
+            feedbackContainer.style.gap = '10px';
+            feedbackContainer.style.alignItems = 'center';
+
+            if (filtered.length > 0) {
                 feedbackContainer.innerHTML = `
+                    ${filterBadgeHtml}
+                    ${query ? `
                     <div class="did-you-mean-container">
                         Showing ${filtered.length} product${filtered.length > 1 ? 's' : ''} for "<strong>${escapeHTML(searchQuery)}</strong>"
                     </div>
+                    ` : ''}
                     <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
                 `;
-            }
-        } else {
-            // No direct matches: compute typo suggestion
-            const suggestion = findDidYouMeanSuggestion(query);
-            if (feedbackContainer) {
-                feedbackContainer.style.display = 'flex';
-                if (suggestion && suggestion.toLowerCase() !== query) {
-                    feedbackContainer.innerHTML = `
+            } else {
+                // No direct matches: compute typo suggestion
+                const suggestion = findDidYouMeanSuggestion(query);
+                feedbackContainer.innerHTML = `
+                    ${filterBadgeHtml}
+                    ${suggestion && suggestion.toLowerCase() !== query ? `
                         <div class="did-you-mean-container">
                             Searching for "<strong>${escapeHTML(searchQuery)}</strong>"... Did you mean <a href="javascript:void(0)" class="did-you-mean-link" data-query="${escapeHTML(suggestion)}">${escapeHTML(suggestion)}</a>?
                         </div>
-                        <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
-                    `;
-                } else {
-                    feedbackContainer.innerHTML = `
+                    ` : `
                         <div class="did-you-mean-container">
-                            No products found for "<strong>${escapeHTML(searchQuery)}</strong>". Try searching for "hoodie", "tee", "cap", "mug", or "vinyl".
+                            No products found in this category. Try clearing filters or searching for "hoodie", "tee", "cap", "mug", or "vinyl".
                         </div>
-                        <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
-                    `;
-                }
+                    `}
+                    <button type="button" id="clear-search-btn" class="search-clear-inline-btn" aria-label="Clear search">Show All</button>
+                `;
+            }
+
+            const clearFilterBtn = document.getElementById('clear-source-filter-btn');
+            if (clearFilterBtn) {
+                clearFilterBtn.addEventListener('click', () => {
+                    activeSource = '';
+                    activeCategory = '';
+                    try {
+                        const cleanUrl = new URL(window.location.href);
+                        cleanUrl.searchParams.delete('source');
+                        cleanUrl.searchParams.delete('category');
+                        window.history.replaceState({}, '', cleanUrl.toString());
+                    } catch (_) {}
+                    renderProducts(productSearchInput ? productSearchInput.value : '');
+                });
             }
         }
     } else {
         if (feedbackContainer) feedbackContainer.style.display = 'none';
     }
 
-    if (filtered.length === 0 && query) {
+    if (filtered.length === 0 && (query || activeSource || activeCategory)) {
         productGrid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed var(--border-color);">
                 <div style="font-size: 2.5rem; margin-bottom: 12px;">🔍</div>
                 <h3 style="color: #fff; margin-bottom: 8px;">No Matching Products Found</h3>
-                <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 20px;">We couldn't find items matching "${escapeHTML(searchQuery)}". Click a suggestion above or view our complete catalog.</p>
+                <p style="color: var(--text-secondary); max-width: 450px; margin: 0 auto 20px;">We couldn't find items matching your criteria. Reset filters to view our complete catalog.</p>
                 <button type="button" class="cta-button" onclick="window.clearProductSearch()">Explore Full Collection</button>
             </div>
         `;
@@ -598,8 +673,56 @@ function setupEventListeners() {
 
     window.clearProductSearch = () => {
         if (searchInput) searchInput.value = '';
+        activeSource = '';
+        activeCategory = '';
+        document.querySelectorAll('.filter-pill').forEach(p => {
+            const isAll = p.dataset.filterType === 'all';
+            p.classList.toggle('active', isAll);
+            p.style.background = isAll ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.04)';
+            p.style.color = isAll ? '#fff' : 'var(--text-secondary)';
+            p.style.fontWeight = isAll ? '700' : '500';
+        });
+        try {
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete('source');
+            cleanUrl.searchParams.delete('category');
+            window.history.replaceState({}, '', cleanUrl.toString());
+        } catch (_) {}
         renderProducts('');
     };
+
+    // Filter pill buttons (All, Dreams TimeSkip, HarmonyTunes, Unstoppable, Apparel, etc.)
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+        pill.addEventListener('click', (e) => {
+            const btn = e.currentTarget;
+            document.querySelectorAll('.filter-pill').forEach(p => {
+                p.classList.remove('active');
+                p.style.background = 'rgba(255,255,255,0.04)';
+                p.style.color = 'var(--text-secondary)';
+                p.style.fontWeight = '500';
+            });
+            btn.classList.add('active');
+            btn.style.background = 'rgba(255,255,255,0.12)';
+            btn.style.color = '#fff';
+            btn.style.fontWeight = '700';
+
+            const filterType = btn.dataset.filterType;
+            const filterVal = btn.dataset.filterVal || '';
+
+            if (filterType === 'all') {
+                activeSource = '';
+                activeCategory = '';
+            } else if (filterType === 'source') {
+                activeSource = filterVal;
+                activeCategory = '';
+            } else if (filterType === 'category') {
+                activeCategory = filterVal;
+                activeSource = '';
+            }
+
+            renderProducts(searchInput ? searchInput.value : '');
+        });
+    });
 
     // Product grid listeners
     if (productGrid) {
@@ -1175,6 +1298,21 @@ try {
 renderProducts();
 setupEventListeners();
 loadProductStats();
+
+// Dynamically fetch catalog from Firestore with local fallback & deep-link check
+fetchProducts().then(() => {
+    renderProducts();
+    if (deepLinkProductId) {
+        const prod = productMap.get(deepLinkProductId);
+        if (prod) {
+            setTimeout(() => {
+                const targetCard = document.querySelector(`.product-card [data-id="${deepLinkProductId}"]`);
+                if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                openReviewsModal(deepLinkProductId);
+            }, 300);
+        }
+    }
+});
 
 // Initial localCart load
 try {

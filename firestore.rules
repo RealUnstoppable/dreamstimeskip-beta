@@ -24,7 +24,7 @@ service cloud.firestore {
     //
     // Preserved Application Collections:
     //   - /dts_waitlist, /minecraft_links, /carts, /wishlists, /loyalty_transactions,
-    //     /orders, /support_tickets, /blog_comments, /reviews, /product_stats,
+    //     /orders, /support_tickets, /blog_comments, /reviews, /products, /product_stats,
     //     /product_questions, /product_reviews, /bookings, /inquiries, /faqs,
     //     /feature_requests, /newsletterSubscribers, /reward_transactions,
     //     /notifications, /artist_tracks, /promo_codes
@@ -145,6 +145,12 @@ service cloud.firestore {
                     && request.resource.data.rating >= 1
                     && request.resource.data.rating <= 5;
       allow delete: if request.auth != null && (request.auth.uid == resource.data.userId || isAdmin());
+    }
+
+    // Products collection: Any site or shopper can view products; direct client writes restricted to admin
+    match /products/{productId} {
+      allow read: if true; // Any site or shopper can view products
+      allow write: if isAdmin(); // Direct client writes restricted; Cloud Functions bypass rules
     }
 
     // Product stats collection: Anyone can read, only backend can write
