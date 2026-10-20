@@ -26,6 +26,10 @@ export function initCookieConsent() {
 
     document.getElementById('decline-cookies').addEventListener('click', () => {
         localStorage.setItem('cookiesAccepted', 'false');
+        try {
+            window.adsbygoogle = window.adsbygoogle || [];
+            window.adsbygoogle.requestNonPersonalizedAds = 1;
+        } catch (_) {}
         closeBanner(banner);
     });
 }

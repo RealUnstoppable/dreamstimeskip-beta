@@ -39,31 +39,9 @@
     }
     </script>
 
-    <!-- GPT SRA and Lazy Loading setup -->
-    <script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>
-    <script>
-      window.googletag = window.googletag || {cmd: []};
-      googletag.cmd.push(function() {
-        // Top Banner
-        googletag.defineSlot('/1234567/top_banner', [[728, 90], [320, 50]], 'div-gpt-ad-top-banner').addService(googletag.pubads());
-        // Right Rail Sticky
-        googletag.defineSlot('/1234567/right_rail_sticky', [[300, 250], [300, 600]], 'div-gpt-ad-right-rail').addService(googletag.pubads());
-        // In-feed Native Ad 1
-        googletag.defineSlot('/1234567/in_feed_1', [[300, 250], 'fluid'], 'div-gpt-ad-in-feed-1').addService(googletag.pubads());
-        // Bottom Mobile Sticky
-        googletag.defineSlot('/1234567/mobile_sticky', [320, 50], 'div-gpt-ad-mobile-sticky').addService(googletag.pubads());
-
-        // Single Request Architecture (SRA)
-        googletag.pubads().enableSingleRequest();
-        // Lazy Loading Setup
-        googletag.pubads().enableLazyLoad({
-          fetchMarginPercent: 500,  // Fetch ads when within 5 viewports
-          renderMarginPercent: 200, // Render ads when within 2 viewports
-          mobileScaling: 2.0        // Scale for mobile devices
-        });
-        googletag.enableServices();
-      });
-    </script>
+    <!-- Google AdSense Account & Async Script -->
+    <meta name="google-adsense-account" content="ca-pub-4254213062632381">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
 
     <style>
         /* Bento Box Layout for Ad Architecture */
@@ -311,13 +289,17 @@
     <header class="main-header"></header>
 
     <!-- AD_SLOT_START -->
-    <div class="ad-container ad-top-banner">
-        <div id="div-gpt-ad-top-banner">
-            <script>
-                googletag.cmd.push(function() { googletag.display('div-gpt-ad-top-banner'); });
-            </script>
+    <section class="site-ad-section" style="max-width: 1200px; margin: 30px auto 20px; padding: 0 20px;" aria-label="Sponsored Content">
+        <div class="site-ad-label">Advertisement</div>
+        <div class="ad-container ad-top-banner">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4254213062632381"
+                 data-ad-slot="9876543210"
+                 data-ad-format="horizontal"
+                 data-full-width-responsive="true"></ins>
         </div>
-    </div>
+    </section>
     <!-- AD_SLOT_END -->
 
     <main class="bento-layout">
@@ -360,13 +342,17 @@
             </ul>
 
             <!-- AD_SLOT_START -->
-            <div class="ad-container ad-in-feed">
-                <div id="div-gpt-ad-in-feed-1">
-                    <script>
-                        googletag.cmd.push(function() { googletag.display('div-gpt-ad-in-feed-1'); });
-                    </script>
+            <section class="site-ad-section" style="margin: 40px auto; padding: 0;" aria-label="Sponsored Content">
+                <div class="site-ad-label">Advertisement</div>
+                <div class="ad-container ad-in-feed">
+                    <ins class="adsbygoogle"
+                         style="display:block"
+                         data-ad-client="ca-pub-4254213062632381"
+                         data-ad-slot="9876543210"
+                         data-ad-format="rectangle"
+                         data-full-width-responsive="true"></ins>
                 </div>
-            </div>
+            </section>
             <!-- AD_SLOT_END -->
 
             <h2 id="architecture">Moving Beyond Conventional Architecture</h2>
@@ -388,11 +374,13 @@
         <!-- Right Ad Rail (20%) -->
         <aside class="bento-right-rail">
             <!-- AD_SLOT_START -->
-            <div class="ad-container ad-right-rail">
-                <div id="div-gpt-ad-right-rail">
-                    <script>
-                        googletag.cmd.push(function() { googletag.display('div-gpt-ad-right-rail'); });
-                    </script>
+            <div class="ad-rail-wrapper" style="position: sticky; top: 100px;">
+                <div class="site-ad-label" style="text-align: center; margin-bottom: 6px;">Advertisement</div>
+                <div class="ad-container ad-right-rail">
+                    <ins class="adsbygoogle"
+                         style="display:inline-block;width:300px;height:600px"
+                         data-ad-client="ca-pub-4254213062632381"
+                         data-ad-slot="9876543210"></ins>
                 </div>
             </div>
             <!-- AD_SLOT_END -->
@@ -402,12 +390,11 @@
     
     <!-- Mobile Sticky Ad -->
     <!-- AD_SLOT_START -->
-    <div class="ad-container ad-mobile-sticky">
-        <div id="div-gpt-ad-mobile-sticky">
-            <script>
-                googletag.cmd.push(function() { googletag.display('div-gpt-ad-mobile-sticky'); });
-            </script>
-        </div>
+    <div class="ad-container ad-mobile-sticky" aria-label="Advertisement">
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:320px;height:50px"
+             data-ad-client="ca-pub-4254213062632381"
+             data-ad-slot="9876543210"></ins>
     </div>
     <!-- AD_SLOT_END -->
 
@@ -456,10 +443,10 @@
 
             document.getElementById('cmp-decline').addEventListener('click', () => {
                 localStorage.setItem('user_ad_consent', 'false');
-                // Log consent withdrawal, set AdSense to non-personalized
-                if (window.googletag && googletag.pubads) {
-                    googletag.pubads().setRequestNonPersonalizedAds(1);
-                }
+                // Request non-personalized ads via Google AdSense API
+                try {
+                    (window.adsbygoogle = window.adsbygoogle || []).requestNonPersonalizedAds = 1;
+                } catch (e) {}
                 cmpBanner.classList.remove('visible');
             });
         });

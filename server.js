@@ -22,6 +22,13 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "64kb" }));
 
+// Explicit ads.txt route for Google AdSense crawler verification
+app.get('/ads.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(path.join(__dirname, 'ads.txt'));
+});
+
 // First-Party Telemetry & Consent Pipeline Endpoints
 app.post("/api/v1/telemetry", handleTelemetryIngest);
 app.post("/api/v1/consent", handleConsentRecord);

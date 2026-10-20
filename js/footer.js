@@ -43,10 +43,10 @@ export function loadFooter() {
                 <div class="footer-column">
                     <h5>Company</h5>
                     <ul>
-                        <li><a href="tracker.html">About Us</a></li>
+                        <li><a href="about.html">About Us</a></li>
                         <li><a href="blog.html">Blog</a></li>
                         <li><a href="shop.html">Shop</a></li>
-                        <li><a href="mailto:unstoppableplays2016@hotmail.com">Contact</a></li>
+                        <li><a href="contact.html">Contact</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="terms.html">Terms of Service</a></li>
                         <li><button type="button" id="footer-privacy-choices" class="footer-privacy-choices-btn" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:left;">Your Privacy Choices / Do Not Sell or Share My Personal Information</button></li>
