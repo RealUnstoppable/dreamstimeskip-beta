@@ -215,7 +215,6 @@
             <section class="checkout-payment-form">
                 <div class="checkout-payment-card">
                     <h2>Payment Details</h2>
-                    <p class="placeholder-note">Payment integration is a placeholder.</p>
                     
                     <button class="payment-btn btn-stripe">Pay $10.69 with Card</button>
                     
@@ -230,8 +229,8 @@
         </div>
     </main>
 
-
-    <script src="/js/script.js"></script> <script>
+    <script src="/js/script.js"></script>
+    <script>
         // Basic promo code simulation
         document.getElementById('promo-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -259,15 +258,70 @@
             }, 500);
         });
     </script>
-
-    <script src="/js/script.js"></script>
     <footer class="main-footer"></footer> 
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1791167958698';
         import { loadFooter } from './js/footer.js?v=1791167958698';
+        import { auth } from './js/auth.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();
+
+        let currentUser = null;
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+        });
+
+        async function initiateCheckout() {
+            if (!currentUser) {
+                window.location.href = `sign in beta.html?redirect=${encodeURIComponent(window.location.pathname)}`;
+                return;
+            }
+            const stripeBtn = document.querySelector('.btn-stripe');
+            const originalText = stripeBtn ? stripeBtn.textContent : 'Pay $10.69 with Card';
+            if (stripeBtn) {
+                stripeBtn.textContent = 'Redirecting to checkout...';
+                stripeBtn.disabled = true;
+            }
+            try {
+                const token = await currentUser.getIdToken();
+                const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        plan: 'ultimate',
+                        project: 'dreamstimeskip',
+                        successUrl: window.location.origin + '/success.html',
+                        cancelUrl: window.location.href
+                    })
+                });
+                const data = await response.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Error creating checkout session: ' + (data.error || 'Unknown error'));
+                    if (stripeBtn) {
+                        stripeBtn.textContent = originalText;
+                        stripeBtn.disabled = false;
+                    }
+                }
+            } catch (err) {
+                console.error('Checkout error:', err);
+                alert('Error connecting to payment server.');
+                if (stripeBtn) {
+                    stripeBtn.textContent = originalText;
+                    stripeBtn.disabled = false;
+                }
+            }
+        }
+
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+            btn.addEventListener('click', initiateCheckout);
+        });
     </script>
 
    

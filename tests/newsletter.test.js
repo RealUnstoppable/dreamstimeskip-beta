@@ -10,7 +10,7 @@ document.body.innerHTML = `
 `;
 await import('../js/newsletter.js');
 
-describe.skip('Newsletter Submission', () => {
+describe('Newsletter Submission', () => {
   let form;
   let emailInput;
   let setDocMock;
@@ -59,8 +59,8 @@ describe.skip('Newsletter Submission', () => {
     console.error = jest.fn();
   });
 
-  test.skip('should handle successful submission', async () => {
-    setDocMock.mockResolvedValueOnce();
+  test('should handle successful submission', async () => {
+    setDoc.mockResolvedValueOnce();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
@@ -72,23 +72,22 @@ describe.skip('Newsletter Submission', () => {
     expect(emailInput.value).toBe('');
   });
 
-  test.skip('should handle submission error and show error alert', async () => {
+  test('should handle submission error and show error alert', async () => {
     const error = new Error('Network Error');
-    setDocMock.mockRejectedValueOnce(error);
+    setDoc.mockRejectedValueOnce(error);
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
 
     // Wait for async operations to complete
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 50));
 
-    // expect(console.error).toHaveBeenCalled();
-    // expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
+    expect(console.error).toHaveBeenCalled();
+    expect(window.alert).toHaveBeenCalledWith("There was an error subscribing. Please try again later.");
   });
 
-  test.skip('should not submit if email is empty', async () => {
+  test('should not submit if email is empty', async () => {
     emailInput.value = '   ';
-    window.setDoc = jest.fn();
 
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
@@ -96,7 +95,7 @@ describe.skip('Newsletter Submission', () => {
     // Wait for async operations to complete
     await new Promise(r => setTimeout(r, 10));
 
-    expect(setDocMock).not.toHaveBeenCalled();
+    expect(setDoc).not.toHaveBeenCalled();
     expect(window.alert).not.toHaveBeenCalled();
   });
 });

@@ -17,8 +17,13 @@ document.addEventListener('submit', async (e) => {
         const emailInput = form.querySelector('input[type="email"]');
         const phoneInput = form.querySelector('input[type="tel"]');
         const submitBtn = form.querySelector('button[type="submit"]') || form.querySelector('input[type="submit"]');
-        const email = emailInput.value.trim();
+        const email = emailInput ? emailInput.value.trim() : '';
         const phone = phoneInput ? phoneInput.value.trim() : '';
+
+        if (!email) {
+            return;
+        }
+
         let originalText = submitBtn ? (submitBtn.textContent || submitBtn.value) : 'Subscribe';
 
         if (submitBtn) {

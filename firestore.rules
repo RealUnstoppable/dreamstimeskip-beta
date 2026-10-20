@@ -222,6 +222,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    match /newsletter_subscribers/{email} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
     // Reward Transactions collection
     match /reward_transactions/{transactionId} {
       allow get: if request.auth != null && resource.data.userId == request.auth.uid;

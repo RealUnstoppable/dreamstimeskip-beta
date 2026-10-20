@@ -18,6 +18,10 @@ export const orderBy = jest.fn();
 export const limit = jest.fn();
 export const deleteDoc = jest.fn();
 export const onSnapshot = jest.fn();
+export const increment = jest.fn((val) => val);
+export const average = jest.fn((field) => ({ type: 'average', field }));
+export const count = jest.fn(() => ({ type: 'count' }));
+export const getAggregateFromServer = jest.fn();
 export const Timestamp = {
     now: jest.fn(() => ({ toDate: () => new Date() })),
     fromDate: jest.fn((d) => ({ toDate: () => d }))

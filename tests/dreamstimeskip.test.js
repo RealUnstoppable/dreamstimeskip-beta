@@ -211,5 +211,15 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(html).toContain('This Minecraft username is already linked to a different account. If you think this is a mistake, contact us.');
         });
     });
+
+    describe('Dreams OG Launch Countdown Configuration', () => {
+        it('configures the Dreams OG countdown for 3:00 PM EDT on October 20, 2026', () => {
+            expect(html).toContain('new Countdown("2026-10-20T15:00:00-04:00", "countdown-1")');
+        });
+
+        it('sets the Founder whitelist cutoff to 3:00 PM EDT launch on October 20, 2026', () => {
+            expect(html).toContain("const cutoff = new Date('2026-10-20T15:00:00-04:00');");
+        });
+    });
 });
 

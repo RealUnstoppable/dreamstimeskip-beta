@@ -109,6 +109,7 @@ app.post("/create-checkout-session", async (req, res) => {
         ? ""   // 🔴 from Stripe dashboard
         : "price_individual_id";
 
+    const origin = req.headers.origin || (req.headers.host ? `${req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}` : 'https://realunstoppable.store');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "subscription",
@@ -118,8 +119,8 @@ app.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: "http://localhost:3000?success=true",
-      cancel_url: "http://localhost:3000?canceled=true",
+      success_url: `${origin}?success=true`,
+      cancel_url: `${origin}?canceled=true`,
     });
 
     res.json({ url: session.url });

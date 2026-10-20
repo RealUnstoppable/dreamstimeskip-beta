@@ -37,7 +37,7 @@ window.alert = jest.fn();
 
 await import('../js/medixly.js');
 
-describe.skip('toggleFavorite unit tests', () => {
+describe('toggleFavorite unit tests', () => {
     beforeAll(() => {
         // Trigger DOMContentLoaded so harmonytunes initializes
         document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -48,13 +48,13 @@ describe.skip('toggleFavorite unit tests', () => {
         window.alert.mockClear();
     });
 
-    it.skip('alerts when not logged in', async () => {
+    it('alerts when not logged in', async () => {
         window.__setCurrentUser(null);
         await window.toggleFavorite('deorc-decuple');
         expect(window.alert).toHaveBeenCalledWith("Please sign in to save favorites.");
     });
 
-    it.skip('adds a song to favorites when logged in and song is not in favorites', async () => {
+    it('adds a song to favorites when logged in and song is not in favorites', async () => {
         window.__setCurrentUser({ uid: 'user123' });
         window.__setUserFavorites([]);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);
@@ -72,7 +72,7 @@ describe.skip('toggleFavorite unit tests', () => {
         );
     });
 
-    it.skip('removes a song from favorites when logged in and song is already in favorites', async () => {
+    it('removes a song from favorites when logged in and song is already in favorites', async () => {
         window.__setCurrentUser({ uid: 'user123' });
         window.__setUserFavorites([{ id: 'deorc-decuple', title: 'Deorc Decuple' }]);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);
@@ -86,7 +86,7 @@ describe.skip('toggleFavorite unit tests', () => {
         expect(window.__getUserFavorites()).toEqual([]);
     });
 
-    it.skip('creates a user document if it does not exist (not-found error)', async () => {
+    it('creates a user document if it does not exist (not-found error)', async () => {
         window.__setCurrentUser({ uid: 'user123' });
         window.__setUserFavorites([]);
         window.__setCurrentQueue([{id: 'deorc-decuple'}]);

@@ -1845,7 +1845,20 @@
                     getDocs(collection(db, "users")).catch(e => { console.error("Manager info: [Error fetching users:]", e); return null; }),
                     getDocs(collection(db, "carts")).catch(e => { console.error("Manager info: [Error fetching carts:]", e); return null; }),
                     getDocs(collection(db, "orders")).catch(e => { console.error("Manager info: [Error fetching orders:]", e); return null; }),
-                    getDocs(collection(db, "newsletterSubscribers")).catch(e => { console.error("Manager info: [Error fetching newsletter:]", e); return null; }),
+                    Promise.all([
+                        getDocs(collection(db, "newsletter_subscribers")).catch(() => null),
+                        getDocs(collection(db, "newsletterSubscribers")).catch(() => null)
+                    ]).then(([snap1, snap2]) => {
+                        const docs1 = snap1 ? snap1.docs : [];
+                        const docs2 = snap2 ? snap2.docs : [];
+                        const map = new Map();
+                        [...docs1, ...docs2].forEach(doc => {
+                            const data = doc.data();
+                            const key = (data.email || doc.id).toLowerCase();
+                            if (!map.has(key)) map.set(key, data);
+                        });
+                        return { docs: Array.from(map.values()).map(d => ({ data: () => d })) };
+                    }).catch(e => { console.error("Manager info: [Error fetching newsletter:]", e); return null; }),
                     getDocs(collection(db, "bookings")).catch(e => { console.error("Manager info: [Error fetching bookings:]", e); return null; }),
                     getDocs(collection(db, "quotes")).catch(e => { console.error("Manager info: [Error fetching quotes:]", e); return null; }),
                     typeof getAllTickets === 'function' ? getAllTickets().catch(e => { console.error('Manager info: [Error fetching support tickets]', e); return []; }) : Promise.resolve([]),

@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dreams TimeSkip & Dreams OG | Official Minecraft Server Launch</title>
     <meta name="description" content="The official launch portal for Dreams OG (Coming October 20, 2026) and Dreams TimeSkip. Relive classic survival multiplayer with custom biomes, unscripted battles, and vanilla mechanics.">
+    <link rel="canonical" href="https://realunstoppable.store/dreamstimeskip.html">
+
+    <!-- Open Graph / Facebook / Discord -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://realunstoppable.store/dreamstimeskip.html">
+    <meta property="og:title" content="Dreams TimeSkip & Dreams OG | Official Minecraft Server Launch">
+    <meta property="og:description" content="The official launch portal for Dreams OG and Dreams TimeSkip. Relive classic survival multiplayer with custom biomes, unscripted battles, and vanilla mechanics.">
+    <meta property="og:image" content="https://realunstoppable.store/images/minecraft-adventure.webp">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://realunstoppable.store/dreamstimeskip.html">
+    <meta name="twitter:title" content="Dreams TimeSkip & Dreams OG | Official Minecraft Server Launch">
+    <meta name="twitter:description" content="The official launch portal for Dreams OG and Dreams TimeSkip. Claim your Founder Whitelist spot now.">
+    <meta name="twitter:image" content="https://realunstoppable.store/images/minecraft-adventure.webp">
     
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1362,7 +1377,7 @@
                     Relive your childhood in the classic Minecraft SMP era. Unfiltered survival, legendary player battles, custom biomes, and memories that last forever.
                 </p>
 
-                <!-- Countdown 1: Target Oct 20 2026 -->
+                <!-- Countdown 1: Target Oct 20 2026 at 3:00 PM EDT -->
                 <div id="countdown-1" class="countdown-container"></div>
 
                 <div class="hero-buttons">
@@ -1689,7 +1704,7 @@
                         ⚔️ Create Account & Claim Whitelist
                     </button>
                     <div class="wl-switch-link">
-                        Already have a website account? <a id="switch-to-login-link">Sign In & Link Whitelist</a>
+                        Already have a website account? <a href="#" role="button" id="switch-to-login-link">Sign In & Link Whitelist</a>
                     </div>
                 </div>
             </form>
@@ -1736,7 +1751,7 @@
                         🔑 Sign In & Link To Whitelist
                     </button>
                     <div class="wl-switch-link">
-                        Don't have an account? <a id="switch-to-register-link">Create Account & Whitelist</a>
+                        Don't have an account? <a href="#" role="button" id="switch-to-register-link">Create Account & Whitelist</a>
                     </div>
                 </div>
             </form>
@@ -2142,8 +2157,8 @@
         }
 
         // Initialize Countdowns:
-        // Dreams OG launches October 20, 2026
-        new Countdown("2026-10-20T00:00:00-04:00", "countdown-1");
+        // Dreams OG launches October 20, 2026 at 3:00 PM EDT (15:00)
+        new Countdown("2026-10-20T15:00:00-04:00", "countdown-1");
         // Dreams TimeSkip launches January 15, 2027
         new Countdown("2027-01-15T12:00:00-05:00", "countdown-2", true);
 
@@ -2266,9 +2281,9 @@
         let currentUser = null;
         let currentUserProfile = null;
 
-        // Helper: Is registration before October 20, 2026?
+        // Helper: Is registration before October 20, 2026 3:00 PM EDT launch?
         function checkIsFounder() {
-            const cutoff = new Date('2026-10-20T00:00:00-04:00');
+            const cutoff = new Date('2026-10-20T15:00:00-04:00');
             return new Date() < cutoff;
         }
 
@@ -2487,9 +2502,9 @@
                 showView('success');
             }
 
-            // Helper: Is registration before October 20, 2026?
+            // Helper: Is registration before October 20, 2026 3:00 PM EDT launch?
             function checkIsFounder() {
-                const cutoff = new Date('2026-10-20T00:00:00-04:00');
+                const cutoff = new Date('2026-10-20T15:00:00-04:00');
                 return new Date() < cutoff;
             }
 

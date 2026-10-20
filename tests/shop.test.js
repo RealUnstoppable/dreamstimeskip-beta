@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { productMap } from '../js/products-data.js';
 
 document.body.innerHTML = `
     <div id="product-grid"></div>
@@ -14,7 +15,7 @@ document.body.innerHTML = `
     <div class="nav-links"></div>
 `;
 
-describe.skip('handleUpdateQuantity', () => {
+describe('handleUpdateQuantity', () => {
     let handleUpdateQuantity;
     let cart;
 
@@ -29,62 +30,61 @@ describe.skip('handleUpdateQuantity', () => {
         for (let key in cart) delete cart[key];
     });
 
-    test.skip('updates quantity to a valid number greater than 0', async () => {
+    test('updates quantity to a valid number greater than 0', async () => {
         cart['unstoppable-hoodie'] = 1;
         await handleUpdateQuantity('unstoppable-hoodie', 5);
         expect(cart['unstoppable-hoodie']).toBe(5);
     });
 
-    test.skip('removes item when quantity is 0', async () => {
+    test('removes item when quantity is 0', async () => {
         cart['unstoppable-hoodie'] = 2;
         await handleUpdateQuantity('unstoppable-hoodie', 0);
         expect(cart['unstoppable-hoodie']).toBeUndefined();
     });
 
-    test.skip('removes item when quantity is negative', async () => {
+    test('removes item when quantity is negative', async () => {
         cart['unstoppable-hoodie'] = 3;
         await handleUpdateQuantity('unstoppable-hoodie', -1);
         expect(cart['unstoppable-hoodie']).toBeUndefined();
     });
 
-    test.skip('parses float quantities as integers', async () => {
+    test('parses float quantities as integers', async () => {
         cart['unstoppable-hoodie'] = 1;
         await handleUpdateQuantity('unstoppable-hoodie', 2.5);
         expect(cart['unstoppable-hoodie']).toBe(2);
     });
 
-    test.skip('parses string quantities as integers', async () => {
+    test('parses string quantities as integers', async () => {
         cart['unstoppable-hoodie'] = 1;
         await handleUpdateQuantity('unstoppable-hoodie', '4');
         expect(cart['unstoppable-hoodie']).toBe(4);
     });
 
-    test.skip('logs error when product is not found', async () => {
+    test('logs error when product is not found', async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         await handleUpdateQuantity('non-existent-product', 5);
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Product not found: non-existent-product');
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Manager info: Product not found: non-existent-product');
         consoleErrorSpy.mockRestore();
     });
 
-    test.skip('logs error when saveCart fails', async () => {
+    test('logs error when update fails unexpectedly', async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        const originalSetItem = localStorage.setItem;
-        const testError = new Error('Storage full');
-
-        localStorage.setItem = jest.fn(() => {
+        const testError = new Error('Unexpected failure');
+        const origGet = productMap.get;
+        productMap.get = jest.fn(() => {
             throw testError;
         });
 
         await handleUpdateQuantity('unstoppable-hoodie', 5);
 
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to update quantity:', testError);
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Manager info: Failed to update quantity ', testError);
 
-        localStorage.setItem = originalSetItem;
+        productMap.get = origGet;
         consoleErrorSpy.mockRestore();
     });
 });
 
-describe.skip('loadProductStats', () => {
+describe('loadProductStats', () => {
     let loadProductStats;
 
     beforeAll(async () => {
@@ -93,7 +93,7 @@ describe.skip('loadProductStats', () => {
         loadProductStats = module.loadProductStats;
     });
 
-    test.skip('logs error when getDocs fails', async () => {
+    test('logs error when getDocs fails', async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         await loadProductStats();
@@ -101,8 +101,8 @@ describe.skip('loadProductStats', () => {
         // Since the environment isn't fully mocked, getDocs should fail on its own
         // We just need to check if the error is caught and logged correctly.
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-            'Error loading product stats - Manager info:',
-            expect.any(Error)
+            'Manager info: Error fetching product_stats:',
+            expect.any(String)
         );
 
         consoleErrorSpy.mockRestore();
