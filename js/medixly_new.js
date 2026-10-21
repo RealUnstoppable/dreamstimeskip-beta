@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js?v=20260923b';
 
-import { librarySongs, songColors, getSongById } from './song-data.js?v=20260923b';
+import { librarySongs, songColors, getSongById, songIndexMap, addSongToMap, updateSongInMap, removeSongFromMap } from './song-data.js?v=20260923b';
 
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
@@ -293,7 +293,7 @@ function initHarmonyTunes() {
         const activateResult = (row) => {
             if (!row) return;
             const songId = row.dataset.songId;
-            const idx = librarySongs.findIndex(s => s.id === songId);
+            const idx = songIndexMap.get(songId) ?? -1;
             if (idx !== -1) {
                 currentQueue = [...librarySongs];
                 currentSongIndex = idx;
@@ -639,7 +639,7 @@ function initHarmonyTunes() {
             if (viralPlayBtn) {
                 viralPlayBtn.addEventListener('click', () => {
                     if (!viralTargetSongId) return;
-                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
+                    const songIdx = songIndexMap.get(viralTargetSongId) ?? -1;
                     if (songIdx !== -1) {
                         currentQueue = [...librarySongs];
                         currentSongIndex = songIdx;
@@ -768,7 +768,7 @@ function initHarmonyTunes() {
 
     window.playSongById = (id) => {
         __recordHistory();
-        const songIndex = librarySongs.findIndex(s => s.id === id);
+        const songIndex = songIndexMap.get(id) ?? -1;
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
     
