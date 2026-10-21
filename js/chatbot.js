@@ -21,9 +21,9 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e).
 - Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming Minecraft server saga launching January 15, 2027.
-  2. Dreams OG: A nostalgic classic Minecraft SMP experience launching on October 20, 2026!
+  2. Dreams OG: A nostalgic classic Minecraft SMP experience that is now live!
   - Official Minecraft Server IP: **dts.realunstoppable.store** (supports Minecraft Java 26.3 and Bedrock).
-  - Server Status: The server is currently under maintenance until October 20, 2026, when Dreams OG launches.
+  - Server Status: Dreams OG is live! The server is currently under maintenance while deployment finishes (We are working on it — estimated 6 hours remaining, downtime 3 hours).
 - Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella for listeners, editors, and creators.
 - Merch Store: Official shop selling the 'Unstoppable Hoodie', 'DTS Model Tee', 'HarmonyTunes Cap', 'Unstoppable Mousepad', and 'Ceramic Mug'.
 - Squishly: Our juicy, physics-driven ASMR arcade minigame in the hub (formerly called Blob Game).
@@ -335,7 +335,7 @@ export function getDreamsCountdownsData() {
     return {
         currentDate: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         serverIP: "dts.realunstoppable.store",
-        serverStatus: "Under maintenance preparing for the Dreams OG launch on October 20, 2026",
+        serverStatus: "Server maintenance in progress following Dreams OG launch. We are working on it (Est. 6 hours remaining, current downtime: 3 hours)",
         minecraftVersion: "26.3 (Java & Bedrock compatible)",
         dreamsOG: {
             launchDate: "October 20, 2026",

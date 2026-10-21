@@ -221,5 +221,33 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(html).toContain("const cutoff = new Date('2026-10-20T23:59:00-04:00');");
         });
     });
+
+    describe('Dreams OG Live & Server Maintenance Box Verification', () => {
+        it('confirms Dreams OG is Live across announcement banner, badge, and section header', () => {
+            expect(html).toContain('DREAMS OG IS LIVE');
+            expect(html).toContain('OFFICIAL MINECRAFT RELEASE • DREAMS OG IS LIVE');
+            expect(html).toContain('<h1>DREAMS OG IS LIVE</h1>');
+        });
+
+        it('renders the server maintenance box with required text, working notice, and metrics', () => {
+            expect(html).toContain('class="mc-maintenance-box"');
+            expect(html).toContain('SERVER MAINTENANCE');
+            expect(html).toContain('We are working on it.');
+            expect(html).toContain('Est. 6 hrs until finished');
+            expect(html).toContain('Downtime: 3 hrs');
+        });
+
+        it('features the smooth continuous looping progress bar and professional CSS keyframe animation', () => {
+            expect(html).toContain('class="mc-progress-bar-indeterminate"');
+            expect(html).toContain('class="mc-progress-track"');
+            expect(html).toContain('mcProgressLoop');
+            expect(html).toContain('animation: mcProgressLoop 2.4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite');
+        });
+
+        it('contains accessible markup for the maintenance box and progress loop', () => {
+            expect(html).toContain('role="region" aria-label="Server Maintenance Status"');
+            expect(html).toContain('role="progressbar" aria-label="Server maintenance progress loop"');
+        });
+    });
 });
 
