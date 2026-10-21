@@ -1,3 +1,10 @@
 ## 2024-05-24 - [Micro-UX Event Delegation]
 **Learning:** In highly interactive dynamic lists like Lyrics and Spotlight search, repeated event listeners can cause huge memory bloat. Furthermore, modifying DOM instances iteratively inside functions like `renderLyrics()` can create stale closure bugs.
 **Action:** Applied Event Delegation using dataset checks (`dataset.delegated = "true"`) to attach single event listeners on parent containers and check `e.target.closest()`. The listener is attached globally (e.g., inside `initHarmonyTunes`) and reads dependencies like `activeAudio` dynamically at execution time, which decreases listener bloat and runs significantly faster without stale closure issues.
+## 2025-02-12 - [Replace O(N) Array Find with O(1) Hash Map for Static Array Lookups]
+**Learning:** `librarySongs` array in `js/song-data.js` has nearly ~2,000 items (29,000+ lines). Performing `Array.findIndex` or `Array.find` on every search lookup causes O(N) overhead during frequent iterations in the frontend.
+**Action:** Always precompute large static data collections into a `Map(id -> object)` and `Map(id -> index)` on load. Use `map.get(id)` for fast O(1) reads, substituting `findIndex` gracefully with `map.get(id) ?? -1`. Avoid using `Array.from(map.values())` as an alternative iterator since it heavily impacts memory allocation.
+
+## 2025-02-12 - [Synchronizing Cached Array Maps with Array Mutations]
+**Learning:** When optimizing O(N) array lookups to O(1) by maintaining a `songIndexMap` and `songMap` cache, `Array.prototype.unshift()` and `Array.prototype.splice()` dynamically shift all indices. Caching indices is only safe if you also explicitly synchronize and shift all existing map indices during these mutations.
+**Action:** Always verify if static arrays are mutated at runtime. Provide map-aware update functions (`addSongToMap`, `removeSongFromMap`) that correctly iterate and shift stored map indices whenever the underlying array structure shifts, avoiding fatal off-by-one regressions.

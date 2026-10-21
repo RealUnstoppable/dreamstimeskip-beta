@@ -29333,9 +29333,45 @@ export const librarySongs = [
     }
 ];
 
+export const songMap = new Map();
+export const songIndexMap = new Map();
+
+for (let i = 0; i < librarySongs.length; i++) {
+    const song = librarySongs[i];
+    songMap.set(song.id, song);
+    songIndexMap.set(song.id, i);
+}
+
+
+export function addSongToMap(song) {
+    songMap.set(song.id, song);
+    for (const [id, idx] of songIndexMap.entries()) {
+        songIndexMap.set(id, idx + 1);
+    }
+    songIndexMap.set(song.id, 0);
+}
+
+export function updateSongInMap(song, index) {
+    songMap.set(song.id, song);
+    songIndexMap.set(song.id, index);
+}
+
+export function removeSongFromMap(id) {
+    songMap.delete(id);
+    const removedIdx = songIndexMap.get(id);
+    if (removedIdx !== undefined) {
+        songIndexMap.delete(id);
+        for (const [iterId, iterIdx] of songIndexMap.entries()) {
+            if (iterIdx > removedIdx) {
+                songIndexMap.set(iterId, iterIdx - 1);
+            }
+        }
+    }
+}
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+    return songMap.get(id) ||
+           songMap.get(`top100-${id}`) ||
+           songMap.get(id.replace(/^top100-/, '')) || null;
 }

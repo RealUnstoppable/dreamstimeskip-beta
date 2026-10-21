@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, ad
 import { getCachedUserProfile } from './utils.js';
 import { lyricsData } from './lyrics-data.js?v=1790377272083b';
 
-import { librarySongs, songColors, getSongById } from './song-data.js?v=1790377272083b';
+import { librarySongs, songColors, getSongById, songIndexMap, addSongToMap, updateSongInMap, removeSongFromMap } from './song-data.js?v=1790377272083b';
 
 // Utility to prevent DOM-based and Stored XSS
 
@@ -527,7 +527,7 @@ function initHarmonyTunes() {
         try {
             
             if (initialSongId) {
-                const sIndex = librarySongs.findIndex(s => s.id === initialSongId);
+                const sIndex = songIndexMap.get(initialSongId) ?? -1;
                 if (sIndex !== -1) {
                     currentQueue = [...librarySongs];
                     currentSongIndex = sIndex;
@@ -912,7 +912,7 @@ function initHarmonyTunes() {
             if (viralPlayBtn) {
                 viralPlayBtn.addEventListener('click', () => {
                     if (!viralTargetSongId) return;
-                    const songIdx = librarySongs.findIndex(s => s.id === viralTargetSongId);
+                    const songIdx = songIndexMap.get(viralTargetSongId) ?? -1;
                     if (songIdx !== -1) {
                         currentQueue = [...librarySongs];
                         currentSongIndex = songIdx;
@@ -1025,7 +1025,7 @@ function initHarmonyTunes() {
 
     window.playSongById = (id) => {
         __recordHistory();
-        const songIndex = librarySongs.findIndex(s => s.id === id);
+        const songIndex = songIndexMap.get(id) ?? -1;
         if (songIndex > -1) playContext(librarySongs, songIndex);
     };
     

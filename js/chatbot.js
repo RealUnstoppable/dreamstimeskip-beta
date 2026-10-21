@@ -1109,7 +1109,7 @@ export function initChatbot() {
 
             // Append interactive Song Play Card
             if (songIdToRender) {
-                const song = getSongById(songIdToRender) || librarySongs.find(s => s.id === songIdToRender) || librarySongs[0];
+                const song = getSongById(songIdToRender) || librarySongs[0];
                 const songCard = document.createElement('div');
                 songCard.className = 'chat-song-card';
                 songCard.innerHTML = `
