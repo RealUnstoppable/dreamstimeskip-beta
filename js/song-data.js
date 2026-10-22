@@ -29333,9 +29333,20 @@ export const librarySongs = [
     }
 ];
 
+const songIdMap = new Map();
+for (let i = 0; i < librarySongs.length; i++) {
+    songIdMap.set(librarySongs[i].id, librarySongs[i]);
+}
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+    let s = songIdMap.get(id);
+    if (s) return s;
+    s = songIdMap.get(`top100-${id}`);
+    if (s) return s;
+    if (id.startsWith('top100-')) {
+        s = songIdMap.get(id.replace(/^top100-/, ''));
+        if (s) return s;
+    }
+    return null;
 }
