@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-10-21T09:10:04.290Z",
-  "dateFormatted": "Oct 21, 2026",
-  "overallStatus": "Operational",
-  "badgeClass": "online",
+  "timestamp": "2026-10-22T09:12:45.181Z",
+  "dateFormatted": "Oct 22, 2026",
+  "overallStatus": "Maintenance",
+  "badgeClass": "maintenance",
   "systems": [
     {
       "id": "hub",
@@ -15,8 +15,11 @@
       "id": "dreamstimeskip",
       "name": "Dreams TimeSkip",
       "primaryPage": "dreamstimeskip.html",
-      "status": "Operational",
-      "issues": []
+      "status": "Maintenance",
+      "issues": [
+        "Missing local asset: \"minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132\" in dreamstimeskip.html",
+        "Missing local asset: \"minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132\" in new-dts.html"
+      ]
     },
     {
       "id": "medixly",
@@ -75,11 +78,22 @@
       "issues": []
     }
   ],
-  "offlineSystems": [],
+  "offlineSystems": [
+    {
+      "id": "dreamstimeskip",
+      "name": "Dreams TimeSkip",
+      "primaryPage": "dreamstimeskip.html",
+      "status": "Maintenance",
+      "issues": [
+        "Missing local asset: \"minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132\" in dreamstimeskip.html",
+        "Missing local asset: \"minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132\" in new-dts.html"
+      ]
+    }
+  ],
   "totalSystems": 10,
-  "operationalCount": 10,
+  "operationalCount": 9,
   "offlineCount": 0,
-  "maintenanceCount": 0,
-  "durationMs": 1371,
+  "maintenanceCount": 1,
+  "durationMs": 452,
   "allDiscoveredPagesCount": 34
 }
