@@ -29,6 +29,7 @@
     
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/streakCelebration.css">
 
     <meta name="google-adsense-account" content="ca-pub-4254213062632381">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
@@ -3021,6 +3022,56 @@
         </div>
     </dialog>
 
+    <!-- Minecraft Daily Check-in Duolingo x Minecraft Voxel Streak Celebration Modal -->
+    <div id="mc-flare-modal" class="mc-flare-overlay" style="display: none;" role="dialog" aria-modal="true" aria-label="Daily Streak Celebration">
+        <canvas id="mc-celebration-canvas" class="mc-celebration-canvas"></canvas>
+        <div class="mc-flare-backdrop"></div>
+        <div class="mc-flare-heat-bloom bloom-idle" id="mc-flare-heat-bloom"></div>
+        <div class="mc-shockwave-ring" id="mc-shockwave-ring"></div>
+        
+        <div class="mc-flare-card">
+            <!-- Voxel Flame Emblem (Scalable Pixel-Art SVG) -->
+            <div id="flare-voxel-flame-container" class="flare-voxel-flame-container dormant">
+                <!-- SVG dynamically populated -->
+            </div>
+
+            <!-- Rolling Odometer Streak Counter -->
+            <div id="flare-streak-odometer-container" class="flare-streak-odometer-container">
+                <div class="odometer-window">
+                    <span id="flare-streak-roll-prev" class="odometer-digit digit-prev">0</span>
+                    <span id="flare-streak-roll-next" class="odometer-digit digit-next prepare-bottom">1</span>
+                </div>
+                <span class="flare-days-label mc-pixel-font">DAY STREAK!</span>
+                <!-- Hidden fallback element for backwards compatibility -->
+                <span class="mc-flare-days-count" id="flare-streak-number" style="display: none;">1</span>
+            </div>
+
+            <!-- 7-Day Weekly Hotbar Slot Row -->
+            <div id="flare-weekly-hotbar-container" class="flare-weekly-hotbar-wrap"></div>
+
+            <!-- Reward Details Card -->
+            <div class="flare-reward-card">
+                <div class="mc-flare-rarity-pill" id="flare-rarity-pill">LEGENDARY REWARD</div>
+                <div class="mc-flare-icon-container" id="flare-icon-container">
+                    <!-- SVG Icon populated dynamically -->
+                </div>
+                <h3 class="mc-flare-item-name" id="flare-item-name">5x Diamonds</h3>
+                <p class="mc-flare-points-bonus" id="flare-points-bonus">+100 Unstoppable Loyalty Points</p>
+                <p class="mc-flare-desc" id="flare-item-desc">Crafted from the deepest caves of Dreams TimeSkip.</p>
+            </div>
+
+            <!-- Celebratory Sub-Message Banner -->
+            <div id="flare-celebration-banner" class="flare-celebration-banner mc-pixel-font">
+                STREAK IGNITED! Keep the furnace burning tomorrow!
+            </div>
+
+            <!-- Action Buttons -->
+            <div id="flare-actions-container" class="flare-actions-row">
+                <button type="button" id="flare-collect-btn" class="mc-button mc-button-collect mc-pixel-btn-claim">⚡ AWESOME / KEEP IT BURNING</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="main-footer"></footer> 
  
     <!-- Scripts -->
@@ -3385,6 +3436,8 @@
             MC_ALREADY_LINKED_MESSAGE, 
             MC_ALREADY_LINKED_HTML 
         } from './js/minecraft-link-service.js';
+        import { triggerFlareAnimation, streakCelebration } from './js/streakCelebration.js';
+        import { streakAudio } from './js/streakSoundEngine.js';
 
         // --- Shared Auth & Profile State ---
         let currentUser = null;
@@ -4077,6 +4130,7 @@
                 return { success: false, alreadyClaimed: true, streak: data.streak, data };
             }
 
+            const previousStreak = data.streak || 0;
             let isConsecutive = false;
             if (data.lastClaimDate && getCalendarDayDiff(todayStr, data.lastClaimDate) === 1) {
                 isConsecutive = true;
@@ -4139,7 +4193,7 @@
                 if (currentIgn) currentUserProfile.minecraftUsername = currentIgn;
             }
 
-            return { success: true, rewardItem, streak: newStreak, data };
+            return { success: true, rewardItem, streak: newStreak, previousStreak, data };
         }
 
         function getEffectiveLinkedUser(user, profile) {
@@ -4531,11 +4585,21 @@
                         currentUserProfile = newProfile;
 
                         // Claim Day 1 streak
-                        await claimStreakReward(user, mcUsername);
+                        streakAudio.ensureContext();
+                        const claimRes = await claimStreakReward(user, mcUsername);
 
                         showStreakView('dash');
                         renderStreakDashboard(currentUser, currentUserProfile);
                         updatePreLaunchStreakUI(currentUser, currentUserProfile);
+
+                        if (claimRes && claimRes.success) {
+                            if (streakModal && typeof streakModal.close === 'function' && streakModal.open) {
+                                streakModal.close();
+                            }
+                            triggerFlareAnimation(claimRes.streak, claimRes.rewardItem, claimRes.previousStreak ?? 0, () => {
+                                openStreakModal();
+                            });
+                        }
                     } catch (err) {
                         console.error('Streak register failed:', err);
                         let msg = err.message;
@@ -4606,11 +4670,21 @@
                         currentUserProfile = { ...existingData, ...updatePayload };
 
                         // Claim today's streak
-                        await claimStreakReward(user, mcUsername);
+                        streakAudio.ensureContext();
+                        const claimRes = await claimStreakReward(user, mcUsername);
 
                         showStreakView('dash');
                         renderStreakDashboard(currentUser, currentUserProfile);
                         updatePreLaunchStreakUI(currentUser, currentUserProfile);
+
+                        if (claimRes && claimRes.success) {
+                            if (streakModal && typeof streakModal.close === 'function' && streakModal.open) {
+                                streakModal.close();
+                            }
+                            triggerFlareAnimation(claimRes.streak, claimRes.rewardItem, claimRes.previousStreak ?? Math.max(0, claimRes.streak - 1), () => {
+                                openStreakModal();
+                            });
+                        }
                     } catch (err) {
                         console.error('Streak login failed:', err);
                         let msg = err.message;
@@ -4667,11 +4741,21 @@
                         }
 
                         // Claim today's streak
-                        await claimStreakReward(currentUser, mcUsername);
+                        streakAudio.ensureContext();
+                        const claimRes = await claimStreakReward(currentUser, mcUsername);
 
                         showStreakView('dash');
                         renderStreakDashboard(currentUser, currentUserProfile);
                         updatePreLaunchStreakUI(currentUser, currentUserProfile);
+
+                        if (claimRes && claimRes.success) {
+                            if (streakModal && typeof streakModal.close === 'function' && streakModal.open) {
+                                streakModal.close();
+                            }
+                            triggerFlareAnimation(claimRes.streak, claimRes.rewardItem, claimRes.previousStreak ?? Math.max(0, claimRes.streak - 1), () => {
+                                openStreakModal();
+                            });
+                        }
                     } catch (err) {
                         console.error('Streak link failed:', err);
                         showStreakError(err.message || 'Failed to save Minecraft IGN.');
@@ -4692,13 +4776,23 @@
                         return;
                     }
 
+                    streakAudio.ensureContext();
                     dashClaimBtn.disabled = true;
                     dashClaimBtn.textContent = '⏳ Claiming Pre-Launch Streak...';
 
                     try {
-                        await claimStreakReward(currentUser, ign);
+                        const claimRes = await claimStreakReward(currentUser, ign);
                         renderStreakDashboard(currentUser, currentUserProfile);
                         updatePreLaunchStreakUI(currentUser, currentUserProfile);
+
+                        if (claimRes && claimRes.success) {
+                            if (streakModal && typeof streakModal.close === 'function' && streakModal.open) {
+                                streakModal.close();
+                            }
+                            triggerFlareAnimation(claimRes.streak, claimRes.rewardItem, claimRes.previousStreak ?? Math.max(0, claimRes.streak - 1), () => {
+                                openStreakModal();
+                            });
+                        }
                     } catch (err) {
                         console.error('Streak claim failed:', err);
                         showStreakError(err.message || 'Failed to claim streak.');

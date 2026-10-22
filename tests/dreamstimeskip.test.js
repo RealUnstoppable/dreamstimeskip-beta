@@ -322,5 +322,40 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(newDtsHtml).toContain('id="open-mc-java-btn"');
         });
     });
+
+    describe('Pre-Launch Streak Celebration Animation & Web Audio Integration', () => {
+        it('links the shared streakCelebration.css stylesheet', () => {
+            expect(html).toContain('href="/css/streakCelebration.css"');
+        });
+
+        it('contains the Duolingo x Minecraft celebration modal (#mc-flare-modal) with canvas, odometer, and flame container', () => {
+            expect(html).toContain('id="mc-flare-modal"');
+            expect(html).toContain('id="mc-celebration-canvas"');
+            expect(html).toContain('id="mc-flare-heat-bloom"');
+            expect(html).toContain('id="mc-shockwave-ring"');
+            expect(html).toContain('id="flare-voxel-flame-container"');
+            expect(html).toContain('id="flare-streak-odometer-container"');
+            expect(html).toContain('id="flare-streak-roll-prev"');
+            expect(html).toContain('id="flare-streak-roll-next"');
+            expect(html).toContain('id="flare-weekly-hotbar-container"');
+            expect(html).toContain('id="flare-rarity-pill"');
+            expect(html).toContain('id="flare-icon-container"');
+            expect(html).toContain('id="flare-item-name"');
+            expect(html).toContain('id="flare-points-bonus"');
+            expect(html).toContain('id="flare-item-desc"');
+            expect(html).toContain('id="flare-celebration-banner"');
+            expect(html).toContain('id="flare-collect-btn"');
+        });
+
+        it('imports triggerFlareAnimation and streakAudio in script module', () => {
+            expect(html).toContain("import { triggerFlareAnimation, streakCelebration } from './js/streakCelebration.js';");
+            expect(html).toContain("import { streakAudio } from './js/streakSoundEngine.js';");
+        });
+
+        it('triggers celebration animation and audio context upon successful streak claim', () => {
+            expect(html).toContain('triggerFlareAnimation(claimRes.streak, claimRes.rewardItem');
+            expect(html).toContain('streakAudio.ensureContext()');
+        });
+    });
 });
 

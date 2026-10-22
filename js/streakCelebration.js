@@ -445,6 +445,115 @@ export function getWeeklyHotbarHtml(streak = 0, isClaimedToday = false, todaySlo
 }
 
 /**
+ * Minecraft Reward Item Pixel SVGs
+ */
+export function getMinecraftItemSvg(icon) {
+    switch (icon) {
+        case 'diamond':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="4" width="10" height="2" fill="#55ffff"/>
+                <rect x="7" y="6" width="18" height="2" fill="#00aaaa"/>
+                <rect x="5" y="8" width="22" height="4" fill="#55ffff"/>
+                <rect x="7" y="12" width="18" height="4" fill="#00aaaa"/>
+                <rect x="9" y="16" width="14" height="4" fill="#008282"/>
+                <rect x="11" y="20" width="10" height="4" fill="#005555"/>
+                <rect x="13" y="24" width="6" height="3" fill="#003333"/>
+                <rect x="15" y="27" width="2" height="2" fill="#002222"/>
+                <rect x="9" y="8" width="4" height="2" fill="#ffffff"/>
+                <rect x="7" y="10" width="2" height="2" fill="#ffffff"/>
+                <rect x="18" y="9" width="3" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'netherite':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#312a2b"/>
+                <rect x="8" y="9" width="16" height="4" fill="#423b3c"/>
+                <rect x="6" y="13" width="20" height="3" fill="#5a4f50"/>
+                <rect x="6" y="21" width="20" height="3" fill="#1e191a"/>
+                <rect x="9" y="14" width="4" height="2" fill="#7d3b5b"/>
+                <rect x="19" y="15" width="3" height="2" fill="#9333ea"/>
+                <rect x="14" y="10" width="4" height="2" fill="#c084fc"/>
+                <rect x="15" y="18" width="3" height="2" fill="#dc2626"/>
+            </svg>`;
+        case 'elytra':
+            return `<img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6f/Elytra_JE2_BE2.png/revision/latest?cb=20230930213939" alt="Elytra" class="mc-item-icon-img mc-elytra-img" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='images/elytra.png';" />`;
+        case 'iron':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#8f939d"/>
+                <rect x="8" y="9" width="16" height="4" fill="#b0b5c0"/>
+                <rect x="6" y="13" width="20" height="3" fill="#d2d7e2"/>
+                <rect x="6" y="21" width="20" height="3" fill="#666a74"/>
+                <rect x="9" y="10" width="6" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'gold':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6" y="13" width="20" height="11" rx="2" fill="#d99b16"/>
+                <rect x="8" y="9" width="16" height="4" fill="#f5bc18"/>
+                <rect x="6" y="13" width="20" height="3" fill="#fde047"/>
+                <rect x="6" y="21" width="20" height="3" fill="#a16207"/>
+                <rect x="9" y="10" width="6" height="2" fill="#ffffff"/>
+            </svg>`;
+        case 'emerald':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="5" width="10" height="22" rx="2" fill="#15803d"/>
+                <rect x="13" y="7" width="6" height="18" fill="#22c55e"/>
+                <rect x="14" y="9" width="4" height="14" fill="#86efac"/>
+                <rect x="14" y="10" width="2" height="4" fill="#ffffff"/>
+            </svg>`;
+        case 'golden_apple':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="18" r="9" fill="#f5bc18"/>
+                <ellipse cx="14" cy="16" rx="4" ry="5" fill="#fef08a"/>
+                <rect x="15" y="6" width="2" height="4" fill="#854d0e"/>
+                <path d="M17 7 C19 6 22 7 21 9" stroke="#22c55e" stroke-width="2" fill="none"/>
+            </svg>`;
+        case 'book':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="7" y="6" width="18" height="20" rx="2" fill="#78350f"/>
+                <rect x="9" y="8" width="14" height="16" fill="#fef3c7"/>
+                <line x1="16" y1="8" x2="16" y2="24" stroke="#d97706" stroke-width="2"/>
+                <rect x="11" y="14" width="10" height="3" fill="#9333ea"/>
+                <circle cx="16" cy="15.5" r="3" fill="#c084fc"/>
+            </svg>`;
+        case 'ender_pearl':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="9" fill="#064e3b"/>
+                <circle cx="16" cy="16" r="6" fill="#0d9488"/>
+                <circle cx="15" cy="14" r="3" fill="#5eead4"/>
+                <circle cx="14" cy="13" r="1.5" fill="#ffffff"/>
+            </svg>`;
+        case 'redstone':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="7" fill="#dc2626"/>
+                <circle cx="12" cy="20" r="4" fill="#ef4444"/>
+                <circle cx="21" cy="19" r="4" fill="#b91c1c"/>
+                <circle cx="14" cy="14" r="2.5" fill="#fca5a5"/>
+            </svg>`;
+        case 'lapis':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="9" width="14" height="14" rx="2" fill="#1e3a8a"/>
+                <rect x="11" y="11" width="10" height="10" fill="#2563eb"/>
+                <rect x="12" y="12" width="5" height="5" fill="#60a5fa"/>
+            </svg>`;
+        case 'totem':
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="11" y="6" width="10" height="9" fill="#f5bc18"/>
+                <rect x="8" y="15" width="16" height="5" fill="#eab308"/>
+                <rect x="12" y="20" width="8" height="8" fill="#ca8a04"/>
+                <rect x="12" y="9" width="3" height="2" fill="#22c55e"/>
+                <rect x="17" y="9" width="3" height="2" fill="#22c55e"/>
+            </svg>`;
+        case 'nether_star':
+            return `<svg viewBox="0 0 32 32" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="16,3 20,12 29,16 20,20 16,29 12,20 3,16 12,12" fill="#f8fafc"/>
+                <polygon points="16,7 18,13 25,16 18,19 16,25 14,19 7,16 14,13" fill="#38bdf8"/>
+                <circle cx="16" cy="16" r="3" fill="#ffffff"/>
+            </svg>`;
+        default:
+            return `<svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="10" fill="#55ffff"/></svg>`;
+    }
+}
+
+/**
  * 4. 5-STAGE DUOLINGO x MINECRAFT CELEBRATION ORCHESTRATOR
  * Timeline:
  * - Stage 1 (0ms - 200ms): Anticipation & Squash
@@ -460,12 +569,16 @@ export class StreakCelebrationController {
         this.activeTimers = [];
         this.isAnimating = false;
         this.soundEngine = streakAudio;
+        this.onCollectCallback = null;
     }
 
     init() {
         this.modalEl = document.getElementById('mc-flare-modal');
         const canvas = document.getElementById('mc-celebration-canvas');
         if (canvas) {
+            if (this.particleCanvas) {
+                this.particleCanvas.destroy();
+            }
             this.particleCanvas = new VoxelParticleCanvas(canvas);
         }
     }
@@ -477,6 +590,10 @@ export class StreakCelebrationController {
 
     closeModal() {
         this.cleanupTimers();
+        if (this.handleKeyDown) {
+            window.removeEventListener('keydown', this.handleKeyDown);
+            this.handleKeyDown = null;
+        }
         if (this.particleCanvas) {
             this.particleCanvas.stop();
             this.particleCanvas.clear();
@@ -496,10 +613,13 @@ export class StreakCelebrationController {
         newStreak = 1,
         rewardItem = null,
         isReplay = false,
-        onComplete = null
+        onComplete = null,
+        onCollect = null
     } = {}) {
-        if (!this.modalEl) this.init();
+        if (!this.modalEl || !this.modalEl.isConnected) this.init();
         if (!this.modalEl) return;
+
+        this.onCollectCallback = onCollect;
 
         // Prevent spam-clicking overlapping runs
         if (this.isAnimating && !isReplay) return;
@@ -578,6 +698,9 @@ export class StreakCelebrationController {
             if (itemName) itemName.textContent = rewardItem.name || 'Daily Minecraft Reward';
             if (pointsBonus) pointsBonus.textContent = `+${rewardItem.points || 50} Unstoppable Loyalty Points`;
             if (itemDesc) itemDesc.textContent = rewardItem.desc || 'Consecutive daily check-in streak reward.';
+            if (iconContainer && rewardItem.icon) {
+                iconContainer.innerHTML = getMinecraftItemSvg(rewardItem.icon);
+            }
             if (rarityPill) {
                 rarityPill.className = `mc-flare-rarity-pill rarity-${rewardItem.rarity || 'common'}`;
                 if (rewardItem.rarity === 'legendary') {
@@ -728,15 +851,108 @@ export class StreakCelebrationController {
         }, 1550);
         this.activeTimers.push(timerStage5);
 
-        // Button Click Handlers
+        // Collect & Backdrop Dismiss Handlers
+        const handleCollectAction = () => {
+            const cb = this.onCollectCallback;
+            this.onCollectCallback = null;
+            this.closeModal();
+            if (typeof cb === 'function') {
+                cb();
+            }
+        };
+
         if (collectBtn) {
-            collectBtn.onclick = () => {
-                this.closeModal();
+            collectBtn.onclick = handleCollectAction;
+        }
+
+        if (this.modalEl) {
+            this.modalEl.onclick = (e) => {
+                if (e.target === this.modalEl || e.target.classList.contains('mc-flare-backdrop')) {
+                    handleCollectAction();
+                }
             };
         }
+
+        if (this.handleKeyDown) {
+            window.removeEventListener('keydown', this.handleKeyDown);
+        }
+        this.handleKeyDown = (e) => {
+            if (e.key === 'Escape' && this.modalEl && this.modalEl.style.display !== 'none') {
+                handleCollectAction();
+            }
+        };
+        window.addEventListener('keydown', this.handleKeyDown);
     }
 }
 
 // Global Singleton
 export const streakCelebration = new StreakCelebrationController();
+
+/**
+ * Universal Flare Celebration Trigger
+ * Used across account.html and dreamstimeskip.html
+ */
+export function triggerFlareAnimation(streak, rewardItem, previousStreak = Math.max(0, streak - 1), onCollect = null) {
+    const flareModal = document.getElementById('mc-flare-modal');
+    if (!flareModal) return;
+
+    // Backward-compatible element updates
+    const streakNumberEl = document.getElementById('flare-streak-number');
+    const rarityPillEl = document.getElementById('flare-rarity-pill');
+    const iconContainerEl = document.getElementById('flare-icon-container');
+    const itemNameEl = document.getElementById('flare-item-name');
+    const pointsBonusEl = document.getElementById('flare-points-bonus');
+    const itemDescEl = document.getElementById('flare-item-desc');
+    const collectBtn = document.getElementById('flare-collect-btn');
+
+    if (streakNumberEl) streakNumberEl.textContent = streak;
+    if (rewardItem) {
+        if (itemNameEl) itemNameEl.textContent = rewardItem.name;
+        if (pointsBonusEl) pointsBonusEl.textContent = `+${rewardItem.points} Unstoppable Loyalty Points Added!`;
+        if (itemDescEl) itemDescEl.textContent = rewardItem.desc;
+
+        if (rarityPillEl) {
+            rarityPillEl.className = 'mc-flare-rarity-pill';
+            if (rewardItem.rarity === 'legendary') {
+                rarityPillEl.textContent = '💎 LEGENDARY REWARD';
+                rarityPillEl.classList.add('legendary');
+            } else if (rewardItem.rarity === 'mythic') {
+                rarityPillEl.textContent = '🛡️ MYTHIC REWARD';
+                rarityPillEl.classList.add('mythic');
+            } else if (rewardItem.rarity === 'elytra') {
+                rarityPillEl.textContent = '🪽 ULTRA GRAND FINALE';
+                rarityPillEl.classList.add('grand');
+            } else {
+                rarityPillEl.textContent = '✨ DAILY MINECRAFT TREASURE';
+            }
+        }
+
+        if (iconContainerEl && rewardItem.icon) {
+            iconContainerEl.innerHTML = getMinecraftItemSvg(rewardItem.icon);
+        }
+    }
+
+    streakCelebration.onCollectCallback = onCollect;
+
+    // Trigger full 5-stage Duolingo x Minecraft celebration sequence!
+    streakCelebration.triggerCelebration({
+        previousStreak,
+        newStreak: streak,
+        rewardItem,
+        isReplay: false,
+        onCollect
+    });
+
+    if (collectBtn) {
+        collectBtn.onclick = () => {
+            const cb = streakCelebration.onCollectCallback;
+            streakCelebration.onCollectCallback = null;
+            streakCelebration.closeModal();
+            if (typeof cb === 'function') {
+                cb();
+            }
+        };
+    }
+}
+
 export default streakCelebration;
