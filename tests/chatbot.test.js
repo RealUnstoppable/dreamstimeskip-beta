@@ -79,7 +79,8 @@ describe('chatbot.js functionality and offline intelligence', () => {
         
         expect(countdowns.serverIP).toBe("dts.realunstoppable.store");
         expect(countdowns.minecraftVersion).toContain("26.3");
-        expect(countdowns.serverStatus).toContain("maintenance");
+        expect(countdowns.serverStatus.toLowerCase()).toContain("maintenance");
+        expect(countdowns.serverStatus).toContain("Server is now working");
         expect(countdowns.dreamsOG.launchDate).toBe("October 20, 2026");
 
         const res = generateOfflineResponse("when does dreams launch?");

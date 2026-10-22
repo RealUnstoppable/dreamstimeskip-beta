@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dreams TimeSkip & Dreams OG | Official Minecraft Server Launch</title>
-    <meta name="description" content="The official launch portal for Dreams OG (Now Live - Server Maintenance in Progress) and Dreams TimeSkip. Relive classic survival multiplayer with custom biomes, unscripted battles, and vanilla mechanics.">
+    <meta name="description" content="The official launch portal for Dreams OG (Now Live - Server Is Now Working • Join Below • Maintenance Complete) and Dreams TimeSkip. Relive classic survival multiplayer with custom biomes, unscripted battles, and vanilla mechanics.">
     <link rel="canonical" href="https://realunstoppable.store/dreamstimeskip.html">
 
     <!-- Open Graph / Facebook / Discord -->
@@ -583,6 +583,17 @@
             box-sizing: border-box;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .mc-box-complete {
+            border-color: #55ff55;
+            border-top-color: #a3e635;
+            border-bottom-color: #3c8527;
+            box-shadow: 
+                0 14px 34px rgba(0, 0, 0, 0.85),
+                0 0 32px rgba(85, 255, 85, 0.32),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
         }
 
         .mc-maint-header {
@@ -629,6 +640,14 @@
             border: 2px solid var(--mc-gold);
             color: var(--mc-gold-light);
             box-shadow: 0 0 12px rgba(245, 188, 24, 0.25);
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .mc-pill-complete {
+            background: rgba(60, 133, 39, 0.25);
+            border: 2px solid #55ff55;
+            color: #55ff55;
+            box-shadow: 0 0 12px rgba(85, 255, 85, 0.35);
             text-shadow: 1px 1px 0 #000;
         }
 
@@ -699,6 +718,21 @@
             padding: 15px 18px;
             margin-bottom: 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .mc-maint-complete-banner {
+            background: rgba(60, 133, 39, 0.12);
+            border: 2px solid rgba(85, 255, 85, 0.45);
+            border-left: 5px solid #55ff55;
+            box-shadow: 0 4px 16px rgba(60, 133, 39, 0.25);
+        }
+
+        .mc-maint-complete-banner .mc-maint-icon-wrap {
+            color: #55ff55;
+        }
+
+        .mc-maint-complete-banner .mc-maint-primary-msg strong {
+            color: #55ff55;
         }
 
         .mc-maint-icon-wrap {
@@ -901,6 +935,44 @@
             box-shadow: 0 0 18px rgba(85, 255, 85, 0.8), 0 0 30px rgba(245, 188, 24, 0.5);
             animation: mcProgressLoop 2.4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
             will-change: left, opacity;
+        }
+
+        .mc-progress-bar-complete {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, 
+                #2d701e 0%, 
+                #3c8527 20%, 
+                #55ff55 50%, 
+                #a3e635 70%, 
+                #55ff55 90%, 
+                #3c8527 100%
+            );
+            box-shadow: 0 0 22px rgba(85, 255, 85, 0.95), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            animation: mcCompleteShimmer 3s ease-in-out infinite;
+        }
+
+        .mc-glow-complete {
+            background: linear-gradient(90deg, 
+                rgba(60, 133, 39, 0.3) 0%, 
+                rgba(85, 255, 85, 0.45) 50%, 
+                rgba(60, 133, 39, 0.3) 100%
+            ) !important;
+            opacity: 1 !important;
+        }
+
+        @keyframes mcCompleteShimmer {
+            0%, 100% {
+                filter: brightness(1);
+                box-shadow: 0 0 20px rgba(85, 255, 85, 0.85);
+            }
+            50% {
+                filter: brightness(1.2);
+                box-shadow: 0 0 32px rgba(85, 255, 85, 1), 0 0 12px rgba(255, 255, 255, 0.6);
+            }
         }
 
         @keyframes mcProgressLoop {
@@ -2048,8 +2120,8 @@
 
     <!-- Top Minecraft Announcement Ribbon -->
     <div class="mc-announcement-bar">
-        <span class="mc-announcement-pulse" style="background: #ffaa00; box-shadow: 0 0 10px #ffaa00;"></span>
-        <span>⚔️ DREAMS OG IS LIVE • SERVER MAINTENANCE IN PROGRESS • ESTIMATED 6 HRS REMAINING ⚔️</span>
+        <span class="mc-announcement-pulse" style="background: #55ff55; box-shadow: 0 0 10px #55ff55;"></span>
+        <span>⚔️ DREAMS OG IS LIVE • SERVER IS NOW WORKING • JOIN BELOW • MAINTENANCE COMPLETE ⚔️</span>
     </div>
 
     <main>
@@ -2068,89 +2140,89 @@
                     Relive your childhood in the classic Minecraft SMP era. Unfiltered survival, legendary player battles, custom biomes, and memories that last forever.
                 </p>
 
-                <!-- Countdown 1: Dreams OG Live Server Maintenance Box -->
+                <!-- Countdown 1: Dreams OG Live Server Status Box -->
                 <div id="countdown-1" class="mc-maintenance-container">
-                    <div class="mc-maintenance-box" role="region" aria-label="Server Maintenance Status">
+                    <div class="mc-maintenance-box mc-box-complete" role="region" aria-label="Server Status - Maintenance Complete">
                         <!-- Maintenance Header Badge Row -->
                         <div class="mc-maint-header">
                             <div class="mc-maint-pill-group">
                                 <span class="mc-maint-pill mc-pill-live">
                                     <span class="mc-pill-dot green"></span> DREAMS OG IS LIVE
                                 </span>
-                                <span class="mc-maint-pill mc-pill-status">
-                                    <span class="mc-pill-dot amber"></span> SERVER MAINTENANCE
+                                <span class="mc-maint-pill mc-pill-complete">
+                                    <span class="mc-pill-dot green"></span> MAINTENANCE COMPLETE
                                 </span>
                             </div>
                             <div class="mc-maint-refresh-badge">
-                                <span class="mc-spin-icon">⚙️</span>
-                                <span>SYSTEMS OPTIMIZING</span>
+                                <span class="mc-check-green">✔</span>
+                                <span style="color: #55ff55;">ALL SYSTEMS OPERATIONAL</span>
                             </div>
                         </div>
 
                         <!-- Main Title & Working Message -->
                         <div class="mc-maint-body">
                             <h2 class="mc-maint-heading">
-                                DREAMS OG IS LIVE! <span class="live-sub-tag">• ACTIVE MAINTENANCE</span>
+                                DREAMS OG IS LIVE! <span class="live-sub-tag">• SERVER IS NOW WORKING</span>
                             </h2>
                             
-                            <div class="mc-maint-working-banner">
+                            <div class="mc-maint-working-banner mc-maint-complete-banner">
                                 <div class="mc-maint-icon-wrap">
-                                    <span>⚡</span>
+                                    <span>⚔️</span>
                                 </div>
                                 <div class="mc-maint-text-wrap">
                                     <p class="mc-maint-primary-msg">
-                                        <strong>We are working on it.</strong> The servers are actively undergoing deployment maintenance following the official Dreams OG launch.
+                                        <strong>Server is now working — join below!</strong> Maintenance is complete, realm deployment has finished, and world systems are online.
                                     </p>
                                     <p class="mc-maint-sub-msg">
-                                        Our engineering team is finalizing custom biome generation, world border pre-caching, and whitelist permissions.
+                                        Custom biomes, world border caches, and crossplay connections are active. Click <strong>Join Server</strong> below to copy the IP or connect directly with Minecraft!
                                     </p>
                                 </div>
                             </div>
 
-                            <!-- Metrics Grid: est 6hrs until finished, downtime 3hrs -->
+                            <!-- Metrics Grid: Maintenance Complete, Server Working / Join Below, Dreams OG Live -->
                             <div class="mc-maint-stats-grid">
                                 <div class="mc-maint-stat-card">
-                                    <span class="mc-stat-label">ESTIMATED COMPLETION</span>
-                                    <span class="mc-stat-val val-gold">Est. 6 hrs until finished</span>
-                                    <span class="mc-stat-sub">Deployment &amp; synchronization phase</span>
+                                    <span class="mc-stat-label">MAINTENANCE STATUS</span>
+                                    <span class="mc-stat-val val-green">Maintenance Complete</span>
+                                    <span class="mc-stat-sub">100% deployment completed</span>
                                 </div>
                                 <div class="mc-maint-stat-card">
-                                    <span class="mc-stat-label">CURRENT DOWNTIME</span>
-                                    <span class="mc-stat-val val-amber">Downtime: 3 hrs</span>
-                                    <span class="mc-stat-sub">Active scheduled maintenance window</span>
+                                    <span class="mc-stat-label">SERVER AVAILABILITY</span>
+                                    <span class="mc-stat-val val-green">Server is now working • Join below</span>
+                                    <span class="mc-stat-sub">Java 26.3 &amp; Bedrock open</span>
                                 </div>
                                 <div class="mc-maint-stat-card">
                                     <span class="mc-stat-label">GLOBAL REALM STATUS</span>
                                     <span class="mc-stat-val val-green">Dreams OG Live</span>
-                                    <span class="mc-stat-sub">Java 26.3 &amp; Bedrock Crossplay</span>
+                                    <span class="mc-stat-sub">dts.realunstoppable.store</span>
                                 </div>
                             </div>
 
-                            <!-- Looping Progress Bar (Smooth & Professional) -->
+                            <!-- Graphic: Progress Bar showing Maintenance Complete (100% Full Emerald Bar) -->
                             <div class="mc-maint-progress-section">
                                 <div class="mc-progress-header">
                                     <span class="mc-progress-title">
-                                        <span class="mc-progress-pulse"></span> Deploying Infrastructure &amp; Biome Sync
+                                        <span class="mc-check-green">✔</span> Maintenance Complete — All Systems Operational
                                     </span>
-                                    <span class="mc-progress-status-text">Continuous Diagnostics • Active</span>
+                                    <span class="mc-progress-status-text val-green" style="color: #55ff55;">100% Complete • Online</span>
                                 </div>
 
-                                <div class="mc-progress-track" role="progressbar" aria-label="Server maintenance progress loop" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="mc-progress-glow-track"></div>
+                                <div class="mc-progress-track" role="progressbar" aria-label="Server maintenance complete" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="mc-progress-glow-track mc-glow-complete"></div>
                                     <div class="mc-progress-stripes"></div>
-                                    <div class="mc-progress-bar-indeterminate"></div>
+                                    <div class="mc-progress-bar-complete"></div>
                                 </div>
 
                                 <div class="mc-progress-footer">
-                                    <span>⚡ Synchronizing chunk caches &amp; anti-cheat nodes...</span>
-                                    <span>Smooth Loop Active</span>
+                                    <span>✔ Maintenance complete • All nodes synchronized</span>
+                                    <span style="color: #55ff55;">Server is now working • Join below</span>
                                 </div>
                             </div>
 
                             <!-- Whitelist & Streak Reassurance -->
                             <div class="mc-maint-footer-note">
                                 <span class="mc-check-green">✔</span>
-                                <span>All Founder Whitelist registrations, Minecraft usernames, and pre-launch daily streak rewards are safely stored and will be available in-game immediately once servers open.</span>
+                                <span>Founder Whitelist registrations, Minecraft usernames, and daily streak rewards are synced and active in-game. Click the <strong>Join Server</strong> button below to hop in!</span>
                             </div>
                         </div>
                     </div>
@@ -2172,8 +2244,8 @@
                 </div>
 
                 <div class="mc-server-status">
-                    <span class="mc-status-dot" style="background: #ffaa00; box-shadow: 0 0 10px #ffaa00;"></span>
-                    <span style="color: #ffcc00; font-weight: 700;">SERVER: ACTIVE MAINTENANCE (EST. 6 HRS REMAINING • DOWNTIME: 3 HRS)</span>
+                    <span class="mc-status-dot" style="background: #55ff55; box-shadow: 0 0 10px #55ff55;"></span>
+                    <span style="color: #55ff55; font-weight: 700;">SERVER IS NOW WORKING (JOIN BELOW) • MAINTENANCE COMPLETE</span>
                     <span>•</span>
                     <span style="color: #55ff55; font-weight: 700;">DREAMS OG LIVE</span>
                     <span>•</span>

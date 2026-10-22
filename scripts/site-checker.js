@@ -139,6 +139,7 @@ function shouldIgnoreReference(ref) {
     trimmed.startsWith('mailto:') ||
     trimmed.startsWith('tel:') ||
     trimmed.startsWith('javascript:') ||
+    trimmed.startsWith('minecraft:') ||
     trimmed.includes('${') ||
     trimmed.includes('{{')
   );

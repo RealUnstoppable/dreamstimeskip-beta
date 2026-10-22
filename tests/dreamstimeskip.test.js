@@ -222,31 +222,31 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         });
     });
 
-    describe('Dreams OG Live & Server Maintenance Box Verification', () => {
+    describe('Dreams OG Live & Server Maintenance Complete Verification', () => {
         it('confirms Dreams OG is Live across announcement banner, badge, and section header', () => {
             expect(html).toContain('DREAMS OG IS LIVE');
             expect(html).toContain('OFFICIAL MINECRAFT RELEASE • DREAMS OG IS LIVE');
             expect(html).toContain('<h1>DREAMS OG IS LIVE</h1>');
         });
 
-        it('renders the server maintenance box with required text, working notice, and metrics', () => {
-            expect(html).toContain('class="mc-maintenance-box"');
-            expect(html).toContain('SERVER MAINTENANCE');
-            expect(html).toContain('We are working on it.');
-            expect(html).toContain('Est. 6 hrs until finished');
-            expect(html).toContain('Downtime: 3 hrs');
+        it('renders the server maintenance complete box with server is now working and join below notice', () => {
+            expect(html).toContain('class="mc-maintenance-box');
+            expect(html).toContain('MAINTENANCE COMPLETE');
+            expect(html).toContain('Server is now working — join below!');
+            expect(html).toContain('Server is now working • Join below');
+            expect(html).toContain('Maintenance Complete');
         });
 
-        it('features the smooth continuous looping progress bar and professional CSS keyframe animation', () => {
-            expect(html).toContain('class="mc-progress-bar-indeterminate"');
+        it('features the complete progress bar graphic showing maintenance complete', () => {
+            expect(html).toContain('class="mc-progress-bar-complete"');
             expect(html).toContain('class="mc-progress-track"');
-            expect(html).toContain('mcProgressLoop');
-            expect(html).toContain('animation: mcProgressLoop 2.4s cubic-bezier(0.4, 0.0, 0.2, 1) infinite');
+            expect(html).toContain('mcCompleteShimmer');
+            expect(html).toContain('100% Complete • Online');
         });
 
-        it('contains accessible markup for the maintenance box and progress loop', () => {
-            expect(html).toContain('role="region" aria-label="Server Maintenance Status"');
-            expect(html).toContain('role="progressbar" aria-label="Server maintenance progress loop"');
+        it('contains accessible markup for the maintenance complete box and progress graphic', () => {
+            expect(html).toContain('role="region" aria-label="Server Status - Maintenance Complete"');
+            expect(html).toContain('role="progressbar" aria-label="Server maintenance complete" aria-valuenow="100"');
         });
     });
 
