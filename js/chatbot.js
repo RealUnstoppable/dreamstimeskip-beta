@@ -22,7 +22,7 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming Minecraft server saga launching January 15, 2027.
   2. Dreams OG: A nostalgic classic Minecraft SMP experience that is now live!
-  - Official Minecraft Server IP: **dts.realunstoppable.store** (supports Minecraft Java 26.3 and Bedrock).
+  - Official Minecraft Server IP: **dts.realunstoppable.store** (supports Minecraft Java 26.3 and Bedrock). Java does not require a port. Bedrock port is **19132**.
   - Server Status: Dreams OG is live! The server is currently under maintenance while deployment finishes (We are working on it — estimated 6 hours remaining, downtime 3 hours).
 - Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella for listeners, editors, and creators.
 - Merch Store: Official shop selling the 'Unstoppable Hoodie', 'DTS Model Tee', 'HarmonyTunes Cap', 'Unstoppable Mousepad', and 'Ceramic Mug'.
@@ -335,6 +335,9 @@ export function getDreamsCountdownsData() {
     return {
         currentDate: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         serverIP: "dts.realunstoppable.store",
+        javaIP: "dts.realunstoppable.store",
+        bedrockIP: "dts.realunstoppable.store",
+        bedrockPort: 19132,
         serverStatus: "Server maintenance in progress following Dreams OG launch. We are working on it (Est. 6 hours remaining, current downtime: 3 hours)",
         minecraftVersion: "26.3 (Java & Bedrock compatible)",
         dreamsOG: {

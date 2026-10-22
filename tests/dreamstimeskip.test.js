@@ -249,5 +249,78 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(html).toContain('role="progressbar" aria-label="Server maintenance progress loop"');
         });
     });
+
+    describe('Join Server Button & Crossplay Connection Modal Verification', () => {
+        it('renders the Join Server button in the hero buttons container', () => {
+            expect(html).toContain('id="join-server-btn"');
+            expect(html).toContain('Join Server');
+            expect(html).toContain('open-join-server-trigger');
+        });
+
+        it('includes the Join Server dialog modal with accessible attributes and Minecraft styling', () => {
+            expect(html).toContain('id="join-server-modal"');
+            expect(html).toContain('class="mc-modal mc-join-server-modal"');
+            expect(html).toContain('JOIN DREAMS SERVER');
+            expect(html).toContain('id="close-join-server-btn"');
+        });
+
+        it('displays all three connection fields: Java IP, Bedrock Address, and Bedrock Port', () => {
+            expect(html).toContain('id="display-java-ip"');
+            expect(html).toContain('id="display-bedrock-ip"');
+            expect(html).toContain('id="display-bedrock-port"');
+            expect(html).toContain('19132');
+            expect(html).toContain('dts.realunstoppable.store');
+        });
+
+        it('clarifies that Java does not require a port and Bedrock port is 19132', () => {
+            expect(html).toContain('NO PORT REQUIRED');
+            expect(html).toContain('Bedrock Port is <strong>19132</strong> (Java Edition does not have a port)');
+        });
+
+        it('provides individual copy buttons for all 3 fields', () => {
+            expect(html).toContain('id="copy-java-ip-btn"');
+            expect(html).toContain('Copy Java IP');
+            expect(html).toContain('id="copy-bedrock-ip-btn"');
+            expect(html).toContain('Copy Address');
+            expect(html).toContain('id="copy-bedrock-port-btn"');
+            expect(html).toContain('Copy Port');
+        });
+
+        it('includes Open Minecraft launcher buttons for both mobile and Java launcher', () => {
+            expect(html).toContain('id="open-mc-mobile-btn"');
+            expect(html).toContain('minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132');
+            expect(html).toContain('Open Bedrock (Mobile)');
+            expect(html).toContain('id="open-mc-java-btn"');
+            expect(html).toContain('Open Java Launcher');
+        });
+
+        it('contains CSS definitions for Join Server modal and launcher buttons', () => {
+            expect(html).toContain('.mc-join-server-modal');
+            expect(html).toContain('.join-fields-container');
+            expect(html).toContain('.join-field-card');
+            expect(html).toContain('.join-copy-btn');
+            expect(html).toContain('.join-launch-btn');
+        });
+    });
+
+    describe("What's New in DTS (new-dts.html) Join Server Modal Verification", () => {
+        const newDtsPath = path.join(ROOT_DIR, 'new-dts.html');
+        const newDtsHtml = fs.readFileSync(newDtsPath, 'utf8');
+
+        it('renders the Join Server button on new-dts.html', () => {
+            expect(newDtsHtml).toContain('id="join-server-btn"');
+            expect(newDtsHtml).toContain('Join Server');
+        });
+
+        it('includes the Join Server modal and copy buttons in new-dts.html', () => {
+            expect(newDtsHtml).toContain('id="join-server-modal"');
+            expect(newDtsHtml).toContain('id="copy-java-ip-btn"');
+            expect(newDtsHtml).toContain('id="copy-bedrock-ip-btn"');
+            expect(newDtsHtml).toContain('id="copy-bedrock-port-btn"');
+            expect(newDtsHtml).toContain('19132');
+            expect(newDtsHtml).toContain('id="open-mc-mobile-btn"');
+            expect(newDtsHtml).toContain('id="open-mc-java-btn"');
+        });
+    });
 });
 

@@ -600,6 +600,365 @@
                 font-size: 0.7rem;
             }
         }
+
+        /* --- Minecraft Join Server Modal Styles --- */
+        .mc-modal {
+            margin: auto;
+            padding: 0;
+            max-width: 960px;
+            width: 92vw;
+            background: #181a1f;
+            border: 3px solid #000;
+            box-shadow: inset 3px 3px 0 #3e424a, inset -3px -3px 0 #101114, 0 25px 60px rgba(0,0,0,0.95);
+            color: #fff;
+        }
+
+        .mc-modal::backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .mc-modal-header {
+            background: #252830;
+            border-bottom: 3px solid #000;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mc-modal-header h3 {
+            font-family: var(--mc-font-pixel);
+            font-size: 1rem;
+            color: var(--mc-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .mc-modal-close {
+            background: #bd3232;
+            border: 2px solid #000;
+            color: #fff;
+            width: 32px;
+            height: 32px;
+            font-family: var(--mc-font-pixel);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 1px 1px 0 #ff6e6e, inset -1px -1px 0 #6e1515;
+            transition: background 0.15s ease;
+        }
+
+        .mc-modal-close:hover {
+            background: #d83d3d;
+        }
+
+        .mc-modal-body {
+            padding: 16px;
+            background: #0e1013;
+        }
+
+        .mc-modal-footer {
+            padding: 14px 20px;
+            background: #1e2026;
+            border-top: 2px solid #2b2e35;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: #9da6b2;
+            font-family: var(--mc-font-sub);
+        }
+
+        .mc-join-server-modal {
+            max-width: 640px;
+            width: 95vw;
+        }
+
+        .join-crossplay-banner {
+            background: linear-gradient(135deg, rgba(60, 133, 39, 0.22) 0%, rgba(245, 188, 24, 0.16) 100%);
+            border: 2px solid var(--mc-green);
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .join-banner-badge {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.78rem;
+            color: #55ff55;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .join-banner-text {
+            color: #f1f5f9;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            font-family: var(--mc-font-sub);
+        }
+
+        .join-fields-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .join-field-card {
+            background: #12151a;
+            border: 2px solid #282c35;
+            border-top: 2px solid #363b47;
+            border-bottom: 3px solid #000;
+            padding: 14px 16px;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.05), 0 4px 8px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .join-field-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .join-field-label-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .join-field-edition {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.68rem;
+            padding: 3px 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #000;
+        }
+
+        .join-field-edition.java {
+            background: rgba(245, 188, 24, 0.2);
+            color: var(--mc-gold-light);
+            border-color: var(--mc-gold);
+        }
+
+        .join-field-edition.bedrock {
+            background: rgba(60, 133, 39, 0.25);
+            color: #55ff55;
+            border-color: var(--mc-green);
+        }
+
+        .join-field-title {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.82rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .join-field-port-note {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.65rem;
+            color: #8c96a4;
+            letter-spacing: 0.5px;
+        }
+
+        .join-field-badge {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.65rem;
+            color: #a8b2be;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 7px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .join-field-badge.port-badge {
+            color: var(--mc-gold-light);
+            background: rgba(245, 188, 24, 0.15);
+            border-color: rgba(245, 188, 24, 0.35);
+        }
+
+        .join-field-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #090a0d;
+            border: 2px solid #1f232b;
+            padding: 6px 8px 6px 14px;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.8);
+        }
+
+        @media (max-width: 520px) {
+            .join-field-input-row {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 10px;
+            }
+        }
+
+        .join-field-display {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.95rem;
+            color: #55ff55;
+            letter-spacing: 0.8px;
+            flex-grow: 1;
+            word-break: break-all;
+            text-shadow: 0 0 8px rgba(85, 255, 85, 0.3);
+            user-select: all;
+        }
+
+        .join-field-display.port-number {
+            color: var(--mc-gold-light);
+            text-shadow: 0 0 8px rgba(245, 188, 24, 0.3);
+        }
+
+        .join-copy-btn {
+            padding: 9px 18px !important;
+            font-size: 0.78rem !important;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .join-field-tip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            color: #8c96a4;
+            font-family: var(--mc-font-sub);
+        }
+
+        .join-field-tip code {
+            background: #181a20;
+            padding: 1px 5px;
+            border: 1px solid #2d3038;
+            color: #ffdd55;
+            font-family: monospace;
+        }
+
+        /* --- Quick Launch Minecraft Section --- */
+        .join-launch-section {
+            background: #15181f;
+            border: 2px solid #252932;
+            padding: 16px;
+            box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.05);
+            margin-bottom: 6px;
+        }
+
+        .join-launch-title {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.88rem;
+            color: var(--mc-gold);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .join-launch-desc {
+            font-size: 0.8rem;
+            color: #a8b2be;
+            margin: 0 0 14px 0;
+            font-family: var(--mc-font-sub);
+        }
+
+        .join-launch-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 580px) {
+            .join-launch-btn-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .join-launch-btn {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 12px 14px !important;
+            text-align: left !important;
+            justify-content: flex-start !important;
+            text-decoration: none !important;
+        }
+
+        .launch-btn-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .launch-btn-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .launch-btn-main {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .launch-btn-sub {
+            font-family: var(--mc-font-sub);
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .join-feedback-banner {
+            background: rgba(60, 133, 39, 0.25);
+            border: 1px solid var(--mc-green);
+            color: #55ff55;
+            padding: 8px 12px;
+            font-family: var(--mc-font-pixel);
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 10px rgba(60, 133, 39, 0.3);
+            animation: mcFadeIn 0.2s ease;
+        }
+
+        .join-footer-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: #8c96a4;
+            font-family: var(--mc-font-pixel);
+        }
+
+        .join-footer-info code {
+            color: #55ff55;
+            font-family: inherit;
+        }
     </style>
 </head>
 
@@ -629,8 +988,8 @@
                 <button id="toggle-all-sections-btn" class="mc-btn mc-btn-green">
                     [+] Expand All Sections
                 </button>
-                <button id="copy-server-ip-btn" class="mc-btn mc-btn-gold" data-ip="dts.realunstoppable.store">
-                    <span class="btn-text">📋 Copy Server IP</span>
+                <button id="join-server-btn" class="mc-btn mc-btn-gold open-join-server-trigger" data-ip="dts.realunstoppable.store" aria-haspopup="dialog" aria-controls="join-server-modal">
+                    <span class="btn-text">⚔ Join Server</span>
                 </button>
             </div>
         </header>
@@ -1286,6 +1645,145 @@
         </div>
     </main>
 
+    <!-- ========================================================
+         MINECRAFT JOIN SERVER MODAL (JAVA & BEDROCK CROSSPLAY)
+         ======================================================== -->
+    <dialog id="join-server-modal" class="mc-modal mc-join-server-modal" role="dialog" aria-labelledby="join-modal-title">
+        <div class="mc-modal-header">
+            <h3 id="join-modal-title"><span>⚔️</span> JOIN DREAMS SERVER</h3>
+            <button class="mc-modal-close" id="close-join-server-btn" aria-label="Close Join Server dialog">&times;</button>
+        </div>
+        <div class="mc-modal-body" style="padding: 22px 24px;">
+            <!-- Crossplay Banner -->
+            <div class="join-crossplay-banner">
+                <div class="join-banner-badge">🎮 OFFICIAL CROSSPLAY REALM • VERSION 26.3</div>
+                <div class="join-banner-text">
+                    Connect seamlessly from <strong>Java Edition (PC / Mac / Linux)</strong> or <strong>Bedrock Edition (Mobile, Console, Windows 10/11)</strong>. Both editions share the exact same persistent world!
+                </div>
+            </div>
+
+            <!-- Server Connection Details Grid -->
+            <div class="join-fields-container">
+                <!-- Field 1: Java Edition Server IP -->
+                <div class="join-field-card">
+                    <div class="join-field-header">
+                        <div class="join-field-label-group">
+                            <span class="join-field-edition java">JAVA EDITION</span>
+                            <span class="join-field-title">SERVER IP</span>
+                        </div>
+                        <span class="join-field-port-note">NO PORT REQUIRED</span>
+                    </div>
+                    <div class="join-field-input-row">
+                        <div class="join-field-display" id="display-java-ip">dts.realunstoppable.store</div>
+                        <button type="button" class="mc-btn mc-btn-green join-copy-btn" id="copy-java-ip-btn" data-copy="dts.realunstoppable.store" aria-label="Copy Java IP">
+                            <span class="btn-text">📋 Copy Java IP</span>
+                        </button>
+                    </div>
+                    <div class="join-field-tip">
+                        <span>ℹ️</span> <span>Multiplayer → Direct Connection / Add Server → Paste IP</span>
+                    </div>
+                </div>
+
+                <!-- Field 2: Bedrock Edition Server Address -->
+                <div class="join-field-card">
+                    <div class="join-field-header">
+                        <div class="join-field-label-group">
+                            <span class="join-field-edition bedrock">BEDROCK EDITION</span>
+                            <span class="join-field-title">SERVER ADDRESS</span>
+                        </div>
+                        <span class="join-field-badge">MOBILE &amp; CONSOLES</span>
+                    </div>
+                    <div class="join-field-input-row">
+                        <div class="join-field-display" id="display-bedrock-ip">dts.realunstoppable.store</div>
+                        <button type="button" class="mc-btn mc-btn-green join-copy-btn" id="copy-bedrock-ip-btn" data-copy="dts.realunstoppable.store" aria-label="Copy Bedrock Server Address">
+                            <span class="btn-text">📋 Copy Address</span>
+                        </button>
+                    </div>
+                    <div class="join-field-tip">
+                        <span>ℹ️</span> <span>Play → Servers Tab → Add Server → Enter Server Address</span>
+                    </div>
+                </div>
+
+                <!-- Field 3: Bedrock Edition Port -->
+                <div class="join-field-card">
+                    <div class="join-field-header">
+                        <div class="join-field-label-group">
+                            <span class="join-field-edition bedrock">BEDROCK EDITION</span>
+                            <span class="join-field-title">PORT</span>
+                        </div>
+                        <span class="join-field-badge port-badge">PORT: 19132</span>
+                    </div>
+                    <div class="join-field-input-row">
+                        <div class="join-field-display port-number" id="display-bedrock-port">19132</div>
+                        <button type="button" class="mc-btn mc-btn-gold join-copy-btn" id="copy-bedrock-port-btn" data-copy="19132" aria-label="Copy Bedrock Port">
+                            <span class="btn-text">📋 Copy Port</span>
+                        </button>
+                    </div>
+                    <div class="join-field-tip">
+                        <span>ℹ️</span> <span>Bedrock Port is <strong>19132</strong> (Java Edition does not have a port).</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Open Minecraft Action Section -->
+            <div class="join-launch-section">
+                <div class="join-launch-title">
+                    <span>🚀</span> OPEN MINECRAFT
+                </div>
+                <p class="join-launch-desc">
+                    Quick-launch directly into Minecraft on mobile or launch your desktop Java client:
+                </p>
+                <div class="join-launch-btn-grid">
+                    <!-- Mobile & Bedrock Launcher Button -->
+                    <a href="minecraft://?addExternalServer=Dreams%20TimeSkip|dts.realunstoppable.store:19132" class="mc-btn mc-btn-green join-launch-btn" id="open-mc-mobile-btn">
+                        <span class="launch-btn-icon">📱</span>
+                        <div class="launch-btn-content">
+                            <span class="launch-btn-main">Open Bedrock (Mobile)</span>
+                            <span class="launch-btn-sub">Auto-adds server on iOS, Android &amp; Windows</span>
+                        </div>
+                    </a>
+
+                    <!-- Java Launcher Button -->
+                    <button type="button" class="mc-btn mc-btn-stone join-launch-btn" id="open-mc-java-btn">
+                        <span class="launch-btn-icon">☕</span>
+                        <div class="launch-btn-content">
+                            <span class="launch-btn-main">Open Java Launcher</span>
+                            <span class="launch-btn-sub">Copies IP &amp; opens Minecraft desktop launcher</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Step-by-Step Launcher Quick Guide -->
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 14px; font-size: 0.78rem; color: #a8b2be; font-family: var(--mc-font-sub);">
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <span style="color: var(--mc-gold-light); font-weight: bold; flex-shrink: 0;">☕ Java Launcher:</span>
+                        <span>Multiplayer → Direct Connection → Paste <code>dts.realunstoppable.store</code> → Join Server!</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+                        <span style="color: #55ff55; font-weight: bold; flex-shrink: 0;">📱 Mobile / Bedrock:</span>
+                        <span>Play → Servers → Add Server → Address: <code>dts.realunstoppable.store</code> • Port: <code>19132</code></span>
+                    </div>
+                </div>
+
+                <!-- Launch / Copy Feedback Alert -->
+                <div id="join-modal-toast" class="join-feedback-banner" style="display: none;" role="status" aria-live="polite">
+                    <span class="toast-icon">✔</span>
+                    <span class="toast-message" id="join-toast-text"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mc-modal-footer">
+            <div class="join-footer-info">
+                <span class="mc-status-dot" style="background: #55ff55; box-shadow: 0 0 8px #55ff55;"></span>
+                <span>Server: <code>dts.realunstoppable.store</code> • Bedrock Port: <code>19132</code></span>
+            </div>
+            <button type="button" class="mc-btn mc-btn-dark" id="close-join-modal-bottom-btn" style="padding: 8px 20px; font-size: 0.82rem;">
+                Close
+            </button>
+        </div>
+    </dialog>
+
     <footer class="main-footer"></footer>
 
     <!-- Scripts -->
@@ -1325,23 +1823,129 @@
             });
         }
 
-        const copyIpBtn = document.getElementById('copy-server-ip-btn');
-        if (copyIpBtn) {
-            copyIpBtn.addEventListener('click', () => {
-                const ip = copyIpBtn.getAttribute('data-ip') || 'dts.realunstoppable.store';
+        // --- Join Server Modal & Connection Details Setup ---
+        const joinServerModal = document.getElementById('join-server-modal');
+        const openJoinServerTriggers = document.querySelectorAll('.open-join-server-trigger, #join-server-btn, #copy-server-ip-btn');
+        const closeJoinServerBtn = document.getElementById('close-join-server-btn');
+        const closeJoinModalBottomBtn = document.getElementById('close-join-modal-bottom-btn');
+        const joinToast = document.getElementById('join-modal-toast');
+        const joinToastText = document.getElementById('join-toast-text');
+        let joinToastTimer = null;
+
+        function showJoinToast(msg, duration = 3000) {
+            if (!joinToast || !joinToastText) return;
+            joinToastText.textContent = msg;
+            joinToast.style.display = 'flex';
+            if (joinToastTimer) clearTimeout(joinToastTimer);
+            joinToastTimer = setTimeout(() => {
+                joinToast.style.display = 'none';
+            }, duration);
+        }
+
+        function openJoinModal() {
+            if (joinServerModal) {
+                if (typeof joinServerModal.showModal === 'function') {
+                    joinServerModal.showModal();
+                } else {
+                    joinServerModal.setAttribute('open', '');
+                }
+            }
+        }
+
+        function closeJoinModal() {
+            if (joinServerModal) {
+                if (typeof joinServerModal.close === 'function') {
+                    joinServerModal.close();
+                } else {
+                    joinServerModal.removeAttribute('open');
+                }
+            }
+        }
+
+        openJoinServerTriggers.forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                openJoinModal();
+            });
+        });
+
+        if (closeJoinServerBtn) {
+            closeJoinServerBtn.addEventListener('click', closeJoinModal);
+        }
+        if (closeJoinModalBottomBtn) {
+            closeJoinModalBottomBtn.addEventListener('click', closeJoinModal);
+        }
+        if (joinServerModal) {
+            joinServerModal.addEventListener('click', (e) => {
+                const rect = joinServerModal.getBoundingClientRect();
+                const inDialog = (
+                    rect.top <= e.clientY &&
+                    e.clientY <= rect.top + rect.height &&
+                    rect.left <= e.clientX &&
+                    e.clientX <= rect.left + rect.width
+                );
+                if (!inDialog) closeJoinModal();
+            });
+        }
+
+        // Copy Field Buttons inside Join Server Modal
+        const copyFieldButtons = document.querySelectorAll('.join-copy-btn');
+        copyFieldButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const textToCopy = btn.getAttribute('data-copy') || '';
+                const fieldType = btn.id === 'copy-java-ip-btn' ? 'Java IP' :
+                                  btn.id === 'copy-bedrock-port-btn' ? 'Bedrock Port' : 'Bedrock Server Address';
+                const textSpan = btn.querySelector('.btn-text');
+                const origText = textSpan ? textSpan.textContent : btn.textContent;
+
+                const onSuccess = () => {
+                    if (textSpan) textSpan.textContent = '✔ Copied!';
+                    showJoinToast(`✔ ${fieldType} copied to clipboard: ${textToCopy}`);
+                    setTimeout(() => {
+                        if (textSpan) textSpan.textContent = origText;
+                    }, 2500);
+                };
+
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(ip).then(() => {
-                        const textSpan = copyIpBtn.querySelector('.btn-text');
-                        const orig = textSpan ? textSpan.textContent : copyIpBtn.textContent;
-                        if (textSpan) textSpan.textContent = '✔ IP Copied!';
-                        setTimeout(() => {
-                            if (textSpan) textSpan.textContent = orig;
-                        }, 2500);
-                    }).catch(() => {
-                        prompt('Copy Dreams TimeSkip server address:', ip);
+                    navigator.clipboard.writeText(textToCopy).then(onSuccess).catch(() => {
+                        prompt(`Copy ${fieldType}:`, textToCopy);
                     });
                 } else {
-                    prompt('Copy Dreams TimeSkip server address:', ip);
+                    prompt(`Copy ${fieldType}:`, textToCopy);
+                }
+            });
+        });
+
+        // Launch Minecraft Actions (Mobile & Java Launcher)
+        const openMobileBtn = document.getElementById('open-mc-mobile-btn');
+        if (openMobileBtn) {
+            openMobileBtn.addEventListener('click', () => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText('dts.realunstoppable.store:19132').catch(() => {});
+                }
+                showJoinToast('Launching Minecraft Bedrock... (dts.realunstoppable.store:19132 copied)');
+            });
+        }
+
+        const openJavaBtn = document.getElementById('open-mc-java-btn');
+        if (openJavaBtn) {
+            openJavaBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const javaIP = 'dts.realunstoppable.store';
+                const copyPromise = navigator.clipboard && navigator.clipboard.writeText
+                    ? navigator.clipboard.writeText(javaIP)
+                    : Promise.resolve();
+
+                copyPromise.then(() => {
+                    showJoinToast('✔ Java IP copied to clipboard! Opening Minecraft Launcher...');
+                }).catch(() => {
+                    prompt('Java Server IP:', javaIP);
+                });
+
+                try {
+                    window.location.href = 'minecraft://';
+                } catch (err) {
+                    // Protocol handler fallback
                 }
             });
         }
