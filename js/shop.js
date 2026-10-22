@@ -1584,6 +1584,7 @@ async function handleAnswerSubmit(questionId) {
     } catch (error) {
         console.error("Manager info: Error submitting answer: [" + error.message + "]");
         alert("Failed to submit answer.");
+    } finally {
         if(submitBtn) {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
