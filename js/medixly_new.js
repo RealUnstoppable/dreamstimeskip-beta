@@ -776,47 +776,51 @@ function initHarmonyTunes() {
 
     // --- RENDERING TABLE (Fixed Duration Bug) ---
     function updateSongTableActiveState() {
-        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length || !songListBody) return;
         const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
+
+        // ⚡ Bolt: O(1) DOM update instead of O(N) querySelectorAll('tr') loop
+        const activeRow = songListBody.querySelector('tr.playing');
+        if (activeRow && activeRow.dataset.songId !== currentSongId) {
+            activeRow.classList.remove('playing');
+            const idxSpan = activeRow.querySelector('.song-index');
+            const iconSpan = activeRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'inline';
+            if (iconSpan) iconSpan.style.display = 'none';
+        }
+
+        const newRow = songListBody.querySelector(`tr[data-song-id="${currentSongId}"]`);
+        if (newRow && !newRow.classList.contains('playing')) {
+            newRow.classList.add('playing');
+            const idxSpan = newRow.querySelector('.song-index');
+            const iconSpan = newRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'none';
+            if (iconSpan) iconSpan.style.display = 'inline';
+        }
     }
 
     function updateSongTableActiveState() {
-        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length || !songListBody) return;
         const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
+
+        // ⚡ Bolt: O(1) DOM update instead of O(N) querySelectorAll('tr') loop
+        const activeRow = songListBody.querySelector('tr.playing');
+        if (activeRow && activeRow.dataset.songId !== currentSongId) {
+            activeRow.classList.remove('playing');
+            const idxSpan = activeRow.querySelector('.song-index');
+            const iconSpan = activeRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'inline';
+            if (iconSpan) iconSpan.style.display = 'none';
+        }
+
+        const newRow = songListBody.querySelector(`tr[data-song-id="${currentSongId}"]`);
+        if (newRow && !newRow.classList.contains('playing')) {
+            newRow.classList.add('playing');
+            const idxSpan = newRow.querySelector('.song-index');
+            const iconSpan = newRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'none';
+            if (iconSpan) iconSpan.style.display = 'inline';
+        }
     }
 
     let currentRenderIndex = 0;
