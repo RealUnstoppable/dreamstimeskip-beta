@@ -1,0 +1,4 @@
+## 2025-02-27 - Path Traversal via Unsafe Regex Mitigation
+**Vulnerability:** The application attempted to mitigate path traversal using `path.normalize().replace(/^(\.\.[\/\\])+/, '')`, which failed to decode URL-encoded segments (e.g., `%2e%2e%2f`) and didn't prevent absolute path injection or nested traversals.
+**Learning:** `req.path` in Express does not automatically decode URL-encoded slashes (`%2f` or `%5c`). Attackers can bypass naive string-matching filters easily.
+**Prevention:** Always decode the URI component (`decodeURIComponent`), check for and reject null bytes (`\0`), resolve the path safely using `path.resolve` by prefixing a dot to the path (`'.' + reqPath`) to force a relative resolution, and verify the resulting path strictly stays within intended directory boundaries using `.startsWith()`.
