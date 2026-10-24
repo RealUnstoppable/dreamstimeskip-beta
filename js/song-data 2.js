@@ -23620,6 +23620,26 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Cached Map for O(1) lookups. Rebuilt if librarySongs mutates (e.g. via unshift/splice)
+let songIndexMap = null;
+let lastLibraryLength = -1;
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    if (!id) return null;
+
+    if (!songIndexMap || librarySongs.length !== lastLibraryLength) {
+        songIndexMap = new Map();
+        for (let i = 0; i < librarySongs.length; i++) {
+            songIndexMap.set(librarySongs[i].id, librarySongs[i]);
+        }
+        lastLibraryLength = librarySongs.length;
+    }
+
+    let song = songIndexMap.get(id);
+    if (song) return song;
+    song = songIndexMap.get(`top100-${id}`);
+    if (song) return song;
+
+    // The original code's 3rd condition was logically redundant, so it's omitted here.
+    return null;
 }
