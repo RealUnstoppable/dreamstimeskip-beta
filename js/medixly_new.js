@@ -778,45 +778,26 @@ function initHarmonyTunes() {
     function updateSongTableActiveState() {
         if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
         const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
-    }
 
-    function updateSongTableActiveState() {
-        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
-        const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
+        // Remove active state from current
+        const currentActive = songListBody.querySelector('tr.playing');
+        if (currentActive) {
+            currentActive.classList.remove('playing');
+            const idxSpan = currentActive.querySelector('.song-index');
+            const iconSpan = currentActive.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'inline';
+            if (iconSpan) iconSpan.style.display = 'none';
+        }
+
+        // Add active state to new
+        const newActive = songListBody.querySelector(`tr[data-song-id="${currentSongId}"]`);
+        if (newActive) {
+            newActive.classList.add('playing');
+            const idxSpan = newActive.querySelector('.song-index');
+            const iconSpan = newActive.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'none';
+            if (iconSpan) iconSpan.style.display = 'inline';
+        }
     }
 
     let currentRenderIndex = 0;
