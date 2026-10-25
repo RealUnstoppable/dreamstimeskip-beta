@@ -1,3 +1,3 @@
-## 2024-05-24 - [Micro-UX Event Delegation]
-**Learning:** In highly interactive dynamic lists like Lyrics and Spotlight search, repeated event listeners can cause huge memory bloat. Furthermore, modifying DOM instances iteratively inside functions like `renderLyrics()` can create stale closure bugs.
-**Action:** Applied Event Delegation using dataset checks (`dataset.delegated = "true"`) to attach single event listeners on parent containers and check `e.target.closest()`. The listener is attached globally (e.g., inside `initHarmonyTunes`) and reads dependencies like `activeAudio` dynamically at execution time, which decreases listener bloat and runs significantly faster without stale closure issues.
+## 2024-05-24 - O(N) vs O(1) DOM Updates in Active State Management
+**Learning:** Found a severe performance anti-pattern in `js/medixly.js` and `js/medixly_new.js`. The `updateSongTableActiveState` function used `songListBody.querySelectorAll('tr')` and looped through the entire collection to update the class of just two rows. As lists grow large, this causes significant UI thread blocking.
+**Action:** Replace `querySelectorAll` loops with targeted `querySelector` calls on specific classes (`tr.playing`) and dataset attributes (`[data-song-id]`) when only a single item in a large list is changing state.
