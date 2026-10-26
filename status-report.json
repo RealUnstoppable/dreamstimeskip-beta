@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-26T09:49:00.553Z",
+  "timestamp": "2026-10-26T21:04:17.422Z",
   "dateFormatted": "Oct 26, 2026",
   "overallStatus": "Operational",
   "badgeClass": "online",
@@ -14,7 +14,7 @@
     {
       "id": "dreamstimeskip",
       "name": "Dreams TimeSkip",
-      "primaryPage": "dreamstimeskip.html",
+      "primaryPage": "dts.html",
       "status": "Operational",
       "issues": []
     },
@@ -80,6 +80,6 @@
   "operationalCount": 10,
   "offlineCount": 0,
   "maintenanceCount": 0,
-  "durationMs": 439,
-  "allDiscoveredPagesCount": 34
+  "durationMs": 524,
+  "allDiscoveredPagesCount": 35
 }

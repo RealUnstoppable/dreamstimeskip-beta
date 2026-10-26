@@ -47,7 +47,7 @@ describe('navbar', () => {
     const header = document.querySelector('.main-header');
     expect(header.innerHTML).toContain('<nav class="navbar">');
     expect(header.innerHTML).toContain('href="unstoppable.html"');
-    expect(header.innerHTML).toContain('href="dreamstimeskip.html"');
+    expect(header.innerHTML).toContain('href="dts.html"');
   });
 
   it('attaches click event to hamburger menu', () => {

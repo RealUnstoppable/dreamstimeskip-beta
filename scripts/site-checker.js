@@ -40,8 +40,8 @@ export const ECOSYSTEM_SYSTEMS = [
   {
     id: 'dreamstimeskip',
     name: 'Dreams TimeSkip',
-    primaryPage: 'dreamstimeskip.html',
-    pages: ['dreamstimeskip.html', 'dreams-timeskip-first-look.html', 'new-dts.html'],
+    primaryPage: 'dts.html',
+    pages: ['dts.html', 'dreamstimeskip.html', 'dreams-timeskip-first-look.html', 'new-dts.html'],
     scripts: ['js/script.js'],
     styles: ['css/style.css']
   },
@@ -202,7 +202,7 @@ export function checkPageIntegrity(rootDir, relativePagePath) {
     if (shouldIgnoreReference(ref)) continue;
 
     const resolved = resolveLocalPath(rootDir, fullPath, ref);
-    if (!fs.existsSync(resolved)) {
+    if (!fs.existsSync(resolved) && !fs.existsSync(`${resolved}.html`)) {
       // Determine what kind of asset it is
       const ext = path.extname(resolved).toLowerCase();
       const isCritical = ['.js', '.css'].includes(ext);

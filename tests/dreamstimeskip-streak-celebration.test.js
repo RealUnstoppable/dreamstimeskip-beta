@@ -13,12 +13,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
-describe('Dreams TimeSkip (dreamstimeskip.html) Streak Claim Celebration Integration', () => {
+describe('Dreams TimeSkip (dts.html) Streak Claim Celebration Integration', () => {
     let dtsHtml;
     let streakCss;
 
     beforeAll(() => {
-        dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dreamstimeskip.html'), 'utf-8');
+        dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dts.html'), 'utf-8');
         streakCss = fs.readFileSync(path.join(ROOT_DIR, 'css', 'streakCelebration.css'), 'utf-8');
     });
 

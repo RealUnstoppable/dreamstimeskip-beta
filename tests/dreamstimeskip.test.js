@@ -7,8 +7,18 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
 describe('Dreams TimeSkip Launch Portal Integrity', () => {
-    const filePath = path.join(ROOT_DIR, 'dreamstimeskip.html');
+    const filePath = path.join(ROOT_DIR, 'dts.html');
     const html = fs.readFileSync(filePath, 'utf8');
+
+    it('verifies dts.html has canonical URL https://realunstoppable.store/dts and dreamstimeskip.html redirect', () => {
+        expect(html).toContain('<link rel="canonical" href="https://realunstoppable.store/dts">');
+        expect(html).toContain('<meta property="og:url" content="https://realunstoppable.store/dts">');
+
+        const legacyRedirectPath = path.join(ROOT_DIR, 'dreamstimeskip.html');
+        expect(fs.existsSync(legacyRedirectPath)).toBe(true);
+        const redirectHtml = fs.readFileSync(legacyRedirectPath, 'utf8');
+        expect(redirectHtml).toContain('url=/dts');
+    });
 
     it('contains the Phase Two Road to 2027 DTS launch section (#dts)', () => {
         expect(html).toContain('id="dts"');

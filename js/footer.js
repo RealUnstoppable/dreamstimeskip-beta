@@ -19,7 +19,7 @@ export function loadFooter() {
                     <ul>
                         <li><a href="index.html#bento">Overview</a></li>
                         <li><a href="unstoppable.html">Unstoppable</a></li>
-                        <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+                        <li><a href="dts.html">Dreams TimeSkip</a></li>
                         <li><a href="medixly.html">Medixly</a></li>
                         <li><a href="blobgame.html">Squishly (Beta)</a></li>
                     </ul>

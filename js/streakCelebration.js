@@ -890,7 +890,7 @@ export const streakCelebration = new StreakCelebrationController();
 
 /**
  * Universal Flare Celebration Trigger
- * Used across account.html and dreamstimeskip.html
+ * Used across account.html and dts.html (dreamstimeskip)
  */
 export function triggerFlareAnimation(streak, rewardItem, previousStreak = Math.max(0, streak - 1), onCollect = null) {
     const flareModal = document.getElementById('mc-flare-modal');

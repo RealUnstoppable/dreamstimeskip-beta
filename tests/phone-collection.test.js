@@ -12,7 +12,7 @@ describe('Phone Number Collection Across Site & Cancellation/Deactivation Flow',
     beforeAll(() => {
         signinHtml = fs.readFileSync(path.join(ROOT_DIR, 'sign in beta.html'), 'utf-8');
         authJs = fs.readFileSync(path.join(ROOT_DIR, 'js', 'auth.js'), 'utf-8');
-        dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dreamstimeskip.html'), 'utf-8');
+        dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dts.html'), 'utf-8');
         medixlyOnboardingJs = fs.readFileSync(path.join(ROOT_DIR, 'js', 'medixly-onboarding.js'), 'utf-8');
         trackerHtml = fs.readFileSync(path.join(ROOT_DIR, 'tracker.html'), 'utf-8');
         bookingHtml = fs.readFileSync(path.join(ROOT_DIR, 'booking.html'), 'utf-8');
@@ -42,7 +42,7 @@ describe('Phone Number Collection Across Site & Cancellation/Deactivation Flow',
         });
     });
 
-    describe('Dreams TimeSkip Launch Portal (dreamstimeskip.html)', () => {
+    describe('Dreams TimeSkip Launch Portal (dts.html)', () => {
         test('includes phone input in wl-register-form', () => {
             expect(dtsHtml).toContain('id="wl-phone"');
             expect(dtsHtml).toContain('name="phone"');

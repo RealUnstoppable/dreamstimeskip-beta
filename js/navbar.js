@@ -24,7 +24,7 @@ const PRELOADED_NOTIFICATIONS = [
         id: 'pre-2',
         title: '🌌 Dreams TimeSkip — New Update',
         message: 'Explore the latest features in Dreams TimeSkip.',
-        link: 'dreamstimeskip.html',
+        link: 'dts.html',
         isRead: false,
         preloaded: true
     },
@@ -56,7 +56,7 @@ export function loadNavbar() {
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
-            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+            <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li>
@@ -116,7 +116,7 @@ export function loadUdsNavbar() {
         </a>
         <ul class="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
-            <li><a href="dreamstimeskip.html">Dreams TimeSkip</a></li>
+            <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="shop.html">Shop</a></li>
             <li>

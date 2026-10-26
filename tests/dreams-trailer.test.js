@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
 describe('Dreams OG Trailer Integration & High Quality Verification', () => {
-    const dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dreamstimeskip.html'), 'utf8');
+    const dtsHtml = fs.readFileSync(path.join(ROOT_DIR, 'dts.html'), 'utf8');
     const indexHtml = fs.readFileSync(path.join(ROOT_DIR, 'index.html'), 'utf8');
     const trailerVideoPath = path.join(ROOT_DIR, 'video/dreams-trailer.mp4');
 
@@ -19,7 +19,7 @@ describe('Dreams OG Trailer Integration & High Quality Verification', () => {
         expect(stats.size).toBe(9997745);
     });
 
-    it('ensures dreamstimeskip.html references the trailer modal, video source, and open triggers', () => {
+    it('ensures dts.html references the trailer modal, video source, and open triggers', () => {
         expect(dtsHtml).toContain('id="trailer-modal"');
         expect(dtsHtml).toContain('/video/dreams-trailer.mp4');
         expect(dtsHtml).toContain('open-trailer-trigger');
