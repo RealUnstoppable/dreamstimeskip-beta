@@ -1034,24 +1034,27 @@ function initHarmonyTunes() {
     // --- RENDERING TABLE (Fixed Duration Bug) ---
     function updateSongTableActiveState() {
         if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
+
+        // Remove active state from current playing row (O(1))
+        const activeRow = songListBody.querySelector('tr.playing');
+        if (activeRow) {
+            activeRow.classList.remove('playing');
+            const idxSpan = activeRow.querySelector('.song-index');
+            const iconSpan = activeRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'inline';
+            if (iconSpan) iconSpan.style.display = 'none';
+        }
+
+        // Add active state to new playing row (O(1))
         const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
+        const newRow = songListBody.querySelector(`tr[data-song-id="${currentSongId}"]`);
+        if (newRow) {
+            newRow.classList.add('playing');
+            const idxSpan = newRow.querySelector('.song-index');
+            const iconSpan = newRow.querySelector('.playing-icon');
+            if (idxSpan) idxSpan.style.display = 'none';
+            if (iconSpan) iconSpan.style.display = 'inline';
+        }
     }
 
     let currentRenderIndex = 0;
