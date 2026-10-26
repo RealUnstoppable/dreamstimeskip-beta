@@ -496,7 +496,7 @@ function initHarmonyTunes() {
                 </div>
                 ${optionsHtml}
                 <span class="spotlight-result-play">▶</span>
-                <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options">...</button>
+                <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>
             </div>
         `}).join('');
     }
