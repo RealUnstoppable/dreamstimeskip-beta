@@ -405,7 +405,7 @@ function initHarmonyTunes() {
                 </div>
                 ${optionsHtml}
                 <span class="spotlight-result-play">▶</span>
-                <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options">...</button>
+                <button class="card-more-btn" style="background:transparent;border:none;color:#fff;padding:0 10px;font-size:16px;cursor:pointer;" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>
             </div>
         `}).join('');
 
@@ -1090,7 +1090,7 @@ function initHarmonyTunes() {
                 <td style="color: #888;">${escapeHTML(song.tags && song.tags.length > 0 ? song.tags[0].charAt(0).toUpperCase() + song.tags[0].slice(1) : "Pop")}</td>
                 <td style="text-align: right;">${escapeHTML(song.duration)}</td>
                 <td style="width: 40px; text-align: center;">
-                    <button class="card-more-btn" style="background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;" title="More Options">...</button>
+                    <button class="card-more-btn" style="background:transparent;border:none;color:#fff;font-size:16px;cursor:pointer;" title="More Options" aria-label="More options for ${escapeHTML(group.baseTitle)}">...</button>
                 </td>
             `;
 
