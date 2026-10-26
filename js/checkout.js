@@ -32,7 +32,7 @@ function renderCheckoutPage() {
                 <div style="font-size: 3.5rem; margin-bottom: 15px;">🛒</div>
                 <h1 style="color: #fff; font-size: 1.8rem; margin-bottom: 10px;">Your Cart is Empty</h1>
                 <p style="color: var(--text-secondary, #888); margin-bottom: 25px;">Looks like you haven't added any gear or accessories yet.</p>
-                <a href="/shop.html" class="place-order-button" style="display: inline-block; width: auto; padding: 12px 28px; text-decoration: none; margin-top: 0;">Explore the Shop &rarr;</a>
+                <a href="/store.html" class="place-order-button" style="display: inline-block; width: auto; padding: 12px 28px; text-decoration: none; margin-top: 0;">Explore the Shop &rarr;</a>
             </div>
         `;
         return;
@@ -54,7 +54,7 @@ function renderCheckoutPage() {
     checkoutContainer.innerHTML = `
         <div class="checkout-top-header">
             <div class="checkout-brand-title">
-                <a href="/shop.html" style="color: var(--text-secondary, #aaa); text-decoration: none; font-size: 1rem; display: flex; align-items: center; gap: 6px;">&larr; Back to Shop</a>
+                <a href="/store.html" style="color: var(--text-secondary, #aaa); text-decoration: none; font-size: 1rem; display: flex; align-items: center; gap: 6px;">&larr; Back to Shop</a>
                 <span style="color: rgba(255,255,255,0.2);">|</span>
                 <h1>Secure Checkout</h1>
             </div>
@@ -656,7 +656,7 @@ export async function handlePlaceOrder(e) {
                 </div>
 
                 <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                    <a href="shop.html" class="place-order-button" style="text-decoration: none; display: inline-block; padding: 12px 26px; width: auto; margin-top: 0;">Continue Shopping &rarr;</a>
+                    <a href="store.html" class="place-order-button" style="text-decoration: none; display: inline-block; padding: 12px 26px; width: auto; margin-top: 0;">Continue Shopping &rarr;</a>
                     <a href="account.html#orders" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 12px; display: inline-block; font-weight: 600; transition: all 0.2s;">View Order History</a>
                 </div>
             </div>

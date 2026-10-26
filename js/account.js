@@ -400,7 +400,7 @@ export async function renderOrders(user) {
                     <div style="font-size: 2.5rem; margin-bottom: 12px;">🛍️</div>
                     <h4 style="margin: 0 0 8px 0; color: #fff;">No Orders Yet</h4>
                     <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 20px;">You haven't placed any merchandise orders. Browse our store to unlock exclusive gear and earn 10 points for every dollar spent!</p>
-                    <a href="shop.html" class="btn btn-primary" style="display: inline-block;">Browse Shop →</a>
+                    <a href="store.html" class="btn btn-primary" style="display: inline-block;">Browse Shop →</a>
                 </div>
             `;
             return;
@@ -1998,7 +1998,7 @@ export async function loadWishlist(userId) {
                     <div style="font-size: 2.5rem; margin-bottom: 12px;">❤️</div>
                     <h4 style="margin: 0 0 8px 0; color: #fff;">Your Wishlist is Empty</h4>
                     <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 20px;">Save your favorite apparel, posters, and collectibles to revisit anytime.</p>
-                    <a href="shop.html" class="btn btn-primary">Explore Shop →</a>
+                    <a href="store.html" class="btn btn-primary">Explore Shop →</a>
                 </div>
             `;
             return;

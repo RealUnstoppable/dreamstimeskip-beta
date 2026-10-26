@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-26T21:04:17.422Z",
+  "timestamp": "2026-10-26T23:35:04.055Z",
   "dateFormatted": "Oct 26, 2026",
   "overallStatus": "Operational",
   "badgeClass": "online",
@@ -42,7 +42,7 @@
     {
       "id": "shop",
       "name": "Unstoppable Shop",
-      "primaryPage": "shop.html",
+      "primaryPage": "store.html",
       "status": "Operational",
       "issues": []
     },
@@ -80,6 +80,6 @@
   "operationalCount": 10,
   "offlineCount": 0,
   "maintenanceCount": 0,
-  "durationMs": 524,
-  "allDiscoveredPagesCount": 35
+  "durationMs": 454,
+  "allDiscoveredPagesCount": 36
 }

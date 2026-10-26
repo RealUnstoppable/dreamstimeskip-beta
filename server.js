@@ -69,6 +69,7 @@ app.use(async (req, res, next) => {
   let reqPath = req.path;
   if (reqPath === '/') reqPath = '/index.html';
   if (reqPath === '/dts') reqPath = '/dts.html';
+  if (reqPath === '/store') reqPath = '/store.html';
   
   if (reqPath.endsWith('.html')) {
     try {

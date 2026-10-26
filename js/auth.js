@@ -143,7 +143,7 @@ if (document.getElementById('auth-form')) {
 
                 sessionStorage.setItem('newUser', 'true');
                 const redirectParam = urlParams.get('redirect');
-                const allowedRedirects = ['medixly.html', 'index.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
+                const allowedRedirects = ['medixly.html', 'index.html', 'store.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
                 const cleanParam = redirectParam ? redirectParam.replace(/^\/+/, '') : '';
                 const destination = (cleanParam && allowedRedirects.includes(cleanParam)) ? cleanParam : 'account.html';
                 window.location.replace(destination);
@@ -153,7 +153,7 @@ if (document.getElementById('auth-form')) {
 
                 if (userDoc.exists() && !userDoc.data().isBanned) {
                     const redirectParam = urlParams.get('redirect');
-                    const allowedRedirects = ['medixly.html', 'index.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
+                    const allowedRedirects = ['medixly.html', 'index.html', 'store.html', 'shop.html', 'memberships.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'];
                     const cleanParam = redirectParam ? redirectParam.replace(/^\/+/, '') : '';
                     let destination = userDoc.data().isAdmin ? 'admin.html' : 'account.html';
                     if (cleanParam && !userDoc.data().isAdmin && allowedRedirects.includes(cleanParam)) {

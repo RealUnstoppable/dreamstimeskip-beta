@@ -45,7 +45,7 @@ export function loadFooter() {
                     <ul>
                         <li><a href="about.html">About Us</a></li>
                         <li><a href="blog.html">Blog</a></li>
-                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="store.html">Shop</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="terms.html">Terms of Service</a></li>

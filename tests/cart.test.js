@@ -54,7 +54,7 @@ describe('Dedicated High-Converting Cart Page & Conversion UX Standards', () => 
     it('contains unmistakable primary checkout CTA and secondary continue shopping link', () => {
         expect(cartHtml).toContain('id="cart-checkout-btn"');
         expect(cartHtml).toContain('href="checkout.html"');
-        expect(cartHtml).toContain('href="shop.html"');
+        expect(cartHtml).toContain('href="store.html"');
         expect(cartHtml).toContain('Continue Shopping');
         expect(cartHtml).toContain('data-telemetry-cta="checkout"');
     });
@@ -350,11 +350,14 @@ describe('Lexi Chatbot Cart Routing Integration', () => {
         expect(chatbotJs).toContain("window.location.href = 'https://realunstoppable.store/cart.html'");
     });
 
-    it('verifies shop.html and js/shop.js route cart buttons to cart.html', () => {
-        const shopHtml = fs.readFileSync(path.join(ROOT_DIR, 'shop.html'), 'utf8');
+    it('verifies store.html and js/shop.js route cart buttons to cart.html, and shop.html redirects', () => {
+        const storeHtml = fs.readFileSync(path.join(ROOT_DIR, 'store.html'), 'utf8');
         const shopJs = fs.readFileSync(path.join(ROOT_DIR, 'js/shop.js'), 'utf8');
 
-        expect(shopHtml).toContain('href="cart.html"');
+        expect(storeHtml).toContain('href="cart.html"');
         expect(shopJs).toContain("window.location.href = 'cart.html'");
+
+        const shopHtml = fs.readFileSync(path.join(ROOT_DIR, 'shop.html'), 'utf8');
+        expect(shopHtml).toContain('url=/store');
     });
 });

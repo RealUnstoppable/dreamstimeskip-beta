@@ -72,8 +72,8 @@ export const ECOSYSTEM_SYSTEMS = [
   {
     id: 'shop',
     name: 'Unstoppable Shop',
-    primaryPage: 'shop.html',
-    pages: ['shop.html', 'cart.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'],
+    primaryPage: 'store.html',
+    pages: ['store.html', 'shop.html', 'cart.html', 'checkout.html', 'checkout-premium.html', 'checkout-ultimate.html'],
     scripts: ['js/shop.js', 'js/cart.js', 'js/products-data.js', 'js/cart-utils.js'],
     styles: ['css/style.css']
   },

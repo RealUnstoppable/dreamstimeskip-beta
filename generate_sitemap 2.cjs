@@ -17,7 +17,8 @@ const excludeList = [
 
 const priorityMap = {
     'index.html': '1.0',
-    'shop.html': '0.9',
+    'store.html': '0.9',
+    'shop.html': '0.5',
     'harmonytunes.html': '0.9',
     'dts.html': '0.9',
     'dreamstimeskip.html': '0.5',

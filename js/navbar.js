@@ -58,7 +58,7 @@ export function loadNavbar() {
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
-            <li><a href="shop.html">Shop</a></li>
+            <li><a href="store.html">Shop</a></li>
             <li>
                 <a href="cart.html" id="nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
                     <span>Cart</span>
@@ -118,7 +118,7 @@ export function loadUdsNavbar() {
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
-            <li><a href="shop.html">Shop</a></li>
+            <li><a href="store.html">Shop</a></li>
             <li>
                 <a href="cart.html" id="uds-nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
                     <span>Cart</span>

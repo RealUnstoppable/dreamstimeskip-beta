@@ -1164,7 +1164,7 @@ export function initChatbot() {
 
                 if (hasShopToken) {
                     const shopBtn = document.createElement('a');
-                    shopBtn.href = 'shop.html';
+                    shopBtn.href = 'store.html';
                     shopBtn.className = 'chat-shop-btn';
                     shopBtn.textContent = 'Explore Shop →';
                     actionGroup.appendChild(shopBtn);

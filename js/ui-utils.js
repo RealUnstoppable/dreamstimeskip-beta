@@ -102,7 +102,7 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
                         <div style="color: var(--text-secondary); font-size: 0.9rem;">$${product.price.toFixed(2)}</div>
                     </div>
                 </div>
-                <button onclick="window.location.href='shop.html'" style="padding: 5px 10px; background: var(--accent-color); color: #fff; border: none; border-radius: 4px; cursor: pointer;">View Shop</button>
+                <button onclick="window.location.href='store.html'" style="padding: 5px 10px; background: var(--accent-color); color: #fff; border: none; border-radius: 4px; cursor: pointer;">View Shop</button>
             </div>
         `;
     }
