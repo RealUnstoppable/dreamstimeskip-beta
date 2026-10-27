@@ -6,12 +6,21 @@ service cloud.firestore {
     // Assumed Data Model & Access Control
     // ===============================================================
     //
-    // Collection: users/{uid}
-    //   - First-party user profile & telemetry summary
-    //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
+    // Collection: users/{userId}
+    //   - User profile document containing identity (username, email, phone, photoURL), display preferences (theme, accentColor),
+    //     security settings (twoFactorEnabled, twoFactorMethod), and social/gaming profiles (minecraft, discord, etc.).
+    //   - Access control:
+    //       * read: Authenticated owner (request.auth.uid == userId) or admin (isAdmin()).
+    //       * create: Authenticated owner (request.auth.uid == userId) ensuring unprivileged defaults
+    //                 (isAdmin == false, isBanned == false, membershipLevel == 'free', and no protected keys:
+    //                 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance') or admin (isAdmin()).
+    //       * update: Authenticated owner (request.auth.uid == userId) preserving protected fields
+    //                 (!affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
+    //                 or admin (isAdmin()).
+    //       * delete: Admin only (isAdmin()).
     //
-    // Subcollection: users/{uid}/consents/{consentId}
-    //   - Immutable consent ledger records
+    // Subcollection: users/{userId}/consents/{consentId}
+    //   - Immutable consent ledger records tracking privacy choices & policy acceptance
     //   - Direct client SDK access: Locked down (writes disabled; reads admin-only)
     //
     // Collection: sessions/{sessionId}
@@ -40,15 +49,31 @@ service cloud.firestore {
     }
 
     // ===============================================================
-    // Telemetry and Consent Ledger Collections
-    // All writes occur exclusively via the trusted Admin SDK backend endpoint.
-    // Client SDK reads are restricted: disallowed for general users, accessible only by authenticated admins.
+    // User Profiles & Preferences Collection
+    // Allows users to manage their own profile and display preferences (theme, accentColor, socials).
+    // Privileged fields (isAdmin, isBanned, membershipLevel, plan, subscription, loyaltyPoints, pointsBalance)
+    // are strictly locked against unauthorized client-side creation or modification.
     // ===============================================================
 
-    match /users/{uid} {
-      allow read: if isAdmin();
-      allow write: if false;
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && (
+        (request.auth.uid == userId
+         && request.resource.data.get('isAdmin', false) == false
+         && request.resource.data.get('isBanned', false) == false
+         && request.resource.data.get('membershipLevel', 'free') == 'free'
+         && !request.resource.data.keys().hasAny(['plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
+        || isAdmin()
+      );
+      allow update: if request.auth != null && (
+        (request.auth.uid == userId
+         && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin', 'isBanned', 'membershipLevel', 'plan', 'subscription', 'loyaltyPoints', 'pointsBalance']))
+        || isAdmin()
+      );
+      allow delete: if isAdmin();
 
+      // Nested consents subcollection: Immutable consent ledger records
+      // All writes occur exclusively via the trusted backend. Client SDK reads are restricted to admin only.
       match /consents/{consentId} {
         allow read: if isAdmin();
         allow write: if false;

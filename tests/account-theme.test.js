@@ -38,4 +38,19 @@ describe('Appearance & Themes Settings in account.html', () => {
         expect(accountJs).toContain("defaultAccent = '#2563EB'");
         expect(accountJs).toContain('Theme preferences reset to default successfully!');
     });
+
+    test('js/account.js persists theme settings using merge to ensure robust profile updates', () => {
+        const accountJs = fs.readFileSync(path.join(ROOT_DIR, 'js', 'account.js'), 'utf-8');
+        expect(accountJs).toContain('theme-settings-form');
+        expect(accountJs).toMatch(/setDoc\(doc\(db,\s*"users",\s*user\.uid\),\s*\{\s*theme,\s*accentColor\s*\},\s*\{\s*merge:\s*true\s*\}\)/);
+        expect(accountJs).toContain('Theme preferences updated successfully!');
+    });
+
+    test('firestore.rules permits users to read and update their user profile while protecting admin fields', () => {
+        const firestoreRules = fs.readFileSync(path.join(ROOT_DIR, 'firestore.rules'), 'utf-8');
+        expect(firestoreRules).toContain('match /users/{userId}');
+        expect(firestoreRules).toContain('request.auth.uid == userId');
+        expect(firestoreRules).toContain('isAdmin()');
+        expect(firestoreRules).toMatch(/allow update: if request\.auth != null && \(\s*\(request\.auth\.uid == userId/);
+    });
 });

@@ -3058,15 +3058,23 @@ export function initAccountPage() {
             }
 
             try {
-                await updateDoc(doc(db, "users", user.uid), { theme, accentColor });
-                userData.theme = theme;
-                userData.accentColor = accentColor;
-                sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+                if (user?.uid) {
+                    await setDoc(doc(db, "users", user.uid), { theme, accentColor }, { merge: true });
+                }
+                if (userData) {
+                    userData.theme = theme;
+                    userData.accentColor = accentColor;
+                    sessionStorage.setItem(`profile_${user.uid}`, JSON.stringify(userData));
+                }
 
                 document.body.dataset.theme = theme;
                 document.documentElement.style.setProperty('--accent-color', accentColor);
                 localStorage.setItem('userTheme', theme);
                 localStorage.setItem('userAccent', accentColor);
+
+                if (typeof window.updateTheme === 'function') {
+                    window.updateTheme(theme, accentColor);
+                }
 
                 if (notificationEl) {
                     notificationEl.textContent = 'Theme preferences updated successfully!';
@@ -3110,10 +3118,10 @@ export function initAccountPage() {
 
             try {
                 if (user?.uid) {
-                    await updateDoc(doc(db, "users", user.uid), {
+                    await setDoc(doc(db, "users", user.uid), {
                         theme: defaultTheme,
                         accentColor: defaultAccent
-                    });
+                    }, { merge: true });
                     if (userData) {
                         userData.theme = defaultTheme;
                         userData.accentColor = defaultAccent;
