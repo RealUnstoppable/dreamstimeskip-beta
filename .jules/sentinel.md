@@ -1,0 +1,4 @@
+## 2025-02-27 - [CRITICAL] Fix Path Traversal in File Download
+**Vulnerability:** Path traversal vulnerability in `server.js` allowing arbitrary file reading outside the intended application directory.
+**Learning:** The previous implementation relied on a flawed regex (`replace(/^(\.\.[\/\\])+/, '')`) that only stripped leading traversal sequences. This could easily be bypassed with crafted payloads (e.g., `/valid-folder/../../etc/passwd`). Furthermore, URL-encoded path segments were not properly decoded before normalization, presenting another bypass opportunity.
+**Prevention:** Always decode the URI component (`decodeURIComponent()`), check for and reject null bytes (`\0`), resolve the path to an absolute location (`path.resolve()`), and strictly enforce directory boundaries (e.g., `if (!filePath.startsWith(__dirname + path.sep) && filePath !== __dirname)`). Never rely on regex-based string replacements for path sanitization.
