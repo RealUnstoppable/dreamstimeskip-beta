@@ -74,8 +74,24 @@ app.use(async (req, res, next) => {
   if (reqPath.endsWith('.html')) {
     try {
       // Security: prevent directory traversal
-      const normalizedPath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
-      const filePath = path.join(__dirname, normalizedPath);
+      let decodedPath;
+      try {
+        decodedPath = decodeURIComponent(reqPath);
+      } catch (e) {
+        return res.status(400).send('Bad Request');
+      }
+
+      if (decodedPath.indexOf('\0') !== -1) {
+        return res.status(400).send('Bad Request');
+      }
+
+      const relativePath = decodedPath.startsWith('/') ? '.' + decodedPath : decodedPath;
+      const filePath = path.resolve(__dirname, relativePath);
+
+      if (!filePath.startsWith(__dirname + path.sep) && filePath !== __dirname) {
+        return res.status(403).send('Forbidden');
+      }
+
       let html = await fs.readFile(filePath, 'utf8');
       
       const cookies = parseCookies(req);
