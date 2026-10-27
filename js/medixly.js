@@ -1221,38 +1221,11 @@ function initHarmonyTunes() {
     function updateSongTableActiveState() {
         if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
         const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
-                row.classList.remove('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'inline';
-                if(iconSpan) iconSpan.style.display = 'none';
-            }
-        });
-    }
 
-    function updateSongTableActiveState() {
-        if (!currentQueue || currentSongIndex < 0 || currentSongIndex >= currentQueue.length) return;
-        const currentSongId = currentQueue[currentSongIndex].id;
-        const rows = songListBody.querySelectorAll('tr');
-        rows.forEach(row => {
-            const isMatch = row.dataset.songId === currentSongId;
-            if (isMatch) {
-                row.classList.add('playing');
-                const idxSpan = row.querySelector('.song-index');
-                const iconSpan = row.querySelector('.playing-icon');
-                if(idxSpan) idxSpan.style.display = 'none';
-                if(iconSpan) iconSpan.style.display = 'inline';
-            } else {
+        // ⚡ Bolt: O(1) targeted DOM updates instead of O(N) querySelectorAll loop
+        const oldActiveRows = songListBody.querySelectorAll('tr.playing');
+        oldActiveRows.forEach(row => {
+            if (row.dataset.songId !== currentSongId) {
                 row.classList.remove('playing');
                 const idxSpan = row.querySelector('.song-index');
                 const iconSpan = row.querySelector('.playing-icon');
@@ -1260,6 +1233,15 @@ function initHarmonyTunes() {
                 if(iconSpan) iconSpan.style.display = 'none';
             }
         });
+
+        const newActiveRow = songListBody.querySelector(`tr[data-song-id="${currentSongId}"]`);
+        if (newActiveRow && !newActiveRow.classList.contains('playing')) {
+            newActiveRow.classList.add('playing');
+            const idxSpan = newActiveRow.querySelector('.song-index');
+            const iconSpan = newActiveRow.querySelector('.playing-icon');
+            if(idxSpan) idxSpan.style.display = 'none';
+            if(iconSpan) iconSpan.style.display = 'inline';
+        }
     }
 
     let currentRenderIndex = 0;
