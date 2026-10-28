@@ -29345,9 +29345,43 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Pre-computed Maps for O(1) lookups to avoid O(N) Array.find on every getSongById call
+let _songMap = null;
+let _top100BaseMap = null;
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+
+    // Lazy initialization in case array is populated/modified after initial load
+    // Use an explicit length tracker since duplicate IDs would cause _songMap.size to not equal librarySongs.length
+    if (!_songMap || _lastLibraryLength !== librarySongs.length) {
+        _songMap = new Map();
+        _top100BaseMap = new Map();
+        _lastLibraryLength = librarySongs.length;
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            if (!_songMap.has(song.id)) {
+                _songMap.set(song.id, song);
+            }
+
+            // Replicate: librarySongs.find(song => song.id.replace(/^top100-/, '') === id)
+            // By storing the first occurrence of each base ID
+            const baseId = song.id.startsWith('top100-') ? song.id.substring(7) : song.id;
+            if (!_top100BaseMap.has(baseId)) {
+                _top100BaseMap.set(baseId, song);
+            }
+        }
+    }
+
+    let song = _songMap.get(id);
+    if (song) return song;
+
+    song = _songMap.get(`top100-${id}`);
+    if (song) return song;
+
+    song = _top100BaseMap.get(id);
+    if (song) return song;
+
+    return null;
 }

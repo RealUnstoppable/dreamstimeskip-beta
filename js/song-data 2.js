@@ -23620,6 +23620,28 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Pre-computed Maps for O(1) lookups to avoid O(N) Array.find on every getSongById call
+let _songMap = null;
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    if (!id) return null;
+
+    // Lazy initialization in case array is populated/modified after initial load
+    // Use an explicit length tracker since duplicate IDs would cause _songMap.size to not equal librarySongs.length
+    if (!_songMap || _lastLibraryLength !== librarySongs.length) {
+        _songMap = new Map();
+        _lastLibraryLength = librarySongs.length;
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            if (!_songMap.has(song.id)) {
+                _songMap.set(song.id, song);
+            }
+        }
+    }
+
+    let song = _songMap.get(id);
+    if (song) return song;
+
+    return null;
 }
