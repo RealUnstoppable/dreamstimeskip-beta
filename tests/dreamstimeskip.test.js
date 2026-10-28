@@ -20,6 +20,31 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         expect(redirectHtml).toContain('url=/dts');
     });
 
+    it('verifies dreamstimeskip.html and dts.html SEO metadata and JSON-LD schema markup', () => {
+        const legacyRedirectPath = path.join(ROOT_DIR, 'dreamstimeskip.html');
+        const redirectHtml = fs.readFileSync(legacyRedirectPath, 'utf8');
+
+        // dreamstimeskip.html SEO head & h1 optimizations
+        expect(redirectHtml).toContain('Dreams TimeSkip (DreamsTimeskip)');
+        expect(redirectHtml).toContain('<meta name="robots" content="index, follow">');
+        expect(redirectHtml).toContain('<link rel="canonical" href="https://realunstoppable.store/dreamstimeskip.html">');
+        expect(redirectHtml).toContain('"@type": "WebPage"');
+        expect(redirectHtml).toContain('"alternateName": "DreamsTimeskip"');
+        expect(redirectHtml).toContain('<h1>Dreams TimeSkip — Season OG</h1>');
+
+        // dts.html SEO head & structured data optimizations
+        expect(html).toContain('Dreams TimeSkip (DreamsTimeskip)');
+        expect(html).toContain('<meta name="robots" content="index, follow">');
+        expect(html).toContain('"@type": "WebPage"');
+        expect(html).toContain('"name": "Dreams TimeSkip"');
+        expect(html).toContain('"alternateName": "DreamsTimeskip"');
+
+        // index.html homepage link and title checks
+        const indexHtml = fs.readFileSync(path.join(ROOT_DIR, 'index.html'), 'utf8');
+        expect(indexHtml).toContain('Dreams TimeSkip Official Page');
+        expect(indexHtml).not.toContain('<title>DreamsTimeskip Hub');
+    });
+
     it('contains the Phase Two Road to 2027 DTS launch section (#dts)', () => {
         expect(html).toContain('id="dts"');
         expect(html).toContain('class="video-hero-container"');
