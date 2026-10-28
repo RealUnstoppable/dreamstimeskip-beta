@@ -55,7 +55,7 @@
         }
         @media (min-width: 1024px) {
             .bento-layout {
-                grid-template-columns: 200px 1fr 300px; /* Left Nav (20%), Main Content (60%), Right Ad Rail (20%) */
+                grid-template-columns: 220px 1fr;
             }
         }
         
@@ -112,33 +112,16 @@
             height: fit-content;
         }
 
-        /* Ad Containers with explicit dimensions to prevent CLS */
+        /* Native Responsive Ad Placement */
         .ad-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #eaeaea;
-            border: 2px dashed #bbb;
-            margin: 20px 0;
+            background-color: transparent;
+            margin: 24px auto;
             overflow: hidden;
             position: relative;
         }
-        .ad-container::before {
-            content: 'Ad Space (' attr(class) ')';
-            color: #888;
-            font-family: monospace;
-            font-size: 14px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none; /* Let clicks pass through to the real ad */
-        }
-        /* Hide the long class names and just show a generic Ad string */
-        .ad-top-banner::before { content: 'Advertisement (728x90)'; }
-        .ad-right-rail::before { content: 'Advertisement (300x600)'; }
-        .ad-in-feed::before { content: 'Advertisement (300x250)'; }
-        .ad-mobile-sticky::before { content: 'Advertisement Mobile (320x50)'; }
         
         .ad-container > div {
             position: relative;
@@ -288,21 +271,7 @@
 
     <header class="main-header"></header>
 
-    <!-- AD_SLOT_START -->
-    <section class="site-ad-section" style="max-width: 1200px; margin: 30px auto 20px; padding: 0 20px;" aria-label="Sponsored Content">
-        <div class="site-ad-label">Advertisement</div>
-        <div class="ad-container ad-top-banner">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-4254213062632381"
-                 data-ad-slot="9876543210"
-                 data-ad-format="horizontal"
-                 data-full-width-responsive="true"></ins>
-        </div>
-    </section>
-    <!-- AD_SLOT_END -->
-
-    <main class="bento-layout">
+    <main class="bento-layout" style="padding-top: 100px;">
         
         <!-- Left Navigation Rail -->
         <aside class="bento-left-rail">
@@ -370,33 +339,7 @@
 
             <section id="comments-section" class="blog-comments" data-post-id="the-philosophy-behind-unstoppable-more-than-a-brand" style="margin-top: 60px; border-top: 1px solid var(--border-color); padding-top: 20px;"></section>
         </article>
-
-        <!-- Right Ad Rail (20%) -->
-        <aside class="bento-right-rail">
-            <!-- AD_SLOT_START -->
-            <div class="ad-rail-wrapper" style="position: sticky; top: 100px;">
-                <div class="site-ad-label" style="text-align: center; margin-bottom: 6px;">Advertisement</div>
-                <div class="ad-container ad-right-rail">
-                    <ins class="adsbygoogle"
-                         style="display:inline-block;width:300px;height:600px"
-                         data-ad-client="ca-pub-4254213062632381"
-                         data-ad-slot="9876543210"></ins>
-                </div>
-            </div>
-            <!-- AD_SLOT_END -->
-        </aside>
-
     </main>
-    
-    <!-- Mobile Sticky Ad -->
-    <!-- AD_SLOT_START -->
-    <div class="ad-container ad-mobile-sticky" aria-label="Advertisement">
-        <ins class="adsbygoogle"
-             style="display:inline-block;width:320px;height:50px"
-             data-ad-client="ca-pub-4254213062632381"
-             data-ad-slot="9876543210"></ins>
-    </div>
-    <!-- AD_SLOT_END -->
 
     <!-- SOC 2 Compliant Consent Management Platform (CMP) Banner -->
     <div id="cmp-banner">

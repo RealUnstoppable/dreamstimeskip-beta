@@ -1,54 +1,347 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | DTS HUB</title>
+    <title>Medixly: How We Find the Internet's Biggest Hits | DTS HUB</title>
+    <meta name="description" content="Discover the data science, Web Audio engineering, and human curation workflows behind Medixly, the streaming discovery platform in the Unstoppable ecosystem.">
+    <link rel="canonical" href="https://realunstoppable.store/medixly-hits.html">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/blog.css">
-    <link rel="stylesheet" href="/css/the-philosophy-behind-unstoppable-more-than-a-brand.css">
     <link rel="stylesheet" href="/css/themes.css">
-</head>
+    
+    <!-- E-E-A-T Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Medixly: How We Find the Internet's Biggest Hits",
+      "author": {
+        "@type": "Person",
+        "name": "Catalin Andrian",
+        "url": "https://realunstoppable.store/about.html"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "DreamsTimeSkip Hub",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://realunstoppable.store/images/Pencil-1-logo-light.png"
+        }
+      },
+      "datePublished": "2026-10-18T10:00:00+00:00",
+      "dateModified": "2026-10-27T12:00:00+00:00"
+    }
+    </script>
 
+    <!-- Google AdSense Account & Async Script -->
+    <meta name="google-adsense-account" content="ca-pub-4254213062632381">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
+
+    <style>
+        .bento-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        @media (min-width: 1024px) {
+            .bento-layout {
+                grid-template-columns: 240px 1fr;
+            }
+        }
+        
+        .bento-left-rail {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            .bento-left-rail {
+                display: block;
+                border-right: 1px solid var(--border-color);
+                padding-right: 20px;
+                position: sticky;
+                top: 100px;
+                height: fit-content;
+            }
+            .bento-left-rail h4 {
+                font-size: 1.05rem;
+                margin-bottom: 15px;
+                color: var(--text-primary);
+            }
+            .bento-left-rail ul {
+                list-style: none;
+                padding: 0;
+            }
+            .bento-left-rail ul li {
+                margin-bottom: 12px;
+            }
+            .bento-left-rail ul li a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                font-size: 0.92rem;
+                line-height: 1.4;
+                display: block;
+                transition: color 0.2s;
+            }
+            .bento-left-rail ul li a:hover {
+                color: var(--accent-blue, #2563EB);
+            }
+        }
+
+        .bento-main-content {
+            background-color: var(--bg-secondary, rgba(255, 255, 255, 0.02));
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            font-size: 1.08rem;
+            line-height: 1.85;
+            color: var(--text-primary);
+        }
+        
+        .bento-main-content h1 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .bento-main-content h2 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            margin-top: 45px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            padding-bottom: 8px;
+        }
+
+        .bento-main-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .bento-main-content p {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .bento-main-content ul, .bento-main-content ol {
+            margin: 0 0 24px 24px;
+            color: var(--text-primary);
+        }
+
+        .bento-main-content li {
+            margin-bottom: 8px;
+        }
+
+        .bento-main-content blockquote {
+            border-left: 4px solid #ec4899;
+            margin: 25px 0;
+            padding: 15px 20px;
+            background: rgba(236, 72, 153, 0.08);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: var(--text-primary);
+        }
+
+        .author-bio {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+            border-radius: 12px;
+            margin: 25px 0 35px;
+            border-left: 4px solid #ec4899;
+        }
+        .author-bio img {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ec4899;
+        }
+        .author-bio-text h4 {
+            margin: 0 0 4px 0;
+            font-size: 1.15rem;
+            color: var(--text-primary);
+        }
+        .author-bio-text p {
+            margin: 0;
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 1px solid var(--border-color, #444);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #ec4899;
+        }
+
+        .tech-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .tech-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .tech-card h4 {
+            margin: 0 0 8px;
+            font-size: 1.05rem;
+            color: #ec4899;
+            font-weight: 700;
+        }
+        .tech-card p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+    </style>
+</head>
 <body>
 
     <header class="main-header"></header>
 
-    <main class="blog-main">
-        <section class="blog-header">
+    <main class="bento-layout" style="padding-top: 100px;">
+        
+        <!-- Left Table of Contents Rail -->
+        <aside class="bento-left-rail">
+            <h4>Table of Contents</h4>
+            <ul>
+                <li><a href="#discovery-shift">1. The Shift in Music Discovery</a></li>
+                <li><a href="#hybrid-curation">2. The Hybrid Curation Engine</a></li>
+                <li><a href="#web-audio">3. Web Audio Architecture & EQ</a></li>
+                <li><a href="#artist-first">4. Supporting Independent Artists</a></li>
+                <li><a href="#future-features">5. Next Frontiers: AI Stems & Mobile</a></li>
+                <li><a href="#conclusion">6. The Philosophy of Frictionless Sound</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Editorial Content -->
+        <article class="bento-main-content">
+            <a href="blog.html" class="back-button">&larr; Back to All Blogs</a>
+
             <h1>Medixly: How We Find the Internet's Biggest Hits</h1>
-            <h3>Every day, our TikTok is filled with the tracks you can't get out of your head. But how do we do it? Our
-                process is a mix of algorithmic analysis and human curation. With the official Medixly app
-                launching next year, we're excited to give you even more control over your daily dose of music...</h3>
-        </section>
-        <button class="back-button" onclick="window.history.back();"> &larr; Back to Blog</button>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: -6px;">Published on October 18, 2026 &bull; Updated October 27, 2026 &bull; 8 min read</p>
 
+            <div class="author-bio">
+                <img src="/images/Pencil-1-logo-light.png" alt="Catalin Andrian">
+                <div class="author-bio-text">
+                    <h4>Catalin Andrian</h4>
+                    <p>Founder & Lead Developer of Medixly. Audio software engineer researching browser-based digital signal processing, spatial audio, and music recommendation systems.</p>
+                </div>
+            </div>
+
+            <p>Every single day, hundreds of thousands of new audio clips and songs are uploaded across TikTok, Instagram Reels, YouTube Shorts, and streaming platforms. Out of that deafening avalanche of sound, only a handful of tracks catch fire and lodge themselves into the collective consciousness of millions of listeners.</p>
+
+            <p>At <strong>Medixly</strong> (formerly HarmonyTunes), our mission has always been simple: eliminate the friction between hearing a viral track in a short video clip and enjoying its full high-fidelity studio version. But behind our clean, neon-lit web interface lies a sophisticated blend of trend analytics, browser-based digital signal processing (DSP), and hands-on human musical curation.</p>
+
+            <blockquote>
+                "Algorithmic recommendations on major platforms tend to trap listeners in echo chambers—serving the same thirty mainstream songs on repeat. Medixly was designed to do the exact opposite: detect authentic cultural momentum the moment it sparks in grassroots creator communities."
+            </blockquote>
+
+            <h2 id="discovery-shift">1. The Shift in Modern Music Discovery</h2>
+            <p>Ten years ago, music discovery was dictated by radio gatekeepers and corporate editorial playlists. Today, cultural velocity is bottom-up. A bedroom producer in London or a teenager in Tokyo can drop a 15-second snippet with a hypnotic bassline, and within forty-eight hours, half a million creators have used it as background audio for their videos.</p>
+            <p>However, major streaming services are remarkably slow to adapt to this dynamic. Listeners frequently find themselves scouring comment sections asking <em>"What's the song in this clip?"</em> only to discover the track is unreleased, miscredited, or buried under dozens of pitch-shifted impostor uploads. Medixly solves this problem by directly bridging the gap between social audio trends and instant web playback.</p>
+
+            <div class="tech-card-grid">
+                <div class="tech-card">
+                    <h4>📈 Sound Velocity Metrics</h4>
+                    <p>Tracking the derivative creation rate of audio stems across social networks rather than merely counting passive streams.</p>
+                </div>
+                <div class="tech-card">
+                    <h4>🎧 Native Web DSP</h4>
+                    <p>Harnessing the browser's hardware-accelerated Web Audio API for custom multi-band equalization, spatial audio, and zero-latency playback.</p>
+                </div>
+                <div class="tech-card">
+                    <h4>✨ Human Curation</h4>
+                    <p>Active editorial listening to ensure only verified, mastered studio audio makes it onto our featured daily charts.</p>
+                </div>
+            </div>
+
+            <h2 id="hybrid-curation">2. The Hybrid Curation Engine: Data Meets Human Taste</h2>
+            <p>Computers are exceptional at identifying numerical growth curves, but they have zero innate understanding of rhythm, emotional resonance, or cultural vibe. If you rely solely on algorithms, your music platform ends up filled with artificial spam and engagement-hacked soundbites.</p>
+            <p>Medixly operates on a strict <strong>Hybrid Curation Pipeline</strong>:</p>
+            <ol>
+                <li><strong>Ingestion & Velocity Detection:</strong> Our automated discovery pipeline monitors public metadata feeds for sudden surges in creation velocity—identifying songs whose user-generated creations are multiplying exponentially over a rolling 72-hour window.</li>
+                <li><strong>Acoustic Fingerprinting & Match Verification:</strong> We cross-reference the viral audio snippets with authoritative databases (including Apple Music, Spotify, and MusicBrainz) to locate the legitimate full-length source master and ensure proper credit to original creators.</li>
+                <li><strong>Human Curation & Mastering Check:</strong> Every single candidate track is manually auditioned by our editorial team. We test for mix quality, dynamic range, and replay value before any track is approved for our front-page rotation.</li>
+            </ol>
+
+            <h2 id="web-audio">3. Web Audio Architecture: Bringing Studio Control to the Browser</h2>
+            <p>Most web audio players treat sound as an afterthought, relying on standard HTML5 <code>&lt;audio&gt;</code> tags that offer little more than basic volume sliders. At Medixly, we built our audio player on top of the native <strong>Web Audio API</strong> graph.</p>
+            <p>By routing the media stream through a custom chain of <code>BiquadFilterNode</code> instances, Medixly provides listeners with genuine real-time audio shaping directly in the browser:</p>
+            <ul>
+                <li><strong>10-Band Graphic Equalizer:</strong> Users can tune frequency bands from 32 Hz sub-bass up to 16 kHz airy highs, tailored specifically for headphones, car audio systems, or studio monitors.</li>
+                <li><strong>Dynamic Compression & Limiting:</strong> A built-in <code>DynamicsCompressorNode</code> prevents ear fatigue and harsh clipping when transitioning between differently mastered community tracks.</li>
+                <li><strong>Binaural Stereo Panning:</strong> Subtle psychoacoustic widening gives standard stereo mixes a spacious, immersive soundstage that feels open and fatigue-free during long study or gaming sessions.</li>
+            </ul>
+
+            <h2 id="artist-first">4. Supporting Independent Artists & Ethical Attribution</h2>
+            <p>One of the biggest tragedies of the short-form video era is that independent musicians frequently get stripped of their attribution. When their audio becomes a trending "sound," millions of people hear their craft without ever knowing their name or where to find their full discography.</p>
+            <p>Medixly takes attribution seriously. Every track on our platform includes prominent links to the original artist's official streaming profiles, social channels, and merchandise stores. We do not pirate or monetize artist master recordings; rather, our player serves as an interactive discovery gateway that channels engaged fans directly back to the creators who made the music.</p>
+
+            <h2 id="future-features">5. The Road Ahead: AI Stems, Offline Caching, and Mobile Suite</h2>
+            <p>We are constantly expanding what is possible within a lightweight web environment. Over the next year, our development roadmap includes several exciting milestones:</p>
+            <ul>
+                <li><strong>Client-Side Stem Separation:</strong> Exploring WebAssembly (Wasm) and WebGPU models to allow listeners to isolate vocals, basslines, or drums on the fly directly inside their browser without cloud latency.</li>
+                <li><strong>Persistent Offline Cache (IndexedDB):</strong> Enabling instant offline playback for favorite playlists via service worker caching and encrypted IndexedDB storage, ideal for flights or poor cellular reception.</li>
+                <li><strong>Native Mobile Companion:</strong> Bringing Medixly's viral trend radar to iOS and Android with background audio support and widget integrations.</li>
+            </ul>
+
+            <h2 id="conclusion">6. The Philosophy of Frictionless Sound</h2>
+            <p>Music should never be gated behind clunky registration walls, bloated desktop apps, or invasive trackers. We believe discovering great music should be immediate, joyous, and visually inspiring.</p>
+            <p>You can experience Medixly for yourself right now at <a href="/medixly.html" style="color: #ec4899; font-weight: 600;">realunstoppable.store/medixly.html</a>. Put on your headphones, explore today's viral charting tracks, and discover the songs that are shaping the sound of the internet.</p>
+
+            <section id="comments-section" class="blog-comments" data-post-id="medixly-hits" style="margin-top: 50px; border-top: 1px solid var(--border-color, rgba(255,255,255,0.1)); padding-top: 30px;"></section>
         </article>
-
-        <section id="comments-section" class="blog-comments" data-post-id="harmonytunes-hits" style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 20px;"></section>
-
-        </section>
     </main>
-
+    
     <footer class="main-footer"></footer>
 
     <script type="module" src="/js/blog-comments.js"></script>
-
     <script src="/js/script.js"></script>
-
     <script type="module">
         import { loadNavbar } from './js/navbar.js?v=1791167958698';
         import { loadFooter } from './js/footer.js?v=1791167958698';
-
+        
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();
     </script>
 </body>
-
 </html>

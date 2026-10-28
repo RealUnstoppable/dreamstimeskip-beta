@@ -4,72 +4,165 @@
     <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unstoppable | DreamsTimeskip Hub</title>
-    
+    <title>Unstoppable | Gaming, Deep Dives &amp; Community</title>
+    <meta name="description" content="Explore Unstoppable: high-tier gameplay, in-depth gaming culture analysis, Minecraft mechanics, and competitive guides by Catalin Andrian.">
+    <link rel="canonical" href="https://realunstoppable.store/unstoppable.html">
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css?v=1791167958698">
     <link rel="stylesheet" href="/css/themes.css">
 
     <meta name="google-adsense-account" content="ca-pub-4254213062632381">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
+
+    <style>
+        .channel-pillars {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 40px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+            text-align: left;
+        }
+        .pillar-card {
+            background: var(--card-bg, rgba(255, 255, 255, 0.03));
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            border-radius: 14px;
+            padding: 28px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        .pillar-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-blue, #2563EB);
+        }
+        .pillar-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .pillar-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 30px auto;
+            max-width: 1200px;
+            padding: 0 20px;
+        }
+        .video-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            text-align: left;
+        }
+        .video-card h3 {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin: 12px 0 6px;
+        }
+        .video-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .creator-section {
+            max-width: 900px;
+            margin: 60px auto 40px;
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+            border-radius: 16px;
+            text-align: left;
+        }
+        .creator-section h2 {
+            font-size: 1.75rem;
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .creator-section p {
+            color: var(--text-secondary);
+            line-height: 1.75;
+            font-size: 1rem;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
     <header class="main-header"></header>
 
     <main style="padding-top: 80px;">
-        <section class="hero" style="min-height: 60vh;">
+        <section class="hero" style="min-height: 50vh;">
             <div class="hero-content">
                 <div class="orb"></div>
                 <h1 class="reveal">Unstoppable</h1>
-                <p class="section-subtitle reveal">High-tier gameplay, deep dives, and gaming culture.</p>
-                <div style="margin-top: 20px;">
-                    <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button" target="_blank">Subscribe to YouTube</a>
-                    <a href="https://ko-fi.com/unstoppable" class="cta-button" style="background: #10B981; margin-left: 10px;" target="_blank">Support Us</a>
+                <p class="section-subtitle reveal">High-tier gameplay, deep dives, competitive strategy, and community-driven gaming culture.</p>
+                <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button" style="background: #FF0000; color: #fff;" target="_blank" rel="noopener">Subscribe on YouTube</a>
+                    <a href="the-philosophy-behind-unstoppable-more-than-a-brand.html" class="cta-button" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);">Read Brand Philosophy</a>
+                    <a href="https://discord.gg/6zdH5De3ab" class="cta-button" style="background: #5865F2; color: #fff;" target="_blank" rel="noopener">Join Discord Community</a>
                 </div>
             </div>
         </section>
 
-        <section style="padding: 60px 20px; max-width: 1200px; margin: 0 auto; text-align: center;">
-            <h2 style="margin-bottom: 40px; font-size: 2rem; color: #fff;">Recent Content</h2>
+        <section style="padding: 40px 20px 20px; max-width: 1200px; margin: 0 auto; text-align: center;">
+            <h2 style="margin-bottom: 10px; font-size: 2rem; color: var(--text-primary);">Featured Channel Media</h2>
+            <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 30px;">Trailers, technical breakdowns, and deep dives into our multiplayer worlds and gaming projects.</p>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-                <!-- Embedded Video 1 (Channel Trailer) -->
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #333;">
-                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 15px; background: #000;">
-                        <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/-MfSBwzapaU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="video-grid">
+                <!-- Video 1 (Official Channel Trailer) -->
+                <div class="video-card">
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000;">
+                        <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/-MfSBwzapaU" title="Unstoppable Channel Trailer" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
-                    <h3 style="font-size: 1.2rem; color: #fff; margin-bottom: 10px;">Channel Trailer</h3>
+                    <h3>Unstoppable Official Trailer</h3>
+                    <p>An overview of the gameplay standards, high-tier competition, and creative projects driving the Unstoppable channel.</p>
                 </div>
 
-                <!-- Coming Soon Video -->
-                <div style="background: #111; padding: 15px; border-radius: 12px; border: 1px solid #333; display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 250px;">
-                    <h3 style="font-size: 1.5rem; color: #888; margin-bottom: 15px;">Coming Soon...</h3>
-                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">We're working on something massive. Subscribe so you don't miss it.</p>
-                    <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button" style="padding: 10px 20px; font-size: 0.9rem;" target="_blank">Subscribe</a>
+                <!-- Video 2 (Dreams TimeSkip Spotlight) -->
+                <div class="video-card">
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000;">
+                        <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/5F_O8t6Pj1Q" title="Dreams TimeSkip World &amp; Mechanics" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <h3>Dreams TimeSkip World &amp; Architecture</h3>
+                    <p>Exploring custom survival mechanics, server infrastructure, and worldbuilding in our persistent SMP realm.</p>
                 </div>
             </div>
         </section>
 
-        <!-- AD_SLOT_START -->
-        <section class="site-ad-section" aria-label="Sponsored Content">
-            <div class="site-ad-label">Sponsored</div>
-            <div class="ad-container ad-bottom-banner">
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-4254213062632381"
-                     data-ad-slot="9876543210"
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+        <!-- Channel Content Pillars -->
+        <section class="channel-pillars">
+            <div class="pillar-card">
+                <h3>🎮 High-Tier Gameplay</h3>
+                <p>Meticulously edited competitive matches, mechanics breakdowns, and strategic analyses designed for players who value skill acquisition and execution.</p>
+            </div>
+            <div class="pillar-card">
+                <h3>🏗️ Persistent Worldbuilding</h3>
+                <p>Chronicling multi-year survival sagas in Dreams TimeSkip, featuring intricate community towns, custom redstone contraptions, and evolving server lore.</p>
+            </div>
+            <div class="pillar-card">
+                <h3>⚡ Tech &amp; Community</h3>
+                <p>Bridging gaming culture with web technology, audio engineering via Medixly, and open community feedback on Discord and GitHub.</p>
             </div>
         </section>
-        <!-- AD_SLOT_END -->
+
+        <!-- Creator Mission Statement -->
+        <section class="creator-section">
+            <h2>The Unstoppable Standard</h2>
+            <p>Unstoppable was founded on a simple premise: modern gaming content often trades depth for short-term sensationalism. We believe audiences appreciate substance—whether that is a deeply researched breakdown of game systems, a transparent look at server architecture, or high-tier gameplay presented without artificial fluff.</p>
+            <p>Every video, livestream, and server event is curated with care. To learn more about our foundational principles, read our full manifesto: <a href="the-philosophy-behind-unstoppable-more-than-a-brand.html" style="color: var(--accent-blue, #2563EB); font-weight: 600; text-decoration: underline;">The Philosophy Behind Unstoppable: More Than a Brand</a>.</p>
+        </section>
     </main>
 
     <footer class="main-footer"></footer>

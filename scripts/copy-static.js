@@ -11,24 +11,25 @@ if (!fs.existsSync(distDir)) {
   fs.mkdirSync(distDir, { recursive: true });
 }
 
-// Ensure ads.txt is copied to dist/ads.txt
-const srcAdsTxt = path.join(rootDir, 'ads.txt');
-const distAdsTxt = path.join(distDir, 'ads.txt');
+// Helper to sync a static file
+function syncStaticFile(filename) {
+  const src = path.join(rootDir, filename);
+  const dist = path.join(distDir, filename);
+  const pub = path.join(publicDir, filename);
 
-if (fs.existsSync(srcAdsTxt)) {
-  fs.copyFileSync(srcAdsTxt, distAdsTxt);
-  console.log(`[build] Successfully copied ads.txt -> ${distAdsTxt}`);
-} else {
-  console.warn(`[build] Warning: ${srcAdsTxt} not found!`);
+  if (fs.existsSync(src)) {
+    fs.copyFileSync(src, dist);
+    fs.copyFileSync(src, pub);
+    console.log(`[build] Synced ${filename} -> dist/ & public/`);
+  }
 }
 
-// Ensure public/ads.txt also exists
+// Ensure public directory exists
 const publicDir = path.join(rootDir, 'public');
 if (!fs.existsSync(publicDir)) {
   fs.mkdirSync(publicDir, { recursive: true });
 }
-const publicAdsTxt = path.join(publicDir, 'ads.txt');
-if (fs.existsSync(srcAdsTxt) && !fs.existsSync(publicAdsTxt)) {
-  fs.copyFileSync(srcAdsTxt, publicAdsTxt);
-  console.log(`[build] Synced ads.txt -> ${publicAdsTxt}`);
-}
+
+syncStaticFile('ads.txt');
+syncStaticFile('robots.txt');
+syncStaticFile('sitemap.xml');

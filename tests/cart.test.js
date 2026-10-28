@@ -78,10 +78,9 @@ describe('Dedicated High-Converting Cart Page & Conversion UX Standards', () => 
         expect(cartCss).toContain('letter-spacing: -0.5px');
     });
 
-    it('places conversion-safe ad unit below the cart fold to prevent layout shift', () => {
-        expect(cartHtml).toContain('cart-ad-container');
-        expect(cartHtml).toContain('data-ad-slot="cart-bottom-slot"');
-        expect(cartCss).toContain('min-height: 90px');
+    it('ensures cart page follows Google Publisher Policy by keeping checkout flows ad-free', () => {
+        expect(cartHtml).not.toContain('ins class="adsbygoogle"');
+        expect(cartHtml).not.toContain('data-ad-slot="cart-bottom-slot"');
     });
 
     it('mounts sitewide navbar and footer with loadNavbar and loadFooter', () => {

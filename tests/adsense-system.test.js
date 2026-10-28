@@ -165,4 +165,52 @@ describe('Google AdSense Implementation & Policy Compliance Tests', () => {
             expect(contactHtml).toContain('Contact Us');
         });
     });
+
+    describe('AdSense High-Value Content & Policy Standards Verification', () => {
+        it('verifies dreams-timeskip-first-look.html is a substantial, fully-written editorial article', () => {
+            const html = fs.readFileSync(path.join(ROOT_DIR, 'dreams-timeskip-first-look.html'), 'utf8');
+            expect(html).toContain('A First Look at Dreams TimeSkip: The Road to 2027');
+            expect(html).toContain('Catalin Andrian');
+            expect(html).toContain('"@type": "Article"');
+            expect(html).toContain('Table of Contents');
+            // Ensure no empty stubs: article text must be substantial
+            const textContent = html.replace(/<[^>]+>/g, ' ');
+            const wordCount = textContent.split(/\s+/).filter(Boolean).length;
+            expect(wordCount).toBeGreaterThan(600);
+        });
+
+        it('verifies medixly-hits.html is a substantial, fully-written editorial article', () => {
+            const html = fs.readFileSync(path.join(ROOT_DIR, 'medixly-hits.html'), 'utf8');
+            expect(html).toContain("Medixly: How We Find the Internet's Biggest Hits");
+            expect(html).toContain('Catalin Andrian');
+            expect(html).toContain('"@type": "Article"');
+            expect(html).toContain('Table of Contents');
+            const textContent = html.replace(/<[^>]+>/g, ' ');
+            const wordCount = textContent.split(/\s+/).filter(Boolean).length;
+            expect(wordCount).toBeGreaterThan(600);
+        });
+
+        it('verifies sitemap.xml is clean, canonical, and contains zero redirect stubs', () => {
+            const sitemap = fs.readFileSync(path.join(ROOT_DIR, 'sitemap.xml'), 'utf8');
+            expect(sitemap).toContain('https://realunstoppable.store/dreams-timeskip-first-look.html');
+            expect(sitemap).toContain('https://realunstoppable.store/medixly-hits.html');
+            expect(sitemap).toContain('https://realunstoppable.store/about.html');
+            expect(sitemap).toContain('https://realunstoppable.store/contact.html');
+            // Instant redirect stubs must not be present
+            expect(sitemap).not.toContain('uds.html');
+            expect(sitemap).not.toContain('dreamstimeskip.html');
+            expect(sitemap).not.toContain('shop.html');
+        });
+
+        it('verifies robots.txt explicitly allows Mediapartners-Google crawler', () => {
+            const robots = fs.readFileSync(path.join(ROOT_DIR, 'robots.txt'), 'utf8');
+            expect(robots).toContain('Mediapartners-Google');
+            expect(robots).toContain('sitemap.xml');
+        });
+
+        it('verifies unstoppable.html has eliminated "coming soon" placeholders with ads', () => {
+            const unstoppableHtml = fs.readFileSync(path.join(ROOT_DIR, 'unstoppable.html'), 'utf8');
+            expect(unstoppableHtml).not.toContain('Coming Soon...');
+        });
+    });
 });

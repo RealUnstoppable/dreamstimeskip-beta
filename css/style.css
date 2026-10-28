@@ -1857,8 +1857,8 @@ textarea:focus-visible {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px dashed rgba(255, 255, 255, 0.22);
+    background-color: transparent;
+    border: none;
     border-radius: 8px;
     margin: 0 auto;
     overflow: hidden;
@@ -1869,23 +1869,12 @@ textarea:focus-visible {
 
 [data-theme="light"] .ad-container,
 body.light-theme .ad-container {
-    background-color: #f1f5f9;
-    border: 1px dashed #cbd5e1;
+    background-color: transparent;
+    border: none;
 }
 
 .ad-container::before {
-    content: 'Advertisement';
-    color: #94a3b8;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 1;
+    content: none;
 }
 
 .ad-top-banner::before,
@@ -1893,7 +1882,7 @@ body.light-theme .ad-container {
 .ad-right-rail::before,
 .ad-in-feed::before,
 .ad-mobile-sticky::before {
-    content: 'Advertisement';
+    content: none;
 }
 
 /* Once ad finishes loading, suppress placeholder text */

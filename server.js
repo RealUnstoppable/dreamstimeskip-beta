@@ -29,6 +29,20 @@ app.get('/ads.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'ads.txt'));
 });
 
+// Explicit sitemap.xml route for search engine & AdSense indexing
+app.get('/sitemap.xml', (req, res) => {
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(path.join(__dirname, 'sitemap.xml'));
+});
+
+// Explicit robots.txt route
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Cache-Control', 'public, max-age=3600');
+  res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
 // First-Party Telemetry & Consent Pipeline Endpoints
 app.post("/api/v1/telemetry", handleTelemetryIngest);
 app.post("/api/v1/consent", handleConsentRecord);
