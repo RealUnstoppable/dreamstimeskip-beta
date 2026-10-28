@@ -80,7 +80,17 @@ function parseCookies(request) {
 
 // Middleware to serve HTML files and strip ads for premium users
 app.use(async (req, res, next) => {
-  let reqPath = req.path;
+  let reqPath;
+  try {
+    reqPath = decodeURIComponent(req.path);
+  } catch (e) {
+    return res.status(400).send('Bad Request');
+  }
+
+  if (reqPath.indexOf('\0') !== -1) {
+    return res.status(400).send('Bad Request');
+  }
+
   if (reqPath === '/') reqPath = '/index.html';
   if (reqPath === '/dts') reqPath = '/dts.html';
   if (reqPath === '/store') reqPath = '/store.html';
@@ -88,8 +98,18 @@ app.use(async (req, res, next) => {
   if (reqPath.endsWith('.html')) {
     try {
       // Security: prevent directory traversal
-      const normalizedPath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
-      const filePath = path.join(__dirname, normalizedPath);
+      let relativePath = reqPath;
+      if (relativePath.startsWith('/')) {
+        relativePath = '.' + relativePath;
+      }
+
+      const filePath = path.resolve(__dirname, relativePath);
+
+      // Ensure the resolved path strictly falls within the current directory
+      if (!filePath.startsWith(__dirname + path.sep) && filePath !== __dirname) {
+        return res.status(403).send('Forbidden');
+      }
+
       let html = await fs.readFile(filePath, 'utf8');
       
       const cookies = parseCookies(req);
