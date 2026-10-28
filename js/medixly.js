@@ -5,6 +5,7 @@ import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1791167969660b';
 import { mixEngine } from "./audio-engine.js";
+import { audioAdManager } from "./audio-ads.js";
 
 
 // Utility to prevent DOM-based and Stored XSS
@@ -422,6 +423,19 @@ function initHarmonyTunes() {
 
     const fsCurrentTime = document.querySelector('.fs-current-time');
     const fsTotalTime = document.querySelector('.fs-total-time');
+
+    // Initialize Audio Ad Manager
+    audioAdManager.init({
+        mixEngine,
+        viewLyrics,
+        fsPlayer,
+        playerTitle,
+        playerArtist,
+        playerArt,
+        progressFill: progress,
+        playIcon,
+        pauseIcon
+    });
 
 
     // ===== Spotlight Search =====
@@ -1373,6 +1387,15 @@ function initHarmonyTunes() {
         } else {
             currentSongIndex = startIndex;
         }
+
+        if (audioAdManager.shouldPlayAd('play_request')) {
+            audioAdManager.playAd(() => {
+                loadSong(currentSongIndex);
+                playSong();
+            });
+            return;
+        }
+
         loadSong(currentSongIndex);
         playSong();
     }
@@ -1414,7 +1437,8 @@ function initHarmonyTunes() {
                     activeAudio.src = song.streamUrl;
                     activeAudio.play().then(onPlaybackRecovered).catch(()=>{});
                 } else if (!song.streamUrl && song.title) {
-                    const query = `${song.title} ${song.artist || ''}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
+                    const cleanArtist = (song.artist && song.artist !== 'Unknown Artist') ? song.artist : '';
+                    const query = `${song.title} ${cleanArtist}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`)
                         .then(res => res.json())
                         .then(data => {
@@ -1578,6 +1602,16 @@ function initHarmonyTunes() {
     }
 
     async function togglePlayPause() {
+        if (audioAdManager.isAdPlaying()) {
+            audioAdManager.togglePlayPause();
+            const paused = audioAdManager.isPaused();
+            if (playIcon) playIcon.style.display = paused ? 'block' : 'none';
+            if (pauseIcon) pauseIcon.style.display = paused ? 'none' : 'block';
+            if (fsPlayIcon) fsPlayIcon.style.display = paused ? 'block' : 'none';
+            if (fsPauseIcon) fsPauseIcon.style.display = paused ? 'none' : 'block';
+            return;
+        }
+
         if (!currentQueue || currentQueue.length === 0) {
             currentQueue = [...librarySongs];
             currentSongIndex = 0;
@@ -1587,6 +1621,14 @@ function initHarmonyTunes() {
         }
         if ((!activeAudio.src || activeAudio.src === '' || activeAudio.src === window.location.href) && currentQueue[currentSongIndex]) {
             loadSong(currentSongIndex);
+        }
+
+        if (audioAdManager.shouldPlayAd('before_play')) {
+            audioAdManager.playAd(() => {
+                loadSong(currentSongIndex);
+                playSong();
+            });
+            return;
         }
 
         await mixEngine.ensureRunning().catch(() => {});
@@ -1599,6 +1641,10 @@ function initHarmonyTunes() {
     }
 
     function nextSong() {
+        if (audioAdManager.isAdPlaying()) {
+            return;
+        }
+
         if(activeAudio && currentQueue[currentSongIndex]) {
             const currentTime = activeAudio.currentTime;
             const duration = activeAudio.duration;
@@ -1611,6 +1657,8 @@ function initHarmonyTunes() {
             }
         }
 
+        audioAdManager.onSongCompleted();
+
         if(typeof window.__pullFromUserQueue === 'function') {
             if(userQueue.length > 0) {
                 const nextUserSong = window.__pullFromUserQueue();
@@ -1618,6 +1666,13 @@ function initHarmonyTunes() {
                     __recordHistory();
                     currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
                     currentSongIndex = currentSongIndex + 1;
+                    if (audioAdManager.shouldPlayAd('next_song')) {
+                        audioAdManager.playAd(() => {
+                            loadSong(currentSongIndex);
+                            playSong();
+                        });
+                        return;
+                    }
                     loadSong(currentSongIndex);
                     playSong();
                     return;
@@ -1633,11 +1688,23 @@ function initHarmonyTunes() {
             else nextIndex = 0;
         }
         currentSongIndex = nextIndex;
+
+        if (audioAdManager.shouldPlayAd('next_song')) {
+            audioAdManager.playAd(() => {
+                loadSong(currentSongIndex);
+                playSong();
+            });
+            return;
+        }
+
         loadSong(currentSongIndex);
         playSong();
     }
 
     function prevSong() {
+        if (audioAdManager.isAdPlaying()) {
+            return;
+        }
         if (activeAudio.currentTime > 3) {
             activeAudio.currentTime = 0;
         } else {
@@ -1915,6 +1982,9 @@ function initHarmonyTunes() {
                 viewLyrics.style.display = 'flex';
                 viewLyrics.classList.remove('slide-down-active');
                 viewLyrics.classList.add('slide-up-active');
+                if (audioAdManager.isAdPlaying()) {
+                    audioAdManager.showOverlay();
+                }
                 lyricsBtn.style.color = 'var(--accent-green)';
                 if(fsLyricsBtn) fsLyricsBtn.style.color = 'var(--accent-green)';
                 if(mobLyricsBtn) mobLyricsBtn.style.color = 'var(--accent-green)';
@@ -1935,6 +2005,9 @@ function initHarmonyTunes() {
 
         if (closeLyricsBtn) {
             closeLyricsBtn.addEventListener('click', () => {
+                if (audioAdManager.isAdPlaying()) {
+                    audioAdManager.hideOverlay();
+                }
                 if (viewLyrics) {
                     viewLyrics.classList.remove('slide-up-active');
                     viewLyrics.classList.add('slide-down-active');
@@ -1949,6 +2022,14 @@ function initHarmonyTunes() {
 
         // Fullscreen Player — slide-up open/close
         function openFullscreen() {
+            if (audioAdManager.isAdPlaying()) {
+                fsPlayer.style.display = 'flex';
+                fsPlayer.offsetHeight;
+                fsPlayer.classList.remove('fs-hiding');
+                fsPlayer.classList.add('fs-visible');
+                audioAdManager.showOverlay();
+                return;
+            }
             const song = currentQueue[currentSongIndex];
             if(!song) return;
             fsArt.src = song.art;
@@ -1981,6 +2062,9 @@ function initHarmonyTunes() {
         function closeFullscreen() {
             fsPlayer.classList.remove('fs-visible');
             fsPlayer.classList.add('fs-hiding');
+            if (audioAdManager.isAdPlaying()) {
+                audioAdManager.hideOverlay();
+            }
             setTimeout(() => {
                 fsPlayer.style.display = 'none';
                 fsPlayer.classList.remove('fs-hiding');
@@ -2736,6 +2820,11 @@ function initHarmonyTunes() {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const memLevel = (data.membershipLevel || '').toLowerCase();
+                    const isPremium = memLevel === 'premium' || memLevel === 'ultimate';
+                    audioAdManager.setUser(user, isPremium);
+
                     if(docSnap.data().mixerToggled !== undefined) {
                         isMixerMode = docSnap.data().mixerToggled;
                         mixerBtn.classList.toggle('active', isMixerMode);
@@ -2762,6 +2851,8 @@ function initHarmonyTunes() {
             const hour = new Date().getHours();
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
             document.getElementById('greeting').textContent = `${timeGreeting}, ${user.displayName || 'Friend'}`;
+        } else {
+            audioAdManager.setUser(null, false);
         }
         init();
     });

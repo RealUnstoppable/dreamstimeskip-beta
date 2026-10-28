@@ -55,6 +55,9 @@ export class AudioMixEngine {
     if (!this.masterGain) {
       this.masterGain = this.ctx.createGain();
       this.masterGain.connect(this.ctx.destination);
+      if (this.analyser) {
+        try { this.masterGain.connect(this.analyser); } catch (_) {}
+      }
     }
 
     if (!this.deckAGain) {
@@ -416,6 +419,50 @@ export class AudioMixEngine {
     } catch (err) {
       console.warn('Silent trim failed:', err);
       return { startOffset: 0, endOffset: audioElement.duration || 0 };
+    }
+  }
+
+  /**
+   * Returns a connected AnalyserNode for audio visualization
+   * @returns {AnalyserNode|null}
+   */
+  getAnalyser() {
+    if (!this.ctx) return null;
+    if (!this.analyser) {
+      try {
+        this.analyser = this.ctx.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.8;
+        if (this.masterGain) {
+          this.masterGain.connect(this.analyser);
+        }
+      } catch (err) {
+        console.warn('AudioMixEngine: analyser note', err);
+      }
+    }
+    return this.analyser;
+  }
+
+  /**
+   * Wires an ad audio element into the master audio graph
+   * @param {HTMLMediaElement} audioElement
+   */
+  connectAdElement(audioElement) {
+    if (!this.ctx || !audioElement) return;
+    if (!this.elementSources.has(audioElement)) {
+      try {
+        const source = this.ctx.createMediaElementSource(audioElement);
+        if (!this.adGain) {
+          this.adGain = this.ctx.createGain();
+          if (this.masterGain) {
+            this.adGain.connect(this.masterGain);
+          }
+        }
+        source.connect(this.adGain);
+        this.elementSources.set(audioElement, source);
+      } catch (err) {
+        console.warn('AudioMixEngine: connectAdElement note', err);
+      }
     }
   }
 

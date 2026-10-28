@@ -2504,3 +2504,259 @@ body {
         -webkit-transform-origin: left center;
     }
 }
+
+/* ===== Lexi Orb Audio Ad Screen (Dim Blue Background & Audio-Reactive Visualizer) ===== */
+.lexi-ad-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2100;
+    background: radial-gradient(circle at 50% 45%, #0d264f 0%, #061326 55%, #020712 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 32px 24px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s ease;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
+
+.lexi-ad-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    display: flex !important;
+}
+
+.lexi-ad-overlay.merging {
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s ease;
+}
+
+.lexi-ad-overlay.hidden {
+    display: none !important;
+}
+
+.lexi-ad-header {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.lexi-ad-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 24px;
+    background: rgba(14, 38, 79, 0.75);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.lexi-ad-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 10px #38bdf8;
+    animation: lexi-ad-dot-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes lexi-ad-dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.lexi-ad-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.lexi-ad-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
+}
+
+.lexi-ad-orb-stage {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto 0;
+}
+
+.lexi-ad-canvas {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.lexi-ad-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+    transition: transform 0.08s ease-out, opacity 0.08s ease-out;
+}
+
+.lexi-ad-ring.ring-1 {
+    width: 175px;
+    height: 175px;
+    border: 1.5px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+}
+
+.lexi-ad-ring.ring-2 {
+    width: 220px;
+    height: 220px;
+    border: 1.5px solid rgba(30, 64, 175, 0.35);
+    box-shadow: 0 0 30px rgba(30, 64, 175, 0.15);
+}
+
+.lexi-ad-ring.ring-3 {
+    width: 270px;
+    height: 270px;
+    border: 1.5px solid rgba(10, 25, 47, 0.4);
+}
+
+.lexi-ad-orb {
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.35), transparent 60%), linear-gradient(135deg, #0a192f 0%, #1e40af 50%, #38bdf8 100%);
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    background-size: 200% 200%;
+    box-shadow: inset 0 0 16px 3px rgba(255, 255, 255, 0.35), 0 0 35px rgba(56, 189, 248, 0.55), 0 0 70px rgba(30, 64, 175, 0.45);
+    animation: blob-shape 10s ease-in-out infinite, lexi-blue-cycle 12s ease-in-out infinite;
+    position: relative;
+    z-index: 5;
+    transition: transform 0.05s linear, box-shadow 0.05s linear;
+}
+
+.lexi-ad-footer {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    z-index: 10;
+}
+
+.lexi-ad-title {
+    color: #ffffff;
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+.lexi-ad-subtitle {
+    color: #94a3b8;
+    font-size: 0.92rem;
+    margin: 0;
+}
+
+.lexi-ad-upgrade-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #1e40af 0%, #38bdf8 100%);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.lexi-ad-upgrade-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 25px rgba(56, 189, 248, 0.55);
+    color: #ffffff;
+}
+
+.lexi-ad-progress-bar-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
+.lexi-ad-time {
+    min-width: 35px;
+}
+
+.lexi-ad-progress-track {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.lexi-ad-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1e40af, #38bdf8);
+    border-radius: 2px;
+    transition: width 0.1s linear;
+}
+
+@media (max-width: 768px) {
+    .lexi-ad-overlay {
+        padding: 24px 16px;
+    }
+    .lexi-ad-orb-stage {
+        width: 260px;
+        height: 260px;
+    }
+    .lexi-ad-canvas {
+        width: 260px;
+        height: 260px;
+    }
+    .lexi-ad-orb {
+        width: 110px;
+        height: 110px;
+    }
+    .lexi-ad-ring.ring-1 { width: 140px; height: 140px; }
+    .lexi-ad-ring.ring-2 { width: 180px; height: 180px; }
+    .lexi-ad-ring.ring-3 { width: 220px; height: 220px; }
+    .lexi-ad-title { font-size: 1.25rem; }
+    .lexi-ad-subtitle { font-size: 0.82rem; }
+}
+

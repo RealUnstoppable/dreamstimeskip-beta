@@ -15,6 +15,7 @@ yt-dlp
 yt-dlp.exe
 *.mp3
 !music/*.mp3
+!music/ads/*.mp3
 *.webm*
 scratch/
 .DS_Store
