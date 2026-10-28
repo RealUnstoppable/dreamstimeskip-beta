@@ -119,6 +119,29 @@ describe('Google AdSense Implementation & Policy Compliance Tests', () => {
 
             expect(window.adsbygoogle).toBeUndefined();
         });
+
+        it('never collapses document.body or html when an unfilled auto-ad is a direct child of body', async () => {
+            document.body.className = '';
+            document.body.style.display = 'block';
+
+            const autoAdIns = document.createElement('ins');
+            autoAdIns.className = 'adsbygoogle adsbygoogle-noablate';
+            autoAdIns.setAttribute('data-ad-hi', 'true');
+            document.body.appendChild(autoAdIns);
+
+            mountAdUnit(autoAdIns);
+
+            // Simulate AdSense marking unit unfilled
+            autoAdIns.setAttribute('data-ad-status', 'unfilled');
+
+            // Wait a microtask / tick for MutationObserver
+            await new Promise(r => setTimeout(r, 20));
+
+            expect(document.body.style.display).not.toBe('none');
+            expect(document.body.classList.contains('ad-unfilled-collapsed')).toBe(false);
+            expect(autoAdIns.style.display).toBe('none');
+            expect(autoAdIns.classList.contains('ad-unfilled-collapsed')).toBe(true);
+        });
     });
 
     describe('Premium / Ad-Free Removal', () => {

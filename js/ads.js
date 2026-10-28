@@ -108,32 +108,66 @@ export function mountAdUnit(insElement) {
 }
 
 /**
+ * Checks if an element is a designated ad container (never body, html, or main).
+ */
+function isDesignatedAdContainer(el) {
+    if (!el || !(el instanceof HTMLElement)) return false;
+    if (el === document.body || el === document.documentElement) return false;
+    if (el.tagName === 'MAIN' || el.tagName === 'HEADER' || el.tagName === 'FOOTER') return false;
+    return (
+        el.classList.contains('ad-container') ||
+        el.classList.contains('ad-banner-container') ||
+        el.classList.contains('ad-rail-wrapper') ||
+        el.classList.contains('ad-mobile-sticky')
+    );
+}
+
+/**
  * Monitors data-ad-status to collapse unfilled ads with zero layout shift.
+ * Guaranteed never to collapse document.body, html, main, or non-ad containers.
  */
 function setupUnfilledObserver(insElement) {
     if (typeof MutationObserver === 'undefined') return;
 
+    const handleStatus = () => {
+        const status = insElement.getAttribute('data-ad-status');
+        if (!status) return false;
+
+        const candidateContainer = insElement.closest('.ad-container, .ad-banner-container, .ad-rail-wrapper, .ad-mobile-sticky');
+        const container = isDesignatedAdContainer(candidateContainer) ? candidateContainer : null;
+        const candidateSection = insElement.closest('.site-ad-section');
+        const section = (candidateSection && candidateSection !== document.body && candidateSection !== document.documentElement) ? candidateSection : null;
+
+        if (status === 'unfilled') {
+            // Always collapse the individual unfilled ad unit itself
+            insElement.classList.add('ad-unfilled-collapsed');
+            insElement.style.display = 'none';
+
+            // Only collapse verified dedicated ad wrappers, never page layout roots
+            if (container) {
+                container.classList.add('ad-unfilled-collapsed');
+                container.style.display = 'none';
+            }
+            if (section) {
+                section.classList.add('ad-unfilled-collapsed');
+                section.style.display = 'none';
+            }
+            return true;
+        } else if (status === 'filled') {
+            if (container) {
+                container.classList.add('ad-status-done');
+            }
+            return true;
+        }
+        return false;
+    };
+
+    if (handleStatus()) return;
+
     const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'data-ad-status') {
-                const status = insElement.getAttribute('data-ad-status');
-                const container = insElement.closest('.ad-container') || insElement.parentElement;
-                const section = insElement.closest('.site-ad-section');
-
-                if (status === 'unfilled') {
-                    if (container) {
-                        container.classList.add('ad-unfilled-collapsed');
-                        container.style.display = 'none';
-                    }
-                    if (section) {
-                        section.classList.add('ad-unfilled-collapsed');
-                        section.style.display = 'none';
-                    }
-                    observer.disconnect();
-                } else if (status === 'filled') {
-                    if (container) {
-                        container.classList.add('ad-status-done');
-                    }
+                if (handleStatus()) {
                     observer.disconnect();
                 }
             }
@@ -193,9 +227,10 @@ export function refreshAds() {
             return;
         }
 
-        const container = ins.closest('.ad-container') || ins;
+        const candidateContainer = ins.closest('.ad-container, .ad-banner-container, .ad-rail-wrapper, .ad-mobile-sticky');
+        const target = isDesignatedAdContainer(candidateContainer) ? candidateContainer : ins;
         if (observer) {
-            observer.observe(container);
+            observer.observe(target);
         } else {
             // Fallback if IntersectionObserver is unsupported
             mountAdUnit(ins);
