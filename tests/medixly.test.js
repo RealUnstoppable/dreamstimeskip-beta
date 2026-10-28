@@ -111,4 +111,17 @@ describe('Medixly HTML Audio & Footer Configuration', () => {
   it('exposes window.playSongById function for playing tracks in library context', () => {
     expect(typeof window.playSongById).toBe('function');
   });
+
+  it('includes gray try it out first option in onboarding popup', async () => {
+    const fs = await import('fs');
+    const path = await import('path');
+    const js = fs.readFileSync(path.resolve(process.cwd(), 'js/medixly-onboarding.js'), 'utf8');
+    const css = fs.readFileSync(path.resolve(process.cwd(), 'css/onboarding.css'), 'utf8');
+
+    expect(js).toContain('id="ob-try-first"');
+    expect(js).toContain('try it out first');
+    expect(js).toContain('medixly_guest_trial');
+    expect(css).toContain('.onboarding-try-btn');
+    expect(css).toContain('#94a3b8');
+  });
 });

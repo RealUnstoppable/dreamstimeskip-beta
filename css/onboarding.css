@@ -326,3 +326,28 @@
     text-shadow: 0 0 10px rgba(255, 121, 198, 0.5);
     text-decoration: underline;
 }
+
+/* Try it out first - sleek gray link */
+.onboarding-try-row {
+    margin-top: 12px;
+}
+
+.onboarding-try-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 4px 8px;
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+    font-family: inherit;
+    display: inline-block;
+}
+
+.onboarding-try-btn:hover {
+    color: #e2e8f0;
+    text-decoration: underline;
+}
+

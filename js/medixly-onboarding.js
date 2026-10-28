@@ -174,7 +174,12 @@ function createOnboardingUI() {
                 <div class="onboarding-error" id="ob-error"></div>
             </form>
             <div class="onboarding-footer">
-                Already have an account? <a href="/sign in beta.html?redirect=medixly.html" class="onboarding-signin-link">Sign in</a>
+                <div class="onboarding-signin-row">
+                    Already have an account? <a href="/sign in beta.html?redirect=medixly.html" class="onboarding-signin-link">Sign in</a>
+                </div>
+                <div class="onboarding-try-row">
+                    <button type="button" id="ob-try-first" class="onboarding-try-btn">try it out first</button>
+                </div>
             </div>
         </div>
     `;
@@ -186,6 +191,20 @@ function createOnboardingUI() {
     const pfpPreview = document.getElementById('ob-pfp-preview');
     const errorDiv = document.getElementById('ob-error');
     const submitBtn = document.getElementById('ob-submit');
+    const tryFirstBtn = document.getElementById('ob-try-first');
+    
+    if (tryFirstBtn) {
+        tryFirstBtn.addEventListener('click', () => {
+            try {
+                sessionStorage.setItem('medixly_guest_trial', 'true');
+            } catch (_) {}
+            liftAntiBypass();
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                if (overlay.parentNode) overlay.remove();
+            }, 350);
+        });
+    }
     
     let selectedPfpBase64 = null;
     
@@ -289,6 +308,15 @@ onAuthStateChanged(auth, (user) => {
     if (!hasCheckedAuth) {
         hasCheckedAuth = true;
         if (!user) {
+            let isGuestTrial = false;
+            try {
+                isGuestTrial = sessionStorage.getItem('medixly_guest_trial') === 'true';
+            } catch (_) {}
+
+            if (isGuestTrial) {
+                liftAntiBypass();
+                return;
+            }
             createOnboardingUI();
             enforceAntiBypass();
         }
