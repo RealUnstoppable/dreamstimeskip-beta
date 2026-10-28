@@ -66,6 +66,41 @@ describe('Song Data Integrity and File Linking', () => {
         }
     });
 
+    it('verifies all 404vincent tracks exist on disk, have correct artist attribution, and valid sources', () => {
+        const vincentIds = [
+            'fk-school-404vincent',
+            'dumb-luck-404vincent',
+            'i-do-this-404vincent',
+            'im-an-ae-404vincent',
+            'pull-up-404vincent',
+            'talk-a-lot-404vincent'
+        ];
+
+        for (const id of vincentIds) {
+            const song = getSongById(id);
+            expect(song).toBeDefined();
+            expect(song.artist).toBe('404vincent');
+            expect(song.src).toBeDefined();
+            expect(song.src.startsWith('/music/')).toBe(true);
+
+            const diskPath = path.join(process.cwd(), '.' + song.src);
+            expect(fs.existsSync(diskPath)).toBe(true);
+            const stats = fs.statSync(diskPath);
+            expect(stats.size).toBeGreaterThan(100000);
+        }
+    });
+
+    it('verifies Top 100 tracks do not reference 30-second preview snippet URLs', () => {
+        const top100 = librarySongs.filter(s => s.tags && s.tags.includes('top100'));
+        expect(top100.length).toBe(100);
+
+        for (const song of top100) {
+            if (song.streamUrl) {
+                expect(song.streamUrl).not.toContain('itunes.apple.com');
+            }
+        }
+    });
+
     it('safely handles search across both string and array lyrics formats without throwing', () => {
         const testTracks = [
             ...librarySongs.slice(0, 50),
