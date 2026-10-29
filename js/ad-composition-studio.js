@@ -40,7 +40,17 @@ export class CompositionStudio {
         this.blobFilter = 'both';         // 'both' | 'user-only' | 'lexi-only'
         this.showOuterCircles = true;
         this.showNameTags = true;
+        this.showDialogBox = true;
+        this.userName = 'User';
         this.isOpen = false;
+
+        // Load persisted settings
+        try {
+            const savedUserName = localStorage.getItem('medixly_comp_user_name');
+            if (savedUserName) this.userName = savedUserName;
+            const savedDialog = localStorage.getItem('medixly_comp_dialog_box');
+            if (savedDialog !== null) this.showDialogBox = savedDialog === 'true';
+        } catch (_) {}
 
         // DOM references (set during mount)
         this.panelEl = null;
@@ -143,6 +153,20 @@ export class CompositionStudio {
                     </div>
                 </section>
 
+                <!-- Editable User Name -->
+                <section class="comp-section">
+                    <div class="comp-section-header">
+                        <span class="comp-section-step">👤</span>
+                        <span class="comp-section-title">User Display Name</span>
+                    </div>
+                    <div class="comp-input-group">
+                        <input type="text" id="comp-input-user-name" class="comp-text-input" 
+                               placeholder="User" maxlength="24" value="${this.userName}"
+                               data-action="input-user-name">
+                        <button type="button" class="comp-reset-btn" data-action="reset-user-name" title="Reset to default">Reset</button>
+                    </div>
+                </section>
+
                 <!-- Visual Toggles -->
                 <section class="comp-section">
                     <div class="comp-section-header">
@@ -150,6 +174,12 @@ export class CompositionStudio {
                         <span class="comp-section-title">Visual Toggles</span>
                     </div>
                     <div class="comp-toggles">
+                        <label class="comp-toggle-row">
+                            <span class="comp-toggle-label">Dialog Box / Captions</span>
+                            <input type="checkbox" class="comp-toggle-input" data-action="toggle-dialog"
+                                   ${this.showDialogBox ? 'checked' : ''}>
+                            <span class="comp-toggle-slider"></span>
+                        </label>
                         <label class="comp-toggle-row">
                             <span class="comp-toggle-label">Outer Circles</span>
                             <input type="checkbox" class="comp-toggle-input" data-action="toggle-circles"
@@ -214,6 +244,19 @@ export class CompositionStudio {
                     case 'track':
                         this.bindTrack(parseInt(value, 10));
                         break;
+                    case 'reset-user-name':
+                        this.setUserName('User');
+                        const inputEl = this.panelEl.querySelector('#comp-input-user-name');
+                        if (inputEl) inputEl.value = 'User';
+                        break;
+                }
+            });
+
+            // Input listener for dynamic user name typing
+            this.panelEl.addEventListener('input', (e) => {
+                const target = e.target;
+                if (target && target.dataset.action === 'input-user-name') {
+                    this.setUserName(target.value);
                 }
             });
 
@@ -223,6 +266,9 @@ export class CompositionStudio {
                 if (!input.dataset.action) return;
 
                 switch (input.dataset.action) {
+                    case 'toggle-dialog':
+                        this.setDialogBox(input.checked);
+                        break;
                     case 'toggle-circles':
                         this.setOuterCircles(input.checked);
                         break;
@@ -342,6 +388,34 @@ export class CompositionStudio {
     }
 
     /**
+     * Toggle: Speaker text / dialog box visibility
+     */
+    setDialogBox(visible) {
+        this.showDialogBox = visible;
+        const captionsStage = this.controller.elements.captionCard?.closest('.ad-captions-stage') || 
+                              document.querySelector('.ad-captions-stage');
+        if (captionsStage) {
+            captionsStage.classList.toggle('captions-hidden', !visible);
+        }
+        try { localStorage.setItem('medixly_comp_dialog_box', String(visible)); } catch (_) {}
+    }
+
+    /**
+     * Dynamically edit displayed user name
+     */
+    setUserName(name) {
+        this.userName = (name && name.trim()) ? name.trim() : 'User';
+        const userTag = this.controller.elements.userTag || document.getElementById('speaker-tag-user');
+        if (userTag) {
+            const labelSpan = userTag.querySelector('span:last-child');
+            if (labelSpan) {
+                labelSpan.textContent = this.userName;
+            }
+        }
+        try { localStorage.setItem('medixly_comp_user_name', this.userName); } catch (_) {}
+    }
+
+    /**
      * Step 3: Bind a track and start pulse
      */
     bindTrack(trackNumber) {
@@ -357,6 +431,8 @@ export class CompositionStudio {
         this.setBlobFilter(this.blobFilter);
         this.setOuterCircles(this.showOuterCircles);
         this.setNameTags(this.showNameTags);
+        this.setDialogBox(this.showDialogBox);
+        this.setUserName(this.userName);
     }
 
     /**

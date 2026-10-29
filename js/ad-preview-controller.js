@@ -62,6 +62,7 @@ export class AdPreviewController {
     bindDOM(opts = {}) {
         this.elements.viewport = opts.viewport || document.getElementById('ad-viewport');
         this.elements.stage = opts.stage || document.getElementById('ad-stage');
+        this.elements.sceneHeader = opts.sceneHeader || document.querySelector('.ad-scene-header') || document.getElementById('ad-scene-header');
         this.elements.arena = opts.arena || document.getElementById('ad-blobs-arena');
 
         this.elements.pinkBlob = opts.pinkBlob || document.getElementById('pink-user-blob');
@@ -324,6 +325,9 @@ export class AdPreviewController {
                     const speaker = activeSegment.speaker;
                     if (currentTime >= start && currentTime <= end) {
                         el.className = `caption-word active-word-${speaker}`;
+                        if (this.elements.captionCard && this.elements.captionCard.scrollHeight > this.elements.captionCard.clientHeight) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
                     } else if (currentTime > end) {
                         el.className = `caption-word spoken-word-${speaker}`;
                     } else {
@@ -535,7 +539,7 @@ export class AdPreviewController {
             } else if (e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
                 e.preventDefault();
                 this.toggleCleanMode();
-            } else if (e.key >= '1' && e.key <= '5') {
+            } else if (e.key >= '1' && e.key <= '9') {
                 e.preventDefault();
                 this.initTrack(parseInt(e.key, 10));
             } else if (e.key === 'f' || e.key === 'F') {
@@ -586,6 +590,9 @@ export class AdPreviewController {
         }
         if (this.elements.topDock) {
             this.elements.topDock.classList.toggle('dock-hidden', this.isCleanMode);
+        }
+        if (this.elements.sceneHeader) {
+            this.elements.sceneHeader.classList.toggle('header-hidden', this.isCleanMode);
         }
         if (this.elements.tracksMenu) {
             this.elements.tracksMenu.classList.remove('menu-open');

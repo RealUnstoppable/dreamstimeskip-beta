@@ -10,8 +10,13 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 // Set up clean JSDOM structure before importing modules
 document.body.innerHTML = `
     <div id="ad-viewport" class="ad-preview-viewport">
-        <div id="ad-stage" class="ad-recording-stage">
-            <div id="ad-track-badge" class="ad-track-badge"></div>
+        <main id="ad-stage" class="ad-recording-stage">
+            <header id="ad-scene-header" class="ad-scene-header">
+                <div class="ad-brand-pill">
+                    <span class="ad-brand-text">Medixly Ad Studio</span>
+                </div>
+                <div id="ad-track-badge" class="ad-track-badge"></div>
+            </header>
             <div id="ad-track-title" class="ad-track-title"></div>
             <div id="ad-blobs-arena" class="ad-blobs-arena state-idle">
                 <div id="blob-slot-user" class="blob-slot blob-slot-user">
@@ -19,23 +24,31 @@ document.body.innerHTML = `
                         <div class="blob-resonance-ring"></div>
                         <div id="pink-user-blob" class="pink-user-blob"></div>
                     </div>
-                    <div id="speaker-tag-user" class="speaker-tag speaker-tag-user"></div>
+                    <div id="speaker-tag-user" class="speaker-tag speaker-tag-user">
+                        <span class="speaker-tag-dot"></span>
+                        <span id="speaker-name-user">User</span>
+                    </div>
                 </div>
                 <div id="blob-slot-lexi" class="blob-slot blob-slot-lexi">
                     <div id="lexi-ai-wrapper" class="lexi-ai-orb-wrapper">
                         <div class="blob-resonance-ring"></div>
                         <div id="lexi-ai-orb" class="lexi-ai-orb"></div>
                     </div>
-                    <div id="speaker-tag-lexi" class="speaker-tag speaker-tag-lexi"></div>
+                    <div id="speaker-tag-lexi" class="speaker-tag speaker-tag-lexi">
+                        <span class="speaker-tag-dot"></span>
+                        <span>Lexi AI</span>
+                    </div>
                 </div>
             </div>
-            <div id="caption-card" class="caption-card speaker-user">
-                <div id="caption-text" class="caption-text"></div>
-                <div class="caption-progress-track">
-                    <div id="caption-progress-fill" class="caption-progress-fill"></div>
+            <section class="ad-captions-stage">
+                <div id="caption-card" class="caption-card speaker-user">
+                    <div id="caption-text" class="caption-text"></div>
+                    <div class="caption-progress-track">
+                        <div id="caption-progress-fill" class="caption-progress-fill"></div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
         <div id="ad-countdown-overlay" class="ad-countdown-overlay">
             <div id="countdown-number" class="countdown-number">3</div>
         </div>
@@ -45,6 +58,10 @@ document.body.innerHTML = `
             <button id="btn-tracks-menu"></button>
         </nav>
         <div id="tracks-dropdown-menu" class="ad-tracks-menu">
+            <button class="track-item-btn"></button>
+            <button class="track-item-btn"></button>
+            <button class="track-item-btn"></button>
+            <button class="track-item-btn"></button>
             <button class="track-item-btn"></button>
             <button class="track-item-btn"></button>
             <button class="track-item-btn"></button>

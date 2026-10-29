@@ -132,6 +132,18 @@ app.use(async (req, res, next) => {
   if (reqPath === '/ad-preview-5' || reqPath === '/ad-preview-5/') {
     reqPath = '/ad-preview-5.html';
   }
+  if (reqPath === '/ad-preview-6' || reqPath === '/ad-preview-6/') {
+    reqPath = '/ad-preview-6.html';
+  }
+  if (reqPath === '/ad-preview-7' || reqPath === '/ad-preview-7/') {
+    reqPath = '/ad-preview-7.html';
+  }
+  if (reqPath === '/ad-preview-8' || reqPath === '/ad-preview-8/') {
+    reqPath = '/ad-preview-8.html';
+  }
+  if (reqPath === '/ad-preview-9' || reqPath === '/ad-preview-9/') {
+    reqPath = '/ad-preview-9.html';
+  }
   
   if (reqPath.endsWith('.html')) {
     try {
