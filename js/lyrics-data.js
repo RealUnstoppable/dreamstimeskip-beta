@@ -16164,13 +16164,89 @@ export const lyricsData = {
     "krushdafight-n2uthehartlocker": [
         {
             "start": 0,
-            "end": 10,
+            "end": 14,
             "trending": false,
             "words": [
-                {
-                    "text": "[Lyrics not yet available]",
-                    "start": 0
-                }
+                { "text": "(Intro)", "start": 0 },
+                { "text": "Round", "start": 9.5 },
+                { "text": "one...", "start": 11.0 },
+                { "text": "Fight!", "start": 12.8 }
+            ]
+        },
+        {
+            "start": 14,
+            "end": 28,
+            "trending": true,
+            "words": [
+                { "text": "†KRUSHDAFIGHT!†", "start": 14.0 },
+                { "text": "(Heavy", "start": 17.5 },
+                { "text": "bass", "start": 20.0 },
+                { "text": "drop)", "start": 23.5 }
+            ]
+        },
+        {
+            "start": 28,
+            "end": 44,
+            "trending": false,
+            "words": [
+                { "text": "Heat...", "start": 29.0 },
+                { "text": "Heat...", "start": 33.0 },
+                { "text": "Yeah!", "start": 37.0 },
+                { "text": "Get", "start": 40.5 },
+                { "text": "down!", "start": 42.0 }
+            ]
+        },
+        {
+            "start": 44,
+            "end": 62,
+            "trending": false,
+            "words": [
+                { "text": "Perfect...", "start": 45.0 },
+                { "text": "Perfect...", "start": 50.5 },
+                { "text": "You", "start": 57.0 },
+                { "text": "win!", "start": 59.5 }
+            ]
+        },
+        {
+            "start": 62,
+            "end": 80,
+            "trending": true,
+            "words": [
+                { "text": "Round", "start": 64.0 },
+                { "text": "two...", "start": 66.0 },
+                { "text": "Fight!", "start": 68.0 },
+                { "text": "†KRUSHDAFIGHT!†", "start": 71.0 }
+            ]
+        },
+        {
+            "start": 80,
+            "end": 100,
+            "trending": false,
+            "words": [
+                { "text": "Heat...", "start": 82.0 },
+                { "text": "Heat...", "start": 86.0 },
+                { "text": "Rolling", "start": 91.0 },
+                { "text": "bassline", "start": 95.0 }
+            ]
+        },
+        {
+            "start": 100,
+            "end": 120,
+            "trending": false,
+            "words": [
+                { "text": "Perfect...", "start": 102.0 },
+                { "text": "Perfect...", "start": 107.0 },
+                { "text": "You", "start": 113.0 },
+                { "text": "win!", "start": 115.5 }
+            ]
+        },
+        {
+            "start": 120,
+            "end": 139,
+            "trending": false,
+            "words": [
+                { "text": "(Outro)", "start": 120.0 },
+                { "text": "N2UtheHartlocker", "start": 128.0 }
             ]
         }
     ],
