@@ -144,6 +144,9 @@ app.use(async (req, res, next) => {
   if (reqPath === '/ad-preview-9' || reqPath === '/ad-preview-9/') {
     reqPath = '/ad-preview-9.html';
   }
+  if (reqPath === '/ad-preview-showcase' || reqPath === '/ad-preview-showcase/' || reqPath === '/ad-preview-10' || reqPath === '/ad-preview-10/') {
+    reqPath = '/ad-preview.html';
+  }
   
   if (reqPath.endsWith('.html')) {
     try {

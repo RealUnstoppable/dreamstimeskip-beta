@@ -4,11 +4,34 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   Global: Hide wave/orb overlays for non-wave themes
+   Global: Smooth wave/orb transitions across themes
    -------------------------------------------------------------------------- */
-[data-bg-theme]:not([data-bg-theme="waves"]) .ad-waves-container,
-[data-bg-theme]:not([data-bg-theme="waves"]) .ad-bg-orb {
-  display: none;
+.ad-waves-container {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s ease;
+}
+
+.ad-bg-orb {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-bg-theme="waves"] .ad-waves-container,
+[data-bg-theme="dts-waves-hybrid"] .ad-waves-container,
+[data-bg-theme="dark-pink-waves"] .ad-waves-container {
+  opacity: 1;
+}
+
+[data-bg-theme="waves"] .ad-bg-orb,
+[data-bg-theme="pink"] .ad-bg-orb {
+  opacity: 0.75;
+}
+
+[data-bg-theme="dark-pink-waves"] .ad-waves-container {
+  opacity: 0.45;
+  filter: hue-rotate(-20deg) saturate(1.4);
 }
 
 /* --------------------------------------------------------------------------
@@ -273,4 +296,79 @@
   100% {
     background-position: 60% 30%, 35% 75%, center;
   }
+}
+
+/* ==========================================================================
+   6. DTS WAVES HYBRID  —  Purple Grid Canvas with Medixly Flowing SVG Waves
+   ========================================================================== */
+.ad-preview-viewport[data-bg-theme="dts-waves-hybrid"] {
+  background-color: #030108;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(147, 51, 234, 0.42) 0px,
+      rgba(147, 51, 234, 0.42) 1.5px,
+      transparent 1.5px,
+      transparent 80px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(124, 58, 237, 0.42) 0px,
+      rgba(124, 58, 237, 0.42) 1.5px,
+      transparent 1.5px,
+      transparent 80px
+    );
+  background-size: 80px 80px;
+  animation: dtsGridShift 18s linear infinite;
+  transform: translateZ(0);
+}
+
+.ad-preview-viewport[data-bg-theme="dts-waves-hybrid"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(147, 51, 234, 0.28) 0%,
+    rgba(56, 189, 248, 0.15) 40%,
+    transparent 70%
+  );
+  animation: dtsGlowPulse 3s ease-in-out infinite;
+  transform: translateZ(0);
+}
+
+/* ==========================================================================
+   7. DARK PINK WAVES  —  Minimalist Obsidian Canvas with Subtle Rose Waves
+   ========================================================================== */
+.ad-preview-viewport[data-bg-theme="dark-pink-waves"] {
+  background: radial-gradient(
+    circle at 50% 35%,
+    #0f0515 0%,
+    #050208 65%,
+    #000000 100%
+  );
+  transform: translateZ(0);
+}
+
+.ad-preview-viewport[data-bg-theme="dark-pink-waves"]::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    rgba(255, 0, 128, 0.09) 0%,
+    transparent 55%
+  );
+  animation: darkSpotlightDrift 22s ease-in-out infinite alternate;
+  transform: translateZ(0);
+}
+
+/* Audio-reactive pulsing for DTS grid themes */
+.ad-preview-viewport[data-bg-theme="dts-purple-grid"]::before,
+.ad-preview-viewport[data-bg-theme="dts-waves-hybrid"]::before {
+  opacity: calc(0.5 + var(--audio-bass-energy, 0) * 0.85);
+  transform: scale(calc(1 + var(--audio-bass-energy, 0) * 0.08));
+  transition: opacity 0.05s ease, transform 0.05s ease;
 }

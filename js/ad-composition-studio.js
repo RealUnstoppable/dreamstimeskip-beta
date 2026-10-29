@@ -6,11 +6,13 @@
  * Available animated background themes
  */
 export const BACKGROUND_THEMES = [
-    { id: 'waves',          label: 'Waves',                    icon: '🌊', description: 'Smooth SVG wave animation' },
-    { id: 'dts-purple-grid', label: 'DTS Purple Grid',         icon: '🟣', description: 'Dreams TimeSkip glowing grid' },
-    { id: 'pink',           label: 'Pink Vibrant',             icon: '💖', description: 'Fluid pink-magenta motion' },
-    { id: 'dark',           label: 'Dark Minimalist',          icon: '🖤', description: 'Sleek ambient dark canvas' },
-    { id: 'lexi-blue',      label: 'Lexi Blue',               icon: '💎', description: 'Signature intelligent blue glow' }
+    { id: 'waves',            label: 'Medixly Waves',            icon: '🌊', description: 'Smooth multi-layered SVG ribbon waves' },
+    { id: 'dts-purple-grid',   label: 'DTS Purple Grid',          icon: '🟣', description: 'Dreams TimeSkip glowing grid' },
+    { id: 'dts-waves-hybrid',  label: 'Grid + Waves Hybrid',      icon: '⚡', description: 'Purple grid + flowing waves' },
+    { id: 'pink',             label: 'Pink Creator Aura',        icon: '💖', description: 'Fluid pink-magenta motion' },
+    { id: 'lexi-blue',        label: 'Lexi Blue',                icon: '💎', description: 'Signature intelligent blue glow' },
+    { id: 'dark-pink-waves',  label: 'Dark + Pink Waves',        icon: '✨', description: 'Minimalist dark with pink waves' },
+    { id: 'dark',             label: 'Dark Minimalist',          icon: '🖤', description: 'Sleek ambient dark canvas' }
 ];
 
 /**
@@ -26,6 +28,8 @@ export const BLOB_FILTERS = [
  * CompositionStudio manages the settings gear panel with:
  * - Background selection
  * - Blob filtering (which blobs appear)
+ * - Auto background cycling toggle
+ * - Feature badges toggle
  * - Outer circle toggle
  * - Name tag toggle
  * - Track & pulse binding
@@ -38,6 +42,8 @@ export class CompositionStudio {
         // State
         this.activeBackground = 'waves';
         this.blobFilter = 'both';         // 'both' | 'user-only' | 'lexi-only'
+        this.autoCycleBackground = true;
+        this.showFeatureBadges = true;
         this.showOuterCircles = true;
         this.showNameTags = true;
         this.showCaptionBox = true;
@@ -54,6 +60,10 @@ export class CompositionStudio {
                 this.showCaptionBox = savedCaption === 'true';
                 this.showDialogBox = this.showCaptionBox;
             }
+            const savedAutoBg = localStorage.getItem('medixly_comp_auto_bg');
+            if (savedAutoBg !== null) this.autoCycleBackground = savedAutoBg === 'true';
+            const savedBadges = localStorage.getItem('medixly_comp_feature_badges');
+            if (savedBadges !== null) this.showFeatureBadges = savedBadges === 'true';
         } catch (_) {}
 
         // DOM references (set during mount)
@@ -179,6 +189,30 @@ export class CompositionStudio {
                         <span class="comp-section-title">Visual Toggles</span>
                     </div>
                     <div class="comp-toggles">
+                        <label class="comp-toggle-row" title="Cycle backgrounds automatically per choreography">
+                            <div class="comp-toggle-info">
+                                <span class="comp-toggle-label">Auto Backgrounds</span>
+                                <span class="comp-toggle-subtext">Dynamic scene cycling</span>
+                            </div>
+                            <div class="comp-toggle-ctrl">
+                                <span class="comp-toggle-state${this.autoCycleBackground ? '' : ' state-off'}">${this.autoCycleBackground ? 'ON' : 'OFF'}</span>
+                                <input type="checkbox" class="comp-toggle-input" data-action="toggle-auto-bg"
+                                       ${this.autoCycleBackground ? 'checked' : ''}>
+                                <span class="comp-toggle-slider"></span>
+                            </div>
+                        </label>
+                        <label class="comp-toggle-row" title="Show feature badges and status labels">
+                            <div class="comp-toggle-info">
+                                <span class="comp-toggle-label">Feature Badges</span>
+                                <span class="comp-toggle-subtext">Floating showcase pills</span>
+                            </div>
+                            <div class="comp-toggle-ctrl">
+                                <span class="comp-toggle-state${this.showFeatureBadges ? '' : ' state-off'}">${this.showFeatureBadges ? 'ON' : 'OFF'}</span>
+                                <input type="checkbox" class="comp-toggle-input" data-action="toggle-feature-badges"
+                                       ${this.showFeatureBadges ? 'checked' : ''}>
+                                <span class="comp-toggle-slider"></span>
+                            </div>
+                        </label>
                         <label class="comp-toggle-row" id="comp-toggle-caption-box-row" title="Toggle caption box under blobs">
                             <div class="comp-toggle-info">
                                 <span class="comp-toggle-label">Caption Box</span>
@@ -225,6 +259,13 @@ export class CompositionStudio {
                         <span class="comp-section-title">Track & Pulse Binding</span>
                     </div>
                     <div class="comp-tracks-list">
+                        <!-- Master Showcase Preset Button -->
+                        <button class="comp-option-btn comp-track-btn${this.controller.currentTrack?.isMasterShowcase ? ' active' : ''}"
+                                data-action="track" data-value="showcase"
+                                style="border: 1px solid #ec4899; background: rgba(236, 72, 153, 0.12); margin-bottom: 8px;">
+                            <span class="comp-option-label" style="color: #f43f5e; font-weight: 800;">✨ Full Feature Showcase</span>
+                            <span class="comp-track-duration" style="color: #38bdf8; font-weight: 800;">57.0s</span>
+                        </button>
                         ${trackOptions}
                     </div>
                 </section>
@@ -265,7 +306,7 @@ export class CompositionStudio {
                         this.setBlobFilter(value);
                         break;
                     case 'track':
-                        this.bindTrack(parseInt(value, 10));
+                        this.bindTrack(value === 'showcase' ? 'showcase' : parseInt(value, 10));
                         break;
                     case 'reset-user-name':
                         this.setUserName('User');
@@ -289,6 +330,14 @@ export class CompositionStudio {
                 if (!input.dataset.action) return;
 
                 switch (input.dataset.action) {
+                    case 'toggle-auto-bg':
+                        this.setAutoCycleBackground(input.checked);
+                        this._updateToggleStateLabel(input, input.checked);
+                        break;
+                    case 'toggle-feature-badges':
+                        this.setFeatureBadges(input.checked);
+                        this._updateToggleStateLabel(input, input.checked);
+                        break;
                     case 'toggle-caption-box':
                     case 'toggle-dialog':
                         this.setCaptionBox(input.checked);
@@ -354,9 +403,20 @@ export class CompositionStudio {
     /**
      * Step 1: Set background theme
      */
-    setBackground(themeId) {
+    setBackground(themeId, isManual = true) {
         if (!BACKGROUND_THEMES.find(t => t.id === themeId)) return;
         this.activeBackground = themeId;
+
+        if (isManual) {
+            this.setAutoCycleBackground(false);
+            if (this.panelEl) {
+                const autoBgInput = this.panelEl.querySelector('[data-action="toggle-auto-bg"]');
+                if (autoBgInput) {
+                    autoBgInput.checked = false;
+                    this._updateToggleStateLabel(autoBgInput, false);
+                }
+            }
+        }
 
         const viewport = this.controller.elements.viewport;
         if (viewport) {
@@ -364,6 +424,32 @@ export class CompositionStudio {
         }
 
         this._updateActiveButtons('bg', themeId);
+    }
+
+    /**
+     * Toggle: Auto background cycling based on choreography
+     */
+    setAutoCycleBackground(enabled) {
+        this.autoCycleBackground = Boolean(enabled);
+        try { localStorage.setItem('medixly_comp_auto_bg', String(this.autoCycleBackground)); } catch (_) {}
+    }
+
+    /**
+     * Toggle: Floating feature showcase badges
+     */
+    setFeatureBadges(visible) {
+        this.showFeatureBadges = Boolean(visible);
+        const featurePill = document.getElementById('ad-feature-pill');
+        if (featurePill) {
+            featurePill.style.display = this.showFeatureBadges ? '' : 'none';
+            if (!this.showFeatureBadges) featurePill.classList.remove('visible');
+        }
+        const orbPill = document.getElementById('ad-orb-status-pill');
+        if (orbPill) {
+            orbPill.style.display = this.showFeatureBadges ? '' : 'none';
+            if (!this.showFeatureBadges) orbPill.classList.remove('visible');
+        }
+        try { localStorage.setItem('medixly_comp_feature_badges', String(this.showFeatureBadges)); } catch (_) {}
     }
 
     /**
@@ -498,8 +584,10 @@ export class CompositionStudio {
      * Apply current state to DOM (for initialization)
      */
     _applyState() {
-        this.setBackground(this.activeBackground);
+        this.setBackground(this.activeBackground, false);
         this.setBlobFilter(this.blobFilter);
+        this.setAutoCycleBackground(this.autoCycleBackground);
+        this.setFeatureBadges(this.showFeatureBadges);
         this.setOuterCircles(this.showOuterCircles);
         this.setNameTags(this.showNameTags);
         this.setCaptionBox(this.showCaptionBox);

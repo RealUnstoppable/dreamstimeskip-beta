@@ -1,16 +1,16 @@
 // js/ad-preview-controller.js
-// Ad Screen-Recording Preview Scene Controller: Dual Blobs, Audio Analyser, Captions, Menu, & Auth Guard
+// Ad Screen-Recording Preview Scene Controller: Solo-Speaker Stage, Audio Analyser, Dynamic Backgrounds, Captions, Menu, & Auth Guard
 
-import { AD_TRACKS, getTrackById } from './ad-preview-data.js';
+import { AD_TRACKS, MASTER_SHOWCASE_TRACK, getTrackById } from './ad-preview-data.js';
 import { CompositionStudio } from './ad-composition-studio.js';
 
 export const AUTHORIZED_EMAIL = 'catalinandrian1@gmail.com';
 
 export class AdPreviewController {
     constructor(options = {}) {
-        this.tracks = AD_TRACKS;
-        this.currentTrack = this.tracks[0];
-        this.initialTrackId = options.initialTrackId || 'ad-preview-1';
+        this.tracks = [MASTER_SHOWCASE_TRACK, ...AD_TRACKS];
+        this.currentTrack = MASTER_SHOWCASE_TRACK;
+        this.initialTrackId = options.initialTrackId || 'showcase';
 
         this.audioEl = null;
         this.audioCtx = null;
@@ -22,8 +22,10 @@ export class AdPreviewController {
         this.isPlaying = false;
         this.currentEnergy = 0;
         this.smoothEnergy = 0;
+        this.smoothBassEnergy = 0;
         this.animFrameId = null;
-        this.currentSpeaker = 'idle'; // 'user' | 'lexi' | 'both' | 'transition' | 'idle'
+        this.currentSpeaker = 'idle'; // 'user' | 'lexi' | 'visualizer' | 'both' | 'transition' | 'idle'
+        this.currentBlobStyle = 'neon-purple';
 
         this.isAuthorized = false;
         this.currentUser = null;
@@ -69,9 +71,21 @@ export class AdPreviewController {
         this.elements.pinkBlobWrapper = opts.pinkBlobWrapper || document.getElementById('pink-user-wrapper');
         this.elements.lexiOrb = opts.lexiOrb || document.getElementById('lexi-ai-orb');
         this.elements.lexiOrbWrapper = opts.lexiOrbWrapper || document.getElementById('lexi-ai-wrapper');
+        this.elements.visualizerBlob = opts.visualizerBlob || document.getElementById('visualizer-blob');
+        this.elements.visualizerBlobWrapper = opts.visualizerBlobWrapper || document.getElementById('visualizer-blob-wrapper');
+        this.elements.visualizerSlot = opts.visualizerSlot || document.getElementById('blob-slot-visualizer');
+        this.elements.userSlot = opts.userSlot || document.getElementById('blob-slot-user');
+        this.elements.lexiSlot = opts.lexiSlot || document.getElementById('blob-slot-lexi');
+
+        this.elements.featurePill = opts.featurePill || document.getElementById('ad-feature-pill');
+        this.elements.featurePillText = opts.featurePillText || document.getElementById('feature-pill-text');
+        this.elements.featurePillIcon = opts.featurePillIcon || document.getElementById('feature-pill-icon');
+        this.elements.orbStatusPill = opts.orbStatusPill || document.getElementById('ad-orb-status-pill');
+        this.elements.miniWaveform = opts.miniWaveform || document.getElementById('ad-mini-waveform');
 
         this.elements.userTag = opts.userTag || document.getElementById('speaker-tag-user');
         this.elements.lexiTag = opts.lexiTag || document.getElementById('speaker-tag-lexi');
+        this.elements.visualizerTag = opts.visualizerTag || document.getElementById('speaker-tag-visualizer');
 
         this.elements.captionCard = opts.captionCard || document.getElementById('caption-card');
         this.elements.captionText = opts.captionText || document.getElementById('caption-text');
@@ -310,10 +324,24 @@ export class AdPreviewController {
 
         if (activeSegment) {
             // Update speaker state if changed
-            if (this.currentSpeaker !== activeSegment.speaker) {
-                this.setSpeakerState(activeSegment.speaker);
+            if (this.currentSpeaker !== activeSegment.speaker || this.currentBlobStyle !== activeSegment.blobStyle) {
+                this.currentBlobStyle = activeSegment.blobStyle;
+                this.setSpeakerState(activeSegment.speaker, activeSegment.blobStyle);
                 this.renderCaptionSegment(activeSegment);
             }
+
+            // Auto-Cycle background per segment if auto-cycle is enabled
+            if (activeSegment.background) {
+                this.currentBackground = activeSegment.background;
+                if (this.compositionStudio && this.compositionStudio.autoCycleBackground !== false) {
+                    if (this.compositionStudio.activeBackground !== activeSegment.background) {
+                        this.compositionStudio.setBackground(activeSegment.background, false);
+                    }
+                }
+            }
+
+            // Update Feature Showcase Overlays & Badges
+            this.updateFeatureOverlays(activeSegment);
 
             // Update word-level highlighting
             if (this.elements.captionText) {
@@ -346,16 +374,52 @@ export class AdPreviewController {
             }
         } else if (currentTime > this.currentTrack.duration) {
             this.setSpeakerState('idle');
+            this.updateFeatureOverlays({});
         }
     }
 
-    setSpeakerState(speaker) {
+    /**
+     * Update feature showcase pill badge and Lexi status label
+     */
+    updateFeatureOverlays(segment) {
+        const isBadgesEnabled = this.compositionStudio ? this.compositionStudio.showFeatureBadges : true;
+
+        // Floating feature pill (bottom of stage)
+        if (this.elements.featurePill) {
+            if (segment.featureBadge && isBadgesEnabled) {
+                if (this.elements.featurePillText) {
+                    this.elements.featurePillText.textContent = segment.featureBadge;
+                }
+                if (this.elements.miniWaveform) {
+                    const hasWaveform = segment.speaker === 'visualizer' || segment.featureBadge.includes('Waveform') || segment.featureBadge.includes('Lyrics');
+                    this.elements.miniWaveform.style.display = hasWaveform ? 'inline-flex' : 'none';
+                }
+                this.elements.featurePill.classList.add('visible');
+            } else {
+                this.elements.featurePill.classList.remove('visible');
+            }
+        }
+
+        // Orb status label (Above Lexi Orb)
+        if (this.elements.orbStatusPill) {
+            if (segment.statusLabel && isBadgesEnabled && segment.speaker === 'lexi') {
+                const textEl = this.elements.orbStatusPill.querySelector('.status-text') || this.elements.orbStatusPill;
+                textEl.textContent = segment.statusLabel;
+                this.elements.orbStatusPill.classList.add('visible');
+            } else {
+                this.elements.orbStatusPill.classList.remove('visible');
+            }
+        }
+    }
+
+    setSpeakerState(speaker, blobStyle) {
         this.currentSpeaker = speaker;
         if (!this.elements.arena) return;
 
         this.elements.arena.classList.remove(
             'state-user-active',
             'state-lexi-active',
+            'state-visualizer-active',
             'state-both-active',
             'state-idle'
         );
@@ -364,18 +428,30 @@ export class AdPreviewController {
             this.elements.arena.classList.add('state-user-active');
             if (this.elements.pinkBlobWrapper) this.elements.pinkBlobWrapper.classList.add('active-speaking');
             if (this.elements.lexiOrbWrapper) this.elements.lexiOrbWrapper.classList.remove('active-speaking');
+            if (this.elements.visualizerBlobWrapper) this.elements.visualizerBlobWrapper.classList.remove('active-speaking');
         } else if (speaker === 'lexi') {
             this.elements.arena.classList.add('state-lexi-active');
             if (this.elements.pinkBlobWrapper) this.elements.pinkBlobWrapper.classList.remove('active-speaking');
             if (this.elements.lexiOrbWrapper) this.elements.lexiOrbWrapper.classList.add('active-speaking');
+            if (this.elements.visualizerBlobWrapper) this.elements.visualizerBlobWrapper.classList.remove('active-speaking');
+        } else if (speaker === 'visualizer') {
+            this.elements.arena.classList.add('state-visualizer-active');
+            if (this.elements.pinkBlobWrapper) this.elements.pinkBlobWrapper.classList.remove('active-speaking');
+            if (this.elements.lexiOrbWrapper) this.elements.lexiOrbWrapper.classList.remove('active-speaking');
+            if (this.elements.visualizerBlobWrapper) this.elements.visualizerBlobWrapper.classList.add('active-speaking');
+            if (this.elements.visualizerBlob && blobStyle) {
+                this.elements.visualizerBlob.className = `visualizer-blob style-${blobStyle}`;
+            }
         } else if (speaker === 'both') {
             this.elements.arena.classList.add('state-both-active');
             if (this.elements.pinkBlobWrapper) this.elements.pinkBlobWrapper.classList.add('active-speaking');
             if (this.elements.lexiOrbWrapper) this.elements.lexiOrbWrapper.classList.add('active-speaking');
+            if (this.elements.visualizerBlobWrapper) this.elements.visualizerBlobWrapper.classList.remove('active-speaking');
         } else {
             this.elements.arena.classList.add('state-idle');
             if (this.elements.pinkBlobWrapper) this.elements.pinkBlobWrapper.classList.remove('active-speaking');
             if (this.elements.lexiOrbWrapper) this.elements.lexiOrbWrapper.classList.remove('active-speaking');
+            if (this.elements.visualizerBlobWrapper) this.elements.visualizerBlobWrapper.classList.remove('active-speaking');
         }
     }
 
@@ -392,39 +468,64 @@ export class AdPreviewController {
 
     processAudioReactivity() {
         let targetEnergy = 0;
+        let targetBass = 0;
 
         if (this.isPlaying && this.analyser && this.freqData) {
             this.analyser.getByteFrequencyData(this.freqData);
 
-            // Calculate speech band energy (approx 80Hz - 2200Hz)
-            const startBin = 2;
-            const endBin = Math.min(32, this.freqData.length);
-            let sum = 0;
-            for (let i = startBin; i < endBin; i++) {
-                sum += this.freqData[i];
+            // Bass & Sub-Bass band (approx 20Hz - 160Hz)
+            const bassBins = Math.min(6, this.freqData.length);
+            let bassSum = 0;
+            for (let i = 0; i < bassBins; i++) {
+                bassSum += this.freqData[i];
             }
-            targetEnergy = sum / ((endBin - startBin) * 255);
+            targetBass = bassSum / (bassBins * 255);
+
+            // Speech / vocal band (approx 180Hz - 2400Hz)
+            const endBin = Math.min(34, this.freqData.length);
+            let vocalSum = 0;
+            for (let i = bassBins; i < endBin; i++) {
+                vocalSum += this.freqData[i];
+            }
+            targetEnergy = vocalSum / ((endBin - bassBins) * 255);
         } else if (this.isPlaying) {
             // Fallback synthetic breathing pulse if Web Audio is suspended
             targetEnergy = 0.35 + Math.sin(Date.now() / 150) * 0.25;
+            targetBass = 0.45 + Math.sin(Date.now() / 240) * 0.35;
         }
 
         // Smooth energy damping (lerp)
         this.smoothEnergy += (targetEnergy - this.smoothEnergy) * 0.22;
+        this.smoothBassEnergy += (targetBass - this.smoothBassEnergy) * 0.28;
+
         const energy = Math.max(0, Math.min(1, this.smoothEnergy));
+        const bassEnergy = Math.max(0, Math.min(1, this.smoothBassEnergy));
+
+        // Pass real-time amplitude metrics to CSS variables for beat-reactive backgrounds
+        if (this.elements.viewport) {
+            this.elements.viewport.style.setProperty('--audio-energy', energy.toFixed(3));
+            this.elements.viewport.style.setProperty('--audio-bass-energy', bassEnergy.toFixed(3));
+        }
 
         // 1. Reactive Scale & Glow calculations
         const blobScale = (1 + energy * 0.38).toFixed(3);
         const ringScale = (1.15 + energy * 0.55).toFixed(3);
         const ringOpacity = (0.2 + energy * 0.65).toFixed(2);
 
+        // Visualizer bass scales
+        const vizScale = (1 + bassEnergy * 0.52).toFixed(3);
+        const vizRingScale = (1.18 + bassEnergy * 0.72).toFixed(3);
+        const vizRingOpacity = (0.3 + bassEnergy * 0.7).toFixed(2);
+
         // 2. Pink User Blob Audio-Reactive Styling
         if (this.elements.pinkBlob) {
             const isUserActive = this.currentSpeaker === 'user' || this.currentSpeaker === 'both';
-            if (isUserActive && this.isPlaying) {
-                const userGlow = (25 + energy * 70).toFixed(1);
-                const userLightGlow = (45 + energy * 95).toFixed(1);
-                this.elements.pinkBlob.style.transform = `scale(${blobScale})`;
+            const isVizFallback = this.currentSpeaker === 'visualizer' && !this.elements.visualizerBlob;
+            if ((isUserActive || isVizFallback) && this.isPlaying) {
+                const effectiveScale = isVizFallback ? vizScale : blobScale;
+                const userGlow = (25 + (isVizFallback ? bassEnergy : energy) * 70).toFixed(1);
+                const userLightGlow = (45 + (isVizFallback ? bassEnergy : energy) * 95).toFixed(1);
+                this.elements.pinkBlob.style.transform = `scale(${effectiveScale})`;
                 this.elements.pinkBlob.style.boxShadow = `
                     inset 0 0 20px 4px rgba(255, 255, 255, 0.45),
                     inset -5px -5px 15px rgba(159, 18, 57, 0.6),
@@ -466,7 +567,23 @@ export class AdPreviewController {
             }
         }
 
-        // 4. Update Resonance Rings
+        // 4. Medixly Reactive Visualizer Blob Audio-Reactive Styling
+        if (this.elements.visualizerBlob) {
+            const isVizActive = this.currentSpeaker === 'visualizer';
+            if (isVizActive && this.isPlaying) {
+                const vizGlow = (35 + bassEnergy * 85).toFixed(1);
+                this.elements.visualizerBlob.style.transform = `scale(${vizScale})`;
+                this.elements.visualizerBlob.style.boxShadow = `
+                    inset 0 0 20px 4px rgba(255, 255, 255, 0.5),
+                    0 0 ${vizGlow}px rgba(168, 85, 247, ${(0.6 + bassEnergy * 0.4).toFixed(2)}),
+                    0 0 ${(vizGlow * 1.5).toFixed(1)}px rgba(56, 189, 248, 0.45)
+                `;
+            } else {
+                this.elements.visualizerBlob.style.transform = 'scale(1)';
+            }
+        }
+
+        // 5. Update Resonance Rings
         if (this.elements.pinkBlobWrapper) {
             const ring = this.elements.pinkBlobWrapper.querySelector('.blob-resonance-ring');
             if (ring) {
@@ -480,6 +597,14 @@ export class AdPreviewController {
                 ring.style.transform = `translate(-50%, -50%) scale(${ringScale})`;
                 ring.style.opacity = ringOpacity;
             }
+        }
+        if (this.elements.visualizerBlobWrapper) {
+            const rings = this.elements.visualizerBlobWrapper.querySelectorAll('.blob-resonance-ring');
+            rings.forEach((ring, idx) => {
+                const mult = idx === 1 ? 1.25 : 1.0;
+                ring.style.transform = `translate(-50%, -50%) scale(${(vizRingScale * mult).toFixed(3)})`;
+                ring.style.opacity = vizRingOpacity;
+            });
         }
     }
 
@@ -608,6 +733,10 @@ export class AdPreviewController {
         if (this.elements.tracksMenu) {
             this.elements.tracksMenu.classList.remove('menu-open');
         }
+        const gearBtn = document.getElementById('btn-composition-gear');
+        if (gearBtn) {
+            gearBtn.style.display = this.isCleanMode ? 'none' : '';
+        }
         // Close Composition Studio in clean mode
         if (this.compositionStudio && this.isCleanMode) {
             this.compositionStudio.close();
@@ -649,6 +778,10 @@ export class AdPreviewController {
         if (this.elements.sceneHeader) {
             this.elements.sceneHeader.classList.add('header-hidden');
             this.elements.sceneHeader.style.display = 'none';
+        }
+        const gearBtn = document.getElementById('btn-composition-gear');
+        if (gearBtn) {
+            gearBtn.style.display = 'none';
         }
         if (this.elements.viewport) {
             this.elements.viewport.classList.add('countdown-active');
@@ -717,12 +850,17 @@ export class AdPreviewController {
     updateActiveTrackInMenu() {
         if (!this.elements.tracksMenu) return;
         const btns = this.elements.tracksMenu.querySelectorAll('.track-item-btn');
-        btns.forEach((btn, idx) => {
-            const track = this.tracks[idx];
-            if (track && track.id === this.currentTrack.id) {
-                btn.classList.add('active');
+        btns.forEach((btn) => {
+            const isShowcaseBtn = btn.classList.contains('preset-showcase-btn');
+            if (isShowcaseBtn) {
+                btn.classList.toggle('active', Boolean(this.currentTrack?.isMasterShowcase));
             } else {
-                btn.classList.remove('active');
+                const trackName = btn.querySelector('.track-name')?.textContent || '';
+                const match = trackName.match(/Track (\d+)/i);
+                if (match) {
+                    const trackNum = parseInt(match[1], 10);
+                    btn.classList.toggle('active', this.currentTrack?.trackNumber === trackNum && !this.currentTrack?.isMasterShowcase);
+                }
             }
         });
     }

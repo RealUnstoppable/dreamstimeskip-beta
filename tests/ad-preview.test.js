@@ -9,6 +9,7 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 
 // Set up clean JSDOM structure before importing modules
 document.body.innerHTML = `
+    <div id="ad-background-container" class="ad-background-container theme-waves"></div>
     <div id="ad-viewport" class="ad-preview-viewport">
         <main id="ad-stage" class="ad-recording-stage">
             <header id="ad-scene-header" class="ad-scene-header">
@@ -30,6 +31,10 @@ document.body.innerHTML = `
                     </div>
                 </div>
                 <div id="blob-slot-lexi" class="blob-slot blob-slot-lexi">
+                    <div id="ad-orb-status-pill" class="ad-orb-status-pill">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Lexi Mixer: Active</span>
+                    </div>
                     <div id="lexi-ai-wrapper" class="lexi-ai-orb-wrapper">
                         <div class="blob-resonance-ring"></div>
                         <div id="lexi-ai-orb" class="lexi-ai-orb"></div>
@@ -38,6 +43,27 @@ document.body.innerHTML = `
                         <span class="speaker-tag-dot"></span>
                         <span>Lexi AI</span>
                     </div>
+                </div>
+                <div id="blob-slot-visualizer" class="blob-slot blob-slot-visualizer">
+                    <div id="visualizer-blob-wrapper" class="visualizer-blob-wrapper">
+                        <div class="blob-resonance-ring"></div>
+                        <div id="visualizer-blob" class="visualizer-blob style-neon-purple"></div>
+                    </div>
+                    <div id="speaker-tag-visualizer" class="speaker-tag speaker-tag-visualizer">
+                        <span class="speaker-tag-dot"></span>
+                        <span>Beat Visualizer</span>
+                    </div>
+                </div>
+            </div>
+            <div id="ad-feature-pill" class="ad-feature-pill">
+                <span id="feature-pill-icon" class="feature-icon">✨</span>
+                <span id="feature-pill-text" class="feature-text">Voice Command: AI Queueing</span>
+                <div id="ad-mini-waveform" class="ad-mini-waveform" style="display: none;">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
                 </div>
             </div>
             <section class="ad-captions-stage">
@@ -91,9 +117,9 @@ if (typeof window !== 'undefined') {
     }
 }
 
-import { AD_TRACKS, getTrackById } from '../js/ad-preview-data.js';
+import { AD_TRACKS, MASTER_SHOWCASE_TRACK, SHOWCASE_TRACK, getTrackById } from '../js/ad-preview-data.js';
 import { AdPreviewController, AUTHORIZED_EMAIL } from '../js/ad-preview-controller.js';
-import { CompositionStudio } from '../js/ad-composition-studio.js';
+import { CompositionStudio, BACKGROUND_THEMES } from '../js/ad-composition-studio.js';
 
 describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
     let controller;
@@ -382,5 +408,226 @@ describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
             expect(content).toContain('catalinandrian1@gmail.com');
             expect(content).toContain('ad-waves-svg');
         });
+    });
+
+    it('verifies MASTER_SHOWCASE_TRACK exists, 57s duration, and audio files on disk (> 1MB)', () => {
+        expect(MASTER_SHOWCASE_TRACK).toBeDefined();
+        expect(MASTER_SHOWCASE_TRACK.id).toBe('ad-preview-showcase');
+        expect(MASTER_SHOWCASE_TRACK.duration).toBe(57.0);
+        expect(MASTER_SHOWCASE_TRACK.isMasterShowcase).toBe(true);
+
+        const showcaseAudio = path.join(ROOT_DIR, 'music/ads/ad-preview-showcase.mp3');
+        expect(fs.existsSync(showcaseAudio)).toBe(true);
+        expect(fs.statSync(showcaseAudio).size).toBeGreaterThan(1000000); // > 1MB
+
+        const showcase10Audio = path.join(ROOT_DIR, 'music/ads/ad-preview-10.mp3');
+        expect(fs.existsSync(showcase10Audio)).toBe(true);
+        expect(fs.statSync(showcase10Audio).size).toBeGreaterThan(1000000);
+
+        // Verify all 11 choreography intervals cover 0.0 to 57.0 seconds seamlessly
+        expect(MASTER_SHOWCASE_TRACK.choreography.length).toBe(11);
+        expect(MASTER_SHOWCASE_TRACK.choreography[0].start).toBe(0.0);
+        expect(MASTER_SHOWCASE_TRACK.choreography[MASTER_SHOWCASE_TRACK.choreography.length - 1].end).toBe(57.0);
+
+        MASTER_SHOWCASE_TRACK.choreography.forEach(seg => {
+            expect(['user', 'lexi', 'visualizer']).toContain(seg.speaker);
+            expect(seg.end).toBeGreaterThan(seg.start);
+            expect(seg.text.length).toBeGreaterThan(0);
+            expect(Array.isArray(seg.words)).toBe(true);
+            expect(seg.words.length).toBeGreaterThan(0);
+            expect(seg.background).toBeDefined();
+        });
+    });
+
+    it('verifies getTrackById resolves master showcase via showcase, ad-preview-showcase, master, and 0', () => {
+        expect(getTrackById('showcase').id).toBe('ad-preview-showcase');
+        expect(getTrackById('ad-preview-showcase').id).toBe('ad-preview-showcase');
+        expect(getTrackById('master').id).toBe('ad-preview-showcase');
+        expect(getTrackById('full-showcase').id).toBe('ad-preview-showcase');
+        expect(getTrackById(0).id).toBe('ad-preview-showcase');
+        expect(getTrackById('0').id).toBe('ad-preview-showcase');
+    });
+
+    it('enforces strict solo-speaker stage controller without simultaneous idle blobs', () => {
+        const arena = document.getElementById('ad-blobs-arena');
+        const pinkWrapper = document.getElementById('pink-user-wrapper');
+        const lexiWrapper = document.getElementById('lexi-ai-wrapper');
+        const visualizerWrapper = document.getElementById('visualizer-blob-wrapper');
+
+        // State 1: User solo active
+        controller.setSpeakerState('user');
+        expect(arena.classList.contains('state-user-active')).toBe(true);
+        expect(arena.classList.contains('state-lexi-active')).toBe(false);
+        expect(arena.classList.contains('state-visualizer-active')).toBe(false);
+        expect(pinkWrapper.classList.contains('active-speaking')).toBe(true);
+        expect(lexiWrapper.classList.contains('active-speaking')).toBe(false);
+        expect(visualizerWrapper.classList.contains('active-speaking')).toBe(false);
+
+        // State 2: Lexi solo active
+        controller.setSpeakerState('lexi');
+        expect(arena.classList.contains('state-lexi-active')).toBe(true);
+        expect(arena.classList.contains('state-user-active')).toBe(false);
+        expect(arena.classList.contains('state-visualizer-active')).toBe(false);
+        expect(lexiWrapper.classList.contains('active-speaking')).toBe(true);
+        expect(pinkWrapper.classList.contains('active-speaking')).toBe(false);
+        expect(visualizerWrapper.classList.contains('active-speaking')).toBe(false);
+
+        // State 3: Visualizer solo active (beat drops & instrumental)
+        controller.setSpeakerState('visualizer');
+        expect(arena.classList.contains('state-visualizer-active')).toBe(true);
+        expect(arena.classList.contains('state-user-active')).toBe(false);
+        expect(arena.classList.contains('state-lexi-active')).toBe(false);
+        expect(visualizerWrapper.classList.contains('active-speaking')).toBe(true);
+        expect(pinkWrapper.classList.contains('active-speaking')).toBe(false);
+        expect(lexiWrapper.classList.contains('active-speaking')).toBe(false);
+    });
+
+    it('executes complete 7-phase timeline choreography and feature showcase mapping', () => {
+        controller.initTrack('showcase');
+        expect(controller.currentTrack.id).toBe('ad-preview-showcase');
+
+        const featurePill = document.getElementById('ad-feature-pill');
+        const orbStatusPill = document.getElementById('ad-orb-status-pill');
+        const miniWaveform = document.getElementById('ad-mini-waveform');
+        const visualizerBlob = document.getElementById('visualizer-blob');
+
+        // Phase 1: Hook (0:00 - 0:06)
+        controller.syncChoreography(0.5);
+        expect(controller.currentSpeaker).toBe('user');
+        expect(controller.currentBackground).toBe('dts-purple-grid');
+        expect(featurePill.textContent).toContain('AI Queueing');
+
+        controller.syncChoreography(2.5);
+        expect(controller.currentSpeaker).toBe('user');
+        expect(controller.currentBackground).toBe('pink');
+
+        // Phase 2: Lexi Response (0:06 - 0:09)
+        controller.syncChoreography(7.0);
+        expect(controller.currentSpeaker).toBe('lexi');
+        expect(controller.currentBackground).toBe('lexi-blue');
+        expect(orbStatusPill.textContent).toContain('Lexi Mixer: Active');
+
+        // Phase 3: Beat Drop & Visualizer Showcase (0:10 - 0:16)
+        controller.syncChoreography(11.0);
+        expect(controller.currentSpeaker).toBe('visualizer');
+        expect(controller.currentBackground).toBe('dts-purple-grid');
+        expect(visualizerBlob.className).toContain('style-neon-purple');
+        expect(featurePill.textContent).toContain('Beat-Reactive Visualizer');
+
+        // Transition back to User before skip
+        controller.syncChoreography(15.0);
+        expect(controller.currentSpeaker).toBe('user');
+        expect(document.getElementById('caption-text').textContent).toContain('also have this');
+
+        // Phase 4: Viral Skip Feature Demo (0:17 - 0:21)
+        controller.syncChoreography(18.0);
+        expect(controller.currentSpeaker).toBe('user');
+        expect(controller.currentBackground).toBe('waves');
+        expect(featurePill.textContent).toContain('Viral Skip: Jump to Peak Drop');
+
+        controller.syncChoreography(20.0);
+        expect(controller.currentSpeaker).toBe('lexi');
+        expect(controller.currentBackground).toBe('lexi-blue');
+        expect(document.getElementById('caption-text').textContent).toContain('got you, twin');
+
+        // Phase 5: Pitbull Miami Track Drop & Synced Lyrics (0:22 - 0:28)
+        controller.syncChoreography(24.0);
+        expect(controller.currentSpeaker).toBe('visualizer');
+        expect(controller.currentBackground).toBe('dts-waves-hybrid');
+        expect(visualizerBlob.className).toContain('style-miami-cyan');
+        expect(featurePill.textContent).toContain('Synced Lyrics & Waveform Engine');
+        expect(miniWaveform.style.display).toBe('inline-flex');
+        expect(document.getElementById('caption-text').textContent).toContain('Miami');
+
+        // Phase 6: Promotional Pitch (0:29 - 0:43)
+        controller.syncChoreography(32.0);
+        expect(controller.currentSpeaker).toBe('user');
+        expect(controller.currentBackground).toBe('dark-pink-waves');
+        expect(featurePill.textContent).toContain('$0.99 Daily Price Drop');
+        expect(document.getElementById('caption-text').textContent).toContain('99¢');
+
+        // Phase 7: Outro & Editor Showcase (0:44 - 0:57)
+        controller.syncChoreography(46.0);
+        expect(controller.currentSpeaker).toBe('visualizer');
+        expect(controller.currentBackground).toBe('dts-purple-grid');
+        expect(featurePill.textContent).toContain('realunstoppable.store/medixly');
+
+        controller.syncChoreography(53.0);
+        expect(controller.currentSpeaker).toBe('visualizer');
+        expect(controller.currentBackground).toBe('waves');
+        expect(visualizerBlob.className).toContain('style-waves-cyan');
+    });
+
+    it('supports automated background cycling across all 7 background themes and manual override', () => {
+        expect(BACKGROUND_THEMES.length).toBe(7);
+        const themeIds = BACKGROUND_THEMES.map(t => t.id);
+        expect(themeIds).toEqual([
+            'waves',
+            'dts-purple-grid',
+            'dts-waves-hybrid',
+            'pink',
+            'lexi-blue',
+            'dark-pink-waves',
+            'dark'
+        ]);
+
+        const studio = new CompositionStudio(controller);
+        studio.mount();
+
+        expect(studio.autoCycleBackground).toBe(true);
+
+        // Turn autoCycle off
+        studio.setAutoCycleBackground(false);
+        expect(studio.autoCycleBackground).toBe(false);
+
+        // Manually select a theme
+        studio.setBackground('dts-waves-hybrid');
+        expect(studio.activeBackground).toBe('dts-waves-hybrid');
+        expect(document.getElementById('ad-viewport').getAttribute('data-bg-theme')).toBe('dts-waves-hybrid');
+
+        // Re-enable auto-cycle
+        studio.setAutoCycleBackground(true);
+        expect(studio.autoCycleBackground).toBe(true);
+
+        studio.destroy();
+    });
+
+    it('toggles feature showcase badges and ensures clean screen recording mode hides gear icon and scene header', () => {
+        const studio = new CompositionStudio(controller);
+        studio.mount();
+
+        const featurePill = document.getElementById('ad-feature-pill');
+        const orbStatusPill = document.getElementById('ad-orb-status-pill');
+        const gearBtn = document.getElementById('btn-composition-gear');
+        const sceneHeader = document.getElementById('ad-scene-header');
+
+        expect(studio.showFeatureBadges).toBe(true);
+
+        // Toggle off feature badges
+        studio.setFeatureBadges(false);
+        expect(studio.showFeatureBadges).toBe(false);
+        expect(featurePill.style.display).toBe('none');
+        expect(orbStatusPill.style.display).toBe('none');
+
+        // Toggle back on
+        studio.setFeatureBadges(true);
+        expect(studio.showFeatureBadges).toBe(true);
+        expect(featurePill.style.display).toBe('');
+        expect(orbStatusPill.style.display).toBe('');
+
+        // Clean screen recording mode
+        expect(controller.isCleanMode).toBe(false);
+        controller.toggleCleanMode();
+        expect(controller.isCleanMode).toBe(true);
+        expect(gearBtn.style.display).toBe('none');
+        expect(sceneHeader.style.display).toBe('none');
+
+        // Exit clean mode
+        controller.toggleCleanMode();
+        expect(controller.isCleanMode).toBe(false);
+        expect(gearBtn.style.display).toBe('');
+        expect(sceneHeader.style.display).toBe('');
+
+        studio.destroy();
     });
 });

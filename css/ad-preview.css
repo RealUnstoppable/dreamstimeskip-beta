@@ -197,7 +197,15 @@ html, body {
 .ad-scene-header.header-hidden,
 .ad-scene-header.header-user-hidden,
 .countdown-active .ad-scene-header,
-.clean-mode-active .ad-scene-header {
+.clean-mode-active .ad-scene-header,
+.clean-mode-active #btn-composition-gear,
+.countdown-active #btn-composition-gear,
+.clean-mode-active .btn-settings-gear,
+.countdown-active .btn-settings-gear,
+.clean-mode-active .ad-top-dock,
+.countdown-active .ad-top-dock,
+.clean-mode-active .ad-control-dock,
+.countdown-active .ad-control-dock {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
@@ -267,28 +275,39 @@ html, body {
     transform: scale(0.92) !important;
 }
 
-/* Speaker Slot Containers */
+/* Speaker Slot Containers — Strict Solo-Speaker Stage Controller */
 .blob-slot {
     position: absolute;
+    left: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-                opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity, filter;
 }
 
-/* Default Slot Positions */
+/* Default Anchor Slot Positions */
 .blob-slot-user {
-    left: 20%;
+    left: 50%;
     transform: translate(-50%, -15px);
 }
 
 .blob-slot-lexi {
-    right: 20%;
-    transform: translate(50%, -15px);
+    left: 50%;
+    transform: translate(140%, -15px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.blob-slot-visualizer {
+    left: 50%;
+    transform: translate(-50%, 60px) scale(0.6);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
 }
 
 /* Speaker Indicator Pills */
@@ -320,6 +339,13 @@ html, body {
     box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
 }
 
+.speaker-tag-visualizer {
+    background: rgba(147, 51, 234, 0.25);
+    border: 1px solid rgba(168, 85, 247, 0.5);
+    color: #d8b4fe;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.35);
+}
+
 .speaker-tag-dot {
     width: 6px;
     height: 6px;
@@ -336,61 +362,135 @@ html, body {
     box-shadow: 0 0 8px #38bdf8;
 }
 
-/* Dynamic State-Swapping Motion Classes */
-/* State 1: USER SPEAKING */
+.speaker-tag-visualizer .speaker-tag-dot {
+    background: #a855f7;
+    box-shadow: 0 0 8px #a855f7;
+}
+
+/* Strict Solo-Speaker Dynamic Motion Classes */
+
+/* State 1: USER SPEAKING (Pink Blob Dead-Center, Lexi Off-Stage Right) */
 .state-user-active .blob-slot-user {
-    transform: translate(-50%, 0) scale(1.18);
+    left: 50%;
+    transform: translate(-50%, -15px) scale(1.18);
     opacity: 1;
-    filter: drop-shadow(0 0 25px rgba(255, 0, 128, 0.45));
+    filter: drop-shadow(0 0 30px rgba(255, 0, 128, 0.55));
     z-index: 10;
+    pointer-events: auto;
 }
 
 .state-user-active .blob-slot-lexi {
-    transform: translate(65%, 20px) scale(0.72);
-    opacity: 0.25;
-    filter: grayscale(40%) blur(1.5px);
-    z-index: 5;
+    left: 50%;
+    transform: translate(140%, -15px) scale(0.6);
+    opacity: 0 !important;
+    filter: blur(4px);
+    z-index: 1;
+    pointer-events: none;
 }
 
-/* State 2: LEXI SPEAKING */
+.state-user-active .blob-slot-visualizer {
+    left: 50%;
+    transform: translate(-50%, 60px) scale(0.6);
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* State 2: LEXI SPEAKING (Blue Lexi Dead-Center, User Slid Out Left) */
 .state-lexi-active .blob-slot-user {
-    transform: translate(-65%, 20px) scale(0.72);
-    opacity: 0.25;
-    filter: grayscale(40%) blur(1.5px);
-    z-index: 5;
+    left: 50%;
+    transform: translate(-240%, -15px) scale(0.6);
+    opacity: 0 !important;
+    filter: blur(4px);
+    z-index: 1;
+    pointer-events: none;
 }
 
 .state-lexi-active .blob-slot-lexi {
-    transform: translate(50%, 0) scale(1.18);
+    left: 50%;
+    transform: translate(-50%, -15px) scale(1.18);
     opacity: 1;
-    filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.45));
+    filter: drop-shadow(0 0 30px rgba(56, 189, 248, 0.55));
     z-index: 10;
+    pointer-events: auto;
 }
 
-/* State 3: DUAL / BOTH ACTIVE */
+.state-lexi-active .blob-slot-visualizer {
+    left: 50%;
+    transform: translate(-50%, 60px) scale(0.6);
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* State 3: BEAT-REACTIVE VISUALIZER ACTIVE (Dead-Center, Bass Pulsing) */
+.state-visualizer-active .blob-slot-user {
+    left: 50%;
+    transform: translate(-240%, -15px) scale(0.6);
+    opacity: 0 !important;
+    filter: blur(4px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.state-visualizer-active .blob-slot-lexi {
+    left: 50%;
+    transform: translate(140%, -15px) scale(0.6);
+    opacity: 0 !important;
+    filter: blur(4px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.state-visualizer-active .blob-slot-visualizer {
+    left: 50%;
+    transform: translate(-50%, -15px) scale(1.22);
+    opacity: 1;
+    filter: drop-shadow(0 0 35px rgba(168, 85, 247, 0.75));
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* State 4: DUAL / BOTH ACTIVE (Side-by-Side Override Mode) */
 .state-both-active .blob-slot-user {
-    transform: translate(-50%, 0) scale(1.05);
+    left: 32%;
+    transform: translate(-50%, -15px) scale(1.05);
     opacity: 1;
     filter: none;
     z-index: 10;
 }
 
 .state-both-active .blob-slot-lexi {
-    transform: translate(50%, 0) scale(1.05);
+    left: 68%;
+    transform: translate(-50%, -15px) scale(1.05);
     opacity: 1;
     filter: none;
     z-index: 10;
 }
 
-/* State 4: IDLE / PAUSED */
+.state-both-active .blob-slot-visualizer {
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* State 5: IDLE / PAUSED (Solo Pink Blob Center Stage) */
 .state-idle .blob-slot-user {
-    transform: translate(-50%, 0) scale(0.95);
-    opacity: 0.85;
+    left: 50%;
+    transform: translate(-50%, -15px) scale(1);
+    opacity: 1;
+    z-index: 10;
 }
 
 .state-idle .blob-slot-lexi {
-    transform: translate(50%, 0) scale(0.95);
-    opacity: 0.85;
+    left: 50%;
+    transform: translate(140%, -15px) scale(0.6);
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+.state-idle .blob-slot-visualizer {
+    left: 50%;
+    transform: translate(-50%, 60px) scale(0.6);
+    opacity: 0 !important;
+    pointer-events: none;
 }
 
 /* ===== PINK USER BLOB MODEL ===== */
@@ -509,6 +609,178 @@ html, body {
         background-position: 100% 50%;
         filter: hue-rotate(-15deg);
     }
+}
+
+/* ===== BEAT-REACTIVE VISUALIZER BLOB MODEL ===== */
+.visualizer-blob-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visualizer-blob {
+    width: 146px;
+    height: 146px;
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.2) 30%, transparent 65%),
+                linear-gradient(135deg, #7c3aed 0%, #ec4899 45%, #38bdf8 100%);
+    border-radius: 50% 50% 40% 60% / 60% 40% 60% 40%;
+    background-size: 200% 200%;
+    box-shadow: inset 0 0 20px 4px rgba(255, 255, 255, 0.5),
+                inset -5px -5px 15px rgba(124, 58, 237, 0.7),
+                0 0 40px rgba(168, 85, 247, 0.75),
+                0 0 85px rgba(236, 72, 153, 0.55);
+    animation: blobShapeMorph 6s ease-in-out infinite, visualizerColorCycle 8s ease-in-out infinite;
+    position: relative;
+    z-index: 5;
+    transition: transform 0.04s linear, box-shadow 0.04s linear;
+    will-change: transform, box-shadow, border-radius;
+}
+
+.visualizer-blob.style-neon-purple {
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.7) 0%, transparent 60%),
+                linear-gradient(135deg, #9333ea 0%, #7c3aed 45%, #c084fc 100%);
+    box-shadow: inset 0 0 20px 4px rgba(255, 255, 255, 0.5),
+                0 0 45px rgba(168, 85, 247, 0.85),
+                0 0 95px rgba(147, 51, 234, 0.65);
+}
+
+.visualizer-blob.style-miami-cyan {
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.7) 0%, transparent 60%),
+                linear-gradient(135deg, #ff007f 0%, #38bdf8 60%, #06b6d4 100%);
+    box-shadow: inset 0 0 20px 4px rgba(255, 255, 255, 0.5),
+                0 0 45px rgba(56, 189, 248, 0.85),
+                0 0 95px rgba(255, 0, 128, 0.65);
+}
+
+.visualizer-blob.style-waves-cyan {
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.7) 0%, transparent 60%),
+                linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #ec4899 100%);
+    box-shadow: inset 0 0 20px 4px rgba(255, 255, 255, 0.5),
+                0 0 45px rgba(56, 189, 248, 0.85),
+                0 0 95px rgba(236, 72, 153, 0.65);
+}
+
+.visualizer-blob-wrapper .blob-resonance-ring {
+    border-color: rgba(168, 85, 247, 0.6);
+}
+
+.visualizer-blob-wrapper .ring-secondary {
+    border-color: rgba(56, 189, 248, 0.5);
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+@keyframes visualizerColorCycle {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(45deg); }
+}
+
+/* ===== FLOATING FEATURE SHOWCASE BADGES ===== */
+.ad-feature-pill {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.25);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 25;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+}
+
+.ad-feature-pill.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
+    pointer-events: auto;
+}
+
+/* Lexi Orb Status Pill (Above Lexi Orb) */
+.ad-orb-status-pill {
+    position: absolute;
+    top: -42px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: rgba(10, 25, 47, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    border-radius: 20px;
+    color: #7dd3fc;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    pointer-events: none;
+    z-index: 15;
+}
+
+.ad-orb-status-pill.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+.ad-orb-status-pill .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #38bdf8;
+    box-shadow: 0 0 8px #38bdf8;
+    animation: statusPulse 1.8s infinite;
+}
+
+@keyframes statusPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* Mini Audio Waveform indicator */
+.ad-mini-waveform {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    height: 14px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.ad-mini-waveform .wave-bar {
+    width: 3px;
+    height: 100%;
+    background: #38bdf8;
+    border-radius: 2px;
+    animation: waveBarBounce 1s ease-in-out infinite alternate;
+}
+.ad-mini-waveform .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 70%; background: #ec4899; }
+.ad-mini-waveform .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 90%; background: #a855f7; }
+.ad-mini-waveform .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 50%; background: #38bdf8; }
+.ad-mini-waveform .wave-bar:nth-child(5) { animation-delay: 0.3s; height: 80%; background: #ec4899; }
+
+@keyframes waveBarBounce {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
 }
 
 /* ===== ANIMATED CAPTIONS STAGE ===== */

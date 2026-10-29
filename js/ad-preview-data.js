@@ -1124,6 +1124,255 @@ export const AD_TRACKS = [
     }
 ];
 
+export const MASTER_SHOWCASE_TRACK = {
+    id: 'ad-preview-showcase',
+    trackNumber: 0,
+    title: 'Full Feature Showcase (Master 57s Ad)',
+    subtitle: 'Choreographed Timeline • Solo-Speaker Stage • Auto Backgrounds & Synced Lyrics',
+    src: '/music/ads/ad-preview-showcase.mp3',
+    duration: 57.0,
+    isMasterShowcase: true,
+    choreography: [
+        // Phase 1: Hook & AI Queueing (0:00 – 0:06)
+        // Background: Starts on Purple DTS Grid (0:00-0:01), then Pink Creator Aura / Medixly Waves (0:01-0:06)
+        {
+            start: 0.0,
+            end: 1.0,
+            speaker: 'user',
+            background: 'dts-purple-grid',
+            featureBadge: '✨ Voice Command: AI Queueing',
+            text: 'Now, with Medixly, you can!',
+            words: [
+                { word: 'Now,', start: 0.1, end: 0.7 },
+                { word: 'with', start: 0.7, end: 0.95 }
+            ]
+        },
+        {
+            start: 1.0,
+            end: 6.0,
+            speaker: 'user',
+            background: 'pink',
+            featureBadge: '✨ Voice Command: AI Queueing',
+            text: 'Now, with Medixly, you can! Hey Lexi, play some fire.',
+            words: [
+                { word: 'Medixly,', start: 1.0, end: 1.8 },
+                { word: 'you', start: 1.85, end: 2.1 },
+                { word: 'can!', start: 2.1, end: 2.7 },
+                { word: 'Hey', start: 3.2, end: 3.55 },
+                { word: 'Lexi,', start: 3.55, end: 4.1 },
+                { word: 'play', start: 4.4, end: 4.8 },
+                { word: 'some', start: 4.8, end: 5.1 },
+                { word: 'fire.', start: 5.1, end: 5.8 }
+            ]
+        },
+        // Phase 2: Lexi Response (0:06 – 0:09)
+        // Background: Crossfades immediately to Lexi Intelligence Blue
+        // Stage: Pink Blob slides out left; Blue Lexi Blob slides in from right to center stage
+        {
+            start: 6.0,
+            end: 9.6,
+            speaker: 'lexi',
+            background: 'lexi-blue',
+            statusLabel: '🎛️ Lexi Mixer: Active',
+            featureBadge: '🎛️ Lexi Mixer: Active',
+            text: "Queueing up global hits on Medixly. Let's go.",
+            words: [
+                { word: 'Queueing', start: 6.15, end: 6.7 },
+                { word: 'up', start: 6.7, end: 6.95 },
+                { word: 'global', start: 6.95, end: 7.45 },
+                { word: 'hits', start: 7.45, end: 7.85 },
+                { word: 'on', start: 7.85, end: 8.1 },
+                { word: 'Medixly.', start: 8.1, end: 8.7 },
+                { word: "Let's", start: 8.85, end: 9.2 },
+                { word: 'go.', start: 9.2, end: 9.6 }
+            ]
+        },
+        // Phase 3: Beat Drop & Blob Visualizer Showcase 1 (0:10 – 0:16)
+        // Background: Switches to Dreams TimeSkip Purple Grid
+        // Stage (9.6 - 14.2): Medixly Reactive Visualizer Blob dead-center bouncing heavily to bass!
+        {
+            start: 9.6,
+            end: 14.2,
+            speaker: 'visualizer',
+            blobStyle: 'neon-purple',
+            background: 'dts-purple-grid',
+            featureBadge: '🎵 Beat-Reactive Visualizer: 124 BPM Sub-Bass',
+            text: '♫ [Beat Drop: 124 BPM Sub-Bass Visualizer] ♫',
+            words: [
+                { word: '♫', start: 9.6, end: 10.5 },
+                { word: '[Bass', start: 10.5, end: 11.5 },
+                { word: 'Drop', start: 11.5, end: 12.5 },
+                { word: 'Visualizer]', start: 12.5, end: 13.5 },
+                { word: '♫', start: 13.5, end: 14.2 }
+            ]
+        },
+        // Transition (0:14 – 0:16): Morph back to solo Pink User Blob with caption
+        {
+            start: 14.2,
+            end: 16.8,
+            speaker: 'user',
+            background: 'dts-purple-grid',
+            featureBadge: '✨ Medixly Voice Control',
+            text: 'Oh, and we also have this...',
+            words: [
+                { word: 'Oh,', start: 14.3, end: 14.7 },
+                { word: 'and', start: 14.7, end: 14.95 },
+                { word: 'we', start: 14.95, end: 15.2 },
+                { word: 'also', start: 15.2, end: 15.6 },
+                { word: 'have', start: 15.6, end: 15.9 },
+                { word: 'this...', start: 15.9, end: 16.6 }
+            ]
+        },
+        // Phase 4: "Viral Skip" Feature Demo (0:17 – 0:21)
+        // Stage (0:17 – 0:19): Solo Pink User Blob centered on Medixly Signature Waves
+        {
+            start: 16.8,
+            end: 19.2,
+            speaker: 'user',
+            background: 'waves',
+            featureBadge: '⚡ Viral Skip: Jump to Peak Drop',
+            text: 'Hey Lexi, skip to the good part.',
+            words: [
+                { word: 'Hey', start: 16.9, end: 17.25 },
+                { word: 'Lexi,', start: 17.25, end: 17.7 },
+                { word: 'skip', start: 17.9, end: 18.25 },
+                { word: 'to', start: 18.25, end: 18.45 },
+                { word: 'the', start: 18.45, end: 18.65 },
+                { word: 'good', start: 18.65, end: 18.9 },
+                { word: 'part.', start: 18.9, end: 19.2 }
+            ]
+        },
+        // Stage (0:19 – 0:21): Pink slides left, Blue Lexi slides in on Lexi Blue
+        {
+            start: 19.2,
+            end: 21.8,
+            speaker: 'lexi',
+            background: 'lexi-blue',
+            statusLabel: '🎛️ Lexi Mixer: Active',
+            featureBadge: '⚡ Viral Skip: Instant Crossfade',
+            text: "I got you twin, let's go.",
+            words: [
+                { word: 'I', start: 19.35, end: 19.6 },
+                { word: 'got', start: 19.6, end: 19.85 },
+                { word: 'you,', start: 19.85, end: 20.1 },
+                { word: 'twin.', start: 20.1, end: 20.65 },
+                { word: "Let's", start: 20.8, end: 21.15 },
+                { word: 'go.', start: 21.15, end: 21.6 }
+            ]
+        },
+        // Phase 5: Main Miami Track Drop & Synced Lyrics Showcase (0:22 – 0:28)
+        // Background: Purple DTS Grid + Medixly Waves Hybrid pulsing to the beat
+        // Stage: Active Audio-Reactive Blob centered pulsing to Pitbull Miami vocal drop
+        {
+            start: 21.8,
+            end: 28.8,
+            speaker: 'visualizer',
+            blobStyle: 'miami-cyan',
+            background: 'dts-waves-hybrid',
+            featureBadge: '🌊 Synced Lyrics & Waveform Engine',
+            text: "Ey, I love Miami! What happens in Miami never happened (Let's do it!). Dale!",
+            words: [
+                { word: 'Ey,', start: 22.0, end: 22.45 },
+                { word: 'I', start: 22.45, end: 22.8 },
+                { word: 'love', start: 22.8, end: 23.25 },
+                { word: 'Miami!', start: 23.25, end: 24.2 },
+                { word: 'What', start: 24.35, end: 24.75 },
+                { word: 'happens', start: 24.75, end: 25.25 },
+                { word: 'in', start: 25.25, end: 25.55 },
+                { word: 'Miami,', start: 25.55, end: 26.15 },
+                { word: 'never', start: 26.15, end: 26.65 },
+                { word: 'happened', start: 26.65, end: 27.15 },
+                { word: "(Let's", start: 27.15, end: 27.55 },
+                { word: 'do it!)', start: 27.55, end: 27.95 },
+                { word: 'Dale!', start: 28.0, end: 28.75 }
+            ]
+        },
+        // Phase 6: Promotional Pitch (0:29 – 0:43)
+        // Background: Dark Minimalist Studio with subtle flowing Pink Waves
+        // Stage: Solo Pink Narrator Blob centered on stage
+        {
+            start: 28.8,
+            end: 43.8,
+            speaker: 'user',
+            background: 'dark-pink-waves',
+            featureBadge: '🏷️ $0.99 Daily Price Drop • Sound Elevated',
+            text: "We're dropping prices starting at just 99 cents today! But watch out, it goes up a dollar every single day. Lock it in before time runs out. Head to realunstoppable.store/medixly right now. Sound, elevated.",
+            words: [
+                { word: "We're", start: 28.9, end: 29.25 },
+                { word: 'dropping', start: 29.25, end: 29.75 },
+                { word: 'prices', start: 29.75, end: 30.3 },
+                { word: 'starting', start: 30.3, end: 30.8 },
+                { word: 'at', start: 30.8, end: 31.0 },
+                { word: 'just', start: 31.0, end: 31.4 },
+                { word: '99¢', start: 31.4, end: 32.1 },
+                { word: 'today!', start: 32.1, end: 32.8 },
+                { word: 'But', start: 32.9, end: 33.1 },
+                { word: 'watch', start: 33.1, end: 33.4 },
+                { word: 'out,', start: 33.4, end: 33.75 },
+                { word: 'it', start: 33.75, end: 33.95 },
+                { word: 'goes', start: 33.95, end: 34.3 },
+                { word: 'up', start: 34.3, end: 34.55 },
+                { word: 'a', start: 34.55, end: 34.65 },
+                { word: 'dollar', start: 34.65, end: 35.1 },
+                { word: 'every', start: 35.1, end: 35.45 },
+                { word: 'single', start: 35.45, end: 35.85 },
+                { word: 'day.', start: 35.85, end: 36.3 },
+                { word: 'Lock', start: 36.4, end: 36.75 },
+                { word: 'it', start: 36.75, end: 36.95 },
+                { word: 'in', start: 36.95, end: 37.2 },
+                { word: 'before', start: 37.2, end: 37.6 },
+                { word: 'time', start: 37.6, end: 37.95 },
+                { word: 'runs', start: 37.95, end: 38.25 },
+                { word: 'out.', start: 38.25, end: 38.5 },
+                { word: 'Head', start: 38.6, end: 38.95 },
+                { word: 'to', start: 38.95, end: 39.15 },
+                { word: 'realunstoppable.store/medixly', start: 39.15, end: 41.4 },
+                { word: 'right', start: 41.4, end: 41.75 },
+                { word: 'now.', start: 41.75, end: 42.2 },
+                { word: 'Sound,', start: 42.4, end: 42.95 },
+                { word: 'elevated.', start: 42.95, end: 43.7 }
+            ]
+        },
+        // Phase 7: Outro & Full Editor Showcase (0:44 – 0:57)
+        // Background: Cycles through Purple DTS Grid (43.8 – 50.0) and Medixly Waves (50.0 – 57.0)
+        // Stage: Active blob pulsing to music outro with clean branding
+        {
+            start: 43.8,
+            end: 50.0,
+            speaker: 'visualizer',
+            blobStyle: 'neon-purple',
+            background: 'dts-purple-grid',
+            featureBadge: '🚀 realunstoppable.store/medixly',
+            text: '♫ [Outro Beat • Dreams TimeSkip Purple Grid] ♫',
+            words: [
+                { word: '♫', start: 43.8, end: 45.0 },
+                { word: 'realunstoppable.store/medixly', start: 45.0, end: 48.5 },
+                { word: '♫', start: 48.5, end: 50.0 }
+            ]
+        },
+        {
+            start: 50.0,
+            end: 57.0,
+            speaker: 'visualizer',
+            blobStyle: 'waves-cyan',
+            background: 'waves',
+            featureBadge: '🚀 realunstoppable.store/medixly',
+            text: '♫ [Sound, Elevated • RealUnstoppable Store] ♫',
+            words: [
+                { word: '♫', start: 50.0, end: 52.0 },
+                { word: 'Sound,', start: 52.0, end: 53.5 },
+                { word: 'Elevated.', start: 53.5, end: 55.5 },
+                { word: '♫', start: 55.5, end: 57.0 }
+            ]
+        }
+    ]
+};
+
+export const SHOWCASE_TRACK = MASTER_SHOWCASE_TRACK;
+
 export function getTrackById(id) {
+    if (id === 'showcase' || id === 'ad-preview-showcase' || id === 'master' || id === 'full-showcase' || id === 0 || id === '0') {
+        return MASTER_SHOWCASE_TRACK;
+    }
     return AD_TRACKS.find(t => t.id === id || String(t.trackNumber) === String(id)) || AD_TRACKS[0];
 }

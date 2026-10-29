@@ -69,6 +69,11 @@
 
                 <!-- Lexi AI Orb Slot (Right) -->
                 <div id="blob-slot-lexi" class="blob-slot blob-slot-lexi">
+                    <!-- Status Label Above Orb -->
+                    <div id="ad-orb-status-pill" class="ad-orb-status-pill" aria-hidden="true">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Lexi Mixer: Active</span>
+                    </div>
                     <div id="lexi-ai-wrapper" class="lexi-ai-orb-wrapper">
                         <div class="blob-resonance-ring"></div>
                         <div id="lexi-ai-orb" class="lexi-ai-orb" role="img" aria-label="Lexi AI Orb"></div>
@@ -78,7 +83,33 @@
                         <span>Lexi AI</span>
                     </div>
                 </div>
+
+                <!-- Beat-Reactive Visualizer Blob Slot (Center) -->
+                <div id="blob-slot-visualizer" class="blob-slot blob-slot-visualizer">
+                    <div id="visualizer-blob-wrapper" class="visualizer-blob-wrapper">
+                        <div class="blob-resonance-ring"></div>
+                        <div class="blob-resonance-ring ring-secondary"></div>
+                        <div id="visualizer-blob" class="visualizer-blob style-neon-purple" role="img" aria-label="Beat-Reactive Visualizer Blob"></div>
+                    </div>
+                    <div id="speaker-tag-visualizer" class="speaker-tag speaker-tag-visualizer">
+                        <span class="speaker-tag-dot"></span>
+                        <span>Beat Visualizer</span>
+                    </div>
+                </div>
             </section>
+
+            <!-- Floating Feature Showcase Badge -->
+            <div id="ad-feature-pill" class="ad-feature-pill" aria-hidden="true">
+                <span id="feature-pill-icon" class="feature-icon">✨</span>
+                <span id="feature-pill-text" class="feature-text">Voice Command: AI Queueing</span>
+                <div id="ad-mini-waveform" class="ad-mini-waveform" style="display: none;">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                </div>
+            </div>
 
             <!-- Synchronized Captions Stage -->
             <section class="ad-captions-stage">
@@ -117,9 +148,19 @@
 
         <!-- Floating Track Selection Menu -->
         <div id="tracks-dropdown-menu" class="ad-tracks-menu">
-            <div class="menu-title">Select Audio Track & Scene</div>
+            <div class="menu-title">Select Audio Track & Preset</div>
+
+            <!-- Master Showcase Preset -->
+            <button class="track-item-btn preset-showcase-btn active" onclick="window.previewController.initTrack('showcase')">
+                <div class="track-info-col">
+                    <span class="track-name" style="color: #f43f5e; font-weight: 800;">✨ Full Feature Showcase (Master 57s Ad)</span>
+                    <span class="track-desc">Solo Stage • Dynamic Backgrounds • AI Queue & Miami Drop</span>
+                </div>
+                <span class="track-duration" style="color: #38bdf8; font-weight: 800;">57.0s</span>
+            </button>
+            <div style="height: 1px; background: rgba(255,255,255,0.12); margin: 6px 0;"></div>
             
-            <button class="track-item-btn active" onclick="window.previewController.initTrack(1)">
+            <button class="track-item-btn" onclick="window.previewController.initTrack(1)">
                 <div class="track-info-col">
                     <span class="track-name">Track 1: Skip to Good Part (Laugh)</span>
                     <span class="track-desc">Voice prompt & Lexi laugh response</span>
@@ -251,7 +292,7 @@
 
         // Check for URL query param track selector e.g. /ad-preview?track=3
         const params = new URLSearchParams(window.location.search);
-        const initialTrackId = params.get('track') || params.get('ad') || 'ad-preview-1';
+        const initialTrackId = params.get('track') || params.get('ad') || 'showcase';
 
         const controller = new AdPreviewController({ initialTrackId });
         window.previewController = controller;
