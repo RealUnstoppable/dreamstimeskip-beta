@@ -2821,8 +2821,9 @@ function initHarmonyTunes() {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    const memLevel = (data.membershipLevel || '').toLowerCase();
-                    const isPremium = memLevel === 'premium' || memLevel === 'ultimate';
+                    const memLevel = (data.membershipLevel || data.tier || '').toLowerCase();
+                    const isMedixlySub = data.medixlySubscription && data.medixlySubscription.status === 'active';
+                    const isPremium = memLevel === 'premium' || memLevel === 'ultimate' || memLevel === 'ultra' || isMedixlySub;
                     audioAdManager.setUser(user, isPremium);
 
                     if(docSnap.data().mixerToggled !== undefined) {

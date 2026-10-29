@@ -1,6 +1,9 @@
 # Environments
 .env
+.env.local
+.env*.local
 functions/.env
+functions/.env.local
 
 # Node modules
 node_modules/
