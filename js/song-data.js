@@ -29396,9 +29396,29 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Use Map for O(1) lookups instead of O(N) Array.find()
+let _lastLibraryLength = -1;
+let _songIndexMap = new Map();
+let _top100IndexMap = new Map();
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+
+    if (librarySongs.length !== _lastLibraryLength) {
+        _songIndexMap.clear();
+        _top100IndexMap.clear();
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            _songIndexMap.set(song.id, song);
+            if (song.id.startsWith('top100-')) {
+                _top100IndexMap.set(song.id.replace(/^top100-/, ''), song);
+            }
+        }
+        _lastLibraryLength = librarySongs.length;
+    }
+
+    return _songIndexMap.get(id) ||
+           _songIndexMap.get(`top100-${id}`) ||
+           _top100IndexMap.get(id) ||
+           undefined;
 }
