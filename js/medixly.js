@@ -174,8 +174,154 @@ function initHarmonyTunes() {
         }
     }
 
+    // --- PERSONALIZATION & RECOMMENDATION ENGINE ---
+    let currentUserDocData = null;
+    let currentUserPreferences = null;
+
+    function loadActiveUserPreferences() {
+        try {
+            const raw = localStorage.getItem('medixly_user_preferences');
+            if (raw) currentUserPreferences = JSON.parse(raw);
+        } catch (_) {}
+
+        if (currentUserDocData) {
+            currentUserPreferences = {
+                role: currentUserDocData.role || currentUserPreferences?.role || 'listener',
+                acquisitionSource: currentUserDocData.acquisitionSource || currentUserPreferences?.acquisitionSource || 'tiktok',
+                platforms: currentUserDocData.platforms || currentUserPreferences?.platforms || ['tiktok'],
+                genres: currentUserDocData.genres || currentUserPreferences?.genres || ['hiphop', 'pop'],
+                sfxNeeds: currentUserDocData.sfxNeeds || currentUserPreferences?.sfxNeeds || 'moderate',
+                favoriteArtists: currentUserDocData.favoriteArtists || currentUserPreferences?.favoriteArtists || [],
+                completed: currentUserDocData.onboardingCompleted || currentUserPreferences?.completed || false
+            };
+        }
+        return currentUserPreferences;
+    }
+
+    function computePersonalizedScore(song, prefs) {
+        if (!prefs) return 0;
+        let score = 0;
+        const songArtist = (song.artist || '').toLowerCase();
+        const songTags = (song.tags || []).map(t => t.toLowerCase());
+
+        // 1. Favorite Artist match (+60)
+        if (prefs.favoriteArtists && prefs.favoriteArtists.length > 0) {
+            for (const fav of prefs.favoriteArtists) {
+                const favLower = fav.toLowerCase();
+                if (songArtist.includes(favLower) || favLower.includes(songArtist)) {
+                    score += 60;
+                    break;
+                }
+            }
+        }
+
+        // 2. Genre match (+35 each)
+        if (prefs.genres && prefs.genres.length > 0) {
+            for (const genre of prefs.genres) {
+                const g = genre.toLowerCase();
+                if (g === 'hiphop' && (songTags.includes('hiphop') || songTags.includes('rap') || songTags.includes('hip-hop'))) score += 35;
+                else if (g === 'lofi' && (songTags.includes('lofi') || songTags.includes('lo-fi') || songTags.includes('chill') || songTags.includes('relaxed'))) score += 35;
+                else if (g === 'electronic' && (songTags.includes('electronic') || songTags.includes('dance') || songTags.includes('synth'))) score += 35;
+                else if (g === 'pop' && (songTags.includes('pop') || songTags.includes('dark pop'))) score += 35;
+                else if (g === 'cinematic' && (songTags.includes('soundtrack') || songTags.includes('cinematic') || songTags.includes('intense'))) score += 35;
+                else if (g === 'ambient' && (songTags.includes('relaxed') || songTags.includes('chill') || songTags.includes('ambient'))) score += 35;
+                else if (g === 'rock' && (songTags.includes('rock') || songTags.includes('metal') || songTags.includes('punk') || songTags.includes('metalcore'))) score += 35;
+                else if (g === 'rb' && (songTags.includes('rb') || songTags.includes('r-b'))) score += 35;
+                else if (g === 'country' && (songTags.includes('country') || songTags.includes('folk'))) score += 35;
+                else if (g === 'indie' && (songTags.includes('indie') || songTags.includes('folk'))) score += 35;
+                else if (songTags.includes(g)) score += 30;
+            }
+        }
+
+        // 3. Role-based weighting (+25)
+        const role = (prefs.role || 'listener').toLowerCase();
+        if (role === 'creator') {
+            if (songTags.includes('viral')) score += 25;
+            if (songTags.includes('upbeat') || songTags.includes('energetic')) score += 20;
+            if (songTags.includes('soundtrack') || songTags.includes('remix')) score += 20;
+        } else if (role === 'artist') {
+            if (songTags.includes('synth') || songTags.includes('remix') || songTags.includes('blues')) score += 25;
+        } else if (role === 'listener') {
+            if (songTags.includes('top100') || songTags.includes('viral')) score += 20;
+        } else if (role === 'explorer') {
+            if (songTags.includes('indie') || songTags.includes('latin') || songTags.includes('blues')) score += 20;
+        }
+
+        // 4. SFX Needs weighting (+20)
+        const sfx = (prefs.sfxNeeds || 'moderate').toLowerCase();
+        if (sfx === 'heavy') {
+            if (song.bpm && song.bpm >= 125) score += 15;
+            if (song.energy && song.energy >= 0.75) score += 15;
+            if (songTags.includes('intense') || songTags.includes('dark') || songTags.includes('viral')) score += 15;
+        } else if (sfx === 'light') {
+            if (songTags.includes('chill') || songTags.includes('lo-fi') || songTags.includes('relaxed')) score += 20;
+            if (song.bpm && song.bpm < 110) score += 10;
+        }
+
+        return score;
+    }
+
+    function renderRecommendedSongs() {
+        if (!containerRecommended) return;
+        const prefs = loadActiveUserPreferences();
+        
+        let recommended;
+        if (prefs && (prefs.genres?.length || prefs.favoriteArtists?.length || prefs.role)) {
+            recommended = [...librarySongs]
+                .filter(s => !s.isHidden && (s.src && (s.src.startsWith('http') || (s.src.startsWith('/music/') && !s.id.startsWith('song-')))))
+                .map(song => ({
+                    song,
+                    score: computePersonalizedScore(song, prefs) + (Math.random() * 5)
+                }))
+                .sort((a, b) => b.score - a.score)
+                .map(item => item.song);
+
+            const recHeader = containerRecommended.closest('.shelf')?.querySelector('.shelf-header');
+            if (recHeader) {
+                const roleLabels = {
+                    creator: 'Video Editor & Creator',
+                    listener: 'Music Enthusiast',
+                    artist: 'Producer & Artist',
+                    explorer: 'Explorer'
+                };
+                const roleLabel = roleLabels[prefs.role] || 'You';
+                recHeader.innerHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <h2>Recommended for You <span style="font-size: 0.65em; font-weight: 700; color: #bb86fc; background: rgba(187, 134, 252, 0.12); padding: 3px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle; border: 1px solid rgba(187,134,252,0.25);">Curated for ${escapeHTML(roleLabel)}</span></h2>
+                        <span style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.55);">Seeded with your favorite vibes & sound requirements</span>
+                    </div>
+                    <button id="edit-sound-profile-btn" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Edit Profile</button>
+                `;
+                const editBtn = document.getElementById('edit-sound-profile-btn');
+                if (editBtn) {
+                    editBtn.addEventListener('click', () => {
+                        if (typeof window.openMedixlyOnboarding === 'function') {
+                            window.openMedixlyOnboarding(5);
+                        }
+                    });
+                }
+            }
+        } else {
+            recommended = [...librarySongs]
+                .filter(s => !s.isHidden && (s.src && (s.src.startsWith('http') || (s.src.startsWith('/music/') && !s.id.startsWith('song-')))))
+                .sort(() => 0.5 - Math.random());
+        }
+
+        containerRecommended.innerHTML = recommended.slice(0, 30).map(song => createSongCard(song)).join('');
+        let existingShowMore = document.getElementById('show-more-recommended');
+        if (!existingShowMore) {
+            containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
+            existingShowMore = document.getElementById('show-more-recommended');
+            existingShowMore.addEventListener('click', (e) => {
+                containerRecommended.classList.toggle('expanded');
+                e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
+            });
+        }
+    }
+
     function renderHomePlaylists() {
-        const playlists = [
+        const prefs = loadActiveUserPreferences();
+        const basePlaylists = [
             { id: 'top100', title: "Top 100", desc: "Ranked Global Billboard & Viral Hits", cover: "/images/medixly-logo.png" },
             { id: 'main', title: "All Tracks", desc: "Complete Library" },
             { id: 'favorites', title: "Liked Songs", desc: "Your Favorites" },
@@ -183,6 +329,35 @@ function initHarmonyTunes() {
             { id: 'viral', title: "Viral Hits", desc: "Trending on TikTok" },
             { id: 'chill', title: "Late Night", desc: "Chill Vibes" }
         ];
+
+        const personalizedPlaylists = [];
+        if (prefs) {
+            personalizedPlaylists.push({
+                id: 'curated-mix',
+                title: "Curated For You",
+                desc: `Tailored ${prefs.role || 'custom'} daily blend`,
+                cover: "/images/medixly-logo.png"
+            });
+            if (prefs.role === 'creator' || prefs.sfxNeeds === 'heavy' || prefs.sfxNeeds === 'moderate') {
+                personalizedPlaylists.push({
+                    id: 'creator-vault',
+                    title: "Creator Sound Vault",
+                    desc: "Viral beat drops & editing audio",
+                    cover: "/images/harmony-tunes-card.jpg"
+                });
+            }
+            if (prefs.favoriteArtists && prefs.favoriteArtists.length > 0) {
+                const topArtist = prefs.favoriteArtists[0];
+                personalizedPlaylists.push({
+                    id: 'artist-spotlight',
+                    title: `Spotlight: ${topArtist}`,
+                    desc: `Featured collection for ${topArtist}`,
+                    cover: "/images/harmony-tunes-card.jpg"
+                });
+            }
+        }
+
+        const playlists = [...personalizedPlaylists, ...basePlaylists];
         
         const allPlaylistsHtml = playlists.map(pl => `
             <div class="music-card playlist-card" data-playlist-id="${escapeHTML(pl.id)}">
@@ -246,6 +421,16 @@ function initHarmonyTunes() {
     window.__setCurrentQueue = (q) => currentQueue = q;
     window.__setCurrentSongIndex = (i) => currentSongIndex = i;
     window.__getUserFavorites = () => userFavorites;
+    window.__computePersonalizedScore = computePersonalizedScore;
+    window.__loadActiveUserPreferences = loadActiveUserPreferences;
+    window.getPersonalizedRecommendations = () => {
+        const prefs = loadActiveUserPreferences();
+        return [...librarySongs]
+            .filter(s => !s.isHidden && s.src)
+            .map(s => ({ song: s, score: computePersonalizedScore(s, prefs) }))
+            .sort((a, b) => b.score - a.score)
+            .map(item => item.song);
+    };
 
     // --- DOM ELEMENTS ---
     const viewHome = document.getElementById('view-home');
@@ -934,6 +1119,43 @@ function initHarmonyTunes() {
                 if (playBtn) playBtn.onclick = () => {
                     if (chillSongs.length > 0) playContext(chillSongs, 0);
                 };
+            } else if (type === 'curated-mix') {
+                const prefs = loadActiveUserPreferences();
+                const songs = [...librarySongs]
+                    .filter(s => !s.isHidden && s.src)
+                    .map(s => ({ song: s, score: computePersonalizedScore(s, prefs) }))
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 50)
+                    .map(item => item.song);
+                if (titleEl) titleEl.textContent = "Curated For You";
+                if (descEl) descEl.textContent = `Personalized for your ${prefs?.role || 'sound'} profile • ${songs.length} songs`;
+                if (coverImg) coverImg.src = "/images/medixly-logo.png";
+                renderSongTable(songs);
+                if (playBtn) playBtn.onclick = () => {
+                    if (songs.length > 0) playContext(songs, 0);
+                };
+            } else if (type === 'creator-vault') {
+                const songs = librarySongs.filter(s => s.tags && (s.tags.includes('viral') || s.tags.includes('soundtrack') || (s.bpm && s.bpm >= 125)));
+                if (titleEl) titleEl.textContent = "Creator Sound Vault";
+                if (descEl) descEl.textContent = `High Impact Beats, Risers & SFX for Edits • ${songs.length} songs`;
+                if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
+                renderSongTable(songs);
+                if (playBtn) playBtn.onclick = () => {
+                    if (songs.length > 0) playContext(songs, 0);
+                };
+            } else if (type === 'artist-spotlight') {
+                const prefs = loadActiveUserPreferences();
+                const topArtist = (prefs?.favoriteArtists?.[0] || '').toLowerCase();
+                const songs = librarySongs.filter(s => (s.artist || '').toLowerCase().includes(topArtist));
+                const list = songs.length > 0 ? songs : librarySongs.slice(0, 25);
+                const displayName = prefs?.favoriteArtists?.[0] || 'Artist';
+                if (titleEl) titleEl.textContent = `Spotlight: ${displayName}`;
+                if (descEl) descEl.textContent = `Essential catalog & featured tracks • ${list.length} songs`;
+                if (coverImg) coverImg.src = "/images/harmony-tunes-card.jpg";
+                renderSongTable(list);
+                if (playBtn) playBtn.onclick = () => {
+                    if (list.length > 0) playContext(list, 0);
+                };
             } else {
                 const customPl = customPlaylists.find(p => p.id === type);
                 if (customPl) {
@@ -1125,22 +1347,17 @@ function initHarmonyTunes() {
             }
         }
 
-        // 2. Recommended
+        // 2. Recommended (Powered by Personalized Recommendation Engine)
         if (containerRecommended) {
-            const recommended = [...librarySongs]
-                .filter(s => !s.isHidden && (s.src && (s.src.startsWith('http') || (s.src.startsWith('/music/') && !s.id.startsWith('song-')))))
-                .sort(() => 0.5 - Math.random());
-            containerRecommended.innerHTML = recommended.slice(0, 30).map(song => createSongCard(song)).join('');
-            let existingShowMore = document.getElementById('show-more-recommended');
-            if (!existingShowMore) {
-                containerRecommended.insertAdjacentHTML('afterend', '<button id="show-more-recommended" class="show-more-btn">Show More</button>');
-                existingShowMore = document.getElementById('show-more-recommended');
-                existingShowMore.addEventListener('click', (e) => {
-                    containerRecommended.classList.toggle('expanded');
-                    e.target.textContent = containerRecommended.classList.contains('expanded') ? 'Show Less' : 'Show More';
-                });
-            }
+            renderRecommendedSongs();
         }
+
+        // Listen for preference updates from onboarding
+        window.addEventListener('medixly:preferences-updated', (e) => {
+            currentUserPreferences = e.detail;
+            renderRecommendedSongs();
+            renderHomePlaylists();
+        });
 
         // 3. TikToks — Dynamically inject robust iframes using the tiktokVideos array instead of flaky blockquotes
         if (containerTikToks) {
@@ -2821,6 +3038,8 @@ function initHarmonyTunes() {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    currentUserDocData = data;
+                    loadActiveUserPreferences();
                     const memLevel = (data.membershipLevel || data.tier || '').toLowerCase();
                     const isMedixlySub = data.medixlySubscription && data.medixlySubscription.status === 'active';
                     const isPremium = memLevel === 'premium' || memLevel === 'ultimate' || memLevel === 'ultra' || isMedixlySub;

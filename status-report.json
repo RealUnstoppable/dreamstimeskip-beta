@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-29T00:52:00.818Z",
+  "timestamp": "2026-10-29T01:41:56.265Z",
   "dateFormatted": "Oct 28, 2026",
   "overallStatus": "Operational",
   "badgeClass": "online",
@@ -80,6 +80,6 @@
   "operationalCount": 10,
   "offlineCount": 0,
   "maintenanceCount": 0,
-  "durationMs": 472,
-  "allDiscoveredPagesCount": 36
+  "durationMs": 558,
+  "allDiscoveredPagesCount": 37
 }

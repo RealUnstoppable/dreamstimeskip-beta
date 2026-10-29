@@ -49,9 +49,9 @@ export const ECOSYSTEM_SYSTEMS = [
     id: 'medixly',
     name: 'Medixly Music',
     primaryPage: 'medixly.html',
-    pages: ['medixly.html', 'medixly-artists.html', 'medixly-hits.html'],
-    scripts: ['js/medixly.js', 'js/song-data.js', 'js/audio-engine.js'],
-    styles: ['css/style.css']
+    pages: ['medixly.html', 'medixly-pricing.html', 'medixly-artists.html', 'medixly-hits.html'],
+    scripts: ['js/medixly.js', 'js/medixly-pricing-engine.js', 'js/medixly-pricing-ui.js', 'js/song-data.js', 'js/audio-engine.js'],
+    styles: ['css/style.css', 'css/medixly-pricing.css']
   },
   {
     id: 'unstoppable',
