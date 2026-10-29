@@ -1123,6 +1123,7 @@ function initHarmonyTunes() {
         setupNavigation();
         updateAdminAdTestVisibility(isMedixlyAdmin(currentUser, currentUserDocData));
         setupPlayerEvents();
+        initLexiStatusIndicator();
         
         let restored = false;
         try {
@@ -2073,6 +2074,11 @@ function initHarmonyTunes() {
             playerLikeBtn.classList.toggle('active', isFav);
         }
         if(fsLikeBtn) { fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;'; fsLikeBtn.classList.toggle('active', isFav); }
+        if (fsTitle) fsTitle.textContent = song.title;
+        if (fsArtist) fsArtist.textContent = song.artist;
+        if (fsArt) fsArt.src = song.art || '/images/medixly-logo.png';
+        if (fsBg) fsBg.style.backgroundImage = `url(${song.art || '/images/medixly-logo.png'})`;
+        if (typeof syncAllPlayerStates === 'function') syncAllPlayerStates();
 
         renderLyrics(song.id);
 
@@ -2145,6 +2151,7 @@ function initHarmonyTunes() {
         if (crossfadeInterval) clearInterval(crossfadeInterval);
 
         isCrossfading = false;
+        if (typeof setLexiMixingState === 'function') setLexiMixingState(false);
         if (mixerBtn) mixerBtn.classList.remove('pulsing');
         if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
         const mobMixerBtn = document.getElementById('mob-mixer-btn');
@@ -2203,6 +2210,12 @@ function initHarmonyTunes() {
 
         if (isCrossfading) {
             mixEngine.cancelCrossfade();
+            isCrossfading = false;
+            if (typeof setLexiMixingState === 'function') setLexiMixingState(false);
+            if (mixerBtn) mixerBtn.classList.remove('pulsing');
+            if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+            const mobMixerBtn = document.getElementById('mob-mixer-btn');
+            if (mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
             activeAudio.pause();
             nextAudio.pause();
             return;

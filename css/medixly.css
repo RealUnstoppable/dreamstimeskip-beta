@@ -1638,6 +1638,12 @@ body {
     display: inline !important;
 }
 
+#viral-skip-btn.viral-flash, #fs-viral-skip-btn.viral-flash, #mob-viral-btn.viral-flash {
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 10px #ff6b35) drop-shadow(0 0 18px rgba(255, 107, 53, 0.6));
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease;
+}
+
 /* ---- Mobile overflow and queue button ---- */
 .mobile-overflow-btn, .mobile-queue-btn {
     display: flex;
