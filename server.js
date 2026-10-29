@@ -103,6 +103,15 @@ app.use(async (req, res, next) => {
   if (reqPath === '/medixly/pricing' || reqPath === '/medixly-pricing' || reqPath === '/pricing') {
     reqPath = '/medixly-pricing.html';
   }
+  if (reqPath === '/medixly/player' || reqPath === '/medixly/stream' || reqPath === '/medixly/app') {
+    reqPath = '/medixly.html';
+  }
+  if (reqPath === '/medixly/hits') {
+    reqPath = '/medixly-hits.html';
+  }
+  if (reqPath === '/medixly/artists') {
+    reqPath = '/medixly-artists.html';
+  }
 
   // Internal Ad Screen-Recording Preview Scene routes
   if (reqPath === '/ad-preview' || reqPath === '/ad-preview/') {

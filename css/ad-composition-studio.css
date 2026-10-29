@@ -1,0 +1,311 @@
+/* css/ad-composition-studio.css */
+/* Composition Studio Panel — Settings Gear UI for Background + Blob + Track Mapping */
+
+/* ===== COMPOSITION STUDIO PANEL ===== */
+.comp-studio-panel {
+    position: fixed;
+    top: 74px;
+    left: 24px;
+    width: 340px;
+    max-height: calc(100vh - 120px);
+    background: rgba(9, 20, 42, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.65), 0 0 30px rgba(168, 85, 247, 0.15);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    z-index: 55;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    animation: compPanelSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform: translateZ(0);
+}
+
+.comp-studio-panel.panel-open {
+    display: flex;
+}
+
+@keyframes compPanelSlideIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Panel Header */
+.comp-studio-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.comp-studio-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #e2e8f0;
+}
+
+.comp-studio-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    line-height: 1;
+}
+
+.comp-studio-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+/* Panel Body (scrollable) */
+.comp-studio-body {
+    padding: 12px 16px 18px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.comp-studio-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.comp-studio-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.comp-studio-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Section Layout */
+.comp-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comp-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comp-section-step {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(56, 189, 248, 0.2) 100%);
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #c4b5fd;
+}
+
+.comp-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #94a3b8;
+}
+
+/* Options Grid (Backgrounds, Blob Filters) */
+.comp-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.comp-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid transparent;
+    color: #e2e8f0;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    font-size: 0.82rem;
+    font-weight: 500;
+}
+
+.comp-option-btn:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+.comp-option-btn.active {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+}
+
+.comp-option-icon {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.comp-option-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Track list (full-width buttons) */
+.comp-tracks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.comp-track-btn {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+}
+
+.comp-track-duration {
+    font-size: 0.72rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+/* ===== TOGGLE SWITCHES ===== */
+.comp-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.comp-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.comp-toggle-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.comp-toggle-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.comp-toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.comp-toggle-slider {
+    position: relative;
+    width: 38px;
+    height: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+}
+
+.comp-toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #94a3b8;
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.comp-toggle-input:checked + .comp-toggle-slider {
+    background: rgba(168, 85, 247, 0.5);
+}
+
+.comp-toggle-input:checked + .comp-toggle-slider::after {
+    transform: translateX(18px);
+    background: #c4b5fd;
+    box-shadow: 0 0 6px rgba(168, 85, 247, 0.6);
+}
+
+/* ===== BLOB FILTER CENTERING OVERRIDES ===== */
+/* When only one blob is visible, center it on the stage */
+.blob-filter-user-only .blob-slot-user {
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -15px) !important;
+}
+
+.blob-filter-user-only.state-user-active .blob-slot-user {
+    transform: translate(-50%, 0) scale(1.18) !important;
+}
+
+.blob-filter-user-only.state-idle .blob-slot-user {
+    transform: translate(-50%, 0) scale(0.95) !important;
+}
+
+.blob-filter-lexi-only .blob-slot-lexi {
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -15px) !important;
+}
+
+.blob-filter-lexi-only.state-lexi-active .blob-slot-lexi {
+    transform: translate(-50%, 0) scale(1.18) !important;
+}
+
+.blob-filter-lexi-only.state-idle .blob-slot-lexi {
+    transform: translate(-50%, 0) scale(0.95) !important;
+}
+
+/* Gear button active state */
+#btn-composition-gear.active {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border: none;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .comp-studio-panel {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-height: 60vh;
+    }
+
+    .comp-options-grid {
+        grid-template-columns: 1fr;
+    }
+}

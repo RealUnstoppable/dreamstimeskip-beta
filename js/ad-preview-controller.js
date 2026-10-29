@@ -2,6 +2,7 @@
 // Ad Screen-Recording Preview Scene Controller: Dual Blobs, Audio Analyser, Captions, Menu, & Auth Guard
 
 import { AD_TRACKS, getTrackById } from './ad-preview-data.js';
+import { CompositionStudio } from './ad-composition-studio.js';
 
 export const AUTHORIZED_EMAIL = 'catalinandrian1@gmail.com';
 
@@ -31,6 +32,9 @@ export class AdPreviewController {
         this.countdownTimer = null;
         this.playbackRate = 1.0;
 
+        // Composition Studio instance
+        this.compositionStudio = null;
+
         // DOM Elements
         this.elements = {};
     }
@@ -46,6 +50,10 @@ export class AdPreviewController {
 
         // Security Authorization Guard Check
         await this.initAuthGuard();
+
+        // Mount the Composition Studio (Background + Blob + Track Mapping)
+        this.compositionStudio = new CompositionStudio(this);
+        this.compositionStudio.mount();
 
         // Start 60fps render animation loop
         this.startRenderLoop();
@@ -582,6 +590,10 @@ export class AdPreviewController {
         if (this.elements.tracksMenu) {
             this.elements.tracksMenu.classList.remove('menu-open');
         }
+        // Close Composition Studio in clean mode
+        if (this.compositionStudio && this.isCleanMode) {
+            this.compositionStudio.close();
+        }
 
         if (this.elements.cleanHint) {
             if (this.isCleanMode) {
@@ -669,6 +681,7 @@ export class AdPreviewController {
     destroy() {
         if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
         if (this.countdownTimer) clearInterval(this.countdownTimer);
+        if (this.compositionStudio) this.compositionStudio.destroy();
         if (this.audioEl) {
             this.audioEl.pause();
             this.audioEl.src = '';

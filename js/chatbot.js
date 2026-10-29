@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/fir
 import { escapeHTML } from './utils.js';
 import { getVertexAI, getGenerativeModel } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-vertexai.js";
 import { librarySongs, getSongById } from './song-data.js?v=20260920';
+import { lyricsData } from './lyrics-data.js';
 import { products, productMap } from './products-data.js';
 
 // ==========================================
@@ -40,6 +41,8 @@ PAGE AWARENESS & ADVANCED PERSONAL CONTEXT:
 CONTEXTUAL MUSIC TRACKING & MEDIXLY POWERS:
 - When the user asks "What am I listening to?" or asks about the current song/media: ALWAYS call getCurrentlyPlayingSong to inspect active player state. Report the actual track currently playing or paused (Artist, Title, Progress).
 - DO NOT call playHarmonyTunesSong unless the user explicitly commands to play a specific song (e.g. "play [Song Name]").
+- If the user asks to see or show lyrics (e.g. "show lyrics for [Song Name]" or "show lyrics"): Call showLyricsForSong to retrieve and open synchronized lyrics.
+- If the user asks about mixing, crossfade, EQ, or DJ controls: Call adjustMixerSettings to tune playback parameters.
 - If a requested song is not in our library, offer to submit a song request to the admin via requestSongAddition.
 
 GAMES & SQUISHLY:
@@ -383,8 +386,9 @@ export function getDreamsCountdownsData() {
 export function searchMusicLibrary(query) {
     if (!query) return librarySongs.slice(0, 5);
     const q = query.toLowerCase().trim();
-    const cleanQ = q.replace(/^(play\s+|listen to\s+|put on\s+|search\s+|find\s+)/i, '')
+    const cleanQ = q.replace(/^(show\s+lyrics\s+for\s+|show\s+lyrics\s+|view\s+lyrics\s+for\s+|view\s+lyrics\s+|lyrics\s+for\s+|lyrics\s+to\s+|lyrics\s+of\s+|play\s+|listen to\s+|put on\s+|queue\s+|search\s+|find\s+)/i, '')
                     .replace(/^(a\s+song|a\s+track|some\s+music|music|songs)/i, '')
+                    .replace(/^(for\s+|to\s+|about\s+)/i, '')
                     .trim();
 
     if (!cleanQ || cleanQ.length < 2) {
@@ -392,14 +396,15 @@ export function searchMusicLibrary(query) {
     }
 
     let matches = librarySongs.filter(s => 
-        s.title.toLowerCase().includes(cleanQ) || 
-        s.artist.toLowerCase().includes(cleanQ)
+        (s.title && s.title.toLowerCase().includes(cleanQ)) || 
+        (s.artist && s.artist.toLowerCase().includes(cleanQ)) ||
+        (s.id && s.id.toLowerCase() === cleanQ)
     );
 
     if (matches.length === 0 && cleanQ.length > 2) {
         const words = cleanQ.split(/\s+/).filter(w => w.length > 2);
         matches = librarySongs.filter(s => 
-            words.some(w => s.title.toLowerCase().includes(w) || s.artist.toLowerCase().includes(w))
+            words.some(w => (s.title && s.title.toLowerCase().includes(w)) || (s.artist && s.artist.toLowerCase().includes(w)))
         );
     }
     return matches;
@@ -783,7 +788,90 @@ export function generateOfflineResponse(userInput) {
         }
     }
 
-    // 8. Music Playback Commands & Search
+    // 8. Synced Lyrics Inquiries ("Show lyrics for [Song Name]", "lyrics for [Song Name]", "show lyrics")
+    const isLyricsQuery = ['show lyrics', 'view lyrics', 'open lyrics', 'display lyrics', 'read lyrics', 'see lyrics', 'lyrics for', 'song lyrics', 'lyrics', 'sing along'].some(p => lower.includes(p));
+    if (isLyricsQuery) {
+        let cleanSongQuery = lower.replace(/^(show\s+lyrics\s+for|show\s+lyrics|view\s+lyrics\s+for|view\s+lyrics|open\s+lyrics\s+for|open\s+lyrics|display\s+lyrics\s+for|display\s+lyrics|see\s+lyrics\s+for|read\s+lyrics\s+for|lyrics\s+for|what\s+are\s+the\s+lyrics\s+to|what\s+are\s+the\s+lyrics\s+for|song\s+lyrics\s+for|sing\s+along\s+to|lyrics)/i, '').trim();
+        cleanSongQuery = cleanSongQuery.replace(/^(for\s+|to\s+|of\s+)/i, '').trim();
+
+        let targetSong = null;
+        if (cleanSongQuery && cleanSongQuery.length > 1) {
+            const matches = searchMusicLibrary(cleanSongQuery);
+            if (matches.length > 0) targetSong = matches[0];
+        }
+
+        // If no explicit song mentioned in query, fallback to live player track
+        if (!targetSong) {
+            const live = getLivePlayerState();
+            if (live.hasTrack && live.songId) {
+                targetSong = getSongById(live.songId);
+            }
+        }
+
+        // Default to new track if nothing playing and query was generic
+        if (!targetSong && cleanSongQuery.length === 0) {
+            targetSong = getSongById('damn-i-love-miami-pitbull-lil-jon') || librarySongs[0];
+        }
+
+        if (targetSong) {
+            // Trigger UI lyrics viewer if present
+            if (typeof window !== 'undefined') {
+                if (typeof window.showLyrics === 'function') {
+                    window.showLyrics(targetSong.id);
+                } else if (window.MedixlyAPI && typeof window.MedixlyAPI.showLyrics === 'function') {
+                    window.MedixlyAPI.showLyrics(targetSong.id);
+                }
+            }
+
+            const lyricsArray = lyricsData[targetSong.id];
+            let lyricsSnippet = '';
+            if (lyricsArray && Array.isArray(lyricsArray) && lyricsArray.length > 0) {
+                const previewLines = lyricsArray
+                    .filter(l => l.words && l.words.some(w => !w.text.startsWith('(')))
+                    .slice(0, 4)
+                    .map(l => l.words.map(w => w.text).join(' '));
+                
+                if (previewLines.length > 0) {
+                    lyricsSnippet = `\n\n**Lyrics Preview:**\n> *" ${previewLines.join(' "*\n> *" ')} "*`;
+                }
+            }
+
+            return `Here are the synchronized lyrics for **${escapeHTML(targetSong.title)}** by **${escapeHTML(targetSong.artist)}** on Medixly!${lyricsSnippet}\n\n` +
+                `Follow along in real-time with active line highlighting and karaoke sync in Medixly:\n` +
+                `[SHOW_LYRICS:${targetSong.id}] [PLAY_SONG:${targetSong.id}]`;
+        } else {
+            return `I couldn't find lyrics for **"${escapeHTML(cleanSongQuery)}"** in our Medixly catalog. Would you like me to submit a request to add this track?\n\n[REQUEST_SONG:${escapeHTML(cleanSongQuery)}]`;
+        }
+    }
+
+    // 9. Lexi Mixer & DJ Mixing Support
+    const isMixerQuery = ['lexi mixer', 'mixer mode', 'toggle mixer', 'enable mixer', 'turn on mixer', 'crossfade', 'set eq', 'bass boost', 'dj mode', 'beat match', 'mixing'].some(p => lower.includes(p));
+    if (isMixerQuery) {
+        let actionMsg = '';
+        if (typeof window !== 'undefined') {
+            if (lower.includes('enable') || lower.includes('turn on') || lower.includes('toggle') || lower.includes('mixer')) {
+                if (typeof window.toggleMixerMode === 'function') {
+                    window.toggleMixerMode();
+                    actionMsg = `\nI have toggled **Lexi Mixer Studio Mode** for you!`;
+                }
+            }
+            if (window.mixEngine && typeof window.mixEngine.setEQ === 'function') {
+                if (lower.includes('bass boost') || lower.includes('bass')) {
+                    window.mixEngine.setEQ('A', { bass: 6 });
+                    window.mixEngine.setEQ('B', { bass: 6 });
+                    actionMsg += `\nApplied **+6dB Bass Boost** to Deck A & B!`;
+                }
+            }
+        }
+        return `**Medixly Lexi Mixer Studio** is ready!${actionMsg}\n\n` +
+            `* **Dynamic Crossfade:** Seamlessly transitions tracks based on BPM matching (optimal fades for 124 BPM anthems like *Damn I Love Miami*).\n` +
+            `* **3-Band Studio EQ:** Precision bass, mid, and treble shelving.\n` +
+            `* **Viral Loop Mode:** Locks onto high-energy chorus drops for endless seamless looping.\n\n` +
+            `Would you like to queue up our new track **Damn I Love Miami** to test out the crossfade?\n` +
+            `[PLAY_SONG:damn-i-love-miami-pitbull-lil-jon]`;
+    }
+
+    // 10. Music Playback Commands & Search
     const isPlayMusic = lower.startsWith('play ') || lower === 'play' || lower.startsWith('put on ') || lower.startsWith('queue ') || lower.includes('play a song') || lower.includes('play track');
     const isMusicSearch = ['search song', 'find song', 'search music', 'find track', 'browse music'].some(p => lower.includes(p));
     if (isPlayMusic || isMusicSearch) {
@@ -954,6 +1042,48 @@ const tools = [
                         }
                     },
                     required: ["songName", "artistName"]
+                }
+            },
+            {
+                name: "showLyricsForSong",
+                description: "Display or query synchronized lyrics for a song or the currently playing song in Medixly.",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        songId: {
+                            type: "STRING",
+                            description: "The ID of the song to show lyrics for (optional, defaults to current playing song)."
+                        }
+                    }
+                }
+            },
+            {
+                name: "adjustMixerSettings",
+                description: "Adjust Medixly Lexi Mixer settings (crossfade duration, EQ bass/mid/treble, or toggle mixer mode).",
+                parameters: {
+                    type: "OBJECT",
+                    properties: {
+                        crossfadeDuration: {
+                            type: "NUMBER",
+                            description: "Target crossfade duration in seconds (e.g., 3-15)"
+                        },
+                        bass: {
+                            type: "NUMBER",
+                            description: "Bass gain in dB (-12 to +12)"
+                        },
+                        mid: {
+                            type: "NUMBER",
+                            description: "Mid gain in dB (-12 to +12)"
+                        },
+                        treble: {
+                            type: "NUMBER",
+                            description: "Treble gain in dB (-12 to +12)"
+                        },
+                        mixerEnabled: {
+                            type: "BOOLEAN",
+                            description: "Whether Lexi Mixer mode is enabled"
+                        }
+                    }
                 }
             }
         ]
@@ -1283,6 +1413,47 @@ export function initChatbot() {
                             } catch (e) {
                                 callResult = { success: false, error: e.message };
                             }
+                        } else if (call.name === "showLyricsForSong") {
+                            const songId = call.args.songId || (getCurrentlyPlaying()?.id) || 'damn-i-love-miami-pitbull-lil-jon';
+                            const song = getSongById(songId);
+                            const lyrics = lyricsData[songId] || [];
+                            if (typeof window !== 'undefined') {
+                                if (typeof window.showLyrics === 'function') {
+                                    window.showLyrics(songId);
+                                } else if (window.MedixlyAPI && typeof window.MedixlyAPI.showLyrics === 'function') {
+                                    window.MedixlyAPI.showLyrics(songId);
+                                }
+                            }
+                            callResult = {
+                                success: true,
+                                songId: songId,
+                                title: song?.title || "Unknown",
+                                artist: song?.artist || "Unknown",
+                                lyricsCount: lyrics.length,
+                                hasSyncedLyrics: lyrics.length > 0
+                            };
+                        } else if (call.name === "adjustMixerSettings") {
+                            const { crossfadeDuration, bass, mid, treble, mixerEnabled } = call.args;
+                            if (typeof window !== 'undefined') {
+                                if (typeof mixerEnabled === 'boolean' && typeof window.toggleMixerMode === 'function') {
+                                    window.toggleMixerMode();
+                                }
+                                if (window.mixEngine) {
+                                    if (typeof crossfadeDuration === 'number' && typeof window.mixEngine.setCrossfadeDuration === 'function') {
+                                        window.mixEngine.setCrossfadeDuration(crossfadeDuration);
+                                    }
+                                    if ((typeof bass === 'number' || typeof mid === 'number' || typeof treble === 'number') && typeof window.mixEngine.setEQ === 'function') {
+                                        window.mixEngine.setEQ('A', { bass, mid, treble });
+                                        window.mixEngine.setEQ('B', { bass, mid, treble });
+                                    }
+                                }
+                            }
+                            callResult = {
+                                success: true,
+                                message: "Lexi Mixer settings updated",
+                                crossfadeDuration,
+                                bass, mid, treble, mixerEnabled
+                            };
                         }
 
                         functionResponses.push({

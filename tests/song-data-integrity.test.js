@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
-import { librarySongs, getSongById } from '../js/song-data.js';
+import { librarySongs, getSongById, songColors } from '../js/song-data.js';
 import { lyricsData } from '../js/lyrics-data.js';
 
 describe('Song Data Integrity and File Linking', () => {
@@ -206,5 +206,66 @@ describe('Song Data Integrity and File Linking', () => {
         // Ensure trending/drop segment exists for Lexi viral looping
         const hasTrending = lyrics.some(l => l.trending === true);
         expect(hasTrending).toBe(true);
+    });
+
+    it('verifies Damn I Love Miami by Pitbull & Lil Jon has valid audio, high-res PNG cover art, Lexi mixing parameters, and fully synchronized lyrics', () => {
+        const song = getSongById('damn-i-love-miami-pitbull-lil-jon');
+        expect(song).toBeDefined();
+        expect(song.title).toBe('Damn I Love Miami');
+        expect(song.artist).toBe('Pitbull & Lil Jon');
+        expect(song.duration).toBe('3:03');
+        expect(song.src).toBe('/music/damn-i-love-miami-pitbull-lil-jon.mp3');
+
+        // 1. Verify audio file on disk
+        const audioDiskPath = path.join(process.cwd(), '.' + song.src);
+        expect(fs.existsSync(audioDiskPath)).toBe(true);
+        const audioStats = fs.statSync(audioDiskPath);
+        expect(audioStats.size).toBeGreaterThan(1000000); // > 1MB
+
+        // 2. Verify high-resolution PNG cover art on disk
+        expect(song.art).toBe('/images/damn-i-love-miami-cover.png');
+        const artDiskPath = path.join(process.cwd(), '.' + song.art);
+        expect(fs.existsSync(artDiskPath)).toBe(true);
+        const artStats = fs.statSync(artDiskPath);
+        expect(artStats.size).toBeGreaterThan(50000); // High-res asset
+        expect(song.art.endsWith('.png')).toBe(true);
+
+        // 3. Verify Lexi mixing & audio stream parameters
+        expect(song.bpm).toBe(124);
+        expect(song.energy).toBeGreaterThan(0.8);
+        expect(typeof song.inmixPoint).toBe('number');
+        expect(typeof song.outmixPoint).toBe('number');
+        expect(Array.isArray(song.tags)).toBe(true);
+        expect(song.tags).toContain('miami');
+        expect(song.tags).toContain('viral');
+        expect(songColors['damn-i-love-miami-pitbull-lil-jon']).toBe('#ff007f');
+
+        // 4. Verify synchronized lyrics
+        const lyrics = lyricsData['damn-i-love-miami-pitbull-lil-jon'];
+        expect(lyrics).toBeDefined();
+        expect(Array.isArray(lyrics)).toBe(true);
+        expect(lyrics.length).toBeGreaterThan(40); // 46 structured lines
+
+        // Ensure zero placeholder stubs
+        const hasPlaceholder = lyrics.some(l => l.words && l.words.some(w => w.text && w.text.includes('not yet available')));
+        expect(hasPlaceholder).toBe(false);
+
+        // Verify active word karaoke timestamps
+        for (const line of lyrics) {
+            expect(typeof line.start).toBe('number');
+            expect(typeof line.end).toBe('number');
+            expect(line.end).toBeGreaterThan(line.start);
+            expect(Array.isArray(line.words)).toBe(true);
+            expect(line.words.length).toBeGreaterThan(0);
+            for (const word of line.words) {
+                expect(typeof word.text).toBe('string');
+                expect(typeof word.start).toBe('number');
+                expect(word.start).toBeGreaterThanOrEqual(line.start - 0.1);
+            }
+        }
+
+        // Verify trending viral drops exist for Lexi Mixer dynamic loop
+        const trendingCount = lyrics.filter(l => l.trending === true).length;
+        expect(trendingCount).toBeGreaterThanOrEqual(10);
     });
 });

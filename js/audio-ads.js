@@ -235,7 +235,7 @@ export class AudioAdManager {
         }
 
         // Rule 1: Before a user plays a song (session start)
-        if (!this.isSessionAdPlayed()) {
+        if (!this.isSessionAdPlayed() && (context === 'before_play' || context === 'play_request')) {
             return true;
         }
 
@@ -345,6 +345,7 @@ export class AudioAdManager {
                     }).catch((err) => {
                         console.warn('AudioAdManager: autoplay check', err?.message || err);
                         this.updatePlayStateUI(false);
+                        this.completeAd();
                     });
                 } else {
                     this.updatePlayStateUI(true);
@@ -352,6 +353,7 @@ export class AudioAdManager {
             } catch (err) {
                 console.warn('AudioAdManager: play exception', err?.message || err);
                 this.updatePlayStateUI(false);
+                this.completeAd();
             }
         }
 

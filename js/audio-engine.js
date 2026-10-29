@@ -24,11 +24,56 @@ export class AudioMixEngine {
     this.deckBGain = null;
     this.masterGain = null;
     
+    // 3-Band Equalizers for Deck A and B
+    this.deckAEQ = null;
+    this.deckBEQ = null;
+    this.defaultCrossfadeDuration = 15;
+    this.streamHooks = [];
+    
     // WeakMap to prevent double-creation of MediaElementSource
     this.elementSources = new WeakMap();
     
     this.crossfadeTimeout = null;
     this.duckTimeout = null;
+  }
+
+  /**
+   * Helper to create a 3-band equalizer chain (lowshelf, peaking, highshelf)
+   */
+  createEQChain(ctx) {
+    if (!ctx) return null;
+    try {
+      const low = ctx.createBiquadFilter();
+      low.type = 'lowshelf';
+      low.frequency.value = 250;
+      low.gain.value = 0;
+
+      const mid = ctx.createBiquadFilter();
+      mid.type = 'peaking';
+      mid.frequency.value = 1500;
+      mid.Q.value = 1.0;
+      mid.gain.value = 0;
+
+      const high = ctx.createBiquadFilter();
+      high.type = 'highshelf';
+      high.frequency.value = 4000;
+      high.gain.value = 0;
+
+      low.connect(mid);
+      mid.connect(high);
+
+      return {
+        input: low,
+        output: high,
+        low,
+        mid,
+        high,
+        settings: { bass: 0, mid: 0, treble: 0 }
+      };
+    } catch (err) {
+      console.warn('AudioMixEngine: could not build EQ chain', err);
+      return null;
+    }
   }
 
   /**
@@ -70,11 +115,28 @@ export class AudioMixEngine {
       this.deckBGain.connect(this.masterGain);
     }
 
+    // Initialize EQ chains
+    if (!this.deckAEQ) {
+      this.deckAEQ = this.createEQChain(this.ctx);
+      if (this.deckAEQ) {
+        this.deckAEQ.output.connect(this.deckAGain);
+      }
+    }
+    if (!this.deckBEQ) {
+      this.deckBEQ = this.createEQChain(this.ctx);
+      if (this.deckBEQ) {
+        this.deckBEQ.output.connect(this.deckBGain);
+      }
+    }
+
+    const deckAInput = this.deckAEQ ? this.deckAEQ.input : this.deckAGain;
+    const deckBInput = this.deckBEQ ? this.deckBEQ.input : this.deckBGain;
+
     // Connect Deck A
     if (!this.elementSources.has(audioEl1)) {
       try {
         const sourceA = this.ctx.createMediaElementSource(audioEl1);
-        sourceA.connect(this.deckAGain);
+        sourceA.connect(deckAInput);
         this.elementSources.set(audioEl1, sourceA);
       } catch (err) {
         console.error('Failed to create source for Deck A', err);
@@ -83,7 +145,7 @@ export class AudioMixEngine {
       const sourceA = this.elementSources.get(audioEl1);
       try {
         sourceA.disconnect();
-        sourceA.connect(this.deckAGain);
+        sourceA.connect(deckAInput);
       } catch (err) {
         console.warn('AudioMixEngine: Deck A reconnect note', err);
       }
@@ -93,7 +155,7 @@ export class AudioMixEngine {
     if (!this.elementSources.has(audioEl2)) {
       try {
         const sourceB = this.ctx.createMediaElementSource(audioEl2);
-        sourceB.connect(this.deckBGain);
+        sourceB.connect(deckBInput);
         this.elementSources.set(audioEl2, sourceB);
       } catch (err) {
         console.error('Failed to create source for Deck B', err);
@@ -102,7 +164,7 @@ export class AudioMixEngine {
       const sourceB = this.elementSources.get(audioEl2);
       try {
         sourceB.disconnect();
-        sourceB.connect(this.deckBGain);
+        sourceB.connect(deckBInput);
       } catch (err) {
         console.warn('AudioMixEngine: Deck B reconnect note', err);
       }
@@ -467,6 +529,83 @@ export class AudioMixEngine {
   }
 
   /**
+   * Sets the 3-band EQ parameters for Deck A or Deck B
+   * @param {string} deck - 'A' or 'B'
+   * @param {Object} eqValues - { bass?: number, mid?: number, treble?: number } (-12 to +12 dB)
+   */
+  setEQ(deck, { bass, mid, treble } = {}) {
+    const eq = deck === 'A' ? this.deckAEQ : (deck === 'B' ? this.deckBEQ : null);
+    if (!eq || !this.ctx) return null;
+    
+    const clampGain = (val) => Math.max(-12, Math.min(12, typeof val === 'number' ? val : 0));
+    const t = this.ctx.currentTime;
+
+    if (typeof bass === 'number') {
+      const g = clampGain(bass);
+      eq.low.gain.setValueAtTime(g, t);
+      eq.settings.bass = g;
+    }
+    if (typeof mid === 'number') {
+      const g = clampGain(mid);
+      eq.mid.gain.setValueAtTime(g, t);
+      eq.settings.mid = g;
+    }
+    if (typeof treble === 'number') {
+      const g = clampGain(treble);
+      eq.high.gain.setValueAtTime(g, t);
+      eq.settings.treble = g;
+    }
+
+    this.triggerStreamHooks('eqChange', { deck, settings: { ...eq.settings } });
+    return { ...eq.settings };
+  }
+
+  /**
+   * Gets current 3-band EQ settings for Deck A or Deck B
+   * @param {string} deck - 'A' or 'B'
+   */
+  getEQ(deck) {
+    const eq = deck === 'A' ? this.deckAEQ : (deck === 'B' ? this.deckBEQ : null);
+    return eq ? { ...eq.settings } : { bass: 0, mid: 0, treble: 0 };
+  }
+
+  /**
+   * Sets the default or target crossfade duration
+   * @param {number} duration - seconds (1 to 30)
+   */
+  setCrossfadeDuration(duration) {
+    if (typeof duration === 'number' && !isNaN(duration)) {
+      this.defaultCrossfadeDuration = Math.max(1, Math.min(30, duration));
+      this.triggerStreamHooks('crossfadeDurationChange', { duration: this.defaultCrossfadeDuration });
+    }
+    return this.defaultCrossfadeDuration;
+  }
+
+  getCrossfadeDuration() {
+    return this.defaultCrossfadeDuration || 15;
+  }
+
+  /**
+   * Register audio stream hooks for real-time visualization or mixer callbacks
+   * @param {Function} hook - callback(event, payload)
+   */
+  addStreamHook(hook) {
+    if (typeof hook === 'function') {
+      this.streamHooks.push(hook);
+    }
+  }
+
+  triggerStreamHooks(event, payload) {
+    for (const hook of this.streamHooks) {
+      try {
+        hook(event, payload);
+      } catch (err) {
+        console.warn('AudioMixEngine stream hook notice:', err);
+      }
+    }
+  }
+
+  /**
    * Destroys the engine, disconnecting nodes and closing context
    */
   destroy() {
@@ -488,3 +627,6 @@ export class AudioMixEngine {
 }
 
 export const mixEngine = new AudioMixEngine();
+if (typeof window !== 'undefined') {
+  window.mixEngine = mixEngine;
+}

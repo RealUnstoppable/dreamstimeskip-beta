@@ -24829,5 +24829,2317 @@ export const lyricsData = {
                 }
             ]
         }
-    ]
+    ],
+    "damn-i-love-miami-pitbull-lil-jon": [
+        {
+                "start": 0.0,
+                "end": 2.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "(Intro",
+                                "start": 0.0
+                        },
+                        {
+                                "text": "beat)",
+                                "start": 1.4
+                        }
+                ]
+        },
+        {
+                "start": 2.8,
+                "end": 5.0,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Give",
+                                "start": 2.8
+                        },
+                        {
+                                "text": "it",
+                                "start": 3.3
+                        },
+                        {
+                                "text": "to",
+                                "start": 3.7
+                        },
+                        {
+                                "text": "me",
+                                "start": 4.1
+                        },
+                        {
+                                "text": "now",
+                                "start": 4.5
+                        }
+                ]
+        },
+        {
+                "start": 5.0,
+                "end": 7.6,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Ey,",
+                                "start": 5.0
+                        },
+                        {
+                                "text": "I",
+                                "start": 5.8
+                        },
+                        {
+                                "text": "love",
+                                "start": 6.3
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 6.8
+                        }
+                ]
+        },
+        {
+                "start": 7.6,
+                "end": 10.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "What",
+                                "start": 7.6
+                        },
+                        {
+                                "text": "happens",
+                                "start": 8.0
+                        },
+                        {
+                                "text": "in",
+                                "start": 8.5
+                        },
+                        {
+                                "text": "Miami,",
+                                "start": 8.8
+                        },
+                        {
+                                "text": "never",
+                                "start": 9.4
+                        },
+                        {
+                                "text": "happened",
+                                "start": 9.9
+                        },
+                        {
+                                "text": "(Let's",
+                                "start": 10.3
+                        },
+                        {
+                                "text": "do it!)",
+                                "start": 10.5
+                        }
+                ]
+        },
+        {
+                "start": 10.8,
+                "end": 15.0,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Give",
+                                "start": 10.8
+                        },
+                        {
+                                "text": "it",
+                                "start": 11.2
+                        },
+                        {
+                                "text": "to",
+                                "start": 11.5
+                        },
+                        {
+                                "text": "me",
+                                "start": 11.8
+                        },
+                        {
+                                "text": "now,",
+                                "start": 12.1
+                        },
+                        {
+                                "text": "what",
+                                "start": 12.4
+                        },
+                        {
+                                "text": "happens",
+                                "start": 12.7
+                        },
+                        {
+                                "text": "in",
+                                "start": 13.0
+                        },
+                        {
+                                "text": "Miami,",
+                                "start": 13.3
+                        },
+                        {
+                                "text": "never",
+                                "start": 13.8
+                        },
+                        {
+                                "text": "happened",
+                                "start": 14.2
+                        },
+                        {
+                                "text": "(Let's",
+                                "start": 14.5
+                        },
+                        {
+                                "text": "go!)",
+                                "start": 14.7
+                        }
+                ]
+        },
+        {
+                "start": 15.0,
+                "end": 18.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "I'mma",
+                                "start": 15.0
+                        },
+                        {
+                                "text": "hit",
+                                "start": 15.5
+                        },
+                        {
+                                "text": "this",
+                                "start": 15.9
+                        },
+                        {
+                                "text": "hotel,",
+                                "start": 16.3
+                        },
+                        {
+                                "text": "there's",
+                                "start": 16.8
+                        },
+                        {
+                                "text": "a",
+                                "start": 17.2
+                        },
+                        {
+                                "text": "party",
+                                "start": 17.5
+                        },
+                        {
+                                "text": "in",
+                                "start": 17.8
+                        },
+                        {
+                                "text": "that",
+                                "start": 18.0
+                        },
+                        {
+                                "text": "lobby",
+                                "start": 18.2
+                        }
+                ]
+        },
+        {
+                "start": 18.5,
+                "end": 22.0,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Remember",
+                                "start": 18.5
+                        },
+                        {
+                                "text": "careful",
+                                "start": 19.1
+                        },
+                        {
+                                "text": "who",
+                                "start": 19.5
+                        },
+                        {
+                                "text": "you",
+                                "start": 19.8
+                        },
+                        {
+                                "text": "mess",
+                                "start": 20.1
+                        },
+                        {
+                                "text": "with,",
+                                "start": 20.4
+                        },
+                        {
+                                "text": "'cause",
+                                "start": 20.7
+                        },
+                        {
+                                "text": "a",
+                                "start": 20.9
+                        },
+                        {
+                                "text": "ho",
+                                "start": 21.1
+                        },
+                        {
+                                "text": "tell",
+                                "start": 21.3
+                        },
+                        {
+                                "text": "everybody",
+                                "start": 21.6
+                        }
+                ]
+        },
+        {
+                "start": 22.0,
+                "end": 25.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Miami",
+                                "start": 22.0
+                        },
+                        {
+                                "text": "where",
+                                "start": 22.6
+                        },
+                        {
+                                "text": "all",
+                                "start": 23.0
+                        },
+                        {
+                                "text": "that",
+                                "start": 23.4
+                        },
+                        {
+                                "text": "ass",
+                                "start": 23.8
+                        },
+                        {
+                                "text": "from,",
+                                "start": 24.2
+                        },
+                        {
+                                "text": "and",
+                                "start": 24.5
+                        },
+                        {
+                                "text": "their",
+                                "start": 24.7
+                        },
+                        {
+                                "text": "girlfriends",
+                                "start": 24.9
+                        },
+                        {
+                                "text": "got",
+                                "start": 25.2
+                        },
+                        {
+                                "text": "one",
+                                "start": 25.4
+                        }
+                ]
+        },
+        {
+                "start": 25.5,
+                "end": 29.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Nah",
+                                "start": 25.5
+                        },
+                        {
+                                "text": "it",
+                                "start": 25.8
+                        },
+                        {
+                                "text": "ain't",
+                                "start": 26.0
+                        },
+                        {
+                                "text": "my",
+                                "start": 26.3
+                        },
+                        {
+                                "text": "birthday",
+                                "start": 26.6
+                        },
+                        {
+                                "text": "baby,",
+                                "start": 27.0
+                        },
+                        {
+                                "text": "but",
+                                "start": 27.3
+                        },
+                        {
+                                "text": "I",
+                                "start": 27.5
+                        },
+                        {
+                                "text": "wanna",
+                                "start": 27.7
+                        },
+                        {
+                                "text": "see",
+                                "start": 28.0
+                        },
+                        {
+                                "text": "you",
+                                "start": 28.3
+                        },
+                        {
+                                "text": "and",
+                                "start": 28.5
+                        },
+                        {
+                                "text": "her",
+                                "start": 28.7
+                        },
+                        {
+                                "text": "in",
+                                "start": 28.9
+                        },
+                        {
+                                "text": "your",
+                                "start": 29.1
+                        },
+                        {
+                                "text": "birthday",
+                                "start": 29.2
+                        },
+                        {
+                                "text": "suits",
+                                "start": 29.4
+                        }
+                ]
+        },
+        {
+                "start": 29.5,
+                "end": 33.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "I",
+                                "start": 29.5
+                        },
+                        {
+                                "text": "was",
+                                "start": 29.8
+                        },
+                        {
+                                "text": "like",
+                                "start": 30.1
+                        },
+                        {
+                                "text": "'Hey',",
+                                "start": 30.4
+                        },
+                        {
+                                "text": "she",
+                                "start": 30.8
+                        },
+                        {
+                                "text": "was",
+                                "start": 31.0
+                        },
+                        {
+                                "text": "like",
+                                "start": 31.2
+                        },
+                        {
+                                "text": "'Yo',",
+                                "start": 31.5
+                        },
+                        {
+                                "text": "I",
+                                "start": 31.8
+                        },
+                        {
+                                "text": "was",
+                                "start": 32.0
+                        },
+                        {
+                                "text": "like",
+                                "start": 32.2
+                        },
+                        {
+                                "text": "'Ballin'',",
+                                "start": 32.5
+                        },
+                        {
+                                "text": "she",
+                                "start": 32.8
+                        },
+                        {
+                                "text": "was",
+                                "start": 33.0
+                        },
+                        {
+                                "text": "like",
+                                "start": 33.2
+                        },
+                        {
+                                "text": "'Sho''",
+                                "start": 33.4
+                        }
+                ]
+        },
+        {
+                "start": 33.5,
+                "end": 37.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Wanna",
+                                "start": 33.5
+                        },
+                        {
+                                "text": "hit",
+                                "start": 33.9
+                        },
+                        {
+                                "text": "BT's,",
+                                "start": 34.3
+                        },
+                        {
+                                "text": "wanna",
+                                "start": 34.8
+                        },
+                        {
+                                "text": "hit",
+                                "start": 35.1
+                        },
+                        {
+                                "text": "Scarlets,",
+                                "start": 35.5
+                        },
+                        {
+                                "text": "wanna",
+                                "start": 35.9
+                        },
+                        {
+                                "text": "hit",
+                                "start": 36.2
+                        },
+                        {
+                                "text": "Tootsies,",
+                                "start": 36.6
+                        },
+                        {
+                                "text": "baby",
+                                "start": 37.0
+                        },
+                        {
+                                "text": "let's",
+                                "start": 37.2
+                        },
+                        {
+                                "text": "go",
+                                "start": 37.4
+                        }
+                ]
+        },
+        {
+                "start": 37.5,
+                "end": 41.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "She",
+                                "start": 37.5
+                        },
+                        {
+                                "text": "was",
+                                "start": 37.8
+                        },
+                        {
+                                "text": "mulatica,",
+                                "start": 38.1
+                        },
+                        {
+                                "text": "I'm",
+                                "start": 38.6
+                        },
+                        {
+                                "text": "talking",
+                                "start": 38.9
+                        },
+                        {
+                                "text": "'bout",
+                                "start": 39.2
+                        },
+                        {
+                                "text": "a",
+                                "start": 39.4
+                        },
+                        {
+                                "text": "killa,",
+                                "start": 39.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 40.0
+                        },
+                        {
+                                "text": "put",
+                                "start": 40.2
+                        },
+                        {
+                                "text": "her",
+                                "start": 40.4
+                        },
+                        {
+                                "text": "on",
+                                "start": 40.6
+                        },
+                        {
+                                "text": "the",
+                                "start": 40.8
+                        },
+                        {
+                                "text": "mic,",
+                                "start": 41.0
+                        },
+                        {
+                                "text": "beat",
+                                "start": 41.2
+                        },
+                        {
+                                "text": "it",
+                                "start": 41.3
+                        },
+                        {
+                                "text": "up",
+                                "start": 41.4
+                        },
+                        {
+                                "text": "like",
+                                "start": 41.5
+                        },
+                        {
+                                "text": "Thriller",
+                                "start": 41.7
+                        }
+                ]
+        },
+        {
+                "start": 41.5,
+                "end": 45.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "She",
+                                "start": 41.8
+                        },
+                        {
+                                "text": "and",
+                                "start": 42.1
+                        },
+                        {
+                                "text": "her",
+                                "start": 42.3
+                        },
+                        {
+                                "text": "best",
+                                "start": 42.6
+                        },
+                        {
+                                "text": "friend",
+                                "start": 42.9
+                        },
+                        {
+                                "text": "said",
+                                "start": 43.2
+                        },
+                        {
+                                "text": "'Bring",
+                                "start": 43.5
+                        },
+                        {
+                                "text": "one",
+                                "start": 43.8
+                        },
+                        {
+                                "text": "more',",
+                                "start": 44.0
+                        },
+                        {
+                                "text": "another",
+                                "start": 44.3
+                        },
+                        {
+                                "text": "bad",
+                                "start": 44.7
+                        },
+                        {
+                                "text": "one,",
+                                "start": 45.0
+                        },
+                        {
+                                "text": "you",
+                                "start": 45.2
+                        },
+                        {
+                                "text": "already",
+                                "start": 45.4
+                        },
+                        {
+                                "text": "know",
+                                "start": 45.6
+                        }
+                ]
+        },
+        {
+                "start": 45.8,
+                "end": 49.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 45.8
+                        },
+                        {
+                                "text": "I",
+                                "start": 46.2
+                        },
+                        {
+                                "text": "love",
+                                "start": 46.5
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 46.9
+                        },
+                        {
+                                "text": "(I",
+                                "start": 47.4
+                        },
+                        {
+                                "text": "love",
+                                "start": 47.7
+                        },
+                        {
+                                "text": "it),",
+                                "start": 48.0
+                        },
+                        {
+                                "text": "these",
+                                "start": 48.3
+                        },
+                        {
+                                "text": "girls",
+                                "start": 48.6
+                        },
+                        {
+                                "text": "speak",
+                                "start": 49.0
+                        },
+                        {
+                                "text": "my",
+                                "start": 49.2
+                        },
+                        {
+                                "text": "language",
+                                "start": 49.4
+                        }
+                ]
+        },
+        {
+                "start": 49.6,
+                "end": 53.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Russian",
+                                "start": 49.6
+                        },
+                        {
+                                "text": "roulette",
+                                "start": 50.1
+                        },
+                        {
+                                "text": "sexy",
+                                "start": 50.6
+                        },
+                        {
+                                "text": "(Sexy),",
+                                "start": 51.1
+                        },
+                        {
+                                "text": "body",
+                                "start": 51.6
+                        },
+                        {
+                                "text": "speaking",
+                                "start": 52.1
+                        },
+                        {
+                                "text": "Spanglish",
+                                "start": 52.6
+                        },
+                        {
+                                "text": "(\u00a1Aja!)",
+                                "start": 53.1
+                        }
+                ]
+        },
+        {
+                "start": 53.6,
+                "end": 57.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 53.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 54.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 54.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 54.8
+                        },
+                        {
+                                "text": "(I",
+                                "start": 55.3
+                        },
+                        {
+                                "text": "love",
+                                "start": 55.6
+                        },
+                        {
+                                "text": "it),",
+                                "start": 55.9
+                        },
+                        {
+                                "text": "and",
+                                "start": 56.2
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 56.5
+                        },
+                        {
+                                "text": "loves",
+                                "start": 57.0
+                        },
+                        {
+                                "text": "me",
+                                "start": 57.4
+                        }
+                ]
+        },
+        {
+                "start": 57.6,
+                "end": 61.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 57.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 58.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 58.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 58.8
+                        },
+                        {
+                                "text": "(Mia-Miami),",
+                                "start": 59.4
+                        },
+                        {
+                                "text": "there's",
+                                "start": 60.0
+                        },
+                        {
+                                "text": "nothing",
+                                "start": 60.4
+                        },
+                        {
+                                "text": "like",
+                                "start": 60.8
+                        },
+                        {
+                                "text": "it,",
+                                "start": 61.1
+                        },
+                        {
+                                "text": "trust",
+                                "start": 61.3
+                        },
+                        {
+                                "text": "me",
+                                "start": 61.5
+                        }
+                ]
+        },
+        {
+                "start": 61.6,
+                "end": 65.2,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "I",
+                                "start": 61.6
+                        },
+                        {
+                                "text": "got",
+                                "start": 62.0
+                        },
+                        {
+                                "text": "big",
+                                "start": 62.3
+                        },
+                        {
+                                "text": "decisions,",
+                                "start": 62.7
+                        },
+                        {
+                                "text": "I",
+                                "start": 63.2
+                        },
+                        {
+                                "text": "got",
+                                "start": 63.5
+                        },
+                        {
+                                "text": "two",
+                                "start": 63.8
+                        },
+                        {
+                                "text": "brunettes",
+                                "start": 64.1
+                        },
+                        {
+                                "text": "and",
+                                "start": 64.5
+                        },
+                        {
+                                "text": "a",
+                                "start": 64.7
+                        },
+                        {
+                                "text": "blonde",
+                                "start": 64.9
+                        },
+                        {
+                                "text": "one",
+                                "start": 65.1
+                        }
+                ]
+        },
+        {
+                "start": 65.2,
+                "end": 68.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "On",
+                                "start": 65.2
+                        },
+                        {
+                                "text": "the",
+                                "start": 65.5
+                        },
+                        {
+                                "text": "yacht",
+                                "start": 65.8
+                        },
+                        {
+                                "text": "getting",
+                                "start": 66.2
+                        },
+                        {
+                                "text": "butt",
+                                "start": 66.6
+                        },
+                        {
+                                "text": "booty",
+                                "start": 66.9
+                        },
+                        {
+                                "text": "naked,",
+                                "start": 67.2
+                        },
+                        {
+                                "text": "now",
+                                "start": 67.6
+                        },
+                        {
+                                "text": "that's",
+                                "start": 67.9
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 68.2
+                        },
+                        {
+                                "text": "problems",
+                                "start": 68.5
+                        }
+                ]
+        },
+        {
+                "start": 68.8,
+                "end": 72.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "They",
+                                "start": 68.8
+                        },
+                        {
+                                "text": "titties",
+                                "start": 69.2
+                        },
+                        {
+                                "text": "look",
+                                "start": 69.6
+                        },
+                        {
+                                "text": "just",
+                                "start": 69.9
+                        },
+                        {
+                                "text": "like",
+                                "start": 70.2
+                        },
+                        {
+                                "text": "Baywatch,",
+                                "start": 70.6
+                        },
+                        {
+                                "text": "but",
+                                "start": 71.0
+                        },
+                        {
+                                "text": "their",
+                                "start": 71.3
+                        },
+                        {
+                                "text": "ass",
+                                "start": 71.6
+                        },
+                        {
+                                "text": "from",
+                                "start": 71.9
+                        },
+                        {
+                                "text": "the",
+                                "start": 72.1
+                        },
+                        {
+                                "text": "305",
+                                "start": 72.3
+                        }
+                ]
+        },
+        {
+                "start": 72.5,
+                "end": 75.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "You",
+                                "start": 72.5
+                        },
+                        {
+                                "text": "could",
+                                "start": 72.8
+                        },
+                        {
+                                "text": "do",
+                                "start": 73.1
+                        },
+                        {
+                                "text": "a",
+                                "start": 73.3
+                        },
+                        {
+                                "text": "lot",
+                                "start": 73.5
+                        },
+                        {
+                                "text": "on",
+                                "start": 73.8
+                        },
+                        {
+                                "text": "Ocean",
+                                "start": 74.0
+                        },
+                        {
+                                "text": "Drive,",
+                                "start": 74.3
+                        },
+                        {
+                                "text": "or",
+                                "start": 74.6
+                        },
+                        {
+                                "text": "on",
+                                "start": 74.8
+                        },
+                        {
+                                "text": "my",
+                                "start": 75.1
+                        },
+                        {
+                                "text": "deck",
+                                "start": 75.3
+                        },
+                        {
+                                "text": "all",
+                                "start": 75.5
+                        },
+                        {
+                                "text": "night",
+                                "start": 75.7
+                        }
+                ]
+        },
+        {
+                "start": 75.8,
+                "end": 79.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "She",
+                                "start": 75.8
+                        },
+                        {
+                                "text": "said",
+                                "start": 76.1
+                        },
+                        {
+                                "text": "'Hey',",
+                                "start": 76.4
+                        },
+                        {
+                                "text": "I",
+                                "start": 76.8
+                        },
+                        {
+                                "text": "said",
+                                "start": 77.1
+                        },
+                        {
+                                "text": "'D\u00edmelo',",
+                                "start": 77.4
+                        },
+                        {
+                                "text": "she",
+                                "start": 77.8
+                        },
+                        {
+                                "text": "was",
+                                "start": 78.1
+                        },
+                        {
+                                "text": "too",
+                                "start": 78.4
+                        },
+                        {
+                                "text": "hot,",
+                                "start": 78.7
+                        },
+                        {
+                                "text": "I",
+                                "start": 78.9
+                        },
+                        {
+                                "text": "couldn't",
+                                "start": 79.1
+                        },
+                        {
+                                "text": "say",
+                                "start": 79.3
+                        },
+                        {
+                                "text": "no",
+                                "start": 79.4
+                        }
+                ]
+        },
+        {
+                "start": 79.5,
+                "end": 83.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "So",
+                                "start": 79.5
+                        },
+                        {
+                                "text": "I",
+                                "start": 79.8
+                        },
+                        {
+                                "text": "closed",
+                                "start": 80.1
+                        },
+                        {
+                                "text": "the",
+                                "start": 80.4
+                        },
+                        {
+                                "text": "tabs",
+                                "start": 80.7
+                        },
+                        {
+                                "text": "and",
+                                "start": 81.0
+                        },
+                        {
+                                "text": "straight",
+                                "start": 81.3
+                        },
+                        {
+                                "text": "in",
+                                "start": 81.6
+                        },
+                        {
+                                "text": "the",
+                                "start": 81.8
+                        },
+                        {
+                                "text": "car,",
+                                "start": 82.0
+                        },
+                        {
+                                "text": "went",
+                                "start": 82.3
+                        },
+                        {
+                                "text": "Calle",
+                                "start": 82.6
+                        },
+                        {
+                                "text": "Ocho",
+                                "start": 82.9
+                        },
+                        {
+                                "text": "straight",
+                                "start": 83.2
+                        },
+                        {
+                                "text": "to",
+                                "start": 83.3
+                        },
+                        {
+                                "text": "the",
+                                "start": 83.4
+                        },
+                        {
+                                "text": "mo'",
+                                "start": 83.5
+                        }
+                ]
+        },
+        {
+                "start": 83.5,
+                "end": 87.2,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "She",
+                                "start": 83.5
+                        },
+                        {
+                                "text": "was",
+                                "start": 83.8
+                        },
+                        {
+                                "text": "like",
+                                "start": 84.1
+                        },
+                        {
+                                "text": "'\u00a1Qu\u00e9",
+                                "start": 84.4
+                        },
+                        {
+                                "text": "rico!'",
+                                "start": 84.7
+                        },
+                        {
+                                "text": "when",
+                                "start": 85.1
+                        },
+                        {
+                                "text": "I",
+                                "start": 85.4
+                        },
+                        {
+                                "text": "was",
+                                "start": 85.7
+                        },
+                        {
+                                "text": "all",
+                                "start": 86.0
+                        },
+                        {
+                                "text": "in",
+                                "start": 86.4
+                        },
+                        {
+                                "text": "her",
+                                "start": 86.8
+                        }
+                ]
+        },
+        {
+                "start": 87.2,
+                "end": 90.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "And",
+                                "start": 87.2
+                        },
+                        {
+                                "text": "if",
+                                "start": 87.5
+                        },
+                        {
+                                "text": "you",
+                                "start": 87.8
+                        },
+                        {
+                                "text": "go",
+                                "start": 88.1
+                        },
+                        {
+                                "text": "to",
+                                "start": 88.4
+                        },
+                        {
+                                "text": "Kendall",
+                                "start": 88.7
+                        },
+                        {
+                                "text": "they",
+                                "start": 89.2
+                        },
+                        {
+                                "text": "all",
+                                "start": 89.6
+                        },
+                        {
+                                "text": "Kendall",
+                                "start": 90.0
+                        },
+                        {
+                                "text": "Jenners",
+                                "start": 90.4
+                        }
+                ]
+        },
+        {
+                "start": 90.8,
+                "end": 93.8,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Now",
+                                "start": 90.8
+                        },
+                        {
+                                "text": "you",
+                                "start": 91.1
+                        },
+                        {
+                                "text": "out-of-towners",
+                                "start": 91.4
+                        },
+                        {
+                                "text": "know",
+                                "start": 91.9
+                        },
+                        {
+                                "text": "what",
+                                "start": 92.2
+                        },
+                        {
+                                "text": "time",
+                                "start": 92.4
+                        },
+                        {
+                                "text": "it",
+                                "start": 92.6
+                        },
+                        {
+                                "text": "is,",
+                                "start": 92.8
+                        },
+                        {
+                                "text": "305",
+                                "start": 93.1
+                        },
+                        {
+                                "text": "welcome",
+                                "start": 93.4
+                        },
+                        {
+                                "text": "to",
+                                "start": 93.6
+                        },
+                        {
+                                "text": "the",
+                                "start": 93.7
+                        },
+                        {
+                                "text": "crib!",
+                                "start": 93.8
+                        }
+                ]
+        },
+        {
+                "start": 93.8,
+                "end": 97.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 93.8
+                        },
+                        {
+                                "text": "I",
+                                "start": 94.2
+                        },
+                        {
+                                "text": "love",
+                                "start": 94.5
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 94.9
+                        },
+                        {
+                                "text": "(I",
+                                "start": 95.4
+                        },
+                        {
+                                "text": "love",
+                                "start": 95.7
+                        },
+                        {
+                                "text": "it),",
+                                "start": 96.0
+                        },
+                        {
+                                "text": "these",
+                                "start": 96.3
+                        },
+                        {
+                                "text": "girls",
+                                "start": 96.6
+                        },
+                        {
+                                "text": "speak",
+                                "start": 97.0
+                        },
+                        {
+                                "text": "my",
+                                "start": 97.2
+                        },
+                        {
+                                "text": "language",
+                                "start": 97.4
+                        }
+                ]
+        },
+        {
+                "start": 97.6,
+                "end": 101.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Russian",
+                                "start": 97.6
+                        },
+                        {
+                                "text": "roulette",
+                                "start": 98.1
+                        },
+                        {
+                                "text": "sexy",
+                                "start": 98.6
+                        },
+                        {
+                                "text": "(Sexy),",
+                                "start": 99.1
+                        },
+                        {
+                                "text": "body",
+                                "start": 99.6
+                        },
+                        {
+                                "text": "speaking",
+                                "start": 100.1
+                        },
+                        {
+                                "text": "Spanglish",
+                                "start": 100.6
+                        },
+                        {
+                                "text": "(\u00a1Aja!)",
+                                "start": 101.1
+                        }
+                ]
+        },
+        {
+                "start": 101.6,
+                "end": 105.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 101.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 102.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 102.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 102.8
+                        },
+                        {
+                                "text": "(I",
+                                "start": 103.3
+                        },
+                        {
+                                "text": "love",
+                                "start": 103.6
+                        },
+                        {
+                                "text": "it),",
+                                "start": 103.9
+                        },
+                        {
+                                "text": "and",
+                                "start": 104.2
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 104.5
+                        },
+                        {
+                                "text": "loves",
+                                "start": 105.0
+                        },
+                        {
+                                "text": "me",
+                                "start": 105.4
+                        }
+                ]
+        },
+        {
+                "start": 105.6,
+                "end": 109.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 105.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 106.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 106.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 106.8
+                        },
+                        {
+                                "text": "(Mia-Miami),",
+                                "start": 107.4
+                        },
+                        {
+                                "text": "there's",
+                                "start": 108.0
+                        },
+                        {
+                                "text": "nothing",
+                                "start": 108.4
+                        },
+                        {
+                                "text": "like",
+                                "start": 108.8
+                        },
+                        {
+                                "text": "it,",
+                                "start": 109.1
+                        },
+                        {
+                                "text": "trust",
+                                "start": 109.3
+                        },
+                        {
+                                "text": "me",
+                                "start": 109.5
+                        }
+                ]
+        },
+        {
+                "start": 109.6,
+                "end": 113.3,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "West",
+                                "start": 109.6
+                        },
+                        {
+                                "text": "Perrine",
+                                "start": 110.0
+                        },
+                        {
+                                "text": "got",
+                                "start": 110.4
+                        },
+                        {
+                                "text": "that",
+                                "start": 110.7
+                        },
+                        {
+                                "text": "get",
+                                "start": 111.0
+                        },
+                        {
+                                "text": "down,",
+                                "start": 111.3
+                        },
+                        {
+                                "text": "Little",
+                                "start": 111.7
+                        },
+                        {
+                                "text": "Havana",
+                                "start": 112.1
+                        },
+                        {
+                                "text": "got",
+                                "start": 112.5
+                        },
+                        {
+                                "text": "that",
+                                "start": 112.8
+                        },
+                        {
+                                "text": "too",
+                                "start": 113.1
+                        }
+                ]
+        },
+        {
+                "start": 113.3,
+                "end": 117.1,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Wynwood",
+                                "start": 113.3
+                        },
+                        {
+                                "text": "got",
+                                "start": 113.9
+                        },
+                        {
+                                "text": "that",
+                                "start": 114.3
+                        },
+                        {
+                                "text": "get",
+                                "start": 114.7
+                        },
+                        {
+                                "text": "down,",
+                                "start": 115.1
+                        },
+                        {
+                                "text": "Little",
+                                "start": 115.6
+                        },
+                        {
+                                "text": "Haiti",
+                                "start": 116.0
+                        },
+                        {
+                                "text": "got",
+                                "start": 116.4
+                        },
+                        {
+                                "text": "that",
+                                "start": 116.7
+                        },
+                        {
+                                "text": "too",
+                                "start": 117.0
+                        }
+                ]
+        },
+        {
+                "start": 117.1,
+                "end": 120.9,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Hialeah",
+                                "start": 117.1
+                        },
+                        {
+                                "text": "got",
+                                "start": 117.7
+                        },
+                        {
+                                "text": "that",
+                                "start": 118.1
+                        },
+                        {
+                                "text": "get",
+                                "start": 118.5
+                        },
+                        {
+                                "text": "down,",
+                                "start": 118.9
+                        },
+                        {
+                                "text": "Opa-locka",
+                                "start": 119.4
+                        },
+                        {
+                                "text": "got",
+                                "start": 120.0
+                        },
+                        {
+                                "text": "that",
+                                "start": 120.4
+                        },
+                        {
+                                "text": "too",
+                                "start": 120.7
+                        }
+                ]
+        },
+        {
+                "start": 120.9,
+                "end": 124.6,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Carol",
+                                "start": 120.9
+                        },
+                        {
+                                "text": "City",
+                                "start": 121.3
+                        },
+                        {
+                                "text": "got",
+                                "start": 121.7
+                        },
+                        {
+                                "text": "that",
+                                "start": 122.1
+                        },
+                        {
+                                "text": "get",
+                                "start": 122.5
+                        },
+                        {
+                                "text": "down,",
+                                "start": 122.9
+                        },
+                        {
+                                "text": "Liberty",
+                                "start": 123.3
+                        },
+                        {
+                                "text": "City",
+                                "start": 123.7
+                        },
+                        {
+                                "text": "got",
+                                "start": 124.0
+                        },
+                        {
+                                "text": "that",
+                                "start": 124.3
+                        },
+                        {
+                                "text": "too",
+                                "start": 124.5
+                        }
+                ]
+        },
+        {
+                "start": 124.6,
+                "end": 128.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 124.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 125.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 125.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 125.8
+                        },
+                        {
+                                "text": "(I",
+                                "start": 126.3
+                        },
+                        {
+                                "text": "love",
+                                "start": 126.6
+                        },
+                        {
+                                "text": "it),",
+                                "start": 126.9
+                        },
+                        {
+                                "text": "these",
+                                "start": 127.2
+                        },
+                        {
+                                "text": "girls",
+                                "start": 127.5
+                        },
+                        {
+                                "text": "speak",
+                                "start": 127.9
+                        },
+                        {
+                                "text": "my",
+                                "start": 128.1
+                        },
+                        {
+                                "text": "language",
+                                "start": 128.3
+                        }
+                ]
+        },
+        {
+                "start": 128.6,
+                "end": 132.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Russian",
+                                "start": 128.6
+                        },
+                        {
+                                "text": "roulette",
+                                "start": 129.1
+                        },
+                        {
+                                "text": "sexy",
+                                "start": 129.6
+                        },
+                        {
+                                "text": "(Sexy),",
+                                "start": 130.1
+                        },
+                        {
+                                "text": "body",
+                                "start": 130.6
+                        },
+                        {
+                                "text": "speaking",
+                                "start": 131.1
+                        },
+                        {
+                                "text": "Spanglish",
+                                "start": 131.6
+                        },
+                        {
+                                "text": "(\u00a1Aja!)",
+                                "start": 132.1
+                        }
+                ]
+        },
+        {
+                "start": 132.6,
+                "end": 136.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 132.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 133.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 133.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 133.8
+                        },
+                        {
+                                "text": "(I",
+                                "start": 134.3
+                        },
+                        {
+                                "text": "love",
+                                "start": 134.6
+                        },
+                        {
+                                "text": "it),",
+                                "start": 134.9
+                        },
+                        {
+                                "text": "and",
+                                "start": 135.2
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 135.5
+                        },
+                        {
+                                "text": "loves",
+                                "start": 136.0
+                        },
+                        {
+                                "text": "me",
+                                "start": 136.4
+                        }
+                ]
+        },
+        {
+                "start": 136.6,
+                "end": 140.6,
+                "trending": true,
+                "words": [
+                        {
+                                "text": "Damn,",
+                                "start": 136.6
+                        },
+                        {
+                                "text": "I",
+                                "start": 137.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 137.4
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 137.8
+                        },
+                        {
+                                "text": "(Mia-Miami),",
+                                "start": 138.4
+                        },
+                        {
+                                "text": "there's",
+                                "start": 139.0
+                        },
+                        {
+                                "text": "nothing",
+                                "start": 139.4
+                        },
+                        {
+                                "text": "like",
+                                "start": 139.8
+                        },
+                        {
+                                "text": "it,",
+                                "start": 140.1
+                        },
+                        {
+                                "text": "trust",
+                                "start": 140.3
+                        },
+                        {
+                                "text": "me",
+                                "start": 140.5
+                        }
+                ]
+        },
+        {
+                "start": 140.6,
+                "end": 144.3,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Homestead",
+                                "start": 140.6
+                        },
+                        {
+                                "text": "got",
+                                "start": 141.2
+                        },
+                        {
+                                "text": "that",
+                                "start": 141.6
+                        },
+                        {
+                                "text": "get",
+                                "start": 142.0
+                        },
+                        {
+                                "text": "down,",
+                                "start": 142.4
+                        },
+                        {
+                                "text": "and",
+                                "start": 142.8
+                        },
+                        {
+                                "text": "Goulds",
+                                "start": 143.1
+                        },
+                        {
+                                "text": "they",
+                                "start": 143.4
+                        },
+                        {
+                                "text": "got",
+                                "start": 143.7
+                        },
+                        {
+                                "text": "that",
+                                "start": 143.9
+                        },
+                        {
+                                "text": "too",
+                                "start": 144.1
+                        }
+                ]
+        },
+        {
+                "start": 144.3,
+                "end": 148.1,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Cutler",
+                                "start": 144.3
+                        },
+                        {
+                                "text": "Ridge",
+                                "start": 144.8
+                        },
+                        {
+                                "text": "they",
+                                "start": 145.2
+                        },
+                        {
+                                "text": "got",
+                                "start": 145.5
+                        },
+                        {
+                                "text": "that",
+                                "start": 145.8
+                        },
+                        {
+                                "text": "get",
+                                "start": 146.1
+                        },
+                        {
+                                "text": "down,",
+                                "start": 146.4
+                        },
+                        {
+                                "text": "and",
+                                "start": 146.8
+                        },
+                        {
+                                "text": "Perrine",
+                                "start": 147.1
+                        },
+                        {
+                                "text": "got",
+                                "start": 147.5
+                        },
+                        {
+                                "text": "that",
+                                "start": 147.8
+                        },
+                        {
+                                "text": "too",
+                                "start": 148.0
+                        }
+                ]
+        },
+        {
+                "start": 148.1,
+                "end": 151.9,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "South",
+                                "start": 148.1
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 148.5
+                        },
+                        {
+                                "text": "Heights",
+                                "start": 148.9
+                        },
+                        {
+                                "text": "got",
+                                "start": 149.3
+                        },
+                        {
+                                "text": "that",
+                                "start": 149.6
+                        },
+                        {
+                                "text": "get",
+                                "start": 149.9
+                        },
+                        {
+                                "text": "down,",
+                                "start": 150.2
+                        },
+                        {
+                                "text": "and",
+                                "start": 150.6
+                        },
+                        {
+                                "text": "Richmond",
+                                "start": 150.9
+                        },
+                        {
+                                "text": "Heights",
+                                "start": 151.3
+                        },
+                        {
+                                "text": "got",
+                                "start": 151.6
+                        },
+                        {
+                                "text": "that",
+                                "start": 151.8
+                        }
+                ]
+        },
+        {
+                "start": 151.9,
+                "end": 155.6,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Coconut",
+                                "start": 151.9
+                        },
+                        {
+                                "text": "Grove",
+                                "start": 152.4
+                        },
+                        {
+                                "text": "they",
+                                "start": 152.8
+                        },
+                        {
+                                "text": "got",
+                                "start": 153.2
+                        },
+                        {
+                                "text": "that",
+                                "start": 153.5
+                        },
+                        {
+                                "text": "get",
+                                "start": 153.8
+                        },
+                        {
+                                "text": "down,",
+                                "start": 154.2
+                        },
+                        {
+                                "text": "and",
+                                "start": 154.5
+                        },
+                        {
+                                "text": "Overtown",
+                                "start": 154.8
+                        },
+                        {
+                                "text": "they",
+                                "start": 155.1
+                        },
+                        {
+                                "text": "got",
+                                "start": 155.3
+                        },
+                        {
+                                "text": "that",
+                                "start": 155.5
+                        }
+                ]
+        },
+        {
+                "start": 155.6,
+                "end": 158.6,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Hold",
+                                "start": 155.6
+                        },
+                        {
+                                "text": "up!",
+                                "start": 156.0
+                        },
+                        {
+                                "text": "\u00a1Y",
+                                "start": 156.5
+                        },
+                        {
+                                "text": "arriba",
+                                "start": 156.9
+                        },
+                        {
+                                "text": "Pipo!",
+                                "start": 157.4
+                        },
+                        {
+                                "text": "Dice",
+                                "start": 157.9
+                        },
+                        {
+                                "text": "Frankie",
+                                "start": 158.3
+                        }
+                ]
+        },
+        {
+                "start": 158.6,
+                "end": 162.6,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "I",
+                                "start": 158.6
+                        },
+                        {
+                                "text": "love",
+                                "start": 159.0
+                        },
+                        {
+                                "text": "Miami,",
+                                "start": 159.5
+                        },
+                        {
+                                "text": "I",
+                                "start": 160.0
+                        },
+                        {
+                                "text": "love",
+                                "start": 160.4
+                        },
+                        {
+                                "text": "Miami,",
+                                "start": 160.9
+                        },
+                        {
+                                "text": "man",
+                                "start": 161.4
+                        },
+                        {
+                                "text": "I",
+                                "start": 161.8
+                        },
+                        {
+                                "text": "love",
+                                "start": 162.1
+                        },
+                        {
+                                "text": "Miami",
+                                "start": 162.4
+                        }
+                ]
+        },
+        {
+                "start": 162.6,
+                "end": 166.5,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "Miami,",
+                                "start": 162.6
+                        },
+                        {
+                                "text": "Miami,",
+                                "start": 163.6
+                        },
+                        {
+                                "text": "\u00a1se",
+                                "start": 164.5
+                        },
+                        {
+                                "text": "acab\u00f3",
+                                "start": 165.2
+                        },
+                        {
+                                "text": "esto!",
+                                "start": 165.9
+                        }
+                ]
+        },
+        {
+                "start": 166.5,
+                "end": 182.97,
+                "trending": false,
+                "words": [
+                        {
+                                "text": "(Miami",
+                                "start": 166.5
+                        },
+                        {
+                                "text": "beat",
+                                "start": 170.0
+                        },
+                        {
+                                "text": "outro",
+                                "start": 174.0
+                        },
+                        {
+                                "text": "fadeout)",
+                                "start": 178.0
+                        }
+                ]
+        }
+]
 };

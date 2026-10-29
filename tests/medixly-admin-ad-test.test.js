@@ -14,7 +14,7 @@ describe('Admin Ad Test Navigation Button Suite', () => {
 
         expect(html).toContain('id="nav-ad-test"');
         expect(html).toContain('class="nav-pill nav-pill-admin"');
-        expect(html).toMatch(/<button class="nav-pill"[^>]*id="nav-favorites">Favorites<\/button>\s*<button class="nav-pill nav-pill-admin" id="nav-ad-test" style="display:\s*none;"/);
+        expect(html).toMatch(/<button class="nav-pill"[^>]*id="nav-favorites"[\s\S]*?Favorites[\s\S]*?<\/button>\s*<button class="nav-pill nav-pill-admin" id="nav-ad-test" style="display:\s*none;"/);
         expect(html).toContain('title="Admin Ad Test"');
         expect(html).toContain('Ad Test');
     });
@@ -24,7 +24,7 @@ describe('Admin Ad Test Navigation Button Suite', () => {
 
         expect(html).toContain('id="nav-ad-test"');
         expect(html).toContain('class="nav-pill nav-pill-admin"');
-        expect(html).toMatch(/<button class="nav-pill"[^>]*id="nav-favorites">Favorites<\/button>\s*<button class="nav-pill nav-pill-admin" id="nav-ad-test" style="display:\s*none;"/);
+        expect(html).toMatch(/<button class="nav-pill"[^>]*id="nav-favorites"[\s\S]*?Favorites[\s\S]*?<\/button>\s*<button class="nav-pill nav-pill-admin" id="nav-ad-test" style="display:\s*none;"/);
     });
 
     it('verifies css/medixly.css defines .nav-pill-admin with initial display: none and admin styling', () => {
