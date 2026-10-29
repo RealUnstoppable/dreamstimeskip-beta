@@ -1,0 +1,88 @@
+appId: store.realunstoppable.medixly
+productName: Medixly
+executableName: Medixly
+copyright: "Copyright © 2026 RealUnstoppable. All rights reserved."
+
+directories:
+  output: dist-desktop
+  buildResources: desktop/build
+
+asar: true
+asarUnpack:
+  - "music/**/*"
+  - "desktop/build/**/*"
+
+files:
+  - "desktop/**/*"
+  - "js/**/*"
+  - "css/**/*"
+  - "images/**/*"
+  - "music/**/*"
+  - "dist/**/*"
+  - "backend/**/*"
+  - "public/**/*"
+  - "medixly.html"
+  - "medixly-pricing.html"
+  - "medixly-hits.html"
+  - "medixly-artists.html"
+  - "account.html"
+  - "support.html"
+  - "terms.html"
+  - "privacy.html"
+  - "manifest.json"
+  - "package.json"
+  - "!**/*.map"
+  - "!tests/**/*"
+  - "!scratch/**/*"
+  - "!functions/**/*"
+  - "!dts-hub-website/**/*"
+
+mac:
+  category: public.app-category.music
+  icon: desktop/build/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: desktop/entitlements.mac.plist
+  entitlementsInherit: desktop/entitlements.mac.inherit.plist
+  target:
+    - target: dmg
+      arch:
+        - universal
+    - target: zip
+      arch:
+        - universal
+  darkModeSupport: true
+  minimumSystemVersion: "10.15.0"
+  extendInfo:
+    CFBundleDocumentTypes:
+      - CFBundleTypeName: "Audio Stream"
+        CFBundleTypeRole: "Viewer"
+        LSHandlerRank: "Alternate"
+        LSItemContentTypes:
+          - "public.audio"
+          - "public.mp3"
+          - "com.apple.m4a-audio"
+    NSMicrophoneUsageDescription: "Medixly requests microphone permissions for audio visualization and voice commands."
+    UIBackgroundModes:
+      - "audio"
+    ITSAppUsesNonExemptEncryption: false
+
+dmg:
+  title: "Medixly Installer"
+  background: desktop/dmg-background.png
+  icon: desktop/build/icon.icns
+  iconSize: 120
+  iconTextSize: 13
+  window:
+    width: 540
+    height: 380
+  contents:
+    - x: 140
+      y: 220
+      type: file
+    - x: 400
+      y: 220
+      type: link
+      path: /Applications
+
+afterSign: scripts/notarize.cjs
