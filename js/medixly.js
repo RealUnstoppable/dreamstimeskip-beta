@@ -2295,6 +2295,7 @@ function initHarmonyTunes() {
         if (isCrossfading) {
             mixEngine.cancelCrossfade();
             isCrossfading = false;
+            if (typeof setLexiMixingState === 'function') setLexiMixingState(false);
             if (mixerBtn) mixerBtn.classList.remove('pulsing');
             if (typeof fsMixerBtn !== 'undefined' && fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn');
