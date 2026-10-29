@@ -557,6 +557,571 @@ export const AD_TRACKS = [
             }
         ]
     }
+,
+    {
+        id: 'ad-preview-6',
+        trackNumber: 6,
+        title: "Ad 6:  Escalating Drop & Wildest Deal",
+        subtitle: "Urgency Pricing \u2022  Launch Price Going Up Daily \u2022 Lock In Now",
+        src: '/music/ads/ad-preview-6.mp3',
+        duration: 47.65,
+        choreography: [
+            {
+                start: 0.0,
+                end: 2.4,
+                speaker: 'user',
+                text: "Attention music lovers!",
+                words: [
+                    { word: "Attention", start: 0.0, end: 0.8 },
+                    { word: "music", start: 0.8, end: 1.6 },
+                    { word: "lovers!", start: 1.6, end: 2.4 }
+                ]
+            },
+            {
+                start: 2.4,
+                end: 9.8,
+                speaker: 'user',
+                text: "What if I told you that you could unlock the ultimate streaming experience on Medixly for literally ?",
+                words: [
+                    { word: "What", start: 2.4, end: 2.81 },
+                    { word: "if", start: 2.81, end: 3.22 },
+                    { word: "I", start: 3.22, end: 3.63 },
+                    { word: "told", start: 3.63, end: 4.04 },
+                    { word: "you", start: 4.04, end: 4.46 },
+                    { word: "that", start: 4.46, end: 4.87 },
+                    { word: "you", start: 4.87, end: 5.28 },
+                    { word: "could", start: 5.28, end: 5.69 },
+                    { word: "unlock", start: 5.69, end: 6.1 },
+                    { word: "the", start: 6.1, end: 6.51 },
+                    { word: "ultimate", start: 6.51, end: 6.92 },
+                    { word: "streaming", start: 6.92, end: 7.33 },
+                    { word: "experience", start: 7.33, end: 7.74 },
+                    { word: "on", start: 7.74, end: 8.16 },
+                    { word: "Medixly", start: 8.16, end: 8.57 },
+                    { word: "for", start: 8.57, end: 8.98 },
+                    { word: "literally", start: 8.98, end: 9.39 },
+                    { word: "?", start: 9.39, end: 9.8 }
+                ]
+            },
+            {
+                start: 9.8,
+                end: 18.3,
+                speaker: 'lexi',
+                text: "Starting today we are launching our wildest drop yet: we're slashing Medixly membership prices down to just one single dollar.",
+                words: [
+                    { word: "Starting", start: 9.8, end: 10.23 },
+                    { word: "today", start: 10.23, end: 10.65 },
+                    { word: "we", start: 10.65, end: 11.08 },
+                    { word: "are", start: 11.08, end: 11.5 },
+                    { word: "launching", start: 11.5, end: 11.93 },
+                    { word: "our", start: 11.93, end: 12.35 },
+                    { word: "wildest", start: 12.35, end: 12.78 },
+                    { word: "drop", start: 12.78, end: 13.2 },
+                    { word: "yet:", start: 13.2, end: 13.62 },
+                    { word: "we're", start: 13.62, end: 14.05 },
+                    { word: "slashing", start: 14.05, end: 14.48 },
+                    { word: "Medixly", start: 14.48, end: 14.9 },
+                    { word: "membership", start: 14.9, end: 15.32 },
+                    { word: "prices", start: 15.32, end: 15.75 },
+                    { word: "down", start: 15.75, end: 16.18 },
+                    { word: "to", start: 16.18, end: 16.6 },
+                    { word: "just", start: 16.6, end: 17.02 },
+                    { word: "one", start: 17.02, end: 17.45 },
+                    { word: "single", start: 17.45, end: 17.88 },
+                    { word: "dollar.", start: 17.88, end: 18.3 }
+                ]
+            },
+            {
+                start: 18.3,
+                end: 24.0,
+                speaker: 'both',
+                text: "But here is the catch: every single day the price goes up by one dollar.",
+                words: [
+                    { word: "But", start: 18.3, end: 18.68 },
+                    { word: "here", start: 18.68, end: 19.06 },
+                    { word: "is", start: 19.06, end: 19.44 },
+                    { word: "the", start: 19.44, end: 19.82 },
+                    { word: "catch:", start: 19.82, end: 20.2 },
+                    { word: "every", start: 20.2, end: 20.58 },
+                    { word: "single", start: 20.58, end: 20.96 },
+                    { word: "day", start: 20.96, end: 21.34 },
+                    { word: "the", start: 21.34, end: 21.72 },
+                    { word: "price", start: 21.72, end: 22.1 },
+                    { word: "goes", start: 22.1, end: 22.48 },
+                    { word: "up", start: 22.48, end: 22.86 },
+                    { word: "by", start: 22.86, end: 23.24 },
+                    { word: "one", start: 23.24, end: 23.62 },
+                    { word: "dollar.", start: 23.62, end: 24.0 }
+                ]
+            },
+            {
+                start: 24.0,
+                end: 34.0,
+                speaker: 'lexi',
+                text: "Once it hits the top, that window is slammed shut forever. You can lock in either our monthly or yearly plan right now at rock-bottom value before time runs out this week.",
+                words: [
+                    { word: "Once", start: 24.0, end: 24.31 },
+                    { word: "it", start: 24.31, end: 24.62 },
+                    { word: "hits", start: 24.62, end: 24.94 },
+                    { word: "the", start: 24.94, end: 25.25 },
+                    { word: "top,", start: 25.25, end: 25.56 },
+                    { word: "that", start: 25.56, end: 25.88 },
+                    { word: "window", start: 25.88, end: 26.19 },
+                    { word: "is", start: 26.19, end: 26.5 },
+                    { word: "slammed", start: 26.5, end: 26.81 },
+                    { word: "shut", start: 26.81, end: 27.12 },
+                    { word: "forever.", start: 27.12, end: 27.44 },
+                    { word: "You", start: 27.44, end: 27.75 },
+                    { word: "can", start: 27.75, end: 28.06 },
+                    { word: "lock", start: 28.06, end: 28.38 },
+                    { word: "in", start: 28.38, end: 28.69 },
+                    { word: "either", start: 28.69, end: 29.0 },
+                    { word: "our", start: 29.0, end: 29.31 },
+                    { word: "monthly", start: 29.31, end: 29.62 },
+                    { word: "or", start: 29.62, end: 29.94 },
+                    { word: "yearly", start: 29.94, end: 30.25 },
+                    { word: "plan", start: 30.25, end: 30.56 },
+                    { word: "right", start: 30.56, end: 30.88 },
+                    { word: "now", start: 30.88, end: 31.19 },
+                    { word: "at", start: 31.19, end: 31.5 },
+                    { word: "rock-bottom", start: 31.5, end: 31.81 },
+                    { word: "value", start: 31.81, end: 32.12 },
+                    { word: "before", start: 32.12, end: 32.44 },
+                    { word: "time", start: 32.44, end: 32.75 },
+                    { word: "runs", start: 32.75, end: 33.06 },
+                    { word: "out", start: 33.06, end: 33.38 },
+                    { word: "this", start: 33.38, end: 33.69 },
+                    { word: "week.", start: 33.69, end: 34.0 }
+                ]
+            },
+            {
+                start: 34.0,
+                end: 43.5,
+                speaker: 'user',
+                text: "Don't wait until you're paying full price. Head over to Real Unstoppable right now, grab your pass and stream without limits.",
+                words: [
+                    { word: "Don't", start: 34.0, end: 34.45 },
+                    { word: "wait", start: 34.45, end: 34.9 },
+                    { word: "until", start: 34.9, end: 35.36 },
+                    { word: "you're", start: 35.36, end: 35.81 },
+                    { word: "paying", start: 35.81, end: 36.26 },
+                    { word: "full", start: 36.26, end: 36.71 },
+                    { word: "price.", start: 36.71, end: 37.17 },
+                    { word: "Head", start: 37.17, end: 37.62 },
+                    { word: "over", start: 37.62, end: 38.07 },
+                    { word: "to", start: 38.07, end: 38.52 },
+                    { word: "Real", start: 38.52, end: 38.98 },
+                    { word: "Unstoppable", start: 38.98, end: 39.43 },
+                    { word: "right", start: 39.43, end: 39.88 },
+                    { word: "now,", start: 39.88, end: 40.33 },
+                    { word: "grab", start: 40.33, end: 40.79 },
+                    { word: "your", start: 40.79, end: 41.24 },
+                    { word: "pass", start: 41.24, end: 41.69 },
+                    { word: "and", start: 41.69, end: 42.14 },
+                    { word: "stream", start: 42.14, end: 42.6 },
+                    { word: "without", start: 42.6, end: 43.05 },
+                    { word: "limits.", start: 43.05, end: 43.5 }
+                ]
+            },
+            {
+                start: 43.5,
+                end: 47.65,
+                speaker: 'both',
+                text: "Medixly, sound elevated. Act fast!",
+                words: [
+                    { word: "Medixly,", start: 43.5, end: 44.33 },
+                    { word: "sound", start: 44.33, end: 45.16 },
+                    { word: "elevated.", start: 45.16, end: 45.99 },
+                    { word: "Act", start: 45.99, end: 46.82 },
+                    { word: "fast!", start: 46.82, end: 47.65 }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'ad-preview-7',
+        trackNumber: 7,
+        title: "Ad 7: Total Audio Control & 99\u00a2 Editor Pass",
+        subtitle: "Viral Charts & Synced Lyrics \u2022 Copyright-Free Power for Editors",
+        src: '/music/ads/ad-preview-7.mp3',
+        duration: 34.59,
+        choreography: [
+            {
+                start: 0.0,
+                end: 7.0,
+                speaker: 'user',
+                text: "Tired of spending hours searching through copyright claims and dead links just to find that one perfect sound for your edit?",
+                words: [
+                    { word: "Tired", start: 0.0, end: 0.33 },
+                    { word: "of", start: 0.33, end: 0.67 },
+                    { word: "spending", start: 0.67, end: 1.0 },
+                    { word: "hours", start: 1.0, end: 1.33 },
+                    { word: "searching", start: 1.33, end: 1.67 },
+                    { word: "through", start: 1.67, end: 2.0 },
+                    { word: "copyright", start: 2.0, end: 2.33 },
+                    { word: "claims", start: 2.33, end: 2.67 },
+                    { word: "and", start: 2.67, end: 3.0 },
+                    { word: "dead", start: 3.0, end: 3.33 },
+                    { word: "links", start: 3.33, end: 3.67 },
+                    { word: "just", start: 3.67, end: 4.0 },
+                    { word: "to", start: 4.0, end: 4.33 },
+                    { word: "find", start: 4.33, end: 4.67 },
+                    { word: "that", start: 4.67, end: 5.0 },
+                    { word: "one", start: 5.0, end: 5.33 },
+                    { word: "perfect", start: 5.33, end: 5.67 },
+                    { word: "sound", start: 5.67, end: 6.0 },
+                    { word: "for", start: 6.0, end: 6.33 },
+                    { word: "your", start: 6.33, end: 6.67 },
+                    { word: "edit?", start: 6.67, end: 7.0 }
+                ]
+            },
+            {
+                start: 7.0,
+                end: 14.0,
+                speaker: 'user',
+                text: "What if you could find all the trendiest songs, synced lyrics, and custom audio tools all in one place?",
+                words: [
+                    { word: "What", start: 7.0, end: 7.37 },
+                    { word: "if", start: 7.37, end: 7.74 },
+                    { word: "you", start: 7.74, end: 8.11 },
+                    { word: "could", start: 8.11, end: 8.47 },
+                    { word: "find", start: 8.47, end: 8.84 },
+                    { word: "all", start: 8.84, end: 9.21 },
+                    { word: "the", start: 9.21, end: 9.58 },
+                    { word: "trendiest", start: 9.58, end: 9.95 },
+                    { word: "songs,", start: 9.95, end: 10.32 },
+                    { word: "synced", start: 10.32, end: 10.68 },
+                    { word: "lyrics,", start: 10.68, end: 11.05 },
+                    { word: "and", start: 11.05, end: 11.42 },
+                    { word: "custom", start: 11.42, end: 11.79 },
+                    { word: "audio", start: 11.79, end: 12.16 },
+                    { word: "tools", start: 12.16, end: 12.53 },
+                    { word: "all", start: 12.53, end: 12.89 },
+                    { word: "in", start: 12.89, end: 13.26 },
+                    { word: "one", start: 13.26, end: 13.63 },
+                    { word: "place?", start: 13.63, end: 14.0 }
+                ]
+            },
+            {
+                start: 14.0,
+                end: 17.0,
+                speaker: 'lexi',
+                text: "Now, with Medixly, you can!",
+                words: [
+                    { word: "Now,", start: 14.0, end: 14.6 },
+                    { word: "with", start: 14.6, end: 15.2 },
+                    { word: "Medixly,", start: 15.2, end: 15.8 },
+                    { word: "you", start: 15.8, end: 16.4 },
+                    { word: "can!", start: 16.4, end: 17.0 }
+                ]
+            },
+            {
+                start: 17.0,
+                end: 23.0,
+                speaker: 'lexi',
+                text: "We are scaling up, tracking the biggest viral charts, and giving you total audio control.",
+                words: [
+                    { word: "We", start: 17.0, end: 17.4 },
+                    { word: "are", start: 17.4, end: 17.8 },
+                    { word: "scaling", start: 17.8, end: 18.2 },
+                    { word: "up,", start: 18.2, end: 18.6 },
+                    { word: "tracking", start: 18.6, end: 19.0 },
+                    { word: "the", start: 19.0, end: 19.4 },
+                    { word: "biggest", start: 19.4, end: 19.8 },
+                    { word: "viral", start: 19.8, end: 20.2 },
+                    { word: "charts,", start: 20.2, end: 20.6 },
+                    { word: "and", start: 20.6, end: 21.0 },
+                    { word: "giving", start: 21.0, end: 21.4 },
+                    { word: "you", start: 21.4, end: 21.8 },
+                    { word: "total", start: 21.8, end: 22.2 },
+                    { word: "audio", start: 22.2, end: 22.6 },
+                    { word: "control.", start: 22.6, end: 23.0 }
+                ]
+            },
+            {
+                start: 23.0,
+                end: 28.0,
+                speaker: 'both',
+                text: "And for a limited time today, you can lock in your membership for just 99\u00a2.",
+                words: [
+                    { word: "And", start: 23.0, end: 23.33 },
+                    { word: "for", start: 23.33, end: 23.67 },
+                    { word: "a", start: 23.67, end: 24.0 },
+                    { word: "limited", start: 24.0, end: 24.33 },
+                    { word: "time", start: 24.33, end: 24.67 },
+                    { word: "today,", start: 24.67, end: 25.0 },
+                    { word: "you", start: 25.0, end: 25.33 },
+                    { word: "can", start: 25.33, end: 25.67 },
+                    { word: "lock", start: 25.67, end: 26.0 },
+                    { word: "in", start: 26.0, end: 26.33 },
+                    { word: "your", start: 26.33, end: 26.67 },
+                    { word: "membership", start: 26.67, end: 27.0 },
+                    { word: "for", start: 27.0, end: 27.33 },
+                    { word: "just", start: 27.33, end: 27.67 },
+                    { word: "99\u00a2.", start: 27.67, end: 28.0 }
+                ]
+            },
+            {
+                start: 28.0,
+                end: 34.59,
+                speaker: 'both',
+                text: "Stop searching, start creating. Grab your pass at realunstoppable.store/medixly today!",
+                words: [
+                    { word: "Stop", start: 28.0, end: 28.66 },
+                    { word: "searching,", start: 28.66, end: 29.32 },
+                    { word: "start", start: 29.32, end: 29.98 },
+                    { word: "creating.", start: 29.98, end: 30.64 },
+                    { word: "Grab", start: 30.64, end: 31.3 },
+                    { word: "your", start: 31.3, end: 31.95 },
+                    { word: "pass", start: 31.95, end: 32.61 },
+                    { word: "at", start: 32.61, end: 33.27 },
+                    { word: "realunstoppable.store/medixly", start: 33.27, end: 33.93 },
+                    { word: "today!", start: 33.93, end: 34.59 }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'ad-preview-8',
+        trackNumber: 8,
+        title: "Ad 8: Workflow Voice Cue (Hey Lexi, Play Some Fire)",
+        subtitle: "In-Workflow AI Assistant \u2022 Instant Funk Cue \u2022 99\u00a2 Limited Pass",
+        src: '/music/ads/ad-preview-8.mp3',
+        duration: 22.91,
+        choreography: [
+            {
+                start: 0.0,
+                end: 2.8,
+                speaker: 'user',
+                text: "Stop searching, start creating!",
+                words: [
+                    { word: "Stop", start: 0.0, end: 0.7 },
+                    { word: "searching,", start: 0.7, end: 1.4 },
+                    { word: "start", start: 1.4, end: 2.1 },
+                    { word: "creating!", start: 2.1, end: 2.8 }
+                ]
+            },
+            {
+                start: 2.8,
+                end: 6.4,
+                speaker: 'user',
+                text: "In fact, right in the middle of your workflow, just say:",
+                words: [
+                    { word: "In", start: 2.8, end: 3.13 },
+                    { word: "fact,", start: 3.13, end: 3.45 },
+                    { word: "right", start: 3.45, end: 3.78 },
+                    { word: "in", start: 3.78, end: 4.11 },
+                    { word: "the", start: 4.11, end: 4.44 },
+                    { word: "middle", start: 4.44, end: 4.76 },
+                    { word: "of", start: 4.76, end: 5.09 },
+                    { word: "your", start: 5.09, end: 5.42 },
+                    { word: "workflow,", start: 5.42, end: 5.75 },
+                    { word: "just", start: 5.75, end: 6.07 },
+                    { word: "say:", start: 6.07, end: 6.4 }
+                ]
+            },
+            {
+                start: 6.4,
+                end: 8.8,
+                speaker: 'user',
+                text: "Hey Lexi, play some fire.",
+                words: [
+                    { word: "Hey", start: 6.4, end: 6.88 },
+                    { word: "Lexi,", start: 6.88, end: 7.36 },
+                    { word: "play", start: 7.36, end: 7.84 },
+                    { word: "some", start: 7.84, end: 8.32 },
+                    { word: "fire.", start: 8.32, end: 8.8 }
+                ]
+            },
+            {
+                start: 8.8,
+                end: 13.2,
+                speaker: 'lexi',
+                text: "Playing trending funk mix on Medixly, enjoy your session!",
+                words: [
+                    { word: "Playing", start: 8.8, end: 9.29 },
+                    { word: "trending", start: 9.29, end: 9.78 },
+                    { word: "funk", start: 9.78, end: 10.27 },
+                    { word: "mix", start: 10.27, end: 10.76 },
+                    { word: "on", start: 10.76, end: 11.24 },
+                    { word: "Medixly,", start: 11.24, end: 11.73 },
+                    { word: "enjoy", start: 11.73, end: 12.22 },
+                    { word: "your", start: 12.22, end: 12.71 },
+                    { word: "session!", start: 12.71, end: 13.2 }
+                ]
+            },
+            {
+                start: 13.2,
+                end: 18.0,
+                speaker: 'both',
+                text: "That's total audio control built by editors, for editors.",
+                words: [
+                    { word: "That's", start: 13.2, end: 13.73 },
+                    { word: "total", start: 13.73, end: 14.27 },
+                    { word: "audio", start: 14.27, end: 14.8 },
+                    { word: "control", start: 14.8, end: 15.33 },
+                    { word: "built", start: 15.33, end: 15.87 },
+                    { word: "by", start: 15.87, end: 16.4 },
+                    { word: "editors,", start: 16.4, end: 16.93 },
+                    { word: "for", start: 16.93, end: 17.47 },
+                    { word: "editors.", start: 17.47, end: 18.0 }
+                ]
+            },
+            {
+                start: 18.0,
+                end: 22.91,
+                speaker: 'both',
+                text: "And for a limited time today, you can lock in your membership for just 99\u00a2.",
+                words: [
+                    { word: "And", start: 18.0, end: 18.33 },
+                    { word: "for", start: 18.33, end: 18.65 },
+                    { word: "a", start: 18.65, end: 18.98 },
+                    { word: "limited", start: 18.98, end: 19.31 },
+                    { word: "time", start: 19.31, end: 19.64 },
+                    { word: "today,", start: 19.64, end: 19.96 },
+                    { word: "you", start: 19.96, end: 20.29 },
+                    { word: "can", start: 20.29, end: 20.62 },
+                    { word: "lock", start: 20.62, end: 20.95 },
+                    { word: "in", start: 20.95, end: 21.27 },
+                    { word: "your", start: 21.27, end: 21.6 },
+                    { word: "membership", start: 21.6, end: 21.93 },
+                    { word: "for", start: 21.93, end: 22.26 },
+                    { word: "just", start: 22.26, end: 22.58 },
+                    { word: "99\u00a2.", start: 22.58, end: 22.91 }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'ad-preview-9',
+        trackNumber: 9,
+        title: "Ad 9: Uninterrupted Vibe (Zero Ads & Hi-Fi)",
+        subtitle: "Medixly Premium Pitch \u2022 Crystal Clear High Fidelity \u2022 Uninterrupted Flow",
+        src: '/music/ads/ad-preview-9.mp3',
+        duration: 31.71,
+        choreography: [
+            {
+                start: 0.0,
+                end: 2.5,
+                speaker: 'user',
+                text: "Tired of the ads? I get it.",
+                words: [
+                    { word: "Tired", start: 0.0, end: 0.36 },
+                    { word: "of", start: 0.36, end: 0.71 },
+                    { word: "the", start: 0.71, end: 1.07 },
+                    { word: "ads?", start: 1.07, end: 1.43 },
+                    { word: "I", start: 1.43, end: 1.79 },
+                    { word: "get", start: 1.79, end: 2.14 },
+                    { word: "it.", start: 2.14, end: 2.5 }
+                ]
+            },
+            {
+                start: 2.5,
+                end: 10.2,
+                speaker: 'user',
+                text: "You are completely lost in the music, the vibe is absolutely perfect, and then boom, another interruption.",
+                words: [
+                    { word: "You", start: 2.5, end: 2.95 },
+                    { word: "are", start: 2.95, end: 3.41 },
+                    { word: "completely", start: 3.41, end: 3.86 },
+                    { word: "lost", start: 3.86, end: 4.31 },
+                    { word: "in", start: 4.31, end: 4.76 },
+                    { word: "the", start: 4.76, end: 5.22 },
+                    { word: "music,", start: 5.22, end: 5.67 },
+                    { word: "the", start: 5.67, end: 6.12 },
+                    { word: "vibe", start: 6.12, end: 6.58 },
+                    { word: "is", start: 6.58, end: 7.03 },
+                    { word: "absolutely", start: 7.03, end: 7.48 },
+                    { word: "perfect,", start: 7.48, end: 7.94 },
+                    { word: "and", start: 7.94, end: 8.39 },
+                    { word: "then", start: 8.39, end: 8.84 },
+                    { word: "boom,", start: 8.84, end: 9.29 },
+                    { word: "another", start: 9.29, end: 9.75 },
+                    { word: "interruption.", start: 9.75, end: 10.2 }
+                ]
+            },
+            {
+                start: 10.2,
+                end: 14.8,
+                speaker: 'lexi',
+                text: "It really does not have to be this way.",
+                words: [
+                    { word: "It", start: 10.2, end: 10.71 },
+                    { word: "really", start: 10.71, end: 11.22 },
+                    { word: "does", start: 11.22, end: 11.73 },
+                    { word: "not", start: 11.73, end: 12.24 },
+                    { word: "have", start: 12.24, end: 12.76 },
+                    { word: "to", start: 12.76, end: 13.27 },
+                    { word: "be", start: 13.27, end: 13.78 },
+                    { word: "this", start: 13.78, end: 14.29 },
+                    { word: "way.", start: 14.29, end: 14.8 }
+                ]
+            },
+            {
+                start: 14.8,
+                end: 22.5,
+                speaker: 'lexi',
+                text: "With Medixly Premium, you get zero ads, unlimited skips, and crystal clear high-fidelity audio. Just you and the music you love, completely uninterrupted.",
+                words: [
+                    { word: "With", start: 14.8, end: 15.13 },
+                    { word: "Medixly", start: 15.13, end: 15.47 },
+                    { word: "Premium,", start: 15.47, end: 15.8 },
+                    { word: "you", start: 15.8, end: 16.14 },
+                    { word: "get", start: 16.14, end: 16.47 },
+                    { word: "zero", start: 16.47, end: 16.81 },
+                    { word: "ads,", start: 16.81, end: 17.14 },
+                    { word: "unlimited", start: 17.14, end: 17.48 },
+                    { word: "skips,", start: 17.48, end: 17.81 },
+                    { word: "and", start: 17.81, end: 18.15 },
+                    { word: "crystal", start: 18.15, end: 18.48 },
+                    { word: "clear", start: 18.48, end: 18.82 },
+                    { word: "high-fidelity", start: 18.82, end: 19.15 },
+                    { word: "audio.", start: 19.15, end: 19.49 },
+                    { word: "Just", start: 19.49, end: 19.82 },
+                    { word: "you", start: 19.82, end: 20.16 },
+                    { word: "and", start: 20.16, end: 20.49 },
+                    { word: "the", start: 20.49, end: 20.83 },
+                    { word: "music", start: 20.83, end: 21.16 },
+                    { word: "you", start: 21.16, end: 21.5 },
+                    { word: "love,", start: 21.5, end: 21.83 },
+                    { word: "completely", start: 21.83, end: 22.17 },
+                    { word: "uninterrupted.", start: 22.17, end: 22.5 }
+                ]
+            },
+            {
+                start: 22.5,
+                end: 28.0,
+                speaker: 'both',
+                text: "Click the banner right now to upgrade to Premium.",
+                words: [
+                    { word: "Click", start: 22.5, end: 23.11 },
+                    { word: "the", start: 23.11, end: 23.72 },
+                    { word: "banner", start: 23.72, end: 24.33 },
+                    { word: "right", start: 24.33, end: 24.94 },
+                    { word: "now", start: 24.94, end: 25.56 },
+                    { word: "to", start: 25.56, end: 26.17 },
+                    { word: "upgrade", start: 26.17, end: 26.78 },
+                    { word: "to", start: 26.78, end: 27.39 },
+                    { word: "Premium.", start: 27.39, end: 28.0 }
+                ]
+            },
+            {
+                start: 28.0,
+                end: 31.71,
+                speaker: 'both',
+                text: "Let us get back to the music.",
+                words: [
+                    { word: "Let", start: 28.0, end: 28.53 },
+                    { word: "us", start: 28.53, end: 29.06 },
+                    { word: "get", start: 29.06, end: 29.59 },
+                    { word: "back", start: 29.59, end: 30.12 },
+                    { word: "to", start: 30.12, end: 30.65 },
+                    { word: "the", start: 30.65, end: 31.18 },
+                    { word: "music.", start: 31.18, end: 31.71 }
+                ]
+            }
+        ]
+    }
 ];
 
 export function getTrackById(id) {
