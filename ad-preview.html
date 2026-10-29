@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medixly Ad Preview Studio | Dual Blob Choreography</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/ad-preview.css">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+    <div id="ad-viewport" class="ad-preview-viewport">
+        <!-- Ambient Glowing Background Orbs -->
+        <div class="ad-bg-orb ad-bg-orb-pink" aria-hidden="true"></div>
+        <div class="ad-bg-orb ad-bg-orb-blue" aria-hidden="true"></div>
+
+        <!-- Medixly Background SVG Waves -->
+        <div class="ad-waves-container" aria-hidden="true">
+            <svg class="ad-waves-svg" viewBox="0 0 1200 300" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="adWaveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ff007f" stop-opacity="0.22" />
+                        <stop offset="50%" stop-color="#38bdf8" stop-opacity="0.18" />
+                        <stop offset="100%" stop-color="#1e40af" stop-opacity="0.28" />
+                    </linearGradient>
+                    <linearGradient id="adWaveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#1e40af" stop-opacity="0.32" />
+                        <stop offset="50%" stop-color="#ff007f" stop-opacity="0.15" />
+                        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.25" />
+                    </linearGradient>
+                    <linearGradient id="adWaveGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35" />
+                        <stop offset="60%" stop-color="#0a192f" stop-opacity="0.4" />
+                        <stop offset="100%" stop-color="#f43f5e" stop-opacity="0.2" />
+                    </linearGradient>
+                </defs>
+                <path class="ad-wave-layer ad-wave-1" d="M0,150 C300,280, 450,20, 750,160 C1050,300, 1100,60, 1200,130 L1200,300 L0,300 Z" fill="url(#adWaveGrad1)"></path>
+                <path class="ad-wave-layer ad-wave-2" d="M0,120 C220,30, 460,250, 780,110 C980,10, 1100,210, 1200,170 L1200,300 L0,300 Z" fill="url(#adWaveGrad2)"></path>
+                <path class="ad-wave-layer ad-wave-3" d="M0,190 C280,90, 520,270, 840,140 C1040,70, 1140,210, 1200,180 L1200,300 L0,300 Z" fill="url(#adWaveGrad3)"></path>
+            </svg>
+        </div>
+
+        <!-- Recording & Stage Framing Container -->
+        <main id="ad-stage" class="ad-recording-stage">
+            <!-- Scene Header Branding -->
+            <header class="ad-scene-header">
+                <div class="ad-brand-pill">
+                    <span class="ad-brand-dot"></span>
+                    <span class="ad-brand-text">Medixly Ad Studio</span>
+                </div>
+                <div id="ad-track-badge" class="ad-track-badge">Real-Time Amplitude Sync</div>
+            </header>
+
+            <!-- Dual Blob Choreography Arena -->
+            <section id="ad-blobs-arena" class="ad-blobs-arena state-idle">
+                <!-- User Pink Blob Slot (Left) -->
+                <div id="blob-slot-user" class="blob-slot blob-slot-user">
+                    <div id="pink-user-wrapper" class="pink-user-blob-wrapper">
+                        <div class="blob-resonance-ring"></div>
+                        <div id="pink-user-blob" class="pink-user-blob" role="img" aria-label="User Talking Blob"></div>
+                    </div>
+                    <div id="speaker-tag-user" class="speaker-tag speaker-tag-user">
+                        <span class="speaker-tag-dot"></span>
+                        <span>User</span>
+                    </div>
+                </div>
+
+                <!-- Lexi AI Orb Slot (Right) -->
+                <div id="blob-slot-lexi" class="blob-slot blob-slot-lexi">
+                    <div id="lexi-ai-wrapper" class="lexi-ai-orb-wrapper">
+                        <div class="blob-resonance-ring"></div>
+                        <div id="lexi-ai-orb" class="lexi-ai-orb" role="img" aria-label="Lexi AI Orb"></div>
+                    </div>
+                    <div id="speaker-tag-lexi" class="speaker-tag speaker-tag-lexi">
+                        <span class="speaker-tag-dot"></span>
+                        <span>Lexi AI</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Synchronized Captions Stage -->
+            <section class="ad-captions-stage">
+                <div id="caption-card" class="caption-card speaker-user">
+                    <div id="caption-text" class="caption-text">
+                        <span class="caption-word">Ready to record...</span>
+                    </div>
+                    <div class="caption-progress-track">
+                        <div id="caption-progress-fill" class="caption-progress-fill"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 3-2-1 Screen Recording Countdown Overlay -->
+        <div id="ad-countdown-overlay" class="ad-countdown-overlay" aria-hidden="true">
+            <div id="countdown-number" class="countdown-number">3</div>
+            <div class="countdown-label">Get Ready to Record</div>
+        </div>
+
+        <!-- Clean Screen-Recording Hint Toast -->
+        <div id="clean-record-hint" class="clean-record-hint">
+            Recording Mode Active • Press <strong>H</strong> or <strong>ESC</strong> to restore controls
+        </div>
+
+        <!-- Top Floating Controls Dock -->
+        <nav id="ad-top-dock" class="ad-top-dock">
+            <button id="btn-aspect-toggle" class="dock-btn" title="Toggle Aspect Ratio">
+                <span>🖥 Full (16:9)</span>
+            </button>
+            <button id="btn-tracks-menu" class="dock-btn btn-primary" title="Select Audio Track & Preset">
+                <span>🎵 Select Track</span>
+                <span style="font-size: 0.75rem;">▼</span>
+            </button>
+        </nav>
+
+        <!-- Floating Track Selection Menu -->
+        <div id="tracks-dropdown-menu" class="ad-tracks-menu">
+            <div class="menu-title">Select Audio Track & Scene</div>
+            
+            <button class="track-item-btn active" onclick="window.previewController.initTrack(1)">
+                <div class="track-info-col">
+                    <span class="track-name">Track 1: Skip to Good Part (Laugh)</span>
+                    <span class="track-desc">Voice prompt & Lexi laugh response</span>
+                </div>
+                <span class="track-duration">9.5s</span>
+            </button>
+
+            <button class="track-item-btn" onclick="window.previewController.initTrack(2)">
+                <div class="track-info-col">
+                    <span class="track-name">Track 2: Skip to Good Part (Fast)</span>
+                    <span class="track-desc">Snappy voice command cut</span>
+                </div>
+                <span class="track-duration">7.9s</span>
+            </button>
+
+            <button class="track-item-btn" onclick="window.previewController.initTrack(3)">
+                <div class="track-info-col">
+                    <span class="track-name">Track 3: Dale! Miami Trending & 99¢</span>
+                    <span class="track-desc">High energy pitch & urgency pricing</span>
+                </div>
+                <span class="track-duration">40.6s</span>
+            </button>
+
+            <button class="track-item-btn" onclick="window.previewController.initTrack(4)">
+                <div class="track-info-col">
+                    <span class="track-name">Track 4: Oh & We Also Have This</span>
+                    <span class="track-desc">Curiosity teaser transition</span>
+                </div>
+                <span class="track-duration">9.9s</span>
+            </button>
+
+            <button class="track-item-btn" onclick="window.previewController.initTrack(5)">
+                <div class="track-info-col">
+                    <span class="track-name">Track 5: Creator Vision & 99¢ Movement</span>
+                    <span class="track-desc">Full epic storytelling showcase</span>
+                </div>
+                <span class="track-duration">54.4s</span>
+            </button>
+        </div>
+
+        <!-- Bottom Floating Screen Recording Control Dock -->
+        <nav id="ad-control-dock" class="ad-control-dock">
+            <button id="btn-play-pause" class="dock-btn btn-primary" title="Play / Pause (Space)">
+                <span class="btn-icon">▶</span>
+                <span class="btn-text">Play</span>
+            </button>
+            <button id="btn-restart" class="dock-btn" title="Restart from 0:00 (R)">
+                <span>↺ Restart</span>
+            </button>
+            <button id="btn-record-mode" class="dock-btn btn-record" title="Start 3-2-1 Recording Countdown">
+                <span>⏺ 3-2-1 Record</span>
+            </button>
+            <button id="btn-hide-ui" class="dock-btn" title="Hide All UI for Screen Recording (H)">
+                <span>👁 Clean Screen Mode</span>
+            </button>
+        </nav>
+
+        <!-- Hidden Audio Element -->
+        <audio id="ad-audio" preload="auto"></audio>
+
+        <!-- Access Control / Security Guard Overlay -->
+        <div id="ad-security-overlay" class="ad-security-overlay">
+            <div class="ad-security-card">
+                <div class="security-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                </div>
+                <h2 class="security-title">Admin Authorization Required</h2>
+                <p class="security-msg">
+                    This internal ad preview and recording scene is restricted exclusively to authorized account:<br>
+                    <strong style="color: #ffffff;">catalinandrian1@gmail.com</strong>
+                </p>
+                <div class="security-msg">
+                    Current identity: <span id="security-user-email" class="security-user-email">Checking authentication...</span>
+                </div>
+                <div class="security-actions">
+                    <button id="security-google-signin" class="google-signin-btn">
+                        <svg width="18" height="18" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        Sign In with Authorized Google Account
+                    </button>
+                    <a href="/dts.html" class="back-dashboard-btn">Return to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Entrypoint -->
+    <script type="module">
+        import { AdPreviewController } from '/js/ad-preview-controller.js';
+
+        // Check for URL query param track selector e.g. /ad-preview?track=3
+        const params = new URLSearchParams(window.location.search);
+        const initialTrackId = params.get('track') || params.get('ad') || 'ad-preview-1';
+
+        const controller = new AdPreviewController({ initialTrackId });
+        window.previewController = controller;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            controller.init();
+        });
+    </script>
+</body>
+</html>
