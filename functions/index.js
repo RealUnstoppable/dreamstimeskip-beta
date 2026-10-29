@@ -1508,6 +1508,7 @@ exports.processReferral = functions.https.onCall(async (data, context) => {
 
 
 // --- SONG PROCESSING BACKEND FUNCTION ---
+const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpegInstaller = require("@ffmpeg-installer/ffmpeg");
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
