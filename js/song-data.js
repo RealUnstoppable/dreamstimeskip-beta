@@ -21,7 +21,7 @@ export const librarySongs = [
         "artist": "Lil Baby",
         "duration": "2:37",
         "src": "/music/dead-fresh-lil-baby.mp3",
-        "streamUrl": "/music/dead_fresh.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdead-fresh-lil-baby.mp3?alt=media&token=3f2e100a-c7c8-4492-a962-ea54fa713c37",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f4/00/dd/f400ddda-01b6-52ee-1888-477ffee6ed67/26UMGIM86003.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -39,7 +39,7 @@ export const librarySongs = [
         "artist": "Aamadux",
         "duration": "2:45",
         "src": "/music/like-that-guitar-remix-aamadux.mp3",
-        "streamUrl": "/music/like-that-future.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flike-that-guitar-remix-aamadux.mp3?alt=media&token=872d133a-8afd-45dc-9c76-1cf1fa992ce3",
         "art": "/images/harmony-tunes-card.jpg",
         "bpm": 140,
         "energy": 0.85,
@@ -323,7 +323,7 @@ export const librarySongs = [
         "artist": "Justin Bieber",
         "duration": "3:34",
         "src": "/music/baby-justin-bieber.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbaby-feat-ludacris-justin-bieber.mp3?alt=media&token=2fb99e13-a77d-4984-836e-7c6f35254503",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -665,7 +665,7 @@ export const librarySongs = [
         "artist": "Future, Metro Boomin",
         "duration": "3:48",
         "src": "/music/type-shit-future.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ftype-shit-future-metro-boomin-travis-scott-playboi-carti.mp3?alt=media&token=661b74a9-f247-452c-8d92-c4e43ee05f53",
         "art": "/images/medixly-logo.png",
         "bpm": 120,
         "energy": 0.8,
@@ -760,7 +760,7 @@ export const librarySongs = [
         "artist": "Drake",
         "duration": "4:03",
         "src": "/music/knife-talk-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fknife-talk-feat-21-savage-project-pat-drake.mp3?alt=media&token=421ec3e9-1971-49f7-a598-5d7b0b1708fb",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/cb/6b/5f/cb6b5fc3-8d35-908a-18e6-6f8eda46ce11/21UM1IM07521.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1121,7 +1121,7 @@ export const librarySongs = [
         "artist": "YoungBoy Never Broke Again",
         "duration": "2:31",
         "src": "/music/kacey-talk-youngboy-nba.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkacey-talk-youngboy-never-broke-again.mp3?alt=media&token=0d854d83-cacc-46d7-b16c-79ec27a19f4d",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/e7/d8/80/e7d880c5-0a13-0da1-036c-2a35fca4c59d/075679803573.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1292,7 +1292,7 @@ export const librarySongs = [
         "artist": "Future, Metro Boomin & Kendrick Lamar",
         "duration": "2:13",
         "src": "/music/like-me-future.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flike-me-feat-42-dugg-lil-baby-future.mp3?alt=media&token=e89dd66c-ae0a-41e9-8df3-6b6046fa698b",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fe/b6/46/feb64670-4fe7-bbc0-1101-c5f11bfb6905/196871937399.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -3489,7 +3489,7 @@ export const librarySongs = [
         "artist": "Drake",
         "duration": "2:25",
         "src": "/music/im-spent-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fim-spent-drake-loe-shimmy.mp3?alt=media&token=3689c9ec-d107-403d-b060-f4c7a1d1957e",
         "art": "/images/medixly-logo.png",
         "bpm": 120,
         "energy": 0.7,
@@ -3659,7 +3659,7 @@ export const librarySongs = [
         "artist": "Ariana Grande",
         "duration": "3:04",
         "src": "/music/petal-ariana-grande.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpetal-in-the-pavement-ariana-grande.mp3?alt=media&token=73259f21-3965-4b5a-9b27-99fc718475ab",
         "art": "/images/medixly-logo.png",
         "bpm": 120,
         "energy": 0.7,
@@ -7195,7 +7195,7 @@ export const librarySongs = [
         "artist": "Drake, Future",
         "duration": "4:07",
         "src": "/music/ran-to-atlanta-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fran-to-atlanta-drake-future-molly-santana.mp3?alt=media&token=e3294441-f191-4b11-860c-a05692921eb3",
         "art": "/images/medixly-logo.png",
         "bpm": 120,
         "energy": 0.7,
@@ -7251,7 +7251,8 @@ export const librarySongs = [
         "outmixPoint": 170,
         "tags": [
             "hiphop"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fcalling-my-phone-lil-tjay-6lack.mp3?alt=media&token=2d47f2b7-4e06-4fae-9a8a-90286c3531f2"
     },
     {
         "id": "summer-bummer",
@@ -7266,7 +7267,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "pop"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsummer-bummer-lights-on-rhyrhy.mp3?alt=media&token=d149f29c-81d2-4211-9e3e-7e8a9c6df647"
     },
     {
         "id": "on-the-floor",
@@ -7281,7 +7283,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "pop"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fon-the-floor-feat-pitbull-jennifer-lopez.mp3?alt=media&token=b7836e4a-2ef5-4ae5-a322-5501d43f901b"
     },
     {
         "id": "radiance-harp",
@@ -7311,7 +7314,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "rap"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Frockstar-feat-21-savage-post-malone.mp3?alt=media&token=cec7e16b-39db-4af6-a887-2577d566cab6"
     },
     {
         "id": "isabel-larosa-dont-make-them-like-me",
@@ -7326,7 +7330,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "pop"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdont-make-them-like-me-isabel-larosa.mp3?alt=media&token=dc961fc8-2510-43f9-a43a-0c404e320e8b"
     },
     {
         "id": "tate-mcrae-its-okay-im-okay",
@@ -7342,7 +7347,8 @@ export const librarySongs = [
         "tags": [
             "pop",
             "upbeat"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fits-ok-im-ok-tate-mcrae.mp3?alt=media&token=2628eaee-39b1-4873-8e71-f2b00d6c0a80"
     },
     {
         "id": "astrophage",
@@ -7359,7 +7365,8 @@ export const librarySongs = [
             "electronic",
             "synth",
             "energetic"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fastrophage-lupus-nocte.mp3?alt=media&token=2022efc3-bc1f-419b-87bb-fc0f42075e4e"
     },
     {
         "id": "pixy-legacy",
@@ -7376,7 +7383,8 @@ export const librarySongs = [
             "dark",
             "electronic",
             "intense"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpixy-legacy.mp3?alt=media&token=d77b3e20-6b33-4799-a1bd-be07ed1b6cdd"
     },
     {
         "id": "kesha-blow",
@@ -7393,7 +7401,8 @@ export const librarySongs = [
             "pop",
             "party",
             "electronic"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblow-kesha-audio-edit.mp3?alt=media&token=8fea8aef-cc07-4425-8016-2a5a13b42349"
     },
     {
         "id": "deorc-decuple",
@@ -7444,7 +7453,8 @@ export const librarySongs = [
             "pop",
             "dark pop",
             "trending"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdont-make-them-like-me-isabel-larosa.mp3?alt=media&token=dc961fc8-2510-43f9-a43a-0c404e320e8b"
     },
     {
         "id": "dancin-krono-remix-luvli-aaron-smith",
@@ -9030,7 +9040,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmontagem-ladr%C3%A3o-super-slowed-atlxs-mxzi-itamar-mc.mp3?alt=media&token=4098d477-16bb-4110-9ef6-1420c37d1211"
     },
     {
         "id": "montagem-rebola-atlxs-dj-fku",
@@ -9766,7 +9777,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ftek-it-cafun%C3%A9.mp3?alt=media&token=3586a144-b32a-4e49-b1fe-378ce6ff4140"
     },
     {
         "id": "tek-it-sped-up-cafune",
@@ -9781,7 +9793,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ftek-it-sped-up-cafun%C3%A9.mp3?alt=media&token=ad386d14-075e-4605-ad1e-007a911a31c6"
     },
     {
         "id": "tell-em-cochise-not",
@@ -14416,7 +14429,7 @@ export const librarySongs = [
         "artist": "Lil Baby",
         "duration": "2:37",
         "src": "/music/dead-fresh-lil-baby.mp3",
-        "streamUrl": "/music/dead_fresh.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdead-fresh-lil-baby.mp3?alt=media&token=3f2e100a-c7c8-4492-a962-ea54fa713c37",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -19398,7 +19411,7 @@ export const librarySongs = [
         "artist": "N2UtheHartlocker",
         "duration": "2:19",
         "src": "/music/krushdafight-n2uthehartlocker.mp3",
-        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkrushdafight-n2uthehartlocker.mp3?alt=media&token=4870f07a-e5ab-4724-97ea-f7a1968a61c0",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkrushdafight-n2uthehartlocker.mp3?alt=media&token=aff8a4ab-00a3-4ff5-847f-a8990f3d671d",
         "art": "/images/krushdafight.svg",
         "bpm": 125,
         "energy": 0.85,
@@ -23741,7 +23754,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpixy-legacy.mp3?alt=media&token=d77b3e20-6b33-4799-a1bd-be07ed1b6cdd"
     },
     {
         "id": "play-date-melanie-martinez",

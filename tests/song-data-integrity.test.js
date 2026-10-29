@@ -184,6 +184,7 @@ describe('Song Data Integrity and File Linking', () => {
         expect(song.streamUrl).toBeDefined();
         expect(song.streamUrl).toContain('firebasestorage.googleapis.com');
         expect(song.streamUrl).toContain('krushdafight-n2uthehartlocker.mp3');
+        expect(song.streamUrl).toContain('token=aff8a4ab-00a3-4ff5-847f-a8990f3d671d');
 
         // Verify Lexi mixing parameters
         expect(song.bpm).toBe(125);
@@ -267,5 +268,14 @@ describe('Song Data Integrity and File Linking', () => {
         // Verify trending viral drops exist for Lexi Mixer dynamic loop
         const trendingCount = lyrics.filter(l => l.trending === true).length;
         expect(trendingCount).toBeGreaterThanOrEqual(10);
+    });
+
+    it('verifies all linked Firebase streamUrls have valid format and active download tokens', () => {
+        const streamSongs = librarySongs.filter(s => s.streamUrl && s.streamUrl.includes('firebasestorage.googleapis.com'));
+        expect(streamSongs.length).toBeGreaterThan(50);
+
+        for (const song of streamSongs) {
+            expect(song.streamUrl).toMatch(/^https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[a-zA-Z0-9.-]+\/o\/[^?]+\?alt=media&token=[a-f0-9-]+$/);
+        }
     });
 });

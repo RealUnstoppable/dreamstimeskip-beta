@@ -245,21 +245,55 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, border-color 0.2s;
 }
 
 .comp-toggle-row:hover {
     background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.comp-toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .comp-toggle-label {
     font-size: 0.82rem;
     font-weight: 600;
     color: #cbd5e1;
+}
+
+.comp-toggle-subtext {
+    font-size: 0.68rem;
+    color: #64748b;
+    font-weight: 400;
+}
+
+.comp-toggle-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comp-toggle-state {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #38bdf8;
+    min-width: 26px;
+    text-align: right;
+    text-transform: uppercase;
+}
+
+.comp-toggle-state.state-off {
+    color: #64748b;
 }
 
 .comp-toggle-input {

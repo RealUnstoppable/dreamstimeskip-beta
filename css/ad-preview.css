@@ -195,8 +195,12 @@ html, body {
 }
 
 .ad-scene-header.header-hidden,
-.ad-scene-header.header-user-hidden {
+.ad-scene-header.header-user-hidden,
+.countdown-active .ad-scene-header,
+.clean-mode-active .ad-scene-header {
+    display: none !important;
     opacity: 0 !important;
+    visibility: hidden !important;
     pointer-events: none !important;
     transform: translateY(-24px);
 }
@@ -525,8 +529,13 @@ html, body {
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
-.ad-captions-stage.captions-hidden {
+.ad-captions-stage.captions-hidden,
+.ad-captions-stage.captions-hidden #caption-card,
+#caption-card.caption-box-hidden {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .caption-card {

@@ -292,7 +292,8 @@ export class AdPreviewController {
         }
 
         if (this.elements.captionCard) {
-            this.elements.captionCard.className = `caption-card speaker-${segment.speaker}`;
+            const isBoxHidden = this.compositionStudio ? !this.compositionStudio.showCaptionBox : false;
+            this.elements.captionCard.className = `caption-card speaker-${segment.speaker}${isBoxHidden ? ' caption-box-hidden' : ''}`;
         }
     }
 
@@ -538,6 +539,9 @@ export class AdPreviewController {
                 this.restartTrack();
             } else if (e.key === 'h' || e.key === 'H' || e.key === 'Escape') {
                 e.preventDefault();
+                if (this.countdownTimer) {
+                    this.cancelCountdown();
+                }
                 this.toggleCleanMode();
             } else if (e.key >= '1' && e.key <= '9') {
                 e.preventDefault();
@@ -583,8 +587,8 @@ export class AdPreviewController {
         }
     }
 
-    toggleCleanMode() {
-        this.isCleanMode = !this.isCleanMode;
+    toggleCleanMode(forceState) {
+        this.isCleanMode = typeof forceState === 'boolean' ? forceState : !this.isCleanMode;
         if (this.elements.controlDock) {
             this.elements.controlDock.classList.toggle('dock-hidden', this.isCleanMode);
         }
@@ -593,6 +597,13 @@ export class AdPreviewController {
         }
         if (this.elements.sceneHeader) {
             this.elements.sceneHeader.classList.toggle('header-hidden', this.isCleanMode);
+            this.elements.sceneHeader.style.display = this.isCleanMode ? 'none' : '';
+        }
+        if (this.elements.viewport) {
+            this.elements.viewport.classList.toggle('clean-mode-active', this.isCleanMode);
+        }
+        if (this.elements.stage) {
+            this.elements.stage.classList.toggle('clean-mode-active', this.isCleanMode);
         }
         if (this.elements.tracksMenu) {
             this.elements.tracksMenu.classList.remove('menu-open');
@@ -614,26 +625,67 @@ export class AdPreviewController {
         }
     }
 
+    cancelCountdown() {
+        if (this.countdownTimer) {
+            clearInterval(this.countdownTimer);
+            this.countdownTimer = null;
+        }
+        if (this.elements.countdownOverlay) {
+            this.elements.countdownOverlay.classList.remove('visible');
+        }
+        if (this.elements.viewport) {
+            this.elements.viewport.classList.remove('countdown-active');
+        }
+        if (this.elements.stage) {
+            this.elements.stage.classList.remove('countdown-active');
+        }
+    }
+
     startCountdownRecord() {
         if (!this.elements.countdownOverlay || !this.elements.countdownNumber) return;
         if (this.audioEl) this.audioEl.pause();
+
+        // 1. Immediately remove MEDIXLY AD STUDIO & Verified badge during countdown & enter clean mode
+        if (this.elements.sceneHeader) {
+            this.elements.sceneHeader.classList.add('header-hidden');
+            this.elements.sceneHeader.style.display = 'none';
+        }
+        if (this.elements.viewport) {
+            this.elements.viewport.classList.add('countdown-active');
+        }
+        if (this.elements.stage) {
+            this.elements.stage.classList.add('countdown-active');
+        }
+        if (!this.isCleanMode) {
+            this.toggleCleanMode(true);
+        }
 
         let count = 3;
         this.elements.countdownOverlay.classList.add('visible');
         this.elements.countdownNumber.textContent = count;
 
-        clearInterval(this.countdownTimer);
+        if (this.countdownTimer) clearInterval(this.countdownTimer);
         this.countdownTimer = setInterval(() => {
             count--;
             if (count > 0) {
                 this.elements.countdownNumber.textContent = count;
             } else {
                 clearInterval(this.countdownTimer);
+                this.countdownTimer = null;
                 this.elements.countdownOverlay.classList.remove('visible');
+                if (this.elements.viewport) {
+                    this.elements.viewport.classList.remove('countdown-active');
+                }
+                if (this.elements.stage) {
+                    this.elements.stage.classList.remove('countdown-active');
+                }
 
-                // Enter clean mode and play
+                // Ensure clean mode remains active (header remains removed) and play
                 if (!this.isCleanMode) {
-                    this.toggleCleanMode();
+                    this.toggleCleanMode(true);
+                } else if (this.elements.sceneHeader) {
+                    this.elements.sceneHeader.classList.add('header-hidden');
+                    this.elements.sceneHeader.style.display = 'none';
                 }
                 this.restartTrack();
             }
@@ -687,7 +739,7 @@ export class AdPreviewController {
 
     destroy() {
         if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
-        if (this.countdownTimer) clearInterval(this.countdownTimer);
+        this.cancelCountdown();
         if (this.compositionStudio) this.compositionStudio.destroy();
         if (this.audioEl) {
             this.audioEl.pause();

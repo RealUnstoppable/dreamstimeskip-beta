@@ -2044,17 +2044,32 @@ function initHarmonyTunes() {
                     if (fsPauseIcon) fsPauseIcon.style.display = 'block';
                 };
 
+                // 1. If song.streamUrl is available and different from what just failed, fall back to streamUrl immediately
+                if (song.streamUrl && activeAudio.src !== song.streamUrl) {
+                    console.warn(`Local audio unavailable for ${song.title}, falling back to streamUrl...`);
+                    activeAudio.src = song.streamUrl;
+                    activeAudio.play().then(onPlaybackRecovered).catch(() => {
+                        if (activeAudio.crossOrigin || activeAudio.hasAttribute('crossorigin')) {
+                            activeAudio.removeAttribute('crossorigin');
+                            activeAudio.src = song.streamUrl;
+                            activeAudio.play().then(onPlaybackRecovered).catch(() => handlePlaybackSnag(song));
+                        } else {
+                            handlePlaybackSnag(song);
+                        }
+                    });
+                    return;
+                }
+
+                // 2. If crossorigin restriction caused failure on current target, retry without crossorigin
                 if (activeAudio.crossOrigin || activeAudio.hasAttribute('crossorigin')) {
                     activeAudio.removeAttribute('crossorigin');
                     activeAudio.src = targetAudioSrc;
                     activeAudio.play().then(onPlaybackRecovered).catch(() => handlePlaybackSnag(song));
                     return;
                 }
-                if (song.streamUrl && activeAudio.src !== song.streamUrl) {
-                    console.warn(`Local audio unavailable for ${song.title}, falling back to streamUrl...`);
-                    activeAudio.src = song.streamUrl;
-                    activeAudio.play().then(onPlaybackRecovered).catch(() => handlePlaybackSnag(song));
-                } else if (!song.streamUrl && song.title) {
+                
+                // 3. Fallback to iTunes 30-sec preview if no streamUrl is defined
+                if (!song.streamUrl && song.title) {
                     const cleanArtist = (song.artist && song.artist !== 'Unknown Artist') ? song.artist : '';
                     const query = `${song.title} ${cleanArtist}`.replace(/\[.*?\]|\(.*?\)/g, '').trim();
                     fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`)
