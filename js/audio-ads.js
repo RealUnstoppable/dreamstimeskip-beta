@@ -606,7 +606,7 @@ export class AudioAdManager {
         const orb = this.ui.orb || document.getElementById('lexi-ad-orb');
         if (!orb) return;
 
-        // Dynamic scale and glow
+        // Dynamic scale and glow on the blob
         const scale = 1 + energy * 0.38;
         const glow = 25 + energy * 65;
         const lightGlow = 50 + energy * 85;
@@ -614,59 +614,9 @@ export class AudioAdManager {
         orb.style.transform = `scale(${scale.toFixed(3)})`;
         orb.style.boxShadow = `inset 0 0 16px 3px rgba(255, 255, 255, 0.35), 0 0 ${glow.toFixed(1)}px rgba(56, 189, 248, ${(0.45 + energy * 0.45).toFixed(2)}), 0 0 ${lightGlow.toFixed(1)}px rgba(30, 64, 175, 0.45)`;
 
-        // Update concentric rings
-        if (this.ui.ring1) {
-            this.ui.ring1.style.transform = `scale(${(1.12 + energy * 0.35).toFixed(3)})`;
-            this.ui.ring1.style.opacity = (0.25 + energy * 0.65).toFixed(2);
-        }
-        if (this.ui.ring2) {
-            this.ui.ring2.style.transform = `scale(${(1.32 + energy * 0.55).toFixed(3)})`;
-            this.ui.ring2.style.opacity = (0.15 + energy * 0.55).toFixed(2);
-        }
-        if (this.ui.ring3) {
-            this.ui.ring3.style.transform = `scale(${(1.58 + energy * 0.75).toFixed(3)})`;
-            this.ui.ring3.style.opacity = (0.08 + energy * 0.4).toFixed(2);
-        }
-
-        // Render circular soundwave canvas if available
+        // Clear canvas if present to ensure no lines are drawn
         if (this.ui.canvasCtx && this.ui.canvas) {
-            const ctx = this.ui.canvasCtx;
-            const w = this.ui.canvas.width;
-            const h = this.ui.canvas.height;
-            const cx = w / 2;
-            const cy = h / 2;
-            const baseRadius = 75;
-
-            ctx.clearRect(0, 0, w, h);
-
-            const numBars = 32;
-            const stepAngle = (Math.PI * 2) / numBars;
-
-            ctx.lineWidth = 2.5;
-            ctx.lineCap = 'round';
-
-            for (let i = 0; i < numBars; i++) {
-                const angle = i * stepAngle;
-                let binVal = 0;
-                if (this.freqData && this.freqData.length > i * 2) {
-                    binVal = this.freqData[i * 2] / 255;
-                } else {
-                    binVal = Math.abs(Math.sin(angle * 3 + energy * 4));
-                }
-
-                const barLen = 4 + binVal * 32 * (energy + 0.3);
-
-                const x1 = cx + Math.cos(angle) * baseRadius;
-                const y1 = cy + Math.sin(angle) * baseRadius;
-                const x2 = cx + Math.cos(angle) * (baseRadius + barLen);
-                const y2 = cy + Math.sin(angle) * (baseRadius + barLen);
-
-                ctx.strokeStyle = `rgba(56, 189, 248, ${(0.3 + binVal * 0.6).toFixed(2)})`;
-                ctx.beginPath();
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
-                ctx.stroke();
-            }
+            this.ui.canvasCtx.clearRect(0, 0, this.ui.canvas.width, this.ui.canvas.height);
         }
     }
 

@@ -16,10 +16,6 @@ document.body.innerHTML = `
             <button id="lexi-ad-close-btn" class="lexi-ad-close-btn"></button>
         </div>
         <div class="lexi-ad-orb-stage">
-            <canvas id="lexi-ad-canvas" width="320" height="320"></canvas>
-            <div class="lexi-ad-ring ring-1"></div>
-            <div class="lexi-ad-ring ring-2"></div>
-            <div class="lexi-ad-ring ring-3"></div>
             <div class="lexi-ad-orb" id="lexi-ad-orb"></div>
         </div>
         <div class="lexi-ad-footer">
@@ -223,9 +219,13 @@ describe('Lexi Orb Audio-Reactive Visualizer & Overlay', () => {
         expect(overlay.classList.contains('hidden')).toBe(false);
     });
 
-    it('pulses the Lexi orb and rings based on audio energy', () => {
+    it('pulses the Lexi orb based on audio energy with only the blob present in stage', () => {
         const orb = document.getElementById('lexi-ad-orb');
-        const ring1 = document.querySelector('.lexi-ad-ring.ring-1');
+        const stage = document.querySelector('.lexi-ad-orb-stage');
+
+        // Stage contains only the blob, no rings or lines around it
+        expect(stage.children.length).toBe(1);
+        expect(stage.firstElementChild.id).toBe('lexi-ad-orb');
 
         // Test with high soundwave energy (e.g. vocal peak 0.8)
         audioAdManager.renderVisualizerFrame(0.8);
@@ -239,10 +239,6 @@ describe('Lexi Orb Audio-Reactive Visualizer & Overlay', () => {
 
         // Box shadow should reflect cyan/blue glow
         expect(orb.style.boxShadow).toContain('56, 189, 248');
-
-        // Ring 1 should expand and become more opaque
-        expect(ring1.style.transform).toContain('scale(');
-        expect(parseFloat(ring1.style.opacity)).toBeGreaterThan(0.6);
     });
 
     it('merges smoothly to the next song when ad finishes', (done) => {
@@ -282,14 +278,15 @@ describe('Lexi Orb Audio-Reactive Visualizer & Overlay', () => {
 });
 
 describe('HTML & CSS Integration Integrity', () => {
-    it('verifies medixly.html contains the Lexi ad overlay, audio element, and dim blue background styles in css/medixly.css', () => {
+    it('verifies medixly.html contains the Lexi ad overlay with only the blob, audio element, and dim blue background styles in css/medixly.css', () => {
         const html = fs.readFileSync(path.join(ROOT_DIR, 'medixly.html'), 'utf8');
         const css = fs.readFileSync(path.join(ROOT_DIR, 'css/medixly.css'), 'utf8');
 
         // HTML checks
         expect(html).toContain('id="lexi-ad-overlay"');
         expect(html).toContain('id="lexi-ad-orb"');
-        expect(html).toContain('id="lexi-ad-canvas"');
+        expect(html).not.toContain('id="lexi-ad-canvas"');
+        expect(html).not.toContain('class="lexi-ad-ring');
         expect(html).toContain('id="medixly-ad-audio"');
         expect(html).toContain('id="lexi-ad-close-btn"');
 

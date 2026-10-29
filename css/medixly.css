@@ -2611,40 +2611,9 @@ body {
     margin: auto 0;
 }
 
-.lexi-ad-canvas {
-    position: absolute;
-    width: 320px;
-    height: 320px;
-    z-index: 3;
-    pointer-events: none;
-}
-
+.lexi-ad-canvas,
 .lexi-ad-ring {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 2;
-    transition: transform 0.08s ease-out, opacity 0.08s ease-out;
-}
-
-.lexi-ad-ring.ring-1 {
-    width: 175px;
-    height: 175px;
-    border: 1.5px solid rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-}
-
-.lexi-ad-ring.ring-2 {
-    width: 220px;
-    height: 220px;
-    border: 1.5px solid rgba(30, 64, 175, 0.35);
-    box-shadow: 0 0 30px rgba(30, 64, 175, 0.15);
-}
-
-.lexi-ad-ring.ring-3 {
-    width: 270px;
-    height: 270px;
-    border: 1.5px solid rgba(10, 25, 47, 0.4);
+    display: none !important;
 }
 
 .lexi-ad-orb {
@@ -2745,17 +2714,10 @@ body {
         width: 260px;
         height: 260px;
     }
-    .lexi-ad-canvas {
-        width: 260px;
-        height: 260px;
-    }
     .lexi-ad-orb {
         width: 110px;
         height: 110px;
     }
-    .lexi-ad-ring.ring-1 { width: 140px; height: 140px; }
-    .lexi-ad-ring.ring-2 { width: 180px; height: 180px; }
-    .lexi-ad-ring.ring-3 { width: 220px; height: 220px; }
     .lexi-ad-title { font-size: 1.25rem; }
     .lexi-ad-subtitle { font-size: 0.82rem; }
 }
