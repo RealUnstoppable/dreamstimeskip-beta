@@ -2,6 +2,7 @@
 // Auto-generated song library with Medixly Top 100 playlist
 
 export const songColors = {
+    "krushdafight-n2uthehartlocker": "#c51818",
     "pixy-legacy": "#5c4a3d",
     "deorc-decuple": "#1d3036",
     "no-pole-remix": "#a11f8b",
@@ -19382,17 +19383,21 @@ export const librarySongs = [
     },
     {
         "id": "krushdafight-n2uthehartlocker",
-        "title": "Krushdafight N2uthehartlocker",
-        "artist": "Unknown Artist",
-        "duration": "2:18",
-        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkrushdafight-n2uthehartlocker.mp3?alt=media&token=4870f07a-e5ab-4724-97ea-f7a1968a61c0",
-        "art": "/images/blank_cover.svg",
-        "bpm": 120,
-        "energy": 0.7,
+        "title": "KRUSHDAFIGHT!",
+        "artist": "N2UtheHartlocker",
+        "duration": "2:19",
+        "src": "/music/krushdafight-n2uthehartlocker.mp3",
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fkrushdafight-n2uthehartlocker.mp3?alt=media&token=4870f07a-e5ab-4724-97ea-f7a1968a61c0",
+        "art": "/images/krushdafight.svg",
+        "bpm": 125,
+        "energy": 0.85,
         "inmixPoint": 10,
         "outmixPoint": 10,
         "tags": [
-            "untagged"
+            "phonk",
+            "brazilian phonk",
+            "electronic",
+            "gaming"
         ]
     },
     {
