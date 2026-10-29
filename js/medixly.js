@@ -732,6 +732,29 @@ function initHarmonyTunes() {
     const mobLexiStatusText = document.getElementById('mob-lexi-status-text');
     let lexiFadeTimeout = null;
     let previousView = 'home';
+
+    function setLexiMixingState(isMixing, customText) {
+        const text = customText || (isMixing ? 'Lexi is mixing...' : 'Lexi is a mixer');
+        const tooltips = [lexiStatusTooltip, fsLexiStatusTooltip, mobLexiStatusTooltip];
+        const texts = [lexiStatusText, fsLexiStatusText, mobLexiStatusText];
+
+        texts.forEach(el => {
+            if (el) el.textContent = text;
+        });
+
+        tooltips.forEach(el => {
+            if (!el) return;
+            if (isMixing) {
+                el.classList.add('mixing');
+            } else {
+                el.classList.remove('mixing');
+            }
+        });
+    }
+
+    function initLexiStatusIndicator() {
+        setLexiMixingState(isCrossfading);
+    }
     
     // Containers
     const containerJumpBack = document.getElementById('container-jump-back-in');
@@ -2419,29 +2442,377 @@ function initHarmonyTunes() {
                     }
                     lastTrigger = now;
                     if (e && e.preventDefault) e.preventDefault();
-                    handler();
+                    handler(e);
                 };
                 btn.addEventListener('click', safeHandler);
                 btn.addEventListener('touchstart', safeHandler, {passive: false});
             }
         };
 
-        bindEvent(fsPrevBtn, prevSong);
-        bindEvent(fsNextBtn, nextSong);
-        bindEvent(fsPlayPauseBtn, togglePlayPause);
+        // --- EXTRACTED HANDLERS FOR CROSS-PLATFORM SUPPORT ---
+        const toggleMixer = () => {
+            isMixerMode = !isMixerMode;
+            if(currentUser) {
+                const userRef = doc(db, "users", currentUser.uid);
+                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
+            }
+            syncAllPlayerStates();
+            
+            document.querySelectorAll('.lexi-mixer-wrapper').forEach(w => {
+                if (isMixerMode) {
+                    w.classList.remove('state-listening', 'state-deactivated');
+                    w.classList.add('state-mixxing');
+                } else {
+                    w.classList.remove('state-mixxing');
+                    w.classList.add('state-deactivated'); // Turns red when deactivated
+                    setTimeout(() => {
+                        // Revert to listening or default after 2s of red
+                        if (w.classList.contains('state-deactivated')) {
+                            w.classList.remove('state-deactivated');
+                            if (!activeAudio.paused) w.classList.add('state-listening');
+                        }
+                    }, 2000);
+                }
+            });
+        };
+        window.toggleMixerMode = toggleMixer;
 
-        // Instead of calling .click(), call the actual handlers directly or dispatch proper Event
-        const triggerClick = (targetBtn) => {
-            if(targetBtn) targetBtn.dispatchEvent(new Event('click', { bubbles: true }));
+        const toggleShuffle = () => {
+            isShuffle = !isShuffle;
+            syncAllPlayerStates();
         };
 
-        bindEvent(fsMixerBtn, () => triggerClick(mixerBtn));
-        bindEvent(fsLyricsBtn, () => { triggerClick(lyricsBtn); closeFullscreen(); });
-        // fsViralSkipBtn is handled via pointer events below, so it's not bound to basic click here
-        bindEvent(fsLikeBtn, () => triggerClick(playerLikeBtn));
-        bindEvent(fsShuffleBtn, () => triggerClick(shuffleBtn));
-        bindEvent(fsRepeatBtn, () => triggerClick(repeatBtn));
-        
+        const toggleRepeat = () => {
+            repeatMode = (repeatMode + 1) % 3;
+            syncAllPlayerStates();
+        };
+
+        const toggleLike = () => {
+            if(currentQueue[currentSongIndex]) {
+                toggleFavorite(currentQueue[currentSongIndex].id);
+                syncAllPlayerStates();
+            }
+        };
+
+        // --- FULLSCREEN TO MINI STATE SYNC ---
+        function syncAllPlayerStates() {
+            const song = currentQueue[currentSongIndex];
+            if (!song) return;
+
+            // 1. Text & Artwork
+            if (playerArt) playerArt.src = song.art || '/images/medixly-logo.png';
+            if (playerTitle) playerTitle.textContent = song.title;
+            if (playerArtist) playerArtist.textContent = song.artist;
+            if (fsArt) fsArt.src = song.art || '/images/medixly-logo.png';
+            if (fsBg) fsBg.style.backgroundImage = `url(${song.art || '/images/medixly-logo.png'})`;
+            if (fsTitle) fsTitle.textContent = song.title;
+            if (fsArtist) fsArtist.textContent = song.artist;
+
+            // 2. Play / Pause icons
+            const playing = activeAudio && !activeAudio.paused && isPlaying;
+            if (playIcon) playIcon.style.display = playing ? 'none' : 'block';
+            if (pauseIcon) pauseIcon.style.display = playing ? 'block' : 'none';
+            if (fsPlayIcon) fsPlayIcon.style.display = playing ? 'none' : 'block';
+            if (fsPauseIcon) fsPauseIcon.style.display = playing ? 'block' : 'none';
+
+            // 3. Shuffle
+            const shuffleColor = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            if (shuffleBtn) {
+                shuffleBtn.style.color = shuffleColor;
+                shuffleBtn.classList.toggle('active', isShuffle);
+            }
+            if (fsShuffleBtn) {
+                fsShuffleBtn.style.color = shuffleColor;
+                fsShuffleBtn.classList.toggle('active', isShuffle);
+            }
+            const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
+            if (mobShuffleBtn) {
+                mobShuffleBtn.style.color = shuffleColor;
+                mobShuffleBtn.classList.toggle('active', isShuffle);
+            }
+
+            // 4. Repeat
+            const updateRepeatVisuals = (btn, indicator) => {
+                if (!btn) return;
+                if (repeatMode === 0) {
+                    btn.style.color = '#b3b3b3';
+                    if (indicator) indicator.textContent = '';
+                    btn.classList.remove('active');
+                } else if (repeatMode === 1) {
+                    btn.style.color = 'var(--accent-green)';
+                    if (indicator) indicator.textContent = '.';
+                    btn.classList.add('active');
+                } else {
+                    btn.style.color = 'var(--accent-green)';
+                    if (indicator) indicator.textContent = '1';
+                    btn.classList.add('active');
+                }
+            };
+            if (repeatBtn) updateRepeatVisuals(repeatBtn, repeatBtn.querySelector('.repeat-indicator'));
+            if (fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
+            const mobRepeatBtn = document.getElementById('mob-repeat-btn');
+            if (mobRepeatBtn) updateRepeatVisuals(mobRepeatBtn, mobRepeatBtn.querySelector('.repeat-indicator') || mobRepeatBtn.querySelector('span'));
+
+            // 5. Lexi Mixer
+            if (mixerBtn) mixerBtn.classList.toggle('active', isMixerMode);
+            if (fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
+            const mobMixerBtn = document.getElementById('mob-mixer-btn');
+            if (mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
+
+            // 6. Favorites
+            const isFav = userFavoritesIds.has(song.id);
+            if (playerLikeBtn) {
+                playerLikeBtn.textContent = isFav ? '♥' : '♡';
+                playerLikeBtn.classList.toggle('active', isFav);
+            }
+            if (fsLikeBtn) {
+                fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;';
+                fsLikeBtn.classList.toggle('active', isFav);
+            }
+
+            // 7. Viral Skip
+            if (viralSkipBtn) viralSkipBtn.classList.toggle('viral-locked', viralLocked);
+            if (fsViralSkipBtn) fsViralSkipBtn.classList.toggle('viral-locked', viralLocked);
+            const mobViralBtn = document.getElementById('mob-viral-btn');
+            if (mobViralBtn) mobViralBtn.classList.toggle('viral-locked', viralLocked);
+
+            // 8. Progress
+            if (activeAudio && activeAudio.duration) {
+                const percent = (activeAudio.currentTime / activeAudio.duration) * 100;
+                if (progress) progress.style.width = `${percent}%`;
+                if (fsProgress) fsProgress.style.width = `${percent}%`;
+                const timeStr = formatTime(activeAudio.currentTime);
+                const remStr = showCountdown ? "-" + formatTime(activeAudio.duration - activeAudio.currentTime) : formatTime(activeAudio.duration);
+                if (currentTimeEl) currentTimeEl.textContent = timeStr;
+                if (totalTimeEl) totalTimeEl.textContent = remStr;
+                if (fsCurrentTime) fsCurrentTime.textContent = timeStr;
+                if (fsTotalTime) fsTotalTime.textContent = remStr;
+            }
+        }
+        window.syncAllPlayerStates = syncAllPlayerStates;
+
+        // --- VIRAL SKIP LOGIC & CYCLING ---
+        function flashViralButton() {
+            [viralSkipBtn, fsViralSkipBtn, document.getElementById('mob-viral-btn')].forEach(btn => {
+                if (!btn) return;
+                btn.classList.add('viral-flash');
+                setTimeout(() => btn.classList.remove('viral-flash'), 400);
+            });
+        }
+
+        function getViralTrendingSongs() {
+            const viral = librarySongs.filter(s => {
+                if (s.isHidden || (!s.src && !s.streamUrl)) return false;
+                const tags = Array.isArray(s.tags) ? s.tags.map(t => String(t).toLowerCase()) : [];
+                return tags.includes('viral') || tags.includes('trending') || tags.includes('tiktok') || (typeof s.inmixPoint === 'number' && s.inmixPoint > 0);
+            });
+            return viral.length > 0 ? viral : librarySongs.filter(s => !s.isHidden);
+        }
+
+        function cycleToNextViralTrack() {
+            if (viralLocked) {
+                toggleViralLock(true);
+            }
+            const viralList = getViralTrendingSongs();
+            if (!viralList || viralList.length === 0) return;
+
+            const currentSong = currentQueue[currentSongIndex];
+            const currentId = currentSong ? currentSong.id : null;
+
+            // Check if upcoming viral track already exists in current queue
+            let nextIndex = -1;
+            for (let i = currentSongIndex + 1; i < currentQueue.length; i++) {
+                const item = currentQueue[i];
+                const tags = Array.isArray(item.tags) ? item.tags.map(t => String(t).toLowerCase()) : [];
+                if (tags.includes('viral') || tags.includes('trending') || tags.includes('tiktok') || (typeof item.inmixPoint === 'number' && item.inmixPoint > 0)) {
+                    nextIndex = i;
+                    break;
+                }
+            }
+
+            if (nextIndex !== -1) {
+                __recordHistory();
+                currentSongIndex = nextIndex;
+                loadSong(currentSongIndex);
+                const meta = librarySongsMap.get(currentQueue[currentSongIndex]?.id) || currentQueue[currentSongIndex];
+                const hookTime = (meta && typeof meta.inmixPoint === 'number') ? meta.inmixPoint : 0;
+                playSong();
+                if (activeAudio && hookTime > 0) {
+                    activeAudio.currentTime = hookTime;
+                }
+            } else {
+                const candidates = viralList.filter(s => s.id !== currentId);
+                const nextSongObj = (candidates.length > 0)
+                    ? candidates[Math.floor(Math.random() * candidates.length)]
+                    : viralList[0];
+
+                if (nextSongObj) {
+                    __recordHistory();
+                    currentQueue.splice(currentSongIndex + 1, 0, nextSongObj);
+                    currentSongIndex++;
+                    loadSong(currentSongIndex);
+                    const hookTime = typeof nextSongObj.inmixPoint === 'number' ? nextSongObj.inmixPoint : 0;
+                    playSong();
+                    if (activeAudio && hookTime > 0) {
+                        activeAudio.currentTime = hookTime;
+                    }
+                }
+            }
+
+            if (queuePanel && queuePanel.classList.contains('open')) {
+                renderQueue();
+            }
+            syncAllPlayerStates();
+        }
+
+        let viralLastTapTime = 0;
+        const toggleViralLock = (forceUnlock = false) => {
+            if (viralLocked || forceUnlock) {
+                viralLocked = false;
+                if (viralSkipBtn) viralSkipBtn.classList.remove('viral-locked');
+                if (fsViralSkipBtn) fsViralSkipBtn.classList.remove('viral-locked');
+                const mobViral = document.getElementById('mob-viral-btn');
+                if (mobViral) mobViral.classList.remove('viral-locked');
+            } else {
+                viralLocked = true;
+                if (viralSkipBtn) viralSkipBtn.classList.add('viral-locked');
+                if (fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
+                const mobViral = document.getElementById('mob-viral-btn');
+                if (mobViral) mobViral.classList.add('viral-locked');
+            }
+        };
+
+        const handleViralClick = (e) => {
+            if (e && e.preventDefault) e.preventDefault();
+            flashViralButton();
+
+            const now = Date.now();
+            // Fast double tap (< 450ms) toggles viral lock loop deliberately
+            if (now - viralLastTapTime < 450 && viralLastTapTime !== 0) {
+                toggleViralLock();
+                viralLastTapTime = 0;
+                return;
+            }
+            viralLastTapTime = now;
+
+            if (viralLocked) {
+                toggleViralLock(true);
+            }
+
+            const song = currentQueue[currentSongIndex];
+            const meta = song ? (librarySongsMap.get(song.id) || song) : null;
+            const inmix = meta && typeof meta.inmixPoint === 'number' ? meta.inmixPoint : null;
+
+            // If current song has an inmixPoint hook ahead of current playback position, jump to hook
+            if (inmix !== null && inmix > 0 && activeAudio && activeAudio.currentTime < (inmix - 2)) {
+                activeAudio.currentTime = inmix;
+                if (activeAudio.paused) playSong();
+                syncAllPlayerStates();
+            } else {
+                // Otherwise seamlessly cycle to next viral/trending track
+                cycleToNextViralTrack();
+            }
+        };
+        window.handleViralClick = handleViralClick;
+        window.cycleToNextViralTrack = cycleToNextViralTrack;
+        window.toggleViralLock = toggleViralLock;
+
+        // --- LEXI ASSISTANT STATUS INDICATOR ---
+        function setLexiMixingState(isMixing, label = null) {
+            const text = label || (isMixing ? 'Mixing' : 'Lexi is a mixer');
+            const tooltips = [lexiStatusTooltip, fsLexiStatusTooltip, mobLexiStatusTooltip].filter(Boolean);
+            const textEls = [lexiStatusText, fsLexiStatusText, mobLexiStatusText].filter(Boolean);
+
+            textEls.forEach(el => {
+                el.textContent = text;
+            });
+
+            if (lexiFadeTimeout) {
+                clearTimeout(lexiFadeTimeout);
+                lexiFadeTimeout = null;
+            }
+
+            if (isMixing) {
+                tooltips.forEach(t => {
+                    t.classList.add('visible', 'mixing');
+                });
+            } else {
+                tooltips.forEach(t => {
+                    t.classList.remove('mixing');
+                });
+                lexiFadeTimeout = setTimeout(() => {
+                    tooltips.forEach(t => t.classList.remove('visible'));
+                    lexiFadeTimeout = null;
+                }, 1500);
+            }
+        }
+
+        function initLexiStatusIndicator() {
+            const tooltips = [lexiStatusTooltip, fsLexiStatusTooltip, mobLexiStatusTooltip].filter(Boolean);
+            const textEls = [lexiStatusText, fsLexiStatusText, mobLexiStatusText].filter(Boolean);
+            textEls.forEach(el => {
+                el.textContent = 'Lexi is a mixer';
+            });
+            tooltips.forEach(t => {
+                t.classList.remove('mixing');
+                t.classList.add('visible');
+            });
+
+            if (lexiFadeTimeout) clearTimeout(lexiFadeTimeout);
+            lexiFadeTimeout = setTimeout(() => {
+                tooltips.forEach(t => t.classList.remove('visible'));
+                lexiFadeTimeout = null;
+            }, 4000);
+        }
+        window.setLexiMixingState = setLexiMixingState;
+        window.initLexiStatusIndicator = initLexiStatusIndicator;
+
+        // Fullscreen Lyrics panel toggle (keeps fullscreen open)
+        const toggleFullscreenLyrics = () => {
+            const fsContent = document.getElementById('fullscreen-content');
+            const fsSidePanel = document.getElementById('fs-lyrics-side-panel');
+            if (!fsContent || !fsSidePanel) return;
+
+            const isOpen = fsContent.classList.toggle('lyrics-open');
+            if (fsLyricsBtn) fsLyricsBtn.style.color = isOpen ? 'var(--accent-green)' : '#b3b3b3';
+
+            if (isOpen) {
+                const lyricsSource = document.getElementById('lyrics-content');
+                if (lyricsSource && lyricsSource.children.length > 0) {
+                    fsSidePanel.innerHTML = lyricsSource.innerHTML;
+                    setTimeout(() => {
+                        const activeLine = fsSidePanel.querySelector('.lyric-line.active');
+                        if (activeLine) {
+                            activeLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                        }
+                    }, 380);
+                } else {
+                    fsSidePanel.innerHTML = '<p style="color:rgba(255,255,255,0.4);padding:20px;text-align:center;">No lyrics available.</p>';
+                }
+            }
+        };
+
+        // Bind Player Action Buttons (Mini + Fullscreen + Mobile)
+        bindEvent(playPauseBtn, togglePlayPause);
+        bindEvent(nextBtn, nextSong);
+        bindEvent(prevBtn, prevSong);
+        bindEvent(mixerBtn, toggleMixer);
+        bindEvent(shuffleBtn, toggleShuffle);
+        bindEvent(repeatBtn, toggleRepeat);
+        bindEvent(playerLikeBtn, toggleLike);
+        bindEvent(viralSkipBtn, handleViralClick);
+
+        bindEvent(fsPlayPauseBtn, togglePlayPause);
+        bindEvent(fsNextBtn, nextSong);
+        bindEvent(fsPrevBtn, prevSong);
+        bindEvent(fsMixerBtn, toggleMixer);
+        bindEvent(fsShuffleBtn, toggleShuffle);
+        bindEvent(fsRepeatBtn, toggleRepeat);
+        bindEvent(fsLikeBtn, toggleLike);
+        bindEvent(fsViralSkipBtn, handleViralClick);
+        bindEvent(fsLyricsBtn, toggleFullscreenLyrics);
+        bindEvent(closeFsBtn, closeFullscreen);
+
         if(fsProgressBar) {
             fsProgressBar.addEventListener('click', (e) => {
                 const width = fsProgressBar.clientWidth;
@@ -2460,9 +2831,6 @@ function initHarmonyTunes() {
             });
         }
 
-        bindEvent(playPauseBtn, togglePlayPause);
-        bindEvent(nextBtn, nextSong);
-        bindEvent(prevBtn, prevSong);
         let lastStateSaveTime = 0;
         [audioPlayer1, audioPlayer2].filter(Boolean).forEach(player => {
             player.addEventListener('error', (e) => {
@@ -2506,84 +2874,6 @@ function initHarmonyTunes() {
             saveSitewideMusicState({ isPlaying: !activeAudio.paused });
         });
 
-        // --- EXTRACTED HANDLERS FOR CROSS-PLATFORM SUPPORT ---
-        const toggleMixer = () => {
-            isMixerMode = !isMixerMode;
-            if(currentUser) {
-                const userRef = doc(db, "users", currentUser.uid);
-                setDoc(userRef, { mixerToggled: isMixerMode }, { merge: true }).catch(e => console.error("Manager info:", e));
-            }
-            if (mixerBtn) mixerBtn.classList.toggle('active', isMixerMode);
-            if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
-            const mobMixerBtn = document.getElementById('mob-mixer-btn');
-            if(mobMixerBtn) mobMixerBtn.classList.toggle('active', isMixerMode);
-            
-            document.querySelectorAll('.lexi-mixer-wrapper').forEach(w => {
-                if (isMixerMode) {
-                    w.classList.remove('state-listening', 'state-deactivated');
-                    w.classList.add('state-mixxing');
-                } else {
-                    w.classList.remove('state-mixxing');
-                    w.classList.add('state-deactivated'); // Turns red when deactivated
-                    setTimeout(() => {
-                        // Revert to listening or default after 2s of red
-                        if (w.classList.contains('state-deactivated')) {
-                            w.classList.remove('state-deactivated');
-                            if (!activeAudio.paused) w.classList.add('state-listening');
-                        }
-                    }, 2000);
-                }
-            });
-        };
-        
-        window.toggleMixerMode = toggleMixer;
-
-        const toggleShuffle = () => {
-            isShuffle = !isShuffle;
-            const color = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
-            shuffleBtn.style.color = color;
-            if(fsShuffleBtn) fsShuffleBtn.style.color = color;
-            const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
-            if(mobShuffleBtn) mobShuffleBtn.style.color = color;
-        };
-
-        const toggleRepeat = () => {
-            repeatMode = (repeatMode + 1) % 3;
-            const updateRepeatVisuals = (btn, indicator) => {
-                if(!btn) return;
-                if (repeatMode === 0) {
-                    btn.style.color = '#b3b3b3';
-                    if(indicator) indicator.textContent = '';
-                } else if (repeatMode === 1) {
-                    btn.style.color = 'var(--accent-green)';
-                    if(indicator) indicator.textContent = '.';
-                } else {
-                    btn.style.color = 'var(--accent-green)';
-                    if(indicator) indicator.textContent = '1';
-                }
-            };
-            
-            updateRepeatVisuals(repeatBtn, repeatBtn.querySelector('.repeat-indicator'));
-            if(fsRepeatBtn) updateRepeatVisuals(fsRepeatBtn, document.getElementById('fs-repeat-indicator'));
-            const mobRepeatBtn = document.getElementById('mob-repeat-btn');
-            if(mobRepeatBtn) {
-                // For mobile we might just change color without the indicator dot, or with it if available.
-                updateRepeatVisuals(mobRepeatBtn, mobRepeatBtn.querySelector('.repeat-indicator') || mobRepeatBtn.querySelector('span'));
-            }
-        };
-
-        const toggleLike = () => {
-            if(currentQueue[currentSongIndex]) {
-                toggleFavorite(currentQueue[currentSongIndex].id);
-            }
-        };
-
-        // Bind Extracted Handlers
-        if (mixerBtn) mixerBtn.addEventListener('click', toggleMixer);
-        if (shuffleBtn) shuffleBtn.addEventListener('click', toggleShuffle);
-        if (repeatBtn) repeatBtn.addEventListener('click', toggleRepeat);
-        if (playerLikeBtn) playerLikeBtn.addEventListener('click', toggleLike);
-
         if (volumeSlider) {
             volumeSlider.addEventListener('input', (e) => {
                 if (fadeInterval) {
@@ -2608,43 +2898,6 @@ function initHarmonyTunes() {
             });
         }
 
-        // Viral Skip: Double Tap to Loop, Single Tap to Skip
-        let viralLastTapTime = 0;
-        const toggleViralLock = (forceUnlock = false) => {
-            if (viralLocked || forceUnlock) {
-                viralLocked = false;
-                viralSkipBtn.classList.remove('viral-locked');
-                if(fsViralSkipBtn) fsViralSkipBtn.classList.remove('viral-locked');
-            } else {
-                viralLocked = true;
-                viralSkipBtn.classList.add('viral-locked');
-                if(fsViralSkipBtn) fsViralSkipBtn.classList.add('viral-locked');
-            }
-        };
-        const handleViralClick = (e) => {
-            if(e) e.preventDefault();
-            const now = Date.now();
-            if (now - viralLastTapTime < 5000 && viralLastTapTime !== 0) {
-                // Double tap detected (within 5 seconds)
-                toggleViralLock();
-                viralLastTapTime = 0; // reset
-            } else {
-                // Single tap detected
-                viralLastTapTime = now;
-                const song = currentQueue[currentSongIndex];
-                if (song && song.inmixPoint) {
-                    activeAudio.currentTime = song.inmixPoint;
-                    if (activeAudio.paused) playSong();
-                }
-            }
-        };
-
-        [viralSkipBtn, fsViralSkipBtn].forEach(btn => {
-            if (!btn) return;
-            btn.addEventListener('click', handleViralClick);
-            btn.addEventListener('contextmenu', (e) => e.preventDefault());
-        });
-
         const toggleLyrics = () => {
             const mobLyricsBtn = document.getElementById('mob-lyrics-btn');
             if (viewLyrics.style.display !== 'none' && !viewLyrics.classList.contains('slide-down-active')) {
@@ -2659,10 +2912,6 @@ function initHarmonyTunes() {
                 }, 300);
             } else {
                 viewHome.style.display = 'none';
-                
-                
-                
-                
                 viewLyrics.style.display = 'flex';
                 viewLyrics.classList.remove('slide-down-active');
                 viewLyrics.classList.add('slide-up-active');
@@ -2753,32 +3002,19 @@ function initHarmonyTunes() {
             }
             const song = currentQueue[currentSongIndex];
             if(!song) return;
-            fsArt.src = song.art;
-            fsBg.style.backgroundImage = `url(${song.art})`;
+            fsArt.src = song.art || '/images/medixly-logo.png';
+            fsBg.style.backgroundImage = `url(${song.art || '/images/medixly-logo.png'})`;
             fsTitle.textContent = song.title;
             fsArtist.textContent = song.artist;
-            // Sync state into fullscreen buttons
-            if(fsMixerBtn) fsMixerBtn.classList.toggle('active', isMixerMode);
-            if(fsShuffleBtn) fsShuffleBtn.classList.toggle('active', isShuffle);
-            if(fsViralSkipBtn) fsViralSkipBtn.classList.toggle('viral-locked', viralLocked);
-            // Sync progress
-            if(fsProgress && activeAudio.duration) {
-                fsProgress.style.width = `${(activeAudio.currentTime / activeAudio.duration) * 100}%`;
-            }
+            
+            syncAllPlayerStates();
+
             // Show with slide-up animation
             fsPlayer.style.display = 'flex';
             // Force reflow so transition fires
             fsPlayer.offsetHeight;
             fsPlayer.classList.remove('fs-hiding');
             fsPlayer.classList.add('fs-visible');
-
-            if (isPlaying) {
-                if(fsPlayIcon) fsPlayIcon.style.display = 'none';
-                if(fsPauseIcon) fsPauseIcon.style.display = 'block';
-            } else {
-                if(fsPlayIcon) fsPlayIcon.style.display = 'block';
-                if(fsPauseIcon) fsPauseIcon.style.display = 'none';
-            }
         }
         function closeFullscreen() {
             fsPlayer.classList.remove('fs-visible');
@@ -2794,6 +3030,7 @@ function initHarmonyTunes() {
                 if (fsContent) fsContent.classList.remove('lyrics-open');
                 if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
             }, 420);
+            syncAllPlayerStates();
         }
 
         if(playerArt) playerArt.addEventListener('click', openFullscreen);
@@ -2804,38 +3041,6 @@ function initHarmonyTunes() {
             if (!e.target.closest('.like-btn-player')) openFullscreen();
         });
         if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
-        if(fsPlayPauseBtn) fsPlayPauseBtn.addEventListener('click', togglePlayPause);
-        if(fsNextBtn) fsNextBtn.addEventListener('click', nextSong);
-        if(fsPrevBtn) fsPrevBtn.addEventListener('click', prevSong);
-
-        // Fullscreen lyrics button → side panel (not the old full-screen lyrics view)
-        if (fsLyricsBtn) {
-            fsLyricsBtn.addEventListener('click', () => {
-                const fsContent = document.getElementById('fullscreen-content');
-                const fsSidePanel = document.getElementById('fs-lyrics-side-panel');
-                if (!fsContent || !fsSidePanel) return;
-
-                const isOpen = fsContent.classList.toggle('lyrics-open');
-                fsLyricsBtn.style.color = isOpen ? 'var(--accent-green)' : '#b3b3b3';
-
-                if (isOpen) {
-                    // Mirror the current lyrics content into the side panel
-                    const lyricsSource = document.getElementById('lyrics-content');
-                    if (lyricsSource) {
-                        fsSidePanel.innerHTML = lyricsSource.innerHTML;
-                        // Scroll to active line
-                        setTimeout(() => {
-                            const activeLine = fsSidePanel.querySelector('.lyric-line.active');
-                            if (activeLine) {
-                                activeLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                            }
-                        }, 380);
-                    } else {
-                        fsSidePanel.innerHTML = '<p style="color:rgba(255,255,255,0.4);padding:20px;text-align:center;">No lyrics available.</p>';
-                    }
-                }
-            });
-        }
 
 
         // Artist Profile
@@ -3203,6 +3408,7 @@ function initHarmonyTunes() {
             if (mixerBtn) mixerBtn.classList.remove('analyzing'); if(fsMixerBtn) fsMixerBtn.classList.remove('analyzing');
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             isCrossfading = true;
+            setLexiMixingState(true);
             if (mixerBtn) mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
             if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             
@@ -3327,6 +3533,7 @@ function initHarmonyTunes() {
             const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('analyzing');
             
             isCrossfading = true;
+            setLexiMixingState(true);
             if (mixerBtn) mixerBtn.classList.add('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.add('pulsing');
             if(mobMixerBtn) mobMixerBtn.classList.add('pulsing');
             

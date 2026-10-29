@@ -1560,6 +1560,14 @@ export function initChatbot() {
                 text = text.replace(songMatch[0], '');
             }
 
+            // 3.5. Process Show Lyrics token: [SHOW_LYRICS:<id>]
+            let showLyricsId = null;
+            const lyricsMatch = text.match(/\[SHOW_LYRICS:([^\]]+)\]/);
+            if (lyricsMatch) {
+                showLyricsId = lyricsMatch[1];
+                text = text.replace(lyricsMatch[0], '');
+            }
+
             // 4. Process Request Song token: [REQUEST_SONG:<title>]
             let requestSongTitle = null;
             const reqMatch = text.match(/\[REQUEST_SONG:([^\]]+)\]/);
@@ -1584,10 +1592,20 @@ export function initChatbot() {
                     </div>
                     <div class="chat-song-actions">
                         <button class="chat-song-play-btn" data-song-id="${escapeHTML(song.id)}" aria-label="Play ${escapeHTML(song.title)}">▶ Play Now</button>
+                        <button class="chat-song-lyrics-btn" data-song-id="${escapeHTML(song.id)}" aria-label="Show lyrics for ${escapeHTML(song.title)}">🎤 Lyrics</button>
                         <a href="medixly.html" class="chat-song-link" title="Open Medixly">Open</a>
                     </div>
                 `;
                 msgDiv.appendChild(songCard);
+            } else if (showLyricsId) {
+                const song = getSongById(showLyricsId) || librarySongs.find(s => s.id === showLyricsId);
+                if (song) {
+                    const lyricsAction = document.createElement('button');
+                    lyricsAction.className = 'chat-action-btn chat-show-lyrics-action';
+                    lyricsAction.dataset.songId = song.id;
+                    lyricsAction.textContent = `🎤 View Synced Lyrics (${escapeHTML(song.title)})`;
+                    msgDiv.appendChild(lyricsAction);
+                }
             }
 
             // Append Song Request Button
