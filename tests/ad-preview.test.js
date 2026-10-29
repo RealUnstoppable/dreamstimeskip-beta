@@ -258,30 +258,89 @@ describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
         expect(controlDock.classList.contains('dock-hidden')).toBe(true);
         expect(topDock.classList.contains('dock-hidden')).toBe(true);
         expect(sceneHeader.classList.contains('header-hidden')).toBe(true);
+        expect(sceneHeader.style.display).toBe('none');
 
         controller.toggleCleanMode();
         expect(controller.isCleanMode).toBe(false);
         expect(controlDock.classList.contains('dock-hidden')).toBe(false);
         expect(topDock.classList.contains('dock-hidden')).toBe(false);
         expect(sceneHeader.classList.contains('header-hidden')).toBe(false);
+        expect(sceneHeader.style.display).toBe('');
     });
 
-    it('manages settings gear modal with dialog box toggle and editable user display name', () => {
+    it('removes MEDIXLY AD STUDIO and Verified badge immediately during recording countdown', () => {
+        const sceneHeader = document.getElementById('ad-scene-header');
+        const countdownOverlay = document.getElementById('ad-countdown-overlay');
+        const viewport = document.getElementById('ad-viewport');
+
+        expect(sceneHeader.classList.contains('header-hidden')).toBe(false);
+
+        // Start countdown
+        controller.startCountdownRecord();
+
+        // While countdown is running, header (Medixly Ad Studio & Verified badge) must be removed
+        expect(sceneHeader.classList.contains('header-hidden')).toBe(true);
+        expect(sceneHeader.style.display).toBe('none');
+        expect(countdownOverlay.classList.contains('visible')).toBe(true);
+        expect(viewport.classList.contains('countdown-active')).toBe(true);
+
+        // Cancel countdown cleanly
+        controller.cancelCountdown();
+        expect(countdownOverlay.classList.contains('visible')).toBe(false);
+        expect(viewport.classList.contains('countdown-active')).toBe(false);
+    });
+
+    it('manages settings gear modal with caption box toggle (on and off) and editable user display name', () => {
         const studio = new CompositionStudio(controller);
         studio.mount();
 
         const captionsStage = document.querySelector('.ad-captions-stage');
+        const captionCard = document.getElementById('caption-card');
         const userTag = document.getElementById('speaker-tag-user');
+        const gearBtn = document.getElementById('btn-composition-gear');
 
-        // Test dialog box toggle
+        expect(gearBtn).not.toBeNull();
+        expect(gearBtn.title).toContain('Settings');
+
+        // Test caption box toggle - defaults to true (ON)
+        expect(studio.showCaptionBox).toBe(true);
         expect(studio.showDialogBox).toBe(true);
-        studio.setDialogBox(false);
+
+        // Toggle OFF -> Removes the box under the blobs
+        studio.setCaptionBox(false);
+        expect(studio.showCaptionBox).toBe(false);
         expect(studio.showDialogBox).toBe(false);
+        expect(captionsStage.classList.contains('captions-hidden')).toBe(true);
+        expect(captionsStage.style.display).toBe('none');
+        expect(captionCard.classList.contains('caption-box-hidden')).toBe(true);
+        expect(captionCard.style.display).toBe('none');
+
+        // Toggle ON -> Restores the box under the blobs
+        studio.setCaptionBox(true);
+        expect(studio.showCaptionBox).toBe(true);
+        expect(studio.showDialogBox).toBe(true);
+        expect(captionsStage.classList.contains('captions-hidden')).toBe(false);
+        expect(captionsStage.style.display).toBe('');
+        expect(captionCard.classList.contains('caption-box-hidden')).toBe(false);
+        expect(captionCard.style.display).toBe('');
+
+        // Backwards compatibility check for setDialogBox
+        studio.setDialogBox(false);
+        expect(studio.showCaptionBox).toBe(false);
         expect(captionsStage.classList.contains('captions-hidden')).toBe(true);
 
         studio.setDialogBox(true);
-        expect(studio.showDialogBox).toBe(true);
+        expect(studio.showCaptionBox).toBe(true);
         expect(captionsStage.classList.contains('captions-hidden')).toBe(false);
+
+        // Test checkbox interaction in settings panel
+        const toggleCheckbox = document.getElementById('comp-toggle-caption-box');
+        if (toggleCheckbox) {
+            toggleCheckbox.checked = false;
+            toggleCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+            expect(studio.showCaptionBox).toBe(false);
+            expect(captionsStage.classList.contains('captions-hidden')).toBe(true);
+        }
 
         // Test editable user name
         studio.setUserName('Alex Editor');

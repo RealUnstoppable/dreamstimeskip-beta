@@ -40,6 +40,7 @@ export class CompositionStudio {
         this.blobFilter = 'both';         // 'both' | 'user-only' | 'lexi-only'
         this.showOuterCircles = true;
         this.showNameTags = true;
+        this.showCaptionBox = true;
         this.showDialogBox = true;
         this.userName = 'User';
         this.isOpen = false;
@@ -48,8 +49,11 @@ export class CompositionStudio {
         try {
             const savedUserName = localStorage.getItem('medixly_comp_user_name');
             if (savedUserName) this.userName = savedUserName;
-            const savedDialog = localStorage.getItem('medixly_comp_dialog_box');
-            if (savedDialog !== null) this.showDialogBox = savedDialog === 'true';
+            const savedCaption = localStorage.getItem('medixly_comp_caption_box') ?? localStorage.getItem('medixly_comp_dialog_box');
+            if (savedCaption !== null) {
+                this.showCaptionBox = savedCaption === 'true';
+                this.showDialogBox = this.showCaptionBox;
+            }
         } catch (_) {}
 
         // DOM references (set during mount)
@@ -76,9 +80,10 @@ export class CompositionStudio {
 
         this.gearBtn = document.createElement('button');
         this.gearBtn.id = 'btn-composition-gear';
-        this.gearBtn.className = 'dock-btn';
-        this.gearBtn.title = 'Composition Studio';
-        this.gearBtn.innerHTML = '<span>⚙️ Studio</span>';
+        this.gearBtn.className = 'dock-btn btn-settings-gear';
+        this.gearBtn.title = 'Settings & Composition Studio';
+        this.gearBtn.setAttribute('aria-label', 'Settings');
+        this.gearBtn.innerHTML = '<span>⚙️ Settings</span>';
         topDock.insertBefore(this.gearBtn, topDock.firstChild);
     }
 
@@ -126,7 +131,7 @@ export class CompositionStudio {
 
         return `
             <div class="comp-studio-header">
-                <span class="comp-studio-title">⚙️ Composition Studio</span>
+                <span class="comp-studio-title">⚙️ Settings & Studio</span>
                 <button class="comp-studio-close" data-action="close" title="Close">&times;</button>
             </div>
 
@@ -174,23 +179,41 @@ export class CompositionStudio {
                         <span class="comp-section-title">Visual Toggles</span>
                     </div>
                     <div class="comp-toggles">
-                        <label class="comp-toggle-row">
-                            <span class="comp-toggle-label">Dialog Box / Captions</span>
-                            <input type="checkbox" class="comp-toggle-input" data-action="toggle-dialog"
-                                   ${this.showDialogBox ? 'checked' : ''}>
-                            <span class="comp-toggle-slider"></span>
+                        <label class="comp-toggle-row" id="comp-toggle-caption-box-row" title="Toggle caption box under blobs">
+                            <div class="comp-toggle-info">
+                                <span class="comp-toggle-label">Caption Box</span>
+                                <span class="comp-toggle-subtext">Box under blobs</span>
+                            </div>
+                            <div class="comp-toggle-ctrl">
+                                <span class="comp-toggle-state${this.showCaptionBox ? '' : ' state-off'}">${this.showCaptionBox ? 'ON' : 'OFF'}</span>
+                                <input type="checkbox" class="comp-toggle-input" id="comp-toggle-caption-box" data-action="toggle-caption-box"
+                                       ${this.showCaptionBox ? 'checked' : ''}>
+                                <span class="comp-toggle-slider"></span>
+                            </div>
                         </label>
-                        <label class="comp-toggle-row">
-                            <span class="comp-toggle-label">Outer Circles</span>
-                            <input type="checkbox" class="comp-toggle-input" data-action="toggle-circles"
-                                   ${this.showOuterCircles ? 'checked' : ''}>
-                            <span class="comp-toggle-slider"></span>
+                        <label class="comp-toggle-row" title="Toggle outer resonance rings">
+                            <div class="comp-toggle-info">
+                                <span class="comp-toggle-label">Outer Circles</span>
+                                <span class="comp-toggle-subtext">Resonance rings</span>
+                            </div>
+                            <div class="comp-toggle-ctrl">
+                                <span class="comp-toggle-state${this.showOuterCircles ? '' : ' state-off'}">${this.showOuterCircles ? 'ON' : 'OFF'}</span>
+                                <input type="checkbox" class="comp-toggle-input" data-action="toggle-circles"
+                                       ${this.showOuterCircles ? 'checked' : ''}>
+                                <span class="comp-toggle-slider"></span>
+                            </div>
                         </label>
-                        <label class="comp-toggle-row">
-                            <span class="comp-toggle-label">Name Tags</span>
-                            <input type="checkbox" class="comp-toggle-input" data-action="toggle-tags"
-                                   ${this.showNameTags ? 'checked' : ''}>
-                            <span class="comp-toggle-slider"></span>
+                        <label class="comp-toggle-row" title="Toggle speaker name tags">
+                            <div class="comp-toggle-info">
+                                <span class="comp-toggle-label">Name Tags</span>
+                                <span class="comp-toggle-subtext">User & Lexi AI tags</span>
+                            </div>
+                            <div class="comp-toggle-ctrl">
+                                <span class="comp-toggle-state${this.showNameTags ? '' : ' state-off'}">${this.showNameTags ? 'ON' : 'OFF'}</span>
+                                <input type="checkbox" class="comp-toggle-input" data-action="toggle-tags"
+                                       ${this.showNameTags ? 'checked' : ''}>
+                                <span class="comp-toggle-slider"></span>
+                            </div>
                         </label>
                     </div>
                 </section>
@@ -266,14 +289,18 @@ export class CompositionStudio {
                 if (!input.dataset.action) return;
 
                 switch (input.dataset.action) {
+                    case 'toggle-caption-box':
                     case 'toggle-dialog':
-                        this.setDialogBox(input.checked);
+                        this.setCaptionBox(input.checked);
+                        this._updateToggleStateLabel(input, input.checked);
                         break;
                     case 'toggle-circles':
                         this.setOuterCircles(input.checked);
+                        this._updateToggleStateLabel(input, input.checked);
                         break;
                     case 'toggle-tags':
                         this.setNameTags(input.checked);
+                        this._updateToggleStateLabel(input, input.checked);
                         break;
                 }
             });
@@ -388,16 +415,60 @@ export class CompositionStudio {
     }
 
     /**
-     * Toggle: Speaker text / dialog box visibility
+     * Update state label (ON / OFF) beside toggle slider
      */
-    setDialogBox(visible) {
-        this.showDialogBox = visible;
+    _updateToggleStateLabel(input, isChecked) {
+        const row = input.closest('.comp-toggle-row');
+        if (!row) return;
+        const stateEl = row.querySelector('.comp-toggle-state');
+        if (stateEl) {
+            stateEl.textContent = isChecked ? 'ON' : 'OFF';
+            stateEl.classList.toggle('state-off', !isChecked);
+        }
+    }
+
+    /**
+     * Toggle: Caption box (box under blobs) visibility (on / off)
+     * Removes or shows the captions stage and card beneath the dual blobs
+     */
+    setCaptionBox(visible) {
+        this.showCaptionBox = Boolean(visible);
+        this.showDialogBox = this.showCaptionBox;
         const captionsStage = this.controller.elements.captionCard?.closest('.ad-captions-stage') || 
                               document.querySelector('.ad-captions-stage');
         if (captionsStage) {
-            captionsStage.classList.toggle('captions-hidden', !visible);
+            captionsStage.classList.toggle('captions-hidden', !this.showCaptionBox);
+            captionsStage.style.display = this.showCaptionBox ? '' : 'none';
         }
-        try { localStorage.setItem('medixly_comp_dialog_box', String(visible)); } catch (_) {}
+        const captionCard = this.controller.elements.captionCard || document.getElementById('caption-card');
+        if (captionCard) {
+            captionCard.classList.toggle('caption-box-hidden', !this.showCaptionBox);
+            captionCard.style.display = this.showCaptionBox ? '' : 'none';
+        }
+
+        // Sync toggle checkbox state if rendered in panel
+        if (this.panelEl) {
+            const toggleInput = this.panelEl.querySelector('[data-action="toggle-caption-box"]') ||
+                                this.panelEl.querySelector('[data-action="toggle-dialog"]');
+            if (toggleInput && toggleInput.checked !== this.showCaptionBox) {
+                toggleInput.checked = this.showCaptionBox;
+            }
+            if (toggleInput) {
+                this._updateToggleStateLabel(toggleInput, this.showCaptionBox);
+            }
+        }
+
+        try {
+            localStorage.setItem('medixly_comp_caption_box', String(this.showCaptionBox));
+            localStorage.setItem('medixly_comp_dialog_box', String(this.showCaptionBox));
+        } catch (_) {}
+    }
+
+    /**
+     * Alias for setCaptionBox for backwards compatibility
+     */
+    setDialogBox(visible) {
+        this.setCaptionBox(visible);
     }
 
     /**
@@ -431,7 +502,7 @@ export class CompositionStudio {
         this.setBlobFilter(this.blobFilter);
         this.setOuterCircles(this.showOuterCircles);
         this.setNameTags(this.showNameTags);
-        this.setDialogBox(this.showDialogBox);
+        this.setCaptionBox(this.showCaptionBox);
         this.setUserName(this.userName);
     }
 
