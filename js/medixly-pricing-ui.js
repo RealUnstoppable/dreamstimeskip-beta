@@ -348,7 +348,16 @@ export class MedixlyPricingUI {
 
       const data = await response.json();
       if (data && data.url) {
-        window.location.href = data.url;
+        if (typeof window !== 'undefined' && window.medixlyDesktop && window.medixlyDesktop.openExternal) {
+          window.medixlyDesktop.openExternal(data.url);
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Opened Checkout in Browser ↗';
+            setTimeout(() => { btn.textContent = origText; }, 4000);
+          }
+        } else {
+          window.location.href = data.url;
+        }
       } else {
         throw new Error('Checkout URL not returned by payment gateway.');
       }

@@ -3091,3 +3091,51 @@ body {
     transform: scale(0.95);
 }
 
+/* ===== macOS Desktop Native Enhancements ===== */
+body.is-desktop-mac {
+    user-select: none;
+    -webkit-user-select: none;
+    overflow-x: hidden;
+}
+
+body.is-desktop-mac .main-header {
+    -webkit-app-region: drag;
+    padding-left: 84px; /* Leaves clear breathing room for macOS traffic lights */
+    background: rgba(10, 11, 14, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+body.is-desktop-mac .main-header button,
+body.is-desktop-mac .main-header a,
+body.is-desktop-mac .main-header input,
+body.is-desktop-mac .main-header select,
+body.is-desktop-mac .pill-nav,
+body.is-desktop-mac .nav-pill,
+body.is-desktop-mac button,
+body.is-desktop-mac input,
+body.is-desktop-mac a,
+body.is-desktop-mac .music-card,
+body.is-desktop-mac .player-controls-container {
+    -webkit-app-region: no-drag;
+}
+
+body.is-desktop-mac ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+body.is-desktop-mac ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body.is-desktop-mac ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+}
+
+body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+

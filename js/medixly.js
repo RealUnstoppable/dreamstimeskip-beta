@@ -2144,6 +2144,10 @@ function initHarmonyTunes() {
             navigator.mediaSession.setActionHandler('play', () => { if (!isPlaying) togglePlayPause(); });
             navigator.mediaSession.setActionHandler('pause', () => { if (isPlaying) togglePlayPause(); });
         }
+
+        if (typeof window !== 'undefined' && window.medixlyDesktopBridge) {
+            window.medixlyDesktopBridge.updateTrack(song, isPlaying);
+        }
     }
 
     
@@ -2219,6 +2223,12 @@ function initHarmonyTunes() {
             if (pauseIcon) pauseIcon.style.display = 'block';
             if (fsPlayIcon) fsPlayIcon.style.display = 'none';
             if (fsPauseIcon) fsPauseIcon.style.display = 'block';
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'playing';
+            }
+            if (typeof window !== 'undefined' && window.medixlyDesktopBridge) {
+                window.medixlyDesktopBridge.updatePlaybackState(true);
+            }
         }).catch(e => {
             if (e && e.name === 'AbortError') {
                 return;
@@ -2233,6 +2243,12 @@ function initHarmonyTunes() {
             if (pauseIcon) pauseIcon.style.display = 'none';
             if (fsPlayIcon) fsPlayIcon.style.display = 'block';
             if (fsPauseIcon) fsPauseIcon.style.display = 'none';
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = 'paused';
+            }
+            if (typeof window !== 'undefined' && window.medixlyDesktopBridge) {
+                window.medixlyDesktopBridge.updatePlaybackState(false);
+            }
         });
     }
 
@@ -2245,6 +2261,12 @@ function initHarmonyTunes() {
         pauseIcon.style.display = 'none';
         if(fsPlayIcon) fsPlayIcon.style.display = 'block';
         if(fsPauseIcon) fsPauseIcon.style.display = 'none';
+        if ('mediaSession' in navigator) {
+            navigator.mediaSession.playbackState = 'paused';
+        }
+        if (typeof window !== 'undefined' && window.medixlyDesktopBridge) {
+            window.medixlyDesktopBridge.updatePlaybackState(false);
+        }
 
         if (isCrossfading) {
             mixEngine.cancelCrossfade();
@@ -2433,6 +2455,15 @@ function initHarmonyTunes() {
                 playSong();
             }
         }
+    }
+
+    // Expose playback controls for native desktop bridge (hardware keys, menu bar, touch bar)
+    if (typeof window !== 'undefined') {
+        window.togglePlayPause = togglePlayPause;
+        window.nextSong = nextSong;
+        window.prevSong = prevSong;
+        window.playSong = playSong;
+        window.pauseSong = pauseSong;
     }
 
     // --- EVENTS ---
