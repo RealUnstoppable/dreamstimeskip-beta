@@ -75,7 +75,7 @@ export const librarySongs = [
         "artist": "The Weeknd",
         "duration": "3:22",
         "src": "/music/blinding-lights-the-weeknd.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fblinding-lights-the-weeknd.mp3?alt=media&token=3a416be2-09e4-4e5f-a243-1308dd6ed9f2",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -151,7 +151,7 @@ export const librarySongs = [
         "artist": "Kendrick Lamar",
         "duration": "4:34",
         "src": "/music/not-like-us-kendrick-lamar.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fnot-like-us-kendrick-lamar.mp3?alt=media&token=900d2ae7-de5e-43f8-8d94-f78e68901f52",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/31/3a/3f/313a3fbc-bb8f-80c7-b5a2-e226869a38cd/24UMGIM51924.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -170,7 +170,7 @@ export const librarySongs = [
         "artist": "Drake",
         "duration": "3:19",
         "src": "/music/gods-plan-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fgods-plan-drake.mp3?alt=media&token=eadb0776-dbd2-4ee6-88fb-2aef3d6863cd",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/6d/8f/bb6d8f67-6d04-10b5-dd62-eb5809ac54fc/00602567879152.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -246,7 +246,7 @@ export const librarySongs = [
         "artist": "Ariana Grande",
         "duration": "2:59",
         "src": "/music/7-rings-ariana-grande.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2F7-rings-ariana-grande.mp3?alt=media&token=5b7408a1-c146-4e80-9ceb-345639f8d620",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/bb/69/07/bb6907de-8ad4-970b-3311-121320e1bf9c/19UMGIM03691.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -265,7 +265,7 @@ export const librarySongs = [
         "artist": "Drake",
         "duration": "4:59",
         "src": "/music/passionfruit-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fpassionfruit-drake.mp3?alt=media&token=06bc44f9-aaf3-4a1b-8ad4-c1d7c112484a",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/18/9d/b8/189db80b-bfa8-89d1-1514-5fcb7e5cf8f4/00602557611526.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -303,7 +303,7 @@ export const librarySongs = [
         "artist": "SZA",
         "duration": "3:22",
         "src": "/music/snooze-sza.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsnooze-sza.mp3?alt=media&token=15a42e1f-393d-4ce2-b7d3-1d1d39833346",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/62/93/13/6293132e-20ff-67ab-3d1f-96bb6797a6ba/196589564955.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -493,7 +493,7 @@ export const librarySongs = [
         "artist": "The Neighbourhood",
         "duration": "4:00",
         "src": "/music/sweater-weather-the-neighbourhood.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fsweater-weather-the-neighbourhood.mp3?alt=media&token=8a849d46-20d1-4847-ab02-57d5ecce05f5",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -550,7 +550,7 @@ export const librarySongs = [
         "artist": "Billie Eilish",
         "duration": "4:21",
         "src": "/music/wildflower-billie-eilish.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwildflower-billie-eilish.mp3?alt=media&token=1537d185-b39c-48a4-91ef-5d0802730192",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/92/9f/69/929f69f1-9977-3a44-d674-11f70c852d1b/24UMGIM36186.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -569,7 +569,7 @@ export const librarySongs = [
         "artist": "The Weeknd",
         "duration": "5:25",
         "src": "/music/wicked-games-the-weeknd.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwicked-games-the-weeknd.mp3?alt=media&token=f839aa9d-65a2-485e-bfd4-e6ff7ab3526e",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4b/ab/3c/4bab3c0d-ea9a-ad8e-4229-b1e73cad0283/21UMGIM06668.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -607,7 +607,7 @@ export const librarySongs = [
         "artist": "Gunna",
         "duration": "2:05",
         "src": "/music/fukumean-gunna.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffukumean-gunna.mp3?alt=media&token=0ef259b1-27fc-49cb-a5ca-5cc72743234e",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/af/f8/ef/aff8ef1c-e1e7-8c70-75fa-2201d8785f3d/075679678492.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1101,7 +1101,7 @@ export const librarySongs = [
         "artist": "Future",
         "duration": "2:51",
         "src": "/music/stick-talk-future.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fstick-talk-future.mp3?alt=media&token=c7d7cc4e-dff0-49fe-a421-1bf3ce6beae8",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/21/01/d0/2101d0ef-079a-974e-317a-780275f8c269/886445328547.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1310,7 +1310,7 @@ export const librarySongs = [
         "artist": "Future",
         "duration": "4:32",
         "src": "/music/im-dat-na-future.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fim-dat-na-future.mp3?alt=media&token=6053c77d-fd0e-4174-ab56-f98a96d748e5",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/62/d5/31/62d53149-d488-a115-4e3c-3c73972c24bb/196589180544.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1367,7 +1367,7 @@ export const librarySongs = [
         "artist": "Drake",
         "duration": "3:09",
         "src": "/music/shabang-drake.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fshabang-drake.mp3?alt=media&token=bd7d4e8e-32f6-41db-89db-6affefc36c8a",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/39/61/7f396123-be56-bc11-eaab-976441808e58/26UMGIM63622.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1386,7 +1386,7 @@ export const librarySongs = [
         "artist": "Ariana Grande",
         "duration": "3:18",
         "src": "/music/hate-that-i-made-you-love-me-ariana-grande.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhate-that-i-made-you-love-me-ariana-grande.mp3?alt=media&token=f937e22e-44a5-4eaf-9811-f4f7a402021b",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/56/f4/96/56f49612-02dd-83f4-44fe-d2118cc70707/26UMGIM51129.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -1728,7 +1728,7 @@ export const librarySongs = [
         "artist": "Lil Baby",
         "duration": "2:37",
         "src": "/music/dead-fresh-lil-baby.mp3",
-        "streamUrl": null,
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdead-fresh-lil-baby.mp3?alt=media&token=3f2e100a-c7c8-4492-a962-ea54fa713c37",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f4/00/dd/f400ddda-01b6-52ee-1888-477ffee6ed67/26UMGIM86003.rgb.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.8,
@@ -2093,7 +2093,7 @@ export const librarySongs = [
         "title": "Janice STFU",
         "artist": "Drake",
         "duration": "3:57",
-        "src": "/music/janice-stfu-drake.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fjanice-stfu-drake.mp3?alt=media&token=e12bf628-efe0-4887-91a3-b2ee050cc150",
         "streamUrl": null,
         "art": "/images/medixly-logo.png",
         "bpm": 120,
@@ -2552,7 +2552,7 @@ export const librarySongs = [
         "title": "B's On The Table",
         "artist": "Drake, 21 Savage",
         "duration": "2:18",
-        "src": "/music/bs-on-the-table-drake.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbs-on-the-table-drake-21-savage.mp3?alt=media&token=26d282f5-a2f2-4fe1-87c6-a5aeb03a0edb",
         "streamUrl": null,
         "art": "/images/medixly-logo.png",
         "bpm": 120,
@@ -4184,7 +4184,7 @@ export const librarySongs = [
         "title": "What You Saying",
         "artist": "Lil Uzi Vert",
         "duration": "2:12",
-        "src": "/music/what-you-saying-lil-uzi-vert.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fwhat-you-saying-lil-uzi-vert.mp3?alt=media&token=c9f0e2ed-2b50-46de-a3b2-83ce457f5631",
         "streamUrl": null,
         "art": "/images/medixly-logo.png",
         "bpm": 120,
@@ -7458,7 +7458,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdancin-krono-remix-feat-luvli-aaron-smith.mp3?alt=media&token=6bf52ce0-ff30-4a13-ae5b-e8070c532563"
     },
     {
         "id": "did-i-tell-u-that-i-miss-u-adore",
@@ -7473,7 +7474,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdid-i-tell-u-that-i-miss-u-adore.mp3?alt=media&token=3d93a342-ed04-438f-bbd1-5712ffc44413"
     },
     {
         "id": "died-once-guitar-remix-aamadux",
@@ -7488,7 +7490,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fdied-once-guitar-remix-aamadux.mp3?alt=media&token=cc38c311-8031-45f9-8e30-fcfbf5a1239b"
     },
     {
         "id": "fame-is-a-gun-addison-rae",
@@ -7503,7 +7506,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Ffame-is-a-gun-addison-rae.mp3?alt=media&token=9173dcf5-3696-4cb7-bae7-85c1efdce558"
     },
     {
         "id": "i-feel-lost-aaron-hibell",
@@ -7518,7 +7522,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-feel-lost-aaron-hibell.mp3?alt=media&token=652c5665-0143-4719-bf44-6c74b8fb605d"
     },
     {
         "id": "i-smoked-away-my-brain-im-god-x-demons-mashup-imogen-heap-cl",
@@ -7533,7 +7538,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3?alt=media&token=5e541b97-f97d-4680-869a-8d4d93a33dc9"
     },
     {
         "id": "loverboy-a-wall",
@@ -7548,7 +7554,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Floverboy-a-wall.mp3?alt=media&token=708e6b6a-4adc-4219-ad33-8d1280cc709c"
     },
     {
         "id": "summer-bummer-rhy-rhy",
@@ -7720,7 +7727,7 @@ export const librarySongs = [
         "title": "Automotivo Bibi Fogosa - Slowed + Reverb",
         "artist": "bbygirl",
         "duration": "0:00",
-        "src": "/music/automotivo-bibi-fogosa-bibi-babydoll-dj-brunin-xm-kza-produções.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fautomotivo-bibi-fogosa-slowed-reverb-bbygirl.mp3?alt=media&token=f1fed8d2-7ea5-4e6e-9486-8c311dcd69cd",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/0c/4e/b8/0c4eb8aa-d999-5042-005c-3d596d3c9c81/5063341826598_cover.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
@@ -7765,7 +7772,7 @@ export const librarySongs = [
         "title": "BAILA JAZZÃO",
         "artist": "Chrxs Beats & Bread Beatz",
         "duration": "0:00",
-        "src": "/music/baila-jazzão-chrxs-beats-bread-beatz.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fbaila-jazz%C3%A3o-chrxs-beats-bread-beatz.mp3?alt=media&token=5dfe767e-31fa-44de-be35-62edf5320131",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/75/53/f0/7553f084-8979-bff7-8602-155ec33b8a9a/60508.jpg/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
@@ -8080,7 +8087,7 @@ export const librarySongs = [
         "title": "Duvet",
         "artist": "bôa",
         "duration": "0:00",
-        "src": "/music/duvet-bôa.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fduvet-b%C3%B4a.mp3?alt=media&token=00a838a9-8151-408a-91db-30f7adfeae4f",
         "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/45/44/15/45441528-0288-eedc-f6fc-93137b8cfe96/067003248969.png/600x600bb.jpg",
         "bpm": 120,
         "energy": 0.7,
@@ -8315,7 +8322,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fhate-that-i-made-you-love-me-ariana-grande.mp3?alt=media&token=f937e22e-44a5-4eaf-9811-f4f7a402021b"
     },
     {
         "id": "haza-tiktok-version-udiennx",
@@ -8570,7 +8578,8 @@ export const librarySongs = [
         "outmixPoint": 10,
         "tags": [
             "untagged"
-        ]
+        ],
+        "streamUrl": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fi-smoked-away-my-brain-im-god-x-demons-mashup-feat-imogen-heap-clams-casino-aap-rocky.mp3?alt=media&token=5e541b97-f97d-4680-869a-8d4d93a33dc9"
     },
     {
         "id": "in-this-darkness-clara-la-san",
@@ -8712,7 +8721,7 @@ export const librarySongs = [
         "title": "Let The World Burn Chris Grey",
         "artist": "Unknown Artist",
         "duration": "2:43",
-        "src": "/music/let-the-world-burn-chris-grey.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flet-the-world-burn-chris-grey.mp3?alt=media&token=9a32b4cf-83cc-4817-bd90-ba31a3696ae4",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8727,7 +8736,7 @@ export const librarySongs = [
         "title": "Let The World Burn Hoodtrap Mylancore Remix Chris Grey R3bel Kryd",
         "artist": "Unknown Artist",
         "duration": "2:10",
-        "src": "/music/let-the-world-burn-hoodtrap-mylancore-remix-chris-grey-r3bel-kryd.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flet-the-world-burn-hoodtrap-mylancore-remix-chris-grey-r3bel-kryd.mp3?alt=media&token=36b3f713-7af5-4708-996c-2e6df137a9e7",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8742,7 +8751,7 @@ export const librarySongs = [
         "title": "Let You Go Clara La San",
         "artist": "Unknown Artist",
         "duration": "2:52",
-        "src": "/music/let-you-go-clara-la-san.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flet-you-go-clara-la-san.mp3?alt=media&token=d769ddb3-9b0f-4613-b962-fe9f2af60f05",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8757,7 +8766,7 @@ export const librarySongs = [
         "title": "Lets Go Away",
         "artist": "Young Thug A Boogie Wit Da Hoodie",
         "duration": "2:21",
-        "src": "/music/lets-go-away-feat-young-thug-a-boogie-wit-da-hoodie.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flets-go-away-feat-young-thug-a-boogie-wit-da-hoodie.mp3?alt=media&token=66de41a7-f5ee-4db8-ab8d-e9ad740fca93",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8772,7 +8781,7 @@ export const librarySongs = [
         "title": "Lipstick Sped Up Version Burnedsam",
         "artist": "Unknown Artist",
         "duration": "2:28",
-        "src": "/music/lipstick-sped-up-version-burnedsam.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flipstick-sped-up-version-burnedsam.mp3?alt=media&token=46abdc25-7377-4fc6-8dcc-bfb26a14d7a3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8787,7 +8796,7 @@ export const librarySongs = [
         "title": "Look Back At It A Boogie Wit Da Hoodie",
         "artist": "Unknown Artist",
         "duration": "2:59",
-        "src": "/music/look-back-at-it-a-boogie-wit-da-hoodie.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flook-back-at-it-a-boogie-wit-da-hoodie.mp3?alt=media&token=f9ac70d8-d483-4a9d-84d7-8eced0bdf192",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8802,7 +8811,7 @@ export const librarySongs = [
         "title": "Lost Souls Baby Keem",
         "artist": "Unknown Artist",
         "duration": "4:31",
-        "src": "/music/lost-souls-baby-keem.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flost-souls-baby-keem.mp3?alt=media&token=c49741c6-8fc8-48d1-86bf-cd590095c6d6",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8817,7 +8826,7 @@ export const librarySongs = [
         "title": "Love Game Bread Beatz",
         "artist": "Unknown Artist",
         "duration": "2:37",
-        "src": "/music/love-game-bread-beatz.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flove-game-bread-beatz.mp3?alt=media&token=4a4af683-e0b5-4742-a997-c76404b44020",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8832,7 +8841,7 @@ export const librarySongs = [
         "title": "Love Island Civ",
         "artist": "Unknown Artist",
         "duration": "16:43",
-        "src": "/music/love-island-civ.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flove-island-civ.mp3?alt=media&token=836b572d-f988-4e02-9404-f8e79a17d09d",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8847,7 +8856,7 @@ export const librarySongs = [
         "title": "Love Potions",
         "artist": "Princess Paparazzi Bj Lips",
         "duration": "3:24",
-        "src": "/music/love-potions-feat-princess-paparazzi-bj-lips.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flove-potions-feat-princess-paparazzi-bj-lips.mp3?alt=media&token=e4b2b294-e164-4bf3-867e-e5d1eb3eb6b3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8862,7 +8871,7 @@ export const librarySongs = [
         "title": "Loyal",
         "artist": "Lil Wayne Tyga Chris Brown",
         "duration": "4:26",
-        "src": "/music/loyal-feat-lil-wayne-tyga-chris-brown.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Floyal-feat-lil-wayne-tyga-chris-brown.mp3?alt=media&token=e3523bd7-283a-441d-89fd-3454739f1f00",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8877,7 +8886,7 @@ export const librarySongs = [
         "title": "Lunch Billie Eilish",
         "artist": "Unknown Artist",
         "duration": "2:59",
-        "src": "/music/lunch-billie-eilish.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flunch-billie-eilish.mp3?alt=media&token=2d9c8f13-db36-4fa0-a1d2-07f6a3f13195",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8892,7 +8901,7 @@ export const librarySongs = [
         "title": "Lyfe",
         "artist": "Prodbysky Teefaygoo Guitar Remix Ahfxck",
         "duration": "2:55",
-        "src": "/music/lyfe-feat-prodbysky-teefaygoo-guitar-remix-ahfxck.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Flyfe-feat-prodbysky-teefaygoo-guitar-remix-ahfxck.mp3?alt=media&token=a05f6c22-0598-4b13-ab80-e3c85f35b964",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8907,7 +8916,7 @@ export const librarySongs = [
         "title": "Makeba Sped Up Reverb Bbygirl",
         "artist": "Unknown Artist",
         "duration": "3:43",
-        "src": "/music/makeba-sped-up-reverb-bbygirl.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmakeba-sped-up-reverb-bbygirl.mp3?alt=media&token=5b3eb8c4-d884-41fe-aa0a-47ef39ab3f41",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8922,7 +8931,7 @@ export const librarySongs = [
         "title": "Manasha Slowed Ashreveal Ashish Swargiary",
         "artist": "Unknown Artist",
         "duration": "2:15",
-        "src": "/music/manasha-slowed-ashreveal-ashish-swargiary.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmanasha-slowed-ashreveal-ashish-swargiary.mp3?alt=media&token=49c2a00a-e73d-4cb8-8cc4-9828177ea52a",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8952,7 +8961,7 @@ export const librarySongs = [
         "title": "Meet Me Halfway Black Eyed Peas",
         "artist": "Unknown Artist",
         "duration": "4:44",
-        "src": "/music/meet-me-halfway-black-eyed-peas.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmeet-me-halfway-black-eyed-peas.mp3?alt=media&token=3ecc7917-1f9d-4f33-b371-8f22915ab3c0",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8967,7 +8976,7 @@ export const librarySongs = [
         "title": "Mine Bazzi",
         "artist": "Unknown Artist",
         "duration": "2:13",
-        "src": "/music/mine-bazzi.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmine-bazzi.mp3?alt=media&token=9e1faa5d-5f98-4291-92fc-7d43b975fbd3",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,
@@ -8982,7 +8991,7 @@ export const librarySongs = [
         "title": "Montagem Coma Andromeda Elysian",
         "artist": "Unknown Artist",
         "duration": "1:26",
-        "src": "/music/montagem-coma-andromeda-elysian.mp3",
+        "src": "https://firebasestorage.googleapis.com/v0/b/dts-hub-website.firebasestorage.app/o/music%2Fmontagem-coma-andromeda-elysian.mp3?alt=media&token=8516995a-18a3-4bdc-8444-76a8ca05e795",
         "art": "/images/blank_cover.svg",
         "bpm": 120,
         "energy": 0.7,

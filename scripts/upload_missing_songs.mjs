@@ -1,57 +1,29 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { execSync } from 'child_process';
 
 const downloadDir = '/Users/catalinandrian/Downloads/Songs';
 const configFile = path.join(process.env.HOME, '.config/configstore/firebase-tools.json');
 const bucket = 'dts-hub-website.firebasestorage.app';
 
 function getAccessToken() {
-    try {
-        const cfg = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-        return cfg.tokens.access_token;
-    } catch (_) {
-        execSync('npx firebase projects:list', { stdio: 'ignore' });
-        const cfg = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-        return cfg.tokens.access_token;
-    }
+    const cfg = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+    return cfg.tokens.access_token;
 }
 
-
-async function uploadFile(filename, token) {
-    const filePath = path.join(downloadDir, filename);
-    if (!fs.existsSync(filePath)) {
-        console.warn(`File not found: ${filePath}`);
-        return null;
-    }
-
-    const fileBuffer = fs.readFileSync(filePath);
+async function uploadResumable(fn, token) {
+    const filePath = path.join(downloadDir, fn);
+    const stats = fs.statSync(filePath);
     const downloadToken = crypto.randomUUID();
 
-    const uploadUrl = `https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=media&name=${encodeURIComponent('music/' + filename)}`;
-
-    const res = await fetch(uploadUrl, {
+    // 1. Initiate session with metadata included
+    const initRes = await fetch(`https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=resumable&name=${encodeURIComponent('music/' + fn)}`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'audio/mpeg'
-        },
-        body: fileBuffer
-    });
-
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Upload failed for ${filename}: ${res.status} ${text}`);
-    }
-
-    // Set download token metadata
-    const metaUrl = `https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent('music/' + filename)}`;
-    const patchRes = await fetch(metaUrl, {
-        method: 'PATCH',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=UTF-8',
+            'X-Upload-Content-Type': 'audio/mpeg',
+            'X-Upload-Content-Length': stats.size.toString()
         },
         body: JSON.stringify({
             metadata: {
@@ -60,63 +32,87 @@ async function uploadFile(filename, token) {
         })
     });
 
-    if (!patchRes.ok) {
-        const text = await patchRes.text();
-        console.warn(`Failed to set metadata token for ${filename}: ${text}`);
+    const uploadUrl = initRes.headers.get('Location');
+    if (!uploadUrl) {
+        const text = await initRes.text();
+        throw new Error(`Failed to initiate upload session (${initRes.status}): ${text}`);
     }
 
-    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent('music/' + filename)}?alt=media&token=${downloadToken}`;
+    // 2. Stream data to resumable endpoint
+    const putRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+            'Content-Length': stats.size.toString(),
+            'Content-Type': 'audio/mpeg'
+        },
+        duplex: 'half',
+        body: fs.createReadStream(filePath)
+    });
+
+    if (!putRes.ok) {
+        const text = await putRes.text();
+        throw new Error(`Upload PUT failed (${putRes.status}): ${text}`);
+    }
+
+    const publicUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent('music/' + fn)}?alt=media&token=${downloadToken}`;
     return {
-        filename,
+        filename: fn,
         token: downloadToken,
         url: publicUrl,
-        size: fileBuffer.length
+        size: stats.size
     };
 }
 
 async function main() {
     let token = getAccessToken();
 
-    // Read list of missing files
     const allDownloads = fs.readdirSync(downloadDir).filter(f => f.endsWith('.mp3'));
     const fbItems = JSON.parse(fs.readFileSync('/tmp/firebase_music_items.json', 'utf8'));
     const fbNames = new Set(fbItems.map(i => path.basename(i.name)));
 
     const toUpload = allDownloads.filter(f => !fbNames.has(f));
-    // Also include krushdafight to update with full 4.2MB version
     if (!toUpload.includes('krushdafight-n2uthehartlocker.mp3')) {
         toUpload.push('krushdafight-n2uthehartlocker.mp3');
     }
 
-    console.log(`Starting upload of ${toUpload.length} files to Firebase Storage...`);
-
-    const results = {};
-    const batchSize = 3;
-    let completed = 0;
-
-    for (let i = 0; i < toUpload.length; i += batchSize) {
-        const batch = toUpload.slice(i, i + batchSize);
-        await Promise.all(batch.map(async (fn) => {
-            try {
-                const res = await uploadFile(fn, token);
-                if (res) {
-                    results[fn] = res;
-                    completed++;
-                    console.log(`[${completed}/${toUpload.length}] Uploaded ${fn} (${(res.size / 1024 / 1024).toFixed(2)} MB)`);
-                }
-            } catch (err) {
-                console.error(`Error uploading ${fn}:`, err.message);
-            }
-        }));
-
-        // Periodically save progress
-        if (!fs.existsSync('scratch')) {
-            fs.mkdirSync('scratch', { recursive: true });
-        }
-        fs.writeFileSync('scratch/uploaded_songs.json', JSON.stringify(results, null, 2), 'utf8');
+    const resultsFile = 'scratch/uploaded_songs.json';
+    let results = {};
+    if (fs.existsSync(resultsFile)) {
+        try {
+            results = JSON.parse(fs.readFileSync(resultsFile, 'utf8'));
+        } catch (_) {}
     }
 
-    console.log(`Finished! Successfully uploaded ${completed}/${toUpload.length} files.`);
+    const pending = toUpload.filter(fn => !results[fn]);
+    console.log(`Total target files: ${toUpload.length}. Already recorded: ${Object.keys(results).length}. Pending: ${pending.length}.`);
+
+    let count = Object.keys(results).length;
+    for (const fn of pending) {
+        let attempts = 0;
+        let success = false;
+        while (attempts < 3 && !success) {
+            attempts++;
+            try {
+                const uploaded = await uploadResumable(fn, token);
+                results[fn] = uploaded;
+                count++;
+                console.log(`[${count}/${toUpload.length}] Successfully uploaded ${fn} (${(uploaded.size / 1024 / 1024).toFixed(2)} MB)`);
+                fs.writeFileSync(resultsFile, JSON.stringify(results, null, 2), 'utf8');
+                success = true;
+            } catch (err) {
+                console.error(`Attempt ${attempts} failed for ${fn}:`, err.message);
+                if (err.message.includes('401')) {
+                    // refresh token
+                    token = getAccessToken();
+                }
+                if (attempts < 3) {
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
+        }
+    }
+
+    console.log(`All uploads complete! Total uploaded in map: ${Object.keys(results).length}`);
 }
 
 main().catch(err => {

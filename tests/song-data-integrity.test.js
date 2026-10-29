@@ -2,6 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 import { librarySongs, getSongById } from '../js/song-data.js';
+import { lyricsData } from '../js/lyrics-data.js';
 
 describe('Song Data Integrity and File Linking', () => {
     it('every .mp3 file on disk in /music/ is referenced by at least one song in librarySongs or an alias', () => {
@@ -163,5 +164,47 @@ describe('Song Data Integrity and File Linking', () => {
         const byStringLyrics = searchSongs('celestial sky');
         expect(byStringLyrics.length).toBeGreaterThan(0);
         expect(byStringLyrics[0].id).toBe('artist-upload-dream');
+    });
+
+    it('verifies KRUSHDAFIGHT! by N2UtheHartlocker has valid audio file on disk, Firebase streamUrl, Lexi mixing parameters, and synced lyrics', () => {
+        const song = getSongById('krushdafight-n2uthehartlocker');
+        expect(song).toBeDefined();
+        expect(song.title).toBe('KRUSHDAFIGHT!');
+        expect(song.artist).toBe('N2UtheHartlocker');
+        expect(song.duration).toBe('2:19');
+        expect(song.src).toBe('/music/krushdafight-n2uthehartlocker.mp3');
+
+        // Verify disk file exists and has content
+        const diskPath = path.join(process.cwd(), '.' + song.src);
+        expect(fs.existsSync(diskPath)).toBe(true);
+        const stats = fs.statSync(diskPath);
+        expect(stats.size).toBeGreaterThan(1000000); // > 1MB
+
+        // Verify Firebase Storage streaming URL
+        expect(song.streamUrl).toBeDefined();
+        expect(song.streamUrl).toContain('firebasestorage.googleapis.com');
+        expect(song.streamUrl).toContain('krushdafight-n2uthehartlocker.mp3');
+
+        // Verify Lexi mixing parameters
+        expect(song.bpm).toBe(125);
+        expect(typeof song.energy).toBe('number');
+        expect(typeof song.inmixPoint).toBe('number');
+        expect(typeof song.outmixPoint).toBe('number');
+        expect(Array.isArray(song.tags)).toBe(true);
+        expect(song.tags).toContain('phonk');
+
+        // Verify lyricsData has synced lyrics
+        const lyrics = lyricsData['krushdafight-n2uthehartlocker'];
+        expect(lyrics).toBeDefined();
+        expect(Array.isArray(lyrics)).toBe(true);
+        expect(lyrics.length).toBeGreaterThan(1);
+
+        // Ensure not placeholder
+        const hasPlaceholder = lyrics.some(l => l.words && l.words.some(w => w.text && w.text.includes('not yet available')));
+        expect(hasPlaceholder).toBe(false);
+
+        // Ensure trending/drop segment exists for Lexi viral looping
+        const hasTrending = lyrics.some(l => l.trending === true);
+        expect(hasTrending).toBe(true);
     });
 });
