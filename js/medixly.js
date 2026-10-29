@@ -3435,6 +3435,7 @@ function initHarmonyTunes() {
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
+                    setLexiMixingState(false);
                     if (mixerBtn) mixerBtn.classList.remove('pulsing'); if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                     const mobMixerBtn = document.getElementById('mob-mixer-btn'); if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
                 }
@@ -3560,6 +3561,7 @@ function initHarmonyTunes() {
                         nextAudio.src = preloadedNextSongObj.src || preloadedNextSongObj.audioUrl || preloadedNextSongObj.streamUrl;
                     } else {
                         isCrossfading = false;
+                        setLexiMixingState(false);
                         if (mixerBtn) mixerBtn.classList.remove('pulsing');
                         if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                         if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
@@ -3633,6 +3635,7 @@ function initHarmonyTunes() {
                     prevAudio.pause();
                     prevAudio.currentTime = 0;
                     isCrossfading = false;
+                    setLexiMixingState(false);
                     if (mixerBtn) mixerBtn.classList.remove('pulsing');
                     if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
                     if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');

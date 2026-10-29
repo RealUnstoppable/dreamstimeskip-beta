@@ -243,4 +243,53 @@ describe('chatbot.js functionality and offline intelligence', () => {
         expect(Array.isArray(snapshot.recentPaths)).toBe(true);
         expect(snapshot.recentPaths).toContain('/account.html');
     });
+
+    it('should query, queue, and control playback of Damn I Love Miami via natural language', () => {
+        const { generateOfflineResponse } = chatbotModule;
+        const mockPlaySongById = jest.fn();
+        window.playSongById = mockPlaySongById;
+
+        const res = generateOfflineResponse("Play Damn I Love Miami");
+        expect(res).toContain("Damn I Love Miami");
+        expect(res).toMatch(/Pitbull (&|&amp;) Lil Jon/);
+        expect(res).toContain("[PLAY_SONG:damn-i-love-miami-pitbull-lil-jon]");
+        expect(mockPlaySongById).toHaveBeenCalledWith('damn-i-love-miami-pitbull-lil-jon');
+
+        delete window.playSongById;
+    });
+
+    it('should retrieve synchronized lyrics and trigger UI lyrics handler for Damn I Love Miami', () => {
+        const { generateOfflineResponse } = chatbotModule;
+        const mockShowLyrics = jest.fn();
+        window.showLyrics = mockShowLyrics;
+
+        const res = generateOfflineResponse("Show lyrics for Damn I Love Miami");
+        expect(res).toContain("synchronized lyrics for **Damn I Love Miami**");
+        expect(res).toMatch(/Pitbull (&|&amp;) Lil Jon/);
+        expect(res).toContain("Lyrics Preview");
+        expect(res).toContain("[SHOW_LYRICS:damn-i-love-miami-pitbull-lil-jon]");
+        expect(mockShowLyrics).toHaveBeenCalledWith('damn-i-love-miami-pitbull-lil-jon');
+
+        delete window.showLyrics;
+    });
+
+    it('should handle Lexi Mixer studio commands including EQ and crossfade parameter queries', () => {
+        const { generateOfflineResponse } = chatbotModule;
+        const mockToggleMixer = jest.fn();
+        window.toggleMixerMode = mockToggleMixer;
+        window.mixEngine = {
+            setEQ: jest.fn()
+        };
+
+        const res = generateOfflineResponse("enable lexi mixer with bass boost");
+        expect(res).toContain("Medixly Lexi Mixer Studio");
+        expect(res).toContain("Dynamic Crossfade");
+        expect(res).toContain("3-Band Studio EQ");
+        expect(res).toContain("Damn I Love Miami");
+        expect(mockToggleMixer).toHaveBeenCalled();
+        expect(window.mixEngine.setEQ).toHaveBeenCalledWith('A', { bass: 6 });
+
+        delete window.toggleMixerMode;
+        delete window.mixEngine;
+    });
 });

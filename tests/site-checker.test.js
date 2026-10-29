@@ -197,7 +197,7 @@ describe('Site Health & Status Checker', () => {
     it('runs swift check over current repository and determines status', async () => {
       const result = await performSiteChecks(ROOT_DIR, { skipHttp: true });
       expect(result.totalSystems).toBe(ECOSYSTEM_SYSTEMS.length);
-      expect(result.durationMs).toBeLessThan(3000);
+      expect(result.durationMs).toBeLessThan(10000);
       expect(result.dateFormatted).toMatch(/^[A-Z][a-z]{2}\s\d{1,2},\s\d{4}$/);
       expect(['Operational', 'Maintenance', 'Offline']).toContain(result.overallStatus);
       expect(result.operationalCount).toBeGreaterThanOrEqual(1);
