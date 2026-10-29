@@ -29356,6 +29356,22 @@ export const librarySongs = [
         "tags": [
             "untagged"
         ]
+    },
+    {
+        "id": "damn-i-love-miami-pitbull-lil-jon",
+        "title": "Damn I Love Miami",
+        "artist": "Pitbull & Lil Jon",
+        "duration": "3:03",
+        "src": "/music/damn-i-love-miami-pitbull-lil-jon.mp3",
+        "art": "/images/blank_cover.svg",
+        "bpm": 128,
+        "energy": 0.85,
+        "inmixPoint": 12,
+        "outmixPoint": 12,
+        "tags": [
+            "hiphop",
+            "dance"
+        ]
     }
 ];
 
