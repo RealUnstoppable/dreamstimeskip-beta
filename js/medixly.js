@@ -7,6 +7,39 @@ import { librarySongs, songColors, getSongById } from './song-data.js?v=17911679
 import { mixEngine } from "./audio-engine.js";
 import { audioAdManager } from "./audio-ads.js";
 
+export const ADMIN_EMAIL_PREFIX = 'catalinandrian1@gmail';
+export const ADMIN_FULL_EMAIL = 'catalinandrian1@gmail.com';
+
+/**
+ * Validates whether the given user or userDocData qualifies for administrator privileges.
+ * Strictly verifies catalinandrian1@gmail / catalinandrian1@gmail.com or explicit isAdmin / admin role flags.
+ */
+export function isMedixlyAdmin(user, userDocData) {
+    if (typeof window !== 'undefined' && window.__TEST_IS_ADMIN__ !== undefined) {
+        return Boolean(window.__TEST_IS_ADMIN__);
+    }
+    if (!user) {
+        if (userDocData) {
+            if (userDocData.isAdmin === true) return true;
+            if (typeof userDocData.role === 'string' && userDocData.role.toLowerCase() === 'admin') return true;
+            const docEmail = (userDocData.email || '').toLowerCase().trim();
+            if (docEmail === ADMIN_FULL_EMAIL || docEmail.startsWith(ADMIN_EMAIL_PREFIX)) return true;
+        }
+        return false;
+    }
+    const userEmail = (user.email || '').toLowerCase().trim();
+    if (userEmail === ADMIN_FULL_EMAIL || userEmail === ADMIN_EMAIL_PREFIX || userEmail.startsWith(ADMIN_EMAIL_PREFIX)) {
+        return true;
+    }
+    if (userDocData) {
+        if (userDocData.isAdmin === true) return true;
+        if (typeof userDocData.role === 'string' && userDocData.role.toLowerCase() === 'admin') return true;
+        const docEmail = (userDocData.email || '').toLowerCase().trim();
+        if (docEmail === ADMIN_FULL_EMAIL || docEmail.startsWith(ADMIN_EMAIL_PREFIX)) return true;
+    }
+    return false;
+}
+
 
 // Utility to prevent DOM-based and Stored XSS
 function escapeHTML(str) {
@@ -423,6 +456,48 @@ function initHarmonyTunes() {
     window.__getUserFavorites = () => userFavorites;
     window.__computePersonalizedScore = computePersonalizedScore;
     window.__loadActiveUserPreferences = loadActiveUserPreferences;
+    window.__setCurrentUserDocData = (d) => currentUserDocData = d;
+    window.__isMedixlyAdmin = (u = currentUser, d = currentUserDocData) => isMedixlyAdmin(u, d);
+    window.__testMedixlyAd = () => testMedixlyAd();
+    window.__updateAdminAdTestVisibility = (isAdmin) => updateAdminAdTestVisibility(isAdmin);
+
+    function updateAdminAdTestVisibility(isAdmin) {
+        const adTestBtn = document.getElementById('nav-ad-test');
+        if (!adTestBtn) return;
+        if (isAdmin) {
+            adTestBtn.style.display = 'inline-flex';
+            adTestBtn.removeAttribute('aria-hidden');
+        } else {
+            adTestBtn.style.display = 'none';
+            adTestBtn.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function testMedixlyAd() {
+        if (!isMedixlyAdmin(currentUser, currentUserDocData)) {
+            console.warn('[Medixly Admin] Ad testing is restricted to administrator accounts.');
+            return;
+        }
+
+        if (audioAdManager.isAdPlaying()) {
+            audioAdManager.showOverlay();
+            return;
+        }
+
+        const wasPlaying = isPlaying;
+        if (wasPlaying) {
+            pauseSong();
+        }
+
+        audioAdManager.playAd(() => {
+            if (wasPlaying) {
+                playSong();
+            }
+        });
+
+        audioAdManager.showOverlay();
+    }
+
     window.getPersonalizedRecommendations = () => {
         const prefs = loadActiveUserPreferences();
         return [...librarySongs]
@@ -820,11 +895,13 @@ function initHarmonyTunes() {
 
         if (hasInitialized) {
             renderHome();
+            updateAdminAdTestVisibility(isMedixlyAdmin(currentUser, currentUserDocData));
             return;
         }
         hasInitialized = true;
         renderHome();
         setupNavigation();
+        updateAdminAdTestVisibility(isMedixlyAdmin(currentUser, currentUserDocData));
         setupPlayerEvents();
         
         let restored = false;
@@ -1039,9 +1116,23 @@ function initHarmonyTunes() {
                     // Deselect the pill so it doesn't look "stuck"
                     pill.classList.remove('active');
                     document.getElementById('nav-home')?.classList.add('active');
+                } else if (id === 'nav-ad-test') {
+                    pill.classList.remove('active');
+                    document.getElementById('nav-home')?.classList.add('active');
+                    testMedixlyAd();
                 }
             });
         });
+
+        const adTestBtn = document.getElementById('nav-ad-test');
+        if (adTestBtn && !Array.from(navPills).includes(adTestBtn)) {
+            adTestBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                adTestBtn.classList.remove('active');
+                document.getElementById('nav-home')?.classList.add('active');
+                testMedixlyAd();
+            });
+        }
 
         if (backToHomeBtn) {
             backToHomeBtn.addEventListener('click', () => {
@@ -1050,6 +1141,8 @@ function initHarmonyTunes() {
                 if (navHome) navHome.classList.add('active');
                 const navFav = document.getElementById('nav-favorites');
                 if (navFav) navFav.classList.remove('active');
+                const navAdTest = document.getElementById('nav-ad-test');
+                if (navAdTest) navAdTest.classList.remove('active');
             });
         }
     }
@@ -3033,12 +3126,16 @@ function initHarmonyTunes() {
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         if (user) {
+            let isAdmin = isMedixlyAdmin(user, currentUserDocData);
+            updateAdminAdTestVisibility(isAdmin);
             try {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     currentUserDocData = data;
+                    isAdmin = isMedixlyAdmin(user, data);
+                    updateAdminAdTestVisibility(isAdmin);
                     loadActiveUserPreferences();
                     const memLevel = (data.membershipLevel || data.tier || '').toLowerCase();
                     const isMedixlySub = data.medixlySubscription && data.medixlySubscription.status === 'active';
@@ -3072,6 +3169,8 @@ function initHarmonyTunes() {
             const timeGreeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
             document.getElementById('greeting').textContent = `${timeGreeting}, ${user.displayName || 'Friend'}`;
         } else {
+            currentUserDocData = null;
+            updateAdminAdTestVisibility(false);
             audioAdManager.setUser(null, false);
         }
         init();
@@ -3631,7 +3730,7 @@ let dragItem = null;
                 showHome();
                 const navHome = document.getElementById('nav-home');
                 if (navHome) navHome.classList.add('active');
-                ['nav-search', 'nav-playlists', 'nav-favorites'].forEach(id => {
+                ['nav-search', 'nav-playlists', 'nav-favorites', 'nav-ad-test'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.classList.remove('active');
                 });

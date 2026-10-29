@@ -329,6 +329,33 @@ body {
     border-color: var(--accent-color, #16A34A);
 }
 
+.nav-pill-admin {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    background: linear-gradient(135deg, rgba(230, 57, 149, 0.18), rgba(56, 189, 248, 0.18));
+    border: 1px solid rgba(230, 57, 149, 0.45);
+    color: #ffd6ec;
+    font-weight: 700;
+}
+
+.nav-pill-admin:hover {
+    background: linear-gradient(135deg, rgba(230, 57, 149, 0.35), rgba(56, 189, 248, 0.35));
+    border-color: #e63995;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(230, 57, 149, 0.35);
+}
+
+.nav-pill-admin svg {
+    color: #e63995;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.nav-pill-admin:hover svg {
+    transform: scale(1.15);
+    color: #38bdf8;
+}
+
 
 .greet-section h1 {
     font-size: clamp(2.2rem, 5vw, 3.2rem);
