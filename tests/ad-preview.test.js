@@ -93,6 +93,7 @@ if (typeof window !== 'undefined') {
 
 import { AD_TRACKS, getTrackById } from '../js/ad-preview-data.js';
 import { AdPreviewController, AUTHORIZED_EMAIL } from '../js/ad-preview-controller.js';
+import { CompositionStudio } from '../js/ad-composition-studio.js';
 
 describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
     let controller;
@@ -109,8 +110,8 @@ describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
         }
     });
 
-    it('verifies all 5 ad audio files exist on disk with valid file size (> 100KB)', () => {
-        for (let i = 1; i <= 5; i++) {
+    it('verifies all 9 ad audio files exist on disk with valid file size (> 100KB)', () => {
+        for (let i = 1; i <= 9; i++) {
             const filePath = path.join(ROOT_DIR, `music/ads/ad-preview-${i}.mp3`);
             expect(fs.existsSync(filePath)).toBe(true);
 
@@ -119,8 +120,8 @@ describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
         }
     });
 
-    it('verifies AD_TRACKS metadata integrity for all 5 uploaded audio files', () => {
-        expect(AD_TRACKS.length).toBeGreaterThanOrEqual(5);
+    it('verifies AD_TRACKS metadata integrity for all 9 registered audio files', () => {
+        expect(AD_TRACKS.length).toBe(9);
 
         AD_TRACKS.forEach((track, index) => {
             const trackNum = index + 1;
@@ -246,30 +247,67 @@ describe('Ad Screen-Recording Preview Scene & Secure Route Suite', () => {
         expect(stage.className).toBe('ad-recording-stage');
     });
 
-    it('toggles clean screen recording mode hiding toolbars', () => {
+    it('toggles clean screen recording mode cleanly hiding toolbars, header, and auth badge', () => {
         const controlDock = document.getElementById('ad-control-dock');
         const topDock = document.getElementById('ad-top-dock');
+        const sceneHeader = document.getElementById('ad-scene-header');
 
         expect(controller.isCleanMode).toBe(false);
         controller.toggleCleanMode();
         expect(controller.isCleanMode).toBe(true);
         expect(controlDock.classList.contains('dock-hidden')).toBe(true);
         expect(topDock.classList.contains('dock-hidden')).toBe(true);
+        expect(sceneHeader.classList.contains('header-hidden')).toBe(true);
 
         controller.toggleCleanMode();
         expect(controller.isCleanMode).toBe(false);
         expect(controlDock.classList.contains('dock-hidden')).toBe(false);
         expect(topDock.classList.contains('dock-hidden')).toBe(false);
+        expect(sceneHeader.classList.contains('header-hidden')).toBe(false);
     });
 
-    it('verifies all 6 new HTML pages exist on disk and have required components', () => {
+    it('manages settings gear modal with dialog box toggle and editable user display name', () => {
+        const studio = new CompositionStudio(controller);
+        studio.mount();
+
+        const captionsStage = document.querySelector('.ad-captions-stage');
+        const userTag = document.getElementById('speaker-tag-user');
+
+        // Test dialog box toggle
+        expect(studio.showDialogBox).toBe(true);
+        studio.setDialogBox(false);
+        expect(studio.showDialogBox).toBe(false);
+        expect(captionsStage.classList.contains('captions-hidden')).toBe(true);
+
+        studio.setDialogBox(true);
+        expect(studio.showDialogBox).toBe(true);
+        expect(captionsStage.classList.contains('captions-hidden')).toBe(false);
+
+        // Test editable user name
+        studio.setUserName('Alex Editor');
+        expect(studio.userName).toBe('Alex Editor');
+        expect(userTag.textContent).toContain('Alex Editor');
+
+        // Reset user name
+        studio.setUserName('User');
+        expect(studio.userName).toBe('User');
+        expect(userTag.textContent).toContain('User');
+
+        studio.destroy();
+    });
+
+    it('verifies all 10 ad preview HTML pages exist on disk and have required components', () => {
         const pages = [
             'ad-preview.html',
             'ad-preview-1.html',
             'ad-preview-2.html',
             'ad-preview-3.html',
             'ad-preview-4.html',
-            'ad-preview-5.html'
+            'ad-preview-5.html',
+            'ad-preview-6.html',
+            'ad-preview-7.html',
+            'ad-preview-8.html',
+            'ad-preview-9.html'
         ];
 
         pages.forEach(page => {
