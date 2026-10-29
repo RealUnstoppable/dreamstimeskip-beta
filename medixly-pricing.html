@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="module" src="/js/theme-loader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medixly Memberships & Pricing | Daily Escalation Promotion — Lock in from $1.00</title>
+    <meta name="description" content="Unlock unlimited, ad-free music streaming with Medixly Premium and Ultra. Promotion starts at $1.00 today and increases by $1.00 every day at midnight UTC. Lock in your lifetime rate!">
+    <link rel="canonical" href="https://realunstoppable.store/medixly">
+
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://realunstoppable.store/medixly">
+    <meta property="og:title" content="Medixly Memberships & Dynamic Pricing | Lock in from $1.00 Today">
+    <meta property="og:description" content="Stream the hottest tracks without ads. Daily price increases by $1.00 every midnight UTC until reaching tier caps ($6.99 Premium, $12.99 Ultra). Secure today's lowest entry rate!">
+    <meta property="og:image" content="https://realunstoppable.store/images/medixly-logo.png">
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://realunstoppable.store/medixly">
+    <meta name="twitter:title" content="Medixly Memberships & Dynamic Pricing | Lock in from $1.00 Today">
+    <meta name="twitter:description" content="Daily price increases by $1.00 every midnight UTC. Lock in your lifetime subscription price now!">
+    <meta name="twitter:image" content="https://realunstoppable.store/images/medixly-logo.png">
+
+    <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/medixly-pricing.css?v=20261028">
+</head>
+<body class="medixly-pricing-body">
+
+    <!-- Atmospheric Background Glow -->
+    <div class="pricing-ambient-bg" aria-hidden="true">
+        <div class="pricing-ambient-mesh"></div>
+    </div>
+
+    <!-- Navigation Header inserted by navbar.js -->
+    <header class="main-header"></header>
+
+    <div class="pricing-page-wrapper">
+        
+        <!-- Live Urgency Banner -->
+        <div class="urgency-top-banner">
+            <div class="urgency-banner-left">
+                <span class="urgency-flame-icon">🔥</span>
+                <span>PROMOTION ACTIVE: Starts at <strong id="banner-current-price">$1.00</strong> today — Increases to <strong id="banner-next-price">$2.00</strong> at Midnight UTC!</span>
+            </div>
+            <div class="urgency-banner-right">
+                <span>Launch Window Ends:</span>
+                <strong id="week-countdown-timer">6d 00h 00m 00s</strong>
+            </div>
+        </div>
+
+        <!-- Logged-in User Active Subscription Container -->
+        <div id="user-subscription-banner" style="display: none;"></div>
+
+        <!-- Hero Header -->
+        <section class="pricing-hero">
+            <div class="pricing-brand-badge">
+                <span>🎵 Medixly Audio Pass</span>
+            </div>
+            <h1>Unlimited Music.<br>Escalating Daily Price.</h1>
+            <p class="pricing-hero-sub">
+                Lock in today's entry price before midnight UTC. Whatever rate you claim today is <strong>locked permanently</strong> for the entire duration of your plan.
+            </p>
+
+            <!-- Real-Time Countdown Timer Component -->
+            <div class="live-countdown-container" id="countdown-widget">
+                <div class="countdown-header">
+                    <div class="countdown-title">
+                        <span class="pulsing-dot"></span>
+                        <span>Next Daily Price Bump Occurs In:</span>
+                    </div>
+                    <div class="countdown-day-pill" id="promo-day-badge">
+                        DAY 1 OF 7
+                    </div>
+                </div>
+
+                <div class="countdown-clock" aria-label="Countdown to next price increase">
+                    <div class="countdown-digit-block">
+                        <div class="countdown-digits" id="cd-hours">00</div>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-colon">:</div>
+                    <div class="countdown-digit-block">
+                        <div class="countdown-digits" id="cd-minutes">00</div>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-colon">:</div>
+                    <div class="countdown-digit-block">
+                        <div class="countdown-digits" id="cd-seconds">00</div>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
+
+                <div class="countdown-progress-track">
+                    <div class="countdown-progress-fill" id="countdown-progress-bar"></div>
+                </div>
+
+                <div class="countdown-info-row">
+                    <span>⚡ Daily Price Increment: +$1.00 / 24h</span>
+                    <span>Midnight UTC Reset (00:00:00 UTC)</span>
+                    <span>Cap: $6.99 (Premium) / $12.99 (Ultra)</span>
+                </div>
+            </div>
+
+            <!-- Pricing Controls (Billing cycle & purchase mode) -->
+            <div class="pricing-controls">
+                <div class="billing-switch-group" role="tablist" aria-label="Billing Cycle">
+                    <button class="switch-btn active" id="toggle-monthly" role="tab" aria-selected="true">
+                        Monthly Billing
+                    </button>
+                    <button class="switch-btn" id="toggle-yearly" role="tab" aria-selected="false">
+                        Yearly Billing
+                        <span class="badge-savings">2 Months Free</span>
+                    </button>
+                </div>
+
+                <div class="mode-switch-group">
+                    <span>Checkout Mode:</span>
+                    <button class="mode-pill-btn active" id="toggle-mode-subscription">
+                        🔒 Auto-Renewing (Price Locked Forever)
+                    </button>
+                    <button class="mode-pill-btn" id="toggle-mode-onetime">
+                        🎟️ One-Off Promotional Pass
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Cards Grid -->
+        <section class="pricing-grid">
+            
+            <!-- Plan 1: Free Standard -->
+            <div class="pricing-card">
+                <div class="card-header">
+                    <h3>Free Standard</h3>
+                    <p class="card-desc">Essential streaming with curated viral tracks and playlists.</p>
+                </div>
+
+                <div class="card-price-block">
+                    <div class="price-strike-row">
+                        <span style="font-size: 0.9rem; color: var(--mdx-text-subtle);">Forever Free</span>
+                    </div>
+                    <div class="price-main-row">
+                        <span class="price-amount">$0</span>
+                        <span class="price-period">/ month</span>
+                    </div>
+                    <div class="price-tomorrow-notice" style="color: var(--mdx-text-subtle);">
+                        Standard features included
+                    </div>
+                </div>
+
+                <ul class="card-features">
+                    <li><span class="check-icon">✓</span> Stream top trending & viral tracks</li>
+                    <li><span class="check-icon">✓</span> Standard 160 kbps audio quality</li>
+                    <li><span class="check-icon">✓</span> Create up to 3 custom playlists</li>
+                    <li class="dimmed"><span class="check-icon" style="color: #6b7280;">✕</span> Zero audio & banner ads</li>
+                    <li class="dimmed"><span class="check-icon" style="color: #6b7280;">✕</span> Unlimited track skips</li>
+                    <li class="dimmed"><span class="check-icon" style="color: #6b7280;">✕</span> Hi-Res Lossless FLAC playback</li>
+                </ul>
+
+                <a href="medixly.html" class="btn-tier-cta btn-free-standard">
+                    ▶ Start Listening Free
+                </a>
+            </div>
+
+            <!-- Plan 2: Medixly Premium (HIGHLIGHTED) -->
+            <div class="pricing-card highlight">
+                <div class="card-top-badge">⚡ MOST POPULAR • $6.99 CAP</div>
+
+                <div class="card-header">
+                    <h3>Medixly Premium</h3>
+                    <p class="card-desc">The ultimate uninterrupted music experience with pure sound.</p>
+                </div>
+
+                <div class="card-price-block">
+                    <div class="price-strike-row">
+                        <span class="price-original" id="premium-regular-price">$9.99</span>
+                        <span class="discount-tag" id="premium-savings-badge">SAVE 90%</span>
+                    </div>
+                    <div class="price-main-row">
+                        <span class="price-amount" id="premium-price-display">$1.00</span>
+                        <span class="price-period" id="premium-period-display">/ month</span>
+                    </div>
+                    <div class="price-tomorrow-notice" id="premium-tomorrow-price">
+                        Increases to $2.00 at midnight UTC
+                    </div>
+                </div>
+
+                <ul class="card-features">
+                    <li><span class="check-icon">✓</span> <strong>100% Ad-Free Listening</strong> (Zero interruptions)</li>
+                    <li><span class="check-icon">✓</span> <strong>Unlimited Skips & Scrubbing</strong> without limits</li>
+                    <li><span class="check-icon">✓</span> <strong>High-Definition 320 kbps MP3 Audio</strong></li>
+                    <li><span class="check-icon">✓</span> <strong>Unlimited Custom Playlists</strong> with sharing</li>
+                    <li><span class="check-icon">✓</span> <strong>Background Playback</strong> on mobile & desktop</li>
+                    <li><span class="check-icon">✓</span> <strong>10% Merch Discount</strong> on Unstoppable Store</li>
+                    <li><span class="check-icon">✓</span> <strong>VIP Discord Role</strong> in the community</li>
+                </ul>
+
+                <button class="btn-tier-cta btn-premium-cta" id="btn-choose-premium">
+                    Lock In Premium ($1.00/mo)
+                </button>
+            </div>
+
+            <!-- Plan 3: Medixly Ultra -->
+            <div class="pricing-card">
+                <div class="card-top-badge" style="background: linear-gradient(90deg, var(--mdx-purple), var(--mdx-cyan));">💎 AUDIOPHILE & CREATOR • $12.99 CAP</div>
+
+                <div class="card-header">
+                    <h3>Medixly Ultra</h3>
+                    <p class="card-desc">Studio-grade master quality for audiophiles, producers, and superfans.</p>
+                </div>
+
+                <div class="card-price-block">
+                    <div class="price-strike-row">
+                        <span class="price-original" id="ultra-regular-price">$19.99</span>
+                        <span class="discount-tag" id="ultra-savings-badge">SAVE 95%</span>
+                    </div>
+                    <div class="price-main-row">
+                        <span class="price-amount" id="ultra-price-display">$1.00</span>
+                        <span class="price-period" id="ultra-period-display">/ month</span>
+                    </div>
+                    <div class="price-tomorrow-notice" id="ultra-tomorrow-price">
+                        Increases to $2.00 at midnight UTC
+                    </div>
+                </div>
+
+                <ul class="card-features">
+                    <li><span class="check-icon">✓</span> <strong>Everything in Premium</strong>, plus:</li>
+                    <li><span class="check-icon">✓</span> <strong>Lossless 24-bit / 96kHz FLAC</strong> studio audio</li>
+                    <li><span class="check-icon">✓</span> <strong>Early Access to Unreleased Tracks</strong> & beta stems</li>
+                    <li><span class="check-icon">✓</span> <strong>25% Sitewide Discount</strong> on all store merch</li>
+                    <li><span class="check-icon">✓</span> <strong>AI DJ & Smart Playlist Flow</strong> curation</li>
+                    <li><span class="check-icon">✓</span> <strong>Discord Ultra Producer Badge</strong> & private lounge</li>
+                    <li><span class="check-icon">✓</span> <strong>Priority 24/7 VIP Support</strong></li>
+                </ul>
+
+                <button class="btn-tier-cta btn-ultra-cta" id="btn-choose-ultra">
+                    Lock In Ultra ($1.00/mo)
+                </button>
+            </div>
+        </section>
+
+        <!-- Price Lock Guarantee Callout -->
+        <section class="guarantee-callout">
+            <div class="guarantee-icon">🛡️</div>
+            <div class="guarantee-content">
+                <h3>The Medixly Lifetime Price-Lock Guarantee</h3>
+                <p>
+                    When you subscribe during this promotional launch, your entry price is locked in for the entire life of your membership. As the daily promotion price escalates to its final tier caps ($6.99 for Premium and $12.99 for Ultra), your rate will <strong>never increase</strong> as long as your subscription remains active. Cancel anytime with zero fees.
+                </p>
+            </div>
+        </section>
+
+        <!-- Comprehensive Feature Comparison Table -->
+        <section class="comparison-section">
+            <h2>Detailed Feature Comparison</h2>
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Capability</th>
+                            <th>Free Standard</th>
+                            <th>Medixly Premium</th>
+                            <th>Medixly Ultra</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Audio Bitrate</strong></td>
+                            <td>Standard (160 kbps)</td>
+                            <td>High Fidelity (320 kbps)</td>
+                            <td>Lossless FLAC (24-bit / 96kHz)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ad Interruption</strong></td>
+                            <td>Sponsored Audio & Banners</td>
+                            <td>100% Ad-Free</td>
+                            <td>100% Ad-Free</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Track Skips</strong></td>
+                            <td>6 Skips / hour</td>
+                            <td>Unlimited</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Playlists</strong></td>
+                            <td>Up to 3 Playlists</td>
+                            <td>Unlimited Playlists</td>
+                            <td>Unlimited + AI Dynamic Flows</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Merch Store Discount</strong></td>
+                            <td>None</td>
+                            <td>10% Off Sitewide</td>
+                            <td>25% Off Sitewide</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Discord Roles</strong></td>
+                            <td>Community Member</td>
+                            <td>VIP Streamer</td>
+                            <td>Ultra Producer Lounge</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Early Access Music</strong></td>
+                            <td>Standard Release</td>
+                            <td>48 Hours Early</td>
+                            <td>7 Days Early + Acoustic Stems</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Price Cap</strong></td>
+                            <td>$0.00</td>
+                            <td>$6.99 / mo</td>
+                            <td>$12.99 / mo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Frequently Asked Questions Accordion -->
+        <section class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How does the daily price escalation mechanic work?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    The promotion begins at $1.00 and increases by exactly $1.00 every single day at midnight UTC (00:00:00 UTC). Once a tier reaches its peak cap ($6.99 for Premium, $12.99 for Ultra), it will remain at that capped rate. By locking in early, you secure the lowest possible price.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What does "Lifetime Price Lock" mean?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    If you lock in Premium today for $1.00/month, your monthly renewal will stay at $1.00/month for as long as your membership stays active—even after the public price rises to $6.99/month.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Can I purchase a One-Off Pass without auto-renewing?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    Yes! Use the "One-Off Promotional Pass" toggle above to purchase a single prepaid 30-day or 365-day pass at the current promotional rate with zero automatic renewals.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>What payment methods are supported?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    All checkouts are processed securely through Stripe Checkout, supporting all major credit/debit cards (Visa, MasterCard, American Express, Discover), Apple Pay, Google Pay, and link payments.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>Can I cancel or upgrade my subscription later?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    Yes, you can cancel your membership at any time from your Account settings with a single click. If you upgrade from Premium to Ultra, your new plan will immediately activate with full benefits.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    <span>How do I access my benefits after paying?</span>
+                    <span class="faq-chevron">▼</span>
+                </button>
+                <div class="faq-answer">
+                    Your membership status is synced immediately with your account via our secure webhook backend. You can instantly jump into the Medixly Web Player at realunstoppable.store/medixly.html and enjoy zero ads and lossless sound.
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Toast Notification for Rollover / Updates -->
+    <div id="urgency-toast" class="urgency-toast"></div>
+
+    <!-- Success Celebration Modal -->
+    <div id="checkout-success-modal" class="checkout-success-modal">
+        <div class="success-modal-card">
+            <div class="success-icon-wrap">🎉</div>
+            <h2>You're In! Rate Locked.</h2>
+            <p style="color: var(--mdx-text-muted); margin: 15px 0 25px;">
+                Your <strong id="success-tier-name">PREMIUM</strong> membership is now active at your locked promotional rate. Zero ads, unlimited skips, and premium sound are unlocked!
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="medixly.html" class="btn-tier-cta btn-premium-cta" style="width: auto; padding: 12px 24px;">
+                    ▶ Launch Web Player
+                </a>
+                <a href="account.html" class="btn-tier-cta btn-free-standard" style="width: auto; padding: 12px 24px;">
+                    View My Account
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer inserted by footer.js -->
+    <footer class="main-footer"></footer>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { loadNavbar } from './js/navbar.js?v=20261028';
+        import { loadFooter } from './js/footer.js?v=20261028';
+        if (typeof loadNavbar === 'function') loadNavbar();
+        if (typeof loadFooter === 'function') loadFooter();
+    </script>
+    <script type="module" src="/js/medixly-pricing-ui.js?v=20261028"></script>
+</body>
+</html>

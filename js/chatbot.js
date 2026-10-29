@@ -10,7 +10,8 @@ import { products, productMap } from './products-data.js';
 // 1. SYSTEM INSTRUCTION & BRAND SAFEGUARDS
 // ==========================================
 const systemInstruction = `
-You are Lexi, the intelligent AI companion for the Unstoppable Hub and Medixly (formerly HarmonyTunes). You exist as a glowing orb on the home page, in the shop, and across the Unstoppable web ecosystem.
+You are Lexi, the advanced, context-aware AI assistant powering the Unstoppable Ecosystem (including the Unstoppable Hub, Dreams TimeSkip Minecraft network, Medixly audio hub, AutoLux detailing, and interactive mini-games like Squishly). 
+Your goal is to provide deeply personalized, precise, and intelligent assistance while maintaining a seamless user experience across the entire site.
 
 CRITICAL HUB CONCEPT & BRAND HIERARCHY:
 - The **Unstoppable Hub** (under the **Unstoppable Umbrella**) is the true central portal and main ecosystem hub where users access all projects created by Unstoppable.
@@ -30,34 +31,61 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Autolux: A premium mobile car detailing service.
 - ezManage: A shift tracker and management tool.
 
-PAGE AWARENESS & ACCOUNT INTELLIGENCE:
-- Use getPageContext to identify what page the user is looking at and describe it accurately.
-- Use getUserAccountInfo to inspect the user's loyalty points, daily check-in streak, order history, and membership plan.
+PAGE AWARENESS & ADVANCED PERSONAL CONTEXT:
+- Use getPageContext to identify what page the user is viewing, current tags, and recent navigation paths.
+- Use getUserAccountInfo to inspect the user's loyalty points, daily check-in streak, order history, and membership plan. Address the user naturally based on their current session state.
 - Use getShoppingCartContents to see what items are in the user's cart, compute subtotals, and provide checkout assistance.
 - Use getDreamsCountdowns to provide real-time launch countdowns and server connection info.
 
-MUSIC & MEDIXLY POWERS:
-- If a user asks to play a song or asks about music, search the library using searchHarmonyTunesLibrary or playHarmonyTunesSong.
-- Include "[PLAY_SONG:<songId>]" so an interactive play dialog is displayed.
+CONTEXTUAL MUSIC TRACKING & MEDIXLY POWERS:
+- When the user asks "What am I listening to?" or asks about the current song/media: ALWAYS call getCurrentlyPlayingSong to inspect active player state. Report the actual track currently playing or paused (Artist, Title, Progress).
+- DO NOT call playHarmonyTunesSong unless the user explicitly commands to play a specific song (e.g. "play [Song Name]").
 - If a requested song is not in our library, offer to submit a song request to the admin via requestSongAddition.
 
 GAMES & SQUISHLY:
 - NEVER refer to the minigame as "Blob Game". Always call it **Squishly**.
 - If the user asks about games or asks to play, enthusiastically recommend Squishly and MUST include the exact text "[PLAY_SQUISHLY]" in your response.
 
-SAFEGUARDS & RESTRICTIONS:
-- Do NOT answer questions about API keys, development secrets, backend architecture, or system internals. Politely refuse and state that this information is classified.
-- Maintain brand hierarchy at all times.
-- Be helpful, slightly futuristic, concise, and enthusiastic.
+INTERACTION & PROTOCOLS:
+- NEVER dump your raw greeting/default feature list unless the user explicitly asks "What can you do?" or sends an empty/greeting-only message.
+- If a query is ambiguous, leverage context clues or politely ask a targeted clarifying question rather than spitting out a wall of pre-set capabilities.
+- Tone: Sharp, professional, engaging, modern, and confident.
+- Do NOT share API keys, development secrets, backend architecture, or system internals. Politely refuse and state that this information is classified.
 `;
 
 // ==========================================
 // 2. CONTEXT & STATE HELPER FUNCTIONS
 // ==========================================
 
+export function recordNavigationPath(pathName) {
+    if (typeof sessionStorage === 'undefined') return;
+    try {
+        const raw = sessionStorage.getItem('unstoppable_nav_paths');
+        let paths = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(paths)) paths = [];
+        const current = pathName || (typeof window !== 'undefined' && window.location ? (window.location.pathname || '/') : '/');
+        if (current && paths[paths.length - 1] !== current) {
+            paths.push(current);
+            if (paths.length > 10) paths.shift();
+            sessionStorage.setItem('unstoppable_nav_paths', JSON.stringify(paths));
+        }
+    } catch (_) {}
+}
+
+export function getNavigationPaths() {
+    if (typeof sessionStorage === 'undefined') return [];
+    try {
+        const raw = sessionStorage.getItem('unstoppable_nav_paths');
+        return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+        return [];
+    }
+}
+
 export function getPageContext() {
     const path = (typeof window !== 'undefined' && window.location ? window.location.pathname || '' : '').toLowerCase();
     const hash = typeof window !== 'undefined' && window.location ? window.location.hash || '' : '';
+    recordNavigationPath(path || '/');
 
     if (path.includes('account')) {
         let tab = 'Dashboard';
@@ -274,7 +302,8 @@ export function getUserAccountSnapshot() {
         plan,
         orderSummary,
         orderCount,
-        wishlistCount
+        wishlistCount,
+        recentPaths: getNavigationPaths()
     };
 }
 
@@ -376,7 +405,153 @@ export function searchMusicLibrary(query) {
     return matches;
 }
 
+export function isNetworkSevered() {
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+export function syncLexiDOMState() {
+    if (typeof document === 'undefined') return;
+    const badge = document.getElementById('lexi-status-badge');
+    const badgeText = document.getElementById('lexi-status-text');
+    const severed = isNetworkSevered();
+
+    if (badge && badgeText) {
+        if (severed) {
+            badge.className = 'lexi-status-badge offline';
+            badge.title = 'Offline Mode: Network Transport Severed';
+            badgeText.textContent = 'Offline Lexi';
+        } else if (isLiveAI) {
+            badge.className = 'lexi-status-badge live';
+            badge.title = 'Live Vertex AI Active (realunstoppable.store)';
+            badgeText.textContent = 'Live Lexi';
+        }
+    }
+
+    const currentCtx = getPageContext();
+    const tagEl = document.getElementById('chatbot-page-tag');
+    if (tagEl && currentCtx.tag) {
+        tagEl.textContent = currentCtx.tag;
+    }
+}
+
+export function getLivePlayerState() {
+    let title = '';
+    let artist = '';
+    let songId = null;
+    let isPlaying = false;
+    let currentTime = 0;
+    let duration = 0;
+    let queueLength = 0;
+    let art = '';
+
+    // 1. Check window.DTSMusic engine
+    if (typeof window !== 'undefined' && window.DTSMusic) {
+        try {
+            const currentSong = typeof window.DTSMusic.getCurrentSong === 'function' ? window.DTSMusic.getCurrentSong() : null;
+            if (currentSong) {
+                title = currentSong.title || '';
+                artist = currentSong.artist || '';
+                songId = currentSong.id || null;
+                art = currentSong.art || '';
+            }
+            if (window.DTSMusic.state) {
+                isPlaying = !!window.DTSMusic.state.isPlaying;
+                currentTime = window.DTSMusic.state.currentTime || 0;
+                if (window.DTSMusic.state.duration) duration = window.DTSMusic.state.duration;
+                if (Array.isArray(window.DTSMusic.state.queue)) queueLength = window.DTSMusic.state.queue.length;
+            }
+            if (window.DTSMusic.audio) {
+                if (typeof window.DTSMusic.audio.paused === 'boolean') {
+                    isPlaying = !window.DTSMusic.audio.paused;
+                }
+                if (window.DTSMusic.audio.currentTime) {
+                    currentTime = window.DTSMusic.audio.currentTime;
+                }
+                if (window.DTSMusic.audio.duration && !isNaN(window.DTSMusic.audio.duration)) {
+                    duration = window.DTSMusic.audio.duration;
+                }
+            }
+        } catch (_) {}
+    }
+
+    // 2. Check live player DOM elements on medixly.html or sitewide playerhead
+    if (typeof document !== 'undefined') {
+        try {
+            const domTitle = document.getElementById('player-song-title') || document.getElementById('fullscreen-title') || document.querySelector('.lexi-song-title');
+            const domArtist = document.getElementById('player-song-artist') || document.getElementById('fullscreen-artist') || document.querySelector('.lexi-song-artist');
+            const audioEl = document.getElementById('audio-player');
+
+            if (domTitle && domTitle.textContent && domTitle.textContent.trim() !== 'Select a song') {
+                title = domTitle.textContent.trim();
+            }
+            if (domArtist && domArtist.textContent && domArtist.textContent.trim() !== '...') {
+                artist = domArtist.textContent.trim();
+            }
+            if (audioEl) {
+                isPlaying = !audioEl.paused && audioEl.currentTime > 0;
+                if (audioEl.currentTime) currentTime = audioEl.currentTime;
+                if (audioEl.duration && !isNaN(audioEl.duration)) duration = audioEl.duration;
+            }
+        } catch (_) {}
+    }
+
+    // 3. Fallback to localStorage 'dts_music_state'
+    if ((!title || !artist) && typeof localStorage !== 'undefined') {
+        try {
+            const raw = localStorage.getItem('dts_music_state');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed.songId) {
+                    songId = parsed.songId;
+                    const song = getSongById(parsed.songId);
+                    if (song) {
+                        title = song.title;
+                        artist = song.artist;
+                        art = song.art || '';
+                    }
+                }
+                isPlaying = !!parsed.isPlaying;
+                if (typeof parsed.currentTime === 'number') currentTime = parsed.currentTime;
+                if (Array.isArray(parsed.queue)) queueLength = parsed.queue.length;
+            }
+        } catch (_) {}
+    }
+
+    const formatTime = (secs) => {
+        if (!secs || isNaN(secs)) return '0:00';
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    const progressStr = duration > 0 ? `${formatTime(currentTime)} / ${formatTime(duration)}` : formatTime(currentTime);
+
+    return {
+        hasTrack: Boolean(title && title !== 'Select a song'),
+        title: title || '',
+        artist: artist || '',
+        songId,
+        isPlaying,
+        currentTime,
+        duration,
+        progressStr,
+        queueLength,
+        art
+    };
+}
+
 export function getCurrentlyPlaying() {
+    const live = getLivePlayerState();
+    if (live.hasTrack) {
+        return {
+            id: live.songId || (librarySongs.find(s => s.title.toLowerCase() === live.title.toLowerCase())?.id) || 'custom',
+            title: live.title,
+            artist: live.artist,
+            art: live.art,
+            isPlaying: live.isPlaying,
+            progressStr: live.progressStr
+        };
+    }
     if (typeof window !== 'undefined' && window.DTSMusic && typeof window.DTSMusic.getCurrentSong === 'function') {
         return window.DTSMusic.getCurrentSong();
     }
@@ -575,15 +750,48 @@ export function generateOfflineResponse(userInput) {
             `[PLAY_SQUISHLY]`;
     }
 
-    // 7. Music & Medixly Play Request
-    const musicKeywords = ['song', 'songs', 'music', 'listen', 'track', 'tracks', 'medixly', 'harmonytunes', 'sound', 'artist'];
-    const isPlayMusic = lower.startsWith('play ') || lower === 'play' || lower.includes('play a song');
-    if (musicKeywords.some(w => lower.includes(w)) || isPlayMusic) {
+    // 7. Contextual Music Tracking ("What am I listening to?")
+    const mediaStatusPatterns = [
+        'what am i listening to',
+        "what'm i listening to",
+        'what is playing',
+        "what's playing",
+        'whats playing',
+        'what song is playing',
+        'what song is this',
+        'what track is this',
+        'current song',
+        'current track',
+        'now playing',
+        'who is singing',
+        'who sings this',
+        'what is currently playing',
+        'what are we listening to',
+        'song currently playing',
+        'track currently playing'
+    ];
+    if (mediaStatusPatterns.some(p => lower.includes(p))) {
+        const player = getLivePlayerState();
+        if (player.hasTrack) {
+            if (player.isPlaying) {
+                return `You are currently listening to **${escapeHTML(player.title)}** by **${escapeHTML(player.artist)}** (${player.progressStr}) on Medixly.`;
+            } else {
+                return `**${escapeHTML(player.title)}** by **${escapeHTML(player.artist)}** is currently paused at ${player.progressStr} on Medixly.`;
+            }
+        } else {
+            return `No music is currently playing in Medixly. Would you like me to play a track from our library or explore top charts?`;
+        }
+    }
+
+    // 8. Music Playback Commands & Search
+    const isPlayMusic = lower.startsWith('play ') || lower === 'play' || lower.startsWith('put on ') || lower.startsWith('queue ') || lower.includes('play a song') || lower.includes('play track');
+    const isMusicSearch = ['search song', 'find song', 'search music', 'find track', 'browse music'].some(p => lower.includes(p));
+    if (isPlayMusic || isMusicSearch) {
         const matches = searchMusicLibrary(lower);
         if (matches.length > 0) {
             const selected = matches[0];
-            // If sitewide player is available, trigger playback
-            if (typeof window !== 'undefined') {
+            // If sitewide player is available, trigger playback ONLY on explicit play command
+            if (typeof window !== 'undefined' && isPlayMusic) {
                 if (window.DTSMusic && typeof window.DTSMusic.playSongById === 'function') {
                     window.DTSMusic.playSongById(selected.id).catch?.(() => {});
                 } else if (typeof window.playSongById === 'function') {
@@ -593,15 +801,15 @@ export function generateOfflineResponse(userInput) {
             return `Now queueing up **${escapeHTML(selected.title)}** by **${escapeHTML(selected.artist)}** on Medixly!\n\n` +
                 `[PLAY_SONG:${selected.id}]`;
         } else {
-            const cleanQuery = lower.replace(/^(play\s+|song\s+|listen to\s+)/i, '').trim();
+            const cleanQuery = lower.replace(/^(play\s+|song\s+|listen to\s+|put on\s+|queue\s+)/i, '').trim();
             return `I searched our Medixly library, but couldn't find a track matching **"${escapeHTML(cleanQuery)}"**.\n\n` +
                 `Would you like me to submit a song request to the Unstoppable team to add it?\n` +
                 `[REQUEST_SONG:${escapeHTML(cleanQuery)}]`;
         }
     }
 
-    // 8. General Brand & Ecosystem Inquiries
-    if (lower.includes('unstoppable') || lower.includes('about')) {
+    // 9. General Brand & Ecosystem Inquiries
+    if (lower.includes('unstoppable') || lower.includes('about') || lower.includes('ecosystem') || lower.includes('umbrella')) {
         return `**Unstoppable** is the parent brand and central entertainment ecosystem founded by Unstoppable! Under the Unstoppable Umbrella, we build:\n\n` +
             `* **Gaming & YouTube**: @Unstoppab1e gaming channel.\n` +
             `* **Dreams TimeSkip & Dreams OG**: Our dual Minecraft server universe launching in 2026/2027.\n` +
@@ -611,15 +819,50 @@ export function generateOfflineResponse(userInput) {
             `* **ezManage & Autolux**: Business productivity tracking and mobile auto detailing.`;
     }
 
-    // 9. Friendly Default Persona Response
-    return `Hello! I'm **Lexi**, your Unstoppable ecosystem assistant. Here are a few things I can do right now:\n\n` +
-        `* Tell you about the page you're looking at ("*What am I looking at?*")\n` +
-        `* Check your **loyalty points**, **streak**, or **order history**\n` +
-        `* Check live countdowns to **Dreams OG** & **Dreams TimeSkip**\n` +
-        `* Search & play songs in **Medixly** ("*Play a song*")\n` +
-        `* Show items in your shopping cart or provide a **checkout button**\n` +
-        `* Launch our ASMR arcade mini-game, **Squishly**!\n` +
-        `[PLAY_SQUISHLY]`;
+    if (lower.includes('discord') || lower.includes('youtube') || lower.includes('channel') || lower.includes('community')) {
+        return `Join the **Unstoppable Community**!\n\n` +
+            `* **YouTube:** Check out @Unstoppab1e for Minecraft adventures, DTS teasers, and gaming content.\n` +
+            `* **Discord:** Connect with players, suggest music for Medixly, and participate in community tournaments.\n` +
+            `* **Minecraft Servers:** Join Dreams OG and get ready for Dreams TimeSkip at \`${countdowns.serverIP}\`!`;
+    }
+
+    // 10. Greetings & Explicit Capabilities Requests (Never dump capabilities unless greeting or asked)
+    const isGreeting = !text || ['hi', 'hello', 'hey', 'greetings', 'yo', 'sup', 'good morning', 'good afternoon', 'good evening', 'hey lexi', 'hello lexi'].includes(lower);
+    const isCapabilitiesQuery = ['what can you do', 'what do you do', 'help', 'commands', 'features', 'how can you help', 'capabilities', 'who are you', 'what are your features', 'what can lexi do'].some(p => lower.includes(p));
+
+    if (isGreeting || isCapabilitiesQuery) {
+        return `Hello! I'm **Lexi**, your context-aware assistant for the **Unstoppable Ecosystem**.\n\n` +
+            `Here is how I can assist you across our network:\n` +
+            `* **Page & Ecosystem Intelligence:** Ask *"What am I looking at?"* anytime for insights on this page.\n` +
+            `* **Personal Account Snapshot:** Check your **loyalty points**, **daily check-in streak**, **tier**, or **order history**.\n` +
+            `* **Dreams TimeSkip & Dreams OG:** Get live launch countdowns and Minecraft server connection addresses.\n` +
+            `* **Medixly Audio Hub:** Track what's playing (*"What am I listening to?"*) or stream curated tracks.\n` +
+            `* **Merch & Cart:** Review your shopping cart or jump straight to checkout.\n` +
+            `* **Squishly Arcade:** Jump into our physics-driven ASMR minigame!\n` +
+            `[PLAY_SQUISHLY]`;
+    }
+
+    // 11. Contextual Clarification & Targeted Fallback (Never dump default capabilities list)
+    if (pageCtx.isAccount) {
+        return `I'm here with you on your **Account Dashboard**. I couldn't find a direct match for "${escapeHTML(text)}". Were you looking to check your loyalty points (${account.points} pts), daily check-in streak (${account.streak} days), manage orders, or update your settings? Let me know and I'll pull it right up!`;
+    }
+    if (pageCtx.isShop || pageCtx.isCart) {
+        return `You're currently browsing the **Unstoppable Store** (cart: ${cart.count} item${cart.count === 1 ? '' : 's'}). I'm not quite sure what you meant by "${escapeHTML(text)}" — are you looking for specific merch (like our hoodies or DTS tees), or would you like assistance with checkout?`;
+    }
+    if (pageCtx.isCheckout) {
+        return `You're on the **Checkout** page. If you have questions about payment methods, shipping, or order totals, let me know how I can help!`;
+    }
+    if (pageCtx.isMedixly) {
+        return `You're currently in **Medixly**. If you're looking for music, you can ask *"What am I listening to?"* or say *"Play [Song Name]"*. Let me know what track, artist, or audio tool you're searching for!`;
+    }
+    if (pageCtx.isSquishly) {
+        return `You're currently in **Squishly**! If you need gameplay tips, high score strategies, or want to challenge the leaderboard, let me know!`;
+    }
+    if (pageCtx.isDTS) {
+        return `You're on the **Dreams TimeSkip & Dreams OG** portal. Are you looking for the Minecraft server IP (\`${countdowns.serverIP}\`), launch dates, or connection troubleshooting?`;
+    }
+
+    return `I want to make sure I get you the exact information you need across the Unstoppable Ecosystem. Could you clarify what you'd like to do or check regarding "${escapeHTML(text)}"? You can ask about our Minecraft servers, Medixly music, store orders, or your account rewards.`;
 }
 
 // ==========================================
@@ -807,20 +1050,33 @@ export function initChatbot() {
     const sendBtn = document.getElementById('chatbot-send');
 
     function setLexiMode(live) {
+        if (!live && !isNetworkSevered() && isLiveAI) {
+            syncLexiDOMState();
+            return;
+        }
         isLiveAI = live;
         const badge = document.getElementById('lexi-status-badge');
         const badgeText = document.getElementById('lexi-status-text');
         if (badge && badgeText) {
             if (live) {
                 badge.className = 'lexi-status-badge live';
-                badge.title = 'Live Vertex AI Active';
+                badge.title = 'Live Vertex AI Active (realunstoppable.store)';
                 badgeText.textContent = 'Live Lexi';
             } else {
                 badge.className = 'lexi-status-badge offline';
-                badge.title = 'Offline Mode: Local Site Intelligence Active';
+                badge.title = isNetworkSevered() ? 'Offline Mode: Network Transport Severed' : 'Offline Mode: Local Site Intelligence Active';
                 badgeText.textContent = 'Offline Lexi';
             }
         }
+    }
+
+    if (typeof window !== 'undefined') {
+        window.addEventListener('online', () => {
+            syncLexiDOMState();
+        });
+        window.addEventListener('offline', () => {
+            setLexiMode(false);
+        });
     }
 
     // Global Functions for Cart Integration
@@ -992,8 +1248,18 @@ export function initChatbot() {
                         } else if (call.name === "getDreamsCountdowns") {
                             callResult = getDreamsCountdownsData();
                         } else if (call.name === "getCurrentlyPlayingSong") {
-                            const song = getCurrentlyPlaying();
-                            callResult = { song: song.title, artist: song.artist, id: song.id };
+                            const player = getLivePlayerState();
+                            callResult = {
+                                song: player.title,
+                                title: player.title,
+                                artist: player.artist,
+                                id: player.songId,
+                                isPlaying: player.isPlaying,
+                                progress: player.progressStr,
+                                currentTime: player.currentTime,
+                                duration: player.duration,
+                                queueLength: player.queueLength
+                            };
                         } else if (call.name === "playHarmonyTunesSong") {
                             const songId = call.args.songId;
                             if (window.DTSMusic && typeof window.DTSMusic.playSongById === 'function') {
@@ -1034,9 +1300,13 @@ export function initChatbot() {
                 removeElement(typingId);
                 addMessage(responseText, 'siri');
             } catch (error) {
-                // FALLBACK: When Vertex AI fails, smoothly switch to Offline Lexi without saying Lexi is sleeping!
+                // Synchronize with runtime wrapper; only demote to offline if network transport severed
                 console.error("Manager info: Chat Error ", error);
-                setLexiMode(false);
+                if (isNetworkSevered()) {
+                    setLexiMode(false);
+                } else {
+                    syncLexiDOMState();
+                }
                 const offlineReply = generateOfflineResponse(text);
                 removeElement(typingId);
                 addMessage(offlineReply, 'siri');
@@ -1045,8 +1315,12 @@ export function initChatbot() {
                 chatInput.focus();
             }
         } else {
-            // Offline Lexi mode directly
-            setLexiMode(false);
+            // Local Ecosystem Intelligence Mode (realunstoppable.store runtime wrapper)
+            if (isNetworkSevered()) {
+                setLexiMode(false);
+            } else {
+                syncLexiDOMState();
+            }
             setTimeout(() => {
                 const offlineReply = generateOfflineResponse(text);
                 removeElement(typingId);

@@ -485,6 +485,59 @@ exports.createCheckoutSession = onRequest((req, res) => {
             orderDetails: JSON.stringify(orderDetails || {}),
           },
         };
+      } else if (project === "medixly") {
+        const normTier = (plan || "premium").toLowerCase();
+        const tierTitle = normTier === "ultra" ? "Ultra" : "Premium";
+        const isYearly = req.body.billingCycle === "yearly";
+        const isOneTime = req.body.mode === "payment";
+
+        // Daily Escalation Logic: starts at $1.00 on Oct 28 2026, +$1.00 each day at midnight UTC
+        const promoStart = new Date(process.env.MEDIXLY_PROMO_START_DATE || "2026-10-28T00:00:00Z");
+        const now = new Date();
+        const nowUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+        const startUTC = Date.UTC(promoStart.getUTCFullYear(), promoStart.getUTCMonth(), promoStart.getUTCDate());
+        const dayIndex = Math.max(0, Math.floor((nowUTC - startUTC) / (1000 * 60 * 60 * 24)));
+        const cap = normTier === "ultra" ? 12.99 : 6.99;
+        const dailyPrice = Math.min(cap, Math.round((1.00 + dayIndex * 1.00) * 100) / 100);
+        const finalPrice = isYearly ? Math.round(dailyPrice * 10 * 100) / 100 : dailyPrice;
+        const unitAmount = Math.round(finalPrice * 100);
+
+        const defaultMdxSuccess = "https://realunstoppable.store/medixly-pricing.html?status=success&session_id={CHECKOUT_SESSION_ID}";
+        const defaultMdxCancel = "https://realunstoppable.store/medixly-pricing.html?status=cancelled";
+
+        sessionConfig = {
+          mode: isOneTime ? "payment" : "subscription",
+          payment_method_types: ["card"],
+          customer_email: email || undefined,
+          client_reference_id: uid && uid !== "unknown" ? uid : undefined,
+          line_items: [{
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: `Medixly ${tierTitle} Membership (${isYearly ? "Yearly Lock" : "Monthly Lock"})`,
+                description: `Locked promotional rate for Medixly ${tierTitle} - Lifetime Guarantee`,
+                images: ["https://realunstoppable.store/images/medixly-logo.png"],
+              },
+              unit_amount: unitAmount,
+              ...(!isOneTime ? { recurring: { interval: isYearly ? "year" : "month" } } : {})
+            },
+            quantity: 1,
+          }],
+          allow_promotion_codes: true,
+          success_url: successUrl || defaultMdxSuccess,
+          cancel_url: cancelUrl || defaultMdxCancel,
+          metadata: {
+            uid: uid || "unknown",
+            email: email || "",
+            project: "medixly",
+            plan: normTier,
+            tier: normTier,
+            planName: `Medixly ${tierTitle}`,
+            billingCycle: isYearly ? "yearly" : "monthly",
+            lockedPrice: finalPrice.toString(),
+            orderType: isOneTime ? "one_time_lock" : "subscription"
+          }
+        };
       } else {
         sessionConfig = {
           mode: "subscription",
@@ -662,6 +715,90 @@ exports.stripeWebhook = onRequest(async (req, res) => {
       } catch (err) {
         console.error("Manager info: Error saving shop order from stripe webhook: [" + err.message + "]");
       }
+    } else if (metadata.project === "medixly") {
+      try {
+        const tier = (metadata.tier || metadata.plan || "premium").toLowerCase();
+        const tierTitle = tier === "ultra" ? "Ultra" : "Premium";
+        const billingCycle = metadata.billingCycle || "monthly";
+        const lockedPrice = parseFloat(metadata.lockedPrice || "1.00");
+        const orderType = metadata.orderType || "subscription";
+        let targetUid = uid;
+
+        const customerEmail = session.customer_details?.email || session.customer_email || metadata.userEmail || "";
+        const db = admin.firestore();
+
+        if ((!targetUid || targetUid === "unknown" || targetUid === "guest") && customerEmail) {
+          const userSnap = await db.collection("users").where("email", "==", customerEmail).limit(1).get();
+          if (!userSnap.empty) {
+            targetUid = userSnap.docs[0].id;
+          }
+        }
+
+        const durationMs = billingCycle === "yearly" ? (365 * 24 * 60 * 60 * 1000) : (30 * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(Date.now() + durationMs);
+
+        const subscriptionRecord = {
+          status: "active",
+          tier: tier,
+          plan: `Medixly ${tierTitle}`,
+          planName: `Medixly ${tierTitle}`,
+          billingCycle: billingCycle,
+          lockedPrice: lockedPrice,
+          currency: "usd",
+          orderType: orderType,
+          customerId: session.customer || null,
+          subscriptionId: session.subscription || null,
+          sessionId: session.id,
+          paymentIntentId: session.payment_intent || null,
+          paymentStatus: session.payment_status || "paid",
+          startedAt: admin.firestore.FieldValue.serverTimestamp(),
+          expiresAt: expiresAt,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        };
+
+        if (targetUid && targetUid !== "unknown" && targetUid !== "guest") {
+          await getUserDocRef(targetUid).set({
+            membershipLevel: tier,
+            tier: tier,
+            plan: `Medixly ${tierTitle}`,
+            medixlySubscription: subscriptionRecord,
+            subscription: {
+              status: "active",
+              customerId: session.customer || null,
+              subscriptionId: session.subscription || null,
+              tier: tier
+            }
+          }, { merge: true });
+
+          await db.collection("notifications").add({
+            userId: targetUid,
+            title: `Medixly ${tierTitle} Activated! 🎶`,
+            message: `Your promotional rate of $${lockedPrice.toFixed(2)} is locked in! Enjoy uninterrupted streaming.`,
+            isRead: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            link: "medixly.html",
+            type: "membership_upgrade"
+          });
+        }
+
+        await db.collection("membership_orders").doc(session.id).set({
+          orderId: "MDX-" + Math.random().toString(36).substring(2, 8).toUpperCase(),
+          project: "medixly",
+          userId: targetUid || "guest",
+          userEmail: customerEmail,
+          tier: tier,
+          billingCycle: billingCycle,
+          lockedPrice: lockedPrice,
+          totalAmount: session.amount_total ? session.amount_total / 100 : lockedPrice,
+          stripeSessionId: session.id,
+          stripeCustomerId: session.customer || null,
+          stripeSubscriptionId: session.subscription || null,
+          status: "paid",
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (err) {
+        console.error("Manager info: Error saving Medixly order from stripe webhook: [" + err.message + "]");
+      }
     } else if (uid && uid !== "unknown") {
       try {
         const updateData = {
@@ -697,11 +834,68 @@ exports.stripeWebhook = onRequest(async (req, res) => {
           "plan": "free",
           "membershipLevel": "free", // Ensures dreamstimeskip also reverts
           "subscription.status": "canceled",
+          "medixlySubscription.status": "canceled"
         });
       });
       await Promise.all(updates);
     } catch (error) {
       console.error("Manager info: Error processing customer.subscription.deleted: [" + error.message + "]");
+    }
+  }
+
+  if (event.type === "customer.subscription.updated") {
+    const sub = event.data.object;
+
+    try {
+      const snapshot = await admin.firestore()
+          .collection("users")
+          .where("subscription.customerId", "==", sub.customer)
+          .get();
+
+      const isStillActive = sub.status === "active";
+      const updates = snapshot.docs.map((doc) => {
+        return doc.ref.update({
+          ...(isStillActive ? {} : { "plan": "free", "membershipLevel": "free" }),
+          "subscription.status": sub.status,
+          "medixlySubscription.status": sub.status,
+          "medixlySubscription.currentPeriodEnd": new Date(sub.current_period_end * 1000)
+        });
+      });
+      await Promise.all(updates);
+    } catch (error) {
+      console.error("Manager info: Error processing customer.subscription.updated: [" + error.message + "]");
+    }
+  }
+
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object;
+
+    try {
+      const snapshot = await admin.firestore()
+          .collection("users")
+          .where("subscription.customerId", "==", invoice.customer)
+          .get();
+
+      const updates = snapshot.docs.map((doc) => {
+        return Promise.all([
+          doc.ref.update({
+            "medixlySubscription.status": "past_due",
+            "subscription.status": "past_due"
+          }),
+          admin.firestore().collection("notifications").add({
+            userId: doc.id,
+            title: "Medixly Payment Issue ⚠️",
+            message: "Your recent membership payment failed to process. Please update your payment method to keep your locked price.",
+            isRead: false,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            link: "account.html",
+            type: "payment_failed"
+          })
+        ]);
+      });
+      await Promise.all(updates);
+    } catch (error) {
+      console.error("Manager info: Error processing invoice.payment_failed: [" + error.message + "]");
     }
   }
 

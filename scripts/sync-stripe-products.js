@@ -185,6 +185,42 @@ const STORE_CATALOG = [
     sourceSite: 'dreamstimeskip',
     type: 'recurring',
     interval: 'month'
+  },
+  {
+    id: 'medixly-membership-premium',
+    name: 'Medixly Premium Membership',
+    price: 1.00,
+    originalPrice: 9.99,
+    salePrice: 1.00,
+    capPrice: 6.99,
+    description: 'Zero ads, unlimited skips, high-fidelity audio streaming, playlist sharing, and 10% merch store discount.',
+    imageUrl: 'https://realunstoppable.store/images/medixly-logo.png',
+    extraImages: [
+      'https://realunstoppable.store/images/medixly-logo.png',
+      'https://realunstoppable.store/images/harmony-tunes-card.jpg'
+    ],
+    category: 'membership',
+    sourceSite: 'medixly',
+    type: 'recurring',
+    interval: 'month'
+  },
+  {
+    id: 'medixly-membership-ultra',
+    name: 'Medixly Ultra Membership',
+    price: 1.00,
+    originalPrice: 19.99,
+    salePrice: 1.00,
+    capPrice: 12.99,
+    description: 'Lossless Hi-Res FLAC audio, 25% merch store discount, unreleased track early-access, and Discord Ultra Producer badge.',
+    imageUrl: 'https://realunstoppable.store/images/medixly-logo.png',
+    extraImages: [
+      'https://realunstoppable.store/images/medixly-logo.png',
+      'https://realunstoppable.store/images/legacy_cover.jpg'
+    ],
+    category: 'membership',
+    sourceSite: 'medixly',
+    type: 'recurring',
+    interval: 'month'
   }
 ];
 

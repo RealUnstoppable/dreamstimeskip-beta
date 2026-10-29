@@ -223,6 +223,86 @@ describe("createCheckoutSession", () => {
     expect(res.json).toHaveBeenCalledWith({url: "https://checkout.stripe.com/biz-url"});
   });
 
+  it("should create dynamic price session for Medixly Premium", async () => {
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "medixly_user_1",
+      email: "listener@example.com",
+    });
+    mockCreateSession.mockResolvedValueOnce({
+      url: "https://checkout.stripe.com/medixly-premium",
+      id: "cs_medixly_test_1",
+    });
+
+    const req = mockReq({
+      method: "POST",
+      headers: {
+        authorization: "Bearer valid-token",
+      },
+      body: {
+        project: "medixly",
+        plan: "premium",
+        billingCycle: "monthly",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
+      mode: "subscription",
+      customer_email: "listener@example.com",
+      metadata: expect.objectContaining({
+        project: "medixly",
+        tier: "premium",
+      }),
+    }));
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({url: "https://checkout.stripe.com/medixly-premium"});
+  });
+
+  it("should create dynamic price session for Medixly Ultra yearly", async () => {
+    require("firebase-admin")._mockVerifyIdToken.mockResolvedValueOnce({
+      uid: "medixly_ultra_user",
+      email: "ultra@example.com",
+    });
+    mockCreateSession.mockResolvedValueOnce({
+      url: "https://checkout.stripe.com/medixly-ultra-year",
+      id: "cs_medixly_ultra_yr",
+    });
+
+    const req = mockReq({
+      method: "POST",
+      headers: {
+        authorization: "Bearer valid-token",
+      },
+      body: {
+        project: "medixly",
+        plan: "ultra",
+        billingCycle: "yearly",
+      },
+    });
+    const res = mockRes();
+
+    await new Promise((resolve) => {
+      res.json.mockImplementation(() => resolve());
+      createCheckoutSession(req, res);
+    });
+
+    expect(mockCreateSession).toHaveBeenCalledWith(expect.objectContaining({
+      mode: "subscription",
+      customer_email: "ultra@example.com",
+      metadata: expect.objectContaining({
+        project: "medixly",
+        tier: "ultra",
+        billingCycle: "yearly",
+      }),
+    }));
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
+
   it("should handle stripe session errors and return 500", async () => {
     // Suppress console.error in tests for expected errors
     jest.spyOn(console, "error").mockImplementation(() => {});

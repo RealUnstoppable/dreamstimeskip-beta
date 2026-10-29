@@ -24,6 +24,13 @@ import {
   toCustomerMatchCSV,
 } from '../dist/lib/google-ads-sync.js';
 import { PrivacyConsentManager } from '../dist/components/PrivacyConsentManager.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '..');
 
 describe('First-Party Telemetry & Consent System', () => {
   beforeEach(() => {
@@ -301,6 +308,50 @@ describe('First-Party Telemetry & Consent System', () => {
       expect(adToggle.checked).toBe(false);
       expect(shareToggle.disabled).toBe(true);
       expect(shareToggle.checked).toBe(false);
+    });
+  });
+
+  describe('Legal Disclosures & Security Rules Compliance', () => {
+    test('privacy.html contains exact Privacy Policy telemetry clause and privacy choices button', () => {
+      const privacyHtml = fs.readFileSync(path.join(ROOT_DIR, 'privacy.html'), 'utf-8');
+      expect(privacyHtml).toContain('Automated Telemetry, Behavioral Analytics, and Commercial Data Monetization');
+      expect(privacyHtml).toContain('When you access or interact with https://realunstoppable.store (the "Site")');
+      expect(privacyHtml).toContain('Categories of Telemetry Data Collected:');
+      expect(privacyHtml).toContain('Identifiers and Network Information:');
+      expect(privacyHtml).toContain('Device and Browser Environment Attributes:');
+      expect(privacyHtml).toContain('On-Site Behavioral and Interaction Signals:');
+      expect(privacyHtml).toContain('Purposes of Processing, Advertising Integration, and Commercial Transfer ("Sale" or "Sharing"):');
+      expect(privacyHtml).toContain('Your Privacy Rights, Consent Controls, and Opt-Out of Sale/Sharing:');
+      expect(privacyHtml).toContain('Your Privacy Choices / Do Not Sell or Share My Personal Information');
+    });
+
+    test('terms.html contains exact Terms and Conditions telemetry clause and privacy choices button', () => {
+      const termsHtml = fs.readFileSync(path.join(ROOT_DIR, 'terms.html'), 'utf-8');
+      expect(termsHtml).toContain('User Telemetry, Behavioral Analytics, and Data Asset Transfer');
+      expect(termsHtml).toContain('By accessing, browsing, or transacting on https://realunstoppable.store, you acknowledge and agree that our Site utilizes automated first-party and server-side telemetry systems');
+      expect(termsHtml).toContain('constitute proprietary commercial assets of realunstoppable.store');
+      expect(termsHtml).toContain('Your Privacy Choices / Do Not Sell or Share My Personal Information');
+    });
+
+    test('firestore.rules restricts direct writes to consents, sessions, and eventBatches', () => {
+      const rules = fs.readFileSync(path.join(ROOT_DIR, 'firestore.rules'), 'utf-8');
+      expect(rules).toContain('match /consents/{consentId}');
+      expect(rules).toContain('match /sessions/{sessionId}');
+      expect(rules).toContain('match /eventBatches/{batchId}');
+      expect(rules).toContain('allow write: if false;');
+    });
+
+    test('firestore.indexes.json includes composite index for adsExportEligible and computedSegments', () => {
+      const indexesRaw = fs.readFileSync(path.join(ROOT_DIR, 'firestore.indexes.json'), 'utf-8');
+      const indexes = JSON.parse(indexesRaw);
+      const userIndex = indexes.indexes.find(
+        (idx) =>
+          idx.collectionGroup === 'users' &&
+          idx.fields.some((f) => f.fieldPath === 'adsExportEligible') &&
+          idx.fields.some((f) => f.fieldPath === 'computedSegments' && f.arrayConfig === 'CONTAINS') &&
+          idx.fields.some((f) => f.fieldPath === 'lastSeenAt' && f.order === 'DESCENDING')
+      );
+      expect(userIndex).toBeDefined();
     });
   });
 });

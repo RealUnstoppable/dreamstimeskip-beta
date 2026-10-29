@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import { handleTelemetryIngest, handleConsentRecord, handleAdminPerformanceMetrics } from "./dist/lib/telemetry-server.js";
 import { getExportableAudienceCohort } from "./dist/lib/google-ads-sync.js";
+import { createMedixlyCheckoutSession, handleMedixlyWebhookEvent } from "./backend/medixly-stripe-handler.js";
+import { adminDb, FieldValue } from "./dist/lib/firebase-admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +22,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "64kb" }));
+app.use(express.json({
+  limit: "64kb",
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 
 // Explicit ads.txt route for Google AdSense crawler verification
 app.get('/ads.txt', (req, res) => {
@@ -84,6 +91,18 @@ app.use(async (req, res, next) => {
   if (reqPath === '/') reqPath = '/index.html';
   if (reqPath === '/dts') reqPath = '/dts.html';
   if (reqPath === '/store') reqPath = '/store.html';
+
+  // Medixly Membership & Pricing routes
+  if (reqPath === '/medixly' || reqPath === '/medixly/') {
+    if (req.query && (req.query.player === 'true' || req.query.stream === 'true')) {
+      reqPath = '/medixly.html';
+    } else {
+      reqPath = '/medixly-pricing.html';
+    }
+  }
+  if (reqPath === '/medixly/pricing' || reqPath === '/medixly-pricing' || reqPath === '/pricing') {
+    reqPath = '/medixly-pricing.html';
+  }
   
   if (reqPath.endsWith('.html')) {
     try {
@@ -123,8 +142,30 @@ if (!process.env.STRIPE_SECRET_KEY) {
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_mock';
 const stripe = new Stripe(stripeSecretKey);
 
-app.post("/create-checkout-session", async (req, res) => {
-  const { plan } = req.body;
+app.post(["/create-checkout-session", "/api/create-checkout-session"], async (req, res) => {
+  const { plan, project, billingCycle, mode, successUrl, cancelUrl, email, uid } = req.body || {};
+
+  // Medixly Membership Dynamic Promotion Checkout
+  if (project === "medixly" || (plan && (plan.toLowerCase() === "premium" || plan.toLowerCase() === "ultra") && project !== "dreamstimeskip")) {
+    try {
+      const origin = req.headers.origin || (req.headers.host ? `${req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}` : 'https://realunstoppable.store');
+      const result = await createMedixlyCheckoutSession({
+        plan,
+        billingCycle,
+        mode,
+        uid,
+        email,
+        successUrl,
+        cancelUrl,
+        origin,
+        stripeClient: stripe
+      });
+      return res.json({ url: result.url, sessionId: result.sessionId, lockedPrice: result.lockedPrice });
+    } catch (err) {
+      console.error("Medixly checkout error:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
 
   try {
     const priceId =
@@ -149,6 +190,37 @@ app.post("/create-checkout-session", async (req, res) => {
     res.json({ url: session.url });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Secure Stripe Webhook Handler for Medixly Memberships
+app.post(["/stripe-webhook", "/api/stripe-webhook"], async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  let event;
+
+  try {
+    if (webhookSecret && sig && req.rawBody) {
+      event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
+    } else {
+      event = req.body;
+    }
+  } catch (err) {
+    console.error("Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  try {
+    const result = await handleMedixlyWebhookEvent({
+      event,
+      adminDb: typeof adminDb !== "undefined" ? adminDb : null,
+      FieldValue: typeof FieldValue !== "undefined" ? FieldValue : null,
+      stripeClient: stripe
+    });
+    return res.json({ received: true, ...result });
+  } catch (err) {
+    console.error("Webhook processing error:", err.message);
+    return res.status(500).json({ error: err.message });
   }
 });
 

@@ -151,4 +151,96 @@ describe('chatbot.js functionality and offline intelligence', () => {
         expect(pageTag).not.toBeNull();
         expect(pageTag.textContent).toContain('Hub Home');
     });
+
+    it('Protocol 1: should correctly identify severed vs alive network state via isNetworkSevered', () => {
+        const { isNetworkSevered } = chatbotModule;
+        
+        const originalOnLine = navigator.onLine;
+        try {
+            Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+            expect(isNetworkSevered()).toBe(true);
+
+            Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+            expect(isNetworkSevered()).toBe(false);
+        } finally {
+            Object.defineProperty(navigator, 'onLine', { value: originalOnLine, configurable: true });
+        }
+    });
+
+    it('Protocol 2: should never dump default capabilities list on ambiguous queries, but provide targeted clarification', () => {
+        const { generateOfflineResponse } = chatbotModule;
+
+        // Explicit capabilities query DOES return capabilities list
+        const helpRes = generateOfflineResponse("what can you do?");
+        expect(helpRes).toContain("Here is how I can assist you across our network");
+        expect(helpRes).toContain("Page & Ecosystem Intelligence");
+        expect(helpRes).toContain("Squishly Arcade");
+
+        // Greeting DOES return greeting & capabilities
+        const greetingRes = generateOfflineResponse("hello");
+        expect(greetingRes).toContain("Here is how I can assist you across our network");
+
+        // Ambiguous or complex queries do NOT dump raw capabilities list
+        const ambiguousRes = generateOfflineResponse("how do I configure my router port forwarding?");
+        expect(ambiguousRes).not.toContain("Here is how I can assist you across our network");
+        expect(ambiguousRes).toContain("clarify what you'd like to do or check");
+        expect(ambiguousRes).not.toContain("* Tell you about the page you're looking at");
+    });
+
+    it('Protocol 3: should report active song when asking "what am I listening to?" without queueing or playing new song', () => {
+        const { generateOfflineResponse } = chatbotModule;
+
+        // Mock window.DTSMusic
+        const mockPlaySongById = jest.fn();
+        window.DTSMusic = {
+            getCurrentSong: () => ({ id: 'song-mock-1', title: 'Starboy', artist: 'The Weeknd' }),
+            state: { isPlaying: true, currentTime: 75, duration: 230 },
+            playSongById: mockPlaySongById
+        };
+
+        const resPlaying = generateOfflineResponse("what am I listening to?");
+        expect(resPlaying).toContain("Starboy");
+        expect(resPlaying).toContain("The Weeknd");
+        expect(resPlaying).toContain("1:15 / 3:50");
+        expect(resPlaying).toContain("currently listening to");
+        expect(mockPlaySongById).not.toHaveBeenCalled();
+        expect(resPlaying).not.toContain("[PLAY_SONG:");
+
+        // Test paused state
+        window.DTSMusic.state.isPlaying = false;
+        const resPaused = generateOfflineResponse("what song is playing?");
+        expect(resPaused).toContain("currently paused at 1:15 / 3:50");
+        expect(mockPlaySongById).not.toHaveBeenCalled();
+
+        delete window.DTSMusic;
+    });
+
+    it('Protocol 3: should report when no music is playing and not queue a song', () => {
+        const { generateOfflineResponse } = chatbotModule;
+        // Ensure no active track in DOM or DTSMusic
+        delete window.DTSMusic;
+        localStorage.removeItem('dts_music_state');
+
+        const res = generateOfflineResponse("what am I listening to?");
+        expect(res).toContain("No music is currently playing in Medixly");
+        expect(res).not.toContain("[PLAY_SONG:");
+    });
+
+    it('Protocol 4: should track navigation paths and include them in user account snapshot', () => {
+        const { recordNavigationPath, getNavigationPaths, getUserAccountSnapshot } = chatbotModule;
+
+        recordNavigationPath('/shop.html');
+        recordNavigationPath('/medixly.html');
+        recordNavigationPath('/account.html');
+
+        const paths = getNavigationPaths();
+        expect(paths).toContain('/shop.html');
+        expect(paths).toContain('/medixly.html');
+        expect(paths).toContain('/account.html');
+
+        const snapshot = getUserAccountSnapshot();
+        expect(snapshot.recentPaths).toBeDefined();
+        expect(Array.isArray(snapshot.recentPaths)).toBe(true);
+        expect(snapshot.recentPaths).toContain('/account.html');
+    });
 });
