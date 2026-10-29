@@ -1322,6 +1322,22 @@ export function initChatbot() {
             return;
         }
 
+        const songLyricsBtn = e.target.closest('.chat-song-lyrics-btn') || e.target.closest('.chat-show-lyrics-action');
+        if (songLyricsBtn && songLyricsBtn.dataset.songId) {
+            const songId = songLyricsBtn.dataset.songId;
+            if (typeof window !== 'undefined') {
+                if (typeof window.showLyrics === 'function') {
+                    window.showLyrics(songId);
+                } else if (window.MedixlyAPI && typeof window.MedixlyAPI.showLyrics === 'function') {
+                    window.MedixlyAPI.showLyrics(songId);
+                } else {
+                    window.location.href = `medixly.html?lyrics=${encodeURIComponent(songId)}`;
+                }
+            }
+            songLyricsBtn.textContent = '✓ Lyrics Open';
+            return;
+        }
+
         const openCartBtn = e.target.closest('.chat-open-cart-action');
         if (openCartBtn) {
             window.location.href = 'https://realunstoppable.store/cart.html';

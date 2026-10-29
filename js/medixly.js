@@ -1123,7 +1123,7 @@ function initHarmonyTunes() {
         setupNavigation();
         updateAdminAdTestVisibility(isMedixlyAdmin(currentUser, currentUserDocData));
         setupPlayerEvents();
-        initLexiStatusIndicator();
+        if (typeof initLexiStatusIndicator === 'function') initLexiStatusIndicator();
         
         let restored = false;
         try {
