@@ -1,6 +1,15 @@
 // js/ad-composition-studio.js
 // Composition Studio — Background + Blob + Track Mapping Engine
-// Adds granular control over background themes, blob visibility, and audio-pulse binding
+// Adds granular control over background themes, blob visibility, audio-pulse binding, and ad pricing
+
+import {
+    AppleWheelPicker,
+    generatePriceOptions,
+    DEFAULT_PRICE,
+    MIN_PRICE,
+    MAX_PRICE,
+    PRICE_STEP
+} from './apple-wheel-picker.js';
 
 /**
  * Available animated background themes
@@ -49,6 +58,8 @@ export class CompositionStudio {
         this.showCaptionBox = true;
         this.showDialogBox = true;
         this.userName = 'User';
+        this.selectedPrice = DEFAULT_PRICE; // exactly 12.99
+        this.pricePicker = null;
         this.isOpen = false;
 
         // Load persisted settings
@@ -64,6 +75,13 @@ export class CompositionStudio {
             if (savedAutoBg !== null) this.autoCycleBackground = savedAutoBg === 'true';
             const savedBadges = localStorage.getItem('medixly_comp_feature_badges');
             if (savedBadges !== null) this.showFeatureBadges = savedBadges === 'true';
+            const savedPrice = localStorage.getItem('medixly_ad_editor_price') ?? localStorage.getItem('medixly_comp_price');
+            if (savedPrice !== null) {
+                const parsed = parseFloat(savedPrice);
+                if (!isNaN(parsed) && parsed >= MIN_PRICE && parsed <= MAX_PRICE) {
+                    this.selectedPrice = parsed;
+                }
+            }
         } catch (_) {}
 
         // DOM references (set during mount)
@@ -77,6 +95,7 @@ export class CompositionStudio {
     mount() {
         this._createGearButton();
         this._createPanel();
+        this._initPricePicker();
         this._bindEvents();
         this._applyState();
     }
@@ -252,10 +271,51 @@ export class CompositionStudio {
                     </div>
                 </section>
 
-                <!-- Step 3: Track & Pulse Binding -->
-                <section class="comp-section">
+                <!-- Step 3: Ad Pricing & Pass Rate (Apple-Style Wheel Picker) -->
+                <section class="comp-section comp-section-pricing" id="comp-pricing-section">
                     <div class="comp-section-header">
                         <span class="comp-section-step">3</span>
+                        <span class="comp-section-title">Pricing & Pass Rate</span>
+                        <span class="comp-pricing-badge" id="comp-pricing-badge">$${this.selectedPrice.toFixed(2)}</span>
+                    </div>
+                    <div class="comp-pricing-card">
+                        <div class="comp-pricing-display-row">
+                            <div class="comp-pricing-display-col">
+                                <span class="comp-pricing-sublabel">Locked Editor Rate</span>
+                                <div class="comp-pricing-value-group">
+                                    <span class="comp-pricing-hero" id="comp-pricing-hero">$${this.selectedPrice.toFixed(2)}</span>
+                                    <span class="comp-pricing-interval">/mo</span>
+                                </div>
+                            </div>
+                            <div class="comp-pricing-steppers">
+                                <button type="button" class="comp-step-btn" id="btn-price-decrement" data-action="decrement-price" title="Decrease by $1.00" aria-label="Decrease price by $1">−</button>
+                                <button type="button" class="comp-step-btn" id="btn-price-increment" data-action="increment-price" title="Increase by $1.00" aria-label="Increase price by $1">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Apple-Style Smooth Wheel Picker Mount -->
+                        <div id="comp-apple-price-picker" class="apple-price-picker-mount"></div>
+
+                        <!-- Quick Preset Pills -->
+                        <div class="comp-pricing-presets">
+                            <button type="button" class="comp-preset-pill${Math.abs(this.selectedPrice - 0.99) < 0.01 ? ' active' : ''}" data-action="preset-price" data-value="0.99">$0.99 Min</button>
+                            <button type="button" class="comp-preset-pill${Math.abs(this.selectedPrice - 1.99) < 0.01 ? ' active' : ''}" data-action="preset-price" data-value="1.99">$1.99</button>
+                            <button type="button" class="comp-preset-pill${Math.abs(this.selectedPrice - 6.99) < 0.01 ? ' active' : ''}" data-action="preset-price" data-value="6.99">$6.99 Cap</button>
+                            <button type="button" class="comp-preset-pill${Math.abs(this.selectedPrice - 12.99) < 0.01 ? ' active' : ''}" data-action="preset-price" data-value="12.99">$12.99 Default</button>
+                            <button type="button" class="comp-preset-pill${Math.abs(this.selectedPrice - 19.99) < 0.01 ? ' active' : ''}" data-action="preset-price" data-value="19.99">$19.99</button>
+                        </div>
+
+                        <div class="comp-pricing-footer">
+                            <span class="comp-pricing-status" id="comp-pricing-status">✓ Price Synced & Saved to Ad State</span>
+                            <button type="button" class="comp-pricing-save-btn" data-action="save-price" id="btn-save-ad-price" title="Save ad price">Save Price</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 4: Track & Pulse Binding -->
+                <section class="comp-section">
+                    <div class="comp-section-header">
+                        <span class="comp-section-step">4</span>
                         <span class="comp-section-title">Track & Pulse Binding</span>
                     </div>
                     <div class="comp-tracks-list">
@@ -312,6 +372,18 @@ export class CompositionStudio {
                         this.setUserName('User');
                         const inputEl = this.panelEl.querySelector('#comp-input-user-name');
                         if (inputEl) inputEl.value = 'User';
+                        break;
+                    case 'decrement-price':
+                        this.decrementPrice();
+                        break;
+                    case 'increment-price':
+                        this.incrementPrice();
+                        break;
+                    case 'preset-price':
+                        this.setPrice(parseFloat(value), true);
+                        break;
+                    case 'save-price':
+                        this.savePrice();
                         break;
                 }
             });
@@ -592,6 +664,147 @@ export class CompositionStudio {
         this.setNameTags(this.showNameTags);
         this.setCaptionBox(this.showCaptionBox);
         this.setUserName(this.userName);
+        this.setPrice(this.selectedPrice, true);
+    }
+
+    /**
+     * Mount and initialize the Apple Wheel Picker for pricing
+     */
+    _initPricePicker() {
+        if (!this.panelEl) return;
+        const mountEl = this.panelEl.querySelector('#comp-apple-price-picker');
+        if (!mountEl) return;
+
+        this.pricePicker = new AppleWheelPicker({
+            container: mountEl,
+            defaultValue: this.selectedPrice,
+            visibleRows: 5,
+            itemHeight: 44,
+            onChange: (price) => {
+                this.setPrice(price, false);
+            }
+        });
+    }
+
+    /**
+     * Set selected price, updates wheel picker, UI labels, and controller state
+     * @param {number|string} price
+     * @param {boolean} [updatePicker=true]
+     */
+    setPrice(price, updatePicker = true) {
+        const num = parseFloat(price);
+        if (isNaN(num)) return;
+        const clamped = Math.max(MIN_PRICE, Math.min(MAX_PRICE, num));
+        this.selectedPrice = clamped;
+
+        if (updatePicker && this.pricePicker) {
+            this.pricePicker.setValue(clamped, true);
+        }
+
+        if (this.panelEl) {
+            const heroEl = this.panelEl.querySelector('#comp-pricing-hero');
+            if (heroEl) heroEl.textContent = `$${clamped.toFixed(2)}`;
+            const badgeEl = this.panelEl.querySelector('#comp-pricing-badge');
+            if (badgeEl) badgeEl.textContent = `$${clamped.toFixed(2)}`;
+
+            // Update preset pill active states
+            const pills = this.panelEl.querySelectorAll('.comp-preset-pill');
+            pills.forEach(pill => {
+                const pillVal = parseFloat(pill.dataset.value);
+                pill.classList.toggle('active', Math.abs(pillVal - clamped) < 0.01);
+            });
+
+            const statusEl = this.panelEl.querySelector('#comp-pricing-status');
+            if (statusEl) {
+                statusEl.textContent = `✓ Price Synced ($${clamped.toFixed(2)})`;
+            }
+        }
+
+        // Persist to localStorage
+        try {
+            localStorage.setItem('medixly_ad_editor_price', clamped.toFixed(2));
+            localStorage.setItem('medixly_comp_price', clamped.toFixed(2));
+        } catch (_) {}
+
+        // Bind to controller state
+        if (this.controller) {
+            if (typeof this.controller.setAdPrice === 'function') {
+                this.controller.setAdPrice(clamped);
+            } else {
+                this.controller.selectedPrice = clamped;
+                this.controller.adPrice = clamped;
+            }
+        }
+    }
+
+    /**
+     * Get current price number
+     * @returns {number}
+     */
+    getPrice() {
+        return this.selectedPrice;
+    }
+
+    /**
+     * Increment price upwards by $1.00
+     */
+    incrementPrice() {
+        if (this.pricePicker) {
+            this.pricePicker.increment();
+        } else {
+            this.setPrice(Math.min(MAX_PRICE, this.selectedPrice + PRICE_STEP), true);
+        }
+    }
+
+    /**
+     * Decrement price downwards by $1.00 towards $0.99 minimum
+     */
+    decrementPrice() {
+        if (this.pricePicker) {
+            this.pricePicker.decrement();
+        } else {
+            this.setPrice(Math.max(MIN_PRICE, this.selectedPrice - PRICE_STEP), true);
+        }
+    }
+
+    /**
+     * Save price button action with confirmation feedback
+     */
+    savePrice() {
+        this.setPrice(this.selectedPrice, true);
+        if (this.panelEl) {
+            const saveBtn = this.panelEl.querySelector('#btn-save-ad-price');
+            if (saveBtn) {
+                const orig = saveBtn.textContent;
+                saveBtn.textContent = '✓ Saved!';
+                saveBtn.style.background = '#10b981';
+                setTimeout(() => {
+                    saveBtn.textContent = orig;
+                    saveBtn.style.background = '';
+                }, 1400);
+            }
+        }
+        return this.getFormData();
+    }
+
+    /**
+     * Retrieve complete state and form data from the editor
+     * @returns {Object}
+     */
+    getFormData() {
+        return {
+            price: this.selectedPrice,
+            formattedPrice: `$${this.selectedPrice.toFixed(2)}`,
+            background: this.activeBackground,
+            blobFilter: this.blobFilter,
+            userName: this.userName,
+            autoCycleBackground: this.autoCycleBackground,
+            showFeatureBadges: this.showFeatureBadges,
+            showCaptionBox: this.showCaptionBox,
+            showDialogBox: this.showDialogBox,
+            showOuterCircles: this.showOuterCircles,
+            showNameTags: this.showNameTags
+        };
     }
 
     /**
@@ -609,6 +822,10 @@ export class CompositionStudio {
      * Clean up
      */
     destroy() {
+        if (this.pricePicker) {
+            this.pricePicker.destroy();
+            this.pricePicker = null;
+        }
         if (this.panelEl && this.panelEl.parentNode) {
             this.panelEl.parentNode.removeChild(this.panelEl);
         }

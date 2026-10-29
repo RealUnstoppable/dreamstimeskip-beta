@@ -34,6 +34,10 @@ export class AdPreviewController {
         this.countdownTimer = null;
         this.playbackRate = 1.0;
 
+        // Ad Editor Pricing state ($X.99 formulated)
+        this.selectedPrice = 12.99;
+        this.adPrice = 12.99;
+
         // Composition Studio instance
         this.compositionStudio = null;
 
@@ -278,6 +282,30 @@ export class AdPreviewController {
         this.setSpeakerState('idle');
         this.renderInitialCaption();
         this.updateActiveTrackInMenu();
+    }
+
+    /**
+     * Set the ad pricing state and broadcast update
+     * @param {number|string} price
+     */
+    setAdPrice(price) {
+        const num = parseFloat(price);
+        if (isNaN(num)) return;
+        this.selectedPrice = num;
+        this.adPrice = num;
+
+        try {
+            localStorage.setItem('medixly_ad_editor_price', num.toFixed(2));
+        } catch (_) {}
+
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('medixly:ad-price-updated', {
+                detail: {
+                    price: num,
+                    formatted: `$${num.toFixed(2)}`
+                }
+            }));
+        }
     }
 
     renderInitialCaption() {

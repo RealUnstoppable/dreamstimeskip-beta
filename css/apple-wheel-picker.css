@@ -1,0 +1,354 @@
+/* css/apple-wheel-picker.css */
+/* Medixly Apple-Style Smooth Inertial Wheel Picker */
+/* Modern High-Contrast Dark-Mode Aesthetics with Cylindrical Physics */
+
+/* ===== PICKER CONTAINER ===== */
+.apple-wheel-picker {
+    position: relative;
+    width: 100%;
+    border-radius: 16px;
+    background: rgba(5, 12, 28, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 2px 14px rgba(0, 0, 0, 0.55), 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.apple-wheel-picker:focus-visible {
+    border-color: #a855f7;
+    box-shadow: 0 0 14px rgba(168, 85, 247, 0.45), inset 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.apple-wheel-picker.is-dragging {
+    cursor: grabbing;
+}
+
+/* ===== SCROLL CONTAINER & PHYSICS ===== */
+.picker-scroll-container {
+    width: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    cursor: grab;
+}
+
+.picker-scroll-container::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.picker-items-track {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.picker-spacer {
+    width: 100%;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+/* ===== PICKER ITEMS ===== */
+.picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: normal;
+    color: #64748b;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+    cursor: pointer;
+    transform-origin: center center;
+    will-change: transform, opacity;
+    transition: color 0.15s ease;
+}
+
+.picker-item:hover {
+    color: #cbd5e1;
+}
+
+.picker-item-label {
+    pointer-events: none;
+}
+
+/* Active Selected Item (Center Lens) */
+.picker-item.picker-item-selected {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 1.38rem !important;
+    letter-spacing: 0.8px;
+    text-shadow: 0 0 16px rgba(168, 85, 247, 0.65), 0 0 4px rgba(255, 255, 255, 0.9);
+}
+
+/* ===== SELECTION LENS WINDOW (APPLE HIGHLIGHT BAR) ===== */
+.picker-selection-lens {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    border-radius: 10px;
+    pointer-events: none;
+    z-index: 2;
+    background: linear-gradient(90deg, rgba(168, 85, 247, 0.12) 0%, rgba(56, 189, 248, 0.1) 100%);
+    border-top: 1px solid rgba(168, 85, 247, 0.45);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.45);
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 12px;
+}
+
+.picker-lens-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.15) 0%, transparent 75%);
+    pointer-events: none;
+}
+
+.picker-lens-border-top {
+    position: absolute;
+    top: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c084fc, transparent);
+}
+
+.picker-lens-border-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+}
+
+.picker-lens-tag {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #38bdf8;
+    text-transform: uppercase;
+    background: rgba(56, 189, 248, 0.14);
+    padding: 2px 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    z-index: 3;
+}
+
+/* ===== CYLINDRICAL FADE OVERLAYS ===== */
+.picker-fade-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.picker-fade-top {
+    top: 0;
+    background: linear-gradient(to bottom, 
+        rgba(9, 20, 42, 0.98) 0%, 
+        rgba(9, 20, 42, 0.85) 45%, 
+        rgba(9, 20, 42, 0) 100%
+    );
+}
+
+.picker-fade-bottom {
+    bottom: 0;
+    background: linear-gradient(to top, 
+        rgba(9, 20, 42, 0.98) 0%, 
+        rgba(9, 20, 42, 0.85) 45%, 
+        rgba(9, 20, 42, 0) 100%
+    );
+}
+
+/* ===== SETTINGS SECTION PRICING CARD & CONTROLS ===== */
+.comp-pricing-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(4, 10, 24, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+}
+
+.comp-pricing-badge {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #c084fc;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+}
+
+.comp-pricing-display-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.comp-pricing-display-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.comp-pricing-sublabel {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+}
+
+.comp-pricing-value-group {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.comp-pricing-hero {
+    font-size: 1.55rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 30%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+
+.comp-pricing-interval {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.comp-pricing-steppers {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.comp-step-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1;
+}
+
+.comp-step-btn:hover {
+    background: rgba(168, 85, 247, 0.2);
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.comp-step-btn:active {
+    transform: scale(0.95);
+}
+
+/* Presets Pills */
+.comp-pricing-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.comp-preset-pill {
+    flex: 1;
+    min-width: 54px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.comp-preset-pill:hover {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+.comp-preset-pill.active {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(56, 189, 248, 0.2) 100%);
+    border-color: rgba(168, 85, 247, 0.5);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.25);
+    font-weight: 700;
+}
+
+/* Footer / Save indicator */
+.comp-pricing-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 6px;
+    gap: 8px;
+}
+
+.comp-pricing-status {
+    font-size: 0.66rem;
+    color: #38bdf8;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+}
+
+.comp-pricing-save-btn {
+    padding: 5px 12px;
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    border: none;
+    border-radius: 7px;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.comp-pricing-save-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+}
+
+.comp-pricing-save-btn:active {
+    transform: translateY(0);
+}

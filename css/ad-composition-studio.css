@@ -1,5 +1,6 @@
 /* css/ad-composition-studio.css */
-/* Composition Studio Panel — Settings Gear UI for Background + Blob + Track Mapping */
+/* Composition Studio Panel — Settings Gear UI for Background + Blob + Track Mapping + Apple Wheel Pricing */
+@import url('./apple-wheel-picker.css');
 
 /* ===== COMPOSITION STUDIO PANEL ===== */
 .comp-studio-panel {
