@@ -11,6 +11,8 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",
     "check:site": "node scripts/site-checker.js",
     "start": "node server.js",
+    "desktop": "electron desktop/main.cjs",
+    "desktop:dist": "electron-builder",
     "build": "tsc && node scripts/copy-static.js",
     "sync:stripe": "node scripts/sync-stripe-products.js"
   },
