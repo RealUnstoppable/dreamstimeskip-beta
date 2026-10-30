@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ path: [".env.local", ".env"] });
+
 import express from "express";
 import cors from "cors";
 import Stripe from "stripe";
@@ -7,7 +10,7 @@ import fs from "fs/promises";
 import { handleTelemetryIngest, handleConsentRecord, handleAdminPerformanceMetrics } from "./dist/lib/telemetry-server.js";
 import { getExportableAudienceCohort } from "./dist/lib/google-ads-sync.js";
 import { createMedixlyCheckoutSession, handleMedixlyWebhookEvent } from "./backend/medixly-stripe-handler.js";
-import { adminDb, FieldValue } from "./dist/lib/firebase-admin.js";
+import { adminDb, admin, FieldValue } from "./dist/lib/firebase-admin.js";
 import { STRIPE_PRODUCTS, getStripePriceId } from "./js/stripe-config.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -181,10 +184,10 @@ app.use(async (req, res, next) => {
 // Serve static files from the root directory to fix absolute paths in HTML files
 app.use(express.static(__dirname));
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn("WARNING: STRIPE_SECRET_KEY environment variable is missing.");
+if (!process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_SECRET) {
+  console.warn("WARNING: STRIPE_SECRET_KEY / STRIPE_SECRET environment variable is missing.");
 }
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_mock';
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET || 'sk_test_mock';
 const stripe = new Stripe(stripeSecretKey);
 
 app.post(["/create-checkout-session", "/api/create-checkout-session"], async (req, res) => {
@@ -274,19 +277,33 @@ app.post(["/create-checkout-session", "/api/create-checkout-session"], async (re
     try {
       const normPlan = (plan || "premium").toLowerCase();
       const priceId = normPlan === "ultimate"
-        ? getStripePriceId('dts-membership-ultimate', isLive)
-        : getStripePriceId('dts-membership-premium', isLive);
+        ? (getStripePriceId('dts-membership-ultimate', isLive) || (isLive ? 'price_1UW1NEBmfNp1AIyknbvhS9fC' : 'price_1UW1GcBp2C5GdKaKm5lG0dzc'))
+        : (getStripePriceId('dts-membership-premium', isLive) || (isLive ? 'price_1UW1NBBmfNp1AIyk1eR6xFyQ' : 'price_1UW1GaBp2C5GdKaKPXdGnGFq'));
+
+      let effectiveUid = uid;
+      let effectiveEmail = email;
+
+      const authHeader = req.headers.authorization;
+      if ((!effectiveUid || !effectiveEmail) && authHeader && authHeader.startsWith("Bearer ")) {
+        try {
+          const decoded = await admin.auth().verifyIdToken(authHeader.split("Bearer ")[1]);
+          if (decoded) {
+            effectiveUid = effectiveUid || decoded.uid;
+            effectiveEmail = effectiveEmail || decoded.email;
+          }
+        } catch (_) {}
+      }
 
       const session = await stripe.checkout.sessions.create({
         mode: "subscription",
-        customer_email: email && email.includes("@") ? email : undefined,
-        client_reference_id: uid && uid !== "unknown" && uid !== "guest" ? uid : undefined,
+        customer_email: effectiveEmail && effectiveEmail.includes("@") ? effectiveEmail : undefined,
+        client_reference_id: effectiveUid && effectiveUid !== "unknown" && effectiveUid !== "guest" ? effectiveUid : undefined,
         line_items: [{ price: priceId, quantity: 1 }],
         allow_promotion_codes: true,
         success_url: successUrl || `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}&plan=${normPlan}`,
         cancel_url: cancelUrl || `${origin}/cart.html?canceled=true`,
         metadata: {
-          uid: uid || "unknown",
+          uid: effectiveUid || "unknown",
           planName: normPlan === "ultimate" ? "Ultimate" : "Premium",
           project: "dreamstimeskip",
         },

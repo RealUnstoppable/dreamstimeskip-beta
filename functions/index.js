@@ -9,9 +9,9 @@ admin.initializeApp();
 
 // Fallback "placeholder" string to stop Firebase Analyzer from
 // crashing during deployment
-const stripeKey = process.env.STRIPE_SECRET;
+const stripeKey = process.env.STRIPE_SECRET || process.env.STRIPE_SECRET_KEY;
 if (!stripeKey) {
-  console.warn("Manager info: STRIPE_SECRET environment variable is missing.");
+  console.warn("Manager info: STRIPE_SECRET or STRIPE_SECRET_KEY environment variable is missing.");
 }
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -482,9 +482,9 @@ exports.createCheckoutSession = onRequest((req, res) => {
     if (project === "dreamstimeskip") {
       const normPlan = (plan || "premium").toLowerCase();
       if (normPlan === "ultimate") {
-        priceId = getCatalogPriceId("dts-membership-ultimate", isLive);
+        priceId = getCatalogPriceId("dts-membership-ultimate", isLive) || (isLive ? "price_1UW1NEBmfNp1AIyknbvhS9fC" : "price_1UW1GcBp2C5GdKaKm5lG0dzc");
       } else {
-        priceId = getCatalogPriceId("dts-membership-premium", isLive);
+        priceId = getCatalogPriceId("dts-membership-premium", isLive) || (isLive ? "price_1UW1NBBmfNp1AIyk1eR6xFyQ" : "price_1UW1GaBp2C5GdKaKPXdGnGFq");
       }
     } else {
       // Default to ezManage logic
@@ -621,6 +621,7 @@ exports.createCheckoutSession = onRequest((req, res) => {
         sessionConfig = {
           mode: "subscription",
           customer_email: email && email.includes("@") ? email : undefined,
+          client_reference_id: uid && uid !== "unknown" && uid !== "guest" ? uid : undefined,
           line_items: [{price: priceId, quantity: 1}],
           subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
           allow_promotion_codes: true, // ✅ Support promo codes implemented from Stripe
@@ -631,12 +632,26 @@ exports.createCheckoutSession = onRequest((req, res) => {
           metadata: {
             uid: uid || "unknown",
             planName: plan || "Pro",
-            project: project || "ezmanage",
+            project: project || "dreamstimeskip",
           },
         };
       }
 
-      const session = await stripe.checkout.sessions.create(sessionConfig);
+      let session;
+      try {
+        session = await stripe.checkout.sessions.create(sessionConfig);
+      } catch (stripeErr) {
+        // If error was caused by trial_period_days on this customer or price, retry without trial
+        if (sessionConfig.subscription_data && sessionConfig.subscription_data.trial_period_days) {
+          delete sessionConfig.subscription_data.trial_period_days;
+          if (Object.keys(sessionConfig.subscription_data).length === 0) {
+            delete sessionConfig.subscription_data;
+          }
+          session = await stripe.checkout.sessions.create(sessionConfig);
+        } else {
+          throw stripeErr;
+        }
+      }
 
       res.status(200).json({url: session.url});
     } catch (err) {

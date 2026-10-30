@@ -138,3 +138,38 @@ describe('Phase 3: UI Consistency & Dynamic Theming', () => {
         assert.ok(medixlyJs.includes('syncAllPlayerStates('), 'Must refresh player states dynamically on theme change');
     });
 });
+
+describe('Phase 5: Desktop Update Feature & Version Visibility', () => {
+    it('should specify bumped version 1.1.0 in package.json', () => {
+        const pkg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), 'package.json'), 'utf8'));
+        assert.equal(pkg.version, '1.1.0', 'Package version must be 1.1.0');
+    });
+
+    it('should implement checkForUpdates and showAboutDialog in desktop/main.cjs', () => {
+        const mainCjs = fs.readFileSync(path.resolve(process.cwd(), 'desktop/main.cjs'), 'utf8');
+        assert.ok(mainCjs.includes('async function checkForUpdates('), 'Main must implement checkForUpdates');
+        assert.ok(mainCjs.includes('function showAboutDialog()'), 'Main must implement showAboutDialog');
+        assert.ok(mainCjs.includes("ipcMain.handle('medixly:check-for-updates'"), 'Main must handle medixly:check-for-updates IPC');
+        assert.ok(mainCjs.includes('Check for Updates...'), 'Application and tray menu must have Check for Updates item');
+    });
+
+    it('should expose checkForUpdates and onUpdateStatus in desktop/preload.cjs', () => {
+        const preloadCjs = fs.readFileSync(path.resolve(process.cwd(), 'desktop/preload.cjs'), 'utf8');
+        assert.ok(preloadCjs.includes('checkForUpdates: (options) => ipcRenderer.invoke'), 'Preload must expose checkForUpdates');
+        assert.ok(preloadCjs.includes('onUpdateStatus: (callback) =>'), 'Preload must expose onUpdateStatus');
+    });
+
+    it('should wire version display and update status in js/medixly-desktop-bridge.js', () => {
+        const bridgeJs = fs.readFileSync(path.resolve(process.cwd(), 'js/medixly-desktop-bridge.js'), 'utf8');
+        assert.ok(bridgeJs.includes('updateVersionUI(info)'), 'Bridge must implement updateVersionUI');
+        assert.ok(bridgeJs.includes('handleUpdateStatus(status)'), 'Bridge must handle live update status');
+        assert.ok(bridgeJs.includes('async checkForUpdates('), 'Bridge must expose checkForUpdates method');
+    });
+
+    it('should include version badge and update center elements in medixly.html', () => {
+        const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
+        assert.ok(html.includes('id="desktop-version-badge"'), 'Desktop version badge must exist in header');
+        assert.ok(html.includes('id="medixly-app-version-box"'), 'Update center box must exist in account modal');
+        assert.ok(html.includes('id="medixly-check-update-btn"'), 'Check update button must exist');
+    });
+});

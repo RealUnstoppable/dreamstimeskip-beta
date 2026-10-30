@@ -7,9 +7,13 @@ directories:
   output: dist-desktop
   buildResources: desktop/build
 
+extraMetadata:
+  main: desktop/main.cjs
+  version: "1.1.0"
+
+npmRebuild: false
 asar: true
 asarUnpack:
-  - "music/**/*"
   - "desktop/build/**/*"
 
 files:
@@ -17,7 +21,6 @@ files:
   - "js/**/*"
   - "css/**/*"
   - "images/**/*"
-  - "music/**/*"
   - "dist/**/*"
   - "backend/**/*"
   - "public/**/*"
@@ -31,11 +34,21 @@ files:
   - "privacy.html"
   - "manifest.json"
   - "package.json"
+  - "!music/**/*"
   - "!**/*.map"
   - "!tests/**/*"
   - "!scratch/**/*"
   - "!functions/**/*"
   - "!dts-hub-website/**/*"
+  - "!node_modules/firebase/**/*"
+  - "!node_modules/@firebase/**/*"
+  - "!node_modules/firebase-admin/**/*"
+  - "!node_modules/@google-cloud/**/*"
+  - "!node_modules/@grpc/**/*"
+  - "!node_modules/google-gax/**/*"
+  - "!node_modules/protobufjs/**/*"
+  - "!node_modules/playright/**/*"
+  - "!node_modules/stripe/**/*"
 
 mac:
   category: public.app-category.music
@@ -47,10 +60,10 @@ mac:
   target:
     - target: dmg
       arch:
-        - universal
+        - arm64
     - target: zip
       arch:
-        - universal
+        - arm64
   darkModeSupport: true
   minimumSystemVersion: "10.15.0"
   extendInfo:

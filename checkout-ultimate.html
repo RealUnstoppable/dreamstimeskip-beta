@@ -295,30 +295,53 @@
                 const payload = {
                     plan: 'ultimate',
                     project: 'dreamstimeskip',
+                    uid: currentUser ? currentUser.uid : '',
                     email: currentUser ? currentUser.email : '',
-                    successUrl: window.location.origin + '/success.html?status=success',
+                    successUrl: window.location.origin + '/success.html?status=success&session_id={CHECKOUT_SESSION_ID}',
                     cancelUrl: window.location.href
                 };
 
-                let response;
-                try {
-                    response = await fetch('/create-checkout-session', {
-                        method: 'POST',
-                        headers,
-                        body: JSON.stringify(payload)
-                    });
-                } catch (_) {
-                    response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
-                        method: 'POST',
-                        headers,
-                        body: JSON.stringify(payload)
-                    });
+                let data = null;
+                let lastError = null;
+
+                const endpoints = [
+                    '/create-checkout-session',
+                    '/api/create-checkout-session',
+                    'https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession'
+                ];
+
+                for (const url of endpoints) {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers,
+                            body: JSON.stringify(payload)
+                        });
+                        if (response.ok) {
+                            const resData = await response.json();
+                            if (resData && resData.url) {
+                                data = resData;
+                                break;
+                            } else if (resData && resData.error) {
+                                lastError = resData.error;
+                            }
+                        } else {
+                            try {
+                                const errJson = await response.json();
+                                if (errJson && errJson.error) {
+                                    lastError = errJson.error;
+                                }
+                            } catch (_) {}
+                        }
+                    } catch (netErr) {
+                        lastError = netErr.message;
+                    }
                 }
-                const data = await response.json();
-                if (data.url) {
+
+                if (data && data.url) {
                     window.location.href = data.url;
                 } else {
-                    alert('Error creating checkout session: ' + (data.error || 'Unknown error'));
+                    alert('Error creating checkout session: ' + (lastError || 'An internal server error occurred. Please try again later.'));
                     if (stripeBtn) {
                         stripeBtn.textContent = originalText;
                         stripeBtn.disabled = false;
@@ -326,7 +349,7 @@
                 }
             } catch (err) {
                 console.error('Checkout error:', err);
-                alert('Error connecting to payment server.');
+                alert('Error connecting to payment server: ' + (err.message || 'Please check your connection.'));
                 if (stripeBtn) {
                     stripeBtn.textContent = originalText;
                     stripeBtn.disabled = false;

@@ -1,11 +1,8 @@
 {
   "name": "app",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.0",
+  "description": "Medixly Music Player & Streaming App",
   "main": "server.js",
-  "directories": {
-    "test": "tests"
-  },
   "type": "module",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --forceExit",

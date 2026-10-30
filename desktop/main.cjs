@@ -8,7 +8,8 @@ const {
   Menu,
   TouchBar,
   powerSaveBlocker,
-  nativeImage
+  nativeImage,
+  dialog
 } = require('electron');
 const path = require('path');
 const { createDesktopServer } = require('./server.cjs');
@@ -48,6 +49,93 @@ function sendMediaCommand(command) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('medixly:media-command', { command });
   }
+}
+
+function isVersionGreater(latest, current) {
+  const p1 = String(latest || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  const p2 = String(current || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(p1.length, p2.length); i++) {
+    const a = p1[i] || 0;
+    const b = p2[i] || 0;
+    if (a > b) return true;
+    if (a < b) return false;
+  }
+  return false;
+}
+
+async function checkForUpdates(options = { interactive: false }) {
+  const currentVersion = app.getVersion();
+  let result = {
+    currentVersion,
+    latestVersion: currentVersion,
+    updateAvailable: false,
+    releaseUrl: 'https://github.com/RealUnstoppable/dreamstimeskip-beta/releases',
+    message: `Medixly v${currentVersion} is currently up to date.`
+  };
+
+  try {
+    const res = await fetch('https://api.github.com/repos/RealUnstoppable/dreamstimeskip-beta/releases/latest', {
+      headers: {
+        'User-Agent': 'Medixly-Desktop-App',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (res.ok) {
+      const release = await res.json();
+      const tagName = release.tag_name ? release.tag_name.replace(/^v/, '') : '';
+      if (tagName && isVersionGreater(tagName, currentVersion)) {
+        result.updateAvailable = true;
+        result.latestVersion = tagName;
+        result.releaseUrl = release.html_url || result.releaseUrl;
+        result.message = `A new version of Medixly (v${tagName}) is available!`;
+      }
+    }
+  } catch (err) {
+    console.warn('[Main] Update check network error:', err.message);
+  }
+
+  if (options && options.interactive) {
+    if (result.updateAvailable) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Medixly Update Available',
+        message: `A new version of Medixly is available!`,
+        detail: `Installed Version: v${currentVersion}\nLatest Version: v${result.latestVersion}\n\nWould you like to open the releases page to download the latest installer?`,
+        buttons: ['Download Update', 'Later'],
+        defaultId: 0,
+        cancelId: 1
+      }).then(({ response }) => {
+        if (response === 0) {
+          shell.openExternal(result.releaseUrl);
+        }
+      });
+    } else {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Medixly is Up to Date',
+        message: `You're running the latest version of Medixly (v${currentVersion}).`,
+        detail: 'No updates are needed at this time. All latest audio and navigation fixes are active.',
+        buttons: ['OK']
+      });
+    }
+  }
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('medixly:update-status', result);
+  }
+
+  return result;
+}
+
+function showAboutDialog() {
+  dialog.showMessageBox(mainWindow, {
+    type: 'info',
+    title: 'About Medixly',
+    message: `Medixly Desktop v${app.getVersion()}`,
+    detail: `Platform: macOS (${process.arch})\nElectron: ${process.versions.electron}\nChromium: ${process.versions.chrome}\nNode: ${process.versions.node}\n\nCopyright © 2026 RealUnstoppable. All rights reserved.`,
+    buttons: ['OK']
+  });
 }
 
 function updateTrayMenu() {
@@ -94,6 +182,15 @@ function updateTrayMenu() {
           mainWindow.focus();
         }
       }
+    },
+    { type: 'separator' },
+    {
+      label: `Medixly v${app.getVersion()}`,
+      enabled: false
+    },
+    {
+      label: 'Check for Updates...',
+      click: () => checkForUpdates({ interactive: true })
     },
     { type: 'separator' },
     {
@@ -183,7 +280,14 @@ function setupApplicationMenu() {
     {
       label: app.name,
       submenu: [
-        { role: 'about' },
+        {
+          label: `About Medixly (v${app.getVersion()})`,
+          click: () => showAboutDialog()
+        },
+        {
+          label: 'Check for Updates...',
+          click: () => checkForUpdates({ interactive: true })
+        },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -259,6 +363,11 @@ function setupApplicationMenu() {
     {
       label: 'Help',
       submenu: [
+        {
+          label: 'Check for Updates...',
+          click: () => checkForUpdates({ interactive: true })
+        },
+        { type: 'separator' },
         {
           label: 'Medixly Support',
           click: () => {
@@ -468,6 +577,10 @@ ipcMain.handle('medixly:get-app-info', () => {
     electron: process.versions.electron,
     chrome: process.versions.chrome
   };
+});
+
+ipcMain.handle('medixly:check-for-updates', async (event, options) => {
+  return await checkForUpdates(options || { interactive: false });
 });
 
 // Clean termination

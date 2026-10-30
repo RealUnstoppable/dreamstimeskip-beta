@@ -93,5 +93,27 @@ contextBridge.exposeInMainWorld('medixlyDesktop', {
   /**
    * Get application metadata
    */
-  getAppInfo: () => ipcRenderer.invoke('medixly:get-app-info')
+  getAppInfo: () => ipcRenderer.invoke('medixly:get-app-info'),
+
+  /**
+   * Check for updates
+   * @param {Object} [options] - { interactive: boolean }
+   */
+  checkForUpdates: (options) => ipcRenderer.invoke('medixly:check-for-updates', options),
+
+  /**
+   * Listen for background or interactive update status broadcasts
+   * @param {Function} callback - ({ currentVersion, latestVersion, updateAvailable, releaseUrl, message }) => void
+   * @returns {Function} cleanup callback
+   */
+  onUpdateStatus: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const subscription = (event, payload) => {
+      callback(payload);
+    };
+    ipcRenderer.on('medixly:update-status', subscription);
+    return () => {
+      ipcRenderer.removeListener('medixly:update-status', subscription);
+    };
+  }
 });

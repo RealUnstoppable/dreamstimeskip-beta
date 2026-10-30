@@ -527,6 +527,14 @@ export async function handleStripeCheckout(e) {
                 headers,
                 body: JSON.stringify(payload)
             });
+            if (!response.ok) {
+                // If relative endpoint returned 404 or 500, fallback to Cloud Function
+                response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify(payload)
+                });
+            }
         } catch (_) {
             // Fallback to direct Cloud Function if relative route unreachable
             response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
@@ -536,7 +544,10 @@ export async function handleStripeCheckout(e) {
             });
         }
 
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {}
         if (data.url) {
             window.location.href = data.url;
         } else {

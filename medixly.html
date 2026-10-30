@@ -103,6 +103,11 @@
                     <div class="greet-header-row">
                         <h1 id="greeting">Welcome Back</h1>
                         <div class="greet-actions">
+                            <div id="desktop-version-badge" class="desktop-version-badge" style="display: none;">
+                                <span class="desktop-badge-dot"></span>
+                                <span id="desktop-badge-text">v1.1.0</span>
+                                <button type="button" id="desktop-badge-update-btn" class="desktop-badge-btn" title="Check for Updates">Check Update</button>
+                            </div>
                             <button id="header-sound-prefs-btn" class="btn-secondary" onclick="if(window.openMedixlyOnboarding) window.openMedixlyOnboarding(5);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 <span>Sound Profile</span>
@@ -703,6 +708,24 @@
                         <button type="button" class="theme-dot" data-color="red" style="background:#EF4444" title="Red"></button>
                         <button type="button" class="theme-dot" data-color="cyan" style="background:#06B6D4" title="Cyan"></button>
                     </div>
+                </div>
+
+                <div class="medixly-account-divider"></div>
+
+                <!-- App Version & Update Center -->
+                <div class="medixly-app-version-box" id="medixly-app-version-box">
+                    <div class="medixly-version-info">
+                        <div class="medixly-version-labels">
+                            <span class="medixly-version-title">Medixly Desktop</span>
+                            <span class="medixly-version-tag" id="medixly-app-version-tag">v1.1.0</span>
+                        </div>
+                        <span class="medixly-update-status up-to-date" id="medixly-update-status">Up to date</span>
+                    </div>
+                    <button type="button" class="medixly-check-update-btn" id="medixly-check-update-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Check for Updates</span>
+                    </button>
+                    <div id="medixly-update-message" class="medixly-update-message hidden"></div>
                 </div>
 
                 <div class="medixly-account-actions">
