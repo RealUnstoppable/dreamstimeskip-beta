@@ -68,6 +68,22 @@ contextBridge.exposeInMainWorld('medixlyDesktop', {
   },
 
   /**
+   * Listen for intercepted desktop navigations
+   * @param {Function} callback - ({ path: string }) => void
+   * @returns {Function} cleanup callback
+   */
+  onNavigationIntercepted: (callback) => {
+    if (typeof callback !== 'function') return () => {};
+    const subscription = (event, payload) => {
+      callback(payload);
+    };
+    ipcRenderer.on('medixly:navigation-intercepted', subscription);
+    return () => {
+      ipcRenderer.removeListener('medixly:navigation-intercepted', subscription);
+    };
+  },
+
+  /**
    * Window controls (for custom Mac titlebar buttons if desired)
    */
   windowMinimize: () => ipcRenderer.send('medixly:window-minimize'),

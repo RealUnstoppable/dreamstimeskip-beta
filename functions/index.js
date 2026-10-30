@@ -388,19 +388,91 @@ exports.createProduct = onRequest((req, res) => {
   });
 });
 
+// Authoritative Stripe Product & Price Catalog Mapping
+const STRIPE_CATALOG_PRICES = {
+  // Merchandise (One-Time)
+  'unstoppable-hoodie': {
+    test: 'price_1UVuf2Bp2C5GdKaKQIFlTxWS',
+    live: 'price_1UW1JXBmfNp1AIykVW0NRe5A'
+  },
+  'dts-model-tee': {
+    test: 'price_1UVuf8Bp2C5GdKaKbDbKL49h',
+    live: 'price_1UW1JaBmfNp1AIykrrtfOtPN'
+  },
+  'harmonytunes-shirt': {
+    test: 'price_1UW1FABp2C5GdKaKi3LT0P3i',
+    live: 'price_1UW1JdBmfNp1AIykpYOfCE5c'
+  },
+  'unstoppable-mousepad': {
+    test: 'price_1UW1FBBp2C5GdKaKAV7XbGGN',
+    live: 'price_1UW1JhBmfNp1AIykli2Bt3Mu'
+  },
+  'dts-ceramic-mug': {
+    test: 'price_1UW1FDBp2C5GdKaKAHEQRyHd',
+    live: 'price_1UW1JmBmfNp1AIykLOO13VkG'
+  },
+  'harmonytunes-vinyl': {
+    test: 'price_1UW1FEBp2C5GdKaKuqKUX0Uf',
+    live: 'price_1UW1MuBmfNp1AIykS4enpssw'
+  },
+  'isabel-larosa-poster': {
+    test: 'price_1UW1FGBp2C5GdKaK1VCn8EKP',
+    live: 'price_1UW1MyBmfNp1AIykaZj4zktC'
+  },
+  'un250-heritage-tee': {
+    test: 'price_1UW1FHBp2C5GdKaK9zrsWTyL',
+    live: 'price_1UW1N4BmfNp1AIykMgSpSTev'
+  },
+  // Memberships (Recurring Monthly)
+  'dts-membership-premium': {
+    test: 'price_1UW1GaBp2C5GdKaKPXdGnGFq',
+    live: 'price_1UW1NBBmfNp1AIyk1eR6xFyQ'
+  },
+  'dts-membership-ultimate': {
+    test: 'price_1UW1GcBp2C5GdKaKm5lG0dzc',
+    live: 'price_1UW1NEBmfNp1AIyknbvhS9fC'
+  },
+  'medixly-membership-premium': {
+    test: 'price_1UW1GdBp2C5GdKaKk6tNF74b',
+    live: 'price_1UW1NIBmfNp1AIykNrX2wMsy'
+  },
+  'medixly-membership-ultra': {
+    test: 'price_1UW1GeBp2C5GdKaK0RIeiioY',
+    live: 'price_1UW1NNBmfNp1AIyk5zIh9Srz'
+  }
+};
+
+function getCatalogPriceId(productId, isLiveMode) {
+  const item = STRIPE_CATALOG_PRICES[productId];
+  if (!item) return null;
+  return isLiveMode ? item.live : item.test;
+}
+
 exports.createCheckoutSession = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== "POST") {
       return res.status(405).send("Method Not Allowed");
     }
 
-    const decodedToken = await authenticateRequest(req, res, admin);
-    if (!decodedToken) return;
+    let uid = "guest";
+    let email = (req.body && req.body.email) || (req.body && req.body.orderDetails && req.body.orderDetails.email) || "";
 
-    const uid = decodedToken.uid;
-    const email = decodedToken.email;
+    // Optional Authentication: Allow logged-in users while enabling frictionless guest checkout
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      try {
+        const decodedToken = await admin.auth().verifyIdToken(authHeader.split("Bearer ")[1]);
+        if (decodedToken) {
+          uid = decodedToken.uid;
+          email = decodedToken.email || email;
+        }
+      } catch (authErr) {
+        console.warn("Notice: Optional token verification notice:", authErr.message);
+      }
+    }
 
-    const {plan, project, cart, orderDetails, successUrl, cancelUrl} = req.body;
+    const {plan, project, cart, orderDetails, successUrl, cancelUrl} = req.body || {};
+    const isLive = Boolean(stripeKey && stripeKey.startsWith("sk_live_"));
 
     // Check if this is a shop cart order
     const isShopOrder = Boolean(cart && typeof cart === "object" && Object.keys(cart).length > 0);
@@ -408,12 +480,11 @@ exports.createCheckoutSession = onRequest((req, res) => {
     // Determine Price ID based on project
     let priceId;
     if (project === "dreamstimeskip") {
-      if (plan === "premium") {
-        priceId = "price_NEW_DREAMSTIMESKIP_PREMIUM";
-      } else if (plan === "ultimate") {
-        priceId = "price_NEW_DREAMSTIMESKIP_ULTIMATE";
+      const normPlan = (plan || "premium").toLowerCase();
+      if (normPlan === "ultimate") {
+        priceId = getCatalogPriceId("dts-membership-ultimate", isLive);
       } else {
-        priceId = "price_NEW_DREAMSTIMESKIP_PREMIUM"; // fallback
+        priceId = getCatalogPriceId("dts-membership-premium", isLive);
       }
     } else {
       // Default to ezManage logic
@@ -426,11 +497,11 @@ exports.createCheckoutSession = onRequest((req, res) => {
 
       const isDts = project === "dreamstimeskip";
       const defaultSuccess = isDts ?
-        "https://dreamstimeskip-beta.pages.dev/tracker?success=true" :
-        "https://dreamstimeskip-beta.pages.dev/success";
+        "https://realunstoppable.store/success.html?success=true" :
+        "https://realunstoppable.store/success.html";
       const defaultCancel = isDts ?
-        "https://dreamstimeskip-beta.pages.dev/tracker?canceled=true" :
-        "https://dreamstimeskip-beta.pages.dev/cancel";
+        "https://realunstoppable.store/cart.html?canceled=true" :
+        "https://realunstoppable.store/cart.html";
 
       let sessionConfig;
 
@@ -440,39 +511,48 @@ exports.createCheckoutSession = onRequest((req, res) => {
 
         for (const [productId, quantity] of Object.entries(cart)) {
           const qty = Math.max(1, parseInt(quantity, 10) || 1);
-          let productName = productId;
-          let unitAmount = 2000;
-          let images = [];
+          const mappedPrice = getCatalogPriceId(productId, isLive);
 
-          try {
-            const pDoc = await db.collection("products").doc(productId).get();
-            if (pDoc.exists) {
-              const pData = pDoc.data();
-              productName = pData.name || productId;
-              unitAmount = Math.round(Number(pData.price || 20) * 100);
-              if (pData.imageUrl && pData.imageUrl.startsWith("http")) {
-                images = [pData.imageUrl];
+          if (mappedPrice) {
+            lineItems.push({
+              price: mappedPrice,
+              quantity: qty,
+            });
+          } else {
+            let productName = productId;
+            let unitAmount = 2000;
+            let images = [];
+
+            try {
+              const pDoc = await db.collection("products").doc(productId).get();
+              if (pDoc.exists) {
+                const pData = pDoc.data();
+                productName = pData.name || productId;
+                unitAmount = Math.round(Number(pData.price || 20) * 100);
+                if (pData.imageUrl && pData.imageUrl.startsWith("http")) {
+                  images = [pData.imageUrl];
+                }
               }
-            }
-          } catch (_) {}
+            } catch (_) {}
 
-          lineItems.push({
-            price_data: {
-              currency: "usd",
-              product_data: {
-                name: productName,
-                images: images.length > 0 ? images : undefined,
+            lineItems.push({
+              price_data: {
+                currency: "usd",
+                product_data: {
+                  name: productName,
+                  images: images.length > 0 ? images : undefined,
+                },
+                unit_amount: unitAmount,
               },
-              unit_amount: unitAmount,
-            },
-            quantity: qty,
-          });
+              quantity: qty,
+            });
+          }
         }
 
+        // Frictionless Checkout: Apple Pay, Google Pay, Link & Cards enabled automatically
         sessionConfig = {
           mode: "payment",
-          payment_method_types: ["card"],
-          customer_email: email,
+          customer_email: email && email.includes("@") ? email : undefined,
           line_items: lineItems,
           allow_promotion_codes: true,
           success_url: successUrl || (defaultSuccess + "?session_id={CHECKOUT_SESSION_ID}"),
@@ -507,9 +587,8 @@ exports.createCheckoutSession = onRequest((req, res) => {
 
         sessionConfig = {
           mode: isOneTime ? "payment" : "subscription",
-          payment_method_types: ["card"],
-          customer_email: email || undefined,
-          client_reference_id: uid && uid !== "unknown" ? uid : undefined,
+          customer_email: email && email.includes("@") ? email : undefined,
+          client_reference_id: uid && uid !== "unknown" && uid !== "guest" ? uid : undefined,
           line_items: [{
             price_data: {
               currency: "usd",
@@ -541,8 +620,7 @@ exports.createCheckoutSession = onRequest((req, res) => {
       } else {
         sessionConfig = {
           mode: "subscription",
-          payment_method_types: ["card"],
-          customer_email: email,
+          customer_email: email && email.includes("@") ? email : undefined,
           line_items: [{price: priceId, quantity: 1}],
           subscription_data: {trial_period_days: 7}, // ✅ FREE TRIAL
           allow_promotion_codes: true, // ✅ Support promo codes implemented from Stripe

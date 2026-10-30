@@ -231,6 +231,78 @@ function initNavbarCart() {
     }
 }
 
+export function isDesktopAppEnvironment() {
+    if (typeof window === 'undefined') return false;
+    return Boolean(window.medixlyDesktop) ||
+           Boolean(window.medixlyDesktopBridge?.isDesktop) ||
+           Boolean(window.__FORCE_DESKTOP_ENV__) ||
+           (document.body && document.body.classList.contains('is-desktop-mac'));
+}
+
+export function showDesktopUnavailableToast(title = 'This section') {
+    if (typeof document === 'undefined') return;
+    let toast = document.getElementById('desktop-unavailable-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'desktop-unavailable-toast';
+        toast.className = 'desktop-unavailable-toast';
+        document.body.appendChild(toast);
+    }
+    const cleanTitle = (title || 'This section').replace(/\s+/g, ' ').trim();
+    toast.innerHTML = `
+        <div class="desktop-toast-content">
+            <svg class="desktop-toast-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div class="desktop-toast-text">
+                <div class="desktop-toast-title">Section Unavailable</div>
+                <div class="desktop-toast-desc">${escapeHTML(cleanTitle)} is currently available on the web (realunstoppable.store). Routed back to Medixly.</div>
+            </div>
+        </div>
+    `;
+    toast.classList.remove('fade-out');
+    toast.classList.add('show');
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => {
+            toast.classList.remove('show', 'fade-out');
+        }, 300);
+    }, 3600);
+}
+
+export function routeSafelyToMedixlyApp() {
+    if (typeof document === 'undefined') return;
+    const viewHome = document.getElementById('view-home');
+    const viewPlaylist = document.getElementById('view-playlist');
+    const viewPlaylists = document.getElementById('view-playlists');
+    const viewLyrics = document.getElementById('view-lyrics');
+    const fullscreenPlayer = document.getElementById('fullscreen-player');
+
+    if (viewHome) viewHome.style.display = 'block';
+    if (viewPlaylist) viewPlaylist.style.display = 'none';
+    if (viewPlaylists) viewPlaylists.style.display = 'none';
+    if (viewLyrics) viewLyrics.style.display = 'none';
+    if (fullscreenPlayer) fullscreenPlayer.style.display = 'none';
+
+    if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (window.history && window.history.replaceState) {
+            try {
+                window.history.replaceState({}, document.title, 'medixly.html');
+            } catch (_) {}
+        }
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.isDesktopAppEnvironment = isDesktopAppEnvironment;
+    window.showDesktopUnavailableToast = showDesktopUnavailableToast;
+    window.routeSafelyToMedixlyApp = routeSafelyToMedixlyApp;
+}
+
 function attachNavEvents() {
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
@@ -244,6 +316,61 @@ function attachNavEvents() {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('active');
+            });
+        });
+    }
+
+    // Header Navigation Guard for macOS Desktop App
+    // Intercepts navigation to external website sections and routes safely back to Medixly
+    const isDesktop = isDesktopAppEnvironment();
+    const isMedixlyPage = typeof window !== 'undefined' && window.location.pathname.includes('medixly');
+
+    if (isDesktop || isMedixlyPage) {
+        const logoLink = document.getElementById('navbar-logo-link');
+        if (logoLink) {
+            logoLink.addEventListener('click', (e) => {
+                if (isDesktopAppEnvironment()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    routeSafelyToMedixlyApp();
+                }
+            });
+        }
+
+        const allNavLinks = document.querySelectorAll('.nav-links a, .nav-logo');
+        allNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (!isDesktopAppEnvironment()) return;
+
+                const href = (link.getAttribute('href') || '').trim();
+                const isMedixlyTarget = href === 'medixly.html' || href === '/medixly.html' || href === '/medixly' || href.startsWith('medixly');
+                const isAuthTarget = link.id === 'auth-link' || href.includes('sign in beta') || href.includes('account.html') || href.includes('admin.html');
+
+                if (isMedixlyTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    routeSafelyToMedixlyApp();
+                    return;
+                }
+
+                if (isAuthTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof window.openMedixlyAuthModal === 'function') {
+                        window.openMedixlyAuthModal();
+                    } else {
+                        showDesktopUnavailableToast('Account Settings');
+                        routeSafelyToMedixlyApp();
+                    }
+                    return;
+                }
+
+                // Any other header section (Unstoppable, DTS, Shop, Cart, Memberships, Blog, Autolux)
+                e.preventDefault();
+                e.stopPropagation();
+                const linkTitle = link.querySelector('span')?.textContent || link.textContent || 'This Section';
+                showDesktopUnavailableToast(linkTitle.trim());
+                routeSafelyToMedixlyApp();
             });
         });
     }

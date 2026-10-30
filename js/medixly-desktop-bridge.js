@@ -26,6 +26,32 @@ class MedixlyDesktopBridge {
     if (typeof unsubscribe === 'function') {
       this.cleanupListeners.push(unsubscribe);
     }
+
+    // Intercept native desktop navigation attempts to external site views
+    if (typeof window.medixlyDesktop.onNavigationIntercepted === 'function') {
+      const unsubNav = window.medixlyDesktop.onNavigationIntercepted(({ path }) => {
+        this.handleNavigationIntercepted(path);
+      });
+      if (typeof unsubNav === 'function') {
+        this.cleanupListeners.push(unsubNav);
+      }
+    }
+  }
+
+  handleNavigationIntercepted(blockedPath) {
+    console.log('[Medixly Desktop] Blocked external navigation:', blockedPath);
+    const cleanName = (blockedPath || 'Section')
+      .replace(/\.html$/i, '')
+      .replace(/^\//, '')
+      .replace(/-/g, ' ');
+    const formattedTitle = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+
+    if (typeof window.showDesktopUnavailableToast === 'function') {
+      window.showDesktopUnavailableToast(formattedTitle);
+    }
+    if (typeof window.routeSafelyToMedixlyApp === 'function') {
+      window.routeSafelyToMedixlyApp();
+    }
   }
 
   handleNativeCommand(command) {

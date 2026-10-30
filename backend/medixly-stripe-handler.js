@@ -70,7 +70,6 @@ export async function createMedixlyCheckoutSession({
 
   const sessionConfig = {
     mode: isOneTime ? 'payment' : 'subscription',
-    payment_method_types: ['card'],
     line_items: [lineItem],
     allow_promotion_codes: true,
     success_url: successUrl || defaultSuccess,

@@ -1,5 +1,5 @@
 import { auth, db } from './auth.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, serverTimestamp, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 
@@ -328,7 +328,9 @@ function initHarmonyTunes() {
 
     const failedSongIds = new Set();
     let consecutivePlaybackSnags = 0;
-    const MAX_CONSECUTIVE_SNAGS = 4;
+    const MAX_CONSECUTIVE_SNAGS = 3;
+    let isHandlingPlaybackSnag = false;
+    let playbackSnagDebounceTimer = null;
 
     /**
      * Smart Recommendation Fallback Engine
@@ -455,36 +457,51 @@ function initHarmonyTunes() {
      * Resilient playback snag recovery
      */
     function handlePlaybackSnag(failedSong) {
+        if (isHandlingPlaybackSnag) {
+            console.warn('[Medixly Smart Skip] Playback snag handling already active, debouncing duplicate trigger.');
+            return;
+        }
+        isHandlingPlaybackSnag = true;
+
         if (failedSong?.id) {
             failedSongIds.add(failedSong.id);
         }
         consecutivePlaybackSnags++;
         if (consecutivePlaybackSnags > MAX_CONSECUTIVE_SNAGS) {
-            console.warn('[Medixly Smart Skip] Consecutive playback snags reached maximum threshold. Pausing to avoid looping.');
+            console.warn(`[Medixly Smart Skip] Consecutive playback snags reached maximum threshold (${MAX_CONSECUTIVE_SNAGS}). Pausing playback to avoid endless looping.`);
             consecutivePlaybackSnags = 0;
+            isHandlingPlaybackSnag = false;
             pauseSong();
             return;
         }
 
-        console.warn(`[Medixly Smart Skip] Playback snag on "${failedSong?.title || 'Unknown'}". Engaging smart recommendation fallback.`);
+        console.warn(`[Medixly Smart Skip] Playback snag on "${failedSong?.title || 'Unknown'}". Engaging smart recommendation fallback (attempt ${consecutivePlaybackSnags}/${MAX_CONSECUTIVE_SNAGS}).`);
 
-        const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: failedSongIds });
-        if (!fallbackSong) return;
+        clearTimeout(playbackSnagDebounceTimer);
+        playbackSnagDebounceTimer = setTimeout(() => {
+            const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: failedSongIds });
+            if (!fallbackSong) {
+                isHandlingPlaybackSnag = false;
+                return;
+            }
 
-        // Splice fallback song right after current, or as next song
-        currentQueue.splice(currentSongIndex + 1, 0, fallbackSong);
-        currentSongIndex = currentSongIndex + 1;
-        if (queuePanel && queuePanel.classList.contains('open')) {
-            renderQueue();
-        }
+            // Splice fallback song right after current, or as next song
+            currentQueue.splice(currentSongIndex + 1, 0, fallbackSong);
+            currentSongIndex = currentSongIndex + 1;
+            if (queuePanel && queuePanel.classList.contains('open')) {
+                renderQueue();
+            }
 
-        loadSong(currentSongIndex);
-        playSong().then(() => {
-            consecutivePlaybackSnags = 0;
-        }).catch(err => {
-            if (err && err.name === 'AbortError') return;
-            console.warn('[Medixly Smart Skip] Fallback song playback issue:', err);
-        });
+            loadSong(currentSongIndex);
+            playSong().then(() => {
+                consecutivePlaybackSnags = 0;
+                isHandlingPlaybackSnag = false;
+            }).catch(err => {
+                isHandlingPlaybackSnag = false;
+                if (err && err.name === 'AbortError') return;
+                console.warn('[Medixly Smart Skip] Fallback song playback issue:', err);
+            });
+        }, 500);
     }
 
     function renderRecommendedSongs() {
@@ -1206,12 +1223,12 @@ function initHarmonyTunes() {
 
                 if (saved.shuffle) {
                     isShuffle = true;
-                    const color = 'var(--accent-green)';
-                    if (shuffleBtn) shuffleBtn.style.color = color;
+                    const color = 'var(--theme-accent, #16A34A)';
+                    if (shuffleBtn) { shuffleBtn.style.color = color; shuffleBtn.classList.add('active'); }
                     const fsShuffleBtn = document.getElementById('fs-shuffle-btn');
-                    if (fsShuffleBtn) fsShuffleBtn.style.color = color;
+                    if (fsShuffleBtn) { fsShuffleBtn.style.color = color; fsShuffleBtn.classList.add('active'); }
                     const mobShuffleBtn = document.getElementById('mob-shuffle-btn');
-                    if (mobShuffleBtn) mobShuffleBtn.style.color = color;
+                    if (mobShuffleBtn) { mobShuffleBtn.style.color = color; mobShuffleBtn.classList.add('active'); }
                 }
                 
                 if (typeof saved.repeatMode === 'number') {
@@ -1219,13 +1236,16 @@ function initHarmonyTunes() {
                     const updateRepeatVisuals = (btn, indicator) => {
                         if(!btn) return;
                         if (repeatMode === 0) {
-                            btn.style.color = '#b3b3b3';
+                            btn.style.color = '#ffffff';
+                            btn.classList.remove('active');
                             if(indicator) indicator.textContent = '';
                         } else if (repeatMode === 1) {
-                            btn.style.color = 'var(--accent-green)';
+                            btn.style.color = 'var(--theme-accent, #16A34A)';
+                            btn.classList.add('active');
                             if(indicator) indicator.textContent = '.';
                         } else {
-                            btn.style.color = 'var(--accent-green)';
+                            btn.style.color = 'var(--theme-accent, #16A34A)';
+                            btn.classList.add('active');
                             if(indicator) indicator.textContent = '1';
                         }
                     };
@@ -2024,7 +2044,31 @@ function initHarmonyTunes() {
 
         if (activeAudio) {
             const targetAudioSrc = song.src || song.audioUrl || song.url || song.streamUrl;
-            activeAudio.src = targetAudioSrc;
+            
+            // Check if upcoming track was pre-buffered on idle deck for 0ms gapless transition
+            let usedPrebufferedDeck = false;
+            if (nextAudio && nextAudio.src && targetAudioSrc) {
+                let isMatch = false;
+                try {
+                    isMatch = decodeURI(nextAudio.src).endsWith(decodeURI(targetAudioSrc));
+                } catch (_) {
+                    isMatch = nextAudio.src === targetAudioSrc;
+                }
+                if (isMatch && nextAudio.readyState >= 2) {
+                    const prevAudio = activeAudio;
+                    activeAudio = nextAudio;
+                    nextAudio = prevAudio;
+                    if (nextAudio && typeof nextAudio.pause === 'function') {
+                        nextAudio.pause();
+                        nextAudio.currentTime = 0;
+                    }
+                    usedPrebufferedDeck = true;
+                }
+            }
+
+            if (!usedPrebufferedDeck && activeAudio.src !== targetAudioSrc) {
+                activeAudio.src = targetAudioSrc;
+            }
             
             let recoveryAttempted = false;
             activeAudio.onerror = () => {
@@ -2036,6 +2080,7 @@ function initHarmonyTunes() {
 
                 const onPlaybackRecovered = () => {
                     consecutivePlaybackSnags = 0;
+                    isHandlingPlaybackSnag = false;
                     isPlaying = true;
                     saveSitewideMusicState({ isPlaying: true });
                     if (playIcon) playIcon.style.display = 'none';
@@ -2217,6 +2262,7 @@ function initHarmonyTunes() {
 
         activeAudio.play().then(() => {
             consecutivePlaybackSnags = 0;
+            isHandlingPlaybackSnag = false;
             isPlaying = true;
             saveSitewideMusicState({ isPlaying: true });
             if (playIcon) playIcon.style.display = 'none';
@@ -2562,7 +2608,7 @@ function initHarmonyTunes() {
             if (fsPauseIcon) fsPauseIcon.style.display = playing ? 'block' : 'none';
 
             // 3. Shuffle
-            const shuffleColor = isShuffle ? 'var(--accent-green)' : '#b3b3b3';
+            const shuffleColor = isShuffle ? 'var(--theme-accent, #16A34A)' : '#ffffff';
             if (shuffleBtn) {
                 shuffleBtn.style.color = shuffleColor;
                 shuffleBtn.classList.toggle('active', isShuffle);
@@ -2581,15 +2627,15 @@ function initHarmonyTunes() {
             const updateRepeatVisuals = (btn, indicator) => {
                 if (!btn) return;
                 if (repeatMode === 0) {
-                    btn.style.color = '#b3b3b3';
+                    btn.style.color = '#ffffff';
                     if (indicator) indicator.textContent = '';
                     btn.classList.remove('active');
                 } else if (repeatMode === 1) {
-                    btn.style.color = 'var(--accent-green)';
+                    btn.style.color = 'var(--theme-accent, #16A34A)';
                     if (indicator) indicator.textContent = '.';
                     btn.classList.add('active');
                 } else {
-                    btn.style.color = 'var(--accent-green)';
+                    btn.style.color = 'var(--theme-accent, #16A34A)';
                     if (indicator) indicator.textContent = '1';
                     btn.classList.add('active');
                 }
@@ -2610,10 +2656,12 @@ function initHarmonyTunes() {
             if (playerLikeBtn) {
                 playerLikeBtn.textContent = isFav ? '♥' : '♡';
                 playerLikeBtn.classList.toggle('active', isFav);
+                playerLikeBtn.style.color = isFav ? 'var(--theme-accent, #16A34A)' : '#ffffff';
             }
             if (fsLikeBtn) {
                 fsLikeBtn.innerHTML = isFav ? '&#x2665;&#xFE0E;' : '&#x2661;&#xFE0E;';
                 fsLikeBtn.classList.toggle('active', isFav);
+                fsLikeBtn.style.color = isFav ? 'var(--theme-accent, #16A34A)' : '#ffffff';
             }
 
             // 7. Viral Skip
@@ -2820,7 +2868,10 @@ function initHarmonyTunes() {
             if (!fsContent || !fsSidePanel) return;
 
             const isOpen = fsContent.classList.toggle('lyrics-open');
-            if (fsLyricsBtn) fsLyricsBtn.style.color = isOpen ? 'var(--accent-green)' : '#b3b3b3';
+            if (fsLyricsBtn) {
+                fsLyricsBtn.style.color = isOpen ? 'var(--theme-accent, #16A34A)' : '#ffffff';
+                fsLyricsBtn.classList.toggle('active', isOpen);
+            }
 
             if (isOpen) {
                 const lyricsSource = document.getElementById('lyrics-content');
@@ -2882,7 +2933,7 @@ function initHarmonyTunes() {
             player.addEventListener('error', (e) => {
                 if (e.target === activeAudio) {
                     console.warn('[Medixly Audio] Audio element playback error:', player.error);
-                    handlePlaybackSnag(currentQueue[currentSongIndex]);
+                    // Error recovery is orchestrated via activeAudio.onerror to prevent dual-snag race conditions
                 }
             });
             player.addEventListener('timeupdate', (e) => {
@@ -2894,6 +2945,11 @@ function initHarmonyTunes() {
                         checkCrossfade();
                     }
 
+                    // Seamless mixing: pre-buffer upcoming track ~15s before current track completes
+                    if (activeAudio.duration && (activeAudio.duration - activeAudio.currentTime) <= 15) {
+                        prebufferUpcomingTrack();
+                    }
+
                     const now = Date.now();
                     if (now - lastStateSaveTime > 1000) {
                         lastStateSaveTime = now;
@@ -2903,6 +2959,16 @@ function initHarmonyTunes() {
             });
             player.addEventListener('ended', (e) => {
                 if (e.target === activeAudio) {
+                    const duration = activeAudio.duration;
+                    const currentTime = activeAudio.currentTime;
+                    const isValidDuration = isFinite(duration) && duration > 3;
+                    const isNearTrueEnd = isValidDuration && currentTime >= Math.max(1, duration - 2.5);
+
+                    if (!isNearTrueEnd && !isMixerMode) {
+                        console.warn('[Medixly Audio] Premature ended event suppressed (currentTime:', currentTime, 'duration:', duration, ')');
+                        return;
+                    }
+
                     if (isMixerMode && isCrossfading) return;
                     if (userQueue.length > 0) {
                         nextSong();
@@ -2952,9 +3018,10 @@ function initHarmonyTunes() {
                 setTimeout(() => {
                     viewLyrics.style.display = 'none';
                     viewHome.style.display = 'block';
-                    lyricsBtn.style.color = '#b3b3b3';
-                    if(fsLyricsBtn) fsLyricsBtn.style.color = '#b3b3b3';
-                    if(mobLyricsBtn) mobLyricsBtn.style.color = '#b3b3b3';
+                    lyricsBtn.style.color = '#ffffff';
+                    lyricsBtn.classList.remove('active');
+                    if(fsLyricsBtn) { fsLyricsBtn.style.color = '#ffffff'; fsLyricsBtn.classList.remove('active'); }
+                    if(mobLyricsBtn) { mobLyricsBtn.style.color = '#ffffff'; mobLyricsBtn.classList.remove('active'); }
                 }, 300);
             } else {
                 viewHome.style.display = 'none';
@@ -2964,9 +3031,10 @@ function initHarmonyTunes() {
                 if (audioAdManager.isAdPlaying()) {
                     audioAdManager.showOverlay();
                 }
-                lyricsBtn.style.color = 'var(--accent-green)';
-                if(fsLyricsBtn) fsLyricsBtn.style.color = 'var(--accent-green)';
-                if(mobLyricsBtn) mobLyricsBtn.style.color = 'var(--accent-green)';
+                lyricsBtn.style.color = 'var(--theme-accent, #16A34A)';
+                lyricsBtn.classList.add('active');
+                if(fsLyricsBtn) { fsLyricsBtn.style.color = 'var(--theme-accent, #16A34A)'; fsLyricsBtn.classList.add('active'); }
+                if(mobLyricsBtn) { mobLyricsBtn.style.color = 'var(--theme-accent, #16A34A)'; mobLyricsBtn.classList.add('active'); }
                 setTimeout(() => {
                     const activeLine = lyricsContent.querySelector('.lyric-line.active');
                     if (activeLine && isAutoScrolling) {
@@ -3295,8 +3363,11 @@ function initHarmonyTunes() {
     if (lyricsContainer) lyricsContainer.addEventListener('scroll', handleLyricsScroll, { passive: true });
 
     function syncLyrics() {
-        if (viewLyrics.style.display === 'none' || cachedLyricsDOM.length === 0) return;
-        const currentTime = activeAudio.currentTime;
+        const isLyricsOverlayOpen = viewLyrics && viewLyrics.style.display !== 'none';
+        const fsContent = document.getElementById('fullscreen-content');
+        const isFsLyricsOpen = fsContent && fsContent.classList.contains('lyrics-open');
+        if (!isLyricsOverlayOpen && !isFsLyricsOpen && cachedLyricsDOM.length === 0) return;
+        const currentTime = activeAudio ? activeAudio.currentTime : 0;
         
         // ⚡ Bolt: Track time deltas to distinguish between continuous playback and seeks,
         // replacing O(N) DOM iterations with amortized O(1) state updates per frame.
@@ -3410,6 +3481,22 @@ function initHarmonyTunes() {
                     sideActiveLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
                 }
             }
+
+            // Global lyric synchronization: broadcast precise time & active line across tabs/pages
+            try {
+                if (!window.medixlyLyricChannel && typeof BroadcastChannel !== 'undefined') {
+                    window.medixlyLyricChannel = new BroadcastChannel('medixly_lyrics_sync');
+                }
+                if (window.medixlyLyricChannel) {
+                    window.medixlyLyricChannel.postMessage({
+                        type: 'MEDIXLY_LYRICS_SYNC',
+                        songId: currentQueue[currentSongIndex]?.id,
+                        currentTime: currentTime,
+                        activeLineIndex: activeLineIndex,
+                        timestamp: Date.now()
+                    });
+                }
+            } catch (_) {}
         }
     }
 
@@ -3490,6 +3577,34 @@ function initHarmonyTunes() {
     }
 
     let preloadedNextSongObj = null;
+
+    function prebufferUpcomingTrack() {
+        if (!nextAudio || isCrossfading || isListening) return;
+        let nextIdx = currentSongIndex + 1;
+        let targetSong = null;
+
+        if (userQueue && userQueue.length > 0) {
+            targetSong = userQueue[0];
+        } else if (repeatMode === 2) {
+            targetSong = currentQueue[currentSongIndex];
+        } else if (nextIdx < currentQueue.length) {
+            targetSong = currentQueue[nextIdx];
+        } else if (repeatMode === 1 && currentQueue.length > 0) {
+            targetSong = currentQueue[0];
+        }
+
+        if (targetSong) {
+            const targetSrc = targetSong.src || targetSong.audioUrl || targetSong.streamUrl;
+            if (targetSrc && nextAudio.src !== targetSrc) {
+                preloadedNextSongObj = targetSong;
+                nextAudio.src = targetSrc;
+                nextAudio.preload = 'auto';
+                try {
+                    nextAudio.load();
+                } catch (_) {}
+            }
+        }
+    }
 
     function checkCrossfade() {
         if (!isMixerMode) return;
@@ -4385,6 +4500,155 @@ let dragItem = null;
             }
         }
     });
+
+    // In-App Authentication Modal Initialization for Desktop & Web App
+    function initMedixlyAuthModal() {
+        const modal = document.getElementById('medixly-auth-modal');
+        if (!modal) return;
+
+        const closeBtn = document.getElementById('medixly-auth-close');
+        const backdrop = document.getElementById('medixly-auth-backdrop');
+        const form = document.getElementById('medixly-auth-form');
+        const emailInput = document.getElementById('medixly-auth-email');
+        const passwordInput = document.getElementById('medixly-auth-password');
+        const submitBtn = document.getElementById('medixly-auth-submit');
+        const submitText = document.getElementById('medixly-auth-btn-text');
+        const errorEl = document.getElementById('medixly-auth-error');
+        const togglePrompt = document.getElementById('medixly-auth-toggle-prompt');
+        const toggleBtn = document.getElementById('medixly-auth-toggle-mode');
+        const titleEl = document.getElementById('medixly-auth-title');
+        const accountView = document.getElementById('medixly-auth-account-view');
+        const accountEmail = document.getElementById('medixly-account-email');
+        const accountBadge = document.getElementById('medixly-account-badge');
+        const signoutBtn = document.getElementById('medixly-auth-signout');
+        const themeColors = document.getElementById('medixly-theme-colors');
+
+        let isSignUp = false;
+
+        const closeModal = () => {
+            modal.classList.add('hidden');
+            if (errorEl) {
+                errorEl.classList.add('hidden');
+                errorEl.textContent = '';
+            }
+        };
+
+        const openModal = async () => {
+            modal.classList.remove('hidden');
+            const user = auth.currentUser;
+            if (user) {
+                if (form) form.classList.add('hidden');
+                if (accountView) accountView.classList.remove('hidden');
+                if (titleEl) titleEl.textContent = 'Account Profile';
+                if (accountEmail) accountEmail.textContent = user.email || 'Signed in';
+                
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    const data = userDoc.exists() ? userDoc.data() : null;
+                    const level = data?.membershipLevel || 'Free Listener';
+                    if (accountBadge) {
+                        accountBadge.textContent = level;
+                        accountBadge.className = `medixly-account-badge ${level.toLowerCase().replace(/\s+/g, '-')}`;
+                    }
+                } catch (_) {}
+            } else {
+                if (accountView) accountView.classList.add('hidden');
+                if (form) form.classList.remove('hidden');
+                if (titleEl) titleEl.textContent = isSignUp ? 'Create Medixly Account' : 'Sign In to Medixly';
+            }
+        };
+
+        window.openMedixlyAuthModal = openModal;
+        window.closeMedixlyAuthModal = closeModal;
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (backdrop) backdrop.addEventListener('click', closeModal);
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                isSignUp = !isSignUp;
+                if (titleEl) titleEl.textContent = isSignUp ? 'Create Medixly Account' : 'Sign In to Medixly';
+                if (submitText) submitText.textContent = isSignUp ? 'Create Account' : 'Sign In';
+                if (togglePrompt) togglePrompt.textContent = isSignUp ? 'Already have an account?' : "Don't have an account?";
+                if (toggleBtn) toggleBtn.textContent = isSignUp ? 'Sign in' : 'Create one';
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                }
+            });
+        }
+
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = (emailInput?.value || '').trim();
+                const password = passwordInput?.value || '';
+                if (!email || !password) return;
+
+                if (submitBtn) submitBtn.disabled = true;
+                if (submitText) submitText.textContent = isSignUp ? 'Creating...' : 'Signing in...';
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                }
+
+                try {
+                    if (isSignUp) {
+                        const cred = await createUserWithEmailAndPassword(auth, email, password);
+                        await setDoc(doc(db, "users", cred.user.uid), {
+                            email: email,
+                            createdAt: serverTimestamp(),
+                            membershipLevel: 'free',
+                            theme: 'black',
+                            accentColor: 'green'
+                        });
+                    } else {
+                        await signInWithEmailAndPassword(auth, email, password);
+                    }
+                    closeModal();
+                } catch (err) {
+                    if (errorEl) {
+                        errorEl.textContent = err?.message || 'Authentication error. Please try again.';
+                        errorEl.classList.remove('hidden');
+                    }
+                } finally {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (submitText) submitText.textContent = isSignUp ? 'Create Account' : 'Sign In';
+                }
+            });
+        }
+
+        if (signoutBtn) {
+            signoutBtn.addEventListener('click', async () => {
+                try {
+                    await signOut(auth);
+                    closeModal();
+                } catch (err) {
+                    console.error('[Medixly Auth] Signout error:', err);
+                }
+            });
+        }
+
+        if (themeColors) {
+            themeColors.addEventListener('click', (e) => {
+                const dot = e.target.closest('.theme-dot');
+                if (!dot) return;
+                const color = dot.dataset.color;
+                if (typeof window.updateTheme === 'function') {
+                    window.updateTheme(document.documentElement.dataset.theme || 'black', color);
+                }
+                themeColors.querySelectorAll('.theme-dot').forEach(d => d.classList.toggle('selected', d === dot));
+            });
+        }
+
+        window.addEventListener('medixly:theme-changed', () => {
+            if (typeof window.syncAllPlayerStates === 'function' && currentQueue[currentSongIndex]) {
+                window.syncAllPlayerStates(currentQueue[currentSongIndex]);
+            }
+        });
+    }
+
+    initMedixlyAuthModal();
 
     // Initialize immediately without waiting for auth resolution
     init();

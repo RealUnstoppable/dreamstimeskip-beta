@@ -14,7 +14,11 @@ export const products = [
         ],
         category: 'apparel',
         sourceSite: 'unstoppable',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5Udn3Ufpe3de',
+        stripePriceId: 'price_1UW1JXBmfNp1AIykVW0NRe5A',
+        stripeTestPriceId: 'price_1UVuf2Bp2C5GdKaKQIFlTxWS',
+        stripeLivePriceId: 'price_1UW1JXBmfNp1AIykVW0NRe5A'
     },
     {
         id: 'dts-model-tee',
@@ -31,7 +35,11 @@ export const products = [
         ],
         category: 'apparel',
         sourceSite: 'dreamstimeskip',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5UabGi31waB6',
+        stripePriceId: 'price_1UW1JaBmfNp1AIykrrtfOtPN',
+        stripeTestPriceId: 'price_1UVuf8Bp2C5GdKaKbDbKL49h',
+        stripeLivePriceId: 'price_1UW1JaBmfNp1AIykrrtfOtPN'
     },
     {
         id: 'harmonytunes-shirt',
@@ -47,7 +55,11 @@ export const products = [
         ],
         category: 'accessories',
         sourceSite: 'harmonytunes',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5UUMcIccWFEG',
+        stripePriceId: 'price_1UW1JdBmfNp1AIykpYOfCE5c',
+        stripeTestPriceId: 'price_1UW1FABp2C5GdKaKi3LT0P3i',
+        stripeLivePriceId: 'price_1UW1JdBmfNp1AIykpYOfCE5c'
     },
     {
         id: 'unstoppable-mousepad',
@@ -64,7 +76,11 @@ export const products = [
         ],
         category: 'accessories',
         sourceSite: 'unstoppable',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5UpG4OuPpxmJ',
+        stripePriceId: 'price_1UW1JhBmfNp1AIykli2Bt3Mu',
+        stripeTestPriceId: 'price_1UW1FBBp2C5GdKaKAV7XbGGN',
+        stripeLivePriceId: 'price_1UW1JhBmfNp1AIykli2Bt3Mu'
     },
     {
         id: 'dts-ceramic-mug',
@@ -81,7 +97,11 @@ export const products = [
         ],
         category: 'accessories',
         sourceSite: 'dreamstimeskip',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5UEUy1Uuivum',
+        stripePriceId: 'price_1UW1JmBmfNp1AIykLOO13VkG',
+        stripeTestPriceId: 'price_1UW1FDBp2C5GdKaKAHEQRyHd',
+        stripeLivePriceId: 'price_1UW1JmBmfNp1AIykLOO13VkG'
     },
     {
         id: 'harmonytunes-vinyl',
@@ -98,7 +118,11 @@ export const products = [
         ],
         category: 'music',
         sourceSite: 'harmonytunes',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5U3KlZqOa6AC',
+        stripePriceId: 'price_1UW1MuBmfNp1AIykS4enpssw',
+        stripeTestPriceId: 'price_1UW1FEBp2C5GdKaKuqKUX0Uf',
+        stripeLivePriceId: 'price_1UW1MuBmfNp1AIykS4enpssw'
     },
     {
         id: 'isabel-larosa-poster',
@@ -114,7 +138,11 @@ export const products = [
         ],
         category: 'art',
         sourceSite: 'harmonytunes',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5YviIpa3s1Ky',
+        stripePriceId: 'price_1UW1MyBmfNp1AIykaZj4zktC',
+        stripeTestPriceId: 'price_1UW1FGBp2C5GdKaK1VCn8EKP',
+        stripeLivePriceId: 'price_1UW1MyBmfNp1AIykaZj4zktC'
     },
     {
         id: 'un250-heritage-tee',
@@ -131,7 +159,85 @@ export const products = [
         ],
         category: 'apparel',
         sourceSite: 'unstoppable',
-        active: true
+        active: true,
+        stripeProductId: 'prod_VX5Yl2LvNZYbNu',
+        stripePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev',
+        stripeTestPriceId: 'price_1UW1FHBp2C5GdKaK9zrsWTyL',
+        stripeLivePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev'
+    },
+    {
+        id: 'dts-membership-premium',
+        name: 'Dreams TimeSkip Premium Membership',
+        price: 10.86,
+        originalPrice: 14.49,
+        salePrice: 10.86,
+        description: 'Full themes access, 25% merch store discount, exclusive badge, Discord roles & monthly loot boxes.',
+        imageUrl: '/images/dreams-favicon.png',
+        category: 'membership',
+        sourceSite: 'dreamstimeskip',
+        active: true,
+        type: 'recurring',
+        interval: 'month',
+        stripeProductId: 'prod_VX5Y7pMbi8CJQg',
+        stripePriceId: 'price_1UW1NBBmfNp1AIyk1eR6xFyQ',
+        stripeTestPriceId: 'price_1UW1GaBp2C5GdKaKPXdGnGFq',
+        stripeLivePriceId: 'price_1UW1NBBmfNp1AIyk1eR6xFyQ'
+    },
+    {
+        id: 'dts-membership-ultimate',
+        name: 'Dreams TimeSkip Ultimate Membership',
+        price: 14.13,
+        originalPrice: 18.84,
+        salePrice: 14.13,
+        description: 'Completely ad-free experience, custom theme creator, supporter status & badge, 8 mystery boxes/month.',
+        imageUrl: '/images/dreams-timeskip.png',
+        category: 'membership',
+        sourceSite: 'dreamstimeskip',
+        active: true,
+        type: 'recurring',
+        interval: 'month',
+        stripeProductId: 'prod_VX5Yxl2chZIUj4',
+        stripePriceId: 'price_1UW1NEBmfNp1AIyknbvhS9fC',
+        stripeTestPriceId: 'price_1UW1GcBp2C5GdKaKm5lG0dzc',
+        stripeLivePriceId: 'price_1UW1NEBmfNp1AIyknbvhS9fC'
+    },
+    {
+        id: 'medixly-membership-premium',
+        name: 'Medixly Premium Membership',
+        price: 1.00,
+        originalPrice: 9.99,
+        salePrice: 1.00,
+        capPrice: 6.99,
+        description: 'Zero ads, unlimited skips, high-fidelity audio streaming, playlist sharing, and 10% merch store discount.',
+        imageUrl: '/images/medixly-logo.png',
+        category: 'membership',
+        sourceSite: 'medixly',
+        active: true,
+        type: 'recurring',
+        interval: 'month',
+        stripeProductId: 'prod_VX5Yl4KgOUzMRS',
+        stripePriceId: 'price_1UW1NIBmfNp1AIykNrX2wMsy',
+        stripeTestPriceId: 'price_1UW1GdBp2C5GdKaKk6tNF74b',
+        stripeLivePriceId: 'price_1UW1NIBmfNp1AIykNrX2wMsy'
+    },
+    {
+        id: 'medixly-membership-ultra',
+        name: 'Medixly Ultra Membership',
+        price: 1.00,
+        originalPrice: 19.99,
+        salePrice: 1.00,
+        capPrice: 12.99,
+        description: 'Lossless Hi-Res FLAC audio, 25% merch store discount, unreleased track early-access, and Discord Ultra Producer badge.',
+        imageUrl: '/images/medixly-logo.png',
+        category: 'membership',
+        sourceSite: 'medixly',
+        active: true,
+        type: 'recurring',
+        interval: 'month',
+        stripeProductId: 'prod_VX5Y8mTLNnqgSq',
+        stripePriceId: 'price_1UW1NNBmfNp1AIyk5zIh9Srz',
+        stripeTestPriceId: 'price_1UW1GeBp2C5GdKaK0RIeiioY',
+        stripeLivePriceId: 'price_1UW1NNBmfNp1AIyk5zIh9Srz'
     }
 ];
 

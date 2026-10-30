@@ -317,10 +317,21 @@ async function createMainWindow() {
   });
 
   mainWindow.webContents.on('will-navigate', (event, url) => {
-    if (serverPort && !url.startsWith(`http://127.0.0.1:${serverPort}`)) {
+    if (!serverPort || !url.startsWith(`http://127.0.0.1:${serverPort}`)) {
       event.preventDefault();
       shell.openExternal(url);
+      return;
     }
+
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const allowedInternal = ['/medixly.html', '/medixly', '/medixly/stream', '/medixly/hits', '/medixly/artists', '/medixly-hits.html', '/medixly-artists.html'];
+      if (!allowedInternal.some(p => pathname === p || pathname.startsWith(p))) {
+        event.preventDefault();
+        mainWindow.webContents.send('medixly:navigation-intercepted', { path: pathname });
+      }
+    } catch (_) {}
   });
 
   mainWindow.once('ready-to-show', () => {

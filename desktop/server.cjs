@@ -8,10 +8,11 @@ function createDesktopServer(rootDir) {
 
   app.use(cors());
 
-  // Cross-Origin headers for AudioWorklet and WebAudio compatibility
+  // Enable CORS for all internal static assets & remote media proxies
   app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-    res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range, Authorization');
     next();
   });
 
@@ -113,18 +114,29 @@ function createDesktopServer(rootDir) {
   }));
 
   return new Promise((resolve, reject) => {
-    // Listen on ephemeral loopback port (127.0.0.1:0)
-    const server = app.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      const port = address.port;
-      console.log(`[Desktop Server] Internal server running at http://127.0.0.1:${port}`);
-      resolve({ server, port, url: `http://127.0.0.1:${port}` });
-    });
+    // Listen on deterministic port to guarantee persistent Firebase Auth & IndexedDB state across launches
+    const PREFERRED_PORT = parseInt(process.env.MEDIXLY_PORT, 10) || 32849;
 
-    server.on('error', (err) => {
-      console.error('[Desktop Server] Failed to start:', err);
-      reject(err);
-    });
+    const tryListen = (port, fallbackToZero = true) => {
+      const server = app.listen(port, '127.0.0.1', () => {
+        const address = server.address();
+        const finalPort = address.port;
+        console.log(`[Desktop Server] Internal server running at http://127.0.0.1:${finalPort}`);
+        resolve({ server, port: finalPort, url: `http://127.0.0.1:${finalPort}` });
+      });
+
+      server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE' && fallbackToZero) {
+          console.warn(`[Desktop Server] Port ${port} is in use, falling back to ephemeral port...`);
+          tryListen(0, false);
+        } else {
+          console.error('[Desktop Server] Failed to start:', err);
+          reject(err);
+        }
+      });
+    };
+
+    tryListen(PREFERRED_PORT);
   });
 }
 

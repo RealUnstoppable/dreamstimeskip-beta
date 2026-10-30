@@ -3,16 +3,52 @@ import { auth, db, getCachedUserProfile } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+const PRESET_ACCENTS = {
+    blue: '#2563EB',
+    indigo: '#4F46E5',
+    purple: '#9333EA',
+    pink: '#EC4899',
+    green: '#16A34A',
+    emerald: '#10B981',
+    orange: '#F97316',
+    red: '#EF4444',
+    cyan: '#06B6D4'
+};
+
+function resolveAccentHex(accent) {
+    if (!accent) return '#16A34A';
+    if (accent.startsWith('#')) return accent;
+    return PRESET_ACCENTS[accent.toLowerCase()] || '#16A34A';
+}
+
+function hexToRgba(hex, alpha = 1) {
+    let clean = hex.replace('#', '');
+    if (clean.length === 3) {
+        clean = clean.split('').map(c => c + c).join('');
+    }
+    const num = parseInt(clean, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 (function() {
     const localTheme = localStorage.getItem('userTheme');
-    const localAccent = localStorage.getItem('userAccent');
+    const localAccent = localStorage.getItem('userAccent') || 'green';
     if (localTheme) {
         let t = localTheme;
         if (t === 'dark') t = 'black';
         if (t === 'light') t = 'white';
-        document.body.dataset.theme = t;
+        if (document.body) document.body.dataset.theme = t;
+        document.documentElement.dataset.theme = t;
     }
-    if (localAccent) {
+    const hex = resolveAccentHex(localAccent);
+    document.documentElement.style.setProperty('--accent-color', hex);
+    document.documentElement.style.setProperty('--theme-accent', hex);
+    document.documentElement.style.setProperty('--theme-accent-glow', hexToRgba(hex, 0.45));
+    document.documentElement.style.setProperty('--theme-accent-subtle', hexToRgba(hex, 0.15));
+    if (document.body) {
         if (localAccent.startsWith('#')) {
             document.documentElement.style.setProperty('--accent-color', localAccent);
         } else {
@@ -21,25 +57,37 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-
     }
 })();
 
-const applyTheme = (theme, accentColor) => {
+export const applyTheme = (theme, accentColor) => {
     let t = theme || 'black';
     if (t === 'dark') t = 'black';
     if (t === 'light') t = 'white';
-    document.body.dataset.theme = t;
+    if (document.body) document.body.dataset.theme = t;
+    document.documentElement.dataset.theme = t;
     
-    if (accentColor && accentColor.startsWith('#')) {
-        document.documentElement.style.setProperty('--accent-color', accentColor);
-        document.body.removeAttribute('data-accent');
-    } else {
-        document.body.dataset.accent = accentColor || 'blue';
-        document.documentElement.style.removeProperty('--accent-color');
+    const hex = resolveAccentHex(accentColor);
+    document.documentElement.style.setProperty('--accent-color', hex);
+    document.documentElement.style.setProperty('--theme-accent', hex);
+    document.documentElement.style.setProperty('--theme-accent-glow', hexToRgba(hex, 0.45));
+    document.documentElement.style.setProperty('--theme-accent-subtle', hexToRgba(hex, 0.15));
+
+    if (document.body) {
+        if (accentColor && accentColor.startsWith('#')) {
+            document.body.removeAttribute('data-accent');
+        } else {
+            document.body.dataset.accent = accentColor || 'green';
+        }
     }
 
-    // Persist theme for non-logged-in users
+    // Persist theme for guests
     if (!auth.currentUser) {
-        localStorage.setItem('userTheme', document.body.dataset.theme);
-        localStorage.setItem('userAccent', accentColor || 'blue');
+        localStorage.setItem('userTheme', t);
+        localStorage.setItem('userAccent', accentColor || 'green');
     }
+
+    // Broadcast theme update event to entire UI
+    window.dispatchEvent(new CustomEvent('medixly:theme-changed', {
+        detail: { theme: t, accent: accentColor || 'green', hex }
+    }));
 };
 
 onAuthStateChanged(auth, async (user) => {
@@ -49,11 +97,11 @@ onAuthStateChanged(auth, async (user) => {
             if (userData) {
                 applyTheme(userData.theme, userData.accentColor);
             } else {
-                applyTheme('black', 'blue');
+                applyTheme('black', 'green');
             }
         } catch (error) {
             console.error("Manager info: Error loading theme from Firestore:", error.message);
-            applyTheme('black', 'blue');
+            applyTheme('black', 'green');
         }
     } else {
         // Load theme from localStorage for guests
@@ -63,5 +111,10 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Expose a function to be called from the account page for instant theme updates
+// Expose globally
 window.updateTheme = applyTheme;
+window.MedixlyThemeProvider = {
+    applyTheme,
+    resolveAccentHex,
+    presets: PRESET_ACCENTS
+};

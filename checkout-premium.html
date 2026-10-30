@@ -286,20 +286,35 @@
                 stripeBtn.disabled = true;
             }
             try {
-                const token = await currentUser.getIdToken();
-                const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        plan: 'premium',
-                        project: 'dreamstimeskip',
-                        successUrl: window.location.origin + '/success.html',
-                        cancelUrl: window.location.href
-                    })
-                });
+                let token = '';
+                if (currentUser) {
+                    try { token = await currentUser.getIdToken(); } catch (_) {}
+                }
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const payload = {
+                    plan: 'premium',
+                    project: 'dreamstimeskip',
+                    email: currentUser ? currentUser.email : '',
+                    successUrl: window.location.origin + '/success.html?status=success',
+                    cancelUrl: window.location.href
+                };
+
+                let response;
+                try {
+                    response = await fetch('/create-checkout-session', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(payload)
+                    });
+                } catch (_) {
+                    response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify(payload)
+                    });
+                }
                 const data = await response.json();
                 if (data.url) {
                     window.location.href = data.url;

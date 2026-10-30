@@ -8,6 +8,7 @@ import { handleTelemetryIngest, handleConsentRecord, handleAdminPerformanceMetri
 import { getExportableAudienceCohort } from "./dist/lib/google-ads-sync.js";
 import { createMedixlyCheckoutSession, handleMedixlyWebhookEvent } from "./backend/medixly-stripe-handler.js";
 import { adminDb, FieldValue } from "./dist/lib/firebase-admin.js";
+import { STRIPE_PRODUCTS, getStripePriceId } from "./js/stripe-config.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -187,12 +188,69 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY || 'sk_test_mock';
 const stripe = new Stripe(stripeSecretKey);
 
 app.post(["/create-checkout-session", "/api/create-checkout-session"], async (req, res) => {
-  const { plan, project, billingCycle, mode, successUrl, cancelUrl, email, uid } = req.body || {};
+  const { plan, project, billingCycle, mode, successUrl, cancelUrl, email, uid, cart, orderDetails } = req.body || {};
+  const origin = req.headers.origin || (req.headers.host ? `${req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}` : 'https://realunstoppable.store');
+  const isLive = Boolean(stripeSecretKey && stripeSecretKey.startsWith("sk_live_"));
 
-  // Medixly Membership Dynamic Promotion Checkout
+  // Check if this is a shop cart order
+  const isShopOrder = Boolean(cart && typeof cart === "object" && Object.keys(cart).length > 0);
+
+  // 1. Shop Cart Checkout (Merchandise / Physical Gear)
+  if (isShopOrder) {
+    try {
+      const lineItems = [];
+      for (const [productId, quantity] of Object.entries(cart)) {
+        const qty = Math.max(1, parseInt(quantity, 10) || 1);
+        const mappedPriceId = getStripePriceId(productId, isLive);
+
+        if (mappedPriceId) {
+          lineItems.push({
+            price: mappedPriceId,
+            quantity: qty,
+          });
+        } else {
+          // Fallback to price_data
+          lineItems.push({
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: productId,
+                images: ["https://realunstoppable.store/images/UnstoppableHoodieModel300x300.png"],
+              },
+              unit_amount: 2000,
+            },
+            quantity: qty,
+          });
+        }
+      }
+
+      // Frictionless: Apple Pay, Google Pay, Link, and Cards enabled automatically
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        customer_email: (email || orderDetails?.email) && (email || orderDetails?.email).includes("@") ? (email || orderDetails?.email) : undefined,
+        line_items: lineItems,
+        allow_promotion_codes: true,
+        success_url: successUrl || `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl || `${origin}/cart.html?canceled=true`,
+        metadata: {
+          uid: uid || "guest",
+          orderType: "shop",
+          project: project || "unstoppable",
+          cart: JSON.stringify(cart),
+          orderDetails: JSON.stringify(orderDetails || {}),
+        },
+      });
+
+      return res.json({ url: session.url, sessionId: session.id });
+    } catch (err) {
+      console.error("Shop checkout session error:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // 2. Medixly Membership Dynamic Promotion Checkout
   if (project === "medixly" || (plan && (plan.toLowerCase() === "premium" || plan.toLowerCase() === "ultra") && project !== "dreamstimeskip")) {
     try {
-      const origin = req.headers.origin || (req.headers.host ? `${req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}` : 'https://realunstoppable.store');
       const result = await createMedixlyCheckoutSession({
         plan,
         billingCycle,
@@ -211,33 +269,64 @@ app.post(["/create-checkout-session", "/api/create-checkout-session"], async (re
     }
   }
 
+  // 3. Dreams TimeSkip Memberships (Premium / Ultimate)
+  if (project === "dreamstimeskip") {
+    try {
+      const normPlan = (plan || "premium").toLowerCase();
+      const priceId = normPlan === "ultimate"
+        ? getStripePriceId('dts-membership-ultimate', isLive)
+        : getStripePriceId('dts-membership-premium', isLive);
+
+      const session = await stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer_email: email && email.includes("@") ? email : undefined,
+        client_reference_id: uid && uid !== "unknown" && uid !== "guest" ? uid : undefined,
+        line_items: [{ price: priceId, quantity: 1 }],
+        allow_promotion_codes: true,
+        success_url: successUrl || `${origin}/success.html?session_id={CHECKOUT_SESSION_ID}&plan=${normPlan}`,
+        cancel_url: cancelUrl || `${origin}/cart.html?canceled=true`,
+        metadata: {
+          uid: uid || "unknown",
+          planName: normPlan === "ultimate" ? "Ultimate" : "Premium",
+          project: "dreamstimeskip",
+        },
+      });
+
+      return res.json({ url: session.url, sessionId: session.id });
+    } catch (err) {
+      console.error("DTS checkout session error:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
+  // 4. Default / Generic Subscriptions
   try {
     const priceId =
       plan === "Business Pro"
-        ? ""   // 🔴 from Stripe dashboard
-        : "price_individual_id";
+        ? (isLive ? "price_1UJifEBmfNp1AIykML2Y8VLE" : "price_1THHbVBp2C5GdKaKvCVoMf1X")
+        : (isLive ? "price_1UJifGBmfNp1AIykFdVlMS1x" : "price_1THHYPBp2C5GdKaKxNpqndNE");
 
-    const origin = req.headers.origin || (req.headers.host ? `${req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http'}://${req.headers.host}` : 'https://realunstoppable.store');
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       mode: "subscription",
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      success_url: `${origin}?success=true`,
-      cancel_url: `${origin}?canceled=true`,
+      customer_email: email && email.includes("@") ? email : undefined,
+      line_items: [{ price: priceId, quantity: 1 }],
+      allow_promotion_codes: true,
+      success_url: successUrl || `${origin}?success=true`,
+      cancel_url: cancelUrl || `${origin}?canceled=true`,
+      metadata: {
+        uid: uid || "unknown",
+        planName: plan || "Pro",
+        project: project || "ezmanage",
+      },
     });
 
-    res.json({ url: session.url });
+    res.json({ url: session.url, sessionId: session.id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-// Secure Stripe Webhook Handler for Medixly Memberships
+// Comprehensive Stripe Webhook Handler (Shop orders, Medixly, DTS Memberships)
 app.post(["/stripe-webhook", "/api/stripe-webhook"], async (req, res) => {
   const sig = req.headers["stripe-signature"];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -255,13 +344,90 @@ app.post(["/stripe-webhook", "/api/stripe-webhook"], async (req, res) => {
   }
 
   try {
-    const result = await handleMedixlyWebhookEvent({
-      event,
-      adminDb: typeof adminDb !== "undefined" ? adminDb : null,
-      FieldValue: typeof FieldValue !== "undefined" ? FieldValue : null,
-      stripeClient: stripe
-    });
-    return res.json({ received: true, ...result });
+    const eventType = event.type;
+    const session = event.data?.object;
+    const metadata = session?.metadata || {};
+
+    // 1. If Medixly event, let Medixly handler process it
+    if (metadata.project === "medixly") {
+      const result = await handleMedixlyWebhookEvent({
+        event,
+        adminDb: typeof adminDb !== "undefined" ? adminDb : null,
+        FieldValue: typeof FieldValue !== "undefined" ? FieldValue : null,
+        stripeClient: stripe
+      });
+      return res.json({ received: true, ...result });
+    }
+
+    // 2. Shop Order Processing
+    if (eventType === "checkout.session.completed" && (metadata.orderType === "shop" || metadata.cart)) {
+      let cart = {};
+      let orderDetails = {};
+      if (metadata.cart) {
+        try { cart = JSON.parse(metadata.cart); } catch (_) {}
+      }
+      if (metadata.orderDetails) {
+        try { orderDetails = JSON.parse(metadata.orderDetails); } catch (_) {}
+      }
+      const orderId = "ORD-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      const total = session.amount_total ? session.amount_total / 100 : (orderDetails.total || 0);
+
+      const fullOrder = {
+        orderId,
+        userId: metadata.uid || "guest",
+        userEmail: session.customer_details?.email || session.customer_email || orderDetails.email || "",
+        items: cart,
+        status: "Paid",
+        total: total,
+        shippingInfo: orderDetails.shippingInfo || session.shipping_details || {},
+        paymentStatus: "Paid via Stripe Checkout (" + (session.payment_intent || session.id) + ")",
+        stripeSessionId: session.id,
+        appliedPromo: orderDetails.appliedPromo || "",
+        earnedPoints: Math.floor(total * 10),
+        sourceSite: metadata.project || "unstoppable",
+      };
+
+      if (typeof adminDb !== "undefined" && adminDb) {
+        const orderDocRef = adminDb.collection("orders").doc(`${metadata.uid || "guest"}_${Date.now()}`);
+        await orderDocRef.set({
+          ...fullOrder,
+          orderDate: FieldValue ? FieldValue.serverTimestamp() : new Date(),
+        });
+
+        // Update product stock / ordered counts
+        for (const [productId, quantity] of Object.entries(cart)) {
+          const qty = parseInt(quantity, 10) || 1;
+          const statRef = adminDb.collection("product_stats").doc(productId);
+          await statRef.set({
+            orderedCount: FieldValue ? FieldValue.increment(qty) : qty,
+            lastUpdated: FieldValue ? FieldValue.serverTimestamp() : new Date(),
+          }, { merge: true });
+        }
+      }
+
+      console.log(`✓ Webhook recorded shop order ${orderId} ($${total.toFixed(2)})`);
+      return res.json({ received: true, orderId });
+    }
+
+    // 3. Dreams TimeSkip Membership Processing
+    if (eventType === "checkout.session.completed" && metadata.project === "dreamstimeskip") {
+      const uid = metadata.uid;
+      const planName = metadata.planName || "Premium";
+      if (typeof adminDb !== "undefined" && adminDb && uid && uid !== "unknown" && uid !== "guest") {
+        await adminDb.collection("users").doc(uid).set({
+          membershipLevel: planName,
+          plan: planName,
+          subscription: {
+            status: "active",
+            customerId: session.customer || null,
+            subscriptionId: session.subscription || null,
+          }
+        }, { merge: true });
+      }
+      return res.json({ received: true, project: "dreamstimeskip" });
+    }
+
+    return res.json({ received: true });
   } catch (err) {
     console.error("Webhook processing error:", err.message);
     return res.status(500).json({ error: err.message });

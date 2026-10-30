@@ -467,30 +467,12 @@ export async function handleStripeCheckout(e) {
     const emailInput = document.getElementById('email');
 
     const nameVal = nameInput ? nameInput.value.trim() : '';
-    const emailVal = emailInput ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
-
-    if (!nameVal) {
-        if (messageEl) {
-            messageEl.textContent = 'Please enter your Full Name before proceeding to Stripe Checkout.';
-            messageEl.style.color = 'var(--accent-red, #ef4444)';
-        }
-        if (nameInput) nameInput.focus();
-        return;
-    }
-
-    if (!emailVal) {
-        if (messageEl) {
-            messageEl.textContent = 'Please enter a valid email address.';
-            messageEl.style.color = 'var(--accent-red, #ef4444)';
-        }
-        if (emailInput) emailInput.focus();
-        return;
-    }
+    const emailVal = emailInput && emailInput.value.trim() ? emailInput.value.trim() : (currentUser ? currentUser.email : '');
 
     const originalHtml = stripeBtn ? stripeBtn.innerHTML : 'Pay with Stripe Checkout';
     if (stripeBtn) {
         stripeBtn.disabled = true;
-        stripeBtn.innerHTML = '<span>⚡ Connecting to Stripe...</span>';
+        stripeBtn.innerHTML = '<span>⚡ Connecting to Express Checkout...</span>';
     }
 
     const { totalPrice: subtotal } = calculateCartSummary(userCart, productMap);
@@ -502,7 +484,7 @@ export async function handleStripeCheckout(e) {
     const finalTotal = subtotalAfterDiscount + tax;
 
     const shippingInfo = {
-        name: nameVal,
+        name: nameVal || (currentUser ? currentUser.displayName : '') || '',
         address: document.getElementById('address')?.value || '',
         city: document.getElementById('city')?.value || '',
         zip: document.getElementById('zip')?.value || ''
@@ -517,24 +499,42 @@ export async function handleStripeCheckout(e) {
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-                cart: userCart,
-                orderDetails: {
-                    email: emailVal,
-                    total: finalTotal,
-                    shippingInfo,
-                    appliedPromo,
-                    pointsRedeemed: pointsToRedeem
-                },
-                mode: 'payment',
-                project: 'unstoppable',
-                successUrl: window.location.origin + '/success.html?session_id={CHECKOUT_SESSION_ID}',
-                cancelUrl: window.location.href
-            })
-        });
+        const payload = {
+            cart: userCart,
+            email: emailVal,
+            orderDetails: {
+                email: emailVal,
+                total: finalTotal,
+                shippingInfo,
+                appliedPromo,
+                pointsRedeemed: pointsToRedeem
+            },
+            mode: 'payment',
+            project: 'unstoppable',
+            successUrl: window.location.origin + '/success.html?session_id={CHECKOUT_SESSION_ID}',
+            cancelUrl: window.location.href
+        };
+
+        // Determine best checkout endpoint: local/hosted server or cloud function
+        const endpoint = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+            ? '/create-checkout-session'
+            : '/create-checkout-session';
+
+        let response;
+        try {
+            response = await fetch(endpoint, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload)
+            });
+        } catch (_) {
+            // Fallback to direct Cloud Function if relative route unreachable
+            response = await fetch('https://us-central1-dts-hub-website.cloudfunctions.net/createCheckoutSession', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload)
+            });
+        }
 
         const data = await response.json();
         if (data.url) {
@@ -542,7 +542,7 @@ export async function handleStripeCheckout(e) {
         } else {
             console.warn('Manager info: Cloud function response did not contain url, completing via secure test order:', data);
             await processOrderTransaction(currentUser ? currentUser.uid : null, userCart, {
-                email: emailVal,
+                email: emailVal || 'customer@example.com',
                 total: finalTotal,
                 shippingInfo,
                 appliedPromo,
