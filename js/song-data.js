@@ -29396,9 +29396,25 @@ export const librarySongs = [
     }
 ];
 
+let _songCacheMap = null;
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
     if (!id) return null;
-    return librarySongs.find(song => song.id === id) ||
-           librarySongs.find(song => song.id === `top100-${id}`) ||
-           librarySongs.find(song => song.id.replace(/^top100-/, '') === id);
+
+    if (!_songCacheMap || librarySongs.length !== _lastLibraryLength) {
+        _songCacheMap = new Map();
+        _lastLibraryLength = librarySongs.length;
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            if (!_songCacheMap.has(song.id)) {
+                _songCacheMap.set(song.id, song);
+            }
+        }
+    }
+
+    let song = _songCacheMap.get(id);
+    if (song) return song;
+
+    return _songCacheMap.get(`top100-${id}`) || null;
 }
