@@ -43,7 +43,22 @@ function createDesktopServer(rootDir) {
   // Strip web advertising scripts for native desktop experience
   app.use((req, res, next) => {
     if (req.path.endsWith('.html') || req.path === '/medixly.html') {
-      const filePath = path.join(rootDir, req.path.replace(/^\//, ''));
+      let decodedPath;
+      try {
+        decodedPath = decodeURIComponent(req.path);
+      } catch (err) {
+        return res.status(400).send('Bad Request');
+      }
+
+      if (decodedPath.indexOf('\0') !== -1) {
+        return res.status(400).send('Bad Request');
+      }
+
+      const filePath = path.resolve(rootDir, '.' + decodedPath);
+      if (!filePath.startsWith(rootDir + path.sep) && filePath !== rootDir) {
+        return res.status(403).send('Forbidden');
+      }
+
       if (fs.existsSync(filePath)) {
         fs.readFile(filePath, 'utf8', (err, html) => {
           if (err) return next();
