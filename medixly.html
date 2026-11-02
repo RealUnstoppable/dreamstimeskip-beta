@@ -108,7 +108,7 @@
                                 <span id="desktop-badge-text">v1.1.0</span>
                                 <button type="button" id="desktop-badge-update-btn" class="desktop-badge-btn" title="Check for Updates">Check Update</button>
                             </div>
-                            <button id="header-sound-prefs-btn" class="btn-secondary" onclick="if(window.openMedixlyOnboarding) window.openMedixlyOnboarding(5);">
+                            <button id="header-sound-prefs-btn" class="btn-secondary" onclick="if(window.openMedixlyOnboarding) window.openMedixlyOnboarding(5);" aria-label="Sound Profile">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 <span>Sound Profile</span>
                             </button>
@@ -137,7 +137,7 @@
                     <div class="leaderboard-container" id="container-viral-now">
                         <!-- Filled by JS -->
                     </div>
-                    <button class="show-more-btn" id="show-more-viral">Show More</button>
+                    <button class="show-more-btn" id="show-more-viral" aria-label="Show More Viral Songs">Show More</button>
                 </section>
 
 
@@ -187,7 +187,7 @@
             <!-- Dedicated Full Page for Playlists -->
             <div id="view-playlists" class="view-playlists" style="display: none;">
                 <div class="playlists-page-header">
-                    <button id="playlists-back-btn" class="back-btn">← Back to Home</button>
+                    <button id="playlists-back-btn" class="back-btn" aria-label="Back to Home">← Back to Home</button>
                     <div class="playlists-header-title-row">
                         <div>
                             <h1 class="playlists-page-title">Your Playlists</h1>
@@ -219,7 +219,7 @@
             </div>
 
             <div id="view-playlist" style="display: none;">
-                <button id="back-to-home" class="back-btn">← Back</button>
+                <button id="back-to-home" class="back-btn" aria-label="Back">← Back</button>
                 <div class="playlist-header">
                      <img id="playlist-cover-image" src="/images/medixly-logo.png" alt="Album Art" class="album-art">
                     <div class="playlist-details">
@@ -228,8 +228,8 @@
                         <p id="playlist-desc">Unstoppable Media • 24 songs</p>
                         <div class="playlist-actions">
                             <button id="playlist-play-btn" class="action-btn-play" title="Play playlist" aria-label="Play playlist">▶</button>
-                            <button id="share-playlist-btn" class="action-btn-secondary">Share</button>
-                            <button id="delete-playlist-btn" class="action-btn-secondary" style="color:var(--accent-red);border-color:var(--accent-red);display:none;">Delete</button>
+                            <button id="share-playlist-btn" class="action-btn-secondary" aria-label="Share Playlist">Share</button>
+                            <button id="delete-playlist-btn" class="action-btn-secondary" style="color:var(--accent-red);border-color:var(--accent-red);display:none;" aria-label="Delete Playlist">Delete</button>
                         </div>
                     </div>
                 </div>
@@ -429,7 +429,7 @@
                     <p>We've added "Blow" by Kesha to the library, fully synced and ready for the Automix DJ!</p>
                 </div>
             </div>
-            <button id="got-it-btn" class="primary-btn">Got It!</button>
+            <button id="got-it-btn" class="primary-btn" aria-label="Close Announcement">Got It!</button>
         </div>
     </div>
 
@@ -538,15 +538,15 @@
         <div class="queue-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <h2>Queue</h2>
-                <button id="clear-queue-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;">Clear</button>
+                <button id="clear-queue-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;" aria-label="Clear Queue">Clear</button>
             </div>
             <button id="close-queue-btn" class="control-button" title="Close Queue" aria-label="Close Queue">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="queue-tabs">
-            <button class="queue-tab active" id="tab-up-next">Up Next</button>
-            <button class="queue-tab" id="tab-history">History</button>
+            <button class="queue-tab active" id="tab-up-next" aria-label="Up Next Queue">Up Next</button>
+            <button class="queue-tab" id="tab-history" aria-label="Listening History">History</button>
         </div>
         <div class="queue-content" id="queue-content-area">
             <!-- Dynamically populated by JS -->
@@ -647,7 +647,7 @@
                 </div>
             </div>
             <!-- Play Button -->
-            <button class="viral-stats-play-btn" id="viral-stats-play-btn">
+            <button class="viral-stats-play-btn" id="viral-stats-play-btn" aria-label="Play Viral Stats">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 Play Now
             </button>
@@ -737,11 +737,11 @@
 
 
     <div id="lexi-drag-menu" class="lexi-drag-menu hidden">
-        <button id="lexi-drag-cart" class="lexi-action-pill">
+        <button id="lexi-drag-cart" class="lexi-action-pill" aria-label="Lexi Cart">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             <span>Cart</span>
         </button>
-        <button id="lexi-drag-chat" class="lexi-action-pill">
+        <button id="lexi-drag-chat" class="lexi-action-pill" aria-label="Lexi Chat">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <span>Chat</span>
         </button>
@@ -760,9 +760,9 @@
             </div>
             <div style="display:flex;gap:10px;">
                 <input type="text" id="new-playlist-input" placeholder="New Playlist Name" style="flex:1;background:var(--secondary-bg);color:#fff;border:1px solid var(--border-color);border-radius:4px;padding:5px;">
-                <button id="create-and-add-btn" class="action-btn-primary" style="padding:5px 10px;">Create</button>
+                <button id="create-and-add-btn" class="action-btn-primary" style="padding:5px 10px;" aria-label="Create Playlist">Create</button>
             </div>
-            <button id="close-playlist-modal-btn" class="modal-close-btn" style="margin-top:15px;width:100%;">Close</button>
+            <button id="close-playlist-modal-btn" class="modal-close-btn" style="margin-top:15px;width:100%;" aria-label="Close Create Playlist">Close</button>
         </div>
     </div>
 
