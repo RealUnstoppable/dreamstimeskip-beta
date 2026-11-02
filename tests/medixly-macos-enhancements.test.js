@@ -186,7 +186,7 @@ describe('Phase 6: Audio Fixes, Logo Zoom, Promotion & Randomized Ads', () => {
         assert.ok(builderYml.includes('asarUnpack:'), 'electron-builder must have asarUnpack');
 
         const serverCjs = fs.readFileSync(path.resolve(process.cwd(), 'desktop/server.cjs'), 'utf8');
-        assert.ok(serverCjs.includes("app.get(['/music/*', '/music']"), 'server.cjs must have dedicated music streaming route');
+        assert.ok(serverCjs.includes("app.use('/music'"), 'server.cjs must have dedicated music streaming route');
         assert.ok(serverCjs.includes("app.get('/proxy-audio'"), 'server.cjs must provide /proxy-audio route');
     });
 

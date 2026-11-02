@@ -95,8 +95,8 @@ function createDesktopServer(rootDir) {
   });
 
   // Dedicated music streaming route with fallback across unpacked and root directories
-  app.get(['/music/*', '/music'], (req, res, next) => {
-    const rawPath = req.params[0] || (req.path.startsWith('/music/') ? req.path.slice('/music/'.length) : '');
+  app.use('/music', (req, res, next) => {
+    const rawPath = req.path.replace(/^\//, '');
     const candidateDirs = [
       path.join(rootDir, 'music'),
       path.join(rootDir, '..', 'app.asar.unpacked', 'music'),
