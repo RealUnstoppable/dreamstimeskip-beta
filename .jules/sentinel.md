@@ -1,0 +1,4 @@
+## 2024-11-02 - Path Traversal Vulnerability in Express Static File Serving
+**Vulnerability:** The Express middleware serving `.html` files in `server.js` used a vulnerable mechanism for sanitizing file paths: `const normalizedPath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');`.
+**Learning:** `path.normalize()` alone does not prevent traversal, and regex replacements are easily bypassed (e.g. `%2e%2e%2f` or `....//` depending on URL decoding and normalization orders). Express's `req.path` also doesn't decode URL-encoded slashes, exacerbating the risk.
+**Prevention:** Always decode the URI component explicitly, check for null bytes, resolve to an absolute path using `path.resolve(baseDir, relativeReqPath)`, and enforce a strict boundary check: `filePath.startsWith(__dirname + path.sep)`.
