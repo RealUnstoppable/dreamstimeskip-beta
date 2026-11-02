@@ -6,9 +6,34 @@ import { lyricsData } from './lyrics-data.js?v=1791167969660b';
 import { librarySongs, songColors, getSongById } from './song-data.js?v=1791167969660b';
 import { mixEngine } from "./audio-engine.js";
 import { audioAdManager } from "./audio-ads.js";
+import {
+    getRecommendedTrack,
+    computeTrackRelevanceScore,
+    fetchUserRecommendationContext,
+    clearRecommendationCache,
+    EndlessQueueManager
+} from "./recommendation-engine.js";
+import {
+    audioSkipTracker,
+    fetchAdStudioPayload,
+    getRandomSkipInterval
+} from "./audio-skip-tracker.js";
+import { APP_VERSION } from "./version.js";
 
 export const ADMIN_EMAIL_PREFIX = 'catalinandrian1@gmail';
 export const ADMIN_FULL_EMAIL = 'catalinandrian1@gmail.com';
+
+export {
+    getRecommendedTrack,
+    computeTrackRelevanceScore,
+    fetchUserRecommendationContext,
+    clearRecommendationCache,
+    EndlessQueueManager,
+    audioSkipTracker,
+    fetchAdStudioPayload,
+    getRandomSkipInterval,
+    APP_VERSION
+};
 
 let moduleGetSmartFallbackRecommendation = null;
 export function getSmartFallbackRecommendation(options) {
@@ -348,97 +373,30 @@ function initHarmonyTunes() {
         }
         failedSongIds.forEach(id => excluded.add(id));
 
-        // Analyze past listening history (from in-memory historyQueue, userFavorites, and stored musicHistory)
-        const historyArtistCounts = new Map();
-        const historyTagCounts = new Map();
-        const recentHistoryIds = [];
+        const userContext = {
+            genres: prefs?.genres || ['hiphop', 'pop'],
+            favoriteArtists: prefs?.favoriteArtists || [],
+            likedTrackIds: userFavoritesIds || new Set(),
+            likedTracks: userFavorites || [],
+            listeningHistory: historyQueue || [],
+            role: prefs?.role || 'listener',
+            sfxNeeds: prefs?.sfxNeeds || 'moderate'
+        };
 
-        const hist = Array.isArray(historyQueue) ? historyQueue : [];
-        hist.slice(-30).forEach((s) => {
-            if (!s) return;
-            recentHistoryIds.push(s.id);
-            const artist = (s.artist || '').toLowerCase().trim();
-            if (artist) {
-                historyArtistCounts.set(artist, (historyArtistCounts.get(artist) || 0) + 1);
-            }
-            (s.tags || []).forEach(t => {
-                const tag = t.toLowerCase();
-                historyTagCounts.set(tag, (historyTagCounts.get(tag) || 0) + 1);
-            });
+        const currentTrack = currentQueue[currentSongIndex] || null;
+        const recentHistoryIds = historyQueue.map(s => s?.id).filter(Boolean);
+        const upcomingQueueIds = new Set(currentQueue.slice(currentSongIndex + 1).map(s => s?.id).filter(Boolean));
+
+        const recommended = getRecommendedTrack(librarySongs, userContext, {
+            currentTrack,
+            excludeSongIds: excluded,
+            excludeCurrent,
+            recentHistoryIds,
+            upcomingQueueIds
         });
 
-        if (Array.isArray(userFavorites)) {
-            userFavorites.forEach(s => {
-                if (!s) return;
-                const artist = (s.artist || '').toLowerCase().trim();
-                if (artist) {
-                    historyArtistCounts.set(artist, (historyArtistCounts.get(artist) || 0) + 2);
-                }
-                (s.tags || []).forEach(t => {
-                    const tag = t.toLowerCase();
-                    historyTagCounts.set(tag, (historyTagCounts.get(tag) || 0) + 1);
-                });
-            });
-        }
-
-        const candidates = [];
-        for (const song of librarySongs) {
-            if (!song || song.isHidden) continue;
-            const hasSource = Boolean(song.src || song.streamUrl || song.audioUrl || song.url);
-            if (!hasSource) continue;
-            if (excluded.has(song.id)) continue;
-
-            let score = computePersonalizedScore(song, prefs);
-
-            const songArtist = (song.artist || '').toLowerCase().trim();
-            const songTags = (song.tags || []).map(t => t.toLowerCase());
-
-            // Past listening history reinforcement
-            if (songArtist && historyArtistCounts.has(songArtist)) {
-                score += Math.min(30, historyArtistCounts.get(songArtist) * 10);
-            }
-            for (const tag of songTags) {
-                if (historyTagCounts.has(tag)) {
-                    score += Math.min(15, historyTagCounts.get(tag) * 3);
-                }
-            }
-
-            // Favorites affinity bonus
-            if (userFavoritesIds && userFavoritesIds.has(song.id)) {
-                score += 30;
-            }
-
-            // Trending weight (viral, top100, rank, trending)
-            if (songTags.includes('viral')) score += 30;
-            if (songTags.includes('top100')) score += 25;
-            if (typeof song.rank === 'number' && song.rank > 0) {
-                score += Math.max(5, Math.round(35 - (song.rank / 3)));
-            }
-            if (songTags.includes('trending') || songTags.includes('popular')) score += 20;
-
-            // Anti-fatigue penalty for recent plays
-            const recentIdx = recentHistoryIds.lastIndexOf(song.id);
-            if (recentIdx !== -1) {
-                const recency = recentHistoryIds.length - recentIdx;
-                if (recency <= 3) score -= 70;
-                else if (recency <= 8) score -= 40;
-                else score -= 20;
-            }
-
-            // Penalty if already in upcoming queue to avoid duplicates
-            if (currentQueue && currentQueue.some((s, idx) => idx > currentSongIndex && s.id === song.id)) {
-                score -= 35;
-            }
-
-            // Jitter for variety
-            score += Math.random() * 8;
-
-            candidates.push({ song, score });
-        }
-
-        if (candidates.length > 0) {
-            candidates.sort((a, b) => b.score - a.score);
-            return candidates[0].song;
+        if (recommended) {
+            return recommended;
         }
 
         // Resilient fallback pool
@@ -448,6 +406,62 @@ function initHarmonyTunes() {
             return notCurrent[Math.floor(Math.random() * notCurrent.length)];
         }
         return validSongs[0] || librarySongs[0];
+    }
+
+    /**
+     * Algorithmic Endless Queue Auto-Queue Function
+     * Asynchronously queries the user's listening history, liked tracks, and profile genre preferences
+     * from database / optimized in-memory cache to fetch and auto-queue the most relevant next track.
+     */
+    async function recommendAndAutoQueueNextTrack(options = {}) {
+        let userContext = null;
+        if (currentUser?.uid) {
+            userContext = await fetchUserRecommendationContext(db, currentUser.uid, {
+                genres: currentUserPreferences?.genres,
+                favoriteArtists: currentUserPreferences?.favoriteArtists,
+                likedTrackIds: userFavoritesIds,
+                likedTracks: userFavorites,
+                listeningHistory: historyQueue,
+                role: currentUserPreferences?.role,
+                sfxNeeds: currentUserPreferences?.sfxNeeds
+            });
+        } else {
+            const prefs = loadActiveUserPreferences();
+            userContext = {
+                genres: prefs?.genres || ['hiphop', 'pop'],
+                favoriteArtists: prefs?.favoriteArtists || [],
+                likedTrackIds: userFavoritesIds || new Set(),
+                likedTracks: userFavorites || [],
+                listeningHistory: historyQueue || [],
+                role: prefs?.role || 'listener',
+                sfxNeeds: prefs?.sfxNeeds || 'moderate'
+            };
+        }
+
+        const currentTrack = currentQueue[currentSongIndex] || null;
+        const recentHistoryIds = historyQueue.map(s => s?.id).filter(Boolean);
+        const upcomingQueueIds = new Set(currentQueue.slice(currentSongIndex + 1).map(s => s?.id).filter(Boolean));
+        const excluded = new Set(options.excludeSongIds || []);
+        failedSongIds.forEach(id => excluded.add(id));
+
+        const nextTrack = getRecommendedTrack(librarySongs, userContext, {
+            currentTrack,
+            excludeSongIds: excluded,
+            excludeCurrent: options.excludeCurrent !== false,
+            recentHistoryIds,
+            upcomingQueueIds,
+            jitter: true
+        });
+
+        if (nextTrack) {
+            currentQueue.push(nextTrack);
+            if (queuePanel && queuePanel.classList.contains('open')) {
+                renderQueue();
+            }
+            return nextTrack;
+        }
+
+        return null;
     }
 
     // Attach to module exporter
@@ -669,6 +683,10 @@ function initHarmonyTunes() {
     window.__getSmartFallbackRecommendation = (opts) => getSmartFallbackRecommendation(opts);
     window.__handlePlaybackSnag = (song) => handlePlaybackSnag(song);
     window.__nextSong = () => nextSong();
+    window.__playNext = (opts) => playNext(opts);
+    window.__onTrackEnded = (e) => onTrackEnded(e);
+    window.__recommendAndAutoQueueNextTrack = (opts) => recommendAndAutoQueueNextTrack(opts);
+    window.__audioSkipTracker = audioSkipTracker;
     window.__resetSkipThrottle = () => { lastSkipTime = 0; };
     window.__prevSong = () => prevSong();
 
@@ -2372,7 +2390,32 @@ function initHarmonyTunes() {
 
     let lastSkipTime = 0;
 
-    function nextSong() {
+    function showAdUnskippableToast() {
+        if (typeof document === 'undefined') return;
+        let toast = document.getElementById('ad-unskippable-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'ad-unskippable-toast';
+            toast.className = 'ad-unskippable-toast';
+            toast.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>Advertisement in progress • Skips disabled</span>
+            `;
+            document.body.appendChild(toast);
+        }
+        toast.classList.add('visible');
+        clearTimeout(toast.__timer);
+        toast.__timer = setTimeout(() => {
+            toast.classList.remove('visible');
+        }, 2500);
+
+        [nextBtn, fsNextBtn].filter(Boolean).forEach(btn => {
+            btn.classList.add('shake-blocked');
+            setTimeout(() => btn.classList.remove('shake-blocked'), 400);
+        });
+    }
+
+    async function nextSong(options = {}) {
         const now = Date.now();
         if (now - lastSkipTime < 250) {
             return;
@@ -2381,6 +2424,35 @@ function initHarmonyTunes() {
 
         if (audioAdManager && audioAdManager.isAdPlaying()) {
             return;
+        }
+
+        // UN-SKIPPABLE AD ENFORCEMENT:
+        // Ensure users cannot skip the ad (or if they do, it pauses the audio/enforces playback).
+        const currentPlayingTrack = currentQueue[currentSongIndex];
+        if (currentPlayingTrack && (currentPlayingTrack.isAd || currentPlayingTrack.unskippable || audioSkipTracker.isAdTrack(currentPlayingTrack))) {
+            const enforcement = audioSkipTracker.handleSkipAttempt(currentPlayingTrack, activeAudio);
+            console.warn('[Medixly Ad Studio] Skip attempt on advertisement prevented:', enforcement.message);
+            if (activeAudio) {
+                // Enforce continuous playback
+                activeAudio.play().catch(() => {});
+            }
+            showAdUnskippableToast();
+            return;
+        }
+
+        // AD-INJECTION ENGINE (Skip Tracker):
+        // Monitor manual skips. After every 10 to 15 skips (randomized), inject Ad Studio payload as immediate next track.
+        const isUserPrem = audioAdManager ? audioAdManager.isUserPremium() : false;
+        audioSkipTracker.setPremium(isUserPrem);
+        if (!options.triggeredByEnd && !isUserPrem) {
+            const skipEval = audioSkipTracker.recordSkip();
+            if (skipEval.shouldInjectAd) {
+                console.log(`[Medixly Ad Studio] Reached skip threshold (${skipEval.skipCount}/${skipEval.targetThreshold}). Automatically injecting Ad Studio payload.`);
+                await audioSkipTracker.injectAdIntoQueue(currentQueue, currentSongIndex, db);
+                if (queuePanel && queuePanel.classList.contains('open')) {
+                    renderQueue();
+                }
+            }
         }
 
         if(activeAudio && currentQueue[currentSongIndex]) {
@@ -2408,6 +2480,7 @@ function initHarmonyTunes() {
             if (nextAudio) nextAudio.pause();
         }
 
+        // 1. MANUAL QUEUE: If user manual queue has songs, dequeue and play next
         if(typeof window.__pullFromUserQueue === 'function') {
             if(userQueue.length > 0) {
                 const nextUserSong = window.__pullFromUserQueue();
@@ -2431,9 +2504,13 @@ function initHarmonyTunes() {
 
         __recordHistory();
 
+        // 2. ENDLESS QUEUE: If manual queue is empty, trigger recommendation when upcoming queue is exhausted
         if (!currentQueue || currentQueue.length === 0) {
-            const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: false });
-            currentQueue = [fallbackSong];
+            let fallbackSong = await recommendAndAutoQueueNextTrack({ excludeCurrent: false });
+            if (!fallbackSong) {
+                fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: false });
+                currentQueue = [fallbackSong];
+            }
             currentSongIndex = 0;
         } else {
             const nextIndex = currentSongIndex + 1;
@@ -2445,8 +2522,12 @@ function initHarmonyTunes() {
                 } else if (repeatMode === 1 && currentQueue.length > 1) {
                     currentSongIndex = 0;
                 } else {
-                    const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: true });
-                    currentQueue.push(fallbackSong);
+                    // Manual queue empty & queue end reached: Trigger lightweight recommendation function!
+                    let nextSongToPlay = await recommendAndAutoQueueNextTrack({ excludeCurrent: true });
+                    if (!nextSongToPlay) {
+                        nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true });
+                        currentQueue.push(nextSongToPlay);
+                    }
                     currentSongIndex = currentQueue.length - 1;
                     if (queuePanel && queuePanel.classList.contains('open')) {
                         renderQueue();
@@ -2469,10 +2550,49 @@ function initHarmonyTunes() {
         playSong();
     }
 
+    function playNext(options = {}) {
+        return nextSong(options);
+    }
+
+    function onTrackEnded(e) {
+        if (e && e.target !== activeAudio) return;
+
+        const duration = activeAudio.duration;
+        const currentTime = activeAudio.currentTime;
+        const isValidDuration = isFinite(duration) && duration > 3;
+        const isNearTrueEnd = isValidDuration && currentTime >= Math.max(1, duration - 2.5);
+
+        if (!isNearTrueEnd && !isMixerMode) {
+            console.warn('[Medixly Audio] Premature ended event suppressed (currentTime:', currentTime, 'duration:', duration, ')');
+            return;
+        }
+
+        if (isMixerMode && isCrossfading) return;
+
+        if (repeatMode === 2) {
+            activeAudio.currentTime = 0;
+            playSong();
+            return;
+        }
+
+        // When track ends naturally, playNext will either pull from manual queue
+        // or trigger the endless queue recommendation function if manual queue is empty!
+        playNext({ triggeredByEnd: true });
+    }
+
     function prevSong() {
         if (audioAdManager && audioAdManager.isAdPlaying()) {
             return;
         }
+
+        const currentPlayingTrack = currentQueue[currentSongIndex];
+        if (currentPlayingTrack && (currentPlayingTrack.isAd || currentPlayingTrack.unskippable || audioSkipTracker.isAdTrack(currentPlayingTrack))) {
+            console.warn('[Medixly Ad Studio] Rewind/prev on advertisement prevented.');
+            if (activeAudio) activeAudio.play().catch(() => {});
+            showAdUnskippableToast();
+            return;
+        }
+
         if (activeAudio && activeAudio.currentTime > 3) {
             activeAudio.currentTime = 0;
             playSong();
@@ -2506,9 +2626,13 @@ function initHarmonyTunes() {
     if (typeof window !== 'undefined') {
         window.togglePlayPause = togglePlayPause;
         window.nextSong = nextSong;
+        window.playNext = playNext;
+        window.onTrackEnded = onTrackEnded;
         window.prevSong = prevSong;
         window.playSong = playSong;
         window.pauseSong = pauseSong;
+        window.recommendAndAutoQueueNextTrack = recommendAndAutoQueueNextTrack;
+        window.audioSkipTracker = audioSkipTracker;
     }
 
     // --- EVENTS ---
@@ -2958,25 +3082,7 @@ function initHarmonyTunes() {
             });
             player.addEventListener('ended', (e) => {
                 if (e.target === activeAudio) {
-                    const duration = activeAudio.duration;
-                    const currentTime = activeAudio.currentTime;
-                    const isValidDuration = isFinite(duration) && duration > 3;
-                    const isNearTrueEnd = isValidDuration && currentTime >= Math.max(1, duration - 2.5);
-
-                    if (!isNearTrueEnd && !isMixerMode) {
-                        console.warn('[Medixly Audio] Premature ended event suppressed (currentTime:', currentTime, 'duration:', duration, ')');
-                        return;
-                    }
-
-                    if (isMixerMode && isCrossfading) return;
-                    if (userQueue.length > 0) {
-                        nextSong();
-                    } else if (repeatMode === 2) {
-                        activeAudio.currentTime = 0;
-                        playSong();
-                    } else {
-                        nextSong();
-                    }
+                    onTrackEnded(e);
                 }
             });
         });
@@ -3590,6 +3696,19 @@ function initHarmonyTunes() {
             targetSong = currentQueue[nextIdx];
         } else if (repeatMode === 1 && currentQueue.length > 0) {
             targetSong = currentQueue[0];
+        } else if (repeatMode !== 2) {
+            // ENDLESS QUEUE: Proactively pre-queue recommended track if upcoming is empty
+            recommendAndAutoQueueNextTrack().then(rec => {
+                if (rec && nextAudio && (!nextAudio.src || nextAudio.src === '')) {
+                    const recSrc = rec.src || rec.audioUrl || rec.streamUrl;
+                    if (recSrc) {
+                        preloadedNextSongObj = rec;
+                        nextAudio.src = recSrc;
+                        nextAudio.preload = 'auto';
+                        try { nextAudio.load(); } catch (_) {}
+                    }
+                }
+            }).catch(() => {});
         }
 
         if (targetSong) {

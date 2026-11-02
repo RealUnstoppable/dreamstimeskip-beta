@@ -112,10 +112,11 @@ describe('Audio Ad Manager & Alternation System', () => {
     });
 
     it('triggers an ad after every 5 songs played', () => {
-        // Simulate session ad already completed
+        // Simulate session ad already completed and explicit 5 song threshold
         audioAdManager.setSessionAdPlayed(true);
         audioAdManager.setLastAdTimestamp(Date.now());
         audioAdManager.setSongsPlayedCount(0);
+        audioAdManager.setNextSongThreshold(5);
 
         // Before 5 songs: no ad
         for (let i = 1; i <= 4; i++) {
@@ -140,6 +141,7 @@ describe('Audio Ad Manager & Alternation System', () => {
     it('triggers an ad after 15 minutes of listening', () => {
         // Simulate session ad played, and less than 5 songs played
         audioAdManager.setSessionAdPlayed(true);
+        audioAdManager.setNextSongThreshold(5);
         audioAdManager.setSongsPlayedCount(2);
 
         // Set last ad timestamp to 16 minutes ago

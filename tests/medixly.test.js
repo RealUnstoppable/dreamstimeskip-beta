@@ -92,12 +92,12 @@ describe('loadPlaylistView error handling', () => {
 });
 
 describe('Medixly HTML Audio & Footer Configuration', () => {
-  it('ensures audio players do not enforce crossorigin="anonymous" which blocks playback', async () => {
+  it('ensures audio players are configured with crossorigin="anonymous" for Web Audio API mixing', async () => {
     const fs = await import('fs');
     const path = await import('path');
     const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
-    expect(html).not.toMatch(/<audio id="audio-player"[^>]*crossorigin/);
-    expect(html).not.toMatch(/<audio id="audio-player-2"[^>]*crossorigin/);
+    expect(html).toMatch(/<audio id="audio-player"[^>]*crossorigin="anonymous"/);
+    expect(html).toMatch(/<audio id="audio-player-2"[^>]*crossorigin="anonymous"/);
   });
 
   it('ensures main-footer and footer.js script are present in medixly.html', async () => {

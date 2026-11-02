@@ -68,6 +68,8 @@ mac:
   darkModeSupport: true
   minimumSystemVersion: "10.15.0"
   extendInfo:
+    CFBundleVersion: "1.1.0"
+    CFBundleShortVersionString: "1.1.0"
     CFBundleDocumentTypes:
       - CFBundleTypeName: "Audio Stream"
         CFBundleTypeRole: "Viewer"

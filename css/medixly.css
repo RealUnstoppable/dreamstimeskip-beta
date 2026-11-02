@@ -3707,6 +3707,51 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
     color: #dcfce7;
 }
 
+/* Ad Unskippable UI & Locked Feedback */
+.ad-unskippable-toast {
+    position: fixed;
+    bottom: 95px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(239, 68, 68, 0.2);
+    color: #fecaca;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ad-unskippable-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.ad-locked {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+}
+
+@keyframes shake-x {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-4px); }
+    40%, 80% { transform: translateX(4px); }
+}
+
+.shake-blocked {
+    animation: shake-x 0.35s ease-in-out;
+}
+
+
 
 
 
