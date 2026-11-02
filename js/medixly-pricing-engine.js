@@ -10,8 +10,8 @@
  * - Yearly billing: 10x monthly rate (2 months free / 20% savings).
  */
 
-// Default campaign anchor: October 28, 2026 00:00:00 UTC
-export const DEFAULT_PROMO_START_UTC = '2026-10-28T00:00:00Z';
+// Default campaign anchor: November 2, 2026 00:00:00 UTC
+export const DEFAULT_PROMO_START_UTC = '2026-11-02T00:00:00Z';
 
 export const TIER_CONFIG = {
   free: {
@@ -26,7 +26,7 @@ export const TIER_CONFIG = {
   premium: {
     id: 'premium',
     name: 'Medixly Premium',
-    basePrice: 1.00,
+    basePrice: 0.99,
     cap: 6.99,
     regularMonthly: 9.99,
     regularYearly: 99.99,
@@ -35,7 +35,7 @@ export const TIER_CONFIG = {
   ultra: {
     id: 'ultra',
     name: 'Medixly Ultra',
-    basePrice: 1.00,
+    basePrice: 0.99,
     cap: 12.99,
     regularMonthly: 19.99,
     regularYearly: 199.99,

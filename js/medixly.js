@@ -533,16 +533,7 @@ function initHarmonyTunes() {
                         <h2>Recommended for You <span style="font-size: 0.65em; font-weight: 700; color: #bb86fc; background: rgba(187, 134, 252, 0.12); padding: 3px 8px; border-radius: 999px; margin-left: 8px; vertical-align: middle; border: 1px solid rgba(187,134,252,0.25);">Curated for ${escapeHTML(roleLabel)}</span></h2>
                         <span style="font-size: 0.82rem; color: rgba(255, 255, 255, 0.55);">Seeded with your favorite vibes & sound requirements</span>
                     </div>
-                    <button id="edit-sound-profile-btn" style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">Edit Profile</button>
                 `;
-                const editBtn = document.getElementById('edit-sound-profile-btn');
-                if (editBtn) {
-                    editBtn.addEventListener('click', () => {
-                        if (typeof window.openMedixlyOnboarding === 'function') {
-                            window.openMedixlyOnboarding(5);
-                        }
-                    });
-                }
             }
         } else {
             recommended = [...librarySongs]
@@ -2092,15 +2083,20 @@ function initHarmonyTunes() {
                 // 1. If song.streamUrl is available and different from what just failed, fall back to streamUrl immediately
                 if (song.streamUrl && activeAudio.src !== song.streamUrl) {
                     console.warn(`Local audio unavailable for ${song.title}, falling back to streamUrl...`);
-                    activeAudio.src = song.streamUrl;
+                    const isDesktopServer = typeof window !== 'undefined' && window.location.hostname === '127.0.0.1';
+                    const proxiedStreamUrl = isDesktopServer ? `/proxy-audio?url=${encodeURIComponent(song.streamUrl)}` : song.streamUrl;
+                    activeAudio.src = proxiedStreamUrl;
                     activeAudio.play().then(onPlaybackRecovered).catch(() => {
-                        if (activeAudio.crossOrigin || activeAudio.hasAttribute('crossorigin')) {
-                            activeAudio.removeAttribute('crossorigin');
-                            activeAudio.src = song.streamUrl;
-                            activeAudio.play().then(onPlaybackRecovered).catch(() => handlePlaybackSnag(song));
-                        } else {
-                            handlePlaybackSnag(song);
-                        }
+                        activeAudio.src = song.streamUrl;
+                        activeAudio.play().then(onPlaybackRecovered).catch(() => {
+                            if (activeAudio.crossOrigin || activeAudio.hasAttribute('crossorigin')) {
+                                activeAudio.removeAttribute('crossorigin');
+                                activeAudio.src = song.streamUrl;
+                                activeAudio.play().then(onPlaybackRecovered).catch(() => handlePlaybackSnag(song));
+                            } else {
+                                handlePlaybackSnag(song);
+                            }
+                        });
                     });
                     return;
                 }
@@ -2252,7 +2248,10 @@ function initHarmonyTunes() {
 
         const deck = activeAudio === audioPlayer1 ? 'A' : 'B';
 
-        if (activeAudio) activeAudio.volume = 1;
+        if (activeAudio) {
+            activeAudio.volume = 1;
+            activeAudio.muted = false;
+        }
         mixEngine.setDeckVolume(deck, 1);
 
         if (!activeAudio || typeof activeAudio.play !== 'function') {

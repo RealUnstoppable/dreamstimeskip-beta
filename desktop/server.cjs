@@ -94,6 +94,63 @@ function createDesktopServer(rootDir) {
     }
   });
 
+  // Dedicated music streaming route with fallback across unpacked and root directories
+  app.get(['/music/*', '/music'], (req, res, next) => {
+    const rawPath = req.params[0] || (req.path.startsWith('/music/') ? req.path.slice('/music/'.length) : '');
+    const candidateDirs = [
+      path.join(rootDir, 'music'),
+      path.join(rootDir, '..', 'app.asar.unpacked', 'music'),
+      path.join(process.resourcesPath || '', 'app.asar.unpacked', 'music'),
+      path.join(process.resourcesPath || '', 'music')
+    ];
+
+    for (const dir of candidateDirs) {
+      const fullPath = path.join(dir, rawPath);
+      if (fs.existsSync(fullPath)) {
+        try {
+          const stat = fs.statSync(fullPath);
+          if (stat.isFile()) {
+            res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Accept-Ranges', 'bytes');
+            res.setHeader('Content-Type', 'audio/mpeg');
+            return res.sendFile(fullPath);
+          }
+        } catch (_) {}
+      }
+    }
+    next();
+  });
+
+  // Audio proxy for remote streams (prevents Web Audio API CORS-tainting & silence)
+  app.get('/proxy-audio', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl || typeof targetUrl !== 'string') {
+      return res.status(400).send('Missing url query parameter');
+    }
+    try {
+      const headers = {};
+      if (req.headers.range) {
+        headers['range'] = req.headers.range;
+      }
+      const remoteRes = await fetch(targetUrl, { headers });
+      res.status(remoteRes.status);
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Content-Type', remoteRes.headers.get('content-type') || 'audio/mpeg');
+      if (remoteRes.headers.get('content-range')) {
+        res.setHeader('Content-Range', remoteRes.headers.get('content-range'));
+      }
+      if (remoteRes.headers.get('content-length')) {
+        res.setHeader('Content-Length', remoteRes.headers.get('content-length'));
+      }
+      const arrayBuffer = await remoteRes.arrayBuffer();
+      return res.send(Buffer.from(arrayBuffer));
+    } catch (err) {
+      console.warn('[Desktop Server] Audio proxy error:', err.message);
+      return res.status(502).send('Audio proxy failed');
+    }
+  });
+
   // Serve all static assets with byte-range support (vital for mp3 audio seeking)
   app.use(express.static(rootDir, {
     dotfiles: 'ignore',

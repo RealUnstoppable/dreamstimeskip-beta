@@ -10,8 +10,25 @@ export const STORAGE_KEY_LAST_INDEX = 'medixly_last_ad_index';
 export const STORAGE_KEY_LAST_TIMESTAMP = 'medixly_last_ad_timestamp';
 export const STORAGE_KEY_SONGS_COUNT = 'medixly_songs_played_count';
 export const SESSION_KEY_FIRST_PLAYED = 'medixly_session_ad_played';
+export const STORAGE_KEY_SONG_THRESHOLD = 'medixly_ad_song_threshold';
+export const STORAGE_KEY_TIME_THRESHOLD = 'medixly_ad_time_threshold_ms';
 
 export const FIFTEEN_MINUTES_MS = 15 * 60 * 1000; // 900,000 ms
+
+/**
+ * Generate a random song count threshold between min (e.g. 2) and max (e.g. 5) songs
+ */
+export function getRandomSongInterval(min = 2, max = 5) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * Generate a random time interval between minMinutes (e.g. 7) and maxMinutes (e.g. 14) minutes in ms
+ */
+export function getRandomTimeIntervalMs(minMinutes = 7, maxMinutes = 14) {
+    const mins = Math.floor(Math.random() * (maxMinutes - minMinutes + 1)) + minMinutes;
+    return mins * 60 * 1000;
+}
 
 export class AudioAdManager {
     constructor() {
@@ -66,8 +83,68 @@ export class AudioAdManager {
                 if (!localStorage.getItem(STORAGE_KEY_SONGS_COUNT)) {
                     localStorage.setItem(STORAGE_KEY_SONGS_COUNT, '0');
                 }
+                if (!localStorage.getItem(STORAGE_KEY_SONG_THRESHOLD)) {
+                    localStorage.setItem(STORAGE_KEY_SONG_THRESHOLD, String(getRandomSongInterval(2, 5)));
+                }
+                if (!localStorage.getItem(STORAGE_KEY_TIME_THRESHOLD)) {
+                    localStorage.setItem(STORAGE_KEY_TIME_THRESHOLD, String(getRandomTimeIntervalMs(7, 14)));
+                }
             }
         } catch (_) {}
+    }
+
+    getNextSongThreshold() {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                const stored = localStorage.getItem(STORAGE_KEY_SONG_THRESHOLD);
+                if (stored !== null) {
+                    const parsed = parseInt(stored, 10);
+                    if (!isNaN(parsed) && parsed >= 1) return parsed;
+                }
+            }
+        } catch (_) {}
+        const defaultInterval = getRandomSongInterval(2, 5);
+        this.setNextSongThreshold(defaultInterval);
+        return defaultInterval;
+    }
+
+    setNextSongThreshold(val) {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(STORAGE_KEY_SONG_THRESHOLD, String(val));
+            }
+        } catch (_) {}
+    }
+
+    getNextTimeThresholdMs() {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                const stored = localStorage.getItem(STORAGE_KEY_TIME_THRESHOLD);
+                if (stored !== null) {
+                    const parsed = parseInt(stored, 10);
+                    if (!isNaN(parsed) && parsed >= 60000) return parsed;
+                }
+            }
+        } catch (_) {}
+        const defaultInterval = getRandomTimeIntervalMs(7, 14);
+        this.setNextTimeThresholdMs(defaultInterval);
+        return defaultInterval;
+    }
+
+    setNextTimeThresholdMs(val) {
+        try {
+            if (typeof localStorage !== 'undefined') {
+                localStorage.setItem(STORAGE_KEY_TIME_THRESHOLD, String(val));
+            }
+        } catch (_) {}
+    }
+
+    rollNewRandomIntervals() {
+        const nextSongs = getRandomSongInterval(2, 5);
+        const nextTimeMs = getRandomTimeIntervalMs(7, 14);
+        this.setNextSongThreshold(nextSongs);
+        this.setNextTimeThresholdMs(nextTimeMs);
+        return { songThreshold: nextSongs, timeThresholdMs: nextTimeMs };
     }
 
     /**
@@ -239,14 +316,16 @@ export class AudioAdManager {
             return true;
         }
 
-        // Rule 2: After every 5 songs
-        if (this.getSongsPlayedCount() >= 5) {
+        // Rule 2: Random song interval (e.g. every 2-5 songs, rolled dynamically)
+        const targetSongThreshold = this.getNextSongThreshold();
+        if (this.getSongsPlayedCount() >= targetSongThreshold) {
             return true;
         }
 
-        // Rule 3: After 15 minutes
+        // Rule 3: Random time interval (e.g. 7-14 minutes, rolled dynamically)
+        const targetTimeThreshold = this.getNextTimeThresholdMs();
         const elapsed = Date.now() - this.getLastAdTimestamp();
-        if (elapsed >= FIFTEEN_MINUTES_MS) {
+        if (elapsed >= targetTimeThreshold) {
             return true;
         }
 
@@ -262,19 +341,22 @@ export class AudioAdManager {
     }
 
     /**
-     * Alternates between the 2 uploaded ad audios:
-     * ad-1.mp3 -> ad-2.mp3 -> ad-1.mp3 ...
+     * Selects ad audio in randomized sequence avoiding consecutive duplicates
      */
     getNextAdIndex() {
         try {
-            let lastIndex = 1;
+            if (AD_AUDIO_SOURCES.length <= 1) return 0;
+            let lastIndex = 0;
             if (typeof localStorage !== 'undefined') {
                 const stored = localStorage.getItem(STORAGE_KEY_LAST_INDEX);
                 if (stored !== null) {
                     lastIndex = parseInt(stored, 10);
                 }
             }
-            const nextIndex = (lastIndex + 1) % AD_AUDIO_SOURCES.length;
+            let nextIndex = Math.floor(Math.random() * AD_AUDIO_SOURCES.length);
+            if (nextIndex === lastIndex && AD_AUDIO_SOURCES.length > 1) {
+                nextIndex = (lastIndex + 1) % AD_AUDIO_SOURCES.length;
+            }
             if (typeof localStorage !== 'undefined') {
                 localStorage.setItem(STORAGE_KEY_LAST_INDEX, nextIndex.toString());
             }
@@ -454,6 +536,7 @@ export class AudioAdManager {
         this.setSessionAdPlayed(true);
         this.setSongsPlayedCount(0);
         this.setLastAdTimestamp(Date.now());
+        this.rollNewRandomIntervals();
 
         if (this.adAudio) {
             this.adAudio.pause();

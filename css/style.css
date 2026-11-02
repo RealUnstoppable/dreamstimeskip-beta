@@ -1059,7 +1059,8 @@ textarea:focus-visible {
 
 /* ===== Medixly Navbar Logo ===== */
 #medixly-navbar-logo {
-    height: 54px;
+    height: 81px;
+    max-height: 81px;
     margin-top: 2px;
 }
 

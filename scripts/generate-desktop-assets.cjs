@@ -17,6 +17,11 @@ if (!fs.existsSync(iconsetDir)) {
 
 console.log('Generating macOS app icons from', sourceLogo);
 
+// Zoom in by 50% (1.5x zoom: crop center 400x400 of 600x600 and scale to 1024x1024)
+const zoomedMaster = path.join(buildDir, 'zoomed-master.png');
+execSync(`sips -c 400 400 "${sourceLogo}" --out "${zoomedMaster}"`, { stdio: 'ignore' });
+execSync(`sips -z 1024 1024 "${zoomedMaster}" --out "${zoomedMaster}"`, { stdio: 'ignore' });
+
 const iconSizes = [
   { name: 'icon_16x16.png', size: 16 },
   { name: 'icon_16x16@2x.png', size: 32 },
@@ -32,7 +37,7 @@ const iconSizes = [
 
 for (const item of iconSizes) {
   const destPath = path.join(iconsetDir, item.name);
-  execSync(`sips -z ${item.size} ${item.size} "${sourceLogo}" --out "${destPath}"`, { stdio: 'ignore' });
+  execSync(`sips -z ${item.size} ${item.size} "${zoomedMaster}" --out "${destPath}"`, { stdio: 'ignore' });
 }
 
 // Convert iconset to .icns
@@ -47,13 +52,17 @@ try {
 // Generate Tray Icons
 const trayIcon16 = path.join(buildDir, 'tray-icon.png');
 const trayIcon32 = path.join(buildDir, 'tray-icon@2x.png');
-execSync(`sips -z 18 18 "${sourceLogo}" --out "${trayIcon16}"`, { stdio: 'ignore' });
-execSync(`sips -z 36 36 "${sourceLogo}" --out "${trayIcon32}"`, { stdio: 'ignore' });
+execSync(`sips -z 18 18 "${zoomedMaster}" --out "${trayIcon16}"`, { stdio: 'ignore' });
+execSync(`sips -z 36 36 "${zoomedMaster}" --out "${trayIcon32}"`, { stdio: 'ignore' });
 console.log('Generated tray icons:', trayIcon16, trayIcon32);
 
 // Generate 512x512 png icon for electron-builder
 const iconPng512 = path.join(buildDir, 'icon.png');
-execSync(`sips -z 512 512 "${sourceLogo}" --out "${iconPng512}"`, { stdio: 'ignore' });
+execSync(`sips -z 512 512 "${zoomedMaster}" --out "${iconPng512}"`, { stdio: 'ignore' });
+
+if (fs.existsSync(zoomedMaster)) {
+  fs.unlinkSync(zoomedMaster);
+}
 
 // Clean up iconset temp folder
 fs.rmSync(iconsetDir, { recursive: true, force: true });

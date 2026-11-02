@@ -173,3 +173,71 @@ describe('Phase 5: Desktop Update Feature & Version Visibility', () => {
         assert.ok(html.includes('id="medixly-check-update-btn"'), 'Check update button must exist');
     });
 });
+
+describe('Phase 6: Audio Fixes, Logo Zoom, Promotion & Randomized Ads', () => {
+    it('should not contain edit profile button in recommended shelf', () => {
+        const medixlyJs = fs.readFileSync(path.resolve(process.cwd(), 'js/medixly.js'), 'utf8');
+        assert.ok(!medixlyJs.includes('id="edit-sound-profile-btn"'), 'Edit Profile button must be removed from Recommended for You');
+    });
+
+    it('should include music directory in electron-builder.yml and dedicated streaming route in desktop/server.cjs', () => {
+        const builderYml = fs.readFileSync(path.resolve(process.cwd(), 'electron-builder.yml'), 'utf8');
+        assert.ok(builderYml.includes('- "music/**/*"'), 'electron-builder must package music/**/*');
+        assert.ok(builderYml.includes('asarUnpack:'), 'electron-builder must have asarUnpack');
+
+        const serverCjs = fs.readFileSync(path.resolve(process.cwd(), 'desktop/server.cjs'), 'utf8');
+        assert.ok(serverCjs.includes("app.get(['/music/*', '/music']"), 'server.cjs must have dedicated music streaming route');
+        assert.ok(serverCjs.includes("app.get('/proxy-audio'"), 'server.cjs must provide /proxy-audio route');
+    });
+
+    it('should configure audio elements with crossorigin and AudioMixEngine with explicit gains', () => {
+        const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
+        assert.ok(html.includes('id="audio-player" preload="auto" crossorigin="anonymous"'), 'Audio player must have crossorigin="anonymous"');
+        assert.ok(html.includes('id="audio-player-2" preload="auto" crossorigin="anonymous"'), 'Audio player 2 must have crossorigin="anonymous"');
+
+        const engineJs = fs.readFileSync(path.resolve(process.cwd(), 'js/audio-engine.js'), 'utf8');
+        assert.ok(engineJs.includes('this.masterGain.gain.value = 1.0;'), 'masterGain must be explicitly set to 1.0');
+        assert.ok(engineJs.includes('this.deckAGain.gain.value = 1.0;'), 'deckAGain must be explicitly set to 1.0');
+    });
+
+    it('should zoom the app icon logo by 50% in scripts and styles', () => {
+        const navJs = fs.readFileSync(path.resolve(process.cwd(), 'js/navbar.js'), 'utf8');
+        assert.ok(navJs.includes('height: 81px'), 'Navbar logo must be zoomed to 81px height');
+
+        const scriptJs = fs.readFileSync(path.resolve(process.cwd(), 'scripts/generate-desktop-assets.cjs'), 'utf8');
+        assert.ok(scriptJs.includes('-c 400 400'), 'Script must center crop 400x400 for 1.5x zoom');
+        assert.ok(scriptJs.includes('-z 1024 1024'), 'Script must resample zoomed master to 1024x1024');
+    });
+
+    it('should reset promotion anchor to today and entry price to 0.99', async () => {
+        const engine = await import('../js/medixly-pricing-engine.js');
+        assert.equal(engine.TIER_CONFIG.premium.basePrice, 0.99, 'Premium base price must be 0.99');
+        assert.equal(engine.TIER_CONFIG.ultra.basePrice, 0.99, 'Ultra base price must be 0.99');
+        assert.equal(engine.DEFAULT_PROMO_START_UTC, '2026-11-02T00:00:00Z', 'Promo anchor must be today 2026-11-02');
+
+        const priceToday = engine.calculateMedixlyDailyPrice('premium', 'monthly', '2026-11-02T12:00:00Z');
+        assert.equal(priceToday, 0.99, 'Price today must calculate to 0.99');
+
+        const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');
+        assert.ok(html.includes('Upgrade ($0.99 Today)'), 'Header must display $0.99 Today');
+        assert.ok(html.includes('Upgrade to Premium ($0.99 Today)'), 'Modal CTA must display $0.99 Today');
+    });
+
+    it('should play ads in randomized intervals', async () => {
+        const adsModule = await import('../js/audio-ads.js');
+        assert.equal(typeof adsModule.getRandomSongInterval, 'function', 'Must export getRandomSongInterval');
+        assert.equal(typeof adsModule.getRandomTimeIntervalMs, 'function', 'Must export getRandomTimeIntervalMs');
+
+        const songInterval = adsModule.getRandomSongInterval(2, 5);
+        assert.ok(songInterval >= 2 && songInterval <= 5, 'Song interval must be between 2 and 5');
+
+        const timeInterval = adsModule.getRandomTimeIntervalMs(7, 14);
+        assert.ok(timeInterval >= 7 * 60 * 1000 && timeInterval <= 14 * 60 * 1000, 'Time interval must be between 7 and 14 mins');
+
+        const manager = new adsModule.AudioAdManager();
+        assert.equal(typeof manager.rollNewRandomIntervals, 'function', 'AudioAdManager must have rollNewRandomIntervals');
+        const rolled = manager.rollNewRandomIntervals();
+        assert.ok(rolled.songThreshold >= 2 && rolled.songThreshold <= 5, 'Rolled song threshold must be valid');
+        assert.ok(rolled.timeThresholdMs >= 7 * 60 * 1000, 'Rolled time threshold must be valid');
+    });
+});

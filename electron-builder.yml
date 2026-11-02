@@ -14,6 +14,7 @@ extraMetadata:
 npmRebuild: false
 asar: true
 asarUnpack:
+  - "music/**/*"
   - "desktop/build/**/*"
 
 files:
@@ -21,6 +22,7 @@ files:
   - "js/**/*"
   - "css/**/*"
   - "images/**/*"
+  - "music/**/*"
   - "dist/**/*"
   - "backend/**/*"
   - "public/**/*"
@@ -34,7 +36,6 @@ files:
   - "privacy.html"
   - "manifest.json"
   - "package.json"
-  - "!music/**/*"
   - "!**/*.map"
   - "!tests/**/*"
   - "!scratch/**/*"

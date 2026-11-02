@@ -99,6 +99,7 @@ export class AudioMixEngine {
 
     if (!this.masterGain) {
       this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 1.0;
       this.masterGain.connect(this.ctx.destination);
       if (this.analyser) {
         try { this.masterGain.connect(this.analyser); } catch (_) {}
@@ -107,12 +108,26 @@ export class AudioMixEngine {
 
     if (!this.deckAGain) {
       this.deckAGain = this.ctx.createGain();
+      this.deckAGain.gain.value = 1.0;
       this.deckAGain.connect(this.masterGain);
     }
     
     if (!this.deckBGain) {
       this.deckBGain = this.ctx.createGain();
+      this.deckBGain.gain.value = 1.0;
       this.deckBGain.connect(this.masterGain);
+    }
+
+    // Auto-unlock AudioContext on user interaction
+    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+      const unlockAudio = () => {
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume().catch(() => {});
+        }
+      };
+      ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(evt => {
+        document.addEventListener(evt, unlockAudio, { passive: true, once: false });
+      });
     }
 
     // Initialize EQ chains
