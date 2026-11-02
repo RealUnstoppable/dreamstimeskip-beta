@@ -45,9 +45,42 @@ const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
 
 export function loadNavbar() {
     const isMedixlyPage = window.location.pathname.includes('medixly');
+    const isDtsPage = typeof window !== 'undefined' && (
+        window.location.pathname.includes('dts') ||
+        window.location.pathname.includes('dreamstimeskip') ||
+        Boolean(document.getElementById('dts')) ||
+        Boolean(document.querySelector('.hero-og-bg')) ||
+        (document.title && document.title.toLowerCase().includes('dreams timeskip'))
+    );
     const logoContent = isMedixlyPage
         ? `<span class="un-letters">un</span><span style="font-weight: 800; margin: 0 10px; font-size: 1.2rem; color: var(--text-primary);">x</span><img src="/images/medixly-logo.png" alt="Medixly" style="height: 81px; margin-top: 2px;" id="medixly-navbar-logo">`
         : `<span class="un-letters">un</span><span class="un-250">250</span>`;
+
+    const dtsStoreNavItem = isDtsPage ? `
+            <li class="nav-dts-store-item">
+                <a href="#store" id="nav-dts-store-btn" class="nav-dts-store-btn" aria-label="Dreams TimeSkip Store">
+                    <span class="mc-nav-store-icon">🛒</span>
+                    <span class="mc-nav-store-text">STORE</span>
+                    <span class="mc-nav-store-badge">TEBEX</span>
+                </a>
+            </li>` : '';
+
+    const dtsHeaderStoreBtn = isDtsPage ? `
+        <div class="nav-header-actions" style="display: flex; align-items: center; gap: 10px;">
+            <a href="#store" id="nav-dts-store-header-btn" class="nav-dts-store-btn dts-store-header-btn" aria-label="Dreams TimeSkip Store">
+                <span class="mc-nav-store-icon">🛒</span>
+                <span class="mc-nav-store-text">STORE</span>
+                <span class="mc-nav-store-badge">TEBEX</span>
+            </a>
+            <button class="hamburger" title="Open menu" aria-label="Open menu">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
+            </button>
+        </div>` : `
+        <button class="hamburger" title="Open menu" aria-label="Open menu">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+            <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
+        </button>`;
 
     const headerHTML = `
     <nav class="navbar">
@@ -65,6 +98,7 @@ export function loadNavbar() {
                     <span id="nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
                 </a>
             </li>
+            ${dtsStoreNavItem}
             <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
@@ -91,10 +125,7 @@ export function loadNavbar() {
             </li>
             <li><a href="sign in beta.html" id="auth-link">Sign In / Sign Up</a></li>
         </ul>
-        <button class="hamburger" title="Open menu" aria-label="Open menu">
-            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-            <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
-        </button>
+        ${dtsHeaderStoreBtn}
     </nav>`;
 
     const header = document.querySelector('.main-header');
@@ -316,6 +347,20 @@ function attachNavEvents() {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('active');
+            });
+        });
+
+        // Smooth scroll for in-page Store navigation links
+        document.querySelectorAll('a[href="#store"]').forEach(storeLink => {
+            storeLink.addEventListener('click', (e) => {
+                const target = document.getElementById('store');
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (window.history && window.history.pushState) {
+                        window.history.pushState(null, '', '#store');
+                    }
+                }
             });
         });
     }

@@ -247,9 +247,9 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         });
     });
 
-    describe('Dreams OG Launch Countdown Configuration', () => {
-        it('configures the Dreams OG countdown for 11:59 PM EDT on October 20, 2026', () => {
-            expect(html).toContain('new Countdown("2026-10-20T23:59:00-04:00", "countdown-1")');
+    describe('Dreams OG Launch & End Portal Countdown Configuration', () => {
+        it('configures the End Portal opening countdown for 12:00 AM EST on Wednesday, November 4, 2026', () => {
+            expect(html).toContain('new Countdown("2026-11-04T00:00:00-05:00", "countdown-1")');
         });
 
         it('sets the Founder whitelist cutoff to 11:59 PM EDT launch on October 20, 2026', () => {
@@ -257,11 +257,21 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         });
     });
 
-    describe('Dreams OG Live & Server Maintenance Complete Verification', () => {
-        it('confirms Dreams OG is Live across announcement banner, badge, and section header', () => {
+    describe('Dreams OG Live, End Portal Header & Server Maintenance Verification', () => {
+        it('confirms End Portal opens header, purple countdown, and Dreams OG live badges', () => {
             expect(html).toContain('DREAMS OG IS LIVE');
-            expect(html).toContain('OFFICIAL MINECRAFT RELEASE • DREAMS OG IS LIVE');
-            expect(html).toContain('<h1>DREAMS OG IS LIVE</h1>');
+            expect(html).toContain('<h1>End Portal opens 12:00 AM wednesday 4 2026</h1>');
+            expect(html).toContain('countdown-purple');
+            expect(html).toContain('/images/end-portal.jpg');
+        });
+
+        it('renders the 3 gallery archive buttons on the Dreams page', () => {
+            expect(html).toContain('id="hub-gallery-dreams"');
+            expect(html).toContain('mc-btn-red');
+            expect(html).toContain('id="hub-gallery-dreams-og"');
+            expect(html).toContain('mc-btn-green');
+            expect(html).toContain('id="hub-gallery-dreams-timeskip"');
+            expect(html).toContain('mc-btn-disabled');
         });
 
         it('renders the server maintenance complete box with server is now working and join below notice', () => {
