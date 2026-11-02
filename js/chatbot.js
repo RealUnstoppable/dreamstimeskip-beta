@@ -23,9 +23,9 @@ Brand Structure & Ventures under the Unstoppable Umbrella:
 - Unstoppable: The parent brand and central ecosystem. "Unstoppable" is also our gaming channel (https://www.youtube.com/@Unstoppab1e).
 - Dreams: A product line under the Unstoppable Umbrella. 
   1. Dreams TimeSkip (DTS): An upcoming Minecraft server saga launching January 15, 2027.
-  2. Dreams OG: A nostalgic classic Minecraft SMP experience that is now live!
+  2. Dreams OG: A nostalgic classic Minecraft SMP experience (currently in maintenance; the server is still up).
   - Official Minecraft Server IP: **dts.realunstoppable.store** (supports Minecraft Java 26.3 and Bedrock). Java does not require a port. Bedrock port is **19132**.
-  - Server Status: Dreams OG is live! The server is now working! Maintenance is complete. Players can join below using the server address dts.realunstoppable.store (Bedrock port: 19132).
+  - Server Status: The server is still up and operational at dts.realunstoppable.store, while Dreams OG is in maintenance. Players can connect using the server address dts.realunstoppable.store (Bedrock port: 19132).
 - Medixly: Our newly rebranded music platform (formerly HarmonyTunes) under the Unstoppable Umbrella for listeners, editors, and creators.
 - Merch Store: Official shop selling the 'Unstoppable Hoodie', 'DTS Model Tee', 'HarmonyTunes Cap', 'Unstoppable Mousepad', and 'Ceramic Mug'.
 - Squishly: Our juicy, physics-driven ASMR arcade minigame in the hub (formerly called Blob Game).
@@ -370,7 +370,7 @@ export function getDreamsCountdownsData() {
         javaIP: "dts.realunstoppable.store",
         bedrockIP: "dts.realunstoppable.store",
         bedrockPort: 19132,
-        serverStatus: "Server is now working! Server maintenance complete — join below via Java IP (dts.realunstoppable.store) or Bedrock (dts.realunstoppable.store, port 19132)",
+        serverStatus: "The server is still up! Dreams OG is currently in maintenance — connect via Java IP (dts.realunstoppable.store) or Bedrock (dts.realunstoppable.store, port 19132)",
         minecraftVersion: "26.3 (Java & Bedrock compatible)",
         dreamsOG: {
             launchDate: "October 20, 2026",

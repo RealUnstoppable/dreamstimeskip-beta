@@ -257,9 +257,9 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
         });
     });
 
-    describe('Dreams OG Live, End Portal Header & Server Maintenance Verification', () => {
-        it('confirms End Portal opens header, purple countdown, and Dreams OG live badges', () => {
-            expect(html).toContain('DREAMS OG IS LIVE');
+    describe('Dreams OG Maintenance, End Portal Header & Server Status Verification', () => {
+        it('confirms End Portal opens header, purple countdown, and Dreams OG maintenance badges', () => {
+            expect(html).toContain('DREAMS OG IN MAINTENANCE');
             expect(html).toContain('<h1>End Portal opens 12:00 AM wednesday 4 2026</h1>');
             expect(html).toContain('countdown-purple');
             expect(html).toContain('/images/end-portal.jpg');
@@ -274,24 +274,24 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(html).toContain('mc-btn-disabled');
         });
 
-        it('renders the server maintenance complete box with server is now working and join below notice', () => {
-            expect(html).toContain('class="mc-maintenance-box');
-            expect(html).toContain('MAINTENANCE COMPLETE');
-            expect(html).toContain('Server is now working — join below!');
-            expect(html).toContain('Server is now working • Join below');
-            expect(html).toContain('Maintenance Complete');
+        it('renders the Dreams OG maintenance box with server is still up notice and join below options', () => {
+            expect(html).toContain('class="mc-maintenance-box"');
+            expect(html).toContain('DREAMS OG IN MAINTENANCE');
+            expect(html).toContain('SERVER IS STILL UP');
+            expect(html).toContain('Dreams OG is in maintenance — the server is still up!');
+            expect(html).toContain('Server is Still Up');
+            expect(html).toContain('In Maintenance');
         });
 
-        it('features the complete progress bar graphic showing maintenance complete', () => {
-            expect(html).toContain('class="mc-progress-bar-complete"');
+        it('features the progress bar graphic showing Dreams OG maintenance in progress', () => {
+            expect(html).toContain('class="mc-progress-bar-indeterminate"');
             expect(html).toContain('class="mc-progress-track"');
-            expect(html).toContain('mcCompleteShimmer');
-            expect(html).toContain('100% Complete • Online');
+            expect(html).toContain('Under Maintenance');
         });
 
-        it('contains accessible markup for the maintenance complete box and progress graphic', () => {
-            expect(html).toContain('role="region" aria-label="Server Status - Maintenance Complete"');
-            expect(html).toContain('role="progressbar" aria-label="Server maintenance complete" aria-valuenow="100"');
+        it('contains accessible markup for the maintenance box and progress graphic', () => {
+            expect(html).toContain('role="region" aria-label="Dreams OG Maintenance - Server Online"');
+            expect(html).toContain('role="progressbar" aria-label="Dreams OG maintenance active"');
         });
     });
 

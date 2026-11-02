@@ -2879,6 +2879,37 @@
             color: #ffffff;
         }
 
+        .mc-open-4 {
+            display: inline-block;
+            width: 0.8em;
+            height: 0.8em;
+            vertical-align: 0;
+            line-height: 1;
+        }
+
+        .mc-open-4 svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            shape-rendering: crispEdges;
+        }
+
+        .mc-open-4 rect {
+            fill: currentColor;
+        }
+
+        .price-amount .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         .price-cents {
             font-size: 1.2rem;
             font-weight: 700;
@@ -3281,7 +3312,7 @@
     <!-- Top Minecraft Announcement Ribbon -->
     <div class="mc-announcement-bar">
         <span class="mc-announcement-pulse" style="background: #a855f7; box-shadow: 0 0 10px #a855f7;"></span>
-        <span>🌌 END PORTAL OPENS 12:00 AM WEDNESDAY NOV 4, 2026 • DREAMS OG IS LIVE • SERVER IS WORKING 🌌</span>
+        <span>🌌 END PORTAL OPENS 12:00 AM WEDNESDAY NOV 4, 2026 • DREAMS OG IN MAINTENANCE • SERVER IS STILL UP 🌌</span>
     </div>
 
     <main>
@@ -3293,7 +3324,7 @@
             <div class="video-overlay"></div>
             <div class="hero-content">
                 <div class="mc-badge mc-badge-gold" style="background: rgba(147, 51, 234, 0.28); border: 2px solid #a855f7; color: #f3e8ff; text-shadow: 0 0 8px #9333ea;">
-                    <span>✦</span> END PORTAL EVENT • DREAMS OG IS LIVE <span>✦</span>
+                    <span>✦</span> END PORTAL EVENT • DREAMS OG IN MAINTENANCE <span>✦</span>
                 </div>
                 <h1>End Portal opens 12:00 AM wednesday 4 2026</h1>
                 <p class="subtitle">
@@ -3304,87 +3335,87 @@
                 <div id="countdown-1" class="countdown-container countdown-purple"></div>
 
                 <div class="mc-maintenance-container" style="margin-top: 15px;">
-                    <div class="mc-maintenance-box mc-box-complete" role="region" aria-label="Server Status - Maintenance Complete">
+                    <div class="mc-maintenance-box" role="region" aria-label="Dreams OG Maintenance - Server Online">
                         <!-- Maintenance Header Badge Row -->
                         <div class="mc-maint-header">
                             <div class="mc-maint-pill-group">
-                                <span class="mc-maint-pill mc-pill-live">
-                                    <span class="mc-pill-dot green"></span> DREAMS OG IS LIVE
+                                <span class="mc-maint-pill mc-pill-status">
+                                    <span class="mc-pill-dot amber"></span> DREAMS OG IN MAINTENANCE
                                 </span>
-                                <span class="mc-maint-pill mc-pill-complete">
-                                    <span class="mc-pill-dot green"></span> MAINTENANCE COMPLETE
+                                <span class="mc-maint-pill mc-pill-live">
+                                    <span class="mc-pill-dot green"></span> SERVER IS STILL UP
                                 </span>
                             </div>
                             <div class="mc-maint-refresh-badge">
-                                <span class="mc-check-green">✔</span>
-                                <span style="color: #55ff55;">ALL SYSTEMS OPERATIONAL</span>
+                                <span class="mc-spin-icon">⚙</span>
+                                <span>SERVER ONLINE • OG MAINTENANCE</span>
                             </div>
                         </div>
 
                         <!-- Main Title & Working Message -->
                         <div class="mc-maint-body">
                             <h2 class="mc-maint-heading">
-                                DREAMS OG IS LIVE! <span class="live-sub-tag">• SERVER IS NOW WORKING</span>
+                                DREAMS OG IN MAINTENANCE <span class="live-sub-tag">• SERVER IS STILL UP</span>
                             </h2>
                             
-                            <div class="mc-maint-working-banner mc-maint-complete-banner">
+                            <div class="mc-maint-working-banner">
                                 <div class="mc-maint-icon-wrap">
-                                    <span>⚔️</span>
+                                    <span>⚙️</span>
                                 </div>
                                 <div class="mc-maint-text-wrap">
                                     <p class="mc-maint-primary-msg">
-                                        <strong>Server is now working — join below!</strong> Maintenance is complete, realm deployment has finished, and world systems are online.
+                                        <strong>Dreams OG is in maintenance — the server is still up!</strong> Maintenance is underway for Dreams OG while server connectivity remains online.
                                     </p>
                                     <p class="mc-maint-sub-msg">
-                                        Custom biomes, world border caches, and crossplay connections are active. Click <strong>Join Server</strong> below to copy the IP or connect directly with Minecraft!
+                                        The Minecraft server is active and reachable at <strong>dts.realunstoppable.store</strong>. Players can continue to connect below via Java &amp; Bedrock while Dreams OG systems are being maintained.
                                     </p>
                                 </div>
                             </div>
 
-                            <!-- Metrics Grid: Maintenance Complete, Server Working / Join Below, Dreams OG Live -->
+                            <!-- Metrics Grid: Maintenance, Server Still Up, Address -->
                             <div class="mc-maint-stats-grid">
                                 <div class="mc-maint-stat-card">
-                                    <span class="mc-stat-label">MAINTENANCE STATUS</span>
-                                    <span class="mc-stat-val val-green">Maintenance Complete</span>
-                                    <span class="mc-stat-sub">100% deployment completed</span>
+                                    <span class="mc-stat-label">DREAMS OG STATUS</span>
+                                    <span class="mc-stat-val val-amber">In Maintenance</span>
+                                    <span class="mc-stat-sub">Dreams OG is in maintenance</span>
                                 </div>
                                 <div class="mc-maint-stat-card">
                                     <span class="mc-stat-label">SERVER AVAILABILITY</span>
-                                    <span class="mc-stat-val val-green">Server is now working • Join below</span>
-                                    <span class="mc-stat-sub">Java 26.3 &amp; Bedrock open</span>
+                                    <span class="mc-stat-val val-green">Server is Still Up</span>
+                                    <span class="mc-stat-sub">Java 26.3 &amp; Bedrock online</span>
                                 </div>
                                 <div class="mc-maint-stat-card">
-                                    <span class="mc-stat-label">GLOBAL REALM STATUS</span>
-                                    <span class="mc-stat-val val-green">Dreams OG Live</span>
-                                    <span class="mc-stat-sub">dts.realunstoppable.store</span>
+                                    <span class="mc-stat-label">SERVER ADDRESS</span>
+                                    <span class="mc-stat-val val-gold">dts.realunstoppable.store</span>
+                                    <span class="mc-stat-sub">Bedrock port: 19132</span>
                                 </div>
                             </div>
 
-                            <!-- Graphic: Progress Bar showing Maintenance Complete (100% Full Emerald Bar) -->
+                            <!-- Graphic: Progress Bar showing Dreams OG Maintenance (Smooth Indeterminate Looping Bar) -->
                             <div class="mc-maint-progress-section">
                                 <div class="mc-progress-header">
                                     <span class="mc-progress-title">
-                                        <span class="mc-check-green">✔</span> Maintenance Complete — All Systems Operational
+                                        <span class="mc-progress-pulse" style="background: #ffaa00; box-shadow: 0 0 8px #ffaa00;"></span> Dreams OG Maintenance Active — Server Still Up
                                     </span>
-                                    <span class="mc-progress-status-text val-green" style="color: #55ff55;">100% Complete • Online</span>
+                                    <span class="mc-progress-status-text val-amber" style="color: #ffaa00;">Under Maintenance</span>
                                 </div>
 
-                                <div class="mc-progress-track" role="progressbar" aria-label="Server maintenance complete" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                    <div class="mc-progress-glow-track mc-glow-complete"></div>
+                                <div class="mc-progress-track" role="progressbar" aria-label="Dreams OG maintenance active" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="mc-progress-glow-track"></div>
                                     <div class="mc-progress-stripes"></div>
-                                    <div class="mc-progress-bar-complete"></div>
+                                    <div class="mc-progress-bar-indeterminate"></div>
                                 </div>
 
                                 <div class="mc-progress-footer">
-                                    <span>✔ Maintenance complete • All nodes synchronized</span>
-                                    <span style="color: #55ff55;">Server is now working • Join below</span>
+                                    <span>⚙ Dreams OG in maintenance • Updates in progress</span>
+                                    <span style="color: #55ff55;">Server is still up • Join below</span>
                                 </div>
                             </div>
 
                             <!-- Whitelist & Streak Reassurance -->
                             <div class="mc-maint-footer-note">
                                 <span class="mc-check-green">✔</span>
-                                <span>Founder Whitelist registrations, Minecraft usernames, and daily streak rewards are synced and active in-game. Click the <strong>Join Server</strong> button below to hop in!</span>
+                                <span>The server is still up. Whitelist registrations, Minecraft usernames, and daily streak rewards are preserved and active. Click <strong>Join Server</strong> below to connect!</span>
                             </div>
                         </div>
                     </div>
@@ -3407,9 +3438,9 @@
 
                 <div class="mc-server-status">
                     <span class="mc-status-dot" style="background: #55ff55; box-shadow: 0 0 10px #55ff55;"></span>
-                    <span style="color: #55ff55; font-weight: 700;">SERVER IS NOW WORKING (JOIN BELOW) • MAINTENANCE COMPLETE</span>
+                    <span style="color: #55ff55; font-weight: 700;">SERVER IS STILL UP (JOIN BELOW)</span>
                     <span>•</span>
-                    <span style="color: #55ff55; font-weight: 700;">DREAMS OG LIVE</span>
+                    <span style="color: #ffaa00; font-weight: 700;">DREAMS OG IN MAINTENANCE</span>
                     <span>•</span>
                     <span>JAVA 26.3 &amp; BEDROCK</span>
                     <span>•</span>
@@ -3713,7 +3744,7 @@
                             <div class="rank-duration">Permanent Lifetime Access</div>
                             <div class="rank-price-block">
                                 <span class="currency-symbol">$</span>
-                                <span class="price-amount">24</span>
+                                <span class="price-amount" aria-label="24">2<span class="mc-open-4" aria-hidden="true"><svg viewBox="0 0 8 8" focusable="false"><rect x="0" y="0" width="2" height="5" fill="currentColor"/><rect x="0" y="3" width="8" height="2" fill="currentColor"/><rect x="5" y="0" width="2" height="8" fill="currentColor"/></svg></span><span class="sr-only">4</span></span>
                                 <span class="price-cents">.99</span>
                                 <span class="price-term">USD / one-time</span>
                             </div>
@@ -3754,7 +3785,7 @@
                             <div class="rank-duration">Permanent Lifetime Access</div>
                             <div class="rank-price-block">
                                 <span class="currency-symbol">$</span>
-                                <span class="price-amount">49</span>
+                                <span class="price-amount" aria-label="49"><span class="mc-open-4" aria-hidden="true"><svg viewBox="0 0 8 8" focusable="false"><rect x="0" y="0" width="2" height="5" fill="currentColor"/><rect x="0" y="3" width="8" height="2" fill="currentColor"/><rect x="5" y="0" width="2" height="8" fill="currentColor"/></svg></span><span class="sr-only">4</span>9</span>
                                 <span class="price-cents">.99</span>
                                 <span class="price-term">USD / one-time</span>
                             </div>
@@ -3834,7 +3865,7 @@
                             <div class="rank-duration">Cancel Anytime • Auto-Renews Monthly</div>
                             <div class="rank-price-block">
                                 <span class="currency-symbol">$</span>
-                                <span class="price-amount">14</span>
+                                <span class="price-amount" aria-label="14">1<span class="mc-open-4" aria-hidden="true"><svg viewBox="0 0 8 8" focusable="false"><rect x="0" y="0" width="2" height="5" fill="currentColor"/><rect x="0" y="3" width="8" height="2" fill="currentColor"/><rect x="5" y="0" width="2" height="8" fill="currentColor"/></svg></span><span class="sr-only">4</span></span>
                                 <span class="price-cents">.99</span>
                                 <span class="price-term">USD / month</span>
                             </div>

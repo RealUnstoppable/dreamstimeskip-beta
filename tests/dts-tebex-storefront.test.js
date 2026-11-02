@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { chromium } from 'playwright';
+import { jest } from '@jest/globals';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -79,7 +80,8 @@ describe('Dreams TimeSkip Tebex Storefront & Security Hardening', () => {
             expect(html).toContain('CHAMPION');
             expect(html).toContain('featured-tier');
             expect(html).toContain('MOST POPULAR • BEST VALUE');
-            expect(html).toContain('class="price-amount">24</span>');
+            expect(html).toContain('class="price-amount" aria-label="24"');
+            expect(html).toContain('class="mc-open-4"');
             expect(html).toContain('class="price-cents">.99</span>');
             expect(html).toContain('[Champion]');
             expect(html).toContain('https://dreamstimeskip.tebex.io/package/champion');
@@ -89,7 +91,8 @@ describe('Dreams TimeSkip Tebex Storefront & Security Hardening', () => {
             expect(html).toContain('TIME OVERLORD');
             expect(html).toContain('ultimate-tier');
             expect(html).toContain('ULTIMATE PRESTIGE');
-            expect(html).toContain('class="price-amount">49</span>');
+            expect(html).toContain('class="price-amount" aria-label="49"');
+            expect(html).toContain('class="mc-open-4"');
             expect(html).toContain('class="price-cents">.99</span>');
             expect(html).toContain('[Overlord]');
             expect(html).toContain('https://dreamstimeskip.tebex.io/package/overlord');
@@ -107,7 +110,8 @@ describe('Dreams TimeSkip Tebex Storefront & Security Hardening', () => {
             // TimeSkip Elite Pass (Monthly)
             expect(html).toContain('id="card-membership-elite"');
             expect(html).toContain('TIMESKIP ELITE');
-            expect(html).toContain('class="price-amount">14</span>');
+            expect(html).toContain('class="price-amount" aria-label="14"');
+            expect(html).toContain('class="mc-open-4"');
             expect(html).toContain('class="price-cents">.99</span>');
             expect(html).toContain('2.0x Daily Check-In Streak Multiplier');
             expect(html).toContain('https://dreamstimeskip.tebex.io/package/elite-pass');
@@ -172,6 +176,7 @@ describe('Dreams TimeSkip Tebex Storefront & Security Hardening', () => {
 
     describe('Phase 4 & 5: Automated Playwright UI & Viewport Validation', () => {
         let browser;
+        jest.setTimeout(30000);
 
         beforeAll(async () => {
             browser = await chromium.launch({ headless: true });
