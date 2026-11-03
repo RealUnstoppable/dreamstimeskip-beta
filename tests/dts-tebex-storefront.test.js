@@ -125,25 +125,10 @@ describe('Dreams TimeSkip Tebex Storefront & Security Hardening', () => {
     });
 
     describe('Phase 3: Trust Signals & Security UI', () => {
-        it('embeds trusted payment gateway icons below rank tier cards', () => {
+        it('embeds payment security and verified gateway notice below rank tier cards', () => {
             expect(html).toContain('id="store-trust-signals"');
             expect(html).toContain('BANK-GRADE ENCRYPTION &amp; VERIFIED PAYMENT GATEWAYS');
-            expect(html).toContain('title="PayPal Verified"');
-            expect(html).toContain('title="Stripe Payments"');
-            expect(html).toContain('VISA');
-            expect(html).toContain('Mastercard');
-            expect(html).toContain('AMEX');
-            expect(html).toContain('Apple Pay');
-            expect(html).toContain('Google Pay');
-        });
-
-        it('displays security pillars: 256-Bit SSL, PCI-DSS Level 1, Instant Delivery, Minecraft EULA compliance', () => {
-            expect(html).toContain('256-Bit SSL Encryption');
-            expect(html).toContain('PCI-DSS Level 1 Certified');
-            expect(html).toContain('Instant In-Game Delivery');
-            expect(html).toContain('100% Minecraft EULA Safe');
-            expect(html).toContain('POWERED BY TEBEX');
-            expect(html).toContain('Merchant of Record');
+            expect(html).toContain('Transactions are processed via Tebex — the global leader in Minecraft server monetization.');
         });
 
         it('includes micro trust signals directly near every checkout button', () => {

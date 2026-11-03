@@ -260,7 +260,7 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
     describe('Dreams OG Maintenance, End Portal Header & Server Status Verification', () => {
         it('confirms End Portal opens header, purple countdown, and Dreams OG maintenance badges', () => {
             expect(html).toContain('DREAMS OG IN MAINTENANCE');
-            expect(html).toContain('<h1>End Portal opens 12:00 AM wednesday 4 2026</h1>');
+            expect(html).toMatch(/<h1[^>]*>End Portal opens 12:00 AM wednesday (<span[^>]*>)?4(<\/span>)? 2026<\/h1>/);
             expect(html).toContain('countdown-purple');
             expect(html).toContain('/images/end-portal.jpg');
         });

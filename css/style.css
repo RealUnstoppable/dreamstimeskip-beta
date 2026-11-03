@@ -129,6 +129,14 @@ body {
     line-height: 1;
 }
 
+/* DTS Store Header & Nav Buttons - Strictly visible ONLY on dts.html */
+body:not(.page-dts) .nav-dts-store-item,
+body:not(.page-dts) .dts-store-header-btn,
+body:not(.page-dts) #nav-dts-store-btn,
+body:not(.page-dts) #nav-dts-store-header-btn {
+    display: none !important;
+}
+
 .cta-button {
     display: inline-block;
     background-color: var(--accent-color);

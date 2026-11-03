@@ -431,6 +431,17 @@
             line-height: 1.2;
         }
 
+        .hero-content h1 .mc-title-4 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.85em;
+            font-weight: 700;
+            vertical-align: 0.04em;
+            display: inline-block;
+            line-height: inherit;
+            color: inherit;
+            text-shadow: inherit;
+        }
+
         .hero-content .subtitle {
             font-size: clamp(1rem, 2.4vw, 1.35rem);
             color: #d1d5dc;
@@ -1393,7 +1404,14 @@
             width: 100%;
         }
 
-        @media (min-width: 900px) {
+        .card-footer-cta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
             .info-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -1402,6 +1420,7 @@
                 grid-column: 1 / -1;
                 display: grid;
                 grid-template-columns: 440px 1fr;
+                overflow: hidden;
             }
 
             .info-card.info-card-wide .card-image-wrap {
@@ -1416,6 +1435,8 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                min-width: 0;
+                box-sizing: border-box;
             }
 
             .info-card.info-card-wide .card-content h3 {
@@ -1452,6 +1473,114 @@
             .info-card.info-card-wide .card-footer-cta .mc-btn-stone {
                 width: auto;
                 padding: 12px 24px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .info-card,
+            .info-card.info-card-wide {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            .info-card .card-image-wrap,
+            .info-card.info-card-wide .card-image-wrap {
+                width: 100%;
+                height: 220px;
+                min-height: unset;
+                border-right: none;
+                border-bottom: 3px solid var(--mc-card-border);
+            }
+
+            .info-card .card-content,
+            .info-card.info-card-wide .card-content {
+                padding: 20px 16px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .info-card .card-content h3 {
+                font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+                line-height: 1.35;
+                margin-bottom: 10px;
+            }
+
+            .info-card .card-content > p {
+                font-size: 0.92rem;
+                line-height: 1.55;
+                color: #cbd5e1;
+                margin-bottom: 16px;
+            }
+
+            .info-card.info-card-wide .og-streak-callout {
+                margin-bottom: 16px;
+                padding: 12px 14px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .info-card.info-card-wide .og-streak-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+
+            .info-card.info-card-wide .og-streak-tag,
+            .info-card.info-card-wide .og-streak-release {
+                font-size: 0.72rem;
+            }
+
+            .info-card.info-card-wide .og-streak-desc {
+                font-size: 0.86rem;
+                line-height: 1.5;
+                margin-bottom: 8px;
+            }
+
+            .info-card.info-card-wide .og-streak-status-badge {
+                font-size: 0.8rem;
+                line-height: 1.45;
+                padding: 8px 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* Force full width on mobile for buttons in all Realm info cards */
+            .info-card .card-footer-cta,
+            .info-card.info-card-wide .card-footer-cta {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                gap: 10px !important;
+                box-sizing: border-box !important;
+            }
+
+            .info-card .card-footer-cta .mc-btn,
+            .info-card .card-footer-cta button,
+            .info-card .card-footer-cta a,
+            .info-card.info-card-wide .card-footer-cta .mc-btn-streak,
+            .info-card.info-card-wide .card-footer-cta .mc-btn-stone {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+                box-sizing: border-box !important;
+                padding: 13px 16px !important;
+                font-size: 0.82rem !important;
+                margin: 0 !important;
             }
         }
 
@@ -2452,6 +2581,11 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
+        /* Header & Nav Structure */
+        .nav-links, .nav-links li {
+            list-style: none !important;
+        }
+
         /* Top Bar Header Store CTA */
         .dts-store-header-btn {
             display: inline-flex;
@@ -2881,8 +3015,8 @@
 
         .mc-open-4 {
             display: inline-block;
-            width: 0.8em;
-            height: 0.8em;
+            width: 0.58em;
+            height: 0.58em;
             vertical-align: 0;
             line-height: 1;
         }
@@ -3028,9 +3162,26 @@
             border: 2px solid #232a35;
             border-top: 3px solid #3c8527;
             border-radius: 8px;
-            padding: 36px 30px 30px;
+            padding: 24px 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.6);
             margin-top: 20px;
+            text-align: center;
+        }
+
+        .trust-clean-heading {
+            font-family: var(--mc-font-pixel);
+            font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+            color: #ffffff;
+            margin: 0 0 8px;
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+
+        .trust-clean-subtext {
+            font-size: clamp(0.82rem, 2vw, 0.92rem);
+            color: #94a3b8;
+            margin: 0;
+            line-height: 1.5;
         }
 
         .trust-header {
@@ -3246,7 +3397,7 @@
         }
     </style>
 </head>
-<body>
+<body class="page-dts">
 
     <header class="main-header">
         <nav class="navbar">
@@ -3326,7 +3477,7 @@
                 <div class="mc-badge mc-badge-gold" style="background: rgba(147, 51, 234, 0.28); border: 2px solid #a855f7; color: #f3e8ff; text-shadow: 0 0 8px #9333ea;">
                     <span>✦</span> END PORTAL EVENT • DREAMS OG IN MAINTENANCE <span>✦</span>
                 </div>
-                <h1>End Portal opens 12:00 AM wednesday 4 2026</h1>
+                <h1 aria-label="End Portal opens 12:00 AM wednesday 4 2026">End Portal opens 12:00 AM wednesday <span class="mc-title-4">4</span> 2026</h1>
                 <p class="subtitle">
                     The stronghold has been uncovered. Prepare your armor, brews, and bows — the Eyes of Ender are locking into place for the ultimate dimension unlock!
                 </p>
@@ -3572,7 +3723,7 @@
                     <div class="card-content">
                         <h3>Watch The Trailer</h3>
                         <p>Get a first look into the new world, custom biomes, and the adventure that awaits. Watch the official Dreams trailer now.</p>
-                        <div class="card-footer-cta" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="card-footer-cta">
                             <button class="mc-btn mc-btn-green open-trailer-trigger">
                                 ▶ Watch Now
                             </button>
@@ -3594,7 +3745,7 @@
                     <div class="card-content">
                         <h3>Join The Community Realm</h3>
                         <p>Join hundreds of players in an unscripted persistent survival sandbox. Build kingdoms, trade rare loot, and forge your legacy.</p>
-                        <div class="card-footer-cta" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div class="card-footer-cta">
                             <button class="mc-btn mc-btn-green open-waitlist-trigger">
                                 ⚔️ Join Whitelist
                             </button>
@@ -3898,108 +4049,9 @@
                 <!-- ========================================================
                      PHASE 3: TRUST SIGNALS & SECURITY UI
                      ======================================================== -->
-                <div class="dts-trust-container" id="store-trust-signals" role="region" aria-label="Payment Security and Trust Signals">
-                    <div class="trust-header">
-                        <div class="trust-shield-icon">
-                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#55ff55" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <path d="m9 12 2 2 4-4"/>
-                            </svg>
-                        </div>
-                        <div class="trust-header-text">
-                            <h4>BANK-GRADE ENCRYPTION &amp; VERIFIED PAYMENT GATEWAYS</h4>
-                            <p>Transactions are processed via Tebex — the global leader in Minecraft server monetization.</p>
-                        </div>
-                    </div>
-
-                    <!-- Payment Method Badges Row -->
-                    <div class="payment-badges-row" aria-label="Accepted Payment Methods">
-                        <!-- PayPal -->
-                        <div class="payment-badge-item" title="PayPal Verified">
-                            <svg class="pay-icon" viewBox="0 0 100 32" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12.5 4h-8.8a1.5 1.5 0 0 0-1.5 1.2L.1 27.2a.8.8 0 0 0 .8.9h4.6a1 1 0 0 0 1-.8l1.2-7.8a1.5 1.5 0 0 1 1.5-1.2h3.3c6.8 0 10.7-3.3 11.7-9.8.5-3-0.5-5.3-2.6-6.7-1.9-1.2-4.8-1.8-8.1-1.8zm1.2 6.5c-.6 4-3.5 4-6.3 4h-1.6l1.2-7.8a.5.5 0 0 1 .5-.4h1.1c2 0 3.8 0 4.6 1 .5.7.7 1.8.5 3.2z" fill="#003087"/>
-                                <path d="M33.5 11.2h-4.6a1 1 0 0 0-1 .8l-.2 1.2c-.7-.9-2-1.4-3.7-1.4-4.7 0-8.8 3.6-9.6 8.7-.5 2.8.2 5.5 1.9 7.2 1.6 1.6 3.8 2.2 6.2 2.2 3.6 0 5.6-1.9 5.6-1.9l-.2 1.2a.8.8 0 0 0 .8.9h4.2a1 1 0 0 0 1-.8l2.6-16.5a.8.8 0 0 0-.8-.9zm-5.7 8.3c-.4 2.6-2.4 4.3-4.8 4.3-1.2 0-2.2-.4-2.8-1.2-.6-.8-.8-1.9-.6-3.1.4-2.6 2.4-4.3 4.8-4.3 1.2 0 2.2.4 2.8 1.2.6.8.8 1.9.6 3.1z" fill="#0079C1"/>
-                                <path d="M52 11.2h-4.6a1 1 0 0 0-1 .8l-4.5 15.2h4.6a1 1 0 0 0 1-.8l1.1-3.7h3.7c4.6 0 7.8-2.5 8.5-6.7.4-2.3-.2-4.1-1.6-5.2-1.4-1.1-3.6-1.6-7.2-1.6zm-1.8 5.7c-.3 2.1-1.9 3.2-4 3.2h-1.4l1.1-3.8a.5.5 0 0 1 .5-.4h1.1c1.4 0 2.4.3 2.7 1z" fill="#00457C"/>
-                            </svg>
-                            <span class="pay-name">PayPal</span>
-                        </div>
-
-                        <!-- Stripe -->
-                        <div class="payment-badge-item" title="Stripe Payments">
-                            <svg class="pay-icon" viewBox="0 0 60 25" height="20" fill="#635BFF" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M59.64 14.28c0-4.56-2.24-8.16-6.52-8.16-4.32 0-6.92 3.6-6.92 8.12 0 5.36 3.16 8.08 7.6 8.08 2.2 0 3.88-.48 5.12-1.2v-3.48c-1.24.68-2.68 1.04-4.44 1.04-1.76 0-3.32-.68-3.52-2.76h8.64c.04-.44.04-1.2.04-1.64zm-8.68-1.64c.16-1.8 1.28-2.52 2.4-2.52 1.12 0 2.2.72 2.36 2.52h-4.76zM40.24 6.44c-1.84 0-3.04.88-3.68 1.52l-.24-1.24h-4.24v20.24h4.8v-5.2c.64.56 1.72 1.36 3.4 1.36 3.44 0 6.48-2.76 6.48-8.24-.04-5.24-3.08-8.44-6.52-8.44zm-1.24 13.08c-1.2 0-2.2-.44-2.84-1.16v-5.96c.68-.76 1.68-1.2 2.84-1.2 2.08 0 3.52 1.76 3.52 4.16 0 2.44-1.44 4.16-3.52 4.16zM26.96 6.72h-4.76V2.24l-4.8 1.04v3.44h-2.84v3.84h2.84v7.36c0 3.44 1.72 5.36 4.96 5.36 1.48 0 2.68-.28 3.32-.68v-3.72c-.52.2-1.16.32-1.84.32-1.12 0-1.64-.6-1.64-1.76V10.56h4.76V6.72zM9.48 10.36c-1.64-.68-2.68-1.12-2.68-1.92 0-.68.6-1.16 1.68-1.16 1.48 0 3.2.6 4.4 1.32V4.68C11.56 4.28 10.04 4 8.44 4 3.76 4 0.68 6.44 0.68 10.6c0 4.16 3.28 5.76 6.56 7.12 1.84.76 2.48 1.28 2.48 2.04 0 .84-.76 1.32-1.84 1.32-1.68 0-3.68-.76-5.16-1.68v4.04c1.64.68 3.32.96 4.96.96 4.88 0 8.08-2.4 8.08-6.64 0-4.08-3.04-5.6-6.28-7.36z"/>
-                            </svg>
-                            <span class="pay-name">Stripe</span>
-                        </div>
-
-                        <!-- Visa -->
-                        <div class="payment-badge-item" title="Visa">
-                            <span class="card-chip-text visa">VISA</span>
-                        </div>
-
-                        <!-- Mastercard -->
-                        <div class="payment-badge-item" title="Mastercard">
-                            <span class="card-chip-text mc">Mastercard</span>
-                        </div>
-
-                        <!-- American Express -->
-                        <div class="payment-badge-item" title="American Express">
-                            <span class="card-chip-text amex">AMEX</span>
-                        </div>
-
-                        <!-- Apple Pay -->
-                        <div class="payment-badge-item" title="Apple Pay">
-                            <span class="card-chip-text apple">Apple Pay</span>
-                        </div>
-
-                        <!-- Google Pay -->
-                        <div class="payment-badge-item" title="Google Pay">
-                            <span class="card-chip-text gpay">G Pay</span>
-                        </div>
-                    </div>
-
-                    <!-- Security Pillar Cards -->
-                    <div class="trust-pillars-grid">
-                        <div class="trust-pillar-card">
-                            <div class="pillar-icon">🔒</div>
-                            <div class="pillar-content">
-                                <h5 class="pillar-title">256-Bit SSL Encryption</h5>
-                                <p class="pillar-desc">All payment transactions are encrypted with SHA-256 military-grade SSL certs. No sensitive card data touches our game servers.</p>
-                            </div>
-                        </div>
-
-                        <div class="trust-pillar-card">
-                            <div class="pillar-icon">🛡️</div>
-                            <div class="pillar-content">
-                                <h5 class="pillar-title">PCI-DSS Level 1 Certified</h5>
-                                <p class="pillar-desc">Tebex maintains the highest Tier 1 Payment Card Industry compliance, verified by independent annual security audits.</p>
-                            </div>
-                        </div>
-
-                        <div class="trust-pillar-card">
-                            <div class="pillar-icon">⚡</div>
-                            <div class="pillar-content">
-                                <h5 class="pillar-title">Instant In-Game Delivery</h5>
-                                <p class="pillar-desc">Our automated webhook bridge links directly to Dreams TimeSkip nodes. Ranks and perks activate within 60 seconds.</p>
-                            </div>
-                        </div>
-
-                        <div class="trust-pillar-card">
-                            <div class="pillar-icon">⚖️</div>
-                            <div class="pillar-content">
-                                <h5 class="pillar-title">100% Minecraft EULA Safe</h5>
-                                <p class="pillar-desc">All perks, cosmetics, and memberships strictly adhere to Mojang Studios &amp; Microsoft commercial guidelines.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tebex Merchant of Record Footnote -->
-                    <div class="trust-footer-note">
-                        <span class="tebex-tag">POWERED BY TEBEX</span>
-                        <p>
-                            Tebex Limited is the authorized Merchant of Record for all in-game purchases on Dreams TimeSkip. All prices are listed in USD with local currency conversion handled at checkout. Need support with an order? Contact us on Discord or email support@realunstoppable.store.
-                        </p>
-                    </div>
+                <div class="dts-trust-container" id="store-trust-signals" role="region" aria-label="Payment Security and Verified Payment Gateways">
+                    <h4 class="trust-clean-heading">BANK-GRADE ENCRYPTION &amp; VERIFIED PAYMENT GATEWAYS</h4>
+                    <p class="trust-clean-subtext">Transactions are processed via Tebex — the global leader in Minecraft server monetization.</p>
                 </div>
             </div>
         </section>

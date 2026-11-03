@@ -44,14 +44,20 @@ const PRELOADED_NOTIFICATIONS = [
 const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"/></svg>`;
 
 export function loadNavbar() {
-    const isMedixlyPage = typeof window !== 'undefined' && window.location.pathname.includes('medixly');
+    const currentPath = typeof window !== 'undefined' ? (window.location.pathname || '').toLowerCase() : '';
+    const cleanPath = currentPath.split('?')[0].split('#')[0];
+    const isMedixlyPage = typeof window !== 'undefined' && cleanPath.includes('medixly');
+    
+    // STRICT check: ONLY visible on dts.html (or clean /dts route)
+    // Strictly hides this link on index.html, medixly.html, autolux, and all other pages
     const isDtsPage = typeof window !== 'undefined' && (
-        window.location.pathname.includes('dts') ||
-        window.location.pathname.includes('dreamstimeskip') ||
-        Boolean(document.getElementById('dts')) ||
-        Boolean(document.querySelector('.hero-og-bg')) ||
-        (document.title && document.title.toLowerCase().includes('dreams timeskip'))
-    );
+        cleanPath.endsWith('/dts.html') ||
+        cleanPath.endsWith('/dts') ||
+        cleanPath === 'dts.html' ||
+        cleanPath === '/dts.html' ||
+        cleanPath === '/dts' ||
+        (document.body && document.body.classList.contains('page-dts'))
+    ) && !cleanPath.includes('new-dts') && !cleanPath.includes('first-look') && !cleanPath.includes('index') && !cleanPath.includes('medixly');
 
     if (isMedixlyPage) {
         const medixlyHeaderHTML = `
