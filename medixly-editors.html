@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medixly For Editors | Precision Audio Timeline &amp; Beat-by-Beat Lyric Engine</title>
+    <meta name="description" content="Dedicated NLE workspace for video and audio editors. Detect beats and transients, sync lyrics syllable-by-syllable, and export to Premiere Pro, After Effects, DaVinci Resolve, and SRT.">
+    <link rel="icon" type="image/png" href="/images/medixly-logo.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/medixly-editors.css">
+</head>
+<body class="medixly-editors-body">
+
+    <!-- TOP BAR TOOLBAR -->
+    <header class="editor-topbar">
+        <div class="editor-branding">
+            <a href="/medixly.html" class="editor-logo-link" title="Back to Medixly Streamer">
+                <img src="/images/medixly-logo.png" alt="Medixly" class="editor-logo-img">
+                <span class="editor-app-title">Medixly</span>
+            </a>
+            <span class="editor-pro-badge">FOR EDITORS</span>
+
+            <div class="editor-song-selector-wrap">
+                <select id="track-select" class="editor-select" title="Select song from Medixly catalog">
+                    <!-- Populated dynamically from librarySongs -->
+                </select>
+                <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                <button id="upload-audio-btn" class="btn-editor-secondary" title="Import your own WAV, MP3, AAC, or stem file">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Import Audio</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Center SMPTE Timecode Readout -->
+        <div class="editor-timecode-center">
+            <div class="smpte-readout" id="timecode-display">00:00:00:00</div>
+            <div class="frame-readout" id="frame-display">Frame 0</div>
+        </div>
+
+        <!-- Right Action Cluster -->
+        <div class="editor-topbar-actions">
+            <!-- Timeline Zoom -->
+            <div class="zoom-controls-cluster" title="Timeline Zoom (+/- or Alt+Scroll)">
+                <button id="btn-zoom-out" class="editor-btn-subtle" title="Zoom Out (-)">−</button>
+                <input type="range" id="zoom-slider" class="zoom-slider" min="15" max="3000" value="100">
+                <button id="btn-zoom-in" class="editor-btn-subtle" title="Zoom In (+)">+</button>
+                <button id="btn-zoom-fit" class="editor-btn-subtle" title="Fit to Screen (Shift+Z)">Fit</button>
+            </div>
+
+            <!-- Frame Rate Select -->
+            <select id="fps-select" class="editor-select" title="Project Frame Rate (for NLE Timecode Accuracy)">
+                <option value="23.976">23.976 FPS (Cinema)</option>
+                <option value="24">24 FPS (Film)</option>
+                <option value="25">25 FPS (PAL)</option>
+                <option value="29.97">29.97 FPS (NTSC)</option>
+                <option value="30" selected>30 FPS (Standard)</option>
+                <option value="59.94">59.94 FPS (High NTSC)</option>
+                <option value="60">60 FPS (Gaming/60p)</option>
+            </select>
+
+            <!-- Export Pipeline Modal Trigger -->
+            <button id="btn-export" class="btn-editor-primary" title="Export synced lyrics to Premiere, Resolve, After Effects, or SRT">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Export Markers...</span>
+            </button>
+
+            <!-- Back to player link -->
+            <a href="/medixly.html" class="editor-btn-subtle" title="Exit to Player View" style="text-decoration:none;">✕</a>
+        </div>
+    </header>
+
+    <!-- INTERACTIVE AUDIO WAVEFORM TIMELINE -->
+    <section class="editor-timeline-section">
+        <div id="canvas-container" class="timeline-canvas-container">
+            <canvas id="timeline-canvas"></canvas>
+        </div>
+
+        <!-- Transport Bar -->
+        <div class="editor-transport-bar">
+            <div class="transport-cluster-left">
+                <button id="btn-rewind" class="transport-btn" title="Rewind to Beginning (Home / 0)">⏮</button>
+                <button id="btn-step-back" class="transport-btn" title="Step Back 1 Frame (Left Arrow)">◀</button>
+                <button id="btn-play-pause" class="transport-btn transport-btn-primary" title="Play / Pause (Space)">
+                    <span id="icon-play">▶</span>
+                    <span id="icon-pause" style="display: none;">❚❚</span>
+                </button>
+                <button id="btn-step-forward" class="transport-btn" title="Step Forward 1 Frame (Right Arrow)">▶</button>
+                <button id="btn-metronome" class="transport-btn" title="Metronome / Click Track on Beats">⏱ Click</button>
+            </div>
+
+            <div class="transport-cluster-center">
+                <label class="snap-label" title="Snap marker drops and drags to nearest beat or transient">
+                    <input type="checkbox" id="toggle-snap" checked>
+                    <span>Snap to Transients &amp; Beats (S)</span>
+                </label>
+            </div>
+
+            <div class="transport-cluster-right">
+                <span class="editor-btn-subtle" style="font-size: 0.72rem; cursor: default;">
+                    Shortcuts: <strong>Space</strong> (Play) • <strong>M</strong> (Drop Marker) • <strong>J/K/L</strong> (Shuttle) • <strong>←/→</strong> (Nudge)
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOWER DOCK (3-COLUMN NLE WORKBENCH) -->
+    <main class="editor-dock-container">
+
+        <!-- COLUMN 1: BEAT & TRANSIENT DETECTION STUDIO -->
+        <div class="editor-dock-column">
+            <div class="dock-header">
+                <span class="dock-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    Beat &amp; Transient Studio
+                </span>
+            </div>
+            <div class="dock-body">
+                <div class="dsp-stat-card">
+                    <span class="dsp-stat-label">Detected Tempo</span>
+                    <span class="dsp-stat-value" id="bpm-display">120.0 BPM</span>
+                    <span class="dsp-stat-subtext" id="bpm-confidence">94% confidence</span>
+                </div>
+
+                <div class="dsp-stat-card">
+                    <span class="dsp-stat-label">Transients &amp; Grid</span>
+                    <span class="dsp-stat-subtext" id="transient-count-display">Analyzing audio waveform...</span>
+                </div>
+
+                <div class="slider-group">
+                    <label for="transient-sensitivity">
+                        <span>Transient Sensitivity</span>
+                        <span id="sensitivity-value">60%</span>
+                    </label>
+                    <input type="range" id="transient-sensitivity" class="range-input" min="0.1" max="1.0" step="0.05" value="0.6">
+                </div>
+
+                <button id="btn-tap-tempo" class="btn-editor-secondary" style="width: 100%; justify-content: center;" title="Click rhythmically to set custom BPM">
+                    <span>🥁 Tap Manual Tempo</span>
+                </button>
+
+                <button id="btn-quantize" class="btn-editor-secondary" style="width: 100%; justify-content: center;" title="Snap all placed lyric markers to nearest beat grid lines">
+                    <span>⚡ Quantize Markers to Grid</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- COLUMN 2: BEAT-BY-BEAT LYRIC ENGINE & PROMPTER -->
+        <div class="editor-dock-column">
+            <div class="dock-header">
+                <span class="dock-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                    Beat-by-Beat Lyric Synchronizer
+                </span>
+                <div style="display: flex; gap: 6px;">
+                    <select id="sync-mode-select" class="editor-select" style="padding: 2px 8px; font-size: 0.75rem;">
+                        <option value="word">Word Mode</option>
+                        <option value="syllable">Syllable Mode (Splits hyphens &amp; affixes)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="dock-body">
+                <!-- High-Visibility Teleprompter HUD -->
+                <div class="prompter-hero-hud">
+                    <span class="prompter-label">Active Syllable Prompter</span>
+                    <div class="prompter-prev-word" id="prompter-prev">—</div>
+                    <div class="prompter-current-word" id="prompter-current">Ready to Sync</div>
+                    <div class="prompter-next-word" id="prompter-next">—</div>
+
+                    <div class="prompter-progress-wrapper">
+                        <div class="prompter-progress-bar-track">
+                            <div class="prompter-progress-bar-fill" id="prompter-progress-bar"></div>
+                        </div>
+                        <span class="prompter-progress-text" id="prompter-progress">0 / 0 (0%)</span>
+                    </div>
+                </div>
+
+                <!-- Sync Action Buttons -->
+                <div class="prompter-actions-row">
+                    <button id="btn-drop-marker" class="btn-stamp-marker" title="Drop Marker at current millisecond playhead (Press 'M')">
+                        <span>DROP MARKER ('M')</span>
+                    </button>
+                    <button id="btn-undo-marker" class="btn-editor-secondary" title="Undo Last Marker (Cmd+Z)">
+                        <span>Undo</span>
+                    </button>
+                    <button id="btn-reset-sync" class="btn-editor-secondary" title="Reset all marker timings">
+                        <span>Reset</span>
+                    </button>
+                </div>
+
+                <!-- Lyric Source & Textarea -->
+                <div class="lyrics-config-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="dock-title" style="font-size: 0.72rem;">Lyrics Transcription</span>
+                        <div style="display: flex; gap: 6px;">
+                            <button id="btn-load-lyrics" class="editor-btn-subtle" title="Auto-load official lyrics from Medixly catalog">Load Song Lyrics</button>
+                            <button id="btn-parse-lyrics" class="editor-btn-subtle" title="Tokenize text in box into sync units">Parse Text</button>
+                        </div>
+                    </div>
+                    <textarea id="lyrics-input" class="lyrics-textarea" placeholder="Paste song lyrics here or click 'Load Song Lyrics'..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMN 3: MARKER LIST & INSPECTOR -->
+        <div class="editor-dock-column">
+            <div class="dock-header">
+                <span class="dock-title">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                    Marker Inspector
+                </span>
+            </div>
+            <div class="dock-body" style="padding: 0;">
+                <div class="markers-table-container">
+                    <table class="markers-table">
+                        <thead>
+                            <tr>
+                                <th>Timecode</th>
+                                <th>Syllable / Text</th>
+                                <th>Duration</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="markers-table-body">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- EXPORT PIPELINE MODAL -->
+    <div id="export-modal" class="modal-overlay hidden">
+        <div class="export-modal-dialog">
+            <div class="export-modal-header">
+                <div class="export-modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Export Synchronized Lyrics &amp; Markers</span>
+                </div>
+                <button id="btn-close-export" class="editor-btn-subtle" style="font-size: 1.1rem;">✕</button>
+            </div>
+
+            <!-- Export Target Format Tabs -->
+            <div class="export-tabs-nav">
+                <button class="export-tab-btn active" data-format="srt">SubRip Subtitle (.srt)</button>
+                <button class="export-tab-btn" data-format="srt-words">Word Karaoke (.srt)</button>
+                <button class="export-tab-btn" data-format="premiere-csv">Premiere Pro Marker CSV</button>
+                <button class="export-tab-btn" data-format="premiere-xml">Premiere / FCP 7 XML</button>
+                <button class="export-tab-btn" data-format="resolve-csv">DaVinci Resolve CSV</button>
+                <button class="export-tab-btn" data-format="resolve-edl">DaVinci Resolve EDL</button>
+                <button class="export-tab-btn" data-format="after-effects">After Effects JSX / JSON</button>
+                <button class="export-tab-btn" data-format="medixly-json">Medixly Native JSON</button>
+            </div>
+
+            <div class="export-modal-body">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="export-format-badge" class="badge-lyric font-mono">SubRip Subtitles (.srt)</span>
+                    <span style="font-size: 0.72rem; color: var(--editor-text-muted);">Zero millisecond latency guaranteed</span>
+                </div>
+                <textarea id="export-preview" class="export-preview-box" readonly spellcheck="false"></textarea>
+            </div>
+
+            <div class="export-modal-footer">
+                <button id="btn-copy-export" class="btn-editor-secondary">
+                    <span>📋 Copy to Clipboard</span>
+                </button>
+                <button id="btn-download-export" class="btn-editor-primary">
+                    <span>💾 Download File</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspace Initialization Script -->
+    <script type="module">
+        import { MedixlyEditorWorkspace } from '/js/medixly-editors.js';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const workspace = new MedixlyEditorWorkspace();
+            workspace.init();
+            window.medixlyWorkspace = workspace;
+        });
+    </script>
+</body>
+</html>

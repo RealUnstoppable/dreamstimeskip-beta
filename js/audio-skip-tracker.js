@@ -263,6 +263,53 @@ export class AudioSkipTracker {
     }
 
     /**
+     * Sets whether an ad payload is currently active in the player,
+     * updating state and locking/unlocking media player UI controls.
+     */
+    setAdActive(active, track = null) {
+        this.isAdActive = Boolean(active);
+        this.currentAdTrack = active ? track : null;
+        this.lockPlayerControls(this.isAdActive);
+        this.notify();
+    }
+
+    /**
+     * Locks or unlocks media player UI controls (next, prev, seek bars)
+     */
+    lockPlayerControls(isLocked) {
+        if (typeof document === 'undefined') return;
+        const controlIds = [
+            'next-btn', 'prev-btn',
+            'fs-next-btn', 'fs-prev-btn',
+            'mob-next-btn', 'mob-prev-btn',
+            'viral-skip-btn', 'fs-viral-skip-btn'
+        ];
+        controlIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = isLocked;
+                el.setAttribute('aria-disabled', String(isLocked));
+                if (isLocked) {
+                    el.classList.add('ad-locked', 'control-locked');
+                } else {
+                    el.classList.remove('ad-locked', 'control-locked');
+                }
+            }
+        });
+
+        const seekBars = document.querySelectorAll('.progress-bar, #fs-progress-bar, #progress-bar');
+        seekBars.forEach(bar => {
+            if (isLocked) {
+                bar.classList.add('ad-locked', 'seek-disabled');
+                bar.setAttribute('aria-disabled', 'true');
+            } else {
+                bar.classList.remove('ad-locked', 'seek-disabled');
+                bar.removeAttribute('aria-disabled');
+            }
+        });
+    }
+
+    /**
      * Validates whether a skip action is allowed. If current track is an ad,
      * prevents the skip, enforces continuous playback, and optionally pauses momentarily.
      *

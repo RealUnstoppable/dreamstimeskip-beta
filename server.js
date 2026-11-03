@@ -117,6 +117,11 @@ app.use(async (req, res, next) => {
     reqPath = '/medixly-artists.html';
   }
 
+  // Medixly For Editors Workspace routes
+  if (reqPath === '/editors' || reqPath === '/for-editors' || reqPath === '/medixly/editors' || reqPath === '/medixly-editors') {
+    reqPath = '/medixly-editors.html';
+  }
+
   // Internal Ad Screen-Recording Preview Scene routes
   if (reqPath === '/ad-preview' || reqPath === '/ad-preview/') {
     reqPath = '/ad-preview.html';

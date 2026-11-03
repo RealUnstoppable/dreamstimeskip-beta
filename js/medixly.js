@@ -409,40 +409,26 @@ function initHarmonyTunes() {
     }
 
     /**
-     * Algorithmic Endless Queue Auto-Queue Function
-     * Asynchronously queries the user's listening history, liked tracks, and profile genre preferences
-     * from database / optimized in-memory cache to fetch and auto-queue the most relevant next track.
+     * Synchronous / Instant Endless Queue Recommendation Helper
+     * Resolves immediately from memory/cache so queue index advances synchronously.
      */
-    async function recommendAndAutoQueueNextTrack(options = {}) {
-        let userContext = null;
-        if (currentUser?.uid) {
-            userContext = await fetchUserRecommendationContext(db, currentUser.uid, {
-                genres: currentUserPreferences?.genres,
-                favoriteArtists: currentUserPreferences?.favoriteArtists,
-                likedTrackIds: userFavoritesIds,
-                likedTracks: userFavorites,
-                listeningHistory: historyQueue,
-                role: currentUserPreferences?.role,
-                sfxNeeds: currentUserPreferences?.sfxNeeds
-            });
-        } else {
-            const prefs = loadActiveUserPreferences();
-            userContext = {
-                genres: prefs?.genres || ['hiphop', 'pop'],
-                favoriteArtists: prefs?.favoriteArtists || [],
-                likedTrackIds: userFavoritesIds || new Set(),
-                likedTracks: userFavorites || [],
-                listeningHistory: historyQueue || [],
-                role: prefs?.role || 'listener',
-                sfxNeeds: prefs?.sfxNeeds || 'moderate'
-            };
-        }
-
+    function recommendAndAutoQueueNextTrackSync(options = {}) {
         const currentTrack = currentQueue[currentSongIndex] || null;
-        const recentHistoryIds = historyQueue.map(s => s?.id).filter(Boolean);
+        const recentHistoryIds = historyQueue.map(s => s?.id || s).filter(Boolean);
         const upcomingQueueIds = new Set(currentQueue.slice(currentSongIndex + 1).map(s => s?.id).filter(Boolean));
         const excluded = new Set(options.excludeSongIds || []);
         failedSongIds.forEach(id => excluded.add(id));
+
+        const prefs = currentUserPreferences || loadActiveUserPreferences();
+        const userContext = {
+            genres: prefs?.genres || ['hiphop', 'pop'],
+            favoriteArtists: prefs?.favoriteArtists || [],
+            likedTrackIds: userFavoritesIds || new Set(),
+            likedTracks: userFavorites || [],
+            listeningHistory: historyQueue || [],
+            role: prefs?.role || 'listener',
+            sfxNeeds: prefs?.sfxNeeds || 'moderate'
+        };
 
         const nextTrack = getRecommendedTrack(librarySongs, userContext, {
             currentTrack,
@@ -451,7 +437,7 @@ function initHarmonyTunes() {
             recentHistoryIds,
             upcomingQueueIds,
             jitter: true
-        });
+        }) || getSmartFallbackRecommendation(options);
 
         if (nextTrack) {
             currentQueue.push(nextTrack);
@@ -462,6 +448,33 @@ function initHarmonyTunes() {
         }
 
         return null;
+    }
+
+    /**
+     * Algorithmic Endless Queue Auto-Queue Function
+     * Queries the user's listening history, liked tracks, and profile genre preferences
+     * from database / optimized in-memory cache to fetch and auto-queue the most relevant next track.
+     */
+    async function recommendAndAutoQueueNextTrack(options = {}) {
+        // Fast path: immediately queue from memory/cache
+        const immediateTrack = recommendAndAutoQueueNextTrackSync(options);
+        
+        // Refresh background cache if user is authenticated
+        if (currentUser?.uid && db) {
+            try {
+                await fetchUserRecommendationContext(db, currentUser.uid, {
+                    genres: currentUserPreferences?.genres,
+                    favoriteArtists: currentUserPreferences?.favoriteArtists,
+                    likedTrackIds: userFavoritesIds,
+                    likedTracks: userFavorites,
+                    listeningHistory: historyQueue,
+                    role: currentUserPreferences?.role,
+                    sfxNeeds: currentUserPreferences?.sfxNeeds
+                });
+            } catch (_) {}
+        }
+
+        return immediateTrack;
     }
 
     // Attach to module exporter
@@ -492,30 +505,28 @@ function initHarmonyTunes() {
         console.warn(`[Medixly Smart Skip] Playback snag on "${failedSong?.title || 'Unknown'}". Engaging smart recommendation fallback (attempt ${consecutivePlaybackSnags}/${MAX_CONSECUTIVE_SNAGS}).`);
 
         clearTimeout(playbackSnagDebounceTimer);
-        playbackSnagDebounceTimer = setTimeout(() => {
-            const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: failedSongIds });
-            if (!fallbackSong) {
-                isHandlingPlaybackSnag = false;
-                return;
-            }
+        const fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: failedSongIds });
+        if (!fallbackSong) {
+            isHandlingPlaybackSnag = false;
+            return;
+        }
 
-            // Splice fallback song right after current, or as next song
-            currentQueue.splice(currentSongIndex + 1, 0, fallbackSong);
-            currentSongIndex = currentSongIndex + 1;
-            if (queuePanel && queuePanel.classList.contains('open')) {
-                renderQueue();
-            }
+        // Splice fallback song right after current, or as next song
+        currentQueue.splice(currentSongIndex + 1, 0, fallbackSong);
+        currentSongIndex = currentSongIndex + 1;
+        if (queuePanel && queuePanel.classList.contains('open')) {
+            renderQueue();
+        }
 
-            loadSong(currentSongIndex);
-            playSong().then(() => {
-                consecutivePlaybackSnags = 0;
-                isHandlingPlaybackSnag = false;
-            }).catch(err => {
-                isHandlingPlaybackSnag = false;
-                if (err && err.name === 'AbortError') return;
-                console.warn('[Medixly Smart Skip] Fallback song playback issue:', err);
-            });
-        }, 500);
+        loadSong(currentSongIndex);
+        playSong().then(() => {
+            consecutivePlaybackSnags = 0;
+            isHandlingPlaybackSnag = false;
+        }).catch(err => {
+            isHandlingPlaybackSnag = false;
+            if (err && err.name === 'AbortError') return;
+            console.warn('[Medixly Smart Skip] Fallback song playback issue:', err);
+        });
     }
 
     function renderRecommendedSongs() {
@@ -689,6 +700,11 @@ function initHarmonyTunes() {
     window.__audioSkipTracker = audioSkipTracker;
     window.__resetSkipThrottle = () => { lastSkipTime = 0; };
     window.__prevSong = () => prevSong();
+    window.__getActiveAudio = () => activeAudio;
+    window.__getNextAudio = () => nextAudio;
+    window.__getMixEngine = () => mixEngine;
+    window.__lockMediaControls = (l) => lockMediaControls(l);
+    window.__isAdControlsLocked = () => isAdControlsLocked;
 
     function updateAdminAdTestVisibility(isAdmin) {
         const adTestBtn = document.getElementById('nav-ad-test');
@@ -892,10 +908,11 @@ function initHarmonyTunes() {
         return { blockStart, blockEnd, paddedStart, paddedEnd, actualFadeDur };
     };
 
-    let crossfadeDuration = 15;
+    let crossfadeDuration = 5; // 5-second crossfade
     let crossfadeInterval = null;
     let fadeIntervalCrossfade = null;
     let fadeInterval = null;
+    let isAdControlsLocked = false;
     const mixerBtn = document.getElementById('mixer-btn');
     const playPauseBtn = document.getElementById('play-pause-btn');
     const playIcon = playPauseBtn ? playPauseBtn.querySelector('.play-icon') : null;
@@ -912,6 +929,48 @@ function initHarmonyTunes() {
     const playerTitle = document.getElementById('player-song-title');
     const playerArtist = document.getElementById('player-song-artist');
     const playerArt = document.getElementById('player-album-art');
+
+    /**
+     * Lock or unlock media player UI controls during active ad payload
+     */
+    function lockMediaControls(isLocked) {
+        isAdControlsLocked = Boolean(isLocked);
+
+        const buttonsToToggle = [
+            nextBtn, prevBtn,
+            document.getElementById('fs-next-btn'),
+            document.getElementById('fs-prev-btn'),
+            document.getElementById('mob-next-btn'),
+            document.getElementById('mob-prev-btn'),
+            document.getElementById('viral-skip-btn'),
+            document.getElementById('fs-viral-skip-btn')
+        ].filter(Boolean);
+
+        buttonsToToggle.forEach(btn => {
+            btn.disabled = isAdControlsLocked;
+            btn.setAttribute('aria-disabled', String(isAdControlsLocked));
+            if (isAdControlsLocked) {
+                btn.classList.add('ad-locked', 'control-locked');
+            } else {
+                btn.classList.remove('ad-locked', 'control-locked');
+            }
+        });
+
+        const seekElements = document.querySelectorAll('.music-player-bar .progress-bar, #fs-progress-bar, #progress-bar');
+        seekElements.forEach(bar => {
+            if (isAdControlsLocked) {
+                bar.classList.add('ad-locked', 'seek-disabled');
+                bar.setAttribute('aria-disabled', 'true');
+            } else {
+                bar.classList.remove('ad-locked', 'seek-disabled');
+                bar.removeAttribute('aria-disabled');
+            }
+        });
+
+        if (audioSkipTracker && typeof audioSkipTracker.setAdActive === 'function') {
+            audioSkipTracker.setAdActive(isAdControlsLocked, currentQueue ? currentQueue[currentSongIndex] : null);
+        }
+    }
     
     // Lyrics Elements
     const lyricsBtn = document.getElementById('lyrics-btn');
@@ -2018,9 +2077,27 @@ function initHarmonyTunes() {
         }
 
         if (audioAdManager.shouldPlayAd('play_request')) {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.volume = 0;
+            }
+            if (nextAudio) {
+                nextAudio.pause();
+                nextAudio.volume = 0;
+            }
+            isPlaying = false;
+            lockMediaControls(true);
+
             audioAdManager.playAd(() => {
                 loadSong(currentSongIndex);
-                playSong();
+                if (mixEngine && typeof mixEngine.crossfadeAdToSong === 'function' && audioAdManager.adAudio) {
+                    mixEngine.crossfadeAdToSong(audioAdManager.adAudio, activeAudio, 5, () => {
+                        lockMediaControls(false);
+                    });
+                } else {
+                    lockMediaControls(false);
+                    playSong();
+                }
             });
             return;
         }
@@ -2043,6 +2120,12 @@ function initHarmonyTunes() {
         currentSongIndex = index;
         const song = currentQueue[currentSongIndex];
         if (!song) return;
+
+        if (song.isAd || song.unskippable || (audioSkipTracker && audioSkipTracker.isAdTrack(song))) {
+            lockMediaControls(true);
+        } else if (!audioAdManager || !audioAdManager.isAdPlaying()) {
+            lockMediaControls(false);
+        }
         
         if (activeAudio) activeAudio.removeAttribute('data-no-crossfade');
         isListening = false;
@@ -2372,9 +2455,27 @@ function initHarmonyTunes() {
         }
 
         if (audioAdManager.shouldPlayAd('before_play')) {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.volume = 0;
+            }
+            if (nextAudio) {
+                nextAudio.pause();
+                nextAudio.volume = 0;
+            }
+            isPlaying = false;
+            lockMediaControls(true);
+
             audioAdManager.playAd(() => {
                 loadSong(currentSongIndex);
-                playSong();
+                if (mixEngine && typeof mixEngine.crossfadeAdToSong === 'function' && audioAdManager.adAudio) {
+                    mixEngine.crossfadeAdToSong(audioAdManager.adAudio, activeAudio, 5, () => {
+                        lockMediaControls(false);
+                    });
+                } else {
+                    lockMediaControls(false);
+                    playSong();
+                }
             });
             return;
         }
@@ -2489,9 +2590,23 @@ function initHarmonyTunes() {
                     currentQueue.splice(currentSongIndex + 1, 0, nextUserSong);
                     currentSongIndex = currentSongIndex + 1;
                     if (audioAdManager.shouldPlayAd('next_song')) {
+                        if (activeAudio) {
+                            activeAudio.pause();
+                            activeAudio.volume = 0;
+                        }
+                        isPlaying = false;
+                        lockMediaControls(true);
+
                         audioAdManager.playAd(() => {
                             loadSong(currentSongIndex);
-                            playSong();
+                            if (mixEngine && typeof mixEngine.crossfadeAdToSong === 'function' && audioAdManager.adAudio) {
+                                mixEngine.crossfadeAdToSong(audioAdManager.adAudio, activeAudio, 5, () => {
+                                    lockMediaControls(false);
+                                });
+                            } else {
+                                lockMediaControls(false);
+                                playSong();
+                            }
                         });
                         return;
                     }
@@ -2506,7 +2621,7 @@ function initHarmonyTunes() {
 
         // 2. ENDLESS QUEUE: If manual queue is empty, trigger recommendation when upcoming queue is exhausted
         if (!currentQueue || currentQueue.length === 0) {
-            let fallbackSong = await recommendAndAutoQueueNextTrack({ excludeCurrent: false });
+            let fallbackSong = recommendAndAutoQueueNextTrackSync({ excludeCurrent: false });
             if (!fallbackSong) {
                 fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: false });
                 currentQueue = [fallbackSong];
@@ -2523,7 +2638,7 @@ function initHarmonyTunes() {
                     currentSongIndex = 0;
                 } else {
                     // Manual queue empty & queue end reached: Trigger lightweight recommendation function!
-                    let nextSongToPlay = await recommendAndAutoQueueNextTrack({ excludeCurrent: true });
+                    let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
                     if (!nextSongToPlay) {
                         nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true });
                         currentQueue.push(nextSongToPlay);
@@ -2539,9 +2654,23 @@ function initHarmonyTunes() {
         }
 
         if (audioAdManager.shouldPlayAd('next_song')) {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.volume = 0;
+            }
+            isPlaying = false;
+            lockMediaControls(true);
+
             audioAdManager.playAd(() => {
                 loadSong(currentSongIndex);
-                playSong();
+                if (mixEngine && typeof mixEngine.crossfadeAdToSong === 'function' && audioAdManager.adAudio) {
+                    mixEngine.crossfadeAdToSong(audioAdManager.adAudio, activeAudio, 5, () => {
+                        lockMediaControls(false);
+                    });
+                } else {
+                    lockMediaControls(false);
+                    playSong();
+                }
             });
             return;
         }
@@ -3035,6 +3164,12 @@ function initHarmonyTunes() {
 
         if(fsProgressBar) {
             fsProgressBar.addEventListener('click', (e) => {
+                if (isAdControlsLocked || (currentQueue[currentSongIndex] && (currentQueue[currentSongIndex].isAd || currentQueue[currentSongIndex].unskippable)) || (audioAdManager && audioAdManager.isAdPlaying())) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showAdUnskippableToast();
+                    return;
+                }
                 const width = fsProgressBar.clientWidth;
                 const clickX = e.offsetX;
                 const duration = activeAudio.duration;
@@ -3108,6 +3243,12 @@ function initHarmonyTunes() {
 
         if (progressBar) {
             progressBar.addEventListener('click', (e) => {
+                if (isAdControlsLocked || (currentQueue[currentSongIndex] && (currentQueue[currentSongIndex].isAd || currentQueue[currentSongIndex].unskippable)) || (audioAdManager && audioAdManager.isAdPlaying())) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showAdUnskippableToast();
+                    return;
+                }
                 const width = progressBar.clientWidth;
                 const clickX = e.offsetX;
                 const duration = activeAudio.duration;
@@ -3697,18 +3838,17 @@ function initHarmonyTunes() {
         } else if (repeatMode === 1 && currentQueue.length > 0) {
             targetSong = currentQueue[0];
         } else if (repeatMode !== 2) {
-            // ENDLESS QUEUE: Proactively pre-queue recommended track if upcoming is empty
-            recommendAndAutoQueueNextTrack().then(rec => {
-                if (rec && nextAudio && (!nextAudio.src || nextAudio.src === '')) {
-                    const recSrc = rec.src || rec.audioUrl || rec.streamUrl;
-                    if (recSrc) {
-                        preloadedNextSongObj = rec;
-                        nextAudio.src = recSrc;
-                        nextAudio.preload = 'auto';
-                        try { nextAudio.load(); } catch (_) {}
-                    }
+            // ENDLESS QUEUE: Proactively pre-queue recommended track early in lifecycle if upcoming is empty
+            const rec = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
+            if (rec && nextAudio && (!nextAudio.src || nextAudio.src === '')) {
+                const recSrc = rec.src || rec.audioUrl || rec.streamUrl;
+                if (recSrc) {
+                    preloadedNextSongObj = rec;
+                    nextAudio.src = recSrc;
+                    nextAudio.preload = 'auto';
+                    try { nextAudio.load(); } catch (_) {}
                 }
-            }).catch(() => {});
+            }
         }
 
         if (targetSong) {
@@ -3744,7 +3884,10 @@ function initHarmonyTunes() {
                 nextIndex = currentSongIndex;
             } else {
                 if (currentSongIndex + 1 >= currentQueue.length && repeatMode !== 1) {
-                    if (typeof backgroundMixxerAI === 'function') {
+                    const recTrack = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
+                    if (recTrack) {
+                        nextIndex = currentQueue.length - 1;
+                    } else if (typeof backgroundMixxerAI === 'function') {
                         backgroundMixxerAI(); // Analyzes and adds the next song
                     }
                 }
@@ -3833,19 +3976,26 @@ function initHarmonyTunes() {
             } else if (nextIndex >= currentQueue.length) {
                 if (repeatMode === 1) nextIndex = 0;
                 else {
-                    if (typeof backgroundMixxerAI === 'function') backgroundMixxerAI();
-                    if (currentSongIndex + 1 < currentQueue.length) {
+                    const recTrack = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
+                    if (recTrack || currentSongIndex + 1 < currentQueue.length) {
                         nextIndex = currentSongIndex + 1;
                         preloadedNextSongObj = currentQueue[nextIndex];
                         nextAudio.src = preloadedNextSongObj.src || preloadedNextSongObj.audioUrl || preloadedNextSongObj.streamUrl;
                     } else {
-                        isCrossfading = false;
-                        setLexiMixingState(false);
-                        if (mixerBtn) mixerBtn.classList.remove('pulsing');
-                        if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
-                        if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
-                        activeAudio.setAttribute('data-no-crossfade', 'true');
-                        return; 
+                        if (typeof backgroundMixxerAI === 'function') backgroundMixxerAI();
+                        if (currentSongIndex + 1 < currentQueue.length) {
+                            nextIndex = currentSongIndex + 1;
+                            preloadedNextSongObj = currentQueue[nextIndex];
+                            nextAudio.src = preloadedNextSongObj.src || preloadedNextSongObj.audioUrl || preloadedNextSongObj.streamUrl;
+                        } else {
+                            isCrossfading = false;
+                            setLexiMixingState(false);
+                            if (mixerBtn) mixerBtn.classList.remove('pulsing');
+                            if(fsMixerBtn) fsMixerBtn.classList.remove('pulsing');
+                            if(mobMixerBtn) mobMixerBtn.classList.remove('pulsing');
+                            activeAudio.setAttribute('data-no-crossfade', 'true');
+                            return; 
+                        }
                     }
                 }
             }

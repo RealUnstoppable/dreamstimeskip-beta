@@ -17,19 +17,107 @@ for (let i = 0; i < CURVE_LENGTH; i++) {
 // Ensure ramp doesn't go exactly to 0 for exponential ramps
 const EPSILON = 0.0001;
 
+export const EQ_PRESETS = {
+  flat: { name: 'Flat / Balanced', bass: 0, mid: 0, treble: 0 },
+  bass_boost: { name: 'Bass Boost', bass: 7, mid: 1, treble: -1 },
+  vocal: { name: 'Vocal Clarity', bass: -2, mid: 5, treble: 3 },
+  electronic: { name: 'Club / Electronic', bass: 6, mid: 2, treble: 5 },
+  treble_boost: { name: 'Treble Boost', bass: -3, mid: 1, treble: 7 },
+  acoustic: { name: 'Warm Acoustic', bass: 2, mid: 4, treble: 2 }
+};
+
+/**
+ * AudioPlaybackLock
+ * Strict mutual exclusion lock ensuring only one audio source outputs at a time.
+ * Prevents simultaneous ad and song playback on first click, seeking, or track changes.
+ */
+export class AudioPlaybackLock {
+  constructor(engine) {
+    this.engine = engine;
+    this.state = 'idle'; // 'idle' | 'song' | 'ad' | 'crossfade'
+    this.isAdLocked = false;
+    this.listeners = new Set();
+    this.activeSource = null;
+  }
+
+  getState() {
+    return this.state;
+  }
+
+  isAdPlaying() {
+    return this.state === 'ad' || this.isAdLocked;
+  }
+
+  canPlaySong() {
+    return !this.isAdLocked && this.state !== 'ad';
+  }
+
+  acquireAdLock(options = {}) {
+    this.state = 'ad';
+    this.isAdLocked = true;
+    this.activeSource = options.source || 'ad';
+    this.notify({ isAdLocked: true, state: 'ad' });
+    return true;
+  }
+
+  releaseAdLock() {
+    this.state = 'idle';
+    this.isAdLocked = false;
+    this.activeSource = null;
+    this.notify({ isAdLocked: false, state: 'idle' });
+  }
+
+  setSongPlaying() {
+    if (this.isAdLocked) {
+      console.warn('[AudioPlaybackLock] Cannot play song: Ad lock is currently active.');
+      return false;
+    }
+    this.state = 'song';
+    this.notify({ isAdLocked: false, state: 'song' });
+    return true;
+  }
+
+  setCrossfading() {
+    this.state = 'crossfade';
+    this.notify({ isAdLocked: this.isAdLocked, state: 'crossfade' });
+  }
+
+  subscribe(listener) {
+    if (typeof listener === 'function') {
+      this.listeners.add(listener);
+      return () => this.listeners.delete(listener);
+    }
+    return () => {};
+  }
+
+  notify(detail) {
+    for (const fn of this.listeners) {
+      try { fn(detail); } catch (_) {}
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('medixly:playback-lock-changed', { detail }));
+    }
+  }
+}
+
 export class AudioMixEngine {
   constructor() {
     this.ctx = null;
     this.deckAGain = null;
     this.deckBGain = null;
+    this.adGain = null;
     this.masterGain = null;
     
     // 3-Band Equalizers for Deck A and B
     this.deckAEQ = null;
     this.deckBEQ = null;
-    this.defaultCrossfadeDuration = 15;
+    this.activeSoundProfile = 'flat';
+    this.defaultCrossfadeDuration = 5; // 5-second crossfade
     this.streamHooks = [];
     
+    // Strict mutual exclusion lock
+    this.playbackLock = new AudioPlaybackLock(this);
+
     // WeakMap to prevent double-creation of MediaElementSource
     this.elementSources = new WeakMap();
     
@@ -264,11 +352,12 @@ export class AudioMixEngine {
    * Perform a crossfade from one deck to another
    * @param {string} fromDeck - 'A' or 'B'
    * @param {string} toDeck - 'A' or 'B'
-   * @param {number} duration - Duration in seconds
+   * @param {number} duration - Duration in seconds (defaults to 5)
    * @param {Object} options - Crossfade options (equalPower, onComplete)
    * @returns {Object} Object with a cancel() method
    */
-  crossfade(fromDeck, toDeck, duration, options = {}) {
+  crossfade(fromDeck, toDeck, duration = 5, options = {}) {
+    const fadeDuration = typeof duration === 'number' && duration > 0 ? duration : this.defaultCrossfadeDuration;
     const equalPower = options.equalPower !== false;
     const onComplete = options.onComplete;
     
@@ -286,11 +375,11 @@ export class AudioMixEngine {
     toGain.gain.setValueAtTime(toGain.gain.value, t);
 
     if (equalPower) {
-      fromGain.gain.setValueCurveAtTime(fadeOutCurve, t, duration);
-      toGain.gain.setValueCurveAtTime(fadeInCurve, t, duration);
+      fromGain.gain.setValueCurveAtTime(fadeOutCurve, t, fadeDuration);
+      toGain.gain.setValueCurveAtTime(fadeInCurve, t, fadeDuration);
     } else {
-      fromGain.gain.linearRampToValueAtTime(0, t + duration);
-      toGain.gain.linearRampToValueAtTime(1, t + duration);
+      fromGain.gain.linearRampToValueAtTime(0, t + fadeDuration);
+      toGain.gain.linearRampToValueAtTime(1, t + fadeDuration);
     }
 
     if (this.crossfadeTimeout) clearTimeout(this.crossfadeTimeout);
@@ -298,12 +387,157 @@ export class AudioMixEngine {
     if (onComplete) {
       this.crossfadeTimeout = setTimeout(() => {
         onComplete();
-      }, duration * 1000);
+      }, fadeDuration * 1000);
     }
 
     return {
       cancel: () => {
         this.cancelCrossfade();
+      }
+    };
+  }
+
+  /**
+   * 5-Second Crossfade from active Ad to target Song
+   * Ensures mutual exclusion lock transitions cleanly without hard cut or overlap.
+   * @param {HTMLMediaElement} adAudioEl - Ad audio element
+   * @param {HTMLMediaElement} songAudioEl - Target song audio element
+   * @param {number} duration - Crossfade duration in seconds (default: 5)
+   * @param {Function} onComplete - Callback when handover is finished
+   */
+  crossfadeAdToSong(adAudioEl, songAudioEl, duration = 5, onComplete = null) {
+    this.playbackLock.setCrossfading();
+    const durSec = Math.max(1, typeof duration === 'number' ? duration : 5);
+    const hasWebAudio = Boolean(this.ctx && this.adGain && (this.deckAGain || this.deckBGain));
+
+    if (songAudioEl) {
+      songAudioEl.volume = 0;
+      const playPromise = songAudioEl.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+
+    if (hasWebAudio && this.ctx.state === 'running') {
+      try {
+        const t = this.ctx.currentTime;
+        const targetDeck = songAudioEl && songAudioEl.id === 'audio-player-2' ? 'B' : 'A';
+        const songGain = this.getDeckGain(targetDeck);
+
+        this.adGain.gain.cancelScheduledValues(t);
+        this.adGain.gain.setValueAtTime(this.adGain.gain.value, t);
+        this.adGain.gain.setValueCurveAtTime(fadeOutCurve, t, durSec);
+
+        if (songGain) {
+          songGain.gain.cancelScheduledValues(t);
+          songGain.gain.setValueAtTime(0, t);
+          songGain.gain.setValueCurveAtTime(fadeInCurve, t, durSec);
+        }
+      } catch (err) {
+        console.warn('AudioMixEngine: ad-to-song Web Audio ramp note', err);
+      }
+    }
+
+    // Resilient volume interpolation for HTMLMediaElements
+    const startTime = Date.now();
+    const durMs = durSec * 1000;
+    const fadeTimer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(1, Math.max(0, elapsed / durMs));
+      
+      const adVol = Math.cos((Math.PI / 2) * progress);
+      const songVol = Math.sin((Math.PI / 2) * progress);
+
+      if (adAudioEl && !isNaN(adVol)) {
+        adAudioEl.volume = Math.max(0, Math.min(1, adVol));
+      }
+      if (songAudioEl && !isNaN(songVol)) {
+        songAudioEl.volume = Math.max(0, Math.min(1, songVol));
+      }
+
+      if (progress >= 1) {
+        clearInterval(fadeTimer);
+        if (adAudioEl) {
+          try {
+            adAudioEl.pause();
+            adAudioEl.currentTime = 0;
+            adAudioEl.volume = 1;
+          } catch (_) {}
+        }
+        if (songAudioEl) {
+          songAudioEl.volume = 1;
+        }
+        this.playbackLock.releaseAdLock();
+        this.playbackLock.setSongPlaying();
+        if (typeof onComplete === 'function') {
+          onComplete();
+        }
+      }
+    }, 50);
+
+    return {
+      cancel: () => {
+        clearInterval(fadeTimer);
+        this.playbackLock.releaseAdLock();
+      }
+    };
+  }
+
+  /**
+   * 5-Second Crossfade from playing Song into Ad payload
+   * @param {HTMLMediaElement} songAudioEl - Current song audio element
+   * @param {HTMLMediaElement} adAudioEl - Target ad audio element
+   * @param {number} duration - Crossfade duration in seconds (default: 5)
+   * @param {Function} onComplete - Callback when handover is finished
+   */
+  crossfadeSongToAd(songAudioEl, adAudioEl, duration = 5, onComplete = null) {
+    this.playbackLock.acquireAdLock({ source: 'ad-crossfade' });
+    this.playbackLock.setCrossfading();
+    const durSec = Math.max(1, typeof duration === 'number' ? duration : 5);
+
+    if (adAudioEl) {
+      adAudioEl.volume = 0;
+      const p = adAudioEl.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    }
+
+    const startTime = Date.now();
+    const durMs = durSec * 1000;
+    const fadeTimer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(1, Math.max(0, elapsed / durMs));
+      
+      const songVol = Math.cos((Math.PI / 2) * progress);
+      const adVol = Math.sin((Math.PI / 2) * progress);
+
+      if (songAudioEl && !isNaN(songVol)) {
+        songAudioEl.volume = Math.max(0, Math.min(1, songVol));
+      }
+      if (adAudioEl && !isNaN(adVol)) {
+        adAudioEl.volume = Math.max(0, Math.min(1, adVol));
+      }
+
+      if (progress >= 1) {
+        clearInterval(fadeTimer);
+        if (songAudioEl) {
+          try {
+            songAudioEl.pause();
+            songAudioEl.volume = 1;
+          } catch (_) {}
+        }
+        if (adAudioEl) {
+          adAudioEl.volume = 1;
+        }
+        this.playbackLock.acquireAdLock({ source: 'ad-active' });
+        if (typeof onComplete === 'function') {
+          onComplete();
+        }
+      }
+    }, 50);
+
+    return {
+      cancel: () => {
+        clearInterval(fadeTimer);
       }
     };
   }
@@ -585,6 +819,50 @@ export class AudioMixEngine {
   }
 
   /**
+   * Apply a curated EQ Sound Profile preset across both Deck A and Deck B
+   * @param {string} presetKey - 'flat' | 'bass_boost' | 'vocal' | 'electronic' | 'treble_boost' | 'acoustic'
+   */
+  applySoundProfile(presetKey = 'flat') {
+    const preset = EQ_PRESETS[presetKey] || EQ_PRESETS.flat;
+    this.activeSoundProfile = presetKey in EQ_PRESETS ? presetKey : 'flat';
+
+    this.setEQ('A', preset);
+    this.setEQ('B', preset);
+
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('medixly_sound_profile', this.activeSoundProfile);
+      }
+    } catch (_) {}
+
+    this.triggerStreamHooks('soundProfileChange', {
+      profile: this.activeSoundProfile,
+      settings: preset
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('medixly:sound-profile-changed', {
+        detail: { profile: this.activeSoundProfile, settings: preset }
+      }));
+    }
+
+    return { profile: this.activeSoundProfile, settings: preset };
+  }
+
+  /**
+   * Get currently active sound profile and EQ parameters
+   */
+  getSoundProfile() {
+    return {
+      activeProfile: this.activeSoundProfile,
+      preset: EQ_PRESETS[this.activeSoundProfile] || EQ_PRESETS.flat,
+      eqA: this.getEQ('A'),
+      eqB: this.getEQ('B'),
+      presets: EQ_PRESETS
+    };
+  }
+
+  /**
    * Sets the default or target crossfade duration
    * @param {number} duration - seconds (1 to 30)
    */
@@ -597,7 +875,7 @@ export class AudioMixEngine {
   }
 
   getCrossfadeDuration() {
-    return this.defaultCrossfadeDuration || 15;
+    return this.defaultCrossfadeDuration || 5;
   }
 
   /**

@@ -40,6 +40,10 @@ function createDesktopServer(rootDir) {
     res.sendFile(path.join(rootDir, 'medixly-artists.html'));
   });
 
+  app.get(['/editors', '/for-editors', '/medixly/editors', '/medixly-editors', '/medixly-editors.html'], (req, res) => {
+    res.sendFile(path.join(rootDir, 'medixly-editors.html'));
+  });
+
   // Strip web advertising scripts for native desktop experience
   app.use((req, res, next) => {
     if (req.path.endsWith('.html') || req.path === '/medixly.html') {

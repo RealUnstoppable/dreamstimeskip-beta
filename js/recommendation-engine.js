@@ -360,6 +360,22 @@ export class EndlessQueueManager {
     }
 
     /**
+     * Checks if recommendation should fire early in track lifecycle (e.g. 25s before end or at 10s playback)
+     * to ensure the upcoming track is buffered and ready before the 5-second crossfade window.
+     */
+    shouldTriggerEarly(currentTime, duration, upcomingCount = 0) {
+        if (!this.isEnabled) return false;
+        if (upcomingCount > 0) return false; // Already has upcoming track queued
+        
+        const validDur = typeof duration === 'number' && !isNaN(duration) && duration > 5;
+        if (!validDur) return true; // Queue immediately if duration unknown
+
+        const remaining = duration - currentTime;
+        // Trigger early: between 20-25 seconds before song end, or once song is at least 10s in
+        return remaining <= 25 || currentTime >= 10;
+    }
+
+    /**
      * Inspects manual queue and upcoming queue. If manual queue is empty,
      * triggers recommendation and auto-queues the best next track.
      *
@@ -401,6 +417,65 @@ export class EndlessQueueManager {
 
         if (nextTrack) {
             currentQueue.push(nextTrack);
+            return nextTrack;
+        }
+
+        return null;
+    }
+
+    /**
+     * Async database-connected endless queue trigger that pulls fresh user profile
+     * and injects next recommended song early into queue and idle player deck.
+     */
+    async autoQueueNextTrackWithContext(context = {}) {
+        if (!this.isEnabled) return null;
+        const {
+            db = this.db,
+            userId = this.userId,
+            localFallback = {},
+            manualQueue = [],
+            currentQueue = [],
+            currentSongIndex = 0,
+            recentHistory = [],
+            idleAudio = null
+        } = context;
+
+        if (Array.isArray(manualQueue) && manualQueue.length > 0) {
+            return null;
+        }
+
+        const upcomingCount = Math.max(0, currentQueue.length - (currentSongIndex + 1));
+        if (upcomingCount > 0) {
+            return currentQueue[currentSongIndex + 1];
+        }
+
+        let profile = this.userProfile;
+        if (db && userId) {
+            try {
+                profile = await fetchUserRecommendationContext(db, userId, localFallback);
+                this.userProfile = profile;
+            } catch (_) {}
+        }
+
+        const currentTrack = currentQueue[currentSongIndex] || null;
+        const recentHistoryIds = recentHistory.map(s => s?.id || s).filter(Boolean);
+        const upcomingQueueIds = new Set(currentQueue.slice(currentSongIndex + 1).map(s => s?.id).filter(Boolean));
+
+        const nextTrack = getRecommendedTrack(this.librarySongs, profile, {
+            currentTrack,
+            recentHistoryIds,
+            upcomingQueueIds,
+            excludeCurrent: true
+        });
+
+        if (nextTrack) {
+            currentQueue.push(nextTrack);
+            if (idleAudio && nextTrack.src) {
+                try {
+                    idleAudio.src = nextTrack.src;
+                    idleAudio.load();
+                } catch (_) {}
+            }
             return nextTrack;
         }
 

@@ -44,6 +44,7 @@ export class AudioAdManager {
         this.isPremium = false;
         this.currentUser = null;
         this.onCompleteMergeCallback = null;
+        this.controlsLocked = false;
 
         // UI references
         this.ui = {
@@ -405,12 +406,74 @@ export class AudioAdManager {
     }
 
     /**
+     * Lock or unlock media player UI controls (next, prev, and seek bars)
+     */
+    setControlsLocked(isLocked) {
+        this.controlsLocked = !!isLocked;
+        if (typeof document === 'undefined') return;
+
+        const controlIds = [
+            'next-btn', 'prev-btn',
+            'fs-next-btn', 'fs-prev-btn',
+            'mob-next-btn', 'mob-prev-btn',
+            'viral-skip-btn', 'fs-viral-skip-btn'
+        ];
+
+        controlIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = isLocked;
+                el.setAttribute('aria-disabled', String(isLocked));
+                if (isLocked) {
+                    el.classList.add('ad-locked', 'control-locked');
+                } else {
+                    el.classList.remove('ad-locked', 'control-locked');
+                }
+            }
+        });
+
+        // Seek bars
+        const seekBars = document.querySelectorAll('.progress-bar, #fs-progress-bar, #progress-bar');
+        seekBars.forEach(bar => {
+            if (isLocked) {
+                bar.classList.add('ad-locked', 'seek-disabled');
+                bar.setAttribute('aria-disabled', 'true');
+            } else {
+                bar.classList.remove('ad-locked', 'seek-disabled');
+                bar.removeAttribute('aria-disabled');
+            }
+        });
+
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('medixly:ad-controls-locked', {
+                detail: { isLocked, isAdActive: this.isPlaying }
+            }));
+        }
+    }
+
+    /**
      * Begins ad playback, shows Lexi orb if in player/lyrics, and prepares merge callback
      */
     playAd(onCompleteMerge) {
         if (this.isPlaying) return;
         this.isPlaying = true;
         this.onCompleteMergeCallback = onCompleteMerge;
+
+        // Strict mutual exclusion: Acquire playback lock and pause any active song
+        if (this.mixEngine && this.mixEngine.playbackLock) {
+            this.mixEngine.playbackLock.acquireAdLock({ source: 'audio-ad' });
+        }
+        if (typeof window !== 'undefined' && typeof window.__getActiveAudio === 'function') {
+            try {
+                const activeSongAudio = window.__getActiveAudio();
+                if (activeSongAudio && typeof activeSongAudio.pause === 'function') {
+                    activeSongAudio.pause();
+                }
+            } catch (_) {}
+        }
+
+        // Lock media player UI controls during ad payload
+        this.setControlsLocked(true);
 
         const adSrc = this.getNextAdSrc();
 
@@ -554,6 +617,12 @@ export class AudioAdManager {
                 overlay.classList.add('hidden');
                 overlay.setAttribute('aria-hidden', 'true');
             }, 750);
+        }
+
+        // Release UI control locks and mutual exclusion lock
+        this.setControlsLocked(false);
+        if (this.mixEngine && this.mixEngine.playbackLock) {
+            this.mixEngine.playbackLock.releaseAdLock();
         }
 
         // Execute merge callback into next song
