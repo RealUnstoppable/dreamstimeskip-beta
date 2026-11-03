@@ -3741,6 +3741,13 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
     cursor: not-allowed !important;
 }
 
+.control-locked,
+.seek-disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
 @keyframes shake-x {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-4px); }
@@ -3749,6 +3756,281 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
 
 .shake-blocked {
     animation: shake-x 0.35s ease-in-out;
+}
+
+/* ===== Redesigned Desktop-Only Header Navigation ===== */
+.medixly-desktop-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 70px;
+    padding: 0 28px;
+    box-sizing: border-box;
+}
+
+.medixly-nav-left {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.medixly-brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.medixly-brand-lockup:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.medixly-logo-img {
+    height: 81px;
+    width: auto;
+    object-fit: contain;
+}
+
+.medixly-brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.medixly-brand-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.medixly-brand-subtitle {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--theme-accent, #16A34A);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.medixly-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.medixly-header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    color: #e2e8f0;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+}
+
+.medixly-header-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.medixly-header-btn:active {
+    transform: scale(0.98);
+}
+
+.medixly-header-btn svg {
+    color: var(--theme-accent, #16A34A);
+    flex-shrink: 0;
+}
+
+.medixly-auth-btn {
+    background: rgba(22, 163, 74, 0.12);
+    border-color: rgba(22, 163, 74, 0.3);
+    color: #ffffff;
+}
+
+.medixly-auth-btn:hover {
+    background: var(--theme-accent, #16A34A);
+    border-color: var(--theme-accent, #16A34A);
+    color: #ffffff;
+}
+
+.medixly-auth-btn:hover svg {
+    color: #ffffff;
+}
+
+/* ===== Desktop Settings & Sound Profile Modal ===== */
+.medixly-settings-card {
+    max-width: 580px;
+    width: 92%;
+    max-height: 86vh;
+    overflow-y: auto;
+}
+
+.medixly-settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.medixly-settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.medixly-settings-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--theme-accent, #16A34A);
+}
+
+.medixly-settings-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.medixly-settings-subheading {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.medixly-eq-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.medixly-preset-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.medixly-preset-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    transform: translateY(-1px);
+}
+
+.medixly-preset-btn.active {
+    background: rgba(22, 163, 74, 0.14);
+    border-color: var(--theme-accent, #16A34A);
+    box-shadow: 0 0 12px var(--theme-accent-glow, rgba(22, 163, 74, 0.25));
+}
+
+.medixly-preset-btn .preset-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.medixly-preset-btn .preset-desc {
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+
+.medixly-eq-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 6px;
+}
+
+.medixly-eq-slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.eq-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.eq-val {
+    font-family: monospace;
+    font-size: 0.82rem;
+    color: var(--theme-accent, #16A34A);
+}
+
+.medixly-slider {
+    width: 100%;
+    accent-color: var(--theme-accent, #16A34A);
+    cursor: pointer;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    outline: none;
+}
+
+.medixly-crossfade-selector {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.crossfade-pill {
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crossfade-pill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.crossfade-pill.active {
+    background: rgba(22, 163, 74, 0.16);
+    border-color: var(--theme-accent, #16A34A);
+    color: #ffffff;
+    box-shadow: 0 0 10px var(--theme-accent-glow, rgba(22, 163, 74, 0.25));
 }
 
 

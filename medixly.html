@@ -33,9 +33,6 @@
     <link rel="stylesheet" href="/css/chatbot.css">
     <link rel="stylesheet" href="/css/medixly.css?v=1791167958698">
     <link rel="stylesheet" href="/css/onboarding.css">
-
-    <meta name="google-adsense-account" content="ca-pub-4254213062632381">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4254213062632381" crossorigin="anonymous"></script>
 </head>
 <body>
     <!-- Background Waves & Ambiance from index -->
@@ -90,14 +87,14 @@
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                         <span>Favorites</span>
                     </button>
-                    <a href="/medixly-editors.html" class="nav-pill" id="nav-editors" title="For Editors Workspace — Precision Waveform &amp; Lyric Sync" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                        <span>For Editors</span>
-                    </a>
                     <button class="nav-pill nav-pill-admin" id="nav-ad-test" style="display: none;" title="Admin Ad Test" aria-label="Admin Ad Test">
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         <span>Ad Test</span>
                     </button>
+                    <a href="/medixly-editors.html" class="nav-pill" id="nav-editors" title="For Editors Workspace — Precision Waveform &amp; Lyric Sync" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        <span>For Editors</span>
+                    </a>
                 </nav>
 
 
@@ -112,7 +109,7 @@
                                 <span id="desktop-badge-text">v1.1.0</span>
                                 <button type="button" id="desktop-badge-update-btn" class="desktop-badge-btn" title="Check for Updates">Check Update</button>
                             </div>
-                            <button id="header-sound-prefs-btn" class="btn-secondary" onclick="if(window.openMedixlyOnboarding) window.openMedixlyOnboarding(5);">
+                            <button id="header-sound-prefs-btn" class="btn-secondary" onclick="if(window.openMedixlySettingsModal) window.openMedixlySettingsModal(); else if(window.openMedixlyOnboarding) window.openMedixlyOnboarding(5);">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                                 <span>Sound Profile</span>
                             </button>
@@ -169,23 +166,6 @@
                     <div class="card-grid" id="container-playlists">
                         </div>
                 </section>
-
-                <!-- AD_SLOT_START -->
-                <section class="site-ad-section" style="padding: 20px 0 60px;" aria-label="Sponsored Content">
-                    <div class="site-ad-label">Sponsored</div>
-                    <div class="ad-container ad-bottom-banner">
-                        <ins class="adsbygoogle"
-                             style="display:block"
-                             data-ad-client="ca-pub-4254213062632381"
-                             data-ad-slot="9876543210"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        <script>
-                             (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-                    </div>
-                </section>
-                <!-- AD_SLOT_END -->
             </div>
 
             <!-- Dedicated Full Page for Playlists -->
@@ -716,24 +696,147 @@
 
                 <div class="medixly-account-divider"></div>
 
-                <!-- App Version & Update Center -->
-                <div class="medixly-app-version-box" id="medixly-app-version-box">
-                    <div class="medixly-version-info">
-                        <div class="medixly-version-labels">
-                            <span class="medixly-version-title">Medixly Desktop</span>
-                            <span class="medixly-version-tag" id="medixly-app-version-tag">v1.1.0</span>
-                        </div>
-                        <span class="medixly-update-status up-to-date" id="medixly-update-status">Up to date</span>
-                    </div>
-                    <button type="button" class="medixly-check-update-btn" id="medixly-check-update-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-                        <span>Check for Updates</span>
-                    </button>
-                    <div id="medixly-update-message" class="medixly-update-message hidden"></div>
-                </div>
-
                 <div class="medixly-account-actions">
                     <button type="button" id="medixly-auth-signout" class="medixly-auth-btn-secondary">Sign Out</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medixly Desktop Settings & Sound Profile Modal -->
+    <div id="medixly-settings-modal" class="medixly-auth-modal hidden" aria-hidden="true" role="dialog" aria-labelledby="medixly-settings-title">
+        <div class="medixly-auth-backdrop" id="medixly-settings-backdrop"></div>
+        <div class="medixly-auth-card medixly-settings-card">
+            <div class="medixly-auth-header">
+                <div class="medixly-auth-logo">
+                    <img src="/images/medixly-logo.png" alt="Medixly" style="height: 48px;">
+                </div>
+                <h2 id="medixly-settings-title" class="medixly-auth-title">Settings & Sound Profile</h2>
+                <p class="medixly-auth-subtitle">Configure audio hardware, equalizer presets, and application updates.</p>
+                <button type="button" class="medixly-auth-close" id="medixly-settings-close-btn" aria-label="Close settings">&times;</button>
+            </div>
+
+            <div class="medixly-settings-body">
+                <!-- Section 1: Sound Profile (EQ Presets & 3-Band Equalizer) -->
+                <div class="medixly-settings-section">
+                    <div class="medixly-settings-section-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5v14M7 9v6M2 12h20"/></svg>
+                        <h3 class="medixly-settings-heading">Sound Profile & Equalizer</h3>
+                    </div>
+                    <p class="medixly-settings-subheading">Select a calibrated acoustic preset or fine-tune frequencies with the 3-band EQ.</p>
+
+                    <div class="medixly-eq-presets-grid" id="medixly-eq-presets">
+                        <button type="button" class="medixly-preset-btn active" data-preset="flat">
+                            <span class="preset-name">Flat / Balanced</span>
+                            <span class="preset-desc">Neutral studio reference</span>
+                        </button>
+                        <button type="button" class="medixly-preset-btn" data-preset="bass_boost">
+                            <span class="preset-name">Bass Boost</span>
+                            <span class="preset-desc">+7dB Low-end punch</span>
+                        </button>
+                        <button type="button" class="medixly-preset-btn" data-preset="vocal">
+                            <span class="preset-name">Vocal Clarity</span>
+                            <span class="preset-desc">Crisp vocals & podcasts</span>
+                        </button>
+                        <button type="button" class="medixly-preset-btn" data-preset="electronic">
+                            <span class="preset-name">Club / Electronic</span>
+                            <span class="preset-desc">Punchy bass & airy highs</span>
+                        </button>
+                        <button type="button" class="medixly-preset-btn" data-preset="treble_boost">
+                            <span class="preset-name">Treble Boost</span>
+                            <span class="preset-desc">Bright detail & air</span>
+                        </button>
+                        <button type="button" class="medixly-preset-btn" data-preset="acoustic">
+                            <span class="preset-name">Warm Acoustic</span>
+                            <span class="preset-desc">Natural string warmth</span>
+                        </button>
+                    </div>
+
+                    <!-- 3-Band Sliders -->
+                    <div class="medixly-eq-sliders">
+                        <div class="medixly-eq-slider-group">
+                            <div class="eq-label-row">
+                                <label for="eq-slider-bass">Bass (60 Hz)</label>
+                                <span id="eq-val-bass" class="eq-val">+0 dB</span>
+                            </div>
+                            <input type="range" id="eq-slider-bass" min="-12" max="12" step="1" value="0" class="medixly-slider">
+                        </div>
+                        <div class="medixly-eq-slider-group">
+                            <div class="eq-label-row">
+                                <label for="eq-slider-mid">Mid (1 kHz)</label>
+                                <span id="eq-val-mid" class="eq-val">+0 dB</span>
+                            </div>
+                            <input type="range" id="eq-slider-mid" min="-12" max="12" step="1" value="0" class="medixly-slider">
+                        </div>
+                        <div class="medixly-eq-slider-group">
+                            <div class="eq-label-row">
+                                <label for="eq-slider-treble">Treble (8 kHz)</label>
+                                <span id="eq-val-treble" class="eq-val">+0 dB</span>
+                            </div>
+                            <input type="range" id="eq-slider-treble" min="-12" max="12" step="1" value="0" class="medixly-slider">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="medixly-account-divider"></div>
+
+                <!-- Section 2: Seamless Crossfading Duration -->
+                <div class="medixly-settings-section">
+                    <div class="medixly-settings-section-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                        <h3 class="medixly-settings-heading">Seamless Crossfade</h3>
+                    </div>
+                    <p class="medixly-settings-subheading">Transition smoothly between songs and announcements without hard cuts or overlapping audio.</p>
+                    <div class="medixly-crossfade-selector" id="medixly-crossfade-selector">
+                        <button type="button" class="crossfade-pill" data-duration="3">3s (Quick)</button>
+                        <button type="button" class="crossfade-pill active" data-duration="5">5s (Standard)</button>
+                        <button type="button" class="crossfade-pill" data-duration="8">8s (Club)</button>
+                        <button type="button" class="crossfade-pill" data-duration="12">12s (Ambient)</button>
+                    </div>
+                </div>
+
+                <div class="medixly-account-divider"></div>
+
+                <!-- Section 3: App Version & Update Center -->
+                <div class="medixly-settings-section">
+                    <div class="medixly-settings-section-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <h3 class="medixly-settings-heading">Application & Updates</h3>
+                    </div>
+                    <p class="medixly-settings-subheading">Manage your desktop application version and check for software updates.</p>
+
+                    <div class="medixly-app-version-box" id="medixly-app-version-box">
+                        <div class="medixly-version-info">
+                            <div class="medixly-version-labels">
+                                <span class="medixly-version-title">Medixly Desktop</span>
+                                <span class="medixly-version-tag" id="medixly-app-version-tag">v1.1.0</span>
+                            </div>
+                            <span class="medixly-update-status up-to-date" id="medixly-update-status">Up to date</span>
+                        </div>
+                        <button type="button" class="medixly-check-update-btn" id="medixly-check-update-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <span>Check for Updates</span>
+                        </button>
+                        <div id="medixly-update-message" class="medixly-update-message hidden"></div>
+                    </div>
+                </div>
+
+                <div class="medixly-account-divider"></div>
+
+                <!-- Section 4: Theme Accent -->
+                <div class="medixly-theme-picker-section">
+                    <label class="medixly-theme-label">Accent Theme Color</label>
+                    <div class="medixly-theme-colors" id="medixly-settings-theme-colors">
+                        <button type="button" class="theme-dot" data-color="blue" style="background:#2563EB" title="Blue"></button>
+                        <button type="button" class="theme-dot" data-color="indigo" style="background:#4F46E5" title="Indigo"></button>
+                        <button type="button" class="theme-dot" data-color="purple" style="background:#9333EA" title="Purple"></button>
+                        <button type="button" class="theme-dot" data-color="pink" style="background:#EC4899" title="Pink"></button>
+                        <button type="button" class="theme-dot" data-color="green" style="background:#16A34A" title="Green"></button>
+                        <button type="button" class="theme-dot" data-color="emerald" style="background:#10B981" title="Emerald"></button>
+                        <button type="button" class="theme-dot" data-color="orange" style="background:#F97316" title="Orange"></button>
+                        <button type="button" class="theme-dot" data-color="red" style="background:#EF4444" title="Red"></button>
+                        <button type="button" class="theme-dot" data-color="cyan" style="background:#06B6D4" title="Cyan"></button>
+                    </div>
                 </div>
             </div>
         </div>

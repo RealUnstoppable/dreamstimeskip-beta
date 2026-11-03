@@ -77,6 +77,10 @@ export class AudioPlaybackLock {
     return true;
   }
 
+  acquireSongPlayback(options = {}) {
+    return this.setSongPlaying();
+  }
+
   setCrossfading() {
     this.state = 'crossfade';
     this.notify({ isAdLocked: this.isAdLocked, state: 'crossfade' });
@@ -778,11 +782,23 @@ export class AudioMixEngine {
   }
 
   /**
-   * Sets the 3-band EQ parameters for Deck A or Deck B
-   * @param {string} deck - 'A' or 'B'
-   * @param {Object} eqValues - { bass?: number, mid?: number, treble?: number } (-12 to +12 dB)
+   * Sets the 3-band EQ parameters for Deck A or Deck B, or globally across both decks
+   * @param {string|number} deckOrBass - 'A', 'B', or numeric bass dB (-12 to +12)
+   * @param {Object|number} eqValuesOrMid - { bass?, mid?, treble? } or numeric mid dB
+   * @param {number} [maybeTreble] - numeric treble dB
    */
-  setEQ(deck, { bass, mid, treble } = {}) {
+  setEQ(deckOrBass, eqValuesOrMid = {}, maybeTreble = undefined) {
+    if (typeof deckOrBass === 'number') {
+      const bass = deckOrBass;
+      const mid = typeof eqValuesOrMid === 'number' ? eqValuesOrMid : 0;
+      const treble = typeof maybeTreble === 'number' ? maybeTreble : 0;
+      this.setEQ('A', { bass, mid, treble });
+      this.setEQ('B', { bass, mid, treble });
+      return { bass, mid, treble };
+    }
+
+    const deck = deckOrBass;
+    const { bass, mid, treble } = eqValuesOrMid || {};
     const eq = deck === 'A' ? this.deckAEQ : (deck === 'B' ? this.deckBEQ : null);
     if (!eq || !this.ctx) return null;
     
@@ -807,6 +823,16 @@ export class AudioMixEngine {
 
     this.triggerStreamHooks('eqChange', { deck, settings: { ...eq.settings } });
     return { ...eq.settings };
+  }
+
+  /**
+   * Convenience method to set 3-band EQ parameters across both Deck A and Deck B
+   * @param {Object} eqValues - { bass?: number, mid?: number, treble?: number } (-12 to +12 dB)
+   */
+  setGlobalEQ({ bass, mid, treble } = {}) {
+    this.setEQ('A', { bass, mid, treble });
+    this.setEQ('B', { bass, mid, treble });
+    return this.getSoundProfile();
   }
 
   /**

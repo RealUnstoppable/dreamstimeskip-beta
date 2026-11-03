@@ -44,7 +44,7 @@ const PRELOADED_NOTIFICATIONS = [
 const BELL_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6V11a6 6 0 1 0-12 0v5l-2 2v1h16v-1l-2-2z"/></svg>`;
 
 export function loadNavbar() {
-    const isMedixlyPage = window.location.pathname.includes('medixly');
+    const isMedixlyPage = typeof window !== 'undefined' && window.location.pathname.includes('medixly');
     const isDtsPage = typeof window !== 'undefined' && (
         window.location.pathname.includes('dts') ||
         window.location.pathname.includes('dreamstimeskip') ||
@@ -52,9 +52,78 @@ export function loadNavbar() {
         Boolean(document.querySelector('.hero-og-bg')) ||
         (document.title && document.title.toLowerCase().includes('dreams timeskip'))
     );
-    const logoContent = isMedixlyPage
-        ? `<span class="un-letters">un</span><span style="font-weight: 800; margin: 0 10px; font-size: 1.2rem; color: var(--text-primary);">x</span><img src="/images/medixly-logo.png" alt="Medixly" style="height: 81px; margin-top: 2px;" id="medixly-navbar-logo">`
-        : `<span class="un-letters">un</span><span class="un-250">250</span>`;
+
+    if (isMedixlyPage) {
+        const medixlyHeaderHTML = `
+        <nav class="navbar medixly-desktop-navbar">
+            <!-- Left side: ONLY Medixly logo by Unstoppable -->
+            <div class="medixly-nav-left">
+                <a href="medixly.html" id="navbar-logo-link" class="medixly-brand-lockup" aria-label="Medixly by Unstoppable">
+                    <img src="/images/medixly-logo.png" alt="Medixly" style="height: 81px; margin-top: 2px;" id="medixly-navbar-logo">
+                    <div class="medixly-brand-text">
+                        <span class="medixly-brand-title">Medixly</span>
+                        <span class="medixly-brand-subtitle">by Unstoppable</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Right side: Sign In, Notifications, Memberships, Settings -->
+            <div class="medixly-nav-right">
+                <!-- Memberships Button -->
+                <a href="memberships.html" id="nav-memberships-btn" class="medixly-header-btn" title="Memberships">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    <span>Memberships</span>
+                </a>
+
+                <!-- Notifications -->
+                <div class="notification-wrapper" id="notification-wrapper">
+                    <button class="notification-bell-btn desktop-only" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
+                        ${BELL_SVG}
+                        <span class="notification-badge" style="display:none;" id="notification-badge">0</span>
+                    </button>
+                    <button class="notification-mobile-btn mobile-only" id="notification-mobile-btn">
+                        <span>Notifications</span>
+                        <span class="notification-badge mobile-badge" style="display:none;" id="notification-mobile-badge">0</span>
+                    </button>
+                    <div class="notification-dropdown" id="notification-dropdown">
+                        <div class="notification-dropdown-header">
+                            <span>Notifications</span>
+                            <button class="notif-mark-all-read" id="notif-mark-all-read">Mark all as read</button>
+                        </div>
+                        <div class="notification-list" id="notification-list"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Button -->
+                <button type="button" id="header-settings-btn" class="medixly-header-btn medixly-settings-btn" aria-label="Settings" title="Settings & Sound Profile">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+
+                <!-- Sign In Button -->
+                <a href="sign in beta.html" id="auth-link" class="medixly-header-btn medixly-auth-btn" title="Sign In">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span id="auth-link-text">Sign In</span>
+                </a>
+            </div>
+        </nav>`;
+
+        const header = document.querySelector('.main-header');
+        if (header) {
+            header.innerHTML = medixlyHeaderHTML;
+            attachNavEvents();
+            attachNotificationEvents();
+            updateAuthLink();
+            initSettingsModal();
+        }
+        initCookieConsent();
+        return;
+    }
+
+    const logoContent = `<span class="un-letters">un</span><span class="un-250">250</span>`;
 
     const dtsStoreNavItem = isDtsPage ? `
             <li class="nav-dts-store-item">
@@ -380,7 +449,7 @@ function attachNavEvents() {
             });
         }
 
-        const allNavLinks = document.querySelectorAll('.nav-links a, .nav-logo');
+        const allNavLinks = document.querySelectorAll('.nav-links a, .nav-logo, .medixly-header-btn');
         allNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 if (!isDesktopAppEnvironment()) return;
@@ -388,6 +457,7 @@ function attachNavEvents() {
                 const href = (link.getAttribute('href') || '').trim();
                 const isMedixlyTarget = href === 'medixly.html' || href === '/medixly.html' || href === '/medixly' || href.startsWith('medixly');
                 const isAuthTarget = link.id === 'auth-link' || href.includes('sign in beta') || href.includes('account.html') || href.includes('admin.html');
+                const isMembershipsTarget = link.id === 'nav-memberships-btn' || href.includes('memberships');
 
                 if (isMedixlyTarget) {
                     e.preventDefault();
@@ -403,6 +473,18 @@ function attachNavEvents() {
                         window.openMedixlyAuthModal();
                     } else {
                         showDesktopUnavailableToast('Account Settings');
+                        routeSafelyToMedixlyApp();
+                    }
+                    return;
+                }
+
+                if (isMembershipsTarget) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (typeof window.openMedixlyAuthModal === 'function') {
+                        window.openMedixlyAuthModal();
+                    } else {
+                        showDesktopUnavailableToast('Memberships');
                         routeSafelyToMedixlyApp();
                     }
                     return;
@@ -597,4 +679,210 @@ function updateAuthLink() {
             updateNotificationBadge(PRELOADED_NOTIFICATIONS.length);
         }
     });
+}
+
+/**
+ * Open Medixly Desktop Settings & Sound Profile Modal
+ */
+export function openMedixlySettingsModal() {
+    if (typeof document === 'undefined') return;
+    const modal = document.getElementById('medixly-settings-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+    syncSettingsModalWithEngine();
+}
+
+/**
+ * Close Medixly Desktop Settings & Sound Profile Modal
+ */
+export function closeMedixlySettingsModal() {
+    if (typeof document === 'undefined') return;
+    const modal = document.getElementById('medixly-settings-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+/**
+ * Sync UI sliders and preset buttons with current active audio mix engine state
+ */
+export function syncSettingsModalWithEngine() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+    if (mixEngine) {
+        const profile = typeof mixEngine.getSoundProfile === 'function' ? mixEngine.getSoundProfile() : null;
+        if (profile) {
+            const activeKey = profile.activeProfile || 'flat';
+            document.querySelectorAll('#medixly-eq-presets .medixly-preset-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.preset === activeKey);
+            });
+            const eq = profile.preset || {};
+            const bass = typeof eq.bass === 'number' ? eq.bass : 0;
+            const mid = typeof eq.mid === 'number' ? eq.mid : 0;
+            const treble = typeof eq.treble === 'number' ? eq.treble : 0;
+            const bassInput = document.getElementById('eq-slider-bass');
+            const midInput = document.getElementById('eq-slider-mid');
+            const trebleInput = document.getElementById('eq-slider-treble');
+            if (bassInput) bassInput.value = bass;
+            if (midInput) midInput.value = mid;
+            if (trebleInput) trebleInput.value = treble;
+            const bassVal = document.getElementById('eq-val-bass');
+            const midVal = document.getElementById('eq-val-mid');
+            const trebleVal = document.getElementById('eq-val-treble');
+            if (bassVal) bassVal.textContent = (bass > 0 ? '+' : '') + bass + ' dB';
+            if (midVal) midVal.textContent = (mid > 0 ? '+' : '') + mid + ' dB';
+            if (trebleVal) trebleVal.textContent = (treble > 0 ? '+' : '') + treble + ' dB';
+        }
+
+        const currentCrossfade = mixEngine.defaultCrossfadeDuration || 5;
+        document.querySelectorAll('#medixly-crossfade-selector .crossfade-pill').forEach(pill => {
+            const dur = parseFloat(pill.dataset.duration);
+            pill.classList.toggle('active', dur === currentCrossfade);
+        });
+    }
+}
+
+/**
+ * Initializes listeners for Settings modal, EQ presets, sliders, crossfade pills, and update trigger
+ */
+export function initSettingsModal() {
+    if (typeof document === 'undefined') return;
+
+    // Header settings button
+    const settingsBtn = document.getElementById('header-settings-btn');
+    if (settingsBtn && !settingsBtn.dataset.bound) {
+        settingsBtn.dataset.bound = 'true';
+        settingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openMedixlySettingsModal();
+        });
+    }
+
+    // Close button & backdrop
+    const closeBtn = document.getElementById('medixly-settings-close-btn');
+    if (closeBtn && !closeBtn.dataset.bound) {
+        closeBtn.dataset.bound = 'true';
+        closeBtn.addEventListener('click', () => closeMedixlySettingsModal());
+    }
+
+    const backdrop = document.getElementById('medixly-settings-backdrop');
+    if (backdrop && !backdrop.dataset.bound) {
+        backdrop.dataset.bound = 'true';
+        backdrop.addEventListener('click', () => closeMedixlySettingsModal());
+    }
+
+    // ESC key listener
+    if (typeof window !== 'undefined' && !window._medixlySettingsEscBound) {
+        window._medixlySettingsEscBound = true;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMedixlySettingsModal();
+            }
+        });
+    }
+
+    // EQ Preset buttons
+    const presetButtons = document.querySelectorAll('#medixly-eq-presets .medixly-preset-btn');
+    presetButtons.forEach(btn => {
+        if (!btn.dataset.bound) {
+            btn.dataset.bound = 'true';
+            btn.addEventListener('click', () => {
+                const presetKey = btn.dataset.preset;
+                presetButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+                if (mixEngine && typeof mixEngine.applySoundProfile === 'function') {
+                    mixEngine.applySoundProfile(presetKey);
+                    const prof = mixEngine.getSoundProfile();
+                    if (prof && prof.preset) {
+                        const { bass = 0, mid = 0, treble = 0 } = prof.preset;
+                        const bIn = document.getElementById('eq-slider-bass');
+                        const mIn = document.getElementById('eq-slider-mid');
+                        const tIn = document.getElementById('eq-slider-treble');
+                        if (bIn) bIn.value = bass;
+                        if (mIn) mIn.value = mid;
+                        if (tIn) tIn.value = treble;
+                        const bVal = document.getElementById('eq-val-bass');
+                        const mVal = document.getElementById('eq-val-mid');
+                        const tVal = document.getElementById('eq-val-treble');
+                        if (bVal) bVal.textContent = (bass > 0 ? '+' : '') + bass + ' dB';
+                        if (mVal) mVal.textContent = (mid > 0 ? '+' : '') + mid + ' dB';
+                        if (tVal) tVal.textContent = (treble > 0 ? '+' : '') + treble + ' dB';
+                    }
+                }
+            });
+        }
+    });
+
+    // 3-Band Sliders
+    ['bass', 'mid', 'treble'].forEach(band => {
+        const slider = document.getElementById(`eq-slider-${band}`);
+        if (slider && !slider.dataset.bound) {
+            slider.dataset.bound = 'true';
+            slider.addEventListener('input', () => {
+                const b = parseFloat(document.getElementById('eq-slider-bass')?.value || 0);
+                const m = parseFloat(document.getElementById('eq-slider-mid')?.value || 0);
+                const t = parseFloat(document.getElementById('eq-slider-treble')?.value || 0);
+                const bVal = document.getElementById('eq-val-bass');
+                const mVal = document.getElementById('eq-val-mid');
+                const tVal = document.getElementById('eq-val-treble');
+                if (bVal) bVal.textContent = (b > 0 ? '+' : '') + b + ' dB';
+                if (mVal) mVal.textContent = (m > 0 ? '+' : '') + m + ' dB';
+                if (tVal) tVal.textContent = (t > 0 ? '+' : '') + t + ' dB';
+
+                presetButtons.forEach(b => b.classList.remove('active'));
+
+                const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+                if (mixEngine && typeof mixEngine.setGlobalEQ === 'function') {
+                    mixEngine.setGlobalEQ({ bass: b, mid: m, treble: t });
+                } else if (mixEngine && typeof mixEngine.setEQ === 'function') {
+                    mixEngine.setEQ(b, m, t);
+                }
+            });
+        }
+    });
+
+    // Crossfade Pills
+    const crossfadePills = document.querySelectorAll('#medixly-crossfade-selector .crossfade-pill');
+    crossfadePills.forEach(pill => {
+        if (!pill.dataset.bound) {
+            pill.dataset.bound = 'true';
+            pill.addEventListener('click', () => {
+                const dur = parseFloat(pill.dataset.duration) || 5;
+                crossfadePills.forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+                if (mixEngine && typeof mixEngine.setCrossfadeDuration === 'function') {
+                    mixEngine.setCrossfadeDuration(dur);
+                }
+                if (typeof window !== 'undefined') {
+                    window.__medixlyCrossfadeDuration = dur;
+                }
+            });
+        }
+    });
+
+    // Theme Picker Dots inside Settings
+    const themeDots = document.querySelectorAll('#medixly-settings-theme-colors .theme-dot');
+    themeDots.forEach(dot => {
+        if (!dot.dataset.bound) {
+            dot.dataset.bound = 'true';
+            dot.addEventListener('click', () => {
+                const color = dot.dataset.color;
+                if (window.MedixlyThemeProvider && typeof window.MedixlyThemeProvider.setAccentPreset === 'function') {
+                    window.MedixlyThemeProvider.setAccentPreset(color);
+                }
+            });
+        }
+    });
+}
+
+if (typeof window !== 'undefined') {
+    window.openMedixlySettingsModal = openMedixlySettingsModal;
+    window.closeMedixlySettingsModal = closeMedixlySettingsModal;
+    window.initSettingsModal = initSettingsModal;
 }
