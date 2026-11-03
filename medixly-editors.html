@@ -29,9 +29,17 @@
             <span class="editor-pro-badge">FOR EDITORS</span>
 
             <div class="editor-song-selector-wrap">
-                <select id="track-select" class="editor-select" title="Select song from Medixly catalog">
-                    <!-- Populated dynamically from librarySongs -->
-                </select>
+                <!-- Virtualized Autocomplete Instant Search Bar -->
+                <div class="editor-search-container" id="editor-search-container">
+                    <div class="editor-search-input-wrap">
+                        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="editor-song-search" class="editor-search-input" placeholder="Search track, artist, BPM, or key..." autocomplete="off" spellcheck="false">
+                        <button id="search-clear-btn" class="search-clear-btn" style="display: none;" title="Clear Search">✕</button>
+                    </div>
+                    <div id="search-results-dropdown" class="search-results-dropdown" style="display: none;">
+                        <div id="search-results-list" class="search-results-list" role="listbox"></div>
+                    </div>
+                </div>
                 <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
                 <button id="upload-audio-btn" class="btn-editor-secondary" title="Import your own WAV, MP3, AAC, or stem file">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -100,13 +108,22 @@
             <div class="transport-cluster-center">
                 <label class="snap-label" title="Snap marker drops and drags to nearest beat or transient">
                     <input type="checkbox" id="toggle-snap" checked>
-                    <span>Snap to Transients &amp; Beats (S)</span>
+                    <span>Snap (S)</span>
                 </label>
+                <label class="autobeat-label" title="Automatically detect transients & place beat markers along the grid">
+                    <input type="checkbox" id="toggle-autobeat">
+                    <span class="autobeat-badge">⚡ Auto-Beat</span>
+                </label>
+                <div class="in-out-cluster">
+                    <button id="btn-mark-in" class="editor-btn-subtle" title="Set In-Point (I)">[IN</button>
+                    <button id="btn-mark-out" class="editor-btn-subtle" title="Set Out-Point (O)">OUT]</button>
+                    <button id="btn-clear-in-out" class="editor-btn-subtle" title="Clear In/Out Points (Alt+X)">✕</button>
+                </div>
             </div>
 
             <div class="transport-cluster-right">
                 <span class="editor-btn-subtle" style="font-size: 0.72rem; cursor: default;">
-                    Shortcuts: <strong>Space</strong> (Play) • <strong>M</strong> (Drop Marker) • <strong>J/K/L</strong> (Shuttle) • <strong>←/→</strong> (Nudge)
+                    Shortcuts: <strong>Space</strong> (Play) • <strong>M</strong> (Marker Toggle) • <strong>I/O</strong> (In/Out) • <strong>J/K/L</strong> (Shuttle) • <strong>Cmd+Scroll</strong> (Zoom)
                 </span>
             </div>
         </div>
@@ -252,6 +269,25 @@
                 <button id="btn-close-export" class="editor-btn-subtle" style="font-size: 1.1rem;">✕</button>
             </div>
 
+            <!-- Export Scope Selector (Full vs Viral Only) -->
+            <div class="export-scope-container">
+                <span class="export-scope-heading">EXPORT SCOPE:</span>
+                <div class="export-scope-toggle-group">
+                    <button type="button" id="scope-full-song" class="btn-scope-toggle active" data-scope="full">
+                        <span>🎵 Full Song</span>
+                    </button>
+                    <button type="button" id="scope-viral-section" class="btn-scope-toggle" data-scope="viral">
+                        <span>🔥 Viral Section Only (Purple Region)</span>
+                    </button>
+                </div>
+            </div>
+            <div id="viral-scope-callout" class="viral-scope-callout" style="display: none;">
+                <span style="font-size: 1.1rem; flex-shrink: 0;">🔥</span>
+                <span>
+                    <strong>Viral Hook Mode:</strong> All marker timestamps are offset so <code>00:00.000</code> starts at the beginning of the viral section (<span id="viral-start-badge" style="font-weight:700; color:#38bdf8;">00:00.000</span>). Audio will be exported as a sliced lossless WAV file.
+                </span>
+            </div>
+
             <!-- Export Target Format Tabs -->
             <div class="export-tabs-nav">
                 <button class="export-tab-btn active" data-format="srt">SubRip Subtitle (.srt)</button>
@@ -273,11 +309,16 @@
             </div>
 
             <div class="export-modal-footer">
-                <button id="btn-copy-export" class="btn-editor-secondary">
-                    <span>📋 Copy to Clipboard</span>
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-copy-export" class="btn-editor-secondary">
+                        <span>📋 Copy to Clipboard</span>
+                    </button>
+                    <button id="btn-download-audio" class="btn-editor-secondary" title="Download audio buffer (sliced WAV for viral section, or full track)">
+                        <span>🎧 Download Audio (.wav)</span>
+                    </button>
+                </div>
                 <button id="btn-download-export" class="btn-editor-primary">
-                    <span>💾 Download File</span>
+                    <span>💾 Download Markers</span>
                 </button>
             </div>
         </div>

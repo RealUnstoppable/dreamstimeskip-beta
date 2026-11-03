@@ -310,14 +310,21 @@ body {
 .pill-nav {
     display: flex;
     gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
     overflow-x: auto;
-    padding-bottom: 5px;
+    overflow-y: visible;
+    padding: 6px 4px;
+    margin-top: -6px;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    z-index: 5;
 }
 .pill-nav::-webkit-scrollbar { display: none; }
 
 .nav-pill {
+    position: relative;
+    z-index: 20;
     background-color: rgba(255, 255, 255, 0.08);
     color: #f5f5f7;
     border: 1px solid rgba(255, 255, 255, 0.14);
@@ -340,6 +347,7 @@ body {
     border-color: rgba(255, 255, 255, 0.28);
     color: #ffffff;
     transform: translateY(-1px);
+    z-index: 25;
 }
 
 .nav-pill:active {
@@ -357,6 +365,8 @@ body {
 /* ===== Unstoppable Unified Button System (Spotify / Juxxstopped Standards) ===== */
 .btn-primary,
 .action-btn-primary {
+    position: relative;
+    z-index: 20;
     background-color: #ffffff;
     color: #0a0a0a;
     border: 1px solid #ffffff;
@@ -381,6 +391,7 @@ body {
     transform: scale(1.03);
     box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25);
     color: #000000;
+    z-index: 25;
 }
 .btn-primary:active,
 .action-btn-primary:active {
@@ -389,6 +400,8 @@ body {
 
 .btn-secondary,
 .action-btn-secondary {
+    position: relative;
+    z-index: 20;
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.16);
@@ -412,6 +425,7 @@ body {
     border-color: rgba(255, 255, 255, 0.32);
     transform: translateY(-1px);
     color: #ffffff;
+    z-index: 25;
 }
 .btn-secondary:active,
 .action-btn-secondary:active {
@@ -419,6 +433,8 @@ body {
 }
 
 .btn-accent {
+    position: relative;
+    z-index: 20;
     background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
     color: #0a0a0a;
     border: 1px solid rgba(255, 255, 255, 0.4);
@@ -441,6 +457,7 @@ body {
     transform: scale(1.03);
     box-shadow: 0 0 22px rgba(255, 255, 255, 0.38);
     color: #000000;
+    z-index: 25;
 }
 .btn-accent:active {
     transform: scale(0.97);
@@ -452,12 +469,17 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 14px;
+    position: relative;
+    overflow: visible;
 }
 .greet-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
+    position: relative;
+    overflow: visible;
+    padding: 4px 0;
 }
 
 .nav-pill-admin {
@@ -3760,6 +3782,8 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
 
 /* ===== Redesigned Desktop-Only Header Navigation ===== */
 .medixly-desktop-navbar {
+    position: relative;
+    z-index: 2;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -3767,6 +3791,7 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
     height: 70px;
     padding: 0 28px;
     box-sizing: border-box;
+    overflow: visible;
 }
 
 .medixly-nav-left {
@@ -3825,6 +3850,8 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
 }
 
 .medixly-header-btn {
+    position: relative;
+    z-index: 20;
     display: inline-flex;
     align-items: center;
     gap: 7px;
@@ -3846,6 +3873,7 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
     border-color: rgba(255, 255, 255, 0.24);
     color: #ffffff;
     transform: translateY(-1px);
+    z-index: 25;
 }
 
 .medixly-header-btn:active {
@@ -3855,6 +3883,303 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
 .medixly-header-btn svg {
     color: var(--theme-accent, #16A34A);
     flex-shrink: 0;
+}
+
+/* ===== Medixly Upgrade ($0.99 Today) Button ===== */
+.medixly-upgrade-btn {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.16), rgba(168, 85, 247, 0.16));
+    border: 1px solid rgba(236, 72, 153, 0.38);
+    color: #fbcfe8;
+    font-weight: 700;
+}
+.medixly-upgrade-btn:hover {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.3), rgba(168, 85, 247, 0.3));
+    border-color: rgba(236, 72, 153, 0.7);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(236, 72, 153, 0.35);
+}
+.medixly-upgrade-btn svg {
+    color: #f472b6;
+}
+
+/* ===== Ecosystem Toggle Arrow Button & Collapsible Drawer ===== */
+.medixly-ecosystem-arrow-btn {
+    position: relative;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin-left: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 50%;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    flex-shrink: 0;
+}
+.medixly-ecosystem-arrow-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    transform: scale(1.08);
+    z-index: 25;
+}
+.medixly-ecosystem-arrow-btn .ecosystem-arrow-icon {
+    display: inline-block;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    line-height: 1;
+}
+.medixly-ecosystem-arrow-btn.active .ecosystem-arrow-icon,
+.medixly-ecosystem-arrow-btn[aria-expanded="true"] .ecosystem-arrow-icon {
+    transform: rotate(90deg);
+}
+
+.medixly-ecosystem-drawer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    background: rgba(10, 10, 12, 0.95);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.65);
+    padding: 8px 24px;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+}
+.medixly-ecosystem-drawer.is-open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+.medixly-ecosystem-track {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 10px;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 18px, black calc(100% - 18px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 18px, black calc(100% - 18px), transparent 100%);
+}
+.medixly-ecosystem-track::-webkit-scrollbar {
+    display: none;
+}
+.medixly-eco-link {
+    position: relative;
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    color: #cbd5e1;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    flex-shrink: 0;
+    user-select: none;
+}
+.medixly-eco-link:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
+    color: #ffffff;
+    transform: translateY(-1px);
+    z-index: 25;
+}
+
+/* ===== "Get App" Navigation Pill ===== */
+.nav-pill-get-app {
+    background: rgba(56, 189, 248, 0.12);
+    border-color: rgba(56, 189, 248, 0.32);
+    color: #bae6fd;
+}
+.nav-pill-get-app:hover {
+    background: rgba(56, 189, 248, 0.22);
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.3);
+}
+.nav-pill-get-app svg {
+    color: #38bdf8;
+}
+
+/* ===== Get App Modal & OS-specific Instruction Steps ===== */
+.medixly-install-card {
+    max-width: 520px;
+    width: 92%;
+}
+.install-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.install-app-icon {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+.install-modal-sub {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: #94a3b8;
+}
+.install-os-tabs {
+    display: flex;
+    gap: 8px;
+    margin: 16px 0 20px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.install-tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 8px 12px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+.install-tab.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+.install-panel {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+}
+.install-panel.active {
+    display: flex;
+}
+.install-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+.step-num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(22, 163, 74, 0.2);
+    border: 1px solid rgba(22, 163, 74, 0.5);
+    color: #4ade80;
+    font-weight: 800;
+    font-size: 0.88rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.step-content strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #f1f5f9;
+    margin-bottom: 3px;
+}
+.step-content p {
+    margin: 0;
+    font-size: 0.84rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+}
+.ios-share-badge,
+.ios-add-badge,
+.android-dots-badge,
+.android-install-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-weight: 600;
+    color: #ffffff;
+}
+.desktop-install-desc {
+    margin: 0 0 10px;
+    font-size: 0.86rem;
+    color: #cbd5e1;
+}
+.desktop-download-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.desktop-dl-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+}
+.desktop-dl-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+.dl-card-icon {
+    font-size: 1.6rem;
+    line-height: 1;
+}
+.dl-card-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.dl-card-info strong {
+    font-size: 0.92rem;
+    color: #ffffff;
+}
+.dl-card-info span {
+    font-size: 0.78rem;
+    color: #94a3b8;
+}
+.dl-btn-pill {
+    background: var(--theme-accent, #16A34A);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+.install-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .medixly-auth-btn {
@@ -4032,6 +4357,262 @@ body.is-desktop-mac ::-webkit-scrollbar-thumb:hover {
     color: #ffffff;
     box-shadow: 0 0 10px var(--theme-accent-glow, rgba(22, 163, 74, 0.25));
 }
+
+/* ==========================================================================
+   PHASE 3: DEDICATED ARTIST PROFILE VIEW & JUMP BACK IN TABS
+   ========================================================================== */
+
+/* Dedicated Artist Profile View */
+.view-artist {
+    display: none;
+    padding: 10px 0 60px 0;
+    animation: fadeInArtistView 0.25s ease-out;
+}
+
+@keyframes fadeInArtistView {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.artist-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 24px;
+    margin: 16px 0 32px 0;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+@media (min-width: 640px) {
+    .artist-profile-header {
+        flex-direction: row;
+        align-items: flex-end;
+        text-align: left;
+        gap: 32px;
+        padding: 32px;
+    }
+}
+
+.artist-profile-art {
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+    border: 3px solid rgba(255, 255, 255, 0.15);
+    background: #18181b;
+    flex-shrink: 0;
+}
+
+.artist-profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.artist-verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(37, 99, 235, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: #60a5fa;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    width: fit-content;
+}
+
+.artist-verified-badge .badge-check {
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+#artist-profile-name {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+}
+
+.artist-profile-stats {
+    font-size: 0.92rem;
+    color: #a1a1aa;
+    margin: 0;
+}
+
+.artist-profile-bio {
+    font-size: 0.88rem;
+    color: #71717a;
+    line-height: 1.45;
+    margin: 4px 0 12px 0;
+    max-width: 650px;
+}
+
+.artist-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.artist-actions .action-btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e4e4e7;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.artist-actions .action-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+/* Jump Back In Header with Tabs */
+.shelf-header-with-tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.shelf-title-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.shelf-title-group h2 {
+    margin: 0;
+}
+
+.jump-back-tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.jump-tab-btn {
+    background: transparent;
+    border: none;
+    color: #a1a1aa;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.jump-tab-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.jump-tab-btn.active {
+    background: #ffffff;
+    color: #000000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* History List inside Settings Modal */
+.medixly-history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.medixly-history-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.medixly-history-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #27272a;
+    flex-shrink: 0;
+}
+
+.medixly-history-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.medixly-history-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.medixly-history-artist {
+    font-size: 0.76rem;
+    color: #a1a1aa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.medixly-history-time {
+    font-size: 0.72rem;
+    color: #71717a;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.medixly-history-del-btn {
+    background: transparent;
+    border: none;
+    color: #71717a;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+}
+
+.medixly-history-del-btn:hover {
+    color: #ef4444;
+}
+
 
 
 

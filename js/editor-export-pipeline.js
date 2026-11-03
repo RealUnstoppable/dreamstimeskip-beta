@@ -401,14 +401,123 @@ export function exportToMedixlyJSON(markers) {
 }
 
 /**
+ * Normalizes and offsets marker timestamps for a scoped region (e.g. Viral Hook Section).
+ * Sets 00:00.000 to the start of the window and filters out markers outside the window.
+ * 
+ * @param {Array<{ startMs: number, endMs: number, text: string, type?: string, id?: string }>} markers
+ * @param {number} offsetMs - Window start in milliseconds (e.g. viralStart * 1000)
+ * @param {number} [windowEndMs] - Window end in milliseconds (e.g. viralEnd * 1000)
+ * @returns {Array<object>} Offset markers starting from time 0
+ */
+export function offsetMarkers(markers, offsetMs, windowEndMs = Infinity) {
+    if (!Array.isArray(markers)) return [];
+    const validOffset = Math.max(0, Number(offsetMs) || 0);
+
+    return markers
+        .filter(m => {
+            const start = m.startMs ?? 0;
+            const end = m.endMs ?? start;
+            // Include markers that overlap with the window
+            return end >= validOffset && start <= windowEndMs;
+        })
+        .map(m => {
+            const originalStart = m.startMs ?? 0;
+            const originalEnd = m.endMs ?? originalStart;
+            return {
+                ...m,
+                startMs: Math.max(0, Math.round(originalStart - validOffset)),
+                endMs: Math.max(0, Math.round(originalEnd - validOffset))
+            };
+        });
+}
+
+/**
+ * Encodes an AudioBuffer (or time slice) to a lossless 16-bit PCM WAV Blob.
+ * 
+ * @param {AudioBuffer} audioBuffer
+ * @param {number} [startSec=0] - Slice start time in seconds
+ * @param {number} [endSec] - Slice end time in seconds (defaults to audioBuffer.duration)
+ * @returns {Blob} WAV audio file Blob
+ */
+export function audioBufferToWavBlob(audioBuffer, startSec = 0, endSec = null) {
+    if (!audioBuffer) return new Blob([], { type: 'audio/wav' });
+
+    const sampleRate = audioBuffer.sampleRate;
+    const numChannels = audioBuffer.numberOfChannels;
+    const totalDuration = audioBuffer.duration;
+
+    const startSample = Math.max(0, Math.floor(startSec * sampleRate));
+    const effectiveEndSec = (endSec !== null && endSec !== undefined) ? endSec : totalDuration;
+    const endSample = Math.min(audioBuffer.length, Math.floor(effectiveEndSec * sampleRate));
+    const numFrames = Math.max(0, endSample - startSample);
+
+    const bytesPerSample = 2; // 16-bit PCM
+    const blockAlign = numChannels * bytesPerSample;
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = numFrames * blockAlign;
+
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    function writeString(offset, string) {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    }
+
+    // RIFF chunk descriptor
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeString(8, 'WAVE');
+
+    // "fmt " sub-chunk
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);             // Subchunk1Size (16 for PCM)
+    view.setUint16(20, 1, true);              // AudioFormat (1 = PCM)
+    view.setUint16(22, numChannels, true);    // NumChannels
+    view.setUint32(24, sampleRate, true);     // SampleRate
+    view.setUint32(28, byteRate, true);       // ByteRate
+    view.setUint16(32, blockAlign, true);     // BlockAlign
+    view.setUint16(34, 16, true);             // BitsPerSample (16-bit)
+
+    // "data" sub-chunk
+    writeString(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    // Extract channels and interleave
+    const channels = [];
+    for (let c = 0; c < numChannels; c++) {
+        channels.push(audioBuffer.getChannelData(c));
+    }
+
+    let offset = 44;
+    for (let i = startSample; i < endSample; i++) {
+        for (let c = 0; c < numChannels; c++) {
+            let sample = channels[c][i];
+            // Clamp sample to [-1, 1]
+            if (sample < -1) sample = -1;
+            if (sample > 1) sample = 1;
+            // Scale to 16-bit signed integer
+            const intSample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+            view.setInt16(offset, intSample, true);
+            offset += 2;
+        }
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+}
+
+/**
  * Browser file download helper.
- * @param {string} content - Text file content
+ * Supports both text strings and Blob objects (e.g. WAV audio).
+ * 
+ * @param {string|Blob} content - File content or Blob
  * @param {string} filename - Filename to save
- * @param {string} mimeType - MIME type
+ * @param {string} [mimeType='text/plain;charset=utf-8'] - MIME type
  */
 export function downloadFile(content, filename, mimeType = 'text/plain;charset=utf-8') {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    const blob = new Blob([content], { type: mimeType });
+    const blob = (content instanceof Blob) ? content : new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

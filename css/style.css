@@ -1430,23 +1430,35 @@ textarea:focus-visible {
 .lexi-song-info {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
+    margin-right: 12px;
     cursor: pointer;
+    mask-image: linear-gradient(to right, #000 82%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 82%, transparent 100%);
 }
 .lexi-song-title {
     font-size: 0.82rem;
     font-weight: 700;
     color: #ffffff;
     white-space: nowrap;
-    
-    text-overflow: ellipsis;
     line-height: 1.2;
+    display: inline-block;
+}
+.lexi-song-title.marquee {
+    display: inline-block;
+    padding-right: 24px;
+    animation: marquee 10s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
 }
 .lexi-song-artist {
     font-size: 0.7rem;
     color: rgba(255, 255, 255, 0.6);
     white-space: nowrap;
-    
     text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .lexi-player-controls {

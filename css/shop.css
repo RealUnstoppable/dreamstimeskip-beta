@@ -19,22 +19,29 @@
 }
 
 .shop-header {
-    text-align: center;
-    margin-bottom: 60px;
+    text-align: left;
+    margin-bottom: 36px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
 }
 
 .shop-header h1 {
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
     font-weight: 800;
-    letter-spacing: -2px;
+    letter-spacing: -1.5px;
     color: inherit;
+    text-align: left;
+    margin: 0 0 10px 0;
 }
 
 .shop-header p {
-    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-size: clamp(0.95rem, 1.8vw, 1.15rem);
     color: var(--text-secondary);
-    max-width: 600px;
-    margin: 15px auto 0;
+    max-width: 700px;
+    margin: 0;
+    text-align: left;
 }
 
 .product-grid {

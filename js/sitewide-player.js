@@ -737,7 +737,7 @@ class SitewideMusicEngine {
                 <!-- Mini Playerhead Component -->
                 <div class="lexi-playerhead">
                     <img src="${escapeHTML(song.art)}" alt="${escapeHTML(song.title)}" class="lexi-player-art ${isPlaying ? 'spinning' : ''}">
-                    <div class="lexi-song-info" title="Go to HarmonyTunes" onclick="window.location.href='medixly.html'">
+                    <div class="lexi-song-info" title="Go to Medixly" onclick="window.location.href='medixly.html'">
                         <div class="lexi-song-title">${escapeHTML(song.title)}</div>
                         <div class="lexi-song-artist">${escapeHTML(song.artist)}</div>
                     </div>
@@ -798,10 +798,25 @@ class SitewideMusicEngine {
                 const title = orb.querySelector('.lexi-song-title');
                 const artist = orb.querySelector('.lexi-song-artist');
                 const art = orb.querySelector('.lexi-player-art');
-                if (title) title.textContent = newSong.title;
+                if (title) {
+                    title.textContent = newSong.title;
+                    const info = orb.querySelector('.lexi-song-info');
+                    if (info && title.scrollWidth > info.clientWidth) {
+                        title.classList.add('marquee');
+                    } else {
+                        title.classList.remove('marquee');
+                    }
+                }
                 if (artist) artist.textContent = newSong.artist;
                 if (art) art.src = newSong.art;
             });
+        }
+
+        // Initial marquee check on render
+        const initialTitle = orb.querySelector('.lexi-song-title');
+        const initialInfo = orb.querySelector('.lexi-song-info');
+        if (initialTitle && initialInfo && initialTitle.scrollWidth > initialInfo.clientWidth) {
+            initialTitle.classList.add('marquee');
         }
 
         // Wire Ask Lexi

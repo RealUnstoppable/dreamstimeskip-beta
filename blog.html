@@ -4,7 +4,75 @@
      <script type="module" src="/js/theme-loader.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog | DTS HUB</title>
+    <title>Blog &amp; Ecosystem Updates | DTS HUB</title>
+    <meta name="description" content="News, technical deep-dives, architectural roadmaps, and behind-the-scenes looks at the Unstoppable ecosystem, Dreams TimeSkip, and Medixly.">
+    <link rel="canonical" href="https://realunstoppable.store/blog.html">
+
+    <!-- OpenGraph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://realunstoppable.store/blog.html">
+    <meta property="og:title" content="Blog &amp; Ecosystem Updates | Unstoppable">
+    <meta property="og:description" content="News, architectural deep-dives, and updates from the Unstoppable digital ecosystem, Dreams TimeSkip, and Medixly.">
+    <meta property="og:image" content="https://realunstoppable.store/images/dreams-timeskip.png">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog &amp; Ecosystem Updates | Unstoppable">
+    <meta name="twitter:description" content="News, architectural deep-dives, and updates from the Unstoppable digital ecosystem, Dreams TimeSkip, and Medixly.">
+    <meta name="twitter:image" content="https://realunstoppable.store/images/dreams-timeskip.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Unstoppable Ecosystem Blog",
+      "url": "https://realunstoppable.store/blog.html",
+      "description": "News, updates, and behind-the-scenes looks at the Unstoppable ecosystem, Dreams TimeSkip, and Medixly.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Unstoppable",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://realunstoppable.store/images/unstoppable-logo.png"
+        }
+      },
+      "blogPost": [
+        {
+          "@type": "BlogPosting",
+          "headline": "The Founder: About Catalin Andrian",
+          "description": "Explore the background, technical stack, and design philosophy of Catalin Andrian—the developer and architect behind the Unstoppable digital ecosystem.",
+          "image": "https://realunstoppable.store/images/cats-like-to-play.jpg",
+          "author": {
+            "@type": "Person",
+            "name": "Catalin Andrian"
+          },
+          "url": "https://realunstoppable.store/portfolio.html"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "The Philosophy Behind Unstoppable: More Than a Brand",
+          "description": "Discover how the Unstoppable mindset transcends competitive gameplay to define our approach to privacy, community-driven development, and sustainable software.",
+          "image": "https://realunstoppable.store/images/UnstoppableHoodieModel300x300.png",
+          "url": "https://realunstoppable.store/the-philosophy-behind-unstoppable-more-than-a-brand.html"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "A First Look at Dreams TimeSkip: The Road to 2027",
+          "description": "An in-depth look at our persistent Minecraft SMP architecture, living lore systems, fair-play economy, and the overarching roadmap leading to our 2027 milestone.",
+          "image": "https://realunstoppable.store/images/dreams-timeskip.png",
+          "url": "https://realunstoppable.store/dreams-timeskip-first-look.html"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "Medixly: How We Find the Internet's Biggest Hits",
+          "description": "Explore how we blend real-time audio velocity data with human musical curation and native browser Web Audio DSP to surface the web's most viral tracks.",
+          "image": "https://realunstoppable.store/images/medixly-logo.png",
+          "url": "https://realunstoppable.store/medixly-hits.html"
+        }
+      ]
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" type="image/png" href="/images/dreams-favicon.png">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,7 +121,7 @@
                     <div class="post-meta">
                         <span>Founder &amp; Architect</span> &bull; <span>Portfolio</span>
                     </div>
-                    <h3>The Founder: About Catalin Andrian</h3>
+                    <h2 class="blog-post-title">The Founder: About Catalin Andrian</h2>
                     <p>Explore the background, technical stack, and design philosophy of Catalin Andrian—the developer and architect behind the Unstoppable digital ecosystem.</p>
                     <a href="portfolio.html" class="read-more-btn">View Portfolio</a>
                 </div>
@@ -64,7 +132,7 @@
                     <div class="post-meta">
                         <span>October 2026</span> &bull; <span>Brand &amp; Culture</span>
                     </div>
-                    <h3>The Philosophy Behind Unstoppable: More Than a Brand</h3>
+                    <h2 class="blog-post-title">The Philosophy Behind Unstoppable: More Than a Brand</h2>
                     <p>Discover how the Unstoppable mindset transcends competitive gameplay to define our approach to privacy, community-driven development, and sustainable software.</p>
                     <a href="the-philosophy-behind-unstoppable-more-than-a-brand.html" class="read-more-btn">Read More</a>
                 </div>
@@ -76,7 +144,7 @@
                     <div class="post-meta">
                         <span>October 2026</span> &bull; <span>Game Development</span>
                     </div>
-                    <h3>A First Look at Dreams TimeSkip: The Road to 2027</h3>
+                    <h2 class="blog-post-title">A First Look at Dreams TimeSkip: The Road to 2027</h2>
                     <p>An in-depth look at our persistent Minecraft SMP architecture, living lore systems, fair-play economy, and the overarching roadmap leading to our 2027 milestone.</p>
                     <a href="dreams-timeskip-first-look.html" class="read-more-btn">Read More</a>
                 </div>
@@ -88,7 +156,7 @@
                     <div class="post-meta">
                         <span>October 2026</span> &bull; <span>Audio Engineering</span>
                     </div>
-                    <h3>Medixly: How We Find the Internet's Biggest Hits</h3>
+                    <h2 class="blog-post-title">Medixly: How We Find the Internet's Biggest Hits</h2>
                     <p>Explore how we blend real-time audio velocity data with human musical curation and native browser Web Audio DSP to surface the web's most viral tracks.</p>
                     <a href="medixly-hits.html" class="read-more-btn">Read More</a>
                 </div>

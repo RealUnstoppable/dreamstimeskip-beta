@@ -242,10 +242,19 @@ export const products = [
 ];
 
 export function getProductPricing(product) {
-    if (!product) return { originalPrice: 0, salePrice: 0, discountPercent: 25 };
-    const originalPrice = product.originalPrice ?? Number((product.price * 1.35).toFixed(2));
-    const salePrice = product.salePrice ?? Number((originalPrice * 0.75).toFixed(2));
-    return { originalPrice, salePrice, discountPercent: 25 };
+    if (!product) return { originalPrice: 0, salePrice: 0, discountPercent: 0, discount: null, isOnSale: false };
+    const originalPrice = product.originalPrice != null ? Number(product.originalPrice) : Number(((product.price || 0) * 1.35).toFixed(2));
+    const salePrice = product.salePrice != null ? Number(product.salePrice) : Number(product.price || 0);
+    const discountPercent = (originalPrice > salePrice && originalPrice > 0)
+        ? Math.round(((originalPrice - salePrice) / originalPrice) * 100)
+        : 0;
+    return {
+        originalPrice,
+        salePrice,
+        discountPercent,
+        discount: discountPercent > 0 ? `${discountPercent}% OFF` : null,
+        isOnSale: discountPercent > 0
+    };
 }
 
 export const productMap = new Map(products.map(p => [p.id, p]));

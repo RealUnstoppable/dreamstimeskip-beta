@@ -275,6 +275,32 @@ export function renderProducts(searchQuery = '') {
         return;
     }
 
+    // Sort products based on #shop-sort-select
+    const sortSelect = document.getElementById('shop-sort-select');
+    const sortValue = sortSelect ? sortSelect.value : 'featured';
+
+    if (sortValue === 'price-asc') {
+        filtered.sort((a, b) => {
+            const priceA = a.salePrice ?? a.price ?? 0;
+            const priceB = b.salePrice ?? b.price ?? 0;
+            return priceA - priceB;
+        });
+    } else if (sortValue === 'price-desc') {
+        filtered.sort((a, b) => {
+            const priceA = a.salePrice ?? a.price ?? 0;
+            const priceB = b.salePrice ?? b.price ?? 0;
+            return priceB - priceA;
+        });
+    } else if (sortValue === 'name-asc') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    } else if (sortValue === 'rating') {
+        filtered.sort((a, b) => {
+            const ratingA = (productStatsMap.get(a.id) || {}).averageRating || 0;
+            const ratingB = (productStatsMap.get(b.id) || {}).averageRating || 0;
+            return ratingB - ratingA;
+        });
+    }
+
     productGrid.innerHTML = filtered.map(product => {
         const isWishlisted = wishlist.has(product.id);
         const stats = productStatsMap.get(product.id) || { averageRating: 0, reviewCount: 0 };
@@ -724,6 +750,15 @@ function setupEventListeners() {
         });
     });
 
+    // Shop Sort Dropdown Listener
+    const sortSelect = document.getElementById('shop-sort-select');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            const searchInput = document.getElementById('product-search');
+            renderProducts(searchInput ? searchInput.value : '');
+        });
+    }
+
     // Product grid listeners
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
@@ -1095,8 +1130,18 @@ async function openReviewsModal(productId) {
     const salePrice = product.salePrice ?? Number((origPrice * 0.75).toFixed(2));
     const origPriceEl = document.getElementById('detail-original-price');
     const salePriceEl = document.getElementById('detail-sale-price');
+    const discountBadgeEl = document.getElementById('detail-discount-badge') || document.querySelector('#reviews-modal .discount-badge') || document.querySelector('.detail-pricing-row .discount-badge');
     if (origPriceEl) origPriceEl.textContent = `$${origPrice.toFixed(2)}`;
     if (salePriceEl) salePriceEl.textContent = `$${salePrice.toFixed(2)}`;
+    if (discountBadgeEl) {
+        if (origPrice > salePrice) {
+            const discountPct = Math.round(((origPrice - salePrice) / origPrice) * 100);
+            discountBadgeEl.textContent = `${discountPct}% OFF`;
+            discountBadgeEl.style.display = 'inline-block';
+        } else {
+            discountBadgeEl.style.display = 'none';
+        }
+    }
 
     const descEl = document.getElementById('detail-description');
     if (descEl) descEl.textContent = product.description;

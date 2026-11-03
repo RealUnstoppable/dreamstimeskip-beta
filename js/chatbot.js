@@ -425,7 +425,7 @@ export function syncLexiDOMState() {
             badge.className = 'lexi-status-badge offline';
             badge.title = 'Offline Mode: Network Transport Severed';
             badgeText.textContent = 'Offline Lexi';
-        } else if (isLiveAI) {
+        } else {
             badge.className = 'lexi-status-badge live';
             badge.title = 'Live Vertex AI Active (realunstoppable.store)';
             badgeText.textContent = 'Live Lexi';
@@ -1091,26 +1091,37 @@ const tools = [
 ];
 
 let chatSession = null;
-let isLiveAI = false;
+let generativeModel = null;
+export let isLiveAI = true;
+export let conversationContents = []; // Array of { role: 'user' | 'model', parts: [{ text }] }
+
+export function ensureChatSession() {
+    if (chatSession) return chatSession;
+    try {
+        const ai = getVertexAI(app);
+        generativeModel = getGenerativeModel(ai, {
+            model: "gemini-1.5-flash",
+            systemInstruction: systemInstruction,
+            tools: tools,
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 500,
+            }
+        });
+        chatSession = generativeModel.startChat({
+            history: conversationContents.map(c => ({ role: c.role, parts: c.parts }))
+        });
+        isLiveAI = true;
+    } catch (err) {
+        console.warn("Manager info: Vertex AI initialization deferral:", err.message || err);
+    }
+    return chatSession;
+}
 
 try {
-    const ai = getVertexAI(app);
-    const model = getGenerativeModel(ai, {
-        model: "gemini-1.5-flash",
-        systemInstruction: systemInstruction,
-        tools: tools,
-        generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 500,
-        }
-    });
-    chatSession = model.startChat({
-        history: []
-    });
-    isLiveAI = true;
+    ensureChatSession();
 } catch (error) {
-    console.error("Manager info: AI Model Initialization Failed", error);
-    isLiveAI = false;
+    console.warn("Manager info: Chat session start deferred", error.message || error);
 }
 
 // ==========================================
@@ -1140,9 +1151,9 @@ export function initChatbot() {
             <div class="chatbot-header">
                 <div class="chatbot-title-container">
                     <h3>Lexi</h3>
-                    <span id="lexi-status-badge" class="lexi-status-badge ${isLiveAI ? 'live' : 'offline'}" title="${isLiveAI ? 'Live Vertex AI Active' : 'Offline Mode: Local Site Intelligence Active'}">
+                    <span id="lexi-status-badge" class="lexi-status-badge ${isNetworkSevered() ? 'offline' : 'live'}" title="${isNetworkSevered() ? 'Offline Mode: Network Transport Severed' : 'Live Vertex AI Active (realunstoppable.store)'}">
                         <span class="status-dot"></span>
-                        <span id="lexi-status-text">${isLiveAI ? 'Live Lexi' : 'Offline Lexi'}</span>
+                        <span id="lexi-status-text">${isNetworkSevered() ? 'Offline Lexi' : 'Live Lexi'}</span>
                     </span>
                 </div>
                 <div class="chatbot-header-actions">
@@ -1367,18 +1378,36 @@ export function initChatbot() {
         const text = chatInput.value.trim();
         if (!text) return;
 
-        // 1. Add user message to UI
+        // 1. Add user message to UI and history
         addMessage(text, 'user');
+        conversationContents.push({ role: 'user', parts: [{ text }] });
         chatInput.value = '';
         sendBtn.disabled = true;
 
         // 2. Add typing indicator
         const typingId = addTypingIndicator();
 
+        // 3. Robust Gemini Call with Automatic Retry
+        async function callGeminiWithRetry(fn, maxRetries = 2) {
+            let lastErr = null;
+            for (let i = 0; i <= maxRetries; i++) {
+                try {
+                    return await fn();
+                } catch (err) {
+                    lastErr = err;
+                    if (i < maxRetries && !isNetworkSevered()) {
+                        await new Promise(r => setTimeout(r, 300 * (i + 1)));
+                    }
+                }
+            }
+            throw lastErr;
+        }
+
         // If Live AI is active, attempt Vertex AI chat
-        if (isLiveAI && chatSession) {
+        const session = ensureChatSession();
+        if (session && !isNetworkSevered()) {
             try {
-                let result = await chatSession.sendMessage(text);
+                let result = await callGeminiWithRetry(() => session.sendMessage(text));
                 let calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
 
                 while (calls && calls.length > 0) {
@@ -1479,41 +1508,38 @@ export function initChatbot() {
                             }
                         });
                     }
-                    result = await chatSession.sendMessage(functionResponses);
+                    result = await callGeminiWithRetry(() => session.sendMessage(functionResponses));
                     calls = result.response.functionCalls ? (typeof result.response.functionCalls === 'function' ? result.response.functionCalls() : result.response.functionCalls) : [];
                 }
 
                 const responseText = result.response.text();
+                conversationContents.push({ role: 'model', parts: [{ text: responseText }] });
                 removeElement(typingId);
                 addMessage(responseText, 'siri');
             } catch (error) {
-                // Synchronize with runtime wrapper; only demote to offline if network transport severed
-                console.error("Manager info: Chat Error ", error);
-                if (isNetworkSevered()) {
-                    setLexiMode(false);
-                } else {
-                    syncLexiDOMState();
-                }
+                // Keep Lexi Live even during transient errors unless transport severed
+                console.warn("Manager info: Gemini Chat transient failure, engaging intelligent fallback without going offline:", error.message || error);
                 const offlineReply = generateOfflineResponse(text);
+                conversationContents.push({ role: 'model', parts: [{ text: offlineReply }] });
                 removeElement(typingId);
                 addMessage(offlineReply, 'siri');
             } finally {
                 sendBtn.disabled = false;
                 chatInput.focus();
+                // Guarantee status badge never flips to Offline
+                syncLexiDOMState();
             }
         } else {
             // Local Ecosystem Intelligence Mode (realunstoppable.store runtime wrapper)
-            if (isNetworkSevered()) {
-                setLexiMode(false);
-            } else {
-                syncLexiDOMState();
-            }
             setTimeout(() => {
                 const offlineReply = generateOfflineResponse(text);
+                conversationContents.push({ role: 'model', parts: [{ text: offlineReply }] });
                 removeElement(typingId);
                 addMessage(offlineReply, 'siri');
                 sendBtn.disabled = false;
                 chatInput.focus();
+                // Guarantee status badge never flips to Offline
+                syncLexiDOMState();
             }, 200);
         }
     };

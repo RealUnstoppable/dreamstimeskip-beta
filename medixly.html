@@ -91,10 +91,18 @@
                         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                         <span>Ad Test</span>
                     </button>
+                    <a href="medixly-artists.html" class="nav-pill nav-pill-admin" id="nav-artist-upload" style="display: none;" title="Artist Upload">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span>Artist Upload</span>
+                    </a>
                     <a href="/medixly-editors.html" class="nav-pill" id="nav-editors" title="For Editors Workspace — Precision Waveform &amp; Lyric Sync" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                         <span>For Editors</span>
                     </a>
+                    <button type="button" class="nav-pill nav-pill-get-app" id="nav-get-app" title="Download or Install Medixly App">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Get App</span>
+                    </button>
                 </nav>
 
 
@@ -116,20 +124,24 @@
                             <a href="medixly-pricing.html" class="btn-accent">
                                 <span>Upgrade ($0.99 Today)</span>
                             </a>
-                            <a href="medixly-artists.html" class="btn-secondary">
-                                <span>Artist Upload</span>
-                            </a>
                         </div>
                     </div>
                 </div>
 
                 <section class="shelf">
-                    <div class="shelf-header">
-                        <h2>Jump Back In</h2>
-                        <span class="see-all" id="home-history-btn" style="cursor: pointer;">History</span>
+                    <div class="shelf-header shelf-header-with-tabs">
+                        <div class="shelf-title-group">
+                            <h2>Jump Back In</h2>
+                            <div class="jump-back-tabs" id="jump-back-tabs" role="tablist" aria-label="Jump Back In Categories">
+                                <button type="button" class="jump-tab-btn active" data-tab="recent" role="tab" aria-selected="true">Recently Listened</button>
+                                <button type="button" class="jump-tab-btn" data-tab="playlists" role="tab" aria-selected="false">Playlists</button>
+                                <button type="button" class="jump-tab-btn" data-tab="uploads" role="tab" aria-selected="false">User Uploads</button>
+                            </div>
+                        </div>
+                        <span class="see-all" id="home-history-btn" style="cursor: pointer;" title="Open Listening History in Settings">History</span>
                     </div>
                     <div class="card-grid" id="container-jump-back-in">
-                        </div>
+                    </div>
                 </section>
                 <section class="shelf">
                     <div class="shelf-header">
@@ -230,6 +242,41 @@
                         </thead>
                         <tbody id="song-list-body">
                             </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Dedicated Artist Profile View -->
+            <div id="view-artist" class="view-artist" style="display: none;">
+                <button id="back-from-artist-btn" class="back-btn">← Back</button>
+                <div class="artist-profile-header">
+                    <img id="artist-profile-art" src="/images/medixly-logo.png" alt="Artist Profile" class="artist-profile-art">
+                    <div class="artist-profile-details">
+                        <div class="artist-verified-badge"><span class="badge-check">✓</span> Verified Artist</div>
+                        <h1 id="artist-profile-name">Artist Name</h1>
+                        <p id="artist-profile-stats" class="artist-profile-stats">0 Tracks • Medixly Featured Artist</p>
+                        <p id="artist-profile-bio" class="artist-profile-bio">Explore all tracks, remixes, and official releases in the Unstoppable Ecosystem.</p>
+                        <div class="artist-actions">
+                            <button id="artist-profile-play-btn" class="action-btn-play" title="Play artist top tracks" aria-label="Play all artist tracks">▶</button>
+                            <button id="artist-profile-share-btn" class="action-btn-secondary">Share Artist</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="song-list-container">
+                    <div class="artist-section-title"><h3 style="margin: 20px 0 10px; font-size: 1.15rem; color: #fff;">Popular Releases &amp; Tracks</h3></div>
+                    <table class="song-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th>Title</th>
+                                <th>Artist</th>
+                                <th>Genre</th>
+                                <th style="text-align: right;">Duration</th>
+                                <th style="width: 40px; text-align: center;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="artist-song-list-body">
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -548,12 +595,12 @@
 
     <!-- Song Context Menu -->
     <div id="song-context-menu" class="song-context-menu hidden glass-panel">
-        <button class="context-menu-item" id="ctx-play-next">Play Next</button>
-        <button class="context-menu-item" id="ctx-play-last">Play Last</button>
-        <button class="context-menu-item" id="ctx-favorite">Favorite</button>
-        <button class="context-menu-item" id="ctx-view-artist">View Artist</button>
-        <button class="context-menu-item" id="ctx-share">Share Song</button>
-        <button class="context-menu-item" id="ctx-add-playlist">Add to Playlist</button>
+        <button class="context-menu-item" id="ctx-play-next">⏭️ Play Next</button>
+        <button class="context-menu-item" id="ctx-play-last" data-id="ctx-add-to-queue">➕ Add to Queue</button>
+        <button class="context-menu-item" id="ctx-favorite">❤️ Favorite / Like</button>
+        <button class="context-menu-item" id="ctx-view-artist">👤 View Artist Profile</button>
+        <button class="context-menu-item" id="ctx-share">🔗 Share Song</button>
+        <button class="context-menu-item" id="ctx-add-playlist">🎵 Add to Playlist</button>
     </div>
 
     <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
@@ -577,6 +624,7 @@
         }
     </script>
     
+    <script src="/js/medixly-eq-graph.js"></script>
     <script type="module" src="/js/medixly-desktop-bridge.js"></script>
     <script type="module" src="/js/medixly.js?v=1791167958698f"></script>
     
@@ -752,6 +800,20 @@
                         </button>
                     </div>
 
+                    <!-- Apple Settings-Style 2D Acoustic Frequency Curve Graph -->
+                    <div class="medixly-eq-graph-container" id="medixly-eq-graph-container" style="margin: 16px 0; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px;">
+                        <div class="eq-graph-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span class="eq-graph-title" style="font-size: 0.88rem; font-weight: 600; color: #fff;">Acoustic Frequency Curve</span>
+                            <span class="eq-graph-range" style="font-size: 0.75rem; color: #a1a1aa;">20 Hz – 20 kHz • ±12 dB</span>
+                        </div>
+                        <div class="eq-canvas-wrapper" style="position: relative; width: 100%; height: 160px;">
+                            <canvas id="medixly-eq-canvas" width="600" height="160" style="width: 100%; height: 100%; display: block; border-radius: 8px;"></canvas>
+                        </div>
+                        <div class="eq-graph-hint" style="font-size: 0.75rem; color: #71717a; margin-top: 6px; text-align: center;">
+                            Drag the Bass, Mid, or Treble nodes vertically to adjust acoustic curve in real time.
+                        </div>
+                    </div>
+
                     <!-- 3-Band Sliders -->
                     <div class="medixly-eq-sliders">
                         <div class="medixly-eq-slider-group">
@@ -825,7 +887,7 @@
 
                 <!-- Section 4: Theme Accent -->
                 <div class="medixly-theme-picker-section">
-                    <label class="medixly-theme-label">Accent Theme Color</label>
+                    <label class="medixly-theme-label">Accent Theme Color <span class="premium-lock-tag" style="font-size:0.75rem; color:#f59e0b; font-weight:normal; margin-left:6px;">🔒 (Premium / Ultra)</span></label>
                     <div class="medixly-theme-colors" id="medixly-settings-theme-colors">
                         <button type="button" class="theme-dot" data-color="blue" style="background:#2563EB" title="Blue"></button>
                         <button type="button" class="theme-dot" data-color="indigo" style="background:#4F46E5" title="Indigo"></button>
@@ -836,6 +898,27 @@
                         <button type="button" class="theme-dot" data-color="orange" style="background:#F97316" title="Orange"></button>
                         <button type="button" class="theme-dot" data-color="red" style="background:#EF4444" title="Red"></button>
                         <button type="button" class="theme-dot" data-color="cyan" style="background:#06B6D4" title="Cyan"></button>
+                    </div>
+                </div>
+
+                <div class="medixly-account-divider"></div>
+
+                <!-- Section 5: Listening History -->
+                <div class="medixly-settings-section" id="medixly-history-section">
+                    <div class="medixly-settings-section-header">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <h3 class="medixly-settings-heading">Listening History</h3>
+                    </div>
+                    <p class="medixly-settings-subheading">Review, filter, or delete your recent listening history.</p>
+
+                    <div class="medixly-history-controls" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <input type="text" id="settings-history-search" class="medixly-input-search" placeholder="Search history tracks or artists…" style="flex: 1; min-width: 180px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem;">
+                        <button type="button" id="history-delete-hour-btn" class="medixly-btn-danger-outline" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Delete Last 1 Hour</button>
+                        <button type="button" id="history-clear-all-btn" class="medixly-btn-danger-outline" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #9ca3af; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; cursor: pointer;">Clear All</button>
+                    </div>
+
+                    <div id="settings-history-list" class="medixly-history-list" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; padding-right: 4px;">
+                        <!-- Rendered by JS -->
                     </div>
                 </div>
             </div>
@@ -870,6 +953,107 @@
                 <button id="create-and-add-btn" class="action-btn-primary" style="padding:5px 10px;">Create</button>
             </div>
             <button id="close-playlist-modal-btn" class="modal-close-btn" style="margin-top:15px;width:100%;">Close</button>
+        </div>
+    </div>
+
+    <!-- Medixly App Installation Modal (iOS, Android, Desktop) -->
+    <div id="medixly-install-modal" class="medixly-modal-backdrop hidden" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="install-modal-title">
+        <div class="medixly-modal-card medixly-install-card">
+            <div class="medixly-modal-header">
+                <div class="install-header-title">
+                    <span class="install-app-icon">📱</span>
+                    <div>
+                        <h3 id="install-modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #fff;">Get Medixly App</h3>
+                        <p class="install-modal-sub">Fast, offline-ready streaming on any device</p>
+                    </div>
+                </div>
+                <button type="button" class="medixly-modal-close" id="close-install-modal-btn" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div class="install-os-tabs" role="tablist">
+                <button type="button" class="install-tab active" data-tab="ios" id="tab-ios" role="tab" aria-selected="true">iOS / iPhone</button>
+                <button type="button" class="install-tab" data-tab="android" id="tab-android" role="tab" aria-selected="false">Android</button>
+                <button type="button" class="install-tab" data-tab="desktop" id="tab-desktop" role="tab" aria-selected="false">Desktop (Mac / Win)</button>
+            </div>
+
+            <div class="install-tab-content">
+                <!-- iOS Instructions -->
+                <div class="install-panel active" id="panel-ios" role="tabpanel" aria-labelledby="tab-ios">
+                    <div class="install-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Open Safari &amp; Tap Share</strong>
+                            <p>Open this page in Safari, then tap the <span class="ios-share-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> Share</span> icon at the bottom of the screen.</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Select "Add to Home Screen"</strong>
+                            <p>Scroll down the share sheet and tap <span class="ios-add-badge">➕ Add to Home Screen</span>.</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Tap "Add" in Top-Right</strong>
+                            <p>Confirm the app name and tap <strong>Add</strong>. Medixly will appear on your Home Screen as a standalone full-screen audio app!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Android Instructions -->
+                <div class="install-panel" id="panel-android" role="tabpanel" aria-labelledby="tab-android">
+                    <div class="install-step">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Open Chrome &amp; Tap Menu</strong>
+                            <p>In Chrome or your mobile browser, tap the <span class="android-dots-badge">⋮ three dots</span> in the upper-right corner.</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Tap "Install App" or "Add to Home screen"</strong>
+                            <p>Select <span class="android-install-badge">📲 Install App</span> or <strong>Add to Home screen</strong>.</p>
+                        </div>
+                    </div>
+                    <div class="install-step">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Confirm Installation</strong>
+                            <p>Tap <strong>Install</strong>. Medixly will install directly into your app drawer with background playback enabled!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Downloads -->
+                <div class="install-panel" id="panel-desktop" role="tabpanel" aria-labelledby="tab-desktop">
+                    <p class="desktop-install-desc">Download native desktop applications with hardware acceleration and global hotkeys:</p>
+                    <div class="desktop-download-grid">
+                        <a href="/dist-desktop/Medixly-1.1.0-arm64.dmg" class="desktop-dl-card" download>
+                            <div class="dl-card-icon">🍎</div>
+                            <div class="dl-card-info">
+                                <strong>macOS (Apple Silicon &amp; Intel)</strong>
+                                <span>v1.1.0 • .dmg installer</span>
+                            </div>
+                            <span class="dl-btn-pill">Download</span>
+                        </a>
+                        <a href="/download/windows" class="desktop-dl-card" id="win-download-card">
+                            <div class="dl-card-icon">🪟</div>
+                            <div class="dl-card-info">
+                                <strong>Windows (64-bit)</strong>
+                                <span>v1.1.0 • .exe installer</span>
+                            </div>
+                            <span class="dl-btn-pill">Download</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="install-modal-footer">
+                <button type="button" class="btn-secondary" id="install-modal-dismiss-btn">Close</button>
+            </div>
         </div>
     </div>
 

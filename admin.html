@@ -731,8 +731,7 @@
                 <li><a href="index.html" class="mobile-nav-link">← Return to Home</a></li>
                 <li><a href="#performance" class="mobile-nav-link nav-link active">Performance</a></li>
                 <li><a href="#waitlist" class="mobile-nav-link nav-link">⚔️ DTS Whitelist</a></li>
-                <li><a href="#bookings" class="mobile-nav-link nav-link">Bookings</a></li>
-                <li><a href="#quotes" class="mobile-nav-link nav-link">Quotes</a></li>
+                <li><a href="#bookings" class="mobile-nav-link nav-link">🚗 Bookings &amp; Quotes (AutoLux)</a></li>
                 <li><a href="#users" class="mobile-nav-link nav-link">User Management</a></li>
                 <li><a href="#support-tickets" class="mobile-nav-link nav-link">Support Tickets</a></li>
                 <li><a href="#promo-codes" class="mobile-nav-link nav-link">Promo Codes</a></li>
@@ -757,8 +756,7 @@
                     <li><a href="index.html">← Return to Home</a></li>
                     <li><a href="#performance" class="nav-link active">Performance</a></li>
                     <li><a href="#waitlist" class="nav-link">⚔️ DTS Whitelist</a></li>
-                    <li><a href="#bookings" class="nav-link">Bookings</a></li>
-                    <li><a href="#quotes" class="nav-link">Quotes</a></li>
+                    <li><a href="#bookings" class="nav-link">🚗 Bookings &amp; Quotes (AutoLux)</a></li>
                     <li><a href="#users" class="nav-link">User Management</a></li>
                     <li><a href="#support-tickets" class="nav-link">Support Tickets</a></li>
                     <li><a href="#promo-codes" class="nav-link">Promo Codes</a></li>
@@ -1123,8 +1121,15 @@
             </section>
             
             <section id="bookings" class="content-section">
-                <h3>All Bookings</h3>
-                <div class="user-table-container">
+                <div style="margin-bottom: 24px;">
+                    <h3 style="margin: 0 0 6px;">🚗 Bookings &amp; Quotes (AutoLux Detailing)</h3>
+                    <p style="color: var(--text-secondary); margin: 0; font-size: 0.92rem;">
+                        Live customer appointments and custom quote inquiries submitted through AutoLux Mobile Detailing.
+                    </p>
+                </div>
+
+                <h4 style="margin: 0 0 12px; color: #fff;">📅 Confirmed Bookings</h4>
+                <div class="user-table-container" style="margin-bottom: 35px;">
                     <table class="user-table">
                         <thead>
                             <tr>
@@ -1138,6 +1143,23 @@
                         </thead>
                         <tbody id="bookings-list-body">
                             <tr><td colspan="6" style="text-align: center;">Loading bookings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4 style="margin: 0 0 12px; color: #fff;">💬 Custom Quote Requests</h4>
+                <div class="user-table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Vehicle Details &amp; Condition</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quotes-list-body">
+                            <tr><td colspan="4" style="text-align: center;">Loading quotes...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1158,25 +1180,6 @@
                         </thead>
                         <tbody id="support-tickets-list-body">
                             <tr><td colspan="5" style="text-align:center;">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="quotes" class="content-section">
-                <h3>Quote Requests</h3>
-                <div class="user-table-container">
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Email</th>
-                                <th>Vehicle Details & Condition</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="quotes-list-body">
-                            <tr><td colspan="4" style="text-align: center;">Loading quotes...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1673,7 +1676,9 @@
 
             try {
                 const promoPayload = {
+                    code,
                     discount,
+                    discountPercent: discount,
                     active: true,
                     source: isStripe ? 'stripe' : 'custom',
                     description: isStripe ? 'Stripe Checkout Integration' : 'Custom Shop Promo',
@@ -1685,7 +1690,9 @@
                 } catch (actErr) {
                     console.warn('Backend adminAction fallback to direct Firestore:', actErr);
                     await setDoc(doc(db, 'promo_codes', code), {
+                        code,
                         discount,
+                        discountPercent: discount,
                         active: true,
                         source: isStripe ? 'stripe' : 'custom',
                         description: isStripe ? 'Stripe Checkout Integration' : 'Custom Shop Promo',

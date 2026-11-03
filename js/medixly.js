@@ -708,13 +708,24 @@ function initHarmonyTunes() {
 
     function updateAdminAdTestVisibility(isAdmin) {
         const adTestBtn = document.getElementById('nav-ad-test');
-        if (!adTestBtn) return;
-        if (isAdmin) {
-            adTestBtn.style.display = 'inline-flex';
-            adTestBtn.removeAttribute('aria-hidden');
-        } else {
-            adTestBtn.style.display = 'none';
-            adTestBtn.setAttribute('aria-hidden', 'true');
+        if (adTestBtn) {
+            if (isAdmin) {
+                adTestBtn.style.display = 'inline-flex';
+                adTestBtn.removeAttribute('aria-hidden');
+            } else {
+                adTestBtn.style.display = 'none';
+                adTestBtn.setAttribute('aria-hidden', 'true');
+            }
+        }
+        const artistUploadBtn = document.getElementById('nav-artist-upload');
+        if (artistUploadBtn) {
+            if (isAdmin) {
+                artistUploadBtn.style.display = 'inline-flex';
+                artistUploadBtn.removeAttribute('aria-hidden');
+            } else {
+                artistUploadBtn.style.display = 'none';
+                artistUploadBtn.setAttribute('aria-hidden', 'true');
+            }
         }
     }
 
@@ -1066,7 +1077,24 @@ function initHarmonyTunes() {
             if (s.isHidden) return false;
             const title = (s.title || '').toLowerCase();
             const artist = (s.artist || '').toLowerCase();
-            if (title.includes(q) || artist.includes(q)) return true;
+            const author = (s.author || '').toLowerCase();
+
+            // Direct substring match on title, artist, or author
+            if (title.includes(q) || artist.includes(q) || author.includes(q)) return true;
+
+            // Match "Artist - Song Title" or "Song Title - Artist" format
+            if (title.includes(' - ')) {
+                const parts = title.split(' - ').map(p => p.trim());
+                if (parts.some(p => p.includes(q))) return true;
+            }
+
+            // Multi-token search across artist, author and title
+            const words = q.split(/\s+/).filter(Boolean);
+            if (words.length > 1) {
+                const combined = `${artist} ${title} ${author}`;
+                if (words.every(w => combined.includes(w))) return true;
+            }
+
             if (typeof s.lyrics === 'string') {
                 return s.lyrics.toLowerCase().includes(q);
             } else if (Array.isArray(s.lyrics)) {
@@ -1094,7 +1122,7 @@ function initHarmonyTunes() {
                 <img class="spotlight-result-art" src="${escapeHTML(artUrl)}" alt="" loading="lazy">
                 <div class="spotlight-result-info">
                     <div class="spotlight-result-title">${highlightMatch(group.baseTitle, query)}</div>
-                    <div class="spotlight-result-artist">${highlightMatch(group.baseSong.artist, query)}</div>
+                    <div class="spotlight-result-artist" style="cursor: pointer;" title="View Artist Profile">${highlightMatch(group.baseSong.artist, query)}</div>
                 </div>
                 ${optionsHtml}
                 <span class="spotlight-result-play">▶</span>
@@ -1119,6 +1147,22 @@ function initHarmonyTunes() {
         spotlightResults.addEventListener('click', (e) => {
             if (e.target.closest('.card-more-btn')) return;
             if (e.target.closest('.version-select')) return;
+
+            const artistEl = e.target.closest('.spotlight-result-artist');
+            if (artistEl) {
+                e.preventDefault();
+                e.stopPropagation();
+                const row = artistEl.closest('.spotlight-result-row');
+                const songId = row ? row.dataset.songId : null;
+                const song = songId ? librarySongsMap.get(songId) : null;
+                const artistName = song ? song.artist : artistEl.textContent.trim();
+                closeSpotlight();
+                if (typeof window.openArtistProfile === 'function') {
+                    window.openArtistProfile(artistName);
+                }
+                return;
+            }
+
             activateResult(e.target.closest('.spotlight-result-row'));
         });
 
@@ -1229,6 +1273,7 @@ function initHarmonyTunes() {
         hasInitialized = true;
         renderHome();
         setupNavigation();
+        initGetAppButton();
         updateAdminAdTestVisibility(isMedixlyAdmin(currentUser, currentUserDocData));
         setupPlayerEvents();
         if (typeof initLexiStatusIndicator === 'function') initLexiStatusIndicator();
@@ -1492,6 +1537,8 @@ function initHarmonyTunes() {
         if (viewPlaylist) viewPlaylist.style.display = 'none';
         if (viewPlaylists) viewPlaylists.style.display = 'none';
         if (viewLyrics) viewLyrics.style.display = 'none';
+        const artistEl = document.getElementById('view-artist');
+        if (artistEl) artistEl.style.display = 'none';
         previousView = 'home';
 
         // Redundant Home button hidden on home page
@@ -1507,6 +1554,8 @@ function initHarmonyTunes() {
         if (viewPlaylist) viewPlaylist.style.display = 'none';
         if (viewPlaylists) viewPlaylists.style.display = 'block';
         if (viewLyrics) viewLyrics.style.display = 'none';
+        const artistEl = document.getElementById('view-artist');
+        if (artistEl) artistEl.style.display = 'none';
         previousView = 'playlists';
 
         // Reveal Home pill so user can return home
@@ -1523,8 +1572,10 @@ function initHarmonyTunes() {
         const homeEl = viewHome || document.getElementById('view-home');
         const playlistEl = viewPlaylist || document.getElementById('view-playlist');
         const playlistsEl = viewPlaylists || document.getElementById('view-playlists');
+        const artistEl = document.getElementById('view-artist');
         if (homeEl) homeEl.style.display = 'none';
         if (playlistsEl) playlistsEl.style.display = 'none';
+        if (artistEl) artistEl.style.display = 'none';
         if (playlistEl) playlistEl.style.display = 'block';
         if (viewLyrics) viewLyrics.style.display = 'none';
 
@@ -1663,11 +1714,101 @@ function initHarmonyTunes() {
     }
 
     // --- RENDERING HOME ---
-    function renderHome() {
-        // 1. Jump Back In
-        if (containerJumpBack) {
-            containerJumpBack.innerHTML = groupSongsByTitle(librarySongs).slice(0, 2).map(group => createGroupCard(group)).join('');
+    let currentJumpBackTab = 'recent';
+
+    function renderJumpBackIn(tab = currentJumpBackTab) {
+        currentJumpBackTab = tab;
+        const container = containerJumpBack || document.getElementById('container-jump-back-in');
+        if (!container) return;
+
+        // Update active tab buttons
+        document.querySelectorAll('#jump-back-tabs .jump-tab-btn').forEach(btn => {
+            const isActive = btn.dataset.tab === tab;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        if (tab === 'recent') {
+            const seenIds = new Set();
+            const recentSongs = [];
+            for (let i = historyQueue.length - 1; i >= 0; i--) {
+                const s = historyQueue[i];
+                if (s && s.id && !seenIds.has(s.id)) {
+                    seenIds.add(s.id);
+                    recentSongs.push(s);
+                    if (recentSongs.length >= 6) break;
+                }
+            }
+
+            if (recentSongs.length > 0) {
+                container.innerHTML = recentSongs.map(song => createSongCard(song)).join('');
+            } else {
+                container.innerHTML = groupSongsByTitle(librarySongs).slice(0, 4).map(group => createGroupCard(group)).join('');
+            }
+        } else if (tab === 'playlists') {
+            const playlistCards = [
+                {
+                    title: 'Liked Songs',
+                    desc: `${userFavorites.length} favorite tracks`,
+                    art: '/images/harmony-tunes-card.jpg',
+                    type: 'favorites'
+                },
+                {
+                    title: 'Top 100',
+                    desc: 'Medixly Official Top 100 Daily',
+                    art: '/images/medixly-logo.png',
+                    type: 'top100'
+                },
+                {
+                    title: 'Rap Caviar',
+                    desc: 'Top tier hip-hop & rap beats',
+                    art: '/images/harmony-tunes-card.jpg',
+                    type: 'hiphop'
+                },
+                {
+                    title: 'Viral Hits',
+                    desc: 'Trending TikTok & Social hits',
+                    art: '/images/harmony-tunes-card.jpg',
+                    type: 'viral'
+                },
+                {
+                    title: 'Late Night',
+                    desc: 'Chill R&B and night vibes',
+                    art: '/images/harmony-tunes-card.jpg',
+                    type: 'chill'
+                }
+            ];
+
+            container.innerHTML = playlistCards.map(pl => `
+                <div class="music-card jump-playlist-card" data-playlist-type="${pl.type}" style="cursor: pointer;">
+                    <div class="card-img-wrapper">
+                        <img src="${pl.art}" alt="${escapeHTML(pl.title)}" loading="lazy">
+                        <button class="card-play-btn" aria-label="Play ${escapeHTML(pl.title)}">▶</button>
+                    </div>
+                    <div class="card-title">${escapeHTML(pl.title)}</div>
+                    <div class="card-desc">${escapeHTML(pl.desc)}</div>
+                </div>
+            `).join('');
+        } else if (tab === 'uploads') {
+            const userUploads = librarySongs.filter(s => s.isUserUpload || s.isArtistUpload || s.isCustom);
+            if (userUploads.length > 0) {
+                container.innerHTML = userUploads.slice(0, 6).map(s => createSongCard(s)).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="music-card upload-cta-card" id="jump-upload-cta" style="cursor: pointer; border: 1px dashed rgba(255, 255, 255, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 16px; text-align: center;">
+                        <span style="font-size: 2.2rem; margin-bottom: 8px;">☁️</span>
+                        <div class="card-title" style="margin-bottom: 4px;">Upload Music</div>
+                        <div class="card-desc" style="font-size: 0.8rem; color: #a1a1aa;">Drop your original stems or master tracks via Artist Upload</div>
+                    </div>
+                `;
+            }
         }
+    }
+    window.renderJumpBackIn = renderJumpBackIn;
+
+    function renderHome() {
+        // 1. Jump Back In with tabbed interface
+        renderJumpBackIn('recent');
 
         
         // Viral Now
@@ -1849,6 +1990,56 @@ function initHarmonyTunes() {
 
         // Event delegation for dynamically created cards
         document.addEventListener('click', (e) => {
+            const jumpTabBtn = e.target.closest('#jump-back-tabs .jump-tab-btn');
+            if (jumpTabBtn) {
+                const tab = jumpTabBtn.dataset.tab;
+                renderJumpBackIn(tab);
+                return;
+            }
+
+            const jumpPlCard = e.target.closest('.jump-playlist-card');
+            if (jumpPlCard) {
+                const type = jumpPlCard.dataset.playlistType;
+                loadPlaylistView(type);
+                return;
+            }
+
+            const jumpUploadCta = e.target.closest('#jump-upload-cta');
+            if (jumpUploadCta) {
+                const uploadBtn = document.getElementById('nav-artist-upload');
+                if (uploadBtn && uploadBtn.style.display !== 'none') {
+                    uploadBtn.click();
+                } else {
+                    window.location.href = 'medixly-artists.html';
+                }
+                return;
+            }
+
+            const artistDesc = e.target.closest('.card-desc');
+            if (artistDesc && artistDesc.closest('.music-card[data-song-id]')) {
+                e.stopPropagation();
+                const card = artistDesc.closest('.music-card');
+                const songId = card.dataset.songId;
+                const song = librarySongsMap.get(songId);
+                const artistName = song ? song.artist : artistDesc.textContent.trim();
+                if (typeof window.openArtistProfile === 'function') {
+                    window.openArtistProfile(artistName);
+                }
+                return;
+            }
+
+            const artistCell = e.target.closest('td:nth-child(3)');
+            if (artistCell && artistCell.closest('tr[data-song-id]')) {
+                const tr = artistCell.closest('tr');
+                const songId = tr.dataset.songId;
+                const song = librarySongsMap.get(songId);
+                if (song && typeof window.openArtistProfile === 'function') {
+                    e.stopPropagation();
+                    window.openArtistProfile(song.artist);
+                    return;
+                }
+            }
+
             const tiktokCard = e.target.closest('.tiktok-card');
             if (tiktokCard) {
                 const url = tiktokCard.getAttribute('data-url');
@@ -2135,7 +2326,9 @@ function initHarmonyTunes() {
         if(mobMixerBtn) { mobMixerBtn.classList.remove('analyzing'); mobMixerBtn.classList.remove('pulsing'); }
 
         if (activeAudio) {
-            const targetAudioSrc = song.src || song.audioUrl || song.url || song.streamUrl;
+            const targetAudioSrc = (song.streamUrl && typeof song.streamUrl === 'string' && song.streamUrl.startsWith('http'))
+                ? song.streamUrl
+                : (song.src || song.audioUrl || song.url || song.streamUrl);
             
             // Check if upcoming track was pre-buffered on idle deck for 0ms gapless transition
             let usedPrebufferedDeck = false;
@@ -2619,8 +2812,31 @@ function initHarmonyTunes() {
 
         __recordHistory();
 
-        // 2. ENDLESS QUEUE: If manual queue is empty, trigger recommendation when upcoming queue is exhausted
-        if (!currentQueue || currentQueue.length === 0) {
+        // 2. ENDLESS QUEUE & PERSONALIZED FORWARD SKIP:
+        // Whenever manualQueue.length === 0, immediately query the user's Sound Profile,
+        // listening history, and current track metadata (artist/genre/tags) to select and play
+        // a personalized next track (never repeating the exact same song back-to-back).
+        if (!userQueue || userQueue.length === 0) {
+            const currentTrack = currentQueue[currentSongIndex];
+            const excludeIds = [currentTrack?.id].filter(Boolean);
+            let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true, excludeSongIds: excludeIds });
+            if (!nextSongToPlay || nextSongToPlay.id === currentTrack?.id) {
+                nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: excludeIds });
+            }
+
+            if (nextSongToPlay) {
+                currentQueue.splice(currentSongIndex + 1, 0, nextSongToPlay);
+                currentSongIndex = currentSongIndex + 1;
+                if (queuePanel && queuePanel.classList.contains('open')) {
+                    renderQueue();
+                }
+            } else if (currentQueue && currentQueue.length > 0) {
+                currentSongIndex = (currentSongIndex + 1) % currentQueue.length;
+            } else {
+                currentQueue = [getSmartFallbackRecommendation({ excludeCurrent: false })];
+                currentSongIndex = 0;
+            }
+        } else if (!currentQueue || currentQueue.length === 0) {
             let fallbackSong = recommendAndAutoQueueNextTrackSync({ excludeCurrent: false });
             if (!fallbackSong) {
                 fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: false });
@@ -2637,7 +2853,6 @@ function initHarmonyTunes() {
                 } else if (repeatMode === 1 && currentQueue.length > 1) {
                     currentSongIndex = 0;
                 } else {
-                    // Manual queue empty & queue end reached: Trigger lightweight recommendation function!
                     let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
                     if (!nextSongToPlay) {
                         nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true });
@@ -2682,6 +2897,9 @@ function initHarmonyTunes() {
     function playNext(options = {}) {
         return nextSong(options);
     }
+
+    window.nextSong = nextSong;
+    window.nextTrack = nextSong;
 
     function onTrackEnded(e) {
         if (e && e.target !== activeAudio) return;
@@ -3403,41 +3621,149 @@ function initHarmonyTunes() {
         if(closeFsBtn) closeFsBtn.addEventListener('click', closeFullscreen);
 
 
-        // Artist Profile
+        // Dedicated Artist Profile View & Interactions
+        const artistViewEl = document.getElementById('view-artist');
+        const artistBackBtn = document.getElementById('back-from-artist-btn');
+        const artistPlayTopBtn = document.getElementById('artist-profile-play-btn');
+        const artistShareBtn = document.getElementById('artist-profile-share-btn');
+        const artistSongTableBody = document.getElementById('artist-song-list-body');
+
         const openArtistProfile = (artistName) => {
             const cleanName = (artistName || '').toLowerCase().trim();
-            // Find songs by artist (case-insensitive + alias support for Isabel / Isabella)
+            if (!cleanName) return;
+
+            // Find songs by artist (case-insensitive + alias support for Isabel / Isabella / authors)
             const artistSongs = librarySongs.filter(s => {
-                const sArtist = s.artist.toLowerCase();
-                return sArtist === cleanName ||
+                if (s.isHidden) return false;
+                const sArtist = (s.artist || '').toLowerCase();
+                const sAuthor = (s.author || '').toLowerCase();
+                return sArtist === cleanName || sAuthor === cleanName ||
+                    sArtist.includes(cleanName) || cleanName.includes(sArtist) ||
                     (cleanName.includes('larosa') && sArtist.includes('larosa')) ||
                     (cleanName.includes('isabel') && sArtist.includes('isabel'));
             });
 
-            const displayArtistName = artistSongs.length > 0 ? artistSongs[0].artist : artistName;
-            const artistNameEl = document.getElementById('artist-name');
-            if (artistNameEl) artistNameEl.textContent = displayArtistName;
+            const displayArtistName = artistSongs.length > 0 ? (artistSongs[0].artist || artistName) : artistName;
+
+            // Switch to dedicated Artist View
+            if (viewHome) viewHome.style.display = 'none';
+            if (viewPlaylist) viewPlaylist.style.display = 'none';
+            if (viewPlaylists) viewPlaylists.style.display = 'none';
+            if (viewLyrics) viewLyrics.style.display = 'none';
+            if (artistViewEl) artistViewEl.style.display = 'block';
+
+            // Show home pill navigation
+            if (navHomePill) navHomePill.style.display = 'inline-flex';
+            navPills.forEach(p => p.classList.remove('active'));
+
+            // Populate Dedicated View Elements
+            const pName = document.getElementById('artist-profile-name');
+            const pArt = document.getElementById('artist-profile-art');
+            const pStats = document.getElementById('artist-profile-stats');
+            const pBio = document.getElementById('artist-profile-bio');
+
+            if (pName) pName.textContent = displayArtistName;
+            if (pStats) pStats.textContent = `${artistSongs.length} Tracks • Medixly Featured Artist`;
+            if (pBio) pBio.textContent = `Explore all official releases, high-fidelity stems, and remixes by ${displayArtistName} in the Unstoppable Ecosystem.`;
             
-            const avatarDiv = document.getElementById('artist-avatar');
-            if (avatarDiv && artistSongs.length > 0) {
-                avatarDiv.style.backgroundImage = `url("${escapeHTML(artistSongs[0].art)}")`;
-                avatarDiv.style.backgroundSize = 'cover';
-                avatarDiv.style.backgroundPosition = 'center';
-            } else if (avatarDiv) {
-                avatarDiv.style.backgroundImage = 'none';
+            if (pArt) {
+                if (artistSongs.length > 0 && artistSongs[0].art) {
+                    pArt.src = artistSongs[0].art;
+                } else {
+                    pArt.src = '/images/medixly-logo.png';
+                }
             }
-            
-            const artistTrackList = document.getElementById('artist-track-list');
-            if (artistTrackList && artistSongs.length > 0) {
-                const trackListHTML = artistSongs.slice(0, 50).map(song => createSongCard(song)).join('');
-                artistTrackList.innerHTML = `<div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));">${trackListHTML}</div>`;
-            } else if (artistTrackList) {
-                artistTrackList.innerHTML = `<p style="padding:10px; background:rgba(255,255,255,0.1); border-radius:8px; margin-bottom:5px;">Top hit by ${escapeHTML(displayArtistName)}</p>`;
+
+            if (artistSongTableBody) {
+                if (artistSongs.length === 0) {
+                    artistSongTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: #a1a1aa;">No releases found for this artist.</td></tr>`;
+                } else {
+                    artistSongTableBody.innerHTML = artistSongs.map((song, idx) => {
+                        const durStr = song.duration ? formatTime(song.duration) : '3:00';
+                        const artImg = song.art || '/images/medixly-logo.png';
+                        return `
+                            <tr data-song-id="${escapeHTML(song.id)}" style="cursor: pointer;">
+                                <td style="width: 40px; color: #a1a1aa; text-align: center;">${idx + 1}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <img src="${escapeHTML(artImg)}" alt="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; flex-shrink: 0;" loading="lazy">
+                                        <span style="font-weight: 600; color: #fff;">${escapeHTML(song.title)}</span>
+                                    </div>
+                                </td>
+                                <td style="color: #cbd5e1;">${escapeHTML(song.artist)}</td>
+                                <td style="color: #94a3b8;">${escapeHTML(song.genre || 'Electronic')}</td>
+                                <td style="text-align: right; color: #94a3b8;">${durStr}</td>
+                                <td style="width: 40px; text-align: center;">
+                                    <button class="card-more-btn" style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 6px; font-size: 1rem;" title="More Options">...</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
             }
-            
-            if (artistProfile) artistProfile.style.display = 'block';
+
+            if (artistPlayTopBtn) {
+                artistPlayTopBtn.onclick = () => {
+                    if (artistSongs.length > 0) {
+                        playContext(artistSongs, 0);
+                    }
+                };
+            }
+
+            if (artistShareBtn) {
+                artistShareBtn.onclick = () => {
+                    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                        navigator.clipboard.writeText(window.location.href);
+                        const oldText = artistShareBtn.textContent;
+                        artistShareBtn.textContent = 'Copied Link!';
+                        setTimeout(() => artistShareBtn.textContent = oldText, 2000);
+                    }
+                };
+            }
+
+            // Sync legacy modal elements if present
+            const legName = document.getElementById('artist-name');
+            if (legName) legName.textContent = displayArtistName;
+            const legAvatar = document.getElementById('artist-avatar');
+            if (legAvatar && artistSongs.length > 0) {
+                legAvatar.style.backgroundImage = `url("${escapeHTML(artistSongs[0].art)}")`;
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
         window.openArtistProfile = openArtistProfile;
+
+        // Wire Back Button from Artist View
+        if (artistBackBtn && !artistBackBtn.dataset.bound) {
+            artistBackBtn.dataset.bound = 'true';
+            artistBackBtn.addEventListener('click', () => {
+                if (artistViewEl) artistViewEl.style.display = 'none';
+                if (previousView === 'playlists') {
+                    showPlaylistsView();
+                } else if (previousView === 'playlist') {
+                    if (viewPlaylist) viewPlaylist.style.display = 'block';
+                } else {
+                    showHome();
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Row clicks inside Artist Song Table
+        if (artistSongTableBody && !artistSongTableBody.dataset.bound) {
+            artistSongTableBody.dataset.bound = 'true';
+            artistSongTableBody.addEventListener('click', (e) => {
+                if (e.target.closest('.card-more-btn')) return;
+                const row = e.target.closest('tr[data-song-id]');
+                if (!row) return;
+                const songId = row.dataset.songId;
+                const idx = librarySongs.findIndex(s => s.id === songId);
+                if (idx !== -1) {
+                    playContext(librarySongs, idx);
+                }
+            });
+        }
+
         if(playerArtist) playerArtist.addEventListener('click', () => {
             if(currentQueue[currentSongIndex]) openArtistProfile(currentQueue[currentSongIndex].artist);
         });
@@ -4277,10 +4603,34 @@ function initHarmonyTunes() {
         return null;
     };
 
+    // Listening History Persistence & Settings Integration
+    try {
+        const cachedHistory = localStorage.getItem('medixly_listening_history');
+        if (cachedHistory) {
+            const parsed = JSON.parse(cachedHistory);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                historyQueue = parsed;
+            }
+        }
+    } catch (_) {}
+
     window.__pushToHistory = (song) => {
-        historyQueue.push(song);
+        if (!song) return;
+        const entry = {
+            ...song,
+            timestamp: Date.now(),
+            playedAt: Date.now()
+        };
+        historyQueue.push(entry);
         if(historyQueue.length > 50) historyQueue.shift();
+
+        try {
+            localStorage.setItem('medixly_listening_history', JSON.stringify(historyQueue.slice(-50)));
+        } catch (_) {}
+
         if(queuePanel && queuePanel.classList.contains('open')) renderQueue();
+        if (typeof renderJumpBackIn === 'function') renderJumpBackIn();
+        if (typeof renderSettingsHistory === 'function') renderSettingsHistory();
         
         // Push to Firebase
         if(currentUser) {
@@ -4295,6 +4645,135 @@ function initHarmonyTunes() {
             });
         }
     };
+
+    function renderSettingsHistory(filterQuery = '') {
+        const listEl = document.getElementById('settings-history-list');
+        if (!listEl) return;
+
+        const q = (filterQuery || '').toLowerCase().trim();
+        let items = [...historyQueue].reverse(); // newest first
+        if (q) {
+            items = items.filter(s => {
+                const title = (s.title || '').toLowerCase();
+                const artist = (s.artist || '').toLowerCase();
+                return title.includes(q) || artist.includes(q);
+            });
+        }
+
+        if (items.length === 0) {
+            listEl.innerHTML = `<div style="text-align: center; padding: 24px 0; color: #71717a; font-size: 0.85rem;">${q ? 'No matching tracks in history.' : 'No listening history yet.'}</div>`;
+            return;
+        }
+
+        const formatAgo = (timestamp) => {
+            if (!timestamp) return 'Just now';
+            const diff = Date.now() - timestamp;
+            const mins = Math.floor(diff / 60000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return `${mins}m ago`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return `${Math.floor(hours / 24)}d ago`;
+        };
+
+        listEl.innerHTML = items.map(s => {
+            const tStr = formatAgo(s.timestamp || s.playedAt);
+            const artUrl = s.art || '/images/medixly-logo.png';
+            return `
+                <div class="medixly-history-item" data-song-id="${escapeHTML(s.id)}" data-timestamp="${s.timestamp || 0}" style="cursor: pointer;">
+                    <img class="medixly-history-thumb" src="${escapeHTML(artUrl)}" alt="" loading="lazy">
+                    <div class="medixly-history-meta">
+                        <span class="medixly-history-title">${escapeHTML(s.title)}</span>
+                        <span class="medixly-history-artist">${escapeHTML(s.artist)}</span>
+                    </div>
+                    <span class="medixly-history-time">${tStr}</span>
+                    <button type="button" class="medixly-history-del-btn" title="Remove from history" aria-label="Remove">&times;</button>
+                </div>
+            `;
+        }).join('');
+    }
+    window.renderSettingsHistory = renderSettingsHistory;
+    window.__getListeningHistory = () => [...historyQueue];
+
+    function deleteHistoryLastHour() {
+        const oneHourAgo = Date.now() - 3600000;
+        historyQueue = historyQueue.filter(entry => {
+            const t = entry.timestamp || entry.playedAt || 0;
+            return t < oneHourAgo;
+        });
+
+        try {
+            localStorage.setItem('medixly_listening_history', JSON.stringify(historyQueue.slice(-50)));
+        } catch (_) {}
+
+        if (currentUser) {
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                const historyIds = historyQueue.map(s => s.id);
+                updateDoc(userRef, { musicHistory: historyIds }).catch(() => {});
+            } catch (_) {}
+        }
+
+        renderSettingsHistory();
+        if (typeof renderJumpBackIn === 'function') renderJumpBackIn();
+        if (queuePanel && queuePanel.classList.contains('open')) renderQueue();
+    }
+    window.deleteHistoryLastHour = deleteHistoryLastHour;
+
+    function clearAllListeningHistory() {
+        historyQueue = [];
+        try {
+            localStorage.removeItem('medixly_listening_history');
+        } catch (_) {}
+
+        if (currentUser) {
+            try {
+                const userRef = doc(db, "users", currentUser.uid);
+                updateDoc(userRef, { musicHistory: [] }).catch(() => {});
+            } catch (_) {}
+        }
+
+        renderSettingsHistory();
+        if (typeof renderJumpBackIn === 'function') renderJumpBackIn();
+        if (queuePanel && queuePanel.classList.contains('open')) renderQueue();
+    }
+    window.clearAllListeningHistory = clearAllListeningHistory;
+
+    // History item event delegation in settings modal
+    const settingsHistContainer = document.getElementById('settings-history-list');
+    if (settingsHistContainer && !settingsHistContainer.dataset.bound) {
+        settingsHistContainer.dataset.bound = 'true';
+        settingsHistContainer.addEventListener('click', (e) => {
+            const delBtn = e.target.closest('.medixly-history-del-btn');
+            const item = e.target.closest('.medixly-history-item');
+            if (delBtn && item) {
+                e.stopPropagation();
+                const songId = item.dataset.songId;
+                const timestamp = parseFloat(item.dataset.timestamp);
+                const idx = historyQueue.findIndex(s => s.id === songId && (!timestamp || s.timestamp === timestamp));
+                if (idx !== -1) {
+                    historyQueue.splice(idx, 1);
+                    try {
+                        localStorage.setItem('medixly_listening_history', JSON.stringify(historyQueue.slice(-50)));
+                    } catch (_) {}
+                    renderSettingsHistory();
+                    if (typeof renderJumpBackIn === 'function') renderJumpBackIn();
+                }
+                return;
+            }
+
+            if (item) {
+                const songId = item.dataset.songId;
+                const s = librarySongsMap.get(songId);
+                if (s) {
+                    currentQueue.splice(currentSongIndex + 1, 0, s);
+                    currentSongIndex = currentSongIndex + 1;
+                    loadSong(currentSongIndex);
+                    playSong();
+                }
+            }
+        });
+    }
 
     // --- CONTEXT MENU LOGIC ---
     const contextMenu = document.getElementById('song-context-menu');
@@ -4616,9 +5095,9 @@ let dragItem = null;
     const queueContextMenu = document.createElement('div');
     queueContextMenu.className = 'song-context-menu hidden glass-panel';
     queueContextMenu.innerHTML = `
-        <button class="context-menu-item" id="qctx-play-next">Play Next</button>
-        <button class="context-menu-item" id="qctx-play-last">Play Last</button>
-        <button class="context-menu-item" id="qctx-favorite">Favorite</button>
+        <button class="context-menu-item" id="qctx-play-next">⏭️ Play Next</button>
+        <button class="context-menu-item" id="qctx-play-last" data-id="qctx-add-to-queue">➕ Add to Queue</button>
+        <button class="context-menu-item" id="qctx-favorite">❤️ Favorite / Like</button>
         <button class="context-menu-item" id="qctx-suggest-more">Suggest More by Mixxer</button>
         <button class="context-menu-item" id="qctx-suggest-less">Suggest Less</button>
         <button class="context-menu-item" id="qctx-share">Share Song</button>
@@ -5017,4 +5496,159 @@ export function formatTime(seconds) {
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
 export function createSongCard(song) { return createGroupCard({ baseTitle: song.title, baseSong: song, versions: [] }); }
+
+export function detectClientOS() {
+    const ua = (typeof navigator !== 'undefined' ? (navigator.userAgent || '') : '').toLowerCase();
+    const platform = (typeof navigator !== 'undefined' ? (navigator.userAgentData?.platform || navigator.platform || '') : '').toLowerCase();
+
+    // iOS detection
+    if (/iphone|ipad|ipod/.test(ua) || (platform.includes('mac') && typeof navigator !== 'undefined' && navigator.maxTouchPoints > 1)) {
+        return 'ios';
+    }
+    // Android detection
+    if (/android/.test(ua)) {
+        return 'android';
+    }
+    // macOS desktop
+    if (/macintosh|mac os x/.test(ua) || platform.includes('mac')) {
+        return 'macos';
+    }
+    // Windows desktop
+    if (/windows|win32|win64/.test(ua) || platform.includes('win')) {
+        return 'windows';
+    }
+    return 'other';
+}
+
+export function openMedixlyInstallModal(targetTab) {
+    if (typeof document === 'undefined') return;
+    const modal = document.getElementById('medixly-install-modal');
+    if (!modal) return;
+
+    const detected = targetTab || detectClientOS();
+    const activeTabName = (detected === 'ios' || detected === 'android') ? detected : 'desktop';
+
+    const tabs = modal.querySelectorAll('.install-tab');
+    const panels = modal.querySelectorAll('.install-panel');
+    tabs.forEach(t => {
+        const isMatch = t.getAttribute('data-tab') === activeTabName;
+        t.classList.toggle('active', isMatch);
+        t.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+    });
+    panels.forEach(p => {
+        const isMatch = p.id === `panel-${activeTabName}`;
+        p.classList.toggle('active', isMatch);
+    });
+
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+}
+
+export function closeMedixlyInstallModal() {
+    if (typeof document === 'undefined') return;
+    const modal = document.getElementById('medixly-install-modal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+export function initGetAppButton() {
+    if (typeof document === 'undefined') return;
+    const getAppBtn = document.getElementById('nav-get-app');
+    if (getAppBtn) {
+        getAppBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const os = detectClientOS();
+            if (os === 'macos') {
+                const a = document.createElement('a');
+                a.href = '/dist-desktop/Medixly-1.1.0-arm64.dmg';
+                a.download = 'Medixly-1.1.0-arm64.dmg';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+            } else if (os === 'windows') {
+                const a = document.createElement('a');
+                a.href = '/download/windows';
+                a.download = 'Medixly-Setup.exe';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
+            } else if (os === 'ios') {
+                openMedixlyInstallModal('ios');
+            } else if (os === 'android') {
+                openMedixlyInstallModal('android');
+            } else {
+                openMedixlyInstallModal('desktop');
+            }
+        });
+    }
+
+    const modal = document.getElementById('medixly-install-modal');
+    if (modal) {
+        const tabs = modal.querySelectorAll('.install-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabKey = tab.getAttribute('data-tab');
+                openMedixlyInstallModal(tabKey);
+            });
+        });
+
+        const closeBtn = document.getElementById('close-install-modal-btn');
+        const dismissBtn = document.getElementById('install-modal-dismiss-btn');
+        if (closeBtn) closeBtn.addEventListener('click', closeMedixlyInstallModal);
+        if (dismissBtn) dismissBtn.addEventListener('click', closeMedixlyInstallModal);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeMedixlyInstallModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeMedixlyInstallModal();
+            }
+        });
+    }
+}
+
+export function openArtistProfile(artistName) {
+    if (typeof window !== 'undefined' && typeof window.openArtistProfile === 'function') {
+        return window.openArtistProfile(artistName);
+    }
+}
+
+export function renderJumpBackIn(tab) {
+    if (typeof window !== 'undefined' && typeof window.renderJumpBackIn === 'function') {
+        return window.renderJumpBackIn(tab);
+    }
+}
+
+export function deleteHistoryLastHour() {
+    if (typeof window !== 'undefined' && typeof window.deleteHistoryLastHour === 'function') {
+        return window.deleteHistoryLastHour();
+    }
+}
+
+export function renderSettingsHistory(q) {
+    if (typeof window !== 'undefined' && typeof window.renderSettingsHistory === 'function') {
+        return window.renderSettingsHistory(q);
+    }
+}
+
+export function clearAllListeningHistory() {
+    if (typeof window !== 'undefined' && typeof window.clearAllListeningHistory === 'function') {
+        return window.clearAllListeningHistory();
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.detectClientOS = detectClientOS;
+    window.openMedixlyInstallModal = openMedixlyInstallModal;
+    window.closeMedixlyInstallModal = closeMedixlyInstallModal;
+    window.initGetAppButton = initGetAppButton;
+    window.openArtistProfile = openArtistProfile;
+    window.renderJumpBackIn = renderJumpBackIn;
+    window.deleteHistoryLastHour = deleteHistoryLastHour;
+    window.renderSettingsHistory = renderSettingsHistory;
+    window.clearAllListeningHistory = clearAllListeningHistory;
+}
 

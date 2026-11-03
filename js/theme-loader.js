@@ -33,6 +33,36 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+export function calculateLuminance(hex) {
+    if (!hex) return 0.5;
+    let clean = hex.replace('#', '');
+    if (clean.length === 3) clean = clean.split('').map(c => c + c).join('');
+    const num = parseInt(clean, 16);
+    if (isNaN(num)) return 0.5;
+    const r = ((num >> 16) & 255) / 255;
+    const g = ((num >> 8) & 255) / 255;
+    const b = (num & 255) / 255;
+
+    const sRGB = [r, g, b].map(val => val <= 0.04045 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4));
+    return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2];
+}
+
+export function computeContrastVariables(accentHex, themeName = 'black') {
+    const luminance = calculateLuminance(accentHex);
+    const isLightAccent = luminance > 0.45;
+    const isLightTheme = themeName === 'white' || themeName === 'light';
+
+    return {
+        '--btn-text': isLightAccent ? '#0a0a0c' : '#ffffff',
+        '--btn-bg': accentHex,
+        '--btn-border': isLightAccent ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.2)',
+        '--text-primary': isLightTheme ? '#0f172a' : '#ffffff',
+        '--text-secondary': isLightTheme ? '#475569' : '#94a3b8',
+        '--bg-surface': isLightTheme ? '#f8fafc' : (themeName === 'black' ? '#0a0a0c' : '#111827'),
+        '--text-shadow': isLightAccent && !isLightTheme ? '0 1px 2px rgba(0,0,0,0.85)' : 'none'
+    };
+}
+
 (function() {
     const localTheme = localStorage.getItem('userTheme');
     const localAccent = localStorage.getItem('userAccent') || 'green';
@@ -48,6 +78,12 @@ function hexToRgba(hex, alpha = 1) {
     document.documentElement.style.setProperty('--theme-accent', hex);
     document.documentElement.style.setProperty('--theme-accent-glow', hexToRgba(hex, 0.45));
     document.documentElement.style.setProperty('--theme-accent-subtle', hexToRgba(hex, 0.15));
+    
+    // Apply WCAG smart contrast variables
+    const contrastVars = computeContrastVariables(hex, localTheme || 'black');
+    Object.entries(contrastVars).forEach(([prop, val]) => {
+        document.documentElement.style.setProperty(prop, val);
+    });
     if (document.body) {
         if (localAccent.startsWith('#')) {
             document.documentElement.style.setProperty('--accent-color', localAccent);
@@ -69,6 +105,12 @@ export const applyTheme = (theme, accentColor) => {
     document.documentElement.style.setProperty('--theme-accent', hex);
     document.documentElement.style.setProperty('--theme-accent-glow', hexToRgba(hex, 0.45));
     document.documentElement.style.setProperty('--theme-accent-subtle', hexToRgba(hex, 0.15));
+
+    // Apply WCAG smart contrast variables
+    const contrastVars = computeContrastVariables(hex, t);
+    Object.entries(contrastVars).forEach(([prop, val]) => {
+        document.documentElement.style.setProperty(prop, val);
+    });
 
     if (document.body) {
         if (accentColor && accentColor.startsWith('#')) {

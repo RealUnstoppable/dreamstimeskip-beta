@@ -1,6 +1,6 @@
 import { db, auth } from './auth.js';
 import { mapCollectionData } from './utils.js';
-import { collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { collection, addDoc, getDocs, getDoc, doc, updateDoc, query, where, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const TICKETS_COLLECTION = 'support_tickets';
 
@@ -99,6 +99,26 @@ export async function replyToTicket(ticketId, adminReply, status = 'answered') {
             status,
             updatedAt: serverTimestamp()
         });
+
+        // Trigger two-way user notification so user sees reply in notification dropdown & mailbox
+        try {
+            const ticketSnap = await getDoc(ticketRef);
+            if (ticketSnap.exists()) {
+                const ticketData = ticketSnap.data();
+                if (ticketData.userId) {
+                    await addDoc(collection(db, 'notifications'), {
+                        userId: ticketData.userId,
+                        type: 'ticket_reply',
+                        title: '💬 Support Ticket Update',
+                        message: `Admin replied to "${ticketData.subject || 'Ticket'}": ${adminReply.slice(0, 80)}...`,
+                        link: 'account.html#support',
+                        isRead: false,
+                        createdAt: serverTimestamp()
+                    });
+                }
+            }
+        } catch (_) {}
+
         return { success: true };
     } catch (firestoreError) {
         console.warn('Manager info: Direct Firestore update failed, attempting adminAction proxy: [' + firestoreError.message + ']');

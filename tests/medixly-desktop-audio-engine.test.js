@@ -312,15 +312,8 @@ describe('Medixly Desktop Audio Engine, Ad-Locking & Endless Queue Suite', () =>
             const brandLockup = navLeft.querySelector('.medixly-brand-lockup');
             expect(brandLockup).toBeDefined();
             expect(brandLockup.innerHTML).toContain('Medixly');
-            expect(brandLockup.innerHTML).toContain('by Unstoppable');
+            expect(brandLockup.innerHTML).toMatch(/BY un|by Unstoppable/i);
             expect(brandLockup.querySelector('#medixly-navbar-logo')).toBeDefined();
-
-            // Ensure web links are absent from left navigation
-            expect(navLeft.innerHTML).not.toContain('unstoppable.html');
-            expect(navLeft.innerHTML).not.toContain('dts.html');
-            expect(navLeft.innerHTML).not.toContain('store.html');
-            expect(navLeft.innerHTML).not.toContain('cart.html');
-            expect(navLeft.innerHTML).not.toContain('blog.html');
 
             // Right side
             const navRight = header.querySelector('.medixly-nav-right');
@@ -329,13 +322,79 @@ describe('Medixly Desktop Audio Engine, Ad-Locking & Endless Queue Suite', () =>
             // Verify aligned right side buttons
             const signInBtn = navRight.querySelector('#auth-link');
             const notifBtn = navRight.querySelector('#notification-bell-btn');
-            const membershipsBtn = navRight.querySelector('#nav-memberships-btn');
+            const membershipsBtn = navRight.querySelector('#nav-upgrade-btn, #nav-memberships-btn');
             const settingsBtn = navRight.querySelector('#header-settings-btn');
 
             expect(signInBtn).toBeDefined();
             expect(notifBtn).toBeDefined();
             expect(membershipsBtn).toBeDefined();
             expect(settingsBtn).toBeDefined();
+        });
+
+        it('Phase 2 Verification Gate: Medixly header, collapsible ecosystem bar, admin toolbar & Get App', () => {
+            window.history.pushState({}, '', '/medixly.html');
+            loadNavbar();
+
+            const header = document.querySelector('.main-header');
+            expect(header).toBeDefined();
+
+            // 1. Verify MedixlyBY un brand lockup and URL
+            const brandLockup = header.querySelector('.medixly-brand-lockup');
+            expect(brandLockup).toBeDefined();
+            expect(brandLockup.getAttribute('href')).toBe('https://realunstoppable.store/medixly.html');
+            expect(brandLockup.querySelector('.medixly-brand-subtitle').textContent.trim()).toBe('BY un');
+
+            // 2. Verify Upgrade ($0.99 Today) button in header
+            const upgradeBtn = header.querySelector('#nav-upgrade-btn');
+            expect(upgradeBtn).toBeDefined();
+            expect(upgradeBtn.getAttribute('href')).toBe('https://realunstoppable.store/medixly-pricing.html');
+            expect(upgradeBtn.textContent).toContain('Upgrade ($0.99 Today)');
+
+            // 3. Verify expandable > ecosystem arrow toggle button
+            const ecoToggle = header.querySelector('#medixly-ecosystem-toggle');
+            expect(ecoToggle).toBeDefined();
+            const ecoDrawer = header.querySelector('#medixly-ecosystem-drawer');
+            expect(ecoDrawer).toBeDefined();
+            expect(ecoDrawer.classList.contains('is-open')).toBe(false);
+
+            // Toggle open
+            ecoToggle.click();
+            expect(ecoDrawer.classList.contains('is-open')).toBe(true);
+            expect(ecoToggle.classList.contains('active')).toBe(true);
+
+            // Verify ecosystem drawer links
+            const track = ecoDrawer.querySelector('.medixly-ecosystem-track');
+            expect(track).toBeDefined();
+            const links = Array.from(track.querySelectorAll('a')).map(a => ({ text: a.textContent.trim(), href: a.getAttribute('href') }));
+            expect(links).toEqual(expect.arrayContaining([
+                { text: 'Home', href: 'https://realunstoppable.store/index.html' },
+                { text: 'Unstoppable', href: 'https://realunstoppable.store/unstoppable.html' },
+                { text: 'Dreams TimeSkip', href: 'https://realunstoppable.store/dts.html' },
+                { text: 'Shop', href: 'https://realunstoppable.store/store.html' },
+                { text: 'Cart', href: 'https://realunstoppable.store/cart.html' },
+                { text: 'Blog', href: 'https://realunstoppable.store/blog.html' },
+                { text: 'Autolux', href: 'https://autolux.realunstoppable.store/' }
+            ]));
+
+            // Toggle close
+            ecoToggle.click();
+            expect(ecoDrawer.classList.contains('is-open')).toBe(false);
+
+            // 4. Parity check on medixly-pricing.html
+            window.history.pushState({}, '', '/medixly-pricing.html');
+            loadNavbar();
+            const pricingHeader = document.querySelector('.main-header');
+            expect(pricingHeader.querySelector('.medixly-desktop-navbar')).toBeDefined();
+            expect(pricingHeader.querySelector('.medixly-brand-subtitle').textContent.trim()).toBe('BY un');
+            expect(pricingHeader.querySelector('#nav-upgrade-btn')).toBeDefined();
+            expect(pricingHeader.querySelector('#medixly-ecosystem-drawer')).toBeDefined();
+
+            // 5. HTML check for Artist Upload toolbar positioning directly between Ad Test and For Editors
+            const html = fs.readFileSync(path.join(ROOT_DIR, 'medixly.html'), 'utf8');
+            expect(html).toContain('id="nav-artist-upload"');
+            expect(html).toContain('id="nav-get-app"');
+            expect(html).toMatch(/id="nav-ad-test"[\s\S]*?id="nav-artist-upload"[\s\S]*?id="nav-editors"[\s\S]*?id="nav-get-app"/);
+            expect(html).not.toMatch(/class="greet-actions"[\s\S]*?Artist Upload/); // Removed from public greet-actions
         });
 
         it('should open and close Settings modal, update EQ presets and crossfade durations', () => {

@@ -129,6 +129,14 @@ if (document.getElementById('auth-form')) {
                     totalSpent: 0
                 });
 
+                // Record Universal Cross-Site Signup Origin
+                try {
+                    const { recordSignupOrigin } = await import('./signup-origin-tracker.js');
+                    await recordSignupOrigin(db, userCredential.user);
+                } catch (origErr) {
+                    console.warn('Signup origin tracking deferred:', origErr);
+                }
+
                 const referralCodeVal = document.getElementById('referralCode')?.value?.trim();
                 if (referralCodeVal) {
                     try {

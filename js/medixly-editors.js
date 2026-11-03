@@ -1,10 +1,19 @@
 /**
  * js/medixly-editors.js
- * Master controller for Medixly "For Editors" Workspace.
- * Integrates Web Audio DSP, interactive timeline canvas, beat-by-beat lyric engine, and pro NLE export pipeline.
+ * Master controller for Medixly "For Editors" Pro DAW Workspace.
+ * Integrates Web Audio DSP, hardware-accelerated timeline canvas,
+ * background Web Worker analysis, beat-by-beat lyric engine,
+ * purple viral hook highlighting, and pro NLE export pipeline.
  */
 
 import { detectTransients, estimateBPM, generateBeatGrid, snapToNearest } from './editor-audio-analyzer.js';
+import {
+    computePeaksMipmap,
+    computeTransients,
+    computeBPM,
+    computeBeatGrid,
+    computeViralHookSection
+} from './editor-dsp-worker.js';
 import { SyllableSyncManager, splitWordIntoSyllables, tokenizeLyrics } from './editor-syllable-engine.js';
 import {
     msToSrtTimecode,
@@ -18,15 +27,234 @@ import {
     exportToDaVinciResolveEDL,
     exportToAfterEffects,
     exportToMedixlyJSON,
-    downloadFile
+    downloadFile,
+    offsetMarkers,
+    audioBufferToWavBlob
 } from './editor-export-pipeline.js';
 import { WaveformTimelineRenderer } from './editor-waveform-renderer.js';
 import { librarySongs } from './song-data.js';
 import { lyricsData } from './lyrics-data.js';
 
+/**
+ * Global AudioContext Singleton (Strict Single-Instance Enforcement)
+ */
+export function getGlobalAudioContext() {
+    if (typeof window === 'undefined') return null;
+    if (!window.__medixlyGlobalAudioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            window.__medixlyGlobalAudioCtx = new AudioContextClass({ latencyHint: 'interactive' });
+        }
+    }
+    return window.__medixlyGlobalAudioCtx;
+}
+
+/**
+ * Instant Virtualized Autocomplete Search Bar Component
+ * Replaces laggy <select> dropdown with 150ms debounced search across massive catalogs.
+ */
+export class EditorSearchBar {
+    constructor(domElements, songs = [], onSelectSong = () => {}) {
+        this.container = domElements.container;
+        this.input = domElements.input;
+        this.clearBtn = domElements.clearBtn;
+        this.dropdown = domElements.dropdown;
+        this.list = domElements.list;
+        this.songs = songs || [];
+        this.onSelectSong = onSelectSong;
+
+        this.filteredSongs = [...this.songs];
+        this.activeIndex = -1;
+        this.debounceTimer = null;
+        this.maxRenderedItems = 25; // Virtualized DOM capping to prevent bloat
+
+        this._initListeners();
+    }
+
+    _initListeners() {
+        if (!this.input) return;
+
+        // Debounced 150ms search input
+        this.input.addEventListener('input', (e) => {
+            clearTimeout(this.debounceTimer);
+            const query = e.target.value.trim();
+            if (this.clearBtn) {
+                this.clearBtn.style.display = query ? 'flex' : 'none';
+            }
+            this.debounceTimer = setTimeout(() => {
+                this.search(query);
+            }, 150);
+        });
+
+        // Focus & Click opens dropdown
+        this.input.addEventListener('focus', () => {
+            this.search(this.input.value.trim());
+        });
+
+        // Clear button
+        this.clearBtn?.addEventListener('click', () => {
+            this.input.value = '';
+            this.clearBtn.style.display = 'none';
+            this.search('');
+            this.input.focus();
+        });
+
+        // Keyboard navigation
+        this.input.addEventListener('keydown', (e) => {
+            if (this.dropdown.style.display === 'none') {
+                if (e.key === 'ArrowDown' || e.key === 'Enter') {
+                    this.showDropdown();
+                }
+                return;
+            }
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    this.moveHighlight(1);
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    this.moveHighlight(-1);
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (this.activeIndex >= 0 && this.activeIndex < this.filteredSongs.length) {
+                        this.selectSong(this.filteredSongs[this.activeIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    this.hideDropdown();
+                    break;
+            }
+        });
+
+        // Click outside closes dropdown
+        document.addEventListener('click', (e) => {
+            if (!this.container?.contains(e.target)) {
+                this.hideDropdown();
+            }
+        });
+    }
+
+    search(query = '') {
+        const q = query.toLowerCase();
+        if (!q) {
+            this.filteredSongs = [...this.songs];
+        } else {
+            this.filteredSongs = this.songs.filter(song => {
+                const title = (song.title || '').toLowerCase();
+                const artist = (song.artist || '').toLowerCase();
+                const bpm = song.bpm ? String(song.bpm) : '';
+                const key = (song.key || '').toLowerCase();
+                const tags = Array.isArray(song.tags) ? song.tags.join(' ').toLowerCase() : '';
+
+                return title.includes(q) ||
+                    artist.includes(q) ||
+                    bpm.includes(q) ||
+                    key.includes(q) ||
+                    tags.includes(q);
+            });
+        }
+
+        this.activeIndex = this.filteredSongs.length > 0 ? 0 : -1;
+        this.renderDropdown();
+        this.showDropdown();
+    }
+
+    renderDropdown() {
+        if (!this.list) return;
+
+        if (this.filteredSongs.length === 0) {
+            this.list.innerHTML = `
+                <div style="padding: 12px; font-size: 0.8rem; color: var(--editor-text-muted); text-align: center;">
+                    No tracks found matching query
+                </div>`;
+            return;
+        }
+
+        // Render virtualized subset
+        const visibleSlice = this.filteredSongs.slice(0, this.maxRenderedItems);
+        this.list.innerHTML = visibleSlice.map((song, idx) => {
+            const hasViral = (song.tags && song.tags.includes('viral')) || song.viralStart !== undefined || (lyricsData && lyricsData[song.id]?.some(l => l.trending));
+            const isActive = (idx === this.activeIndex);
+
+            return `
+                <div class="search-item ${isActive ? 'active' : ''}" data-index="${idx}" role="option" aria-selected="${isActive}">
+                    <img class="search-item-art" src="${song.art || '/images/medixly-logo.png'}" alt="" loading="lazy">
+                    <div class="search-item-meta">
+                        <span class="search-item-title">${song.title}</span>
+                        <span class="search-item-sub">${song.artist}</span>
+                    </div>
+                    <div class="search-item-badges">
+                        ${hasViral ? '<span class="badge-viral-hook">🔥 Viral</span>' : ''}
+                        ${song.bpm ? `<span class="badge-bpm">${song.bpm} BPM</span>` : ''}
+                        <span class="badge-dur">${song.duration || 'Track'}</span>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // Attach click listeners to rendered items
+        this.list.querySelectorAll('.search-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const idx = parseInt(item.getAttribute('data-index'), 10);
+                if (this.filteredSongs[idx]) {
+                    this.selectSong(this.filteredSongs[idx]);
+                }
+            });
+        });
+    }
+
+    moveHighlight(delta) {
+        if (this.filteredSongs.length === 0) return;
+        const total = Math.min(this.filteredSongs.length, this.maxRenderedItems);
+        this.activeIndex = (this.activeIndex + delta + total) % total;
+
+        const items = this.list.querySelectorAll('.search-item');
+        items.forEach((item, idx) => {
+            if (idx === this.activeIndex) {
+                item.classList.add('active');
+                if (typeof item.scrollIntoView === 'function') {
+                    item.scrollIntoView({ block: 'nearest' });
+                }
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
+
+    selectSong(song) {
+        if (!song) return;
+        if (this.input) {
+            this.input.value = `${song.title} — ${song.artist}`;
+        }
+        if (this.clearBtn) {
+            this.clearBtn.style.display = 'flex';
+        }
+        this.hideDropdown();
+        this.onSelectSong(song);
+    }
+
+    showDropdown() {
+        if (this.dropdown) {
+            this.dropdown.style.display = 'block';
+        }
+    }
+
+    hideDropdown() {
+        if (this.dropdown) {
+            this.dropdown.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Master Medixly Workspace Controller
+ */
 export class MedixlyEditorWorkspace {
     constructor() {
-        // Audio Context & Graph
+        // Audio Context & Graph (Strict Single Global Context)
         this.audioCtx = null;
         this.audioEl = new Audio();
         this.audioEl.crossOrigin = 'anonymous';
@@ -45,18 +273,33 @@ export class MedixlyEditorWorkspace {
         this.beatGrid = [];
         this.syncManager = new SyllableSyncManager({ mode: 'word' });
 
+        // Auto-Beat Engine & Sensitivity
+        this.autoBeatEnabled = false;
+        this.transientSensitivity = 0.6;
+
+        // Pro In/Out Point Handles
+        this.inPoint = null;
+        this.outPoint = null;
+
         // Timeline Settings
         this.fps = 30;
         this.snapToTransients = true;
         this.snapToBeats = true;
         this.snapToleranceMs = 50;
 
-        // Active track data
+        // Active track & Purple Viral Hook metadata
         this.currentSong = null;
+        this.viralSection = null; // { start: number, end: number, label: string }
+        this.exportScope = 'full'; // 'full' | 'viral'
+
+        // Background Web Worker
+        this.dspWorker = null;
+        this.isAnalyzing = false;
 
         // UI Components
         this.renderer = null;
         this.canvas = null;
+        this.searchBar = null;
 
         // Animation frame loop
         this.animFrameId = null;
@@ -70,15 +313,16 @@ export class MedixlyEditorWorkspace {
      */
     async init() {
         this._cacheDom();
+        this._initWorker();
         this._initCanvas();
-        this._initTrackSelector();
+        this._initSearchBar();
         this._attachEventListeners();
         this._attachKeyboardShortcuts();
         this._startPlaybackLoop();
 
         // Load initial track (either URL param song or first in library)
-        const params = new URLSearchParams(window.location.search);
-        const songId = params.get('song') || 'dead-fresh';
+        const params = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search) : null;
+        const songId = params?.get('song') || 'dead-fresh';
         const targetSong = librarySongs.find(s => s.id === songId) || librarySongs[0];
 
         if (targetSong) {
@@ -87,12 +331,17 @@ export class MedixlyEditorWorkspace {
     }
 
     _cacheDom() {
+        if (typeof document === 'undefined') return;
         this.dom = {
             canvas: document.getElementById('timeline-canvas'),
             canvasContainer: document.getElementById('canvas-container'),
             timecodeDisplay: document.getElementById('timecode-display'),
             frameDisplay: document.getElementById('frame-display'),
-            trackSelect: document.getElementById('track-select'),
+            searchContainer: document.getElementById('editor-search-container'),
+            searchInput: document.getElementById('editor-song-search'),
+            searchClearBtn: document.getElementById('search-clear-btn'),
+            searchDropdown: document.getElementById('search-results-dropdown'),
+            searchResultsList: document.getElementById('search-results-list'),
             fileInput: document.getElementById('audio-file-input'),
             uploadBtn: document.getElementById('upload-audio-btn'),
             playPauseBtn: document.getElementById('btn-play-pause'),
@@ -108,6 +357,10 @@ export class MedixlyEditorWorkspace {
             zoomFitBtn: document.getElementById('btn-zoom-fit'),
             fpsSelect: document.getElementById('fps-select'),
             snapToggle: document.getElementById('toggle-snap'),
+            autobeatToggle: document.getElementById('toggle-autobeat'),
+            markInBtn: document.getElementById('btn-mark-in'),
+            markOutBtn: document.getElementById('btn-mark-out'),
+            clearInOutBtn: document.getElementById('btn-clear-in-out'),
             syncModeSelect: document.getElementById('sync-mode-select'),
             lyricsInput: document.getElementById('lyrics-input'),
             loadLyricsBtn: document.getElementById('btn-load-lyrics'),
@@ -126,16 +379,36 @@ export class MedixlyEditorWorkspace {
             tapTempoBtn: document.getElementById('btn-tap-tempo'),
             transientCountDisplay: document.getElementById('transient-count-display'),
             sensitivitySlider: document.getElementById('transient-sensitivity'),
+            sensitivityValue: document.getElementById('sensitivity-value'),
             markersTableBody: document.getElementById('markers-table-body'),
             exportBtn: document.getElementById('btn-export'),
             exportModal: document.getElementById('export-modal'),
             closeExportBtn: document.getElementById('btn-close-export'),
             exportPreview: document.getElementById('export-preview'),
             downloadExportBtn: document.getElementById('btn-download-export'),
+            downloadAudioBtn: document.getElementById('btn-download-audio'),
             copyExportBtn: document.getElementById('btn-copy-export'),
             exportTabs: document.querySelectorAll('.export-tab-btn'),
-            exportFormatBadge: document.getElementById('export-format-badge')
+            exportFormatBadge: document.getElementById('export-format-badge'),
+            scopeFullSongBtn: document.getElementById('scope-full-song'),
+            scopeViralBtn: document.getElementById('scope-viral-section'),
+            viralScopeCallout: document.getElementById('viral-scope-callout'),
+            viralStartBadge: document.getElementById('viral-start-badge')
         };
+    }
+
+    _initWorker() {
+        if (typeof window !== 'undefined' && typeof Worker !== 'undefined') {
+            try {
+                this.dspWorker = new Worker('/js/editor-dsp-worker.js', { type: 'module' });
+                this.dspWorker.onerror = (err) => {
+                    console.warn('DSP Web Worker encountered an error, using high-speed main-thread fallback:', err);
+                    this.dspWorker = null;
+                };
+            } catch (err) {
+                this.dspWorker = null;
+            }
+        }
     }
 
     _initCanvas() {
@@ -143,12 +416,23 @@ export class MedixlyEditorWorkspace {
         this.renderer = new WaveformTimelineRenderer(this.dom.canvas);
         this.canvas = this.dom.canvas;
 
-        // Timeline Scrubbing & Marker Dragging Events
+        // Interactive timeline scrubbing & marker dragging state
         let isMouseDown = false;
         let dragTargetMarker = null;
+        let renderScheduled = false;
+
+        const scheduleRender = () => {
+            if (!renderScheduled) {
+                renderScheduled = true;
+                requestAnimationFrame(() => {
+                    this.renderer.render();
+                    renderScheduled = false;
+                });
+            }
+        };
 
         const onPointerDown = (e) => {
-            if (e.button !== 0) return; // Only left click
+            if (e.button !== 0) return; // Primary left button only
             const rect = this.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
@@ -165,15 +449,15 @@ export class MedixlyEditorWorkspace {
                 this._seekToCanvasX(x);
             }
             this.renderer.render();
+            window.addEventListener('mousemove', onWindowPointerMove);
+            window.addEventListener('mouseup', onWindowPointerUp);
         };
 
-        const onPointerMove = (e) => {
+        const onWindowPointerMove = (e) => {
             const rect = this.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
 
             if (dragTargetMarker) {
-                // Dragging marker to reposition startMs
                 let targetSec = this.renderer.xToTime(x);
                 let targetMs = Math.round(targetSec * 1000);
 
@@ -188,33 +472,59 @@ export class MedixlyEditorWorkspace {
                 dragTargetMarker.endMs = targetMs + duration;
                 this.syncManager.markers.sort((a, b) => a.startMs - b.startMs);
                 this.renderer.setMarkers(this.syncManager.markers);
-                this._renderMarkersTable();
+
+                // Update row timecode directly without rebuilding DOM table
+                const activeRow = this.dom.markersTableBody?.querySelector(`[data-marker-id="${dragTargetMarker.id}"]`);
+                if (activeRow) {
+                    const tcCell = activeRow.querySelector('.col-tc');
+                    if (tcCell) tcCell.textContent = msToSmpteTimecode(targetMs, this.fps);
+                }
+                scheduleRender();
             } else if (isMouseDown) {
                 this._seekToCanvasX(x);
-            } else {
-                // Update hover state
-                const hoverMarker = this.renderer.getMarkerAtCoordinates(x, y);
-                this.renderer.hoveredMarkerId = hoverMarker ? hoverMarker.id : null;
-                this.renderer.render();
+                scheduleRender();
             }
         };
 
-        const onPointerUp = () => {
+        const onWindowPointerUp = () => {
+            if (dragTargetMarker) {
+                this._renderMarkersTable();
+            }
             isMouseDown = false;
             dragTargetMarker = null;
+            window.removeEventListener('mousemove', onWindowPointerMove);
+            window.removeEventListener('mouseup', onWindowPointerUp);
+            this.renderer.render();
         };
 
         this.canvas.addEventListener('mousedown', onPointerDown);
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('mouseup', onPointerUp);
 
-        // Smooth Wheel Zoom centered on cursor
+        // Hover detection on canvas only
+        this.canvas.addEventListener('mousemove', (e) => {
+            if (isMouseDown || dragTargetMarker) return;
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const hoverMarker = this.renderer.getMarkerAtCoordinates(x, y);
+            const newHoverId = hoverMarker ? hoverMarker.id : null;
+            if (this.renderer.hoveredMarkerId !== newHoverId) {
+                this.renderer.hoveredMarkerId = newHoverId;
+                scheduleRender();
+            }
+        });
+
+        // Wheel listener: Cmd/Ctrl + Scroll zooms; normal scroll pans horizontally
         this.canvas.addEventListener('wheel', (e) => {
             e.preventDefault();
-            const zoomDelta = e.deltaY < 0 ? 1.15 : 0.85;
-            this.renderer.setZoom(this.renderer.zoom * zoomDelta, e.clientX);
-            if (this.dom.zoomSlider) {
-                this.dom.zoomSlider.value = this.renderer.zoom;
+            if (e.metaKey || e.ctrlKey) {
+                const zoomDelta = e.deltaY < 0 ? 1.15 : 0.85;
+                this.renderer.setZoom(this.renderer.zoom * zoomDelta, e.clientX);
+                if (this.dom.zoomSlider) {
+                    this.dom.zoomSlider.value = this.renderer.zoom;
+                }
+            } else {
+                const panDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                this.renderer.pan(panDelta);
             }
         }, { passive: false });
     }
@@ -224,32 +534,42 @@ export class MedixlyEditorWorkspace {
         this.seek(timeSec);
     }
 
-    _initTrackSelector() {
-        if (!this.dom.trackSelect) return;
-        this.dom.trackSelect.innerHTML = librarySongs.map(s => `
-            <option value="${s.id}">${s.title} — ${s.artist} (${s.duration || 'Track'})</option>
-        `).join('');
-
-        this.dom.trackSelect.addEventListener('change', async (e) => {
-            const selected = librarySongs.find(s => s.id === e.target.value);
-            if (selected) {
-                await this.loadTrack(selected);
-            }
+    _initSearchBar() {
+        if (!this.dom.searchInput) return;
+        this.searchBar = new EditorSearchBar({
+            container: this.dom.searchContainer,
+            input: this.dom.searchInput,
+            clearBtn: this.dom.searchClearBtn,
+            dropdown: this.dom.searchDropdown,
+            list: this.dom.searchResultsList
+        }, librarySongs, async (selectedSong) => {
+            await this.loadTrack(selectedSong);
         });
     }
 
     /**
-     * Loads a track by audio URL or metadata, decodes its PCM waveform, and detects transients/BPM.
-     * @param {object} song - Song metadata object
-     * @param {File} [customFile] - Optional local file
+     * Loads a track, decodes PCM audio buffer, and triggers worker/DSP analysis.
+     * @param {object} song - Song metadata
+     * @param {File} [customFile] - Optional imported file
      */
     async loadTrack(song, customFile = null) {
         this.pause();
         this.currentSong = song;
 
+        // Reset playhead & In/Out points
+        this.inPoint = null;
+        this.outPoint = null;
+        this.renderer.setInOutPoints(null, null);
+
+        // Update search input text
+        if (this.dom.searchInput && !customFile) {
+            this.dom.searchInput.value = `${song.title} — ${song.artist}`;
+            if (this.dom.searchClearBtn) this.dom.searchClearBtn.style.display = 'flex';
+        }
+
         // Update UI status
         if (this.dom.bpmDisplay) this.dom.bpmDisplay.textContent = 'Analyzing...';
-        if (this.dom.transientCountDisplay) this.dom.transientCountDisplay.textContent = 'Analyzing audio waveform...';
+        if (this.dom.transientCountDisplay) this.dom.transientCountDisplay.textContent = 'Analyzing audio waveform & beats...';
 
         try {
             this._ensureAudioContext();
@@ -266,45 +586,133 @@ export class MedixlyEditorWorkspace {
                 arrayBuffer = await response.arrayBuffer();
             }
 
-            // Decode Audio Data for DSP Analysis
+            // Decode Audio Data via Single Global AudioContext
             this.audioBuffer = await this.audioCtx.decodeAudioData(arrayBuffer);
 
-            // 1. Pass PCM to Waveform Renderer
-            this.renderer.setAudioData(this.audioBuffer);
+            // Determine viral hook metadata if present in song data or lyricsData
+            const viralMeta = this._extractViralMetadata(song);
 
-            // 2. Run DSP Transient Analysis
-            this._runTransientAnalysis();
+            // Run DSP analysis (Worker or Synchronous Fallback)
+            await this._analyzeAudioBuffer(this.audioBuffer, viralMeta);
 
-            // 3. Load associated lyrics if available
+            // Auto-load lyrics
             this._autoLoadSongLyrics(song.id);
 
-            // 4. Update Timecode
+            // Reset timecode to 0
             this.seek(0);
         } catch (err) {
             console.error('Error loading audio track:', err);
             if (this.dom.transientCountDisplay) {
-                this.dom.transientCountDisplay.textContent = `Note: Previewing via audio stream (${err.message})`;
+                this.dom.transientCountDisplay.textContent = `Preview active (${err.message})`;
             }
         }
     }
 
-    _runTransientAnalysis() {
-        if (!this.audioBuffer) return;
-        const sensitivity = this.dom.sensitivitySlider ? parseFloat(this.dom.sensitivitySlider.value) : 0.6;
+    _extractViralMetadata(song) {
+        if (!song) return {};
+        let viralStart = song.viralStart;
+        let viralEnd = song.viralEnd;
 
-        // Detect Transients
-        this.transients = detectTransients(this.audioBuffer, {
-            sensitivity,
-            minSpacingMs: 50
+        // If not explicit on song object, check lyricsData trending lines
+        if (viralStart === undefined && lyricsData && lyricsData[song.id]) {
+            const data = lyricsData[song.id];
+            const trendingLines = data.filter(l => l.trending);
+            if (trendingLines.length > 0) {
+                const first = trendingLines[0];
+                const last = trendingLines[trendingLines.length - 1];
+                viralStart = first.start;
+                viralEnd = (last.end || first.start + 15) + 1.2;
+            }
+        }
+
+        return { viralStart, viralEnd };
+    }
+
+    async _analyzeAudioBuffer(audioBuffer, viralMeta = {}) {
+        const sampleRate = audioBuffer.sampleRate;
+        const pcm = this._getMonoPcm(audioBuffer);
+        const sensitivity = this.transientSensitivity;
+
+        if (this.dspWorker) {
+            // Background Web Worker Execution
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    const messageId = `dsp-${Date.now()}`;
+                    const handler = (e) => {
+                        if (e.data.id === messageId) {
+                            this.dspWorker.removeEventListener('message', handler);
+                            if (e.data.success) {
+                                resolve(e.data);
+                            } else {
+                                reject(new Error(e.data.error || 'Worker DSP error'));
+                            }
+                        }
+                    };
+                    this.dspWorker.addEventListener('message', handler);
+
+                    // Transfer copy of PCM buffer to worker
+                    const pcmCopy = new Float32Array(pcm);
+                    this.dspWorker.postMessage({
+                        id: messageId,
+                        type: 'ANALYZE_AUDIO',
+                        pcm: pcmCopy,
+                        sampleRate,
+                        sensitivity,
+                        metadata: viralMeta
+                    }, [pcmCopy.buffer]);
+                });
+
+                this._applyDspResults(result);
+                return;
+            } catch (workerErr) {
+                console.warn('Worker analysis failed, using local pure functions:', workerErr);
+            }
+        }
+
+        // Main-thread pure-function fallback
+        const peaksMipmap = computePeaksMipmap(pcm, sampleRate);
+        const transients = computeTransients(pcm, sampleRate, { sensitivity });
+        const bpmData = computeBPM(transients);
+        const duration = pcm.length / sampleRate;
+        const beatGrid = computeBeatGrid(duration, bpmData.bpm, bpmData.downbeatOffset);
+        const viralSection = computeViralHookSection(pcm, sampleRate, 20, viralMeta);
+
+        this._applyDspResults({
+            peaksMipmap,
+            transients,
+            bpmData,
+            beatGrid,
+            viralSection,
+            duration
         });
+    }
+
+    _getMonoPcm(audioBuffer) {
+        const ch0 = audioBuffer.getChannelData(0);
+        if (audioBuffer.numberOfChannels === 1) {
+            return ch0;
+        }
+        const ch1 = audioBuffer.getChannelData(1);
+        const mono = new Float32Array(ch0.length);
+        for (let i = 0; i < ch0.length; i++) {
+            mono[i] = (ch0[i] + ch1[i]) * 0.5;
+        }
+        return mono;
+    }
+
+    _applyDspResults(results) {
+        this.transients = results.transients || [];
+        this.bpmData = results.bpmData || { bpm: 120, confidence: 0, downbeatOffset: 0, beatIntervalMs: 500 };
+        this.beatGrid = results.beatGrid || [];
+        this.viralSection = results.viralSection || null;
+
+        // Pass to Waveform Timeline Renderer
+        this.renderer.setAudioData(this.audioBuffer, results.peaksMipmap);
         this.renderer.setTransients(this.transients);
-
-        // Estimate BPM & Beat Grid
-        this.bpmData = estimateBPM(this.transients);
-        this.beatGrid = generateBeatGrid(this.audioBuffer.duration, this.bpmData.bpm, this.bpmData.downbeatOffset);
         this.renderer.setBeats(this.beatGrid);
+        this.renderer.setViralSection(this.viralSection);
 
-        // Update UI Badges
+        // Update DSP Badges
         if (this.dom.bpmDisplay) {
             this.dom.bpmDisplay.textContent = `${this.bpmData.bpm.toFixed(1)} BPM`;
         }
@@ -312,8 +720,34 @@ export class MedixlyEditorWorkspace {
             this.dom.bpmConfidence.textContent = `${Math.round(this.bpmData.confidence * 100)}% confidence`;
         }
         if (this.dom.transientCountDisplay) {
-            this.dom.transientCountDisplay.textContent = `${this.transients.length} transients detected (${this.beatGrid.length} beats)`;
+            this.dom.transientCountDisplay.textContent = `${this.transients.length} transients • ${this.beatGrid.length} beats`;
         }
+
+        // If Auto-Beat is enabled, populate markers from grid
+        if (this.autoBeatEnabled) {
+            this._populateAutoBeatMarkers();
+        }
+    }
+
+    _populateAutoBeatMarkers() {
+        if (!this.beatGrid || this.beatGrid.length === 0) return;
+        const beatMarkers = this.beatGrid.map((b, idx) => {
+            const startMs = Math.round(b.time * 1000);
+            const nextBeatTime = this.beatGrid[idx + 1]?.time || (b.time + (60 / this.bpmData.bpm));
+            const endMs = Math.round(nextBeatTime * 1000);
+            return {
+                id: `beat-${idx}`,
+                text: b.isDownbeat ? `BEAT ${Math.floor(idx / 4) + 1}.1` : `beat ${(idx % 4) + 1}`,
+                startMs,
+                endMs,
+                type: b.isDownbeat ? 'hook' : 'beat'
+            };
+        });
+
+        this.syncManager.markers = beatMarkers;
+        this.renderer.setMarkers(beatMarkers);
+        this._renderMarkersTable();
+        this._updatePrompter();
     }
 
     _autoLoadSongLyrics(songId) {
@@ -321,7 +755,6 @@ export class MedixlyEditorWorkspace {
             const raw = lyricsData[songId];
             this.syncManager.loadFromMedixlyLyrics(raw);
 
-            // Also populate the textarea with the extracted text
             const fullText = raw.map(line => line.words.map(w => w.text).join(' ')).join('\n');
             if (this.dom.lyricsInput) {
                 this.dom.lyricsInput.value = fullText;
@@ -331,7 +764,6 @@ export class MedixlyEditorWorkspace {
             this._updatePrompter();
             this._renderMarkersTable();
         } else {
-            // Default sample lyrics if none exist
             const sampleText = `I found a girl real superstar\nShe's got it all the face card\nAnd I know she's worth any amount\nBaby take my hand`;
             if (this.dom.lyricsInput && !this.dom.lyricsInput.value) {
                 this.dom.lyricsInput.value = sampleText;
@@ -344,11 +776,8 @@ export class MedixlyEditorWorkspace {
     }
 
     _ensureAudioContext() {
-        if (!this.audioCtx) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            this.audioCtx = new AudioContext({ latencyHint: 'interactive' });
-        }
-        if (this.audioCtx.state === 'suspended') {
+        this.audioCtx = getGlobalAudioContext();
+        if (this.audioCtx && this.audioCtx.state === 'suspended') {
             this.audioCtx.resume();
         }
     }
@@ -386,7 +815,8 @@ export class MedixlyEditorWorkspace {
     }
 
     seek(timeSec) {
-        const clamped = Math.max(0, Math.min(this.renderer.duration || this.audioEl.duration || 0, timeSec));
+        const duration = this.renderer?.duration || this.audioEl.duration || 0;
+        const clamped = Math.max(0, Math.min(duration, timeSec));
         this.audioEl.currentTime = clamped;
         this.renderer.setTime(clamped);
         this._updateTimecodeReadout(clamped);
@@ -398,8 +828,8 @@ export class MedixlyEditorWorkspace {
     }
 
     /**
-     * Drops a sync marker at the current playhead position down to the millisecond.
-     * Snaps to nearest beat or transient if enabled.
+     * Manual marker nudge & toggle (Press 'M')
+     * If a marker exists within 80ms of playhead, removes it. Otherwise, drops a new marker.
      */
     dropMarker() {
         const currentMs = Math.round(this.audioEl.currentTime * 1000);
@@ -413,6 +843,20 @@ export class MedixlyEditorWorkspace {
             }
         }
 
+        // Check if there is an existing marker near this playhead position (within 80ms)
+        const existingIndex = this.syncManager.markers.findIndex(m => Math.abs(m.startMs - stampMs) <= 80);
+        if (existingIndex !== -1) {
+            // Remove existing marker at playhead
+            const removed = this.syncManager.markers[existingIndex];
+            this.syncManager.deleteMarker(removed.id);
+            this.renderer.selectedMarkerId = null;
+            this.renderer.setMarkers(this.syncManager.markers);
+            this._renderMarkersTable();
+            this._updatePrompter();
+            return;
+        }
+
+        // Add new marker
         const marker = this.syncManager.dropMarker(stampMs);
         this.renderer.setMarkers(this.syncManager.markers);
         this.renderer.selectedMarkerId = marker.id;
@@ -426,7 +870,7 @@ export class MedixlyEditorWorkspace {
     _triggerMarkerVisualFeedback() {
         if (!this.dom.prompterCurrent) return;
         this.dom.prompterCurrent.classList.remove('pulse-stamp');
-        void this.dom.prompterCurrent.offsetWidth; // trigger reflow
+        void this.dom.prompterCurrent.offsetWidth;
         this.dom.prompterCurrent.classList.add('pulse-stamp');
     }
 
@@ -485,14 +929,14 @@ export class MedixlyEditorWorkspace {
         if (markers.length === 0) {
             this.dom.markersTableBody.innerHTML = `
                 <tr>
-                    <td colspan="5" class="empty-table-msg">No markers dropped yet. Hit Play &amp; press <strong>'M'</strong> to sync lyrics!</td>
+                    <td colspan="5" class="empty-table-msg">No markers placed yet. Hit Play &amp; press <strong>'M'</strong> to sync, or toggle <strong>Auto-Beat</strong>!</td>
                 </tr>`;
             return;
         }
 
-        this.dom.markersTableBody.innerHTML = markers.map((m, idx) => {
+        this.dom.markersTableBody.innerHTML = markers.map((m) => {
             const timecode = msToSmpteTimecode(m.startMs, this.fps);
-            const durationMs = m.endMs - m.startMs;
+            const durationMs = Math.max(0, m.endMs - m.startMs);
             const isSelected = (m.id === this.renderer.selectedMarkerId);
 
             return `
@@ -510,7 +954,7 @@ export class MedixlyEditorWorkspace {
                 </tr>`;
         }).join('');
 
-        // Attach table row actions
+        // Row interaction listeners
         this.dom.markersTableBody.querySelectorAll('.btn-seek-marker').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -568,9 +1012,16 @@ export class MedixlyEditorWorkspace {
         const loop = () => {
             if (this.isPlaying && this.audioEl) {
                 const t = this.audioEl.currentTime;
-                this.renderer.setTime(t);
-                this._updateTimecodeReadout(t);
-                this._checkMetronomeClick(t);
+
+                // Enforce Out-point looping if set
+                if (this.outPoint !== null && t >= this.outPoint) {
+                    const restartTime = (this.inPoint !== null) ? this.inPoint : 0;
+                    this.seek(restartTime);
+                } else {
+                    this.renderer.setTime(t);
+                    this._updateTimecodeReadout(t);
+                    this._checkMetronomeClick(t);
+                }
             }
             this.animFrameId = requestAnimationFrame(loop);
         };
@@ -579,11 +1030,18 @@ export class MedixlyEditorWorkspace {
 
     _updateTimecodeReadout(timeSec) {
         const ms = timeSec * 1000;
+        const totalMs = Math.max(0, Math.round(ms));
+        const minutes = Math.floor(totalMs / 60000);
+        const seconds = Math.floor((totalMs % 60000) / 1000);
+        const remMs = totalMs % 1000;
+        const msStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(remMs).padStart(3, '0')}`;
+        const smpteStr = msToSmpteTimecode(ms, this.fps);
+
         if (this.dom.timecodeDisplay) {
-            this.dom.timecodeDisplay.textContent = msToSmpteTimecode(ms, this.fps);
+            this.dom.timecodeDisplay.textContent = `${msStr} (${smpteStr})`;
         }
         if (this.dom.frameDisplay) {
-            this.dom.frameDisplay.textContent = `Frame ${msToFrames(ms, this.fps)}`;
+            this.dom.frameDisplay.textContent = `Frame ${msToFrames(ms, this.fps)} @ ${this.fps}fps`;
         }
     }
 
@@ -615,7 +1073,10 @@ export class MedixlyEditorWorkspace {
     _attachEventListeners() {
         // Transport buttons
         this.dom.playPauseBtn?.addEventListener('click', () => this.togglePlayPause());
-        this.dom.rewindBtn?.addEventListener('click', () => this.seek(0));
+        this.dom.rewindBtn?.addEventListener('click', () => {
+            const start = this.inPoint !== null ? this.inPoint : 0;
+            this.seek(start);
+        });
         this.dom.stepBackBtn?.addEventListener('click', () => this.stepFrames(-1));
         this.dom.stepForwardBtn?.addEventListener('click', () => this.stepFrames(1));
 
@@ -623,6 +1084,33 @@ export class MedixlyEditorWorkspace {
         this.dom.metronomeBtn?.addEventListener('click', () => {
             this.metronomeEnabled = !this.metronomeEnabled;
             this.dom.metronomeBtn.classList.toggle('active', this.metronomeEnabled);
+        });
+
+        // Auto-Beat toggle
+        this.dom.autobeatToggle?.addEventListener('change', (e) => {
+            this.autoBeatEnabled = e.target.checked;
+            if (this.autoBeatEnabled) {
+                this._populateAutoBeatMarkers();
+            } else if (this.currentSong) {
+                this._autoLoadSongLyrics(this.currentSong.id);
+            }
+        });
+
+        // In / Out point buttons
+        this.dom.markInBtn?.addEventListener('click', () => {
+            this.inPoint = this.audioEl.currentTime;
+            this.renderer.setInOutPoints(this.inPoint, this.outPoint);
+        });
+
+        this.dom.markOutBtn?.addEventListener('click', () => {
+            this.outPoint = this.audioEl.currentTime;
+            this.renderer.setInOutPoints(this.inPoint, this.outPoint);
+        });
+
+        this.dom.clearInOutBtn?.addEventListener('click', () => {
+            this.inPoint = null;
+            this.outPoint = null;
+            this.renderer.setInOutPoints(null, null);
         });
 
         // Zoom Controls
@@ -663,7 +1151,7 @@ export class MedixlyEditorWorkspace {
                 const customSong = {
                     id: `custom-${Date.now()}`,
                     title: file.name.replace(/\.[^/.]+$/, ""),
-                    artist: 'Custom Audio',
+                    artist: 'Imported Master',
                     duration: 'Custom'
                 };
                 await this.loadTrack(customSong, file);
@@ -701,8 +1189,18 @@ export class MedixlyEditorWorkspace {
         this.dom.quantizeBtn?.addEventListener('click', () => this.quantizeMarkers());
 
         // Sensitivity Slider
-        this.dom.sensitivitySlider?.addEventListener('change', () => {
-            this._runTransientAnalysis();
+        this.dom.sensitivitySlider?.addEventListener('input', (e) => {
+            this.transientSensitivity = parseFloat(e.target.value);
+            if (this.dom.sensitivityValue) {
+                this.dom.sensitivityValue.textContent = `${Math.round(this.transientSensitivity * 100)}%`;
+            }
+        });
+
+        this.dom.sensitivitySlider?.addEventListener('change', async () => {
+            if (this.audioBuffer) {
+                const viralMeta = this._extractViralMetadata(this.currentSong);
+                await this._analyzeAudioBuffer(this.audioBuffer, viralMeta);
+            }
         });
 
         // Tap Tempo
@@ -723,6 +1221,7 @@ export class MedixlyEditorWorkspace {
                 this.beatGrid = generateBeatGrid(this.renderer.duration, bpm, this.audioEl.currentTime % (60 / bpm));
                 this.renderer.setBeats(this.beatGrid);
                 if (this.dom.bpmDisplay) this.dom.bpmDisplay.textContent = `${bpm} BPM (Tapped)`;
+                if (this.autoBeatEnabled) this._populateAutoBeatMarkers();
             }
         });
 
@@ -734,18 +1233,37 @@ export class MedixlyEditorWorkspace {
         });
 
         this.dom.exportTabs?.forEach(tab => {
-            tab.addEventListener('click', (e) => {
+            tab.addEventListener('click', () => {
                 this.dom.exportTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 const format = tab.getAttribute('data-format');
                 this._renderExportContent(format);
             });
         });
+
+        // Dual Export Scope Switcher
+        this.dom.scopeFullSongBtn?.addEventListener('click', () => {
+            this.exportScope = 'full';
+            this.dom.scopeFullSongBtn?.classList.add('active');
+            this.dom.scopeViralBtn?.classList.remove('active');
+            if (this.dom.viralScopeCallout) this.dom.viralScopeCallout.style.display = 'none';
+            const activeTab = document.querySelector('.export-tab-btn.active');
+            this._renderExportContent(activeTab ? activeTab.getAttribute('data-format') : 'srt');
+        });
+
+        this.dom.scopeViralBtn?.addEventListener('click', () => {
+            this.exportScope = 'viral';
+            this.dom.scopeViralBtn?.classList.add('active');
+            this.dom.scopeFullSongBtn?.classList.remove('active');
+            if (this.dom.viralScopeCallout) this.dom.viralScopeCallout.style.display = 'flex';
+            const activeTab = document.querySelector('.export-tab-btn.active');
+            this._renderExportContent(activeTab ? activeTab.getAttribute('data-format') : 'srt');
+        });
     }
 
     _attachKeyboardShortcuts() {
         window.addEventListener('keydown', (e) => {
-            // Ignore keystrokes when focused in text inputs (except Escape)
+            // Ignore keystrokes when focused in text inputs
             const activeTag = document.activeElement?.tagName;
             if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') {
                 if (e.key === 'Escape') {
@@ -763,21 +1281,28 @@ export class MedixlyEditorWorkspace {
                     e.preventDefault();
                     this.dropMarker();
                     break;
+                case 'KeyI':
+                    e.preventDefault();
+                    this.inPoint = this.audioEl.currentTime;
+                    this.renderer.setInOutPoints(this.inPoint, this.outPoint);
+                    break;
+                case 'KeyO':
+                    e.preventDefault();
+                    this.outPoint = this.audioEl.currentTime;
+                    this.renderer.setInOutPoints(this.inPoint, this.outPoint);
+                    break;
                 case 'KeyJ':
-                    // Reverse / Slow shuttle
                     e.preventDefault();
                     this.playbackRate = Math.max(0.5, this.playbackRate - 0.25);
                     this.audioEl.playbackRate = this.playbackRate;
                     break;
                 case 'KeyK':
-                    // Pause shuttle
                     e.preventDefault();
                     this.pause();
                     this.playbackRate = 1.0;
                     this.audioEl.playbackRate = 1.0;
                     break;
                 case 'KeyL':
-                    // Forward shuttle
                     e.preventDefault();
                     if (!this.isPlaying) this.play();
                     this.playbackRate = Math.min(2.0, this.playbackRate + 0.25);
@@ -786,11 +1311,11 @@ export class MedixlyEditorWorkspace {
                 case 'ArrowLeft':
                     e.preventDefault();
                     if (e.shiftKey) {
-                        this.seek(this.audioEl.currentTime - 1.0); // 1 sec
+                        this.seek(this.audioEl.currentTime - 1.0);
                     } else if (e.altKey) {
-                        this.seek(this.audioEl.currentTime - 0.01); // 10ms
+                        this.seek(this.audioEl.currentTime - 0.01);
                     } else {
-                        this.stepFrames(-1); // 1 frame
+                        this.stepFrames(-1);
                     }
                     break;
                 case 'ArrowRight':
@@ -804,13 +1329,11 @@ export class MedixlyEditorWorkspace {
                     }
                     break;
                 case 'BracketLeft':
-                    // Zoom Out
                     e.preventDefault();
                     this.renderer.setZoom(this.renderer.zoom / 1.3);
                     if (this.dom.zoomSlider) this.dom.zoomSlider.value = this.renderer.zoom;
                     break;
                 case 'BracketRight':
-                    // Zoom In
                     e.preventDefault();
                     this.renderer.setZoom(this.renderer.zoom * 1.3);
                     if (this.dom.zoomSlider) this.dom.zoomSlider.value = this.renderer.zoom;
@@ -830,6 +1353,14 @@ export class MedixlyEditorWorkspace {
                     this.snapToTransients = !this.snapToTransients;
                     this.snapToBeats = this.snapToTransients;
                     if (this.dom.snapToggle) this.dom.snapToggle.checked = this.snapToTransients;
+                    break;
+                case 'KeyX':
+                    if (e.altKey) {
+                        e.preventDefault();
+                        this.inPoint = null;
+                        this.outPoint = null;
+                        this.renderer.setInOutPoints(null, null);
+                    }
                     break;
                 case 'Delete':
                 case 'Backspace':
@@ -851,7 +1382,12 @@ export class MedixlyEditorWorkspace {
     openExportModal() {
         if (!this.dom.exportModal) return;
         this.dom.exportModal.classList.remove('hidden');
-        // Render first active tab format
+
+        // Configure active scope
+        if (this.dom.viralStartBadge && this.viralSection) {
+            this.dom.viralStartBadge.textContent = msToSrtTimecode(this.viralSection.start * 1000);
+        }
+
         const activeTab = document.querySelector('.export-tab-btn.active');
         const format = activeTab ? activeTab.getAttribute('data-format') : 'srt';
         this._renderExportContent(format);
@@ -863,61 +1399,70 @@ export class MedixlyEditorWorkspace {
     }
 
     _renderExportContent(format) {
-        const markers = this.syncManager.markers;
+        let markersToExport = this.syncManager.markers;
+        const isViralScope = (this.exportScope === 'viral');
+
+        if (isViralScope && this.viralSection) {
+            const startMs = Math.round(this.viralSection.start * 1000);
+            const endMs = Math.round(this.viralSection.end * 1000);
+            markersToExport = offsetMarkers(markersToExport, startMs, endMs);
+        }
+
         let content = '';
-        let filename = `${this.currentSong?.title || 'medixly'}-markers`;
+        let filename = `${this.currentSong?.title || 'medixly'}`;
+        if (isViralScope) filename += '-ViralHook';
         let mime = 'text/plain';
 
         switch (format) {
             case 'srt':
-                content = exportToSRT(markers, { mode: 'line' });
-                filename += '.srt';
+                content = exportToSRT(markersToExport, { mode: 'line' });
+                filename += '-markers.srt';
                 mime = 'application/x-subrip';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = 'SubRip Subtitles (.srt)';
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `SubRip Subtitles (.srt)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'srt-words':
-                content = exportToSRT(markers, { mode: 'word' });
+                content = exportToSRT(markersToExport, { mode: 'word' });
                 filename += '-karaoke.srt';
                 mime = 'application/x-subrip';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = 'Word-by-Word Subtitles (.srt)';
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Word-by-Word Subtitles (.srt)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'premiere-csv':
-                content = exportToPremiereCSV(markers, { fps: this.fps });
+                content = exportToPremiereCSV(markersToExport, { fps: this.fps });
                 filename += '-premiere.csv';
                 mime = 'text/csv';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Premiere Pro Marker CSV (@ ${this.fps} fps)`;
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Premiere Pro Marker CSV (@ ${this.fps} fps)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'premiere-xml':
-                content = exportToPremiereXML(markers, { fps: this.fps, sequenceName: this.currentSong?.title || 'Lyrics' });
+                content = exportToPremiereXML(markersToExport, { fps: this.fps, sequenceName: `${this.currentSong?.title || 'Lyrics'}${isViralScope ? ' (Viral)' : ''}` });
                 filename += '-fcp-premiere.xml';
                 mime = 'application/xml';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Final Cut Pro / Premiere XML (@ ${this.fps} fps)`;
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Final Cut Pro / Premiere XML (@ ${this.fps} fps)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'resolve-csv':
-                content = exportToDaVinciResolveCSV(markers, { fps: this.fps });
+                content = exportToDaVinciResolveCSV(markersToExport, { fps: this.fps });
                 filename += '-resolve.csv';
                 mime = 'text/csv';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `DaVinci Resolve Marker CSV (@ ${this.fps} fps)`;
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `DaVinci Resolve Marker CSV (@ ${this.fps} fps)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'resolve-edl':
-                content = exportToDaVinciResolveEDL(markers, { fps: this.fps });
+                content = exportToDaVinciResolveEDL(markersToExport, { fps: this.fps });
                 filename += '-resolve.edl';
                 mime = 'text/plain';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `DaVinci Resolve / CMX 3600 EDL (@ ${this.fps} fps)`;
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `DaVinci Resolve / CMX 3600 EDL (@ ${this.fps} fps)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'after-effects':
-                const ae = exportToAfterEffects(markers, { fps: this.fps });
+                const ae = exportToAfterEffects(markersToExport, { fps: this.fps });
                 content = ae.script;
                 filename += '-ae-importer.jsx';
                 mime = 'application/javascript';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `After Effects ExtendScript / JSON (@ ${this.fps} fps)`;
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `After Effects ExtendScript / JSON (@ ${this.fps} fps)${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
             case 'medixly-json':
-                const nativeJson = exportToMedixlyJSON(markers);
+                const nativeJson = exportToMedixlyJSON(markersToExport);
                 content = JSON.stringify(nativeJson, null, 2);
                 filename += '-medixly.json';
                 mime = 'application/json';
-                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = 'Medixly Native Lyrics JSON';
+                if (this.dom.exportFormatBadge) this.dom.exportFormatBadge.textContent = `Medixly Native Lyrics JSON${isViralScope ? ' [Viral Section Only]' : ''}`;
                 break;
         }
 
@@ -925,10 +1470,27 @@ export class MedixlyEditorWorkspace {
             this.dom.exportPreview.value = content;
         }
 
-        // Configure Download button
+        // Configure Download Markers button
         if (this.dom.downloadExportBtn) {
             this.dom.downloadExportBtn.onclick = () => {
                 downloadFile(content, filename, mime);
+            };
+        }
+
+        // Configure Download Audio button
+        if (this.dom.downloadAudioBtn) {
+            const audioLabel = isViralScope ? '🎧 Download Sliced Audio (.wav)' : '🎧 Download Full Audio (.wav)';
+            this.dom.downloadAudioBtn.innerHTML = `<span>${audioLabel}</span>`;
+            this.dom.downloadAudioBtn.onclick = () => {
+                if (!this.audioBuffer) {
+                    alert('Audio buffer is still loading or unavailable.');
+                    return;
+                }
+                const startSec = (isViralScope && this.viralSection) ? this.viralSection.start : 0;
+                const endSec = (isViralScope && this.viralSection) ? this.viralSection.end : this.audioBuffer.duration;
+                const wavBlob = audioBufferToWavBlob(this.audioBuffer, startSec, endSec);
+                const audioFilename = `${this.currentSong?.title || 'track'}${isViralScope ? '-ViralHook' : '-Full'}.wav`;
+                downloadFile(wavBlob, audioFilename, 'audio/wav');
             };
         }
 
@@ -943,7 +1505,7 @@ export class MedixlyEditorWorkspace {
                         this.dom.copyExportBtn.textContent = originalText;
                     }, 1500);
                 } catch (err) {
-                    alert('Clipboard access denied, please select and copy from the box.');
+                    alert('Clipboard access denied, please copy directly from the preview text.');
                 }
             };
         }

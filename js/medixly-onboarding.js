@@ -87,7 +87,7 @@ const onboardingState = {
 };
 
 // Helper to persist user preferences to Firestore & localStorage
-async function savePreferencesToBackend(preferences) {
+export async function savePreferencesToBackend(preferences) {
     // 1. Cache locally for instant UI personalization
     try {
         localStorage.setItem('medixly_user_preferences', JSON.stringify({
@@ -97,11 +97,27 @@ async function savePreferencesToBackend(preferences) {
         }));
     } catch (_) {}
 
-    // 2. Persist to Firestore if user is authenticated
-    const targetUid = onboardingState.userUid || auth.currentUser?.uid;
-    if (targetUid) {
+    // 2. Persist to Firestore if user is authenticated (Data Persistence Law)
+    const targetUid = onboardingState.userUid || auth?.currentUser?.uid;
+    if (targetUid && db) {
         try {
-            await setDoc(doc(db, "users", targetUid), {
+            const userDocRef = doc(db, "users", targetUid);
+            let existingData = null;
+            try {
+                const userSnap = await getDoc(userDocRef);
+                existingData = userSnap.exists() ? userSnap.data() : null;
+            } catch (_) {}
+
+            const soundProfileData = {
+                genres: preferences.genres || [],
+                favoriteArtists: preferences.favoriteArtists || [],
+                role: preferences.role || 'listener',
+                acquisitionSource: preferences.acquisitionSource || 'organic',
+                platforms: preferences.platforms || [],
+                sfxNeeds: preferences.sfxNeeds || 'moderate'
+            };
+
+            const updatePayload = {
                 role: preferences.role,
                 acquisitionSource: preferences.acquisitionSource,
                 platforms: preferences.platforms,
@@ -110,17 +126,34 @@ async function savePreferencesToBackend(preferences) {
                 favoriteArtists: preferences.favoriteArtists,
                 onboardingCompleted: true,
                 onboardingCompletedAt: serverTimestamp(),
-                lastUpdated: serverTimestamp()
-            }, { merge: true });
+                lastUpdated: serverTimestamp(),
+                currentSoundProfile: {
+                    ...soundProfileData,
+                    updatedAt: serverTimestamp()
+                }
+            };
+
+            // Immutable Enrollment Law: Never overwrite initial enrollment profile
+            if (!existingData || !existingData.initialEnrollmentSoundProfile) {
+                updatePayload.initialEnrollmentSoundProfile = {
+                    ...soundProfileData,
+                    locked: true,
+                    enrolledAt: serverTimestamp()
+                };
+            }
+
+            await setDoc(userDocRef, updatePayload, { merge: true });
         } catch (err) {
             console.warn("Manager info: Firestore preferences sync notice:", err);
         }
     }
 
     // 3. Dispatch global event so Medixly recommendations and dashboard update immediately
-    window.dispatchEvent(new CustomEvent('medixly:preferences-updated', {
-        detail: preferences
-    }));
+    if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('medixly:preferences-updated', {
+            detail: preferences
+        }));
+    }
 }
 
 export function createOnboardingUI(startStep = 1) {

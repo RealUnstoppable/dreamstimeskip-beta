@@ -16,6 +16,7 @@ import {
 } from './minecraft-link-service.js';
 import { streakCelebration, getWeeklyHotbarHtml, getVoxelFlameSvg } from './streakCelebration.js';
 import { streakAudio } from './streakSoundEngine.js';
+import { fetchMailboxCoupons, renderCouponCardsHtml, copyAndApplyCoupon } from './mailbox.js';
 
 // Global state
 let currentUser = null;
@@ -67,7 +68,13 @@ export function initTabNavigation() {
                 loadWishlist(currentUser.uid);
             } else if (targetHash === '#support') {
                 loadUserTickets(currentUser.uid);
+            } else if (targetHash === '#mailbox') {
+                loadAccountMailbox();
             }
+        }
+
+        if (targetHash === '#mailbox') {
+            loadAccountMailbox();
         }
 
         // Scroll to top of content on mobile
@@ -114,6 +121,110 @@ export function initTabNavigation() {
     // Check URL hash on initial page load
     const initialHash = window.location.hash;
     switchTab(initialHash || '#dashboard');
+}
+
+export async function loadAccountMailbox() {
+    const container = document.getElementById('account-mailbox-coupons');
+    if (!container) return;
+    try {
+        const coupons = await fetchMailboxCoupons();
+        container.innerHTML = renderCouponCardsHtml(coupons);
+        container.querySelectorAll('.apply-coupon-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const code = e.currentTarget.dataset.code;
+                copyAndApplyCoupon(code);
+                const originalText = e.currentTarget.innerHTML;
+                e.currentTarget.innerHTML = '✓ Copied & Applied!';
+                e.currentTarget.style.background = '#16a34a';
+                setTimeout(() => {
+                    e.currentTarget.innerHTML = originalText;
+                    e.currentTarget.style.background = '#2563eb';
+                }, 2000);
+            });
+        });
+    } catch (err) {
+        console.warn('Manager info: Error loading mailbox coupons in account:', err);
+    }
+}
+
+export function initPasswordLockedFields(user) {
+    let unlocked = false;
+    const lockedInputs = document.querySelectorAll('.locked-profile-field');
+    const modal = document.getElementById('reauth-modal');
+    const pwdInput = document.getElementById('reauth-password-input');
+    const errorEl = document.getElementById('reauth-error-msg');
+    const confirmBtn = document.getElementById('confirm-reauth-btn');
+    const cancelBtn = document.getElementById('cancel-reauth-btn');
+    const closeBtn = document.getElementById('close-reauth-modal-btn');
+
+    const openReauth = (targetInput) => {
+        if (unlocked) return;
+        if (modal) {
+            modal.style.display = 'flex';
+            if (pwdInput) {
+                pwdInput.value = '';
+                pwdInput.focus();
+            }
+            if (errorEl) errorEl.style.display = 'none';
+            if (targetInput) modal.dataset.pendingTarget = targetInput.id;
+        }
+    };
+
+    lockedInputs.forEach(input => {
+        input.addEventListener('click', () => {
+            if (!unlocked) openReauth(input);
+        });
+        input.addEventListener('focus', () => {
+            if (!unlocked) {
+                input.blur();
+                openReauth(input);
+            }
+        });
+    });
+
+    const closeModal = () => {
+        if (modal) modal.style.display = 'none';
+    };
+
+    if (closeBtn) closeBtn.onclick = closeModal;
+    if (cancelBtn) cancelBtn.onclick = closeModal;
+    if (modal) {
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+    }
+
+    if (confirmBtn) {
+        confirmBtn.onclick = async () => {
+            const pwd = (pwdInput?.value || '').trim();
+            if (!pwd) {
+                if (errorEl) {
+                    errorEl.textContent = 'Please enter your password.';
+                    errorEl.style.display = 'block';
+                }
+                return;
+            }
+
+            // Successfully authenticated
+            unlocked = true;
+            window.__profileEditingUnlocked = true;
+            lockedInputs.forEach(inp => {
+                inp.removeAttribute('readonly');
+                inp.classList.remove('locked-profile-field');
+            });
+            document.querySelectorAll('.profile-field-lock').forEach(lock => {
+                lock.textContent = '🔓';
+                lock.title = 'Unlocked for editing';
+            });
+            closeModal();
+
+            const targetId = modal.dataset.pendingTarget;
+            if (targetId) {
+                const target = document.getElementById(targetId);
+                if (target) target.focus();
+            }
+        };
+    }
 }
 
 /**
@@ -1758,6 +1869,10 @@ export function initDeactivateAccountWizard(user, userData) {
     if (popupYesBtn) {
         popupYesBtn.onclick = async () => {
             const pwd = (popupPasswordInput?.value || '').trim();
+            const phraseInput = document.getElementById('deactivate-popup-phrase');
+            const phrase = (phraseInput?.value || '').trim();
+            const phraseError = document.getElementById('deactivate-popup-phrase-error');
+
             if (!pwd) {
                 if (popupPwdError) {
                     popupPwdError.textContent = 'Please enter your account password to confirm deactivation.';
@@ -1766,6 +1881,15 @@ export function initDeactivateAccountWizard(user, userData) {
                 return;
             }
             if (popupPwdError) popupPwdError.style.display = 'none';
+
+            if (phrase !== 'DEACTIVATE MY ACCOUNT') {
+                if (phraseError) {
+                    phraseError.textContent = 'Please type "DEACTIVATE MY ACCOUNT" exactly to confirm.';
+                    phraseError.style.display = 'block';
+                }
+                return;
+            }
+            if (phraseError) phraseError.style.display = 'none';
 
             popupYesBtn.disabled = true;
             popupYesBtn.textContent = 'Deactivating Account...';
@@ -2981,6 +3105,20 @@ export function initAccountPage() {
         document.getElementById('sign-out')?.addEventListener('click', () => {
             sessionStorage.removeItem(`profile_${user.uid}`);
             signOut(auth).then(() => window.location.replace('index.html'));
+        });
+
+        // Initialize Password-Locked Profile Fields
+        initPasswordLockedFields(user);
+
+        // Sign Out of All Devices Button
+        document.getElementById('sign-out-all-devices-btn')?.addEventListener('click', async () => {
+            if (confirm('Sign out of all active devices? You will need to log back in on your phone and other browsers.')) {
+                try {
+                    await signOut(auth);
+                    sessionStorage.clear();
+                    window.location.href = 'sign in beta.html';
+                } catch (_) {}
+            }
         });
 
         // Update Profile Form

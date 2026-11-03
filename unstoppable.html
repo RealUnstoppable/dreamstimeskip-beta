@@ -102,16 +102,69 @@
 <body>
     <header class="main-header"></header>
 
-    <main style="padding-top: 80px;">
-        <section class="hero" style="min-height: 50vh;">
-            <div class="hero-content">
-                <div class="orb"></div>
+    <main style="padding-top: 100px;">
+        <section class="hero" style="min-height: 55vh; margin-top: 24px; padding-top: 32px; position: relative; overflow: visible;">
+            <canvas id="orb-explosion-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;"></canvas>
+            <div class="hero-content" style="position: relative; z-index: 6;">
+                <div class="orb" id="unstoppable-orb" title="Drag and pull past the limit to trigger Particle Explosion!"></div>
+                <div class="orb-hint" style="font-size: 0.78rem; color: #a1a1aa; margin: 8px 0 16px 0; letter-spacing: 0.3px;">Pull the blob to high tension to trigger Particle Explosion 💥</div>
                 <h1 class="reveal">Unstoppable</h1>
                 <p class="section-subtitle reveal">High-tier gameplay, deep dives, competitive strategy, and community-driven gaming culture.</p>
                 <div style="margin-top: 24px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <a href="store.html" class="cta-button" style="background: linear-gradient(135deg, #10B981, #059669); color: #fff; font-weight: 700; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);" id="unstoppable-support-btn">⭐ Support Us</a>
                     <a href="https://www.youtube.com/@Unstoppab1e?sub_confirmation=1" class="cta-button" style="background: #FF0000; color: #fff;" target="_blank" rel="noopener">Subscribe on YouTube</a>
                     <a href="the-philosophy-behind-unstoppable-more-than-a-brand.html" class="cta-button" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);">Read Brand Philosophy</a>
                     <a href="https://discord.gg/6zdH5De3ab" class="cta-button" style="background: #5865F2; color: #fff;" target="_blank" rel="noopener">Join Discord Community</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Premium Videos Section (Support to Unlock) -->
+        <section class="premium-videos-section" id="premium-videos-section" style="padding: 40px 20px 20px; max-width: 1200px; margin: 20px auto; text-align: center;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <span style="font-size: 1.5rem;">🔒</span>
+                <h2 style="font-size: 2rem; color: var(--text-primary); margin: 0;">Premium Videos</h2>
+                <span style="background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Support to Unlock</span>
+            </div>
+            <p style="color: var(--text-secondary); max-width: 650px; margin: 0 auto 30px;">Exclusive behind-the-scenes editing masterclasses, raw uncut tournament VODs, and deep architectural analyses reserved for Unstoppable supporters.</p>
+
+            <div class="video-grid">
+                <!-- Premium Video 1 -->
+                <div class="video-card premium-video-card" style="position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(245, 158, 11, 0.3);">
+                    <div class="premium-badge-overlay" style="position: absolute; top: 14px; right: 14px; z-index: 5; background: rgba(0,0,0,0.85); border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                        🔒 Supporters Only
+                    </div>
+                    <div class="video-thumbnail-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 8px; overflow: hidden; background: #18181b;">
+                        <img src="/images/gallery-3.jpg" alt="Uncut Championship VOD" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.55);" loading="lazy">
+                        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 2;">
+                            <span style="font-size: 2.4rem;">🔒</span>
+                            <span style="color: #fff; font-weight: 600; font-size: 0.92rem; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Support on Store to Unlock</span>
+                        </div>
+                    </div>
+                    <h3>SMP S4 Megastructure Masterclass (Uncut)</h3>
+                    <p>4 hours of live technical audio engineering, chunk-loading layout designs, and zero-tick mechanics.</p>
+                    <div style="margin-top: 14px;">
+                        <a href="store.html" class="cta-button" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; font-size: 0.85rem; padding: 8px 18px; border-radius: 8px; display: inline-block;">Support to Unlock</a>
+                    </div>
+                </div>
+
+                <!-- Premium Video 2 -->
+                <div class="video-card premium-video-card" style="position: relative; overflow: hidden; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(245, 158, 11, 0.3);">
+                    <div class="premium-badge-overlay" style="position: absolute; top: 14px; right: 14px; z-index: 5; background: rgba(0,0,0,0.85); border: 1px solid #f59e0b; color: #f59e0b; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px;">
+                        🔒 Supporters Only
+                    </div>
+                    <div class="video-thumbnail-wrapper" style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: 8px; overflow: hidden; background: #18181b;">
+                        <img src="/images/gallery-2.jpg" alt="DAW Stem Breakdown" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.55);" loading="lazy">
+                        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; z-index: 2;">
+                            <span style="font-size: 2.4rem;">🔒</span>
+                            <span style="color: #fff; font-weight: 600; font-size: 0.92rem; text-shadow: 0 2px 8px rgba(0,0,0,0.8);">Support on Store to Unlock</span>
+                        </div>
+                    </div>
+                    <h3>Medixly Audio Engine: High-Tension DSP Stems</h3>
+                    <p>In-depth breakdown of multi-track transient detection, Web Audio crossfade DSP, and frequency curves.</p>
+                    <div style="margin-top: 14px;">
+                        <a href="store.html" class="cta-button" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; font-size: 0.85rem; padding: 8px 18px; border-radius: 8px; display: inline-block;">Support to Unlock</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -175,5 +228,13 @@
         if (typeof loadFooter === 'function') loadFooter();
     </script>
     <script src="/js/script.js"></script>
+    <script src="/js/unstoppable-blob.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.UnstoppableBlobPhysics) {
+                window.UnstoppableBlobPhysics.initUnstoppableBlob('unstoppable-orb', 'orb-explosion-canvas');
+            }
+        });
+    </script>
 </body>
 </html>

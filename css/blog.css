@@ -76,6 +76,7 @@
     font-weight: 500;
 }
 
+.blog-post-content h2,
 .blog-post-content h3 {
     font-size: 1.5rem;
     font-weight: 600;

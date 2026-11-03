@@ -7,8 +7,26 @@ import './sitewide-player.js?v=20260924';
 import './ads.js';
 import './chatbot.js?v=20260925';
 import { initCookieConsent } from './cookie-consent.js';
+import { openUserMailboxModal } from './mailbox.js';
 
 let notificationUnsubscribe = null;
+
+export const getReadNotificationIds = () => {
+    try {
+        return new Set(JSON.parse(localStorage.getItem('read_notification_ids') || '[]'));
+    } catch (_) {
+        return new Set();
+    }
+};
+
+export const markNotificationAsReadLocally = (id) => {
+    if (!id) return;
+    try {
+        const set = getReadNotificationIds();
+        set.add(id);
+        localStorage.setItem('read_notification_ids', JSON.stringify(Array.from(set)));
+    } catch (_) {}
+};
 
 // Preloaded / fallback notifications shown when none from Firebase
 const PRELOADED_NOTIFICATIONS = [
@@ -62,23 +80,26 @@ export function loadNavbar() {
     if (isMedixlyPage) {
         const medixlyHeaderHTML = `
         <nav class="navbar medixly-desktop-navbar">
-            <!-- Left side: ONLY Medixly logo by Unstoppable -->
+            <!-- Left side: Medixly logo BY un + Expandable Ecosystem Arrow -->
             <div class="medixly-nav-left">
-                <a href="medixly.html" id="navbar-logo-link" class="medixly-brand-lockup" aria-label="Medixly by Unstoppable">
+                <a href="https://realunstoppable.store/medixly.html" id="navbar-logo-link" class="medixly-brand-lockup" aria-label="Medixly BY un">
                     <img src="/images/medixly-logo.png" alt="Medixly" style="height: 81px; margin-top: 2px;" id="medixly-navbar-logo">
                     <div class="medixly-brand-text">
                         <span class="medixly-brand-title">Medixly</span>
-                        <span class="medixly-brand-subtitle">by Unstoppable</span>
+                        <span class="medixly-brand-subtitle">BY un</span>
                     </div>
                 </a>
+                <button type="button" id="medixly-ecosystem-toggle" class="medixly-ecosystem-arrow-btn" aria-label="Toggle Ecosystem Navigation" aria-expanded="false" title="Explore Unstoppable Ecosystem">
+                    <span class="ecosystem-arrow-icon">&gt;</span>
+                </button>
             </div>
 
-            <!-- Right side: Sign In, Notifications, Memberships, Settings -->
+            <!-- Right side: Upgrade, Notifications, Settings, Sign In -->
             <div class="medixly-nav-right">
-                <!-- Memberships Button -->
-                <a href="memberships.html" id="nav-memberships-btn" class="medixly-header-btn" title="Memberships">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
-                    <span>Memberships</span>
+                <!-- Upgrade Button ($0.99 Today) -->
+                <a href="https://realunstoppable.store/medixly-pricing.html" id="nav-upgrade-btn" data-id="nav-memberships-btn" class="medixly-header-btn medixly-upgrade-btn" title="Upgrade ($0.99 Today)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>Upgrade ($0.99 Today)</span>
                 </a>
 
                 <!-- Notifications -->
@@ -97,6 +118,11 @@ export function loadNavbar() {
                             <button class="notif-mark-all-read" id="notif-mark-all-read">Mark all as read</button>
                         </div>
                         <div class="notification-list" id="notification-list"></div>
+                        <div class="notification-dropdown-footer" style="padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; background: rgba(0,0,0,0.25);">
+                            <button type="button" class="open-mailbox-btn" style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                                📬 Open Mailbox
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -115,7 +141,19 @@ export function loadNavbar() {
                     <span id="auth-link-text">Sign In</span>
                 </a>
             </div>
-        </nav>`;
+        </nav>
+        <!-- Collapsible Ecosystem Drawer (Underneath Primary Header) -->
+        <div id="medixly-ecosystem-drawer" class="medixly-ecosystem-drawer" aria-hidden="true">
+            <div class="medixly-ecosystem-track">
+                <a href="https://realunstoppable.store/index.html" class="medixly-eco-link"><span>Home</span></a>
+                <a href="https://realunstoppable.store/unstoppable.html" class="medixly-eco-link"><span>Unstoppable</span></a>
+                <a href="https://realunstoppable.store/dts.html" class="medixly-eco-link"><span>Dreams TimeSkip</span></a>
+                <a href="https://realunstoppable.store/store.html" class="medixly-eco-link"><span>Shop</span></a>
+                <a href="https://realunstoppable.store/cart.html" class="medixly-eco-link"><span>Cart</span></a>
+                <a href="https://realunstoppable.store/blog.html" class="medixly-eco-link"><span>Blog</span></a>
+                <a href="https://autolux.realunstoppable.store/" class="medixly-eco-link" target="_blank" rel="noopener"><span>Autolux</span></a>
+            </div>
+        </div>`;
 
         const header = document.querySelector('.main-header');
         if (header) {
@@ -124,6 +162,7 @@ export function loadNavbar() {
             attachNotificationEvents();
             updateAuthLink();
             initSettingsModal();
+            initMedixlyEcosystemDrawer();
         }
         initCookieConsent();
         return;
@@ -166,13 +205,12 @@ export function loadNavbar() {
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="store.html">Shop</a></li>
             <li>
-                <a href="cart.html" id="nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
-                    <span>Cart</span>
+                <a href="cart.html" id="nav-cart-btn" class="nav-cart-btn" aria-label="Shopping Cart" title="View Cart">
+                    <span class="nav-cart-icon" style="font-size: 1.15rem; line-height: 1;">🛒</span>
                     <span id="nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
                 </a>
             </li>
             ${dtsStoreNavItem}
-            <li><a href="memberships.html">Memberships</a></li>
             <li><a href="blog.html">Blog</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
             <li class="nav-notification-item">
@@ -193,6 +231,11 @@ export function loadNavbar() {
                             <button class="notif-mark-all-read" id="notif-mark-all-read">Mark all as read</button>
                         </div>
                         <div class="notification-list" id="notification-list"></div>
+                        <div class="notification-dropdown-footer" style="padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; background: rgba(0,0,0,0.25);">
+                            <button type="button" class="open-mailbox-btn" style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                                📬 Open Mailbox
+                            </button>
+                        </div>
                     </div>
                 </div>
             </li>
@@ -224,8 +267,8 @@ export function loadUdsNavbar() {
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="store.html">Shop</a></li>
             <li>
-                <a href="cart.html" id="uds-nav-cart-btn" class="nav-cart-btn" aria-label="Cart">
-                    <span>Cart</span>
+                <a href="cart.html" id="uds-nav-cart-btn" class="nav-cart-btn" aria-label="Shopping Cart" title="View Cart">
+                    <span class="nav-cart-icon" style="font-size: 1.15rem; line-height: 1;">🛒</span>
                     <span id="uds-nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
                 </a>
             </li>
@@ -254,6 +297,11 @@ export function loadUdsNavbar() {
                             <button class="notif-mark-all-read" id="notif-mark-all-read">Mark all as read</button>
                         </div>
                         <div class="notification-list" id="notification-list"></div>
+                        <div class="notification-dropdown-footer" style="padding: 10px 14px; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; background: rgba(0,0,0,0.25);">
+                            <button type="button" class="open-mailbox-btn" style="width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+                                📬 Open Mailbox
+                            </button>
+                        </div>
                     </div>
                 </div>
             </li>
@@ -455,7 +503,7 @@ function attachNavEvents() {
             });
         }
 
-        const allNavLinks = document.querySelectorAll('.nav-links a, .nav-logo, .medixly-header-btn');
+        const allNavLinks = document.querySelectorAll('.nav-links a, .nav-logo, .medixly-header-btn, .medixly-eco-link');
         allNavLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 if (!isDesktopAppEnvironment()) return;
@@ -463,7 +511,7 @@ function attachNavEvents() {
                 const href = (link.getAttribute('href') || '').trim();
                 const isMedixlyTarget = href === 'medixly.html' || href === '/medixly.html' || href === '/medixly' || href.startsWith('medixly');
                 const isAuthTarget = link.id === 'auth-link' || href.includes('sign in beta') || href.includes('account.html') || href.includes('admin.html');
-                const isMembershipsTarget = link.id === 'nav-memberships-btn' || href.includes('memberships');
+                const isMembershipsTarget = link.id === 'nav-memberships-btn' || link.id === 'nav-upgrade-btn' || href.includes('memberships') || href.includes('medixly-pricing');
 
                 if (isMedixlyTarget) {
                     e.preventDefault();
@@ -507,6 +555,40 @@ function attachNavEvents() {
     }
 }
 
+export function initMedixlyEcosystemDrawer() {
+    const toggleBtn = document.getElementById('medixly-ecosystem-toggle');
+    const drawer = document.getElementById('medixly-ecosystem-drawer');
+    if (!toggleBtn || !drawer) return;
+
+    function toggleDrawer(forceState) {
+        const isOpen = typeof forceState === 'boolean' ? forceState : !drawer.classList.contains('is-open');
+        drawer.classList.toggle('is-open', isOpen);
+        drawer.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        toggleBtn.classList.toggle('active', isOpen);
+        toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    toggleBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleDrawer();
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!drawer.classList.contains('is-open')) return;
+        if (!drawer.contains(e.target) && !toggleBtn.contains(e.target)) {
+            toggleDrawer(false);
+        }
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+            toggleDrawer(false);
+            toggleBtn.focus();
+        }
+    });
+}
+
 function attachNotificationEvents() {
     const bellBtn = document.getElementById('notification-bell-btn');
     const mobileBtn = document.getElementById('notification-mobile-btn');
@@ -543,21 +625,52 @@ function attachNotificationEvents() {
     if (markAllBtn) {
         markAllBtn.addEventListener('click', async (e) => {
             e.stopPropagation();
-            const items = document.querySelectorAll('.notification-item.unread');
+            const list = document.getElementById('notification-list');
+            if (!list) return;
+            const items = list.querySelectorAll('.notification-item:not(.empty-notifs)');
             items.forEach(item => {
-                item.classList.remove('unread');
                 const id = item.getAttribute('data-id');
-                if (id && !id.startsWith('pre-')) {
-                    try { markAsRead(id); } catch (_) { /* ignore read error */ }
+                if (id) {
+                    markNotificationAsReadLocally(id);
+                    if (!id.startsWith('pre-')) {
+                        try { markAsRead(id); } catch (_) { /* ignore read error */ }
+                    }
                 }
             });
+            list.innerHTML = `
+                <div class="notification-item empty-notifs" style="text-align: center; padding: 24px 16px; color: var(--text-secondary); cursor: default;">
+                    <div style="font-size: 1.5rem; margin-bottom: 6px;">✨</div>
+                    <div style="font-weight: 600; color: #fff; margin-bottom: 2px;">No new notifications</div>
+                    <small>You're all caught up!</small>
+                </div>
+            `;
             updateNotificationBadge(0);
         });
     }
 
+    // Open Mailbox button listener
+    document.querySelectorAll('.open-mailbox-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.remove('notif-open');
+            const cleanPath = (typeof window !== 'undefined' ? (window.location.pathname || '') : '').toLowerCase();
+            if (cleanPath.includes('account')) {
+                const mailboxNav = document.querySelector('a[href="#mailbox"]');
+                if (mailboxNav) {
+                    mailboxNav.click();
+                    return;
+                }
+            }
+            if (typeof openUserMailboxModal === 'function') {
+                openUserMailboxModal();
+            }
+        });
+    });
+
     // Load preloaded notifications immediately
     renderNotifications(PRELOADED_NOTIFICATIONS);
-    updateNotificationBadge(PRELOADED_NOTIFICATIONS.length);
+    const initialUnread = (PRELOADED_NOTIFICATIONS || []).filter(n => !getReadNotificationIds().has(n.id)).length;
+    updateNotificationBadge(initialUnread);
 }
 
 function updateNotificationBadge(unreadCount) {
@@ -578,55 +691,82 @@ function updateNotificationBadge(unreadCount) {
     });
 }
 
-function renderNotifications(notifications) {
+export function renderNotifications(notifications) {
     const list = document.getElementById('notification-list');
     if (!list) return;
 
-    if (notifications.length === 0) {
-        list.innerHTML = '<div class="notification-item"><small>You\'re all caught up! 🎉</small></div>';
+    const readIds = getReadNotificationIds();
+    const activeNotifications = (notifications || []).filter(n => !n.isRead && !readIds.has(n.id));
+
+    if (activeNotifications.length === 0) {
+        list.innerHTML = `
+            <div class="notification-item empty-notifs" style="text-align: center; padding: 24px 16px; color: var(--text-secondary); cursor: default;">
+                <div style="font-size: 1.5rem; margin-bottom: 6px;">✨</div>
+                <div style="font-weight: 600; color: #fff; margin-bottom: 2px;">No new notifications</div>
+                <small>You're all caught up!</small>
+            </div>
+        `;
+        updateNotificationBadge(0);
         return;
     }
 
-    list.innerHTML = notifications.map(n => {
+    list.innerHTML = activeNotifications.map(n => {
         let icon = BELL_SVG;
         if (n.type === 'reward') icon = '🎁';
         if (n.type === 'ticket_reply') icon = '💬';
 
         return `
-        <div class="notification-item ${n.isRead ? '' : 'unread'}" data-id="${escapeHTML(n.id)}" data-link="${escapeHTML(n.link || '')}">
+        <div class="notification-item unread" data-id="${escapeHTML(n.id)}" data-link="${escapeHTML(n.link || '')}">
             <div class="notif-icon" style="font-size: 1.2rem; margin-right: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">${icon}</div>
             <div class="notif-content">
                 <p class="notif-title">${escapeHTML(n.title)}</p>
                 <small class="notif-msg">${escapeHTML(n.message)}</small>
             </div>
-            ${!n.isRead ? '<span class="notif-dot"></span>' : ''}
+            <span class="notif-dot"></span>
         </div>
         `;
     }).join('');
 
     list.querySelectorAll('.notification-item').forEach(item => {
         item.addEventListener('click', async (e) => {
-            const id = e.currentTarget.getAttribute('data-id');
-            const link = e.currentTarget.getAttribute('data-link');
-            e.currentTarget.classList.remove('unread');
-            // Remove the blue dot
-            const dot = e.currentTarget.querySelector('.notif-dot');
-            if (dot) dot.remove();
-
-            if (id && !id.startsWith('pre-') && !e.currentTarget.classList.contains('read-processed')) {
-                e.currentTarget.classList.add('read-processed');
+            const currentItem = e.currentTarget;
+            const id = currentItem.getAttribute('data-id');
+            const link = currentItem.getAttribute('data-link');
+            
+            markNotificationAsReadLocally(id);
+            if (id && !id.startsWith('pre-') && !currentItem.classList.contains('read-processed')) {
+                currentItem.classList.add('read-processed');
                 try { await markAsRead(id); } catch (_) { /* ignore read error */ }
             }
 
-            // Recount badge
-            const unread = document.querySelectorAll('.notification-item.unread').length;
-            updateNotificationBadge(unread);
+            // Immediately animate & remove from active dropdown
+            currentItem.style.transition = 'all 0.2s ease';
+            currentItem.style.opacity = '0';
+            currentItem.style.transform = 'translateX(20px)';
+            setTimeout(() => {
+                currentItem.remove();
+                const remaining = list.querySelectorAll('.notification-item:not(.empty-notifs)').length;
+                updateNotificationBadge(remaining);
+                if (remaining === 0) {
+                    list.innerHTML = `
+                        <div class="notification-item empty-notifs" style="text-align: center; padding: 24px 16px; color: var(--text-secondary); cursor: default;">
+                            <div style="font-size: 1.5rem; margin-bottom: 6px;">✨</div>
+                            <div style="font-weight: 600; color: #fff; margin-bottom: 2px;">No new notifications</div>
+                            <small>You're all caught up!</small>
+                        </div>
+                    `;
+                }
+            }, 200);
 
             if (link && link !== 'undefined' && link !== 'null' && link !== '') {
-                window.location.href = link;
+                setTimeout(() => {
+                    window.location.href = link;
+                }, 250);
             }
         });
     });
+
+    updateNotificationBadge(activeNotifications.length);
 }
 
 function updateAuthLink() {
@@ -697,6 +837,25 @@ export function openMedixlySettingsModal() {
     modal.classList.remove('hidden');
     modal.setAttribute('aria-hidden', 'false');
     syncSettingsModalWithEngine();
+
+    // Trigger EQ graph resize & render when modal is displayed
+    if (typeof window !== 'undefined' && window.MedixlyEQGraph) {
+        try {
+            const inst = window.MedixlyEQGraph.getInstance('medixly-eq-canvas');
+            if (inst) {
+                inst.resizeCanvas();
+                const b = parseFloat(document.getElementById('eq-slider-bass')?.value || 0);
+                const m = parseFloat(document.getElementById('eq-slider-mid')?.value || 0);
+                const t = parseFloat(document.getElementById('eq-slider-treble')?.value || 0);
+                inst.setValues(b, m, t);
+            }
+        } catch (_) {}
+    }
+
+    // Refresh history list in modal
+    if (typeof window.renderSettingsHistory === 'function') {
+        window.renderSettingsHistory();
+    }
 }
 
 /**
@@ -716,6 +875,7 @@ export function closeMedixlySettingsModal() {
 export function syncSettingsModalWithEngine() {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
     const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+    let b = 0, m = 0, t = 0;
     if (mixEngine) {
         const profile = typeof mixEngine.getSoundProfile === 'function' ? mixEngine.getSoundProfile() : null;
         if (profile) {
@@ -724,21 +884,21 @@ export function syncSettingsModalWithEngine() {
                 btn.classList.toggle('active', btn.dataset.preset === activeKey);
             });
             const eq = profile.preset || {};
-            const bass = typeof eq.bass === 'number' ? eq.bass : 0;
-            const mid = typeof eq.mid === 'number' ? eq.mid : 0;
-            const treble = typeof eq.treble === 'number' ? eq.treble : 0;
+            b = typeof eq.bass === 'number' ? eq.bass : 0;
+            m = typeof eq.mid === 'number' ? eq.mid : 0;
+            t = typeof eq.treble === 'number' ? eq.treble : 0;
             const bassInput = document.getElementById('eq-slider-bass');
             const midInput = document.getElementById('eq-slider-mid');
             const trebleInput = document.getElementById('eq-slider-treble');
-            if (bassInput) bassInput.value = bass;
-            if (midInput) midInput.value = mid;
-            if (trebleInput) trebleInput.value = treble;
+            if (bassInput) bassInput.value = b;
+            if (midInput) midInput.value = m;
+            if (trebleInput) trebleInput.value = t;
             const bassVal = document.getElementById('eq-val-bass');
             const midVal = document.getElementById('eq-val-mid');
             const trebleVal = document.getElementById('eq-val-treble');
-            if (bassVal) bassVal.textContent = (bass > 0 ? '+' : '') + bass + ' dB';
-            if (midVal) midVal.textContent = (mid > 0 ? '+' : '') + mid + ' dB';
-            if (trebleVal) trebleVal.textContent = (treble > 0 ? '+' : '') + treble + ' dB';
+            if (bassVal) bassVal.textContent = (b > 0 ? '+' : '') + b + ' dB';
+            if (midVal) midVal.textContent = (m > 0 ? '+' : '') + m + ' dB';
+            if (trebleVal) trebleVal.textContent = (t > 0 ? '+' : '') + t + ' dB';
         }
 
         const currentCrossfade = mixEngine.defaultCrossfadeDuration || 5;
@@ -747,6 +907,79 @@ export function syncSettingsModalWithEngine() {
             pill.classList.toggle('active', dur === currentCrossfade);
         });
     }
+
+    if (typeof window !== 'undefined' && window.MedixlyEQGraph) {
+        try {
+            const inst = window.MedixlyEQGraph.getInstance('medixly-eq-canvas');
+            if (inst) inst.setValues(b, m, t);
+        } catch (_) {}
+    }
+}
+
+/**
+ * Check if the active user holds a Premium / Ultra subscription
+ */
+function isUserPremiumSubscribed() {
+    if (typeof window === 'undefined') return false;
+    if (window.audioAdManager && typeof window.audioAdManager.isUserPremium === 'function') {
+        if (window.audioAdManager.isUserPremium()) return true;
+    }
+    if (window.__isUserPremium === true) return true;
+    if (window.currentUserDocData) {
+        const tier = (window.currentUserDocData.membershipTier || '').toLowerCase();
+        if (tier === 'premium' || tier === 'ultra' || window.currentUserDocData.isPremium) return true;
+    }
+    try {
+        const cached = localStorage.getItem('medixly_is_premium');
+        if (cached === 'true') return true;
+    } catch (_) {}
+    return false;
+}
+
+/**
+ * Show a sleek modal / toast informing free users that Accent Theme Colors require Premium
+ */
+function promptPremiumUpgrade(featureName = 'Accent Theme Colors') {
+    if (typeof document === 'undefined') return;
+    const existing = document.getElementById('medixly-upgrade-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.id = 'medixly-upgrade-toast';
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(18, 18, 24, 0.96);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+        border-radius: 12px;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 10000;
+        animation: toastFadeIn 0.25s ease-out;
+        color: #fff;
+        max-width: 90vw;
+    `;
+
+    toast.innerHTML = `
+        <span style="font-size: 1.4rem;">🔒</span>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <strong style="font-size: 0.88rem; color: #fbbf24;">Medixly Premium Exclusive</strong>
+            <span style="font-size: 0.8rem; color: #cbd5e1;">${featureName} are reserved for Premium subscribers.</span>
+        </div>
+        <a href="medixly-pricing.html" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 700; font-size: 0.82rem; padding: 6px 14px; border-radius: 999px; text-decoration: none; white-space: nowrap;">Upgrade ($0.99)</a>
+        <button type="button" style="background: transparent; border: none; color: #9ca3af; font-size: 1.2rem; cursor: pointer; padding: 0 4px;" aria-label="Dismiss">&times;</button>
+    `;
+
+    toast.querySelector('button')?.addEventListener('click', () => toast.remove());
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+    }, 6000);
 }
 
 /**
@@ -763,6 +996,20 @@ export function initSettingsModal() {
             e.preventDefault();
             e.stopPropagation();
             openMedixlySettingsModal();
+        });
+    }
+
+    // Jump Back In "History" see-all link on main page
+    const homeHistBtn = document.getElementById('home-history-btn');
+    if (homeHistBtn && !homeHistBtn.dataset.bound) {
+        homeHistBtn.dataset.bound = 'true';
+        homeHistBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openMedixlySettingsModal();
+            setTimeout(() => {
+                const histSec = document.getElementById('medixly-history-section');
+                if (histSec) histSec.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
         });
     }
 
@@ -787,6 +1034,39 @@ export function initSettingsModal() {
                 closeMedixlySettingsModal();
             }
         });
+    }
+
+    // Initialize Apple Settings-style 2D Visual Frequency Curve Graph
+    let eqGraph = null;
+    if (typeof window !== 'undefined' && window.MedixlyEQGraph) {
+        try {
+            eqGraph = window.MedixlyEQGraph.init('medixly-eq-canvas', (values) => {
+                const b = values.bass;
+                const m = values.mid;
+                const t = values.treble;
+                const bIn = document.getElementById('eq-slider-bass');
+                const mIn = document.getElementById('eq-slider-mid');
+                const tIn = document.getElementById('eq-slider-treble');
+                if (bIn) bIn.value = b;
+                if (mIn) mIn.value = m;
+                if (tIn) tIn.value = t;
+                const bVal = document.getElementById('eq-val-bass');
+                const mVal = document.getElementById('eq-val-mid');
+                const tVal = document.getElementById('eq-val-treble');
+                if (bVal) bVal.textContent = (b > 0 ? '+' : '') + b + ' dB';
+                if (mVal) mVal.textContent = (m > 0 ? '+' : '') + m + ' dB';
+                if (tVal) tVal.textContent = (t > 0 ? '+' : '') + t + ' dB';
+
+                document.querySelectorAll('#medixly-eq-presets .medixly-preset-btn').forEach(btn => btn.classList.remove('active'));
+
+                const mixEngine = typeof window.__getMixEngine === 'function' ? window.__getMixEngine() : null;
+                if (mixEngine && typeof mixEngine.setGlobalEQ === 'function') {
+                    mixEngine.setGlobalEQ({ bass: b, mid: m, treble: t });
+                } else if (mixEngine && typeof mixEngine.setEQ === 'function') {
+                    mixEngine.setEQ(b, m, t);
+                }
+            });
+        } catch (_) {}
     }
 
     // EQ Preset buttons
@@ -817,6 +1097,8 @@ export function initSettingsModal() {
                         if (bVal) bVal.textContent = (bass > 0 ? '+' : '') + bass + ' dB';
                         if (mVal) mVal.textContent = (mid > 0 ? '+' : '') + mid + ' dB';
                         if (tVal) tVal.textContent = (treble > 0 ? '+' : '') + treble + ' dB';
+
+                        if (eqGraph) eqGraph.setValues(bass, mid, treble);
                     }
                 }
             });
@@ -847,6 +1129,8 @@ export function initSettingsModal() {
                 } else if (mixEngine && typeof mixEngine.setEQ === 'function') {
                     mixEngine.setEQ(b, m, t);
                 }
+
+                if (eqGraph) eqGraph.setValues(b, m, t);
             });
         }
     });
@@ -872,19 +1156,61 @@ export function initSettingsModal() {
         }
     });
 
-    // Theme Picker Dots inside Settings
-    const themeDots = document.querySelectorAll('#medixly-settings-theme-colors .theme-dot');
+    // Theme Picker Dots inside Settings (Locked to Premium / Ultra)
+    const themeDots = document.querySelectorAll('#medixly-settings-theme-colors .theme-dot, #medixly-theme-colors .theme-dot');
     themeDots.forEach(dot => {
         if (!dot.dataset.bound) {
             dot.dataset.bound = 'true';
-            dot.addEventListener('click', () => {
+            dot.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (!isUserPremiumSubscribed()) {
+                    promptPremiumUpgrade('Custom Accent Theme Colors');
+                    return;
+                }
+
                 const color = dot.dataset.color;
                 if (window.MedixlyThemeProvider && typeof window.MedixlyThemeProvider.setAccentPreset === 'function') {
                     window.MedixlyThemeProvider.setAccentPreset(color);
+                } else if (typeof window.updateTheme === 'function') {
+                    window.updateTheme(document.documentElement.dataset.theme || 'black', color);
                 }
+                themeDots.forEach(d => d.classList.toggle('selected', d === dot));
             });
         }
     });
+
+    // History controls inside Settings Modal
+    const historySearch = document.getElementById('settings-history-search');
+    if (historySearch && !historySearch.dataset.bound) {
+        historySearch.dataset.bound = 'true';
+        historySearch.addEventListener('input', (e) => {
+            if (typeof window.renderSettingsHistory === 'function') {
+                window.renderSettingsHistory(e.target.value.trim());
+            }
+        });
+    }
+
+    const deleteHourBtn = document.getElementById('history-delete-hour-btn');
+    if (deleteHourBtn && !deleteHourBtn.dataset.bound) {
+        deleteHourBtn.dataset.bound = 'true';
+        deleteHourBtn.addEventListener('click', () => {
+            if (typeof window.deleteHistoryLastHour === 'function') {
+                window.deleteHistoryLastHour();
+            }
+        });
+    }
+
+    const clearAllHistBtn = document.getElementById('history-clear-all-btn');
+    if (clearAllHistBtn && !clearAllHistBtn.dataset.bound) {
+        clearAllHistBtn.dataset.bound = 'true';
+        clearAllHistBtn.addEventListener('click', () => {
+            if (typeof window.clearAllListeningHistory === 'function') {
+                window.clearAllListeningHistory();
+            }
+        });
+    }
 }
 
 if (typeof window !== 'undefined') {

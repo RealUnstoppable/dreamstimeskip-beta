@@ -122,6 +122,26 @@ app.use(async (req, res, next) => {
     reqPath = '/medixly-editors.html';
   }
 
+  // Medixly Desktop Native App Download Routes
+  if (reqPath === '/download/mac' || reqPath === '/download/macos') {
+    const dmgPath = path.join(__dirname, 'dist-desktop', 'Medixly-1.1.0-arm64.dmg');
+    res.download(dmgPath, 'Medixly-1.1.0-arm64.dmg', (err) => {
+      if (err && !res.headersSent) {
+        res.redirect('/dist-desktop/Medixly-1.1.0-arm64.dmg');
+      }
+    });
+    return;
+  }
+  if (reqPath === '/download/windows' || reqPath === '/download/win') {
+    const exePath = path.join(__dirname, 'dist-desktop', 'Medixly-Setup.exe');
+    res.download(exePath, 'Medixly-Setup.exe', (err) => {
+      if (err && !res.headersSent) {
+        res.redirect('/dist-desktop/Medixly-1.1.0-arm64.dmg');
+      }
+    });
+    return;
+  }
+
   // Internal Ad Screen-Recording Preview Scene routes
   if (reqPath === '/ad-preview' || reqPath === '/ad-preview/') {
     reqPath = '/ad-preview.html';

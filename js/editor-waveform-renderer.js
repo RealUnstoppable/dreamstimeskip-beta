@@ -30,6 +30,11 @@ export class WaveformTimelineRenderer {
         this.selectedMarkerId = null;
         this.hoveredMarkerId = null;
 
+        // Pro DAW Viral Section & In/Out Range Handles
+        this.viralSection = null;    // { start: number, end: number, label?: string }
+        this.inPoint = null;         // In-point in seconds
+        this.outPoint = null;        // Out-point in seconds
+
         // Visual styling (Pro Dark Theme)
         this.colors = {
             bg: '#121318',
@@ -50,7 +55,12 @@ export class WaveformTimelineRenderer {
             markerText: '#f3f4f6',
             markerActiveBg: '#7852ff',
             markerHookBg: '#ec4899',
-            selectionBg: 'rgba(120, 82, 255, 0.15)'
+            selectionBg: 'rgba(120, 82, 255, 0.15)',
+            viralHighlight: 'rgba(168, 85, 247, 0.35)',
+            viralBorder: 'rgba(168, 85, 247, 0.9)',
+            viralPillBg: '#7c3aed',
+            inOutLine: '#00d4aa',
+            dimmedOverlay: 'rgba(0, 0, 0, 0.48)'
         };
 
         // Layout measurements
@@ -102,8 +112,9 @@ export class WaveformTimelineRenderer {
      * Builds multi-resolution peak mipmaps from raw AudioBuffer or PCM data.
      * Computes 3 pyramid levels (fast overview, medium, sample detail).
      * @param {AudioBuffer|Float32Array} audioData
+     * @param {object} [precomputedPeaks] - Optional peaks computed off-thread
      */
-    setAudioData(audioData) {
+    setAudioData(audioData, precomputedPeaks = null) {
         if (!audioData) return;
         let pcm;
         let sampleRate = 44100;
@@ -124,6 +135,12 @@ export class WaveformTimelineRenderer {
         } else if (audioData instanceof Float32Array) {
             pcm = audioData;
             this.duration = pcm.length / sampleRate;
+        }
+
+        if (precomputedPeaks) {
+            this.peaksMipmap = precomputedPeaks;
+            this.fitToScreen();
+            return;
         }
 
         // Build 3 peak resolution levels
@@ -246,6 +263,23 @@ export class WaveformTimelineRenderer {
         this.render();
     }
 
+    setViralSection(section) {
+        this.viralSection = section || null;
+        this.render();
+    }
+
+    setInOutPoints(inPoint, outPoint) {
+        this.inPoint = (typeof inPoint === 'number' && inPoint >= 0) ? inPoint : null;
+        this.outPoint = (typeof outPoint === 'number' && outPoint >= 0) ? outPoint : null;
+        this.render();
+    }
+
+    pan(deltaPx) {
+        if (this.duration <= 0) return;
+        this.scrollLeft = Math.max(0, this.scrollLeft + deltaPx);
+        this.render();
+    }
+
     /**
      * Main Render Loop.
      * High performance: executes in < 1ms by rendering only visible viewport window.
@@ -267,19 +301,25 @@ export class WaveformTimelineRenderer {
         // 2. Render Beat & Downbeat Grid Lines
         this._renderBeatGrid(ctx, width, startTime, endTime);
 
-        // 3. Render Audio Waveform
+        // 3. Render Glowing Purple Viral Section Hook
+        this._renderViralSection(ctx, width, height, startTime, endTime);
+
+        // 4. Render Audio Waveform
         this._renderWaveform(ctx, width, startTime, endTime);
 
-        // 4. Render Transient Spikes along waveform baseline
+        // 5. Render Transient Spikes along waveform baseline
         this._renderTransients(ctx, startTime, endTime);
 
-        // 5. Render Marker Track & Syllable Chips
+        // 6. Render Marker Track & Syllable Chips
         this._renderMarkerTrack(ctx, width, startTime, endTime);
 
-        // 6. Render Timeline Ruler
+        // 7. Render In/Out Range Handles & Shading
+        this._renderInOutRange(ctx, width, height, startTime, endTime);
+
+        // 8. Render Timeline Ruler
         this._renderRuler(ctx, width, startTime, endTime);
 
-        // 7. Render Playhead
+        // 9. Render Playhead
         this._renderPlayhead(ctx, height);
     }
 
@@ -508,6 +548,138 @@ export class WaveformTimelineRenderer {
             ctx.clip();
             ctx.fillText(m.text || '', x + 5, textY);
             ctx.restore();
+        }
+    }
+
+    _renderViralSection(ctx, width, height, startTime, endTime) {
+        if (!this.viralSection) return;
+        const { start, end } = this.viralSection;
+        if (end <= startTime || start >= endTime) return;
+
+        const xStart = Math.max(0, this.timeToX(start));
+        const xEnd = Math.min(width, this.timeToX(end));
+        const sectionWidth = Math.max(2, xEnd - xStart);
+        const topY = this.rulerHeight;
+        const sectionHeight = height - topY;
+
+        // Glowing Purple Fill
+        ctx.fillStyle = this.colors.viralHighlight;
+        ctx.fillRect(xStart, topY, sectionWidth, sectionHeight);
+
+        // Glowing Left & Right Vertical Edge Borders
+        ctx.strokeStyle = this.colors.viralBorder;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        if (this.timeToX(start) >= 0 && this.timeToX(start) <= width) {
+            ctx.moveTo(xStart + 0.5, topY);
+            ctx.lineTo(xStart + 0.5, height);
+        }
+        if (this.timeToX(end) >= 0 && this.timeToX(end) <= width) {
+            ctx.moveTo(xEnd - 0.5, topY);
+            ctx.lineTo(xEnd - 0.5, height);
+        }
+        ctx.stroke();
+
+        // "🔥 VIRAL HOOK" Pill Badge
+        const pillX = Math.max(xStart + 6, 8);
+        const pillY = topY + 4;
+        const pillHeight = 18;
+        const durationSec = Math.max(0, end - start);
+        const pillText = `🔥 VIRAL HOOK (${durationSec.toFixed(1)}s)`;
+
+        ctx.font = 'bold 10px "Inter", -apple-system, sans-serif';
+        const textMetrics = ctx.measureText(pillText);
+        const pillWidth = textMetrics.width + 14;
+
+        if (sectionWidth > 40) {
+            ctx.fillStyle = this.colors.viralPillBg;
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(pillX, pillY, pillWidth, pillHeight, 4);
+            } else {
+                ctx.rect(pillX, pillY, pillWidth, pillHeight);
+            }
+            ctx.fill();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            ctx.fillText(pillText, pillX + 7, pillY + 12.5);
+        }
+    }
+
+    _renderInOutRange(ctx, width, height, startTime, endTime) {
+        if (this.inPoint === null && this.outPoint === null) return;
+        const inSec = this.inPoint !== null ? this.inPoint : 0;
+        const outSec = this.outPoint !== null ? this.outPoint : (this.duration || 9999);
+
+        const inX = this.timeToX(inSec);
+        const outX = this.timeToX(outSec);
+
+        // Dim before In-point
+        if (inSec > startTime) {
+            const dimW = Math.max(0, Math.min(width, inX));
+            ctx.fillStyle = this.colors.dimmedOverlay;
+            ctx.fillRect(0, this.rulerHeight, dimW, height - this.rulerHeight);
+        }
+
+        // Dim after Out-point
+        if (outSec < endTime) {
+            const startDim = Math.max(0, outX);
+            const dimW = Math.max(0, width - startDim);
+            ctx.fillStyle = this.colors.dimmedOverlay;
+            ctx.fillRect(startDim, this.rulerHeight, dimW, height - this.rulerHeight);
+        }
+
+        // In-Point Handle (Cyan [IN)
+        if (this.inPoint !== null && inX >= -20 && inX <= width + 20) {
+            ctx.strokeStyle = this.colors.inOutLine;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(inX + 0.5, this.rulerHeight);
+            ctx.lineTo(inX + 0.5, height);
+            ctx.stroke();
+
+            // Handle Flag
+            ctx.fillStyle = this.colors.inOutLine;
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(inX, this.rulerHeight, 26, 14, [0, 4, 4, 0]);
+            } else {
+                ctx.rect(inX, this.rulerHeight, 26, 14);
+            }
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 9px "Inter", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('[IN', inX + 4, this.rulerHeight + 10.5);
+        }
+
+        // Out-Point Handle (Cyan OUT])
+        if (this.outPoint !== null && outX >= -20 && outX <= width + 20) {
+            ctx.strokeStyle = this.colors.inOutLine;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(outX - 0.5, this.rulerHeight);
+            ctx.lineTo(outX - 0.5, height);
+            ctx.stroke();
+
+            // Handle Flag
+            ctx.fillStyle = this.colors.inOutLine;
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(outX - 30, this.rulerHeight, 30, 14, [4, 0, 0, 4]);
+            } else {
+                ctx.rect(outX - 30, this.rulerHeight, 30, 14);
+            }
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 9px "Inter", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('OUT]', outX - 26, this.rulerHeight + 10.5);
         }
     }
 

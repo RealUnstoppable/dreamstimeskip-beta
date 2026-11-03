@@ -77,7 +77,8 @@
     </div>
 
     <!-- Partner & Category Navigation Pills -->
-    <div class="shop-filter-bar" id="shop-filter-bar" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 15px auto 25px; max-width: 1200px; padding: 0 20px;">
+    <!-- Partner & Category Navigation Pills -->
+    <div class="shop-filter-bar" id="shop-filter-bar" style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 15px auto 16px; max-width: 1200px; padding: 0 20px;">
         <button type="button" class="filter-pill active" data-filter-type="all" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 7px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">All Items</button>
         <button type="button" class="filter-pill" data-filter-type="source" data-filter-val="dreamstimeskip" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 7px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">🎮 Dreams TimeSkip</button>
         <button type="button" class="filter-pill" data-filter-type="source" data-filter-val="harmonytunes" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 7px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">🎵 HarmonyTunes</button>
@@ -86,6 +87,70 @@
         <button type="button" class="filter-pill" data-filter-type="category" data-filter-val="accessories" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 7px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">☕ Accessories</button>
         <button type="button" class="filter-pill" data-filter-type="category" data-filter-val="music" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); padding: 7px 16px; border-radius: 20px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: all 0.2s;">💿 Music &amp; Vinyl</button>
     </div>
+
+    <!-- Shop Sorting Controls -->
+    <div class="shop-sort-container" style="display: flex; justify-content: flex-end; align-items: center; max-width: 1200px; margin: 0 auto 20px; padding: 0 20px; gap: 8px;">
+        <label for="shop-sort-select" style="font-size: 0.85rem; color: var(--text-secondary);">Sort By:</label>
+        <select id="shop-sort-select" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;">
+            <option value="featured">Featured &amp; Popular</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="rating">Highest Rated</option>
+        </select>
+    </div>
+
+    <!-- Featured Subscriptions Spotlight: Medixly Premium & Ultra -->
+    <section class="featured-memberships-spotlight" id="featured-memberships-spotlight" style="max-width: 1200px; margin: 0 auto 30px; padding: 0 20px;">
+        <div class="spotlight-section-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 1px;">⭐ Featured Ecosystem Memberships</span>
+                <h2 style="font-size: 1.6rem; color: #fff; margin: 4px 0 0;">Medixly Audio Pass</h2>
+            </div>
+            <a href="medixly-pricing.html" style="color: #60a5fa; font-size: 0.88rem; text-decoration: none; font-weight: 600;">View Subscription Pass &rarr;</a>
+        </div>
+        <div class="featured-memberships-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+            <!-- Card 1: Medixly Premium -->
+            <div class="product-card featured-membership-card" data-id="medixly-membership-premium" style="border: 2px solid rgba(16, 185, 129, 0.4); background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%); position: relative;">
+                <div style="position: absolute; top: 12px; right: 12px; background: #10B981; color: #000; font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;">BESTSELLER</div>
+                <img src="/images/medixly-logo.png" alt="Medixly Premium Membership" class="product-image" data-id="medixly-membership-premium" style="max-height: 160px; object-fit: contain; padding: 16px;" loading="lazy">
+                <div class="product-info">
+                    <h3>Medixly Premium Membership</h3>
+                    <p>Zero audio ads, unlimited skips, high-fidelity audio streaming, playlist sharing, and 10% merch store discount.</p>
+                    <div class="product-footer">
+                        <div class="product-price-wrapper" style="display: flex; align-items: baseline; gap: 8px;">
+                            <span class="original-price" style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.95rem;">$9.99</span>
+                            <span class="product-price" style="font-weight: 800; font-size: 1.35rem; color: #10B981;">$1.00 <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: normal;">/ month</span></span>
+                            <span class="discount-badge" style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">90% OFF</span>
+                        </div>
+                        <div class="action-buttons-container" style="margin-top: 10px;">
+                            <a href="medixly-pricing.html" class="add-to-cart-btn" style="background: linear-gradient(135deg, #10B981, #059669); text-align: center; text-decoration: none; color: #fff; font-weight: 700; width: 100%; border-radius: 8px; padding: 10px;">Subscribe Today ($1.00)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Medixly Ultra -->
+            <div class="product-card featured-membership-card" data-id="medixly-membership-ultra" style="border: 2px solid rgba(147, 51, 234, 0.4); background: linear-gradient(135deg, rgba(147, 51, 234, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%); position: relative;">
+                <div style="position: absolute; top: 12px; right: 12px; background: #9333EA; color: #fff; font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 999px;">ULTRA HI-RES</div>
+                <img src="/images/medixly-logo.png" alt="Medixly Ultra Membership" class="product-image" data-id="medixly-membership-ultra" style="max-height: 160px; object-fit: contain; padding: 16px;" loading="lazy">
+                <div class="product-info">
+                    <h3>Medixly Ultra Membership</h3>
+                    <p>Lossless Hi-Res FLAC audio, 25% merch store discount, unreleased track early-access, and Discord Ultra Producer badge.</p>
+                    <div class="product-footer">
+                        <div class="product-price-wrapper" style="display: flex; align-items: baseline; gap: 8px;">
+                            <span class="original-price" style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.95rem;">$19.99</span>
+                            <span class="product-price" style="font-weight: 800; font-size: 1.35rem; color: #a855f7;">$1.00 <span style="font-size: 0.8rem; color: #cbd5e1; font-weight: normal;">/ month</span></span>
+                            <span class="discount-badge" style="background-color: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">95% OFF</span>
+                        </div>
+                        <div class="action-buttons-container" style="margin-top: 10px;">
+                            <a href="medixly-pricing.html" class="add-to-cart-btn" style="background: linear-gradient(135deg, #9333EA, #7E22CE); text-align: center; text-decoration: none; color: #fff; font-weight: 700; width: 100%; border-radius: 8px; padding: 10px;">Subscribe Today ($1.00)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
         <!-- AD_SLOT_START -->
         <section class="site-ad-section" style="max-width: 1200px; margin: 20px auto; padding: 0 20px;" aria-label="Sponsored Content">
@@ -146,7 +211,7 @@
                         <div class="detail-pricing-row">
                             <span id="detail-original-price" class="original-price" style="text-decoration: line-through; color: var(--text-secondary); font-size: 1.25rem;">$0.00</span>
                             <span id="detail-sale-price" class="sale-price" style="font-size: 2rem; font-weight: 800; color: #fff;">$0.00</span>
-                            <span class="discount-badge" style="background-color: #ef4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">25% OFF</span>
+                            <span id="detail-discount-badge" class="discount-badge" style="background-color: #ef4444; color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; margin-left: 10px; vertical-align: middle;">25% OFF</span>
                         </div>
                         <p id="detail-description" class="detail-description">High-quality gear for the dedicated fan.</p>
                     </div>
