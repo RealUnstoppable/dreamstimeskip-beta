@@ -29402,6 +29402,32 @@ export const librarySongs = [
     }
 ];
 
+let _songCache = new Map();
+let _songIndexCache = new Map();
+let _lastLibraryLength = -1;
+
+function _rebuildSongCache() {
+    if (librarySongs.length !== _lastLibraryLength) {
+        _songCache.clear();
+        _songIndexCache.clear();
+
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            if (!_songCache.has(song.id)) {
+                _songCache.set(song.id, song);
+                _songIndexCache.set(song.id, i);
+            }
+        }
+        _lastLibraryLength = librarySongs.length;
+    }
+}
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    _rebuildSongCache();
+    return _songCache.get(id) || null;
+}
+
+export function getSongIndexById(id) {
+    _rebuildSongCache();
+    return _songIndexCache.get(id) ?? -1;
 }
