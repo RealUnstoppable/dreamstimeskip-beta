@@ -49,10 +49,10 @@ describe('Dreams & Dreams OG Realm Gallery System Integrity', () => {
         const dtsHtml = fs.readFileSync(dtsHtmlPath, 'utf8');
 
         // Header and purple countdown in OG section
-        expect(dtsHtml).toMatch(/<h1[^>]*>End Portal opens 12:00 AM friday (<span[^>]*>)?6(<\/span>)? 2026<\/h1>/i);
+        expect(dtsHtml).toMatch(/<h1[^>]*>End Portal opens 12:00 AM saturday (<span[^>]*>)?7(<\/span>)? 2026<\/h1>/i);
         expect(dtsHtml).toContain('countdown-purple');
         expect(dtsHtml).toContain('background-image: url(\'/images/end-portal.jpg\');');
-        expect(dtsHtml).toContain('new Countdown("2026-11-06T00:00:00-05:00", "countdown-1")');
+        expect(dtsHtml).toContain('new Countdown("2026-11-07T00:00:00-05:00", "countdown-1")');
 
         // Gallery section under End opening & Dreams OG
         expect(dtsHtml).toContain('id="realm-gallery"');
