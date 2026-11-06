@@ -213,9 +213,9 @@ describe('Phase 6: Audio Fixes, Logo Zoom, Promotion & Randomized Ads', () => {
         const engine = await import('../js/medixly-pricing-engine.js');
         assert.equal(engine.TIER_CONFIG.premium.basePrice, 0.99, 'Premium base price must be 0.99');
         assert.equal(engine.TIER_CONFIG.ultra.basePrice, 0.99, 'Ultra base price must be 0.99');
-        assert.equal(engine.DEFAULT_PROMO_START_UTC, '2026-11-02T00:00:00Z', 'Promo anchor must be today 2026-11-02');
+        assert.equal(engine.DEFAULT_PROMO_START_UTC, '2026-11-06T00:00:00Z', 'Promo anchor must be today 2026-11-06');
 
-        const priceToday = engine.calculateMedixlyDailyPrice('premium', 'monthly', '2026-11-02T12:00:00Z');
+        const priceToday = engine.calculateMedixlyDailyPrice('premium', 'monthly', '2026-11-06T12:00:00Z');
         assert.equal(priceToday, 0.99, 'Price today must calculate to 0.99');
 
         const html = fs.readFileSync(path.resolve(process.cwd(), 'medixly.html'), 'utf8');

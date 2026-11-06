@@ -27,9 +27,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v=20261106">
     <link rel="stylesheet" href="/css/themes.css">
-    <link rel="stylesheet" href="/css/medixly-pricing.css?v=20261028">
+    <link rel="stylesheet" href="/css/medixly-pricing.css?v=20261106">
 </head>
 <body class="medixly-pricing-body">
 
@@ -418,11 +418,19 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { loadNavbar } from './js/navbar.js?v=20261028';
-        import { loadFooter } from './js/footer.js?v=20261028';
-        if (typeof loadNavbar === 'function') loadNavbar();
-        if (typeof loadFooter === 'function') loadFooter();
+        import { loadNavbar } from './js/navbar.js?v=20261106';
+        import { loadFooter } from './js/footer.js?v=20261106';
+        try {
+            if (typeof loadNavbar === 'function') loadNavbar();
+        } catch (err) {
+            console.error('Navbar error:', err);
+        }
+        try {
+            if (typeof loadFooter === 'function') loadFooter();
+        } catch (err) {
+            console.error('Footer error:', err);
+        }
     </script>
-    <script type="module" src="/js/medixly-pricing-ui.js?v=20261028"></script>
+    <script type="module" src="/js/medixly-pricing-ui.js?v=20261106"></script>
 </body>
 </html>

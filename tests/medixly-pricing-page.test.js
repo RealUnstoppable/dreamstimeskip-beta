@@ -93,7 +93,7 @@ describe('Medixly Pricing Page & Architecture Validation', () => {
     it('medixly.html links to medixly-pricing.html in audio ads and top banner', () => {
       const playerHtml = fs.readFileSync(path.join(ROOT_DIR, 'medixly.html'), 'utf8');
       expect(playerHtml).toContain('href="medixly-pricing.html"');
-      expect(playerHtml).toContain('Upgrade ($1 Today)');
+      expect(playerHtml).toContain('Upgrade ($0.99 Today)');
     });
 
     it('scripts/sync-stripe-products.js includes medixly memberships', () => {
@@ -123,7 +123,7 @@ describe('Medixly Pricing Page & Architecture Validation', () => {
     const promoStart = new Date('2026-10-28T00:00:00Z');
 
     it('correctly handles Day 0 through Day 6 escalation for Premium', () => {
-      const expected = [1.00, 2.00, 3.00, 4.00, 5.00, 6.00, 6.99];
+      const expected = [0.99, 1.99, 2.99, 3.99, 4.99, 5.99, 6.99];
       for (let day = 0; day <= 6; day++) {
         const testDate = new Date(promoStart.getTime() + day * 86400000 + 3600000);
         const price = calculateMedixlyDailyPrice('premium', 'monthly', testDate, promoStart);
@@ -149,14 +149,14 @@ describe('Medixly Pricing Page & Architecture Validation', () => {
 
     it('calculates yearly rate with exact 2 months free discount', () => {
       const d0 = new Date('2026-10-28T01:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'yearly', d0, promoStart)).toBe(10.00);
-      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d0, promoStart)).toBe(10.00);
+      expect(calculateMedixlyDailyPrice('premium', 'yearly', d0, promoStart)).toBe(9.90);
+      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d0, promoStart)).toBe(9.90);
 
       const d6 = new Date('2026-11-03T01:00:00Z');
       // Premium capped at 6.99 => 6.99 * 10 = 69.90
       expect(calculateMedixlyDailyPrice('premium', 'yearly', d6, promoStart)).toBe(69.90);
-      // Ultra at 7.00 => 70.00
-      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d6, promoStart)).toBe(70.00);
+      // Ultra at 6.99 => 69.90
+      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d6, promoStart)).toBe(69.90);
     });
   });
 });

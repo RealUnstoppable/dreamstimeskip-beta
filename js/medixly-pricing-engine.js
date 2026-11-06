@@ -10,8 +10,8 @@
  * - Yearly billing: 10x monthly rate (2 months free / 20% savings).
  */
 
-// Default campaign anchor: November 2, 2026 00:00:00 UTC
-export const DEFAULT_PROMO_START_UTC = '2026-11-02T00:00:00Z';
+// Default campaign anchor: November 6, 2026 00:00:00 UTC
+export const DEFAULT_PROMO_START_UTC = '2026-11-06T00:00:00Z';
 
 export const TIER_CONFIG = {
   free: {

@@ -30,24 +30,24 @@ describe('Medixly Pricing Engine Math & Escalation', () => {
   });
 
   describe('Premium Tier Pricing Escalation & Cap', () => {
-    it('starts at $1.00 on Day 0 (Today)', () => {
+    it('starts at $0.99 on Day 0 (Today)', () => {
       const d0 = new Date('2026-10-28T10:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'monthly', d0, promoStart)).toBe(1.00);
+      expect(calculateMedixlyDailyPrice('premium', 'monthly', d0, promoStart)).toBe(0.99);
     });
 
-    it('escalates to $2.00 on Day 1', () => {
+    it('escalates to $1.99 on Day 1', () => {
       const d1 = new Date('2026-10-29T01:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'monthly', d1, promoStart)).toBe(2.00);
+      expect(calculateMedixlyDailyPrice('premium', 'monthly', d1, promoStart)).toBe(1.99);
     });
 
-    it('escalates to $3.00 on Day 2', () => {
+    it('escalates to $2.99 on Day 2', () => {
       const d2 = new Date('2026-10-30T01:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'monthly', d2, promoStart)).toBe(3.00);
+      expect(calculateMedixlyDailyPrice('premium', 'monthly', d2, promoStart)).toBe(2.99);
     });
 
-    it('escalates to $6.00 on Day 5', () => {
+    it('escalates to $5.99 on Day 5', () => {
       const d5 = new Date('2026-11-02T01:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'monthly', d5, promoStart)).toBe(6.00);
+      expect(calculateMedixlyDailyPrice('premium', 'monthly', d5, promoStart)).toBe(5.99);
     });
 
     it('hits the cap of $6.99 on Day 6 instead of $7.00', () => {
@@ -62,7 +62,7 @@ describe('Medixly Pricing Engine Math & Escalation', () => {
 
     it('calculates yearly rate with 2 months free (10x monthly)', () => {
       const d0 = new Date('2026-10-28T10:00:00Z');
-      expect(calculateMedixlyDailyPrice('premium', 'yearly', d0, promoStart)).toBe(10.00);
+      expect(calculateMedixlyDailyPrice('premium', 'yearly', d0, promoStart)).toBe(9.90);
 
       const d6 = new Date('2026-11-03T01:00:00Z');
       expect(calculateMedixlyDailyPrice('premium', 'yearly', d6, promoStart)).toBe(69.90);
@@ -70,14 +70,14 @@ describe('Medixly Pricing Engine Math & Escalation', () => {
   });
 
   describe('Ultra Tier Pricing Escalation & Cap', () => {
-    it('starts at $1.00 on Day 0', () => {
+    it('starts at $0.99 on Day 0', () => {
       const d0 = new Date('2026-10-28T10:00:00Z');
-      expect(calculateMedixlyDailyPrice('ultra', 'monthly', d0, promoStart)).toBe(1.00);
+      expect(calculateMedixlyDailyPrice('ultra', 'monthly', d0, promoStart)).toBe(0.99);
     });
 
-    it('reaches $7.00 on Day 6 (while Premium caps at 6.99)', () => {
+    it('reaches $6.99 on Day 6 (while Premium caps at 6.99)', () => {
       const d6 = new Date('2026-11-03T01:00:00Z');
-      expect(calculateMedixlyDailyPrice('ultra', 'monthly', d6, promoStart)).toBe(7.00);
+      expect(calculateMedixlyDailyPrice('ultra', 'monthly', d6, promoStart)).toBe(6.99);
     });
 
     it('hits the Ultra peak cap of $12.99 on Day 12', () => {
@@ -92,7 +92,7 @@ describe('Medixly Pricing Engine Math & Escalation', () => {
 
     it('calculates Ultra yearly rate at 10x monthly', () => {
       const d0 = new Date('2026-10-28T10:00:00Z');
-      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d0, promoStart)).toBe(10.00);
+      expect(calculateMedixlyDailyPrice('ultra', 'yearly', d0, promoStart)).toBe(9.90);
 
       const d12 = new Date('2026-11-09T01:00:00Z');
       expect(calculateMedixlyDailyPrice('ultra', 'yearly', d12, promoStart)).toBe(129.90);
@@ -139,9 +139,9 @@ describe('Medixly Pricing Engine Math & Escalation', () => {
       const snapshot = getPricingSnapshot(new Date('2026-10-28T12:00:00Z'), promoStart);
       expect(snapshot.dayIndex).toBe(0);
       expect(snapshot.dayNumber).toBe(1);
-      expect(snapshot.plans.premium.monthly).toBe(1.00);
-      expect(snapshot.plans.ultra.monthly).toBe(1.00);
-      expect(snapshot.plans.premium.tomorrowMonthly).toBe(2.00);
+      expect(snapshot.plans.premium.monthly).toBe(0.99);
+      expect(snapshot.plans.ultra.monthly).toBe(0.99);
+      expect(snapshot.plans.premium.tomorrowMonthly).toBe(1.99);
       expect(snapshot.plans.premium.savingsPercentMonthly).toBeGreaterThan(85);
     });
   });
