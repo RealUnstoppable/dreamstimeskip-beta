@@ -23620,6 +23620,18 @@ export const librarySongs = [
     }
 ];
 
+let _songCache = null;
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    if (librarySongs.length !== _lastLibraryLength) {
+        _songCache = new Map();
+        for (const song of librarySongs) {
+            if (!_songCache.has(song.id)) {
+                _songCache.set(song.id, song);
+            }
+        }
+        _lastLibraryLength = librarySongs.length;
+    }
+    return _songCache.get(id) || null;
 }
