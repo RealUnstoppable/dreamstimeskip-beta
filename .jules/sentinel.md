@@ -1,0 +1,4 @@
+## 2024-11-07 - Path Traversal bypass with url-encoding and path.normalize
+**Vulnerability:** Path traversal was possible in Express `server.js` by using url-encoded sequences like `%2e%2e%2f` because `req.path` is not decoded automatically by Express, and `path.normalize` followed by `replace(/^(\.\.[\/\\])+/, '')` didn't catch url-encoded sequences or correctly boundary check.
+**Learning:** `path.normalize` and regexes are easily bypassed. `path.resolve` treats leading slashes as absolute paths (bypassing the base directory).
+**Prevention:** Use `decodeURIComponent(req.path)` wrapped in try/catch to handle invalid sequences, convert to relative path by prepending a dot if it starts with slash, use `path.resolve(baseDir, relativePath)`, and always do strict boundary checks: `!filePath.startsWith(baseDir + path.sep)`. Reject null bytes.
