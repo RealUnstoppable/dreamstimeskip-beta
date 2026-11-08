@@ -179,9 +179,23 @@ app.use(async (req, res, next) => {
   
   if (reqPath.endsWith('.html')) {
     try {
-      // Security: prevent directory traversal
-      const normalizedPath = path.normalize(reqPath).replace(/^(\.\.[\/\\])+/, '');
-      const filePath = path.join(__dirname, normalizedPath);
+      // Security: decode, check null bytes, resolve path, and prevent directory traversal
+      let decodedPath;
+      try {
+        decodedPath = decodeURIComponent(reqPath);
+      } catch (err) {
+        decodedPath = reqPath;
+      }
+
+      if (decodedPath.indexOf('\0') !== -1) {
+        return res.status(400).send('Bad Request: Invalid URL');
+      }
+
+      const filePath = path.resolve(__dirname, '.' + decodedPath);
+      if (!filePath.startsWith(__dirname + path.sep) && filePath !== __dirname) {
+        return res.status(403).send('Forbidden: Path Traversal Detected');
+      }
+
       let html = await fs.readFile(filePath, 'utf8');
       
       const cookies = parseCookies(req);
