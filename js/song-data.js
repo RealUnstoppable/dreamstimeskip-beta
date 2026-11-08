@@ -29402,6 +29402,19 @@ export const librarySongs = [
     }
 ];
 
+let _songCacheMap = new Map();
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    // ⚡ Bolt: O(1) Map cache replaces O(N) librarySongs.find()
+    if (librarySongs.length !== _lastLibraryLength) {
+        _songCacheMap.clear();
+        for (const song of librarySongs) {
+            if (!_songCacheMap.has(song.id)) {
+                _songCacheMap.set(song.id, song);
+            }
+        }
+        _lastLibraryLength = librarySongs.length;
+    }
+    return _songCacheMap.get(id) || null;
 }
