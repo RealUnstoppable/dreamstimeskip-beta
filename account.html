@@ -206,7 +206,7 @@
                     <h4>Refer a Friend</h4>
                     <p style="color: var(--text-secondary); margin-bottom: 15px;">Share your unique link below. When a friend signs up, you both get <strong>50 Bonus Points</strong>!</p>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="referral-link" readonly style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-primary);">
+                        <input type="text" id="referral-link" readonly aria-label="Your personal referral link" style="flex: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-primary);">
                         <button class="btn btn-primary" id="copy-referral-btn">Copy Link</button>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                     </div>
                     <div id="share-link-container" style="display: none; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                         <span style="font-size: 0.9rem; margin-right: 10px;">Your link:</span>
-                        <input type="text" id="share-link-input" readonly style="background: var(--bg-color); color: white; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; width: 250px;" />
+                        <input type="text" id="share-link-input" readonly aria-label="Wishlist shareable link" style="background: var(--bg-color); color: white; border: 1px solid var(--border-color); padding: 5px; border-radius: 4px; width: 250px;" />
                         <button id="copy-share-link-btn" class="btn btn-primary" style="padding: 5px 10px; font-size: 0.8rem;">Copy</button>
                         <button id="disable-share-btn" class="btn" style="padding: 5px 10px; font-size: 0.8rem; background: var(--bg-color); border: 1px solid var(--accent-red); color: var(--accent-red); margin-left: 5px;">Make Private</button>
                     </div>
@@ -832,7 +832,7 @@
                     <label for="deactivate-card-input">Last 4 Digits of Card</label>
                     <input type="text" id="deactivate-card-input" maxlength="4" placeholder="•••• (e.g. 4242)" class="deactivate-input" style="font-family: monospace; letter-spacing: 4px; font-size: 1.2rem;">
                     <label class="deactivate-checkbox-label">
-                        <input type="checkbox" id="deactivate-no-card-checkbox">
+                        <input type="checkbox" id="deactivate-no-card-checkbox" aria-label="I do not have a payment card linked to this account">
                         <span>I do not have a payment card linked to this account (verify as 0000)</span>
                     </label>
                     <div id="deactivate-card-error" class="deactivate-error-msg" style="display: none;"></div>
@@ -1099,23 +1099,23 @@
                 <p class="cancel-step-desc">We're genuinely sorry to see you consider cancelling. Please share what's prompting your decision:</p>
                 <div class="cancel-reasons-list">
                     <label class="cancel-reason-option">
-                        <input type="radio" name="cancel_reason" value="too_expensive" checked>
+                        <input type="radio" name="cancel_reason" value="too_expensive" checked aria-label="It is too expensive or tight budget">
                         <span>It's too expensive / tight budget</span>
                     </label>
                     <label class="cancel-reason-option">
-                        <input type="radio" name="cancel_reason" value="not_using_enough">
+                        <input type="radio" name="cancel_reason" value="not_using_enough" aria-label="I do not use the perks often enough">
                         <span>I don't use the perks often enough</span>
                     </label>
                     <label class="cancel-reason-option">
-                        <input type="radio" name="cancel_reason" value="technical_issues">
+                        <input type="radio" name="cancel_reason" value="technical_issues" aria-label="Experienced technical or server issues">
                         <span>Experienced technical or server issues</span>
                     </label>
                     <label class="cancel-reason-option">
-                        <input type="radio" name="cancel_reason" value="switching_service">
+                        <input type="radio" name="cancel_reason" value="switching_service" aria-label="Switching to another platform">
                         <span>Switching to another platform</span>
                     </label>
                     <label class="cancel-reason-option">
-                        <input type="radio" name="cancel_reason" value="other">
+                        <input type="radio" name="cancel_reason" value="other" aria-label="Other reason or temporary break">
                         <span>Other reason / temporary break</span>
                     </label>
                 </div>
@@ -1213,7 +1213,7 @@
                     <label for="cancel-card-input">Last 4 Digits of Card</label>
                     <input type="text" id="cancel-card-input" maxlength="4" placeholder="•••• (e.g. 4242)" class="deactivate-input" style="font-family: monospace; letter-spacing: 4px; font-size: 1.2rem;">
                     <label class="deactivate-checkbox-label">
-                        <input type="checkbox" id="cancel-no-card-checkbox">
+                        <input type="checkbox" id="cancel-no-card-checkbox" aria-label="I do not have a payment card linked">
                         <span>I do not have a payment card linked (verify as 0000)</span>
                     </label>
                     <div id="cancel-card-error" class="deactivate-error-msg" style="display: none;"></div>

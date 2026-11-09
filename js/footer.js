@@ -47,6 +47,7 @@ export function loadFooter() {
                         <li><a href="blog.html">Blog</a></li>
                         <li><a href="store.html">Shop</a></li>
                         <li><a href="contact.html">Contact</a></li>
+                        <li><a href="accessibility.html">Accessibility Statement</a></li>
                         <li><a href="privacy.html">Privacy Policy</a></li>
                         <li><a href="terms.html">Terms of Service</a></li>
                         <li><button type="button" id="footer-privacy-choices" class="footer-privacy-choices-btn" style="background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;text-align:left;">Your Privacy Choices / Do Not Sell or Share My Personal Information</button></li>

@@ -403,13 +403,11 @@
             </div>
         </div>
     </div>
-    <audio id="medixly-ad-audio" preload="auto" crossorigin="anonymous"></audio>
-
 
     <!-- Artist Profile -->
-    <div id="artist-profile" class="artist-profile" style="display: none;">
+    <div id="artist-profile" class="artist-profile" role="dialog" aria-modal="true" aria-label="Artist Profile" style="display: none;">
         <button id="close-artist-btn" class="close-fullscreen-btn" title="Close Profile" aria-label="Close Profile">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
         <div class="artist-header">
             <div class="artist-avatar" id="artist-avatar"></div>
@@ -423,7 +421,7 @@
     </div>
 
     <!-- What's New Popup -->
-    <div id="whats-new-overlay" class="modal-overlay" style="display: none;">
+    <div id="whats-new-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-label="What is New" style="display: none;">
         <div class="modal-content">
             <button id="close-whats-new-btn" class="close-modal-btn" title="Close" aria-label="Close">&times;</button>
             <div class="whats-new-header">
@@ -464,7 +462,8 @@
         </div>
     </div>
 
-    <div class="music-player-bar glass-panel">
+    <aside class="music-player-bar glass-panel" aria-label="Audio Player">
+        <audio id="medixly-ad-audio" preload="auto" crossorigin="anonymous"></audio>
         
         <div class="current-song-details">
             <img src="/images/medixly-logo.png" alt="Current Album Art" id="player-album-art">
@@ -534,10 +533,12 @@
                 <input type="range" class="volume-slider" min="0" max="1" step="0.01" value="1" aria-label="Volume">
             </div>
         </div>
-    </div>
+        <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
+        <audio id="audio-player-2" preload="auto" crossorigin="anonymous"></audio>
+    </aside>
 
     <!-- Mobile Controls Overlay (shown when ... is tapped on mobile) -->
-    <div class="mobile-controls-overlay hidden" id="mobile-controls-overlay">
+    <div class="mobile-controls-overlay hidden" id="mobile-controls-overlay" role="region" aria-label="Mobile Playback Controls">
         <button class="control-button" id="mob-shuffle-btn" title="Shuffle" aria-label="Shuffle">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="16 21 21 21 21 16"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
             <span style="font-size:10px;margin-top:3px;">Shuffle</span>
@@ -565,14 +566,14 @@
     </div>
 
     <!-- Queue Panel -->
-    <div id="queue-panel" class="queue-panel hidden glass-panel">
+    <div id="queue-panel" class="queue-panel hidden glass-panel" role="region" aria-label="Playback Queue">
         <div class="queue-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <h2>Queue</h2>
                 <button id="clear-queue-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 4px 8px; font-size: 0.8rem; cursor: pointer;">Clear</button>
             </div>
             <button id="close-queue-btn" class="control-button" title="Close Queue" aria-label="Close Queue">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="queue-tabs">
@@ -585,7 +586,7 @@
     </div>
 
     <!-- Mixxer Survey Popup -->
-    <div id="mixxer-survey" class="mixxer-survey glass-panel" style="opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px);">
+    <div id="mixxer-survey" class="mixxer-survey glass-panel" role="region" aria-label="Mixer Feedback Survey" style="opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px);">
         <p>How did Mixxer do?</p>
         <div class="survey-btns">
             <button class="survey-btn up" id="survey-up" title="Thumbs Up" aria-label="Thumbs Up">👍</button>
@@ -594,17 +595,14 @@
     </div>
 
     <!-- Song Context Menu -->
-    <div id="song-context-menu" class="song-context-menu hidden glass-panel">
+    <nav id="song-context-menu" class="song-context-menu hidden glass-panel" aria-label="Song Options">
         <button class="context-menu-item" id="ctx-play-next">⏭️ Play Next</button>
         <button class="context-menu-item" id="ctx-play-last" data-id="ctx-add-to-queue">➕ Add to Queue</button>
         <button class="context-menu-item" id="ctx-favorite">❤️ Favorite / Like</button>
         <button class="context-menu-item" id="ctx-view-artist">👤 View Artist Profile</button>
         <button class="context-menu-item" id="ctx-share">🔗 Share Song</button>
         <button class="context-menu-item" id="ctx-add-playlist">🎵 Add to Playlist</button>
-    </div>
-
-    <audio id="audio-player" preload="auto" crossorigin="anonymous"></audio>
-    <audio id="audio-player-2" preload="auto" crossorigin="anonymous"></audio>
+    </nav>
 
     <script type="module" src="/js/footer.js?v=1791167958698"></script>
 
@@ -642,7 +640,7 @@
     </div>
 
     <!-- ===== Viral Song Stats Popup ===== -->
-    <div id="viral-stats-overlay" class="viral-stats-overlay hidden" aria-modal="true" role="dialog">
+    <div id="viral-stats-overlay" class="viral-stats-overlay hidden" aria-modal="true" role="dialog" aria-label="Viral Song Statistics">
         <div class="viral-stats-popup" id="viral-stats-popup">
             <!-- Blurred BG -->
             <div class="viral-stats-bg" id="viral-stats-bg"></div>
@@ -912,7 +910,7 @@
                     <p class="medixly-settings-subheading">Review, filter, or delete your recent listening history.</p>
 
                     <div class="medixly-history-controls" style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                        <input type="text" id="settings-history-search" class="medixly-input-search" placeholder="Search history tracks or artists…" style="flex: 1; min-width: 180px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem;">
+                        <input type="text" id="settings-history-search" class="medixly-input-search" placeholder="Search history tracks or artists…" aria-label="Search history tracks or artists" style="flex: 1; min-width: 180px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; color: #fff; font-size: 0.85rem;">
                         <button type="button" id="history-delete-hour-btn" class="medixly-btn-danger-outline" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.35); color: #fca5a5; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Delete Last 1 Hour</button>
                         <button type="button" id="history-clear-all-btn" class="medixly-btn-danger-outline" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #9ca3af; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; cursor: pointer;">Clear All</button>
                     </div>
@@ -942,14 +940,14 @@
     <script type="module" src="/js/lexi-physics.js?v=1791167958698"></script>
 
     <!-- Playlist Selection Modal -->
-    <div id="playlist-select-modal" class="modal-overlay hidden" style="z-index: 4000;">
+    <div id="playlist-select-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="Add to Playlist" style="z-index: 4000;">
         <div class="modal-content" style="max-width: 300px;">
             <h2 class="modal-title" style="font-size: 1.2rem; margin-bottom: 15px;">Add to Playlist</h2>
             <div id="playlist-select-list" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;margin-bottom:15px;">
                 <!-- Dynamically populated -->
             </div>
             <div style="display:flex;gap:10px;">
-                <input type="text" id="new-playlist-input" placeholder="New Playlist Name" style="flex:1;background:var(--secondary-bg);color:#fff;border:1px solid var(--border-color);border-radius:4px;padding:5px;">
+                <input type="text" id="new-playlist-input" placeholder="New Playlist Name" aria-label="New playlist name" style="flex:1;background:var(--secondary-bg);color:#fff;border:1px solid var(--border-color);border-radius:4px;padding:5px;">
                 <button id="create-and-add-btn" class="action-btn-primary" style="padding:5px 10px;">Create</button>
             </div>
             <button id="close-playlist-modal-btn" class="modal-close-btn" style="margin-top:15px;width:100%;">Close</button>

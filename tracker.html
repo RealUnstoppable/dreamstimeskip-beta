@@ -917,11 +917,11 @@
                     <div class="card">
                         <h3 class="text-xl font-black mb-6">Personal Details</h3>
                         <div class="space-y-4">
-                            <input type="text" id="profName" placeholder="Name">
-                            <input type="text" id="profRole" placeholder="Role">
-                            <input type="email" id="profEmail" readonly title="Email cannot be changed"
+                            <input type="text" id="profName" placeholder="Name" aria-label="Full Name" autocomplete="name">
+                            <input type="text" id="profRole" placeholder="Role" aria-label="Professional Role">
+                            <input type="email" id="profEmail" readonly title="Email cannot be changed" aria-label="Email Address"
                                 class="bg-slate-50 opacity-60 dark:bg-slate-800">
-                            <input type="text" id="profPhone" placeholder="Phone">
+                            <input type="text" id="profPhone" placeholder="Phone" aria-label="Phone Number" autocomplete="tel">
                             <button id="saveProfileBtn" onclick="saveProfileToFirebase()" class="btn btn-accent w-full mt-4">Save
                                 Changes</button>
                         </div>

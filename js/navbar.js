@@ -79,7 +79,8 @@ export function loadNavbar() {
 
     if (isMedixlyPage) {
         const medixlyHeaderHTML = `
-        <nav class="navbar medixly-desktop-navbar">
+        <a href="#main-content" class="skip-to-content">Skip to main content</a>
+        <nav class="navbar medixly-desktop-navbar" aria-label="Medixly Navigation">
             <!-- Left side: Medixly logo BY un + Expandable Ecosystem Arrow -->
             <div class="medixly-nav-left">
                 <a href="https://realunstoppable.store/medixly.html" id="navbar-logo-link" class="medixly-brand-lockup" aria-label="Medixly BY un">
@@ -184,22 +185,23 @@ export function loadNavbar() {
                 <span class="mc-nav-store-icon">🛒</span>
                 <span class="mc-nav-store-text">STORE</span>
             </a>
-            <button class="hamburger" title="Open menu" aria-label="Open menu">
+            <button class="hamburger" title="Open menu" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
                 <span class="bar"></span><span class="bar"></span><span class="bar"></span>
                 <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
             </button>
         </div>` : `
-        <button class="hamburger" title="Open menu" aria-label="Open menu">
+        <button class="hamburger" title="Open menu" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span>
             <span class="hamburger-badge" style="display:none;" id="hamburger-badge">0</span>
         </button>`;
 
     const headerHTML = `
-    <nav class="navbar">
-        <a href="index.html" id="navbar-logo-link" class="nav-logo un-text-logo" style="display: flex; align-items: center;">
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+    <nav class="navbar" aria-label="Main Navigation">
+        <a href="index.html" id="navbar-logo-link" class="nav-logo un-text-logo" style="display: flex; align-items: center;" aria-label="Unstoppable Home">
             ${logoContent}
         </a>
-        <ul class="nav-links">
+        <ul class="nav-links" id="nav-links">
             <li><a href="unstoppable.html">Unstoppable</a></li>
             <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
@@ -216,12 +218,12 @@ export function loadNavbar() {
             <li class="nav-notification-item">
                 <div class="notification-wrapper" id="notification-wrapper">
                     <!-- Desktop bell button -->
-                    <button class="notification-bell-btn desktop-only" id="notification-bell-btn" aria-label="Notifications" title="Notifications">
+                    <button class="notification-bell-btn desktop-only" id="notification-bell-btn" aria-label="Notifications" title="Notifications" aria-haspopup="true" aria-expanded="false">
                         ${BELL_SVG}
                         <span class="notification-badge" style="display:none;" id="notification-badge">0</span>
                     </button>
                     <!-- Mobile text button -->
-                    <button class="notification-mobile-btn mobile-only" id="notification-mobile-btn">
+                    <button class="notification-mobile-btn mobile-only" id="notification-mobile-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
                         <span>Notifications</span>
                         <span class="notification-badge mobile-badge" style="display:none;" id="notification-mobile-badge">0</span>
                     </button>
@@ -460,14 +462,18 @@ function attachNavEvents() {
     const navLinks = document.querySelector('.nav-links');
     if (hamburger && navLinks) {
         hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
+            const isActive = hamburger.classList.toggle('active');
             navLinks.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+            hamburger.setAttribute('aria-label', isActive ? 'Close menu' : 'Open menu');
         });
 
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', () => {
                 hamburger.classList.remove('active');
                 navLinks.classList.remove('active');
+                hamburger.setAttribute('aria-expanded', 'false');
+                hamburger.setAttribute('aria-label', 'Open menu');
             });
         });
 
@@ -598,7 +604,10 @@ function attachNotificationEvents() {
     const toggleDropdown = (e) => {
         e.stopPropagation();
         const isOpen = dropdown.classList.contains('notif-open');
-        dropdown.classList.toggle('notif-open', !isOpen);
+        const willBeOpen = !isOpen;
+        dropdown.classList.toggle('notif-open', willBeOpen);
+        if (bellBtn) bellBtn.setAttribute('aria-expanded', willBeOpen ? 'true' : 'false');
+        if (mobileBtn) mobileBtn.setAttribute('aria-expanded', willBeOpen ? 'true' : 'false');
         if (!isOpen && bellBtn) {
             // Animate bell
             bellBtn.classList.add('bell-ring');
@@ -617,6 +626,8 @@ function attachNotificationEvents() {
         
         if (!clickedInsideDropdown && !clickedBell && !clickedMobile) {
             dropdown.classList.remove('notif-open');
+            if (bellBtn) bellBtn.setAttribute('aria-expanded', 'false');
+            if (mobileBtn) mobileBtn.setAttribute('aria-expanded', 'false');
         }
     });
 

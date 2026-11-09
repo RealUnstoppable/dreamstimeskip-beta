@@ -109,6 +109,7 @@
         .faq-item {
             margin-bottom: 20px;
         }
+        .faq-item h3,
         .faq-item h4 {
             margin: 0 0 6px;
             font-size: 1.05rem;
@@ -122,15 +123,17 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <header class="main-header"></header>
 
-    <main>
+    <main id="main-content">
         <section class="contact-hero">
             <h1>Get In Touch</h1>
             <p class="lead">Have a question, feedback, or business inquiry? We're here to help.</p>
         </section>
 
         <div class="contact-container">
+            <h2 class="sr-only">Contact Channels</h2>
             <div class="contact-grid">
                 <div class="contact-card">
                     <div>
@@ -138,6 +141,17 @@
                         <p>For account issues, membership queries, or general support, send our team an email directly. Typical turnaround is within 24 to 48 hours.</p>
                     </div>
                     <a href="mailto:unstoppableplays2016@hotmail.com" class="contact-action-btn">Send an Email</a>
+                </div>
+
+                <div class="contact-card" style="border: 1px solid rgba(37,99,235,0.4); background: rgba(37,99,235,0.05);">
+                    <div>
+                        <h3>Accessibility Accommodations</h3>
+                        <p>We are committed to digital accessibility under WCAG 2.1 Level AA and ADA Title III. If you experience any barrier using assistive technology, screen readers, or keyboard navigation, contact our team for immediate assistance or order support.</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <a href="mailto:unstoppableplays2016@hotmail.com?subject=Accessibility%20Accommodation%20Request" class="contact-action-btn" style="background: #2563eb;">Email Accessibility Desk</a>
+                        <a href="tel:+18005550199" class="contact-action-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">Call / Text: (800) 555-0199</a>
+                    </div>
                 </div>
 
                 <div class="contact-card">
@@ -160,15 +174,15 @@
             <div class="faq-box">
                 <h2>Frequently Asked Questions</h2>
                 <div class="faq-item">
-                    <h4>Where is Unstoppable LLC based?</h4>
+                    <h3>Where is Unstoppable LLC based?</h3>
                     <p>Unstoppable LLC is an independent digital organization operating in the United States, managing digital services globally.</p>
                 </div>
                 <div class="faq-item">
-                    <h4>How do I cancel or modify my subscription?</h4>
+                    <h3>How do I cancel or modify my subscription?</h3>
                     <p>You can manage your membership tier at any time from your <a href="account.html" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Account Dashboard</a> or reach out via email for billing assistance.</p>
                 </div>
                 <div class="faq-item">
-                    <h4>How do I exercise my data privacy rights?</h4>
+                    <h3>How do I exercise my data privacy rights?</h3>
                     <p>You can adjust your cookie choices at any time using our footer "Your Privacy Choices" controller or review our full <a href="privacy.html" style="color: var(--accent-color, #14b8a6); text-decoration: underline;">Privacy Policy</a>.</p>
                 </div>
             </div>

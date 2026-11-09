@@ -90,24 +90,24 @@ function renderCheckoutPage() {
                     </div>
                     <div class="form-group">
                         <label for="name">Full Name</label>
-                        <input type="text" id="name" placeholder="Alex Mercer" required>
+                        <input type="text" id="name" name="name" placeholder="Alex Mercer" required autocomplete="name" aria-required="true">
                     </div>
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" ${currentUser ? `value="${escapeHTML(currentUser.email || '')}"` : 'placeholder="alex@example.com"'} required>
+                        <input type="email" id="email" name="email" ${currentUser ? `value="${escapeHTML(currentUser.email || '')}"` : 'placeholder="alex@example.com"'} required autocomplete="email" aria-required="true">
                     </div>
                     <div class="form-group">
                         <label for="address">Street Address</label>
-                        <input type="text" id="address" placeholder="742 Evergreen Terrace" required>
+                        <input type="text" id="address" name="street-address" placeholder="742 Evergreen Terrace" required autocomplete="street-address" aria-required="true">
                     </div>
                     <div class="form-group-inline">
                         <div class="form-group">
                             <label for="city">City</label>
-                            <input type="text" id="city" placeholder="Springfield" required>
+                            <input type="text" id="city" name="address-level2" placeholder="Springfield" required autocomplete="address-level2" aria-required="true">
                         </div>
                         <div class="form-group">
                             <label for="zip">ZIP / Postal Code</label>
-                            <input type="text" id="zip" placeholder="97477" required>
+                            <input type="text" id="zip" name="postal-code" placeholder="97477" required autocomplete="postal-code" aria-required="true">
                         </div>
                     </div>
                     
@@ -135,16 +135,16 @@ function renderCheckoutPage() {
 
                     <div class="form-group">
                         <label for="card-number">Card Number</label>
-                        <input type="text" id="card-number" placeholder="4242 4242 4242 4242" maxlength="19">
+                        <input type="text" id="card-number" name="cardnumber" placeholder="4242 4242 4242 4242" maxlength="19" autocomplete="cc-number">
                     </div>
                     <div class="form-group-inline">
                         <div class="form-group">
                             <label for="card-expiry">Expiry Date (MM/YY)</label>
-                            <input type="text" id="card-expiry" placeholder="12/26" maxlength="5">
+                            <input type="text" id="card-expiry" name="cc-exp" placeholder="12/26" maxlength="5" autocomplete="cc-exp">
                         </div>
                         <div class="form-group">
                             <label for="card-cvc">CVC</label>
-                            <input type="text" id="card-cvc" placeholder="123" maxlength="4">
+                            <input type="text" id="card-cvc" name="cc-csc" placeholder="123" maxlength="4" autocomplete="cc-csc">
                         </div>
                     </div>
 

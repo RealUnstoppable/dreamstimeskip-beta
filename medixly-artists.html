@@ -277,24 +277,24 @@
         <div class="upload-section" id="upload-section" style="display: none;">
             <h2 class="section-title">Upload a Track</h2>
             <div class="form-group">
-                <label>Track Title</label>
+                <label for="track-title">Track Title</label>
                 <input type="text" id="track-title" class="search-style-input" placeholder="e.g. Midnight City">
             </div>
             <div class="form-group">
-                <label>Credits (Producers, Writers)</label>
+                <label for="track-credits">Credits (Producers, Writers)</label>
                 <input type="text" id="track-credits" class="search-style-input" placeholder="e.g. Prod. by John Doe">
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
                 <div class="form-group">
-                    <label>Audio File (.mp3, .wav)</label>
+                    <label for="track-file">Audio File (.mp3, .wav)</label>
                     <div class="file-upload-wrapper">
                         <input type="file" id="track-file" accept="audio/*">
                         <div class="file-upload-text" id="file-name-display"><span>Browse</span> or drop audio file</div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Cover Art (.jpg, .png)</label>
+                    <label for="track-art">Cover Art (.jpg, .png)</label>
                     <div class="file-upload-wrapper">
                         <input type="file" id="track-art" accept="image/*">
                         <div class="file-upload-text" id="art-name-display"><span>Browse</span> or drop image</div>

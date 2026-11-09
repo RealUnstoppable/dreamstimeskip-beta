@@ -32,15 +32,15 @@
                 <!-- Virtualized Autocomplete Instant Search Bar -->
                 <div class="editor-search-container" id="editor-search-container">
                     <div class="editor-search-input-wrap">
-                        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        <input type="text" id="editor-song-search" class="editor-search-input" placeholder="Search track, artist, BPM, or key..." autocomplete="off" spellcheck="false">
-                        <button id="search-clear-btn" class="search-clear-btn" style="display: none;" title="Clear Search">✕</button>
+                        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input type="text" id="editor-song-search" class="editor-search-input" placeholder="Search track, artist, BPM, or key..." aria-label="Search track, artist, BPM, or key" autocomplete="off" spellcheck="false">
+                        <button id="search-clear-btn" class="search-clear-btn" style="display: none;" title="Clear Search" aria-label="Clear Search">✕</button>
                     </div>
                     <div id="search-results-dropdown" class="search-results-dropdown" style="display: none;">
                         <div id="search-results-list" class="search-results-list" role="listbox"></div>
                     </div>
                 </div>
-                <input type="file" id="audio-file-input" accept="audio/*" style="display: none;">
+                <input type="file" id="audio-file-input" accept="audio/*" aria-label="Upload audio file" style="display: none;">
                 <button id="upload-audio-btn" class="btn-editor-secondary" title="Import your own WAV, MP3, AAC, or stem file">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span>Import Audio</span>
@@ -58,10 +58,10 @@
         <div class="editor-topbar-actions">
             <!-- Timeline Zoom -->
             <div class="zoom-controls-cluster" title="Timeline Zoom (+/- or Alt+Scroll)">
-                <button id="btn-zoom-out" class="editor-btn-subtle" title="Zoom Out (-)">−</button>
-                <input type="range" id="zoom-slider" class="zoom-slider" min="15" max="3000" value="100">
-                <button id="btn-zoom-in" class="editor-btn-subtle" title="Zoom In (+)">+</button>
-                <button id="btn-zoom-fit" class="editor-btn-subtle" title="Fit to Screen (Shift+Z)">Fit</button>
+                <button id="btn-zoom-out" class="editor-btn-subtle" title="Zoom Out (-)" aria-label="Zoom Out">−</button>
+                <input type="range" id="zoom-slider" class="zoom-slider" min="15" max="3000" value="100" aria-label="Timeline Zoom">
+                <button id="btn-zoom-in" class="editor-btn-subtle" title="Zoom In (+)" aria-label="Zoom In">+</button>
+                <button id="btn-zoom-fit" class="editor-btn-subtle" title="Fit to Screen (Shift+Z)" aria-label="Fit to Screen">Fit</button>
             </div>
 
             <!-- Frame Rate Select -->
@@ -107,11 +107,11 @@
 
             <div class="transport-cluster-center">
                 <label class="snap-label" title="Snap marker drops and drags to nearest beat or transient">
-                    <input type="checkbox" id="toggle-snap" checked>
+                    <input type="checkbox" id="toggle-snap" checked aria-label="Snap marker to nearest beat">
                     <span>Snap (S)</span>
                 </label>
                 <label class="autobeat-label" title="Automatically detect transients & place beat markers along the grid">
-                    <input type="checkbox" id="toggle-autobeat">
+                    <input type="checkbox" id="toggle-autobeat" aria-label="Automatically detect transients and place beat markers">
                     <span class="autobeat-badge">⚡ Auto-Beat</span>
                 </label>
                 <div class="in-out-cluster">

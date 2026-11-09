@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-08T11:05:49.400Z",
-  "dateFormatted": "Nov 8, 2026",
+  "timestamp": "2026-11-09T05:17:31.348Z",
+  "dateFormatted": "Nov 9, 2026",
   "overallStatus": "Maintenance",
   "badgeClass": "maintenance",
   "systems": [
@@ -24,7 +24,6 @@
       "primaryPage": "medixly.html",
       "status": "Maintenance",
       "issues": [
-        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html",
         "Missing local asset: \"/download/windows\" in medixly.html"
       ]
     },
@@ -88,7 +87,6 @@
       "primaryPage": "medixly.html",
       "status": "Maintenance",
       "issues": [
-        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html",
         "Missing local asset: \"/download/windows\" in medixly.html"
       ]
     },
@@ -107,6 +105,6 @@
   "operationalCount": 8,
   "offlineCount": 0,
   "maintenanceCount": 2,
-  "durationMs": 420,
-  "allDiscoveredPagesCount": 51
+  "durationMs": 528,
+  "allDiscoveredPagesCount": 52
 }

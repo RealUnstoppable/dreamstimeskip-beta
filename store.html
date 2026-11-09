@@ -38,10 +38,11 @@
 </head>
 
 <body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <header class="main-header">
     </header>
 
-    <main class="shop-main">
+    <main class="shop-main" id="main-content">
         <section class="shop-header">
             <div class="shop-header-row">
                 <div class="shop-header-text">
@@ -153,7 +154,7 @@
     </section>
 
         <!-- AD_SLOT_START -->
-        <section class="site-ad-section" style="max-width: 1200px; margin: 20px auto; padding: 0 20px;" aria-label="Sponsored Content">
+        <section class="site-ad-section" style="max-width: 1200px; margin: 20px auto; padding: 0 20px;" aria-label="Sponsored Content Top">
             <div class="site-ad-label">Advertisement</div>
             <div class="ad-container ad-top-banner">
                 <ins class="adsbygoogle"
@@ -170,7 +171,7 @@
         </section>
 
         <!-- AD_SLOT_START -->
-        <section class="site-ad-section" style="max-width: 1200px; margin: 40px auto 20px;" aria-label="Sponsored Content">
+        <section class="site-ad-section" style="max-width: 1200px; margin: 40px auto 20px;" aria-label="Sponsored Content Bottom">
             <div class="site-ad-label">Sponsored</div>
             <div class="ad-container ad-bottom-banner">
                 <ins class="adsbygoogle"
@@ -297,7 +298,7 @@
     </div>
 
     <!-- Cart Modal -->
-    <div id="cart-modal" class="cart-modal">
+    <div id="cart-modal" class="cart-modal" role="dialog" aria-modal="true" aria-label="Shopping Cart Drawer">
         <div class="cart-modal-content">
             <div class="cart-modal-header">
                 <h2>Your Cart</h2>

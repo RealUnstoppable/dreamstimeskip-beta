@@ -19,9 +19,10 @@
 </head>
 
 <body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
     <header class="main-header"></header>
 
-    <main class="cart-main-container">
+    <main class="cart-main-container" id="main-content">
         <!-- Page Header & Stepper -->
         <div class="cart-page-header">
             <div class="cart-header-top">
@@ -178,7 +179,7 @@
     </main>
 
     <!-- Mobile Sticky Checkout Bar (Stacked View) -->
-    <div class="cart-mobile-sticky-bar" id="cart-mobile-sticky-bar" aria-label="Quick Checkout">
+    <aside class="cart-mobile-sticky-bar" id="cart-mobile-sticky-bar" aria-label="Quick Checkout">
         <div>
             <div class="mobile-sticky-total-label">Estimated Total</div>
             <div class="mobile-sticky-total-price" id="mobile-sticky-total">$0.00</div>
@@ -186,7 +187,7 @@
         <a href="checkout.html" class="mobile-sticky-checkout-btn checkout-btn" data-telemetry-cta="checkout">
             <span>Checkout &rarr;</span>
         </a>
-    </div>
+    </aside>
 
     <footer class="main-footer"></footer>
 
