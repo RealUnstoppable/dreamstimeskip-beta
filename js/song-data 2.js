@@ -23620,6 +23620,20 @@ export const librarySongs = [
     }
 ];
 
+// ⚡ Bolt: Use a lazy-loaded Map to cache song lookups by ID, reducing O(N) Array.find to O(1)
+let _songCacheMap = null;
+let _lastLibraryLength = -1;
+
 export function getSongById(id) {
-    return librarySongs.find(s => s.id === id) || null;
+    if (!_songCacheMap || librarySongs.length !== _lastLibraryLength) {
+        _songCacheMap = new Map();
+        for (let i = 0; i < librarySongs.length; i++) {
+            const song = librarySongs[i];
+            if (!_songCacheMap.has(song.id)) {
+                _songCacheMap.set(song.id, song);
+            }
+        }
+        _lastLibraryLength = librarySongs.length;
+    }
+    return _songCacheMap.get(id) || null;
 }
