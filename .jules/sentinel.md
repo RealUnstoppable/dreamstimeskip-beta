@@ -1,0 +1,4 @@
+## 2024-05-13 - Path Traversal Vulnerability in Express Route
+**Vulnerability:** A local file inclusion/path traversal vulnerability existed in the fallback static file routing of `server.js`. The previous code relied on `path.normalize` and string replacement (`replace(/^(\.\.[\/\\])+/, '')`) which failed to prevent exploitation when URI encoded or using tricky boundary characters.
+**Learning:** `path.normalize()` is insufficient on its own and regex string manipulation for directory traversal bypasses is almost universally flawed because it only strips exact patterns rather than evaluating the resolved absolute path.
+**Prevention:** Always `decodeURIComponent` explicitly, check for null-bytes (`indexOf('\0') !== -1`), use `path.resolve` relative to the allowed base directory, and explicitly verify using `startsWith` that the resolved path is contained completely within the base directory.
