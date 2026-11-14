@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-11-13T11:55:01.595Z",
-  "dateFormatted": "Nov 13, 2026",
+  "timestamp": "2026-11-14T11:15:22.854Z",
+  "dateFormatted": "Nov 14, 2026",
   "overallStatus": "Maintenance",
   "badgeClass": "maintenance",
   "systems": [
@@ -107,6 +107,6 @@
   "operationalCount": 8,
   "offlineCount": 0,
   "maintenanceCount": 2,
-  "durationMs": 1420,
+  "durationMs": 470,
   "allDiscoveredPagesCount": 52
 }
