@@ -326,15 +326,29 @@
 
 .lexi-cart-glyph {
     position: absolute;
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     pointer-events: none;
     z-index: 2;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+}
+
+.lexi-cart-glyph svg {
+    width: 22px;
+    height: 22px;
+    display: block;
 }
 
 #siri-orb.expanded .lexi-cart-glyph,
 #siri-orb.expanded .lexi-cart-badge {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#siri-orb.has-music .lexi-cart-glyph {
     opacity: 0;
     pointer-events: none;
 }

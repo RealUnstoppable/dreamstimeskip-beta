@@ -206,12 +206,6 @@ export function loadNavbar() {
             <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="store.html">Shop</a></li>
-            <li>
-                <a href="cart.html" id="nav-cart-btn" class="nav-cart-btn" aria-label="Shopping Cart" title="View Cart">
-                    <span class="nav-cart-icon" style="font-size: 1.15rem; line-height: 1;">🛒</span>
-                    <span id="nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
-                </a>
-            </li>
             ${dtsStoreNavItem}
             <li><a href="blog.html">Blog</a></li>
             <li><a href="https://autolux.realunstoppable.store">Autolux</a></li>
@@ -268,12 +262,6 @@ export function loadUdsNavbar() {
             <li><a href="dts.html">Dreams TimeSkip</a></li>
             <li><a href="medixly.html">Medixly</a></li>
             <li><a href="store.html">Shop</a></li>
-            <li>
-                <a href="cart.html" id="uds-nav-cart-btn" class="nav-cart-btn" aria-label="Shopping Cart" title="View Cart">
-                    <span class="nav-cart-icon" style="font-size: 1.15rem; line-height: 1;">🛒</span>
-                    <span id="uds-nav-cart-badge" class="nav-cart-badge" style="display:none;">0</span>
-                </a>
-            </li>
             <li class="nav-dropdown-wrapper">
                 <a href="#" style="cursor: default;">Autolux ▾</a>
                 <div class="nav-dropdown">
@@ -359,6 +347,9 @@ function initNavbarCart() {
         }
     } catch (_) {}
     updateNavbarCartBadge(count);
+    if (typeof window !== 'undefined' && typeof window.updateLexiCartCount === 'function') {
+        window.updateLexiCartCount(count);
+    }
 
     if (typeof window !== 'undefined' && !window._navbarCartListenerAttached) {
         window._navbarCartListenerAttached = true;
@@ -372,6 +363,9 @@ function initNavbarCart() {
                 } catch (_) {}
             }
             updateNavbarCartBadge(c);
+            if (typeof window.updateLexiCartCount === 'function') {
+                window.updateLexiCartCount(c);
+            }
         });
         window.addEventListener('storage', (e) => {
             if (e.key === 'localCart' || e.key === 'cartItemCount') {
@@ -380,6 +374,9 @@ function initNavbarCart() {
                     c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
                 } catch (_) {}
                 updateNavbarCartBadge(c);
+                if (typeof window.updateLexiCartCount === 'function') {
+                    window.updateLexiCartCount(c);
+                }
             }
         });
     }

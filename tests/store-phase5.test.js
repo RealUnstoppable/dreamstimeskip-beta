@@ -28,10 +28,15 @@ describe('PHASE 5: Store & Global Header Overhaul', () => {
             expect(navbarJs).not.toMatch(/<li><a[^>]*href="memberships\.html"[^>]*>Memberships<\/a><\/li>/i);
         });
 
-        test('Replaces text Cart with 🛒 cart icon in standard navigation bar', () => {
-            expect(navbarJs).toContain('nav-cart-icon');
-            expect(navbarJs).toContain('🛒');
-            expect(navbarJs).toContain('nav-cart-badge');
+        test('Removes Cart nav link from sitewide header navigation', () => {
+            expect(navbarJs).not.toMatch(/<ul class="nav-links"[^>]*>[\s\S]*?<a[^>]*href="cart\.html"[^>]*id="nav-cart-btn"/i);
+            expect(navbarJs).not.toMatch(/<ul class="nav-links"[^>]*>[\s\S]*?<a[^>]*href="cart\.html"[^>]*id="uds-nav-cart-btn"/i);
+        });
+
+        test('Verifies Lexi orb contains cart icon glyph and notification badge', () => {
+            const sitewidePlayerJs = fs.readFileSync(path.join(rootDir, 'js', 'sitewide-player.js'), 'utf-8');
+            expect(sitewidePlayerJs).toContain('lexi-cart-glyph');
+            expect(sitewidePlayerJs).toContain('lexi-cart-badge');
         });
     });
 
