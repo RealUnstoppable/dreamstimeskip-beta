@@ -693,6 +693,277 @@
             100% { box-shadow: 0 0 38px rgba(216, 180, 254, 0.85); }
         }
 
+        /* --- Dreams Christmas Festive Countdown Theme --- */
+        .countdown-christmas {
+            margin-bottom: 20px;
+        }
+
+        .countdown-christmas .flip-card {
+            background: #0f281e;
+            border: 3px solid #dc2626;
+            box-shadow: 0 5px 0 #7f1d1d, 0 8px 24px rgba(220, 38, 38, 0.4), 0 0 16px rgba(34, 197, 94, 0.35);
+        }
+
+        .countdown-christmas .top-half,
+        .countdown-christmas .bottom-half,
+        .countdown-christmas .top-flip,
+        .countdown-christmas .bottom-flip {
+            background: linear-gradient(180deg, #164e33 0%, #0d281a 100%);
+            color: #fef08a;
+            font-family: var(--mc-font-pixel);
+            text-shadow: 2px 2px 0 #000, 0 0 12px rgba(254, 240, 138, 0.7);
+        }
+
+        .countdown-christmas .top-half {
+            border-bottom: 2px solid #7f1d1d;
+            box-shadow: inset 2px 2px 0 #15803d;
+        }
+
+        .countdown-christmas .bottom-half {
+            box-shadow: inset 2px -2px 0 #052e16;
+        }
+
+        .countdown-christmas .time-label {
+            color: #86efac;
+            text-shadow: 1px 1px 0 #000, 0 0 8px rgba(34, 197, 94, 0.6);
+            letter-spacing: 1.5px;
+            font-family: var(--mc-font-pixel);
+            text-transform: uppercase;
+        }
+
+        .countdown-ended-christmas {
+            font-family: var(--mc-font-pixel);
+            font-size: 2.2rem;
+            color: #fef08a !important;
+            text-shadow: 3px 3px 0 #000, 0 0 25px #ef4444;
+            padding: 20px;
+            background: rgba(15, 40, 30, 0.95);
+            border: 3px solid #22c55e !important;
+            box-shadow: 0 0 35px rgba(220, 38, 38, 0.65) !important;
+        }
+
+        /* ========================================================
+           DREAMS CHRISTMAS 2026 EVENT BANNER STYLES
+           ======================================================== */
+        .dts-christmas-banner {
+            position: relative;
+            background: 
+                radial-gradient(circle at 50% 15%, rgba(220, 38, 38, 0.22) 0%, rgba(22, 101, 52, 0.28) 45%, rgba(10, 20, 16, 0.98) 100%),
+                #07140e;
+            border-top: 4px solid #dc2626;
+            border-bottom: 4px solid #16a34a;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), inset 0 0 60px rgba(22, 101, 52, 0.35);
+            padding: 55px 20px 60px;
+            text-align: center;
+            overflow: hidden;
+            z-index: 4;
+        }
+
+        .dts-christmas-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(90deg, #dc2626 0px, #dc2626 20px, #ffffff 20px, #ffffff 40px, #16a34a 40px, #16a34a 60px, #ffffff 60px, #ffffff 80px);
+            z-index: 2;
+        }
+
+        .christmas-snow-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 80px 120px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 60px, rgba(254, 240, 138, 0.85), rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 240px 180px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 320px 90px, rgba(255,255,255,0.95), rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 420px 220px, rgba(254, 240, 138, 0.9), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 520px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 640px 140px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 780px 200px, rgba(254, 240, 138, 0.85), rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 900px 80px, #ffffff, rgba(0,0,0,0));
+            background-size: 550px 300px;
+            opacity: 0.55;
+        }
+
+        .christmas-banner-content {
+            position: relative;
+            z-index: 3;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .mc-badge-christmas {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.35) 0%, rgba(22, 101, 52, 0.45) 100%);
+            border: 2px solid #22c55e;
+            color: #fef08a;
+            text-shadow: 0 0 10px rgba(254, 240, 138, 0.6), 1px 1px 0 #000;
+            box-shadow: 0 0 18px rgba(34, 197, 94, 0.4);
+            margin-bottom: 14px;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+        }
+
+        .christmas-heading {
+            font-family: var(--mc-font-pixel);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            color: #ffffff;
+            margin: 0 0 14px;
+            text-shadow: 3px 3px 0 #000, 0 0 24px rgba(239, 68, 68, 0.65), 0 0 35px rgba(34, 197, 94, 0.4);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .christmas-subtitle {
+            font-size: clamp(0.95rem, 2vw, 1.15rem);
+            color: #e2e8f0;
+            max-width: 780px;
+            margin: 0 auto 26px;
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .christmas-subtitle strong {
+            color: #fef08a;
+            text-shadow: 0 0 8px rgba(254, 240, 138, 0.5);
+        }
+
+        .christmas-countdown-wrapper {
+            background: rgba(10, 26, 18, 0.85);
+            border: 2px solid #16a34a;
+            border-radius: 12px;
+            padding: 22px 20px 10px;
+            margin-bottom: 35px;
+            width: 100%;
+            max-width: 720px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(34, 197, 94, 0.25);
+        }
+
+        .christmas-countdown-title {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.92rem;
+            color: #f87171;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 0 #000, 0 0 10px rgba(248, 113, 113, 0.6);
+        }
+
+        .christmas-rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 18px;
+            width: 100%;
+            margin-bottom: 35px;
+        }
+
+        .christmas-reward-card {
+            background: linear-gradient(145deg, rgba(15, 38, 26, 0.9) 0%, rgba(10, 20, 16, 0.95) 100%);
+            border: 2px solid #15803d;
+            border-top: 3px solid #22c55e;
+            border-bottom: 3px solid #14532d;
+            padding: 22px 18px;
+            border-radius: 8px;
+            text-align: left;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .christmas-reward-card:hover {
+            transform: translateY(-5px);
+            border-color: #ef4444;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.7), 0 0 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .xmas-card-badge {
+            font-family: var(--mc-font-pixel);
+            font-size: 0.68rem;
+            letter-spacing: 1px;
+            color: #fef08a;
+            background: rgba(220, 38, 38, 0.4);
+            border: 1px solid #ef4444;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .xmas-card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .christmas-reward-card h3 {
+            font-family: var(--mc-font-pixel);
+            font-size: 1.15rem;
+            color: #ffffff;
+            margin: 0 0 8px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .christmas-reward-card p {
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .christmas-cta-row {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .mc-btn-red {
+            background-color: var(--mc-red, #b91c1c);
+            border-color: var(--mc-red-border, #7f1d1d);
+            border-top-color: #ef4444;
+            border-left-color: #ef4444;
+            color: #fff;
+            box-shadow: 0 4px 0 #450a0a, 0 6px 16px rgba(185, 28, 28, 0.4);
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .mc-btn-red:hover {
+            background-color: #dc2626;
+            box-shadow: 0 2px 0 #450a0a, 0 4px 12px rgba(185, 28, 28, 0.6);
+            transform: translateY(2px);
+        }
+
+        @media (max-width: 600px) {
+            .dts-christmas-banner {
+                padding: 40px 14px;
+            }
+            .christmas-rewards-grid {
+                grid-template-columns: 1fr;
+            }
+            .christmas-countdown-wrapper {
+                padding: 16px 10px 6px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .christmas-reward-card {
+                transition: none;
+            }
+            .christmas-reward-card:hover {
+                transform: none;
+            }
+        }
+
         /* ========================================================
            MINECRAFT SERVER MAINTENANCE BOX & LOOPING PROGRESS BAR
            ======================================================== */
@@ -3596,6 +3867,81 @@
         </section>
 
         <!-- ========================================================
+             SECTION: DREAMS CHRISTMAS 2026 EVENT BANNER
+             ======================================================== -->
+        <section class="dts-christmas-banner" id="dreams-christmas-banner" aria-label="Dreams Christmas Event">
+            <div class="christmas-snow-overlay" aria-hidden="true"></div>
+            
+            <div class="christmas-banner-content">
+                <div class="mc-badge mc-badge-christmas">
+                    <span class="xmas-icon" aria-hidden="true">🎄</span>
+                    <span>HOLIDAY REALM EVENT • STARTS 12.01.2026</span>
+                    <span class="xmas-icon" aria-hidden="true">🎁</span>
+                </div>
+
+                <h2 class="christmas-heading" aria-label="Dreams Christmas starts 12.01.2026">
+                    <span class="xmas-emoji" aria-hidden="true">🎅</span> Dreams Christmas starts 12.01.2026 <span class="xmas-emoji" aria-hidden="true">❄️</span>
+                </h2>
+
+                <p class="christmas-subtitle">
+                    The winter holiday season arrives on Dreams TimeSkip! Starting <strong>12.01.2026</strong>, celebrate with festive world events, seasonal quests, holiday crates, and <strong>players will get loads of rewards!</strong>
+                </p>
+
+                <!-- Christmas Themed Countdown -->
+                <div class="christmas-countdown-wrapper">
+                    <div class="christmas-countdown-title">
+                        <span aria-hidden="true">🍬</span> COUNTDOWN TO DREAMS CHRISTMAS (12.01.2026) <span aria-hidden="true">🍬</span>
+                    </div>
+                    <div id="countdown-christmas" class="countdown-container countdown-christmas"></div>
+                </div>
+
+                <!-- Rewards Highlights: Players will get loads of rewards -->
+                <div class="christmas-rewards-grid" role="region" aria-label="Dreams Christmas Rewards Highlights">
+                    <div class="christmas-reward-card">
+                        <div class="xmas-card-badge">DAILY LOOT</div>
+                        <div class="xmas-card-icon" aria-hidden="true">🎁</div>
+                        <h3>Loads of Rewards</h3>
+                        <p>Log in every day starting December 1st to claim advent calendar gifts, holiday loot keys, and exclusive seasonal gear.</p>
+                    </div>
+
+                    <div class="christmas-reward-card">
+                        <div class="xmas-card-badge">HOLIDAY COSMETICS</div>
+                        <div class="xmas-card-icon" aria-hidden="true">❄️</div>
+                        <h3>Winter Armor &amp; Trims</h3>
+                        <p>Collect limited-edition Santa hats, glowing ice cloaks, snowflake particle trails, and candy cane weapon skins.</p>
+                    </div>
+
+                    <div class="christmas-reward-card">
+                        <div class="xmas-card-badge">COMMUNITY EVENTS</div>
+                        <div class="xmas-card-icon" aria-hidden="true">🎄</div>
+                        <h3>Snowy Realm Quests</h3>
+                        <p>Explore snowy transformed biomes, defeat the Frost King world boss, and unlock community holiday milestones.</p>
+                    </div>
+
+                    <div class="christmas-reward-card">
+                        <div class="xmas-card-badge">DOUBLE STREAKS</div>
+                        <div class="xmas-card-icon" aria-hidden="true">⚡</div>
+                        <h3>2X Streak Multipliers</h3>
+                        <p>Enjoy double streak progression points and bonus seasonal crate rolls throughout the entire holiday celebration.</p>
+                    </div>
+                </div>
+
+                <!-- Call to Action Buttons -->
+                <div class="christmas-cta-row">
+                    <button type="button" class="mc-btn mc-btn-green open-join-server-trigger" data-ip="dts.realunstoppable.store">
+                        <span>⚔️</span> Join Server (Get Ready)
+                    </button>
+                    <a href="https://discord.gg/aYuEdG9Gh7" target="_blank" rel="noopener noreferrer" class="mc-btn mc-btn-red" title="Join Discord Community">
+                        <span>🎁</span> Join Discord for Event Sneak Peeks
+                    </a>
+                    <button type="button" class="mc-btn mc-btn-gold open-waitlist-trigger">
+                        <span>❄️</span> Whitelist Registration
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
              SECTION 1B: DREAMS & DREAMS OG SCREENSHOT GALLERIES
              ======================================================== -->
         <section class="gallery-hub-section" id="realm-gallery">
@@ -4792,6 +5138,8 @@
                     clearInterval(this.interval);
                     if (this.container.id === 'countdown-1') {
                         this.container.innerHTML = "<div class='countdown-ended countdown-ended-purple'>🌌 THE END PORTAL IS NOW OPEN! 🌌</div>";
+                    } else if (this.container.id === 'countdown-christmas') {
+                        this.container.innerHTML = "<div class='countdown-ended countdown-ended-christmas'>🎄 DREAMS CHRISTMAS IS LIVE! 🎁</div>";
                     } else {
                         this.container.innerHTML = "<div class='countdown-ended'>THE WAIT IS OVER! DREAMS OG IS LIVE!</div>";
                     }
@@ -4863,6 +5211,8 @@
         // Initialize Countdowns:
         // End Portal opens 6:00 PM Friday November 20, 2026 EST
         new Countdown("2026-11-20T18:00:00-05:00", "countdown-1");
+        // Dreams Christmas starts 12.01.2026 (December 1, 2026 12:00 AM EST)
+        new Countdown("2026-12-01T00:00:00-05:00", "countdown-christmas");
         // Dreams TimeSkip launches January 15, 2027
         new Countdown("2027-01-15T12:00:00-05:00", "countdown-2", true);
 

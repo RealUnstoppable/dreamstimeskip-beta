@@ -402,5 +402,41 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
             expect(html).toContain('streakAudio.ensureContext()');
         });
     });
+
+    describe('Dreams Christmas 2026 Event Banner & Countdown Verification', () => {
+        it('renders the Dreams Christmas banner strictly below the End section and above realm gallery', () => {
+            expect(html).toContain('id="dreams-christmas-banner"');
+            expect(html).toContain('class="dts-christmas-banner"');
+
+            const endSectionIndex = html.indexOf('class="video-hero-container"');
+            const christmasBannerIndex = html.indexOf('id="dreams-christmas-banner"');
+            const gallerySectionIndex = html.indexOf('id="realm-gallery"');
+
+            expect(endSectionIndex).toBeGreaterThan(-1);
+            expect(christmasBannerIndex).toBeGreaterThan(endSectionIndex);
+            expect(gallerySectionIndex).toBeGreaterThan(christmasBannerIndex);
+        });
+
+        it('displays heading saying Dreams Christmas starts 12.01.2026 and promises loads of rewards', () => {
+            expect(html).toMatch(/Dreams Christmas starts 12\.01\.2026/i);
+            expect(html).toMatch(/players will get loads of rewards/i);
+            expect(html).toContain('Loads of Rewards');
+        });
+
+        it('contains the Christmas themed countdown container and initializes countdown for 12.01.2026', () => {
+            expect(html).toContain('id="countdown-christmas"');
+            expect(html).toContain('countdown-christmas');
+            expect(html).toContain('new Countdown("2026-12-01T00:00:00-05:00", "countdown-christmas");');
+            expect(html).toContain('countdown-ended-christmas');
+        });
+
+        it('contains Christmas themed CSS definitions (snow overlay, festive colors, rewards grid)', () => {
+            expect(html).toContain('.dts-christmas-banner');
+            expect(html).toContain('.christmas-snow-overlay');
+            expect(html).toContain('.countdown-christmas');
+            expect(html).toContain('.christmas-rewards-grid');
+            expect(html).toContain('.christmas-reward-card');
+        });
+    });
 });
 
