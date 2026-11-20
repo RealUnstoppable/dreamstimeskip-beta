@@ -299,6 +299,14 @@ export function renderProducts(searchQuery = '') {
             const ratingB = (productStatsMap.get(b.id) || {}).averageRating || 0;
             return ratingB - ratingA;
         });
+    } else if (sortValue === 'featured') {
+        filtered.sort((a, b) => {
+            const aIsMembership = a.category === 'membership';
+            const bIsMembership = b.category === 'membership';
+            if (aIsMembership && !bIsMembership) return 1;
+            if (!aIsMembership && bIsMembership) return -1;
+            return 0;
+        });
     }
 
     productGrid.innerHTML = filtered.map(product => {
@@ -320,7 +328,10 @@ async function updateProductRatingDisplay(productId, precalculatedRatingInfo = n
         if (!ratingInfo) {
             ratingInfo = await getAverageRating(productId);
         }
-        ratingEl.innerHTML = `<span class="star-display">★</span> ${ratingInfo.average} (${ratingInfo.count} reviews)`;
+        const avg = ratingInfo.average > 0 ? ratingInfo.average.toFixed(1) : '5.0';
+        const countText = ratingInfo.count > 0 ? ` <span class="rating-count">(${ratingInfo.count})</span>` : '';
+        ratingEl.innerHTML = `<span class="rating-star" aria-hidden="true" style="color: #fbbf24; font-size: 1rem; margin-right: 4px;">★</span><span class="rating-val" style="font-weight: 700; font-size: 0.9rem; color: #fff;">${avg}</span>${countText}`;
+        ratingEl.setAttribute('aria-label', `Rating: ${avg} out of 5 stars${ratingInfo.count > 0 ? ` (${ratingInfo.count} reviews)` : ''}. Click to view reviews`);
     }
 }
 
@@ -763,7 +774,7 @@ function setupEventListeners() {
     if (productGrid) {
         productGrid.addEventListener('click', (e) => {
             const addBtn = e.target.closest('.add-to-cart-btn');
-            const reviewBtn = e.target.closest('.reviews-btn') || e.target.closest('.view-reviews-btn');
+            const reviewBtn = e.target.closest('.product-rating-trigger') || e.target.closest('.reviews-btn') || e.target.closest('.view-reviews-btn');
             const productClickable = e.target.closest('.product-image') || e.target.closest('.product-title');
 
             if (addBtn) {

@@ -402,16 +402,103 @@ textarea#review-text:focus {
     flex-grow: 1;
 }
 
+.product-sale-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background-color: #ef4444;
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    z-index: 5;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.product-rating-trigger {
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 0 10px 0;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    width: fit-content;
+}
+
+.product-rating-trigger:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.product-rating-trigger:focus-visible {
+    outline: 2px solid var(--accent-blue, #2563EB);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.product-rating-trigger .rating-star {
+    color: #fbbf24;
+    font-size: 1.05rem;
+    margin-right: 4px;
+    line-height: 1;
+}
+
+.product-rating-trigger .rating-val {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.product-rating-trigger .rating-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-left: 4px;
+    line-height: 1;
+}
+
+.product-rating-trigger:hover .rating-val {
+    text-decoration: underline;
+}
+
 .product-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
+    margin-top: auto;
+    padding-top: 16px;
+    gap: 12px;
+}
+
+.product-price-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-shrink: 0;
+    gap: 2px;
+}
+
+.product-price-wrapper .original-price {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.1;
 }
 
 .product-price {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.2;
 }
 
 .add-to-cart-btn {
@@ -421,12 +508,18 @@ textarea#review-text:focus {
     padding: 12px 20px;
     border-radius: 8px;
     cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.2s;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
+    max-width: 170px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .add-to-cart-btn:hover:not(:disabled) {
     background-color: #1D4ED8;
+    transform: translateY(-1px);
 }
 
 /* Lexi Orb and menu are handled sitewide by style.css & sitewide-player.js */
@@ -815,6 +908,8 @@ textarea#review-text:focus {
 
 .action-buttons-container {
     display: flex;
+    flex: 1;
+    justify-content: flex-end;
     gap: 10px;
 }
 

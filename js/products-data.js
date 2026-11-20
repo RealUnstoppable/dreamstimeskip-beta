@@ -21,6 +21,27 @@ export const products = [
         stripeLivePriceId: 'price_1UW1JXBmfNp1AIykVW0NRe5A'
     },
     {
+        id: 'un250-heritage-tee',
+        name: 'UN 250 Heritage Special Tee',
+        price: 29.99,
+        originalPrice: 40.49,
+        salePrice: 30.36,
+        description: 'Heavyweight vintage-wash cotton tee with woven USA flag emblem and distressed hem tag.',
+        imageUrl: '/images/un250-flag.png',
+        extraImages: [
+            '/images/un250-flag.png',
+            '/images/unstoppable-logo.png',
+            '/images/un-logo.png'
+        ],
+        category: 'apparel',
+        sourceSite: 'unstoppable',
+        active: true,
+        stripeProductId: 'prod_VX5Yl2LvNZYbNu',
+        stripePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev',
+        stripeTestPriceId: 'price_1UW1FHBp2C5GdKaK9zrsWTyL',
+        stripeLivePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev'
+    },
+    {
         id: 'dts-model-tee',
         name: 'DTS Model Tee',
         price: 24.99,
@@ -143,27 +164,6 @@ export const products = [
         stripePriceId: 'price_1UW1MyBmfNp1AIykaZj4zktC',
         stripeTestPriceId: 'price_1UW1FGBp2C5GdKaK1VCn8EKP',
         stripeLivePriceId: 'price_1UW1MyBmfNp1AIykaZj4zktC'
-    },
-    {
-        id: 'un250-heritage-tee',
-        name: 'UN 250 Heritage Special Tee',
-        price: 29.99,
-        originalPrice: 40.49,
-        salePrice: 30.36,
-        description: 'Heavyweight vintage-wash cotton tee with woven USA flag emblem and distressed hem tag.',
-        imageUrl: '/images/un250-flag.png',
-        extraImages: [
-            '/images/un250-flag.png',
-            '/images/unstoppable-logo.png',
-            '/images/un-logo.png'
-        ],
-        category: 'apparel',
-        sourceSite: 'unstoppable',
-        active: true,
-        stripeProductId: 'prod_VX5Yl2LvNZYbNu',
-        stripePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev',
-        stripeTestPriceId: 'price_1UW1FHBp2C5GdKaK9zrsWTyL',
-        stripeLivePriceId: 'price_1UW1N4BmfNp1AIykMgSpSTev'
     },
     {
         id: 'dts-membership-premium',
