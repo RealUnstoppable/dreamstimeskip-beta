@@ -248,8 +248,8 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
     });
 
     describe('Dreams OG Launch & End Portal Countdown Configuration', () => {
-        it('configures the End Portal opening countdown for 11:59 PM EST on Friday, November 20, 2026', () => {
-            expect(html).toContain('new Countdown("2026-11-20T23:59:00-05:00", "countdown-1")');
+        it('configures the End Portal opening countdown for 12:00 PM EST on Saturday, November 21, 2026', () => {
+            expect(html).toContain('new Countdown("2026-11-21T12:00:00-05:00", "countdown-1")');
         });
 
         it('sets the Founder whitelist cutoff to 11:59 PM EDT launch on October 20, 2026', () => {
@@ -260,7 +260,7 @@ describe('Dreams TimeSkip Launch Portal Integrity', () => {
     describe('Dreams OG Maintenance, End Portal Header & Server Status Verification', () => {
         it('confirms End Portal opens header, purple countdown, and Dreams OG maintenance badges', () => {
             expect(html).toContain('DREAMS OG IN MAINTENANCE');
-            expect(html).toMatch(/<h1[^>]*>End Portal opens 11:59 PM friday (<span[^>]*>)?20(<\/span>)? 2026<\/h1>/i);
+            expect(html).toMatch(/<h1[^>]*>End Portal opens 12:00 PM saturday (<span[^>]*>)?21(<\/span>)? 2026<\/h1>/i);
             expect(html).toContain('countdown-purple');
             expect(html).toContain('/images/end-portal.jpg');
         });
