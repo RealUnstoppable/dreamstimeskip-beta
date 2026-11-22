@@ -608,15 +608,17 @@ class SitewideMusicEngine {
 
         // Global update function for external scripts
         window.updateLexiCartCount = (count) => {
+            const validCount = Math.max(0, parseInt(count, 10) || 0);
+            const display = validCount > 99 ? '99+' : validCount;
             const badge = document.getElementById('lexi-cart-badge');
             if (badge) {
-                badge.textContent = count;
-                badge.classList.toggle('hidden', count <= 0);
+                badge.textContent = display;
+                badge.classList.toggle('hidden', validCount <= 0);
             }
             const pillCount = document.getElementById('lexi-pill-cart-count');
             if (pillCount) {
-                pillCount.textContent = count;
-                pillCount.style.display = count > 0 ? 'inline-block' : 'none';
+                pillCount.textContent = display;
+                pillCount.style.display = validCount > 0 ? 'inline-block' : 'none';
             }
         };
 
@@ -705,8 +707,15 @@ class SitewideMusicEngine {
         const song = this.getCurrentSong();
         let count = 0;
         try {
-            count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+            const raw = localStorage.getItem('localCart');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                count = Object.values(parsed || {}).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
+            } else {
+                count = Math.max(0, parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0);
+            }
         } catch (_) { /* ignore playback or state error */ }
+        const displayCount = count > 99 ? '99+' : count;
 
         orb.innerHTML = `
             <span class="orb-text"></span>
@@ -720,7 +729,7 @@ class SitewideMusicEngine {
             <div class="lexi-soundwave-badge" style="display: ${isPlaying ? 'flex' : 'none'};">
                 <span></span><span></span><span></span>
             </div>
-            <div id="lexi-cart-badge" class="lexi-cart-badge ${count > 0 ? '' : 'hidden'}">${count}</div>
+            <div id="lexi-cart-badge" class="lexi-cart-badge ${count > 0 ? '' : 'hidden'}">${displayCount}</div>
         `;
     }
 
@@ -1033,14 +1042,16 @@ if (!window.MedixlyAPI) {
 
 // Global helper to update cart count in Lexi across all pages
 window.updateLexiCartCount = function(count) {
+    const validCount = Math.max(0, parseInt(count, 10) || 0);
     try {
-        localStorage.setItem('cartItemCount', String(count));
+        localStorage.setItem('cartItemCount', String(validCount));
     } catch (_) { /* ignore playback or state error */ }
 
+    const display = validCount > 99 ? '99+' : validCount;
     const badge = document.getElementById('lexi-cart-badge');
     if (badge) {
-        if (count > 0) {
-            badge.textContent = count;
+        if (validCount > 0) {
+            badge.textContent = display;
             badge.classList.remove('hidden');
         } else {
             badge.classList.add('hidden');
@@ -1049,8 +1060,8 @@ window.updateLexiCartCount = function(count) {
 
     const pillCount = document.getElementById('lexi-pill-cart-count');
     if (pillCount) {
-        if (count > 0) {
-            pillCount.textContent = count;
+        if (validCount > 0) {
+            pillCount.textContent = display;
             pillCount.style.display = 'inline-block';
         } else {
             pillCount.style.display = 'none';

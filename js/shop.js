@@ -368,7 +368,7 @@ function renderCart() {
 function updateCartSummary() {
     const { itemCount, totalPrice } = calculateCartSummary(cart, products);
 
-    if (cartItemCountEl) cartItemCountEl.textContent = itemCount;
+    if (cartItemCountEl) cartItemCountEl.textContent = itemCount > 99 ? '99+' : itemCount;
     if (cartTotalPriceEl) cartTotalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
     
     // Sync to localStorage
@@ -434,7 +434,8 @@ export async function handleAddToCart(productId, event, quantity = 1) {
         }
     }
 
-    cart[productId] = (cart[productId] || 0) + addQty;
+    const currentQty = parseInt(cart[productId], 10) || 0;
+    cart[productId] = Math.min(99, Math.max(1, currentQty + addQty));
     try {
         await saveCart();
         renderCart();
@@ -453,7 +454,7 @@ export async function handleUpdateQuantity(productId, quantity) {
         if (quantity <= 0) {
             await handleRemoveFromCart(productId);
         } else {
-            cart[productId] = parseInt(quantity, 10);
+            cart[productId] = Math.min(99, Math.max(1, parseInt(quantity, 10) || 1));
             await saveCart();
             renderCart();
         }
@@ -1374,7 +1375,13 @@ fetchProducts().then(() => {
 try {
     const localCartData = localStorage.getItem('localCart');
     if (localCartData) {
-        cart = JSON.parse(localCartData);
+        const parsed = JSON.parse(localCartData);
+        cart = {};
+        for (const [id, q] of Object.entries(parsed || {})) {
+            const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+            if (validQ > 0) cart[id] = validQ;
+        }
+        localStorage.setItem('localCart', JSON.stringify(cart));
         renderCart();
     }
 } catch (_) { /* ignore local storage error */ }
@@ -1385,7 +1392,13 @@ onAuthStateChanged(auth, async (user) => {
     let localCart = {};
     try {
         const localCartData = localStorage.getItem('localCart');
-        if (localCartData) localCart = JSON.parse(localCartData);
+        if (localCartData) {
+            const parsed = JSON.parse(localCartData);
+            for (const [id, q] of Object.entries(parsed || {})) {
+                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                if (validQ > 0) localCart[id] = validQ;
+            }
+        }
     } catch (_) { /* ignore local storage error */ }
 
     if (user) {
@@ -1415,11 +1428,19 @@ onAuthStateChanged(auth, async (user) => {
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
 
-            const mergedCart = { ...firestoreCart };
+            const mergedCart = {};
+            for (const [pid, q] of Object.entries(firestoreCart || {})) {
+                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                if (validQ > 0) mergedCart[pid] = validQ;
+            }
             let hasLocalItems = false;
-            for (const [productId, quantity] of Object.entries(localCart)) {
-                mergedCart[productId] = (mergedCart[productId] || 0) + quantity;
-                hasLocalItems = true;
+            for (const [productId, quantity] of Object.entries(localCart || {})) {
+                const localQ = Math.min(99, Math.max(0, parseInt(quantity, 10) || 0));
+                if (localQ > 0) {
+                    const currentQ = mergedCart[productId] || 0;
+                    mergedCart[productId] = Math.min(99, currentQ + localQ);
+                    hasLocalItems = true;
+                }
             }
 
             cart = mergedCart;

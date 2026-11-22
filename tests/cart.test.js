@@ -293,6 +293,31 @@ describe('Cart Business Logic, Pricing & Promo Codes (js/cart.js)', () => {
         expect(list.innerHTML).not.toContain('Dark cap with the HarmonyTunes logo. Perfect for music lovers.');
         expect(list.innerHTML).toContain('$24.99 each');
     });
+
+    it('sanitizes and clamps quantities from corrupted 1k+ storage to max 99', () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'unstoppable-hoodie': 1111,
+            'dts-model-tee': '1000'
+        }));
+        cartModule.loadCartFromStorage();
+        const totals = cartModule.calculateCartTotals();
+
+        expect(totals.itemCount).toBe(198); // 99 + 99, never 2111
+        const cleanedCart = JSON.parse(localStorage.getItem('localCart'));
+        expect(cleanedCart['unstoppable-hoodie']).toBe(99);
+        expect(cleanedCart['dts-model-tee']).toBe(99);
+    });
+
+    it('clamps quantity to 99 in handleUpdateQuantity', async () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'unstoppable-hoodie': 1
+        }));
+        cartModule.loadCartFromStorage();
+        await cartModule.handleUpdateQuantity('unstoppable-hoodie', 500);
+
+        const storedCart = JSON.parse(localStorage.getItem('localCart'));
+        expect(storedCart['unstoppable-hoodie']).toBe(99);
+    });
 });
 
 describe('Navbar Cart Badge Updates (js/navbar.js)', () => {
@@ -321,6 +346,19 @@ describe('Navbar Cart Badge Updates (js/navbar.js)', () => {
         expect(badge.textContent).toBe('5');
         expect(udsBadge.style.display).toBe('inline-flex');
         expect(udsBadge.textContent).toBe('5');
+    });
+
+    it('displays 99+ when cart count exceeds 99', () => {
+        const { updateNavbarCartBadge } = navbarModule;
+        updateNavbarCartBadge(1000);
+
+        const badge = document.getElementById('nav-cart-badge');
+        const udsBadge = document.getElementById('uds-nav-cart-badge');
+
+        expect(badge.style.display).toBe('inline-flex');
+        expect(badge.textContent).toBe('99+');
+        expect(udsBadge.style.display).toBe('inline-flex');
+        expect(udsBadge.textContent).toBe('99+');
     });
 
     it('hides badge when count is 0 or negative', () => {

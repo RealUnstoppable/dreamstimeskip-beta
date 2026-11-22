@@ -685,7 +685,13 @@ onAuthStateChanged(auth, async (user) => {
     let localCart = {};
     try {
         const localRaw = localStorage.getItem('localCart');
-        if (localRaw) localCart = JSON.parse(localRaw);
+        if (localRaw) {
+            const parsed = JSON.parse(localRaw);
+            for (const [id, q] of Object.entries(parsed || {})) {
+                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                if (validQ > 0) localCart[id] = validQ;
+            }
+        }
     } catch (_) { /* ignore parse error */ }
 
     // Direct Product Buy / Checkout Deep Link (e.g. ?productId=dts-limited-hoodie&quantity=1)
@@ -694,7 +700,7 @@ onAuthStateChanged(auth, async (user) => {
     const deepLinkQty = parseInt(urlParams.get('quantity') || '1', 10);
 
     if (deepLinkProductId) {
-        localCart[deepLinkProductId] = Math.max(1, deepLinkQty);
+        localCart[deepLinkProductId] = Math.min(99, Math.max(1, deepLinkQty));
         try {
             localStorage.setItem('localCart', JSON.stringify(localCart));
         } catch (_) {}
@@ -706,9 +712,14 @@ onAuthStateChanged(auth, async (user) => {
             const userCartRef = doc(db, 'carts', user.uid);
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
-            userCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
+            const rawUserCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
+            userCart = {};
+            for (const [id, q] of Object.entries(rawUserCart || {})) {
+                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                if (validQ > 0) userCart[id] = validQ;
+            }
             if (deepLinkProductId) {
-                userCart[deepLinkProductId] = Math.max(1, deepLinkQty);
+                userCart[deepLinkProductId] = Math.min(99, Math.max(1, deepLinkQty));
             }
         } catch (_) { /* ignore firestore read error */
             userCart = localCart;

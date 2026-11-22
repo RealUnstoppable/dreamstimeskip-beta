@@ -19,7 +19,23 @@ const getEl = (id) => (typeof document !== 'undefined' ? document.getElementById
 export function loadCartFromStorage() {
     try {
         const rawCart = localStorage.getItem('localCart');
-        cart = rawCart ? JSON.parse(rawCart) : {};
+        const parsed = rawCart ? JSON.parse(rawCart) : {};
+        cart = {};
+        let modified = false;
+        for (const [id, qty] of Object.entries(parsed || {})) {
+            const validQty = Math.min(99, Math.max(0, parseInt(qty, 10) || 0));
+            if (validQty > 0) {
+                cart[id] = validQty;
+                if (validQty !== qty) modified = true;
+            } else {
+                modified = true;
+            }
+        }
+        if (modified) {
+            try {
+                localStorage.setItem('localCart', JSON.stringify(cart));
+            } catch (_) {}
+        }
     } catch (_) {
         cart = {};
     }
@@ -88,7 +104,7 @@ export function calculateCartTotals() {
         const product = productMap.get(productId);
         if (!product) continue;
 
-        const validQuantity = Math.max(0, parseInt(quantity, 10) || 0);
+        const validQuantity = Math.min(99, Math.max(0, parseInt(quantity, 10) || 0));
         if (validQuantity > 0) {
             itemCount += validQuantity;
             subtotal += product.price * validQuantity;
@@ -147,7 +163,7 @@ export function renderCart() {
                 const product = productMap.get(productId);
                 if (!product) return '';
 
-                const q = Math.max(1, parseInt(quantity, 10) || 1);
+                const q = Math.min(99, Math.max(1, parseInt(quantity, 10) || 1));
                 const itemTotal = (product.price * q).toFixed(2);
                 const category = product.category || (product.name.includes('Hoodie') || product.name.includes('Tee') || product.name.includes('Cap') ? 'Apparel' : (product.name.includes('Vinyl') ? 'Music' : 'Merch'));
 
@@ -393,9 +409,14 @@ export function initCartPage() {
                     if (docSnap.exists()) {
                         const firestoreCart = docSnap.data().items;
                         if (firestoreCart && Object.keys(firestoreCart).length > 0) {
-                            // Merge local items into firestore or use firestore if local is empty
+                            const sanitizedFirestore = {};
+                            for (const [id, q] of Object.entries(firestoreCart)) {
+                                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                                if (validQ > 0) sanitizedFirestore[id] = validQ;
+                            }
+                            // Use firestore if local is empty
                             if (Object.keys(cart).length === 0) {
-                                cart = firestoreCart;
+                                cart = sanitizedFirestore;
                                 syncCartState();
                                 renderCart();
                             }

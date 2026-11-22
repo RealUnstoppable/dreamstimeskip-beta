@@ -60,6 +60,21 @@ describe('handleUpdateQuantity', () => {
         expect(cart['unstoppable-hoodie']).toBe(4);
     });
 
+    test('caps quantity at 99 when quantity > 99', async () => {
+        cart['unstoppable-hoodie'] = 1;
+        await handleUpdateQuantity('unstoppable-hoodie', 150);
+        expect(cart['unstoppable-hoodie']).toBe(99);
+    });
+
+    test('prevents string concatenation when adding to cart with existing string quantity', async () => {
+        const { handleAddToCart } = await import('../js/shop.js');
+        cart['unstoppable-hoodie'] = '1';
+        await handleAddToCart('unstoppable-hoodie', null, 1);
+        expect(cart['unstoppable-hoodie']).toBe(2);
+        await handleAddToCart('unstoppable-hoodie', null, 1);
+        expect(cart['unstoppable-hoodie']).toBe(3);
+    });
+
     test('logs error when product is not found', async () => {
         const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
         await handleUpdateQuantity('non-existent-product', 5);

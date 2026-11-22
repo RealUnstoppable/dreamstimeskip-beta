@@ -96,7 +96,7 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
                     <p>${product.price === 0 ? '<span class="free-badge">FREE (Beta)</span>' : '$' + product.price.toFixed(2)}</p>
                 </div>
                 <div class="cart-item-actions">
-                    <input type="number" value="${quantity}" min="1" data-id="${product.id}" class="item-quantity-input" title="Quantity for ${escapeHTML(product.name)}" aria-label="Quantity for ${escapeHTML(product.name)}">
+                    <input type="number" value="${Math.min(99, Math.max(1, parseInt(quantity, 10) || 1))}" min="1" max="99" data-id="${product.id}" class="item-quantity-input" title="Quantity for ${escapeHTML(product.name)}" aria-label="Quantity for ${escapeHTML(product.name)}">
                     <button class="remove-item-btn" data-id="${product.id}" title="Remove item" aria-label="Remove item">&#128465;</button>
                 </div>
             </div>

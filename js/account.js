@@ -2034,11 +2034,18 @@ async function addWishlistItemToCart(productId) {
         let cart = {};
         const localCartData = localStorage.getItem('localCart');
         if (localCartData) {
-            try { cart = JSON.parse(localCartData); } catch (_) {}
+            try {
+                const parsed = JSON.parse(localCartData);
+                for (const [id, q] of Object.entries(parsed || {})) {
+                    const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                    if (validQ > 0) cart[id] = validQ;
+                }
+            } catch (_) {}
         }
-        cart[productId] = (cart[productId] || 0) + 1;
+        const currentQty = parseInt(cart[productId], 10) || 0;
+        cart[productId] = Math.min(99, Math.max(1, currentQty + 1));
         localStorage.setItem('localCart', JSON.stringify(cart));
-        const itemCount = Object.values(cart).reduce((sum, q) => sum + (parseInt(q, 10) || 0), 0);
+        const itemCount = Object.values(cart).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
         localStorage.setItem('cartItemCount', itemCount.toString());
         window.dispatchEvent(new CustomEvent('cartUpdated', { detail: { cart, itemCount } }));
 

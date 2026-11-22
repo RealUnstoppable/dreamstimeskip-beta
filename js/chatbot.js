@@ -324,7 +324,7 @@ export function getCartSnapshot() {
     let count = 0;
 
     for (const [id, qty] of Object.entries(localCart)) {
-        const q = parseInt(qty, 10);
+        const q = Math.min(99, Math.max(0, parseInt(qty, 10) || 0));
         if (q > 0) {
             count += q;
             const product = productMap.get(id) || { id, name: id, price: 19.99, imageUrl: '/images/unstoppable-logo.png' };

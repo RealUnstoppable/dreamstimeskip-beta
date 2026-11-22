@@ -324,7 +324,7 @@ export function updateNavbarCartBadge(count) {
             const validCount = Math.max(0, parseInt(count, 10) || 0);
             if (validCount > 0) {
                 badge.style.display = 'inline-flex';
-                badge.textContent = validCount;
+                badge.textContent = validCount > 99 ? '99+' : validCount;
             } else {
                 badge.style.display = 'none';
             }
@@ -335,14 +335,17 @@ export function updateNavbarCartBadge(count) {
 function initNavbarCart() {
     let count = 0;
     try {
-        const stored = localStorage.getItem('cartItemCount');
-        if (stored !== null && stored !== '') {
-            count = parseInt(stored, 10) || 0;
+        const raw = localStorage.getItem('localCart');
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+                count = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
+                localStorage.setItem('cartItemCount', count.toString());
+            }
         } else {
-            const raw = localStorage.getItem('localCart');
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                count = Object.values(parsed).reduce((sum, q) => sum + (parseInt(q, 10) || 0), 0);
+            const stored = localStorage.getItem('cartItemCount');
+            if (stored !== null && stored !== '') {
+                count = Math.max(0, parseInt(stored, 10) || 0);
             }
         }
     } catch (_) {}
@@ -356,10 +359,16 @@ function initNavbarCart() {
         window.addEventListener('cartUpdated', (e) => {
             let c = 0;
             if (e.detail && typeof e.detail.itemCount === 'number') {
-                c = e.detail.itemCount;
+                c = Math.max(0, e.detail.itemCount);
             } else {
                 try {
-                    c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                    const raw = localStorage.getItem('localCart');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        c = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
+                    } else {
+                        c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                    }
                 } catch (_) {}
             }
             updateNavbarCartBadge(c);
@@ -371,7 +380,13 @@ function initNavbarCart() {
             if (e.key === 'localCart' || e.key === 'cartItemCount') {
                 let c = 0;
                 try {
-                    c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                    const raw = localStorage.getItem('localCart');
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        c = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
+                    } else {
+                        c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                    }
                 } catch (_) {}
                 updateNavbarCartBadge(c);
                 if (typeof window.updateLexiCartCount === 'function') {
