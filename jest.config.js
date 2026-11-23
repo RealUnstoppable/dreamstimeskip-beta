@@ -6,6 +6,9 @@ export default {
     "^.+\\.jsx?$": "babel-jest"
   },
   moduleNameMapper: {
+    "^node:test$": "<rootDir>/tests/__mocks__/node-test.js",
+    "^test$": "<rootDir>/tests/__mocks__/node-test.js",
+    "^.*/firebase-admin(\\.js)?$": "<rootDir>/tests/__mocks__/firebase-admin.js",
     "^https://.*/firebase-app\\.js$": "<rootDir>/tests/__mocks__/firebase-app.js",
     "^https://.*/firebase-auth\\.js$": "<rootDir>/tests/__mocks__/firebase-auth.js",
     "^https://.*/firebase-firestore\\.js$": "<rootDir>/tests/__mocks__/firebase-firestore.js",

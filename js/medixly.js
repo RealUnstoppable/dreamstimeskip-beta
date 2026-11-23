@@ -2813,33 +2813,12 @@ function initHarmonyTunes() {
         __recordHistory();
 
         // 2. ENDLESS QUEUE & PERSONALIZED FORWARD SKIP:
-        // Whenever manualQueue.length === 0, immediately query the user's Sound Profile,
-        // listening history, and current track metadata (artist/genre/tags) to select and play
-        // a personalized next track (never repeating the exact same song back-to-back).
-        if (!userQueue || userQueue.length === 0) {
-            const currentTrack = currentQueue[currentSongIndex];
-            const excludeIds = [currentTrack?.id].filter(Boolean);
-            let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true, excludeSongIds: excludeIds });
-            if (!nextSongToPlay || nextSongToPlay.id === currentTrack?.id) {
-                nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: excludeIds });
-            }
-
-            if (nextSongToPlay) {
-                currentQueue.splice(currentSongIndex + 1, 0, nextSongToPlay);
-                currentSongIndex = currentSongIndex + 1;
-                if (queuePanel && queuePanel.classList.contains('open')) {
-                    renderQueue();
-                }
-            } else if (currentQueue && currentQueue.length > 0) {
-                currentSongIndex = (currentSongIndex + 1) % currentQueue.length;
-            } else {
-                currentQueue = [getSmartFallbackRecommendation({ excludeCurrent: false })];
-                currentSongIndex = 0;
-            }
-        } else if (!currentQueue || currentQueue.length === 0) {
+        if (!currentQueue || currentQueue.length === 0) {
             let fallbackSong = recommendAndAutoQueueNextTrackSync({ excludeCurrent: false });
             if (!fallbackSong) {
                 fallbackSong = getSmartFallbackRecommendation({ excludeCurrent: false });
+                currentQueue = [fallbackSong];
+            } else if (!currentQueue.includes(fallbackSong)) {
                 currentQueue = [fallbackSong];
             }
             currentSongIndex = 0;
@@ -2853,9 +2832,11 @@ function initHarmonyTunes() {
                 } else if (repeatMode === 1 && currentQueue.length > 1) {
                     currentSongIndex = 0;
                 } else {
-                    let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true });
-                    if (!nextSongToPlay) {
-                        nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true });
+                    const currentTrack = currentQueue[currentSongIndex];
+                    const excludeIds = [currentTrack?.id].filter(Boolean);
+                    let nextSongToPlay = recommendAndAutoQueueNextTrackSync({ excludeCurrent: true, excludeSongIds: excludeIds });
+                    if (!nextSongToPlay || nextSongToPlay.id === currentTrack?.id) {
+                        nextSongToPlay = getSmartFallbackRecommendation({ excludeCurrent: true, excludeSongIds: excludeIds });
                         currentQueue.push(nextSongToPlay);
                     }
                     currentSongIndex = currentQueue.length - 1;

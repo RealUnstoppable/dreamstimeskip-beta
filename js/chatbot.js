@@ -421,7 +421,7 @@ export function syncLexiDOMState() {
     const severed = isNetworkSevered();
 
     if (badge && badgeText) {
-        if (severed) {
+        if (severed || (!isLiveAI && !chatSession)) {
             badge.className = 'lexi-status-badge offline';
             badge.title = 'Offline Mode: Network Transport Severed';
             badgeText.textContent = 'Offline Lexi';
@@ -1113,7 +1113,9 @@ export function ensureChatSession() {
         });
         isLiveAI = true;
     } catch (err) {
+        console.error("Manager info: AI Model Initialization Failed", err);
         console.warn("Manager info: Vertex AI initialization deferral:", err.message || err);
+        isLiveAI = false;
     }
     return chatSession;
 }
@@ -1151,9 +1153,9 @@ export function initChatbot() {
             <div class="chatbot-header">
                 <div class="chatbot-title-container">
                     <h3>Lexi</h3>
-                    <span id="lexi-status-badge" class="lexi-status-badge ${isNetworkSevered() ? 'offline' : 'live'}" title="${isNetworkSevered() ? 'Offline Mode: Network Transport Severed' : 'Live Vertex AI Active (realunstoppable.store)'}">
+                    <span id="lexi-status-badge" class="lexi-status-badge ${(isNetworkSevered() || (!isLiveAI && !chatSession)) ? 'offline' : 'live'}" title="${(isNetworkSevered() || (!isLiveAI && !chatSession)) ? 'Offline Mode: Network Transport Severed' : 'Live Vertex AI Active (realunstoppable.store)'}">
                         <span class="status-dot"></span>
-                        <span id="lexi-status-text">${isNetworkSevered() ? 'Offline Lexi' : 'Live Lexi'}</span>
+                        <span id="lexi-status-text">${(isNetworkSevered() || (!isLiveAI && !chatSession)) ? 'Offline Lexi' : 'Live Lexi'}</span>
                     </span>
                 </div>
                 <div class="chatbot-header-actions">

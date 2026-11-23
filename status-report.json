@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-23T14:06:24.189Z",
+  "timestamp": "2026-11-23T15:31:12.032Z",
   "dateFormatted": "Nov 23, 2026",
-  "overallStatus": "Maintenance",
-  "badgeClass": "maintenance",
+  "overallStatus": "Operational",
+  "badgeClass": "online",
   "systems": [
     {
       "id": "hub",
@@ -22,21 +22,15 @@
       "id": "medixly",
       "name": "Medixly Music",
       "primaryPage": "medixly.html",
-      "status": "Maintenance",
-      "issues": [
-        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html",
-        "Missing local asset: \"/download/windows\" in medixly.html"
-      ]
+      "status": "Operational",
+      "issues": []
     },
     {
       "id": "unstoppable",
       "name": "Unstoppable Gaming",
       "primaryPage": "unstoppable.html",
-      "status": "Maintenance",
-      "issues": [
-        "Missing local asset: \"/images/gallery-3.jpg\" in unstoppable.html",
-        "Missing local asset: \"/images/gallery-2.jpg\" in unstoppable.html"
-      ]
+      "status": "Operational",
+      "issues": []
     },
     {
       "id": "fotd",
@@ -81,32 +75,11 @@
       "issues": []
     }
   ],
-  "offlineSystems": [
-    {
-      "id": "medixly",
-      "name": "Medixly Music",
-      "primaryPage": "medixly.html",
-      "status": "Maintenance",
-      "issues": [
-        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html",
-        "Missing local asset: \"/download/windows\" in medixly.html"
-      ]
-    },
-    {
-      "id": "unstoppable",
-      "name": "Unstoppable Gaming",
-      "primaryPage": "unstoppable.html",
-      "status": "Maintenance",
-      "issues": [
-        "Missing local asset: \"/images/gallery-3.jpg\" in unstoppable.html",
-        "Missing local asset: \"/images/gallery-2.jpg\" in unstoppable.html"
-      ]
-    }
-  ],
+  "offlineSystems": [],
   "totalSystems": 10,
-  "operationalCount": 8,
+  "operationalCount": 10,
   "offlineCount": 0,
-  "maintenanceCount": 2,
-  "durationMs": 355,
+  "maintenanceCount": 0,
+  "durationMs": 531,
   "allDiscoveredPagesCount": 52
 }

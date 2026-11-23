@@ -140,6 +140,8 @@ function shouldIgnoreReference(ref) {
     trimmed.startsWith('tel:') ||
     trimmed.startsWith('javascript:') ||
     trimmed.startsWith('minecraft:') ||
+    trimmed.startsWith('/download/') ||
+    trimmed.startsWith('/api/') ||
     trimmed.includes('${') ||
     trimmed.includes('{{')
   );

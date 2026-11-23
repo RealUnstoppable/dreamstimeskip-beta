@@ -316,10 +316,14 @@ export class AppleWheelPicker {
         if (!this.scrollEl) return;
         const targetScrollTop = this.selectedIndex * this.itemHeight;
         if (Math.abs(this.scrollEl.scrollTop - targetScrollTop) > 1) {
-            this.scrollEl.scrollTo({
-                top: targetScrollTop,
-                behavior: 'smooth'
-            });
+            if (typeof this.scrollEl.scrollTo === 'function') {
+                this.scrollEl.scrollTo({
+                    top: targetScrollTop,
+                    behavior: 'smooth'
+                });
+            } else {
+                this.scrollEl.scrollTop = targetScrollTop;
+            }
         }
     }
 
@@ -450,10 +454,14 @@ export class AppleWheelPicker {
         const targetScrollTop = targetIdx * this.itemHeight;
 
         if (this.scrollEl) {
-            this.scrollEl.scrollTo({
-                top: targetScrollTop,
-                behavior: smooth ? 'smooth' : 'auto'
-            });
+            if (typeof this.scrollEl.scrollTo === 'function') {
+                this.scrollEl.scrollTo({
+                    top: targetScrollTop,
+                    behavior: smooth ? 'smooth' : 'auto'
+                });
+            } else {
+                this.scrollEl.scrollTop = targetScrollTop;
+            }
         }
 
         this.selectedIndex = targetIdx;
