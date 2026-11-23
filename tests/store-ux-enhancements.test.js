@@ -80,7 +80,7 @@ describe('Store UX Enhancements: Rating Trigger, Clean Descriptions, Expanded Ad
             expect(priceWrapperMatch[1]).not.toContain('product-sale-tag');
         });
 
-        test('Expands Add to Cart button and gives price ample room', () => {
+        test('Expands Add to Cart button and gives price ample room with reduced height', () => {
             const html = generateProductCardHtml(testProduct, 'shop');
             expect(html).toContain('add-to-cart-btn');
             expect(html).toContain('action-buttons-container');
@@ -88,6 +88,21 @@ describe('Store UX Enhancements: Rating Trigger, Clean Descriptions, Expanded Ad
             const shopCss = fs.readFileSync(path.join(rootDir, 'css', 'shop.css'), 'utf-8');
             expect(shopCss).toContain('.product-sale-tag');
             expect(shopCss).toContain('.product-rating-trigger');
+            expect(shopCss).toMatch(/\.add-to-cart-btn\s*\{[^}]*padding:\s*8px\s+18px/);
+            expect(shopCss).toMatch(/\.product-footer\s*\{[^}]*gap:\s*16px/);
+        });
+
+        test('Eliminates multiple prices and duplicate info, rendering only the single active price', () => {
+            const html = generateProductCardHtml(testProduct, 'shop');
+            expect(html).not.toContain('original-price');
+            expect(html).toContain('product-price');
+            expect(html).toContain('$60.74');
+
+            // Verify only one price element is in the price wrapper
+            const priceWrapperMatch = html.match(/<div class="product-price-wrapper"[^>]*>([\s\S]*?)<\/div>/);
+            expect(priceWrapperMatch).not.toBeNull();
+            expect(priceWrapperMatch[1]).not.toContain('original-price');
+            expect(priceWrapperMatch[1].match(/\$/g).length).toBe(1);
         });
     });
 
@@ -108,10 +123,17 @@ describe('Store UX Enhancements: Rating Trigger, Clean Descriptions, Expanded Ad
     });
 
     describe('4. Store HTML Featured Memberships Alignment', () => {
-        test('Featured memberships have discount tags top-left and rating triggers', () => {
+        test('Featured memberships have discount tags top-left and rating triggers without duplicate prices', () => {
             const storeHtml = fs.readFileSync(path.join(rootDir, 'store.html'), 'utf-8');
             expect(storeHtml).toContain('product-rating-trigger');
             expect(storeHtml).toMatch(/featured-membership-card[\s\S]*?product-sale-tag/);
+            
+            // Check featured membership cards do not show multiple/original prices
+            const featuredSectionMatch = storeHtml.match(/<section class="featured-memberships-spotlight"[\s\S]*?<\/section>/);
+            expect(featuredSectionMatch).not.toBeNull();
+            expect(featuredSectionMatch[0]).not.toContain('original-price');
+            expect(featuredSectionMatch[0]).not.toContain('$9.99');
+            expect(featuredSectionMatch[0]).not.toContain('$19.99');
         });
     });
 });

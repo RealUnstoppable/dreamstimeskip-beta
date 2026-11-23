@@ -795,6 +795,22 @@ function setupEventListeners() {
         });
     }
 
+    // Featured membership spotlight listeners
+    const featuredSpotlight = document.getElementById('featured-memberships-spotlight');
+    if (featuredSpotlight) {
+        featuredSpotlight.addEventListener('click', (e) => {
+            const reviewBtn = e.target.closest('.product-rating-trigger');
+            const productClickable = e.target.closest('.product-image') || e.target.closest('h3');
+            if (reviewBtn || productClickable) {
+                const targetEl = reviewBtn || productClickable;
+                const productId = targetEl.dataset.id || (targetEl.closest('.product-card') ? targetEl.closest('.product-card').dataset.id : null);
+                if (productId) {
+                    openReviewsModal(productId);
+                }
+            }
+        });
+    }
+
     // Thumbnail switching in Store Detail Popup
     const detailThumbs = document.getElementById('detail-thumbnails');
     if (detailThumbs) {

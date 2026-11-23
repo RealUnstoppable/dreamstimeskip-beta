@@ -58,6 +58,8 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
             ? `<span class="rating-count">(${stats.reviewCount})</span>`
             : '';
 
+        const priceText = product.price === 0 ? 'FREE (Beta)' : `$${currentSalePrice.toFixed(2)}`;
+
         return `
             <div class="product-card">
                 ${discountBadgeHtml}
@@ -75,8 +77,7 @@ export function generateProductCardHtml(product, mode, quantity = 1, isWishliste
                     <p>${escapeHTML(product.description)}</p>
                     <div class="product-footer">
                         <div class="product-price-wrapper">
-                            <span class="original-price">$${origPrice.toFixed(2)}</span>
-                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">$${currentSalePrice.toFixed(2)}</span>
+                            <span class="product-price ${product.price === 0 ? 'free-badge' : ''}">${priceText}</span>
                         </div>
                         <div class="action-buttons-container">
                             <button type="button" class="add-to-cart-btn" data-id="${product.id}" aria-label="Add ${escapeHTML(product.name)} to cart">Add to Cart</button>
