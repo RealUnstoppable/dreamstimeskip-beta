@@ -185,31 +185,40 @@
 
 .star-rating-input {
     display: flex;
-    gap: 5px;
+    flex-direction: row;
+    direction: ltr;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
     font-size: 2rem;
     color: #444; /* Dimmed unselected stars */
     cursor: pointer;
     margin-bottom: 15px;
+    user-select: none;
 }
 
 .star-rating-input .star-input {
-    transition: color 0.2s;
+    display: inline-block;
+    color: #444;
+    transition: color 0.15s ease, transform 0.15s ease;
+    cursor: pointer;
 }
 
-.star-rating-input .star-input.active,
-.star-rating-input .star-input:hover,
-.star-rating-input .star-input:hover ~ .star-input {
+.star-rating-input .star-input:hover {
+    transform: scale(1.18);
+}
+
+.star-rating-input .star-input.active {
     color: #FBBF24;
 }
 
-/* Override the sibling hover trick to work left-to-right properly */
-.star-rating-input {
-  direction: rtl;
-  justify-content: flex-end;
+/* Left-to-right hover preview */
+.star-rating-input:hover .star-input {
+    color: #444;
 }
 .star-rating-input .star-input:hover,
-.star-rating-input .star-input:hover ~ .star-input {
-  color: #FBBF24;
+.star-rating-input .star-input:has(~ .star-input:hover) {
+    color: #FBBF24;
 }
 
 textarea#review-text {
@@ -264,23 +273,146 @@ textarea#review-text:focus {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
+    position: relative;
+}
+
+.review-author-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.review-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.review-meta {
+    display: flex;
+    flex-direction: column;
 }
 
 .review-author {
     font-weight: 600;
     color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.2;
 }
 
 .review-date {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
+}
+
+.review-actions-menu {
+    position: relative;
+}
+
+.review-menu-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.review-menu-btn:hover,
+.review-menu-btn:focus-visible {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary);
+    outline: none;
+}
+
+/* Dropdown Menu */
+.review-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: #1e1e24;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+    min-width: 150px;
+    padding: 6px;
+    z-index: 100;
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    animation: dropdownFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.review-dropdown-menu.active {
+    display: flex;
+}
+
+.review-dropdown-item {
+    background: transparent;
+    border: none;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.review-dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.review-dropdown-item.danger {
+    color: #ef4444;
+}
+
+.review-dropdown-item.danger:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+.review-dropdown-item svg {
+    flex-shrink: 0;
 }
 
 .review-stars {
     color: #FBBF24;
     font-size: 1rem;
     letter-spacing: 2px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .review-content {
@@ -288,6 +420,254 @@ textarea#review-text:focus {
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 0;
+}
+
+/* YouTube Style Like & Dislike */
+.review-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.review-reactions-group {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2px 4px;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.review-reactions-group:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.review-reaction-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #aaa);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.15s ease, transform 0.1s ease, background-color 0.15s ease;
+    user-select: none;
+}
+
+.review-reaction-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.review-reaction-btn:active {
+    transform: scale(0.92);
+}
+
+.review-reaction-btn.liked {
+    color: #3ea6ff; /* YouTube signature like blue */
+}
+
+.review-reaction-btn.liked svg {
+    fill: currentColor;
+}
+
+.review-reaction-btn.disliked {
+    color: #3ea6ff;
+}
+
+.review-reaction-btn.disliked svg {
+    fill: currentColor;
+}
+
+.review-reaction-separator {
+    width: 1px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 1px;
+}
+
+/* Inline Edit Box */
+.review-edit-box {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+}
+
+.edit-star-rating {
+    display: flex;
+    flex-direction: row;
+    direction: ltr;
+    justify-content: flex-start;
+    gap: 6px;
+    font-size: 1.5rem;
+    color: #444;
+    cursor: pointer;
+    margin-bottom: 8px;
+    user-select: none;
+}
+
+.edit-star-rating .edit-star {
+    transition: color 0.15s ease, transform 0.1s ease;
+}
+
+.edit-star-rating .edit-star:hover {
+    transform: scale(1.15);
+}
+
+.edit-star-rating .edit-star.active {
+    color: #FBBF24;
+}
+
+.edit-review-textarea {
+    width: 100%;
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 10px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+}
+
+.edit-review-textarea:focus {
+    outline: none;
+    border-color: #2563EB;
+}
+
+.edit-review-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-cancel-edit {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-secondary, #aaa);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.15s ease;
+}
+
+.btn-cancel-edit:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.btn-save-edit {
+    background: #2563EB;
+    border: none;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: background 0.15s ease;
+}
+
+.btn-save-edit:hover {
+    background: #1d4ed8;
+}
+
+/* Author Profile Modal */
+.author-profile-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.author-profile-card {
+    background: #18181b;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 360px;
+    width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+}
+
+.close-profile-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.author-profile-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.author-profile-card h3 {
+    margin: 0 0 6px;
+    font-size: 1.25rem;
+    color: #fff;
+}
+
+.profile-modal-badge {
+    color: #10B981;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.profile-modal-desc {
+    color: var(--text-secondary, #aaa);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.btn-profile-account {
+    display: inline-block;
+    background: #2563EB;
+    color: #fff;
+    text-decoration: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.15s ease;
+}
+
+.btn-profile-account:hover {
+    background: #1d4ed8;
 }
 
 .product-card {

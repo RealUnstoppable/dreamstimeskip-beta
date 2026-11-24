@@ -191,3 +191,111 @@ describe('openReviewsModal', () => {
     });
 });
 
+describe('review interactions and rendering', () => {
+    let renderReviewItemHtml;
+    let getUserReactions;
+    let setUserReaction;
+
+    beforeAll(async () => {
+        const module = await import('../js/shop.js');
+        renderReviewItemHtml = module.renderReviewItemHtml;
+        getUserReactions = module.getUserReactions;
+        setUserReaction = module.setUserReaction;
+    });
+
+    beforeEach(() => {
+        localStorage.clear();
+    });
+
+    test('renders review item with avatar, date, content and kebab menu', () => {
+        const review = {
+            id: 'rev_1',
+            productId: 'unstoppable-hoodie',
+            userId: 'user_123',
+            authorName: 'Alex Mercer',
+            rating: 5,
+            text: 'Amazing comfort and fit!',
+            likes: 4
+        };
+
+        const html = renderReviewItemHtml(review, 'user_999', [], {});
+
+        expect(html).toContain('Alex Mercer');
+        expect(html).toContain('A'); // avatar initial
+        expect(html).toContain('Amazing comfort and fit!');
+        expect(html).toContain('review-menu-btn');
+        expect(html).toContain('btn-view-profile');
+        // Non-owner should not see edit/delete
+        expect(html).not.toContain('btn-edit-review');
+        expect(html).not.toContain('btn-delete-review');
+        // Like and Dislike buttons present like YouTube
+        expect(html).toContain('btn-reaction-like');
+        expect(html).toContain('btn-reaction-dislike');
+        expect(html).toContain('4'); // likes count
+    });
+
+    test('renders Edit and Delete options for owner of review', () => {
+        const review = {
+            id: 'rev_mine',
+            productId: 'unstoppable-hoodie',
+            userId: 'my_uid',
+            authorName: 'Owner User',
+            rating: 4,
+            text: 'My personal review'
+        };
+
+        const html = renderReviewItemHtml(review, 'my_uid', [], {});
+
+        expect(html).toContain('btn-edit-review');
+        expect(html).toContain('btn-delete-review');
+        expect(html).toContain('btn-view-profile');
+    });
+
+    test('renders Edit and Delete for local author review even if unauthenticated', () => {
+        const review = {
+            id: 'rev_local_1',
+            productId: 'unstoppable-hoodie',
+            userId: null,
+            authorName: 'Guest',
+            rating: 5,
+            text: 'Guest review'
+        };
+
+        const html = renderReviewItemHtml(review, null, ['rev_local_1'], {});
+
+        expect(html).toContain('btn-edit-review');
+        expect(html).toContain('btn-delete-review');
+    });
+
+    test('renders YouTube like active state when user has liked review', () => {
+        const review = {
+            id: 'rev_liked',
+            productId: 'unstoppable-hoodie',
+            userId: 'other_user',
+            authorName: 'Sam',
+            rating: 5,
+            text: 'Great product',
+            likes: 12
+        };
+
+        const html = renderReviewItemHtml(review, 'my_uid', [], { rev_liked: 'like' });
+
+        expect(html).toContain('btn-reaction-like liked');
+        expect(html).toContain('12');
+    });
+
+    test('getUserReactions and setUserReaction persist correctly in localStorage', () => {
+        expect(getUserReactions()).toEqual({});
+
+        setUserReaction('rev_test', 'like');
+        expect(getUserReactions()).toEqual({ rev_test: 'like' });
+
+        setUserReaction('rev_test', 'dislike');
+        expect(getUserReactions()).toEqual({ rev_test: 'dislike' });
+
+        setUserReaction('rev_test', null);
+        expect(getUserReactions()).toEqual({});
+    });
+});
+
+

@@ -1,7 +1,7 @@
 // shop.js
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
 import { generateProductCardHtml } from './ui-utils.js?v=1795492123693';
@@ -13,6 +13,25 @@ const urlParams = new URLSearchParams(window.location.search);
 export let activeSource = (urlParams.get('source') || '').toLowerCase().trim();
 export let activeCategory = (urlParams.get('category') || '').toLowerCase().trim();
 export const deepLinkProductId = urlParams.get('productId');
+export const isDemoMode = urlParams.get('demo') === '1';
+
+if (isDemoMode) {
+    try {
+        if (!localStorage.getItem('local_reviews_unstoppable-hoodie')) {
+            localStorage.setItem('local_reviews_unstoppable-hoodie', JSON.stringify([{
+                id: 'demo_rev_1',
+                productId: 'unstoppable-hoodie',
+                userId: 'demo_user',
+                authorName: 'Alex Mercer',
+                rating: 5,
+                text: 'Incredible fabric quality and warmth! By far my favorite hoodie.',
+                likes: 5,
+                dislikes: 0,
+                createdAtDate: 'Yesterday'
+            }]));
+        }
+    } catch (_) {}
+}
 
 // Fetch products dynamically from Firestore with local fallback
 export async function fetchProducts() {
@@ -876,13 +895,26 @@ function setupEventListeners() {
         });
     }
 
-    // Star Rating Logic
+    // Star Rating Logic (Left-to-Right click & hover)
+    const starRatingContainer = document.getElementById('star-rating-input');
     starInputs.forEach(star => {
         star.addEventListener('click', (e) => {
-            currentRating = parseInt(e.target.dataset.value);
+            const target = e.currentTarget || e.target;
+            currentRating = parseInt(target.dataset.value, 10) || 0;
             starInputs.forEach(s => {
-                s.classList.toggle('active', parseInt(s.dataset.value) <= currentRating);
-                s.setAttribute('aria-checked', parseInt(s.dataset.value) <= currentRating ? 'true' : 'false');
+                s.style.color = '';
+                const sVal = parseInt(s.dataset.value, 10);
+                s.classList.toggle('active', sVal <= currentRating);
+                s.setAttribute('aria-checked', sVal <= currentRating ? 'true' : 'false');
+            });
+        });
+
+        star.addEventListener('mouseenter', (e) => {
+            const target = e.currentTarget || e.target;
+            const val = parseInt(target.dataset.value, 10) || 0;
+            starInputs.forEach(s => {
+                const sVal = parseInt(s.dataset.value, 10);
+                s.style.color = sVal <= val ? '#FBBF24' : '#444';
             });
         });
 
@@ -894,6 +926,179 @@ function setupEventListeners() {
             }
         });
     });
+
+    if (starRatingContainer) {
+        starRatingContainer.addEventListener('mouseleave', () => {
+            starInputs.forEach(s => {
+                s.style.color = '';
+                const sVal = parseInt(s.dataset.value, 10);
+                s.classList.toggle('active', sVal <= currentRating);
+            });
+        });
+    }
+
+    // Delegated actions for reviews: kebab menu (...), edit, view profile, delete, like, dislike
+    if (reviewsListContainer) {
+        reviewsListContainer.addEventListener('click', async (e) => {
+            const target = e.target;
+
+            // 1. Kebab menu button click
+            const menuBtn = target.closest('.review-menu-btn');
+            if (menuBtn) {
+                e.stopPropagation();
+                const reviewId = menuBtn.dataset.reviewId;
+                const dropdown = document.getElementById(`dropdown-${reviewId}`);
+                document.querySelectorAll('.review-dropdown-menu.active').forEach(d => {
+                    if (d !== dropdown) d.classList.remove('active');
+                });
+                if (dropdown) dropdown.classList.toggle('active');
+                return;
+            }
+
+            // 2. Edit Review click
+            const editBtn = target.closest('.btn-edit-review');
+            if (editBtn) {
+                e.stopPropagation();
+                const reviewId = editBtn.dataset.reviewId;
+                const dropdown = document.getElementById(`dropdown-${reviewId}`);
+                if (dropdown) dropdown.classList.remove('active');
+
+                const bodyEl = document.getElementById(`review-body-${reviewId}`);
+                const editBox = document.getElementById(`edit-box-${reviewId}`);
+                if (bodyEl) bodyEl.style.display = 'none';
+                if (editBox) editBox.style.display = 'block';
+                return;
+            }
+
+            // 3. Cancel Edit click
+            const cancelEditBtn = target.closest('.btn-cancel-edit');
+            if (cancelEditBtn) {
+                const reviewId = cancelEditBtn.dataset.reviewId;
+                const bodyEl = document.getElementById(`review-body-${reviewId}`);
+                const editBox = document.getElementById(`edit-box-${reviewId}`);
+                if (bodyEl) bodyEl.style.display = 'block';
+                if (editBox) editBox.style.display = 'none';
+                return;
+            }
+
+            // 4. Save Edit click
+            const saveEditBtn = target.closest('.btn-save-edit');
+            if (saveEditBtn) {
+                const reviewId = saveEditBtn.dataset.reviewId;
+                await handleSaveEditReview(reviewId, currentReviewProductId);
+                return;
+            }
+
+            // 5. Edit star click (left-to-right)
+            const editStar = target.closest('.edit-star');
+            if (editStar) {
+                const picker = editStar.closest('.edit-star-rating');
+                if (picker) {
+                    const val = parseInt(editStar.dataset.value, 10) || 5;
+                    picker.dataset.currentRating = val.toString();
+                    const stars = picker.querySelectorAll('.edit-star');
+                    stars.forEach(s => {
+                        const sVal = parseInt(s.dataset.value, 10);
+                        s.classList.toggle('active', sVal <= val);
+                    });
+                }
+                return;
+            }
+
+            // 6. View Profile click
+            const viewProfileBtn = target.closest('.btn-view-profile');
+            if (viewProfileBtn) {
+                e.stopPropagation();
+                const reviewId = viewProfileBtn.closest('.review-item')?.dataset.reviewId;
+                const dropdown = reviewId ? document.getElementById(`dropdown-${reviewId}`) : null;
+                if (dropdown) dropdown.classList.remove('active');
+
+                const userId = viewProfileBtn.dataset.userId;
+                const authorName = viewProfileBtn.dataset.author;
+                showAuthorProfile(userId, authorName);
+                return;
+            }
+
+            // 7. Delete Review click
+            const deleteBtn = target.closest('.btn-delete-review');
+            if (deleteBtn) {
+                e.stopPropagation();
+                const reviewId = deleteBtn.dataset.reviewId;
+                const dropdown = document.getElementById(`dropdown-${reviewId}`);
+                if (dropdown) dropdown.classList.remove('active');
+                await handleDeleteReview(reviewId, currentReviewProductId);
+                return;
+            }
+
+            // 8. YouTube-style Like reaction click
+            const likeBtn = target.closest('.btn-reaction-like');
+            if (likeBtn) {
+                const reviewId = likeBtn.dataset.reviewId;
+                await handleReaction(reviewId, 'like', currentReviewProductId);
+                return;
+            }
+
+            // 9. YouTube-style Dislike reaction click
+            const dislikeBtn = target.closest('.btn-reaction-dislike');
+            if (dislikeBtn) {
+                const reviewId = dislikeBtn.dataset.reviewId;
+                await handleReaction(reviewId, 'dislike', currentReviewProductId);
+                return;
+            }
+        });
+
+        // Edit star hover effect (left-to-right)
+        reviewsListContainer.addEventListener('mouseover', (e) => {
+            const editStar = e.target.closest('.edit-star');
+            if (editStar) {
+                const picker = editStar.closest('.edit-star-rating');
+                if (picker) {
+                    const val = parseInt(editStar.dataset.value, 10) || 5;
+                    const stars = picker.querySelectorAll('.edit-star');
+                    stars.forEach(s => {
+                        const sVal = parseInt(s.dataset.value, 10);
+                        s.style.color = sVal <= val ? '#FBBF24' : '#444';
+                    });
+                }
+            }
+        });
+
+        reviewsListContainer.addEventListener('mouseout', (e) => {
+            const picker = e.target.closest('.edit-star-rating');
+            if (picker && (!e.relatedTarget || !picker.contains(e.relatedTarget))) {
+                const curVal = parseInt(picker.dataset.currentRating, 10) || 5;
+                const stars = picker.querySelectorAll('.edit-star');
+                stars.forEach(s => {
+                    s.style.color = '';
+                    const sVal = parseInt(s.dataset.value, 10);
+                    s.classList.toggle('active', sVal <= curVal);
+                });
+            }
+        });
+    }
+
+    // Global click listener to close all review dropdowns when clicking outside
+    window.addEventListener('click', (e) => {
+        if (!e.target.closest('.review-actions-menu')) {
+            document.querySelectorAll('.review-dropdown-menu.active').forEach(d => {
+                d.classList.remove('active');
+            });
+        }
+    });
+
+    // Author Profile Modal close listeners
+    const closeAuthorProfileBtn = document.getElementById('close-author-profile-btn');
+    const authorProfileModal = document.getElementById('author-profile-modal');
+    if (closeAuthorProfileBtn && authorProfileModal) {
+        closeAuthorProfileBtn.addEventListener('click', () => {
+            authorProfileModal.style.display = 'none';
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === authorProfileModal) {
+                authorProfileModal.style.display = 'none';
+            }
+        });
+    }
 
     // Review Form Submit
     if (reviewForm) {
@@ -1192,7 +1397,7 @@ export async function openReviewsModal(productId) {
     if (reviewNotification) reviewNotification.innerHTML = '';
 
     // Toggle Auth Sections
-    if (currentUser || auth.currentUser) {
+    if (currentUser || auth.currentUser || isDemoMode) {
         if (reviewSubmissionSection) reviewSubmissionSection.style.display = 'block';
         if (loginPromptSection) loginPromptSection.style.display = 'none';
     } else {
@@ -1237,6 +1442,362 @@ export async function openReviewsModal(productId) {
     }
 
     await loadReviews(productId);
+}
+
+function getAvatarInitial(name) {
+    if (!name) return 'U';
+    const clean = name.trim();
+    return clean ? clean.charAt(0).toUpperCase() : 'U';
+}
+
+export function getUserReactions() {
+    try {
+        const raw = localStorage.getItem('review_reactions');
+        return raw ? JSON.parse(raw) : {};
+    } catch (_) {
+        return {};
+    }
+}
+
+export function setUserReaction(reviewId, reaction) {
+    try {
+        const reactions = getUserReactions();
+        if (reaction) {
+            reactions[reviewId] = reaction;
+        } else {
+            delete reactions[reviewId];
+        }
+        localStorage.setItem('review_reactions', JSON.stringify(reactions));
+    } catch (_) {}
+}
+
+function showAuthorProfile(userId, authorName) {
+    const modal = document.getElementById('author-profile-modal');
+    if (!modal) return;
+
+    const avatarEl = document.getElementById('profile-modal-avatar');
+    const nameEl = document.getElementById('profile-modal-name');
+    const accountLink = document.getElementById('profile-modal-account-link');
+
+    const displayName = authorName || 'Customer';
+    if (avatarEl) avatarEl.textContent = getAvatarInitial(displayName);
+    if (nameEl) nameEl.textContent = displayName;
+    if (accountLink) {
+        accountLink.href = 'account.html';
+    }
+
+    modal.style.display = 'flex';
+}
+
+async function handleDeleteReview(reviewId, productId) {
+    const targetProdId = productId || currentReviewProductId;
+    if (!confirm('Are you sure you want to delete your review?')) return;
+
+    try {
+        // 1. Delete from Firestore
+        try {
+            await deleteDoc(doc(db, "reviews", reviewId));
+        } catch (dbErr) {
+            console.warn("Notice: Firestore review delete fallback:", dbErr.message || dbErr);
+        }
+
+        // 2. Remove from local storage
+        try {
+            const localKey = `local_reviews_${targetProdId}`;
+            const raw = localStorage.getItem(localKey);
+            if (raw) {
+                const list = JSON.parse(raw);
+                const filtered = list.filter(r => r.id !== reviewId);
+                localStorage.setItem(localKey, JSON.stringify(filtered));
+            }
+        } catch (_) {}
+
+        // 3. Clear reaction
+        setUserReaction(reviewId, null);
+
+        // 4. Invalidate cache and reload
+        reviewsCache.delete(targetProdId);
+        await loadReviews(targetProdId);
+        renderProducts();
+
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message success">Review deleted successfully.</span>';
+            setTimeout(() => { if (reviewNotification) reviewNotification.innerHTML = ''; }, 3000);
+        }
+    } catch (err) {
+        console.error("Manager info: Error deleting review:", err);
+        alert('Failed to delete review. Please try again.');
+    }
+}
+
+async function handleSaveEditReview(reviewId, productId) {
+    const targetProdId = productId || currentReviewProductId;
+    const editBox = document.getElementById(`edit-box-${reviewId}`);
+    if (!editBox) return;
+
+    const textarea = document.getElementById(`edit-textarea-${reviewId}`);
+    const newText = textarea ? textarea.value.trim() : '';
+    if (!newText) {
+        alert('Please enter review text.');
+        return;
+    }
+
+    const picker = document.getElementById(`edit-star-picker-${reviewId}`);
+    const newRating = parseInt(picker ? picker.dataset.currentRating : 5, 10) || 5;
+
+    const saveBtn = editBox.querySelector('.btn-save-edit');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+    }
+
+    try {
+        // 1. Update in Firestore
+        try {
+            await updateDoc(doc(db, "reviews", reviewId), {
+                rating: newRating,
+                text: newText,
+                updatedAt: serverTimestamp()
+            });
+        } catch (dbErr) {
+            console.warn("Notice: Firestore review update fallback:", dbErr.message || dbErr);
+        }
+
+        // 2. Update in local storage
+        try {
+            const localKey = `local_reviews_${targetProdId}`;
+            const raw = localStorage.getItem(localKey);
+            if (raw) {
+                const list = JSON.parse(raw);
+                const item = list.find(r => r.id === reviewId);
+                if (item) {
+                    item.rating = newRating;
+                    item.text = newText;
+                    item.updatedAtDate = 'Edited just now';
+                    localStorage.setItem(localKey, JSON.stringify(list));
+                }
+            }
+        } catch (_) {}
+
+        // 3. Invalidate cache and reload
+        reviewsCache.delete(targetProdId);
+        await loadReviews(targetProdId);
+        renderProducts();
+
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message success">Review updated successfully!</span>';
+            setTimeout(() => { if (reviewNotification) reviewNotification.innerHTML = ''; }, 3000);
+        }
+    } catch (err) {
+        console.error("Manager info: Error updating review:", err);
+        alert('Failed to update review. Please try again.');
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save Changes';
+        }
+    }
+}
+
+export async function handleReaction(reviewId, reactionType, productId) {
+    const targetProdId = productId || currentReviewProductId;
+    const reactions = getUserReactions();
+    const currentReaction = reactions[reviewId] || null;
+
+    let targetReaction = null;
+    let deltaLikes = 0;
+    let deltaDislikes = 0;
+
+    if (reactionType === 'like') {
+        if (currentReaction === 'like') {
+            targetReaction = null;
+            deltaLikes = -1;
+        } else if (currentReaction === 'dislike') {
+            targetReaction = 'like';
+            deltaDislikes = -1;
+            deltaLikes = 1;
+        } else {
+            targetReaction = 'like';
+            deltaLikes = 1;
+        }
+    } else if (reactionType === 'dislike') {
+        if (currentReaction === 'dislike') {
+            targetReaction = null;
+            deltaDislikes = -1;
+        } else if (currentReaction === 'like') {
+            targetReaction = 'dislike';
+            deltaLikes = -1;
+            deltaDislikes = 1;
+        } else {
+            targetReaction = 'dislike';
+            deltaDislikes = 1;
+        }
+    }
+
+    setUserReaction(reviewId, targetReaction);
+
+    let reviewObj = null;
+    if (reviewsCache.has(targetProdId)) {
+        reviewObj = reviewsCache.get(targetProdId).find(r => r.id === reviewId);
+    }
+    if (!reviewObj) {
+        try {
+            const raw = localStorage.getItem(`local_reviews_${targetProdId}`);
+            if (raw) {
+                const list = JSON.parse(raw);
+                reviewObj = list.find(r => r.id === reviewId);
+            }
+        } catch (_) {}
+    }
+
+    const currentLikes = reviewObj ? (parseInt(reviewObj.likes, 10) || 0) : 0;
+    const currentDislikes = reviewObj ? (parseInt(reviewObj.dislikes, 10) || 0) : 0;
+    const newLikes = Math.max(0, currentLikes + deltaLikes);
+    const newDislikes = Math.max(0, currentDislikes + deltaDislikes);
+
+    if (reviewObj) {
+        reviewObj.likes = newLikes;
+        reviewObj.dislikes = newDislikes;
+    }
+
+    try {
+        const localKey = `local_reviews_${targetProdId}`;
+        const raw = localStorage.getItem(localKey);
+        if (raw) {
+            const list = JSON.parse(raw);
+            const item = list.find(r => r.id === reviewId);
+            if (item) {
+                item.likes = newLikes;
+                item.dislikes = newDislikes;
+                localStorage.setItem(localKey, JSON.stringify(list));
+            }
+        }
+    } catch (_) {}
+
+    const reviewItemEl = document.getElementById(`review-item-${reviewId}`);
+    if (reviewItemEl) {
+        const likeBtn = reviewItemEl.querySelector('.btn-reaction-like');
+        const dislikeBtn = reviewItemEl.querySelector('.btn-reaction-dislike');
+        const likeCountEl = reviewItemEl.querySelector('.reaction-like-count');
+
+        if (likeBtn) {
+            likeBtn.classList.toggle('liked', targetReaction === 'like');
+            const svg = likeBtn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', targetReaction === 'like' ? 'currentColor' : 'none');
+        }
+        if (dislikeBtn) {
+            dislikeBtn.classList.toggle('disliked', targetReaction === 'dislike');
+            const svg = dislikeBtn.querySelector('svg');
+            if (svg) svg.setAttribute('fill', targetReaction === 'dislike' ? 'currentColor' : 'none');
+        }
+        if (likeCountEl) {
+            likeCountEl.textContent = newLikes > 0 ? newLikes.toString() : '';
+        }
+    }
+
+    try {
+        await updateDoc(doc(db, "reviews", reviewId), {
+            likes: newLikes,
+            dislikes: newDislikes
+        });
+    } catch (_) {}
+}
+
+export function renderReviewItemHtml(review, currentUserId, localReviewIds, userReactions) {
+    let date = 'Just now';
+    if (review.createdAt?.toDate) {
+        date = review.createdAt.toDate().toLocaleDateString();
+    } else if (review.createdAtDate) {
+        date = review.createdAtDate;
+    } else if (review.createdAt) {
+        try { date = new Date(review.createdAt).toLocaleDateString(); } catch (_) {}
+    }
+
+    const ratingNum = parseInt(review.rating, 10) || 5;
+    const authorName = review.authorName || review.username || 'Anonymous';
+    const isOwner = (currentUserId && review.userId && review.userId === currentUserId) ||
+                    (Array.isArray(localReviewIds) && localReviewIds.includes(review.id));
+    const userReaction = userReactions[review.id] || null;
+    const likesCount = parseInt(review.likes, 10) || 0;
+
+    return `
+        <div class="review-item" id="review-item-${escapeHTML(review.id)}" data-review-id="${escapeHTML(review.id)}">
+            <div class="review-header">
+                <div class="review-author-info">
+                    <div class="review-avatar">${getAvatarInitial(authorName)}</div>
+                    <div class="review-meta">
+                        <span class="review-author">${escapeHTML(authorName)}</span>
+                        <span class="review-date">${escapeHTML(date)}</span>
+                    </div>
+                </div>
+                <div class="review-actions-menu">
+                    <button type="button" class="review-menu-btn" data-review-id="${escapeHTML(review.id)}" aria-label="Review options" title="More options">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="5" r="2.2"/>
+                            <circle cx="12" cy="12" r="2.2"/>
+                            <circle cx="12" cy="19" r="2.2"/>
+                        </svg>
+                    </button>
+                    <div class="review-dropdown-menu" id="dropdown-${escapeHTML(review.id)}">
+                        ${isOwner ? `
+                            <button type="button" class="review-dropdown-item btn-edit-review" data-review-id="${escapeHTML(review.id)}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                Edit
+                            </button>
+                        ` : ''}
+                        <button type="button" class="review-dropdown-item btn-view-profile" data-user-id="${escapeHTML(review.userId || '')}" data-author="${escapeHTML(authorName)}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            View Profile
+                        </button>
+                        ${isOwner ? `
+                            <button type="button" class="review-dropdown-item danger btn-delete-review" data-review-id="${escapeHTML(review.id)}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                Delete
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-body" id="review-body-${escapeHTML(review.id)}">
+                <div class="review-stars" id="review-stars-${escapeHTML(review.id)}">${generateStarsHtml(ratingNum)}</div>
+                <p class="review-content" id="review-content-${escapeHTML(review.id)}">${escapeHTML(review.text || review.comment || '')}</p>
+            </div>
+
+            <!-- Inline Edit Container (hidden by default) -->
+            <div class="review-edit-box" id="edit-box-${escapeHTML(review.id)}" style="display: none;">
+                <div class="edit-star-rating" id="edit-star-picker-${escapeHTML(review.id)}" data-current-rating="${ratingNum}">
+                    <span class="edit-star ${ratingNum >= 1 ? 'active' : ''}" data-value="1">★</span>
+                    <span class="edit-star ${ratingNum >= 2 ? 'active' : ''}" data-value="2">★</span>
+                    <span class="edit-star ${ratingNum >= 3 ? 'active' : ''}" data-value="3">★</span>
+                    <span class="edit-star ${ratingNum >= 4 ? 'active' : ''}" data-value="4">★</span>
+                    <span class="edit-star ${ratingNum >= 5 ? 'active' : ''}" data-value="5">★</span>
+                </div>
+                <textarea class="edit-review-textarea" id="edit-textarea-${escapeHTML(review.id)}" rows="3">${escapeHTML(review.text || review.comment || '')}</textarea>
+                <div class="edit-review-buttons">
+                    <button type="button" class="btn-cancel-edit" data-review-id="${escapeHTML(review.id)}">Cancel</button>
+                    <button type="button" class="btn-save-edit" data-review-id="${escapeHTML(review.id)}">Save Changes</button>
+                </div>
+            </div>
+
+            <!-- YouTube-style Like & Dislike Toolbar -->
+            <div class="review-footer">
+                <div class="review-reactions-group">
+                    <button type="button" class="review-reaction-btn btn-reaction-like ${userReaction === 'like' ? 'liked' : ''}" data-review-id="${escapeHTML(review.id)}" aria-label="Like this review" title="Like">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="${userReaction === 'like' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                        </svg>
+                        <span class="reaction-like-count">${likesCount > 0 ? likesCount : ''}</span>
+                    </button>
+                    <div class="review-reaction-separator"></div>
+                    <button type="button" class="review-reaction-btn btn-reaction-dislike ${userReaction === 'dislike' ? 'disliked' : ''}" data-review-id="${escapeHTML(review.id)}" aria-label="Dislike this review" title="Dislike">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="${userReaction === 'dislike' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 async function loadReviews(productId) {
@@ -1324,29 +1885,18 @@ async function loadReviews(productId) {
             return;
         }
 
-        let html = '';
-        reviews.forEach(review => {
-            let date = 'Just now';
-            if (review.createdAt?.toDate) {
-                date = review.createdAt.toDate().toLocaleDateString();
-            } else if (review.createdAtDate) {
-                date = review.createdAtDate;
-            } else if (review.createdAt) {
-                try { date = new Date(review.createdAt).toLocaleDateString(); } catch (_) {}
+        const activeUser = currentUser || auth.currentUser;
+        const currentUserId = activeUser ? activeUser.uid : null;
+        let localReviewIds = [];
+        try {
+            const rawLocal = localStorage.getItem(`local_reviews_${productId}`);
+            if (rawLocal) {
+                localReviewIds = JSON.parse(rawLocal).map(r => r.id);
             }
-            const ratingNum = parseInt(review.rating, 10) || 5;
-            html += `
-                <div class="review-item">
-                    <div class="review-header">
-                        <span class="review-author">${escapeHTML(review.authorName || review.username || 'Anonymous')}</span>
-                        <span class="review-date">${escapeHTML(date)}</span>
-                    </div>
-                    <div class="review-stars">${generateStarsHtml(ratingNum)}</div>
-                    <p class="review-content">${escapeHTML(review.text || review.comment || '')}</p>
-                </div>
-            `;
-        });
-        reviewsListContainer.innerHTML = html;
+        } catch (_) {}
+        const userReactions = getUserReactions();
+
+        reviewsListContainer.innerHTML = reviews.map(r => renderReviewItemHtml(r, currentUserId, localReviewIds, userReactions)).join('');
 
     } catch (error) {
         console.error("Manager info: Error loading reviews:", error.message || error);
@@ -1356,22 +1906,11 @@ async function loadReviews(productId) {
             if (localRevRaw) {
                 const localRevs = JSON.parse(localRevRaw);
                 if (Array.isArray(localRevs) && localRevs.length > 0) {
-                    let html = '';
-                    localRevs.forEach(review => {
-                        const date = review.createdAtDate || 'Just now';
-                        const ratingNum = parseInt(review.rating, 10) || 5;
-                        html += `
-                            <div class="review-item">
-                                <div class="review-header">
-                                    <span class="review-author">${escapeHTML(review.authorName || review.username || 'Anonymous')}</span>
-                                    <span class="review-date">${escapeHTML(date)}</span>
-                                </div>
-                                <div class="review-stars">${generateStarsHtml(ratingNum)}</div>
-                                <p class="review-content">${escapeHTML(review.text || review.comment || '')}</p>
-                            </div>
-                        `;
-                    });
-                    reviewsListContainer.innerHTML = html;
+                    const activeUser = currentUser || auth.currentUser;
+                    const currentUserId = activeUser ? activeUser.uid : null;
+                    const localReviewIds = localRevs.map(r => r.id);
+                    const userReactions = getUserReactions();
+                    reviewsListContainer.innerHTML = localRevs.map(r => renderReviewItemHtml(r, currentUserId, localReviewIds, userReactions)).join('');
                     return;
                 }
             }
@@ -1429,6 +1968,8 @@ async function handleReviewSubmit(e) {
             authorName: authorName,
             rating: currentRating,
             text: text,
+            likes: 0,
+            dislikes: 0,
             createdAt: serverTimestamp(),
             timestamp: Date.now()
         };
@@ -1452,6 +1993,8 @@ async function handleReviewSubmit(e) {
                 authorName: authorName,
                 rating: currentRating,
                 text: text,
+                likes: 0,
+                dislikes: 0,
                 createdAtDate: 'Just now',
                 timestamp: Date.now()
             });
