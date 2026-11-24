@@ -13,6 +13,26 @@ document.body.innerHTML = `
     <div id="nav-cta-container"></div>
     <div class="hamburger"></div>
     <div class="nav-links"></div>
+    <div id="reviews-modal" style="display: none;"></div>
+    <div id="reviews-list-container"></div>
+    <div id="review-submission-section"></div>
+    <div id="login-prompt-section"></div>
+    <form id="review-form"></form>
+    <div id="review-notification"></div>
+    <textarea id="review-text"></textarea>
+    <button id="submit-review-btn"></button>
+    <div id="detail-product-name"></div>
+    <img id="detail-main-image" />
+    <div id="detail-thumbnails"></div>
+    <div id="detail-original-price"></div>
+    <div id="detail-sale-price"></div>
+    <div id="detail-discount-badge"></div>
+    <div id="detail-description"></div>
+    <input id="detail-quantity-input" />
+    <span id="modal-average-rating"></span>
+    <span id="modal-stars-display"></span>
+    <span id="modal-review-count"></span>
+    <div id="reviews-list"></div>
 `;
 
 describe('handleUpdateQuantity', () => {
@@ -123,3 +143,51 @@ describe('loadProductStats', () => {
         consoleErrorSpy.mockRestore();
     });
 });
+
+describe('openReviewsModal', () => {
+    let openReviewsModal;
+    let productStatsMap;
+
+    beforeAll(async () => {
+        const module = await import('../js/shop.js');
+        openReviewsModal = module.openReviewsModal;
+        productStatsMap = module.productStatsMap;
+    });
+
+    test('displays valid stats when product has existing ratings', async () => {
+        productStatsMap.set('unstoppable-hoodie', {
+            averageRating: 4.8,
+            reviewCount: 12
+        });
+
+        await openReviewsModal('unstoppable-hoodie');
+
+        expect(document.getElementById('modal-average-rating').textContent).toBe('4.8');
+        expect(document.getElementById('modal-review-count').textContent).toBe('(12 reviews)');
+        expect(document.getElementById('modal-stars-display').innerHTML).toContain('★');
+    });
+
+    test('gracefully falls back to 0.0 and (0 reviews) when product has no stats', async () => {
+        productStatsMap.delete('unstoppable-hoodie');
+
+        await openReviewsModal('unstoppable-hoodie');
+
+        expect(document.getElementById('modal-average-rating').textContent).toBe('0.0');
+        expect(document.getElementById('modal-review-count').textContent).toBe('(0 reviews)');
+        expect(document.getElementById('modal-stars-display').innerHTML).toBe('☆☆☆☆☆');
+    });
+
+    test('handles NaN and undefined gracefully without rendering NaN to users', async () => {
+        productStatsMap.set('unstoppable-hoodie', {
+            averageRating: NaN,
+            reviewCount: undefined
+        });
+
+        await openReviewsModal('unstoppable-hoodie');
+
+        expect(document.getElementById('modal-average-rating').textContent).toBe('0.0');
+        expect(document.getElementById('modal-review-count').textContent).toBe('(0 reviews)');
+        expect(document.getElementById('modal-stars-display').innerHTML).toBe('☆☆☆☆☆');
+    });
+});
+

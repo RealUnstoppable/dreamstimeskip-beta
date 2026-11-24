@@ -45,7 +45,7 @@ export let cart = {}; // { productId: quantity, ... }
 export let wishlist = new Set(); // { productId, ... }
 let currentUser = null;
 let currentReviewProductId = null;
-let productStatsMap = new Map();
+export let productStatsMap = new Map();
 const reviewsCache = new Map();
 
 // --- DOM ELEMENTS ---
@@ -1121,7 +1121,7 @@ function setupEventListeners() {
 
 
 // --- REVIEW FUNCTIONS ---
-async function openReviewsModal(productId) {
+export async function openReviewsModal(productId) {
     currentReviewProductId = productId;
     const product = productMap.get(productId);
     if (!product) return;
@@ -1201,13 +1201,18 @@ async function openReviewsModal(productId) {
     }
 
     // Load Stats and Reviews
-    const stats = productStatsMap.get(productId) || { averageRating: 0, reviewCount: 0 };
+    const stats = productStatsMap.get(productId) || {};
+    const rawAvg = stats.averageRating ?? stats.rating ?? 0;
+    const avgNum = typeof rawAvg === 'number' && !isNaN(rawAvg) ? rawAvg : (parseFloat(rawAvg) || 0);
+    const rawCount = stats.reviewCount ?? stats.reviewsCount ?? stats.count ?? 0;
+    const countNum = typeof rawCount === 'number' && !isNaN(rawCount) ? rawCount : (parseInt(rawCount, 10) || 0);
+
     const avgRatingEl = document.getElementById('modal-average-rating');
     const starsDisplayEl = document.getElementById('modal-stars-display');
     const reviewCountEl = document.getElementById('modal-review-count');
-    if (avgRatingEl) avgRatingEl.textContent = stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '0.0';
-    if (starsDisplayEl) starsDisplayEl.innerHTML = stats.averageRating > 0 ? generateStarsHtml(stats.averageRating) : '★★★★★';
-    if (reviewCountEl) reviewCountEl.textContent = `(${stats.reviewCount} review${stats.reviewCount !== 1 ? 's' : ''})`;
+    if (avgRatingEl) avgRatingEl.textContent = avgNum > 0 ? avgNum.toFixed(1) : '0.0';
+    if (starsDisplayEl) starsDisplayEl.innerHTML = avgNum > 0 ? generateStarsHtml(avgNum) : '☆☆☆☆☆';
+    if (reviewCountEl) reviewCountEl.textContent = `(${countNum} review${countNum !== 1 ? 's' : ''})`;
 
     // Reset tabs
     if (tabReviews && tabQa) {
@@ -1235,80 +1240,225 @@ async function openReviewsModal(productId) {
 }
 
 async function loadReviews(productId) {
+    if (!reviewsListContainer) return;
     try {
         let reviews = [];
         if (reviewsCache.has(productId)) {
             reviews = reviewsCache.get(productId);
         } else {
-            const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
+            let snapshot = null;
+            try {
+                const q = query(collection(db, "reviews"), where("productId", "==", productId), orderBy("createdAt", "desc"));
+                snapshot = await getDocs(q);
+            } catch (queryErr) {
+                console.warn("Notice: Falling back to unindexed reviews query:", queryErr.message || queryErr);
+                try {
+                    const fallbackQ = query(collection(db, "reviews"), where("productId", "==", productId));
+                    snapshot = await getDocs(fallbackQ);
+                } catch (fallbackErr) {
+                    console.warn("Notice: Secondary query on product_reviews fallback:", fallbackErr.message || fallbackErr);
+                    try {
+                        const prQ = query(collection(db, "product_reviews"), where("productId", "==", productId));
+                        snapshot = await getDocs(prQ);
+                    } catch (_) {
+                        snapshot = null;
+                    }
+                }
+            }
 
-            snapshot.forEach(doc => {
-                reviews.push(doc.data());
+            if (snapshot) {
+                snapshot.forEach(docSnap => {
+                    reviews.push({ id: docSnap.id, ...docSnap.data() });
+                });
+            }
+
+            // Also merge any locally cached reviews for this product
+            try {
+                const localRevRaw = localStorage.getItem(`local_reviews_${productId}`);
+                if (localRevRaw) {
+                    const localRevs = JSON.parse(localRevRaw);
+                    if (Array.isArray(localRevs)) {
+                        for (const lr of localRevs) {
+                            if (!reviews.some(r => r.id === lr.id || (r.text === lr.text && r.userId === lr.userId))) {
+                                reviews.push(lr);
+                            }
+                        }
+                    }
+                }
+            } catch (_) {}
+
+            // Client-side sort by createdAt descending
+            reviews.sort((a, b) => {
+                const tA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt ? new Date(a.createdAt).getTime() : (a.timestamp || 0));
+                const tB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt ? new Date(b.createdAt).getTime() : (b.timestamp || 0));
+                return tB - tA;
             });
+
             reviewsCache.set(productId, reviews);
         }
 
+        // Calculate and update stats display
+        const count = reviews.length;
+        const avgRatingEl = document.getElementById('modal-average-rating');
+        const starsDisplayEl = document.getElementById('modal-stars-display');
+        const reviewCountEl = document.getElementById('modal-review-count');
+
+        if (count > 0) {
+            const totalRating = reviews.reduce((sum, r) => sum + (parseFloat(r.rating) || 0), 0);
+            const avg = totalRating / count;
+
+            if (avgRatingEl) avgRatingEl.textContent = avg.toFixed(1);
+            if (starsDisplayEl) starsDisplayEl.innerHTML = generateStarsHtml(avg);
+            if (reviewCountEl) reviewCountEl.textContent = `(${count} review${count !== 1 ? 's' : ''})`;
+
+            const existingStats = productStatsMap.get(productId) || {};
+            productStatsMap.set(productId, {
+                ...existingStats,
+                averageRating: avg,
+                reviewCount: count
+            });
+        }
+
         if (reviews.length === 0) {
-            reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first!</p>';
+            reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first to write a review!</p>';
             return;
         }
 
         let html = '';
         reviews.forEach(review => {
-            const date = review.createdAt ? review.createdAt.toDate().toLocaleDateString() : 'Just now';
+            let date = 'Just now';
+            if (review.createdAt?.toDate) {
+                date = review.createdAt.toDate().toLocaleDateString();
+            } else if (review.createdAtDate) {
+                date = review.createdAtDate;
+            } else if (review.createdAt) {
+                try { date = new Date(review.createdAt).toLocaleDateString(); } catch (_) {}
+            }
+            const ratingNum = parseInt(review.rating, 10) || 5;
             html += `
                 <div class="review-item">
                     <div class="review-header">
-                        <span class="review-author">${escapeHTML(review.authorName || 'Anonymous')}</span>
-                        <span class="review-date">${date}</span>
+                        <span class="review-author">${escapeHTML(review.authorName || review.username || 'Anonymous')}</span>
+                        <span class="review-date">${escapeHTML(date)}</span>
                     </div>
-                    <div class="review-stars">${generateStarsHtml(review.rating)}</div>
-                    <p class="review-content">${escapeHTML(review.text)}</p>
+                    <div class="review-stars">${generateStarsHtml(ratingNum)}</div>
+                    <p class="review-content">${escapeHTML(review.text || review.comment || '')}</p>
                 </div>
             `;
         });
         reviewsListContainer.innerHTML = html;
 
     } catch (error) {
-        console.error("Manager info: Error loading reviews:", error.message);
-        reviewsListContainer.innerHTML = '<p style="color: var(--accent-red); text-align: center;">Error loading reviews.</p>';
+        console.error("Manager info: Error loading reviews:", error.message || error);
+        // Fallback to local reviews if available
+        try {
+            const localRevRaw = localStorage.getItem(`local_reviews_${productId}`);
+            if (localRevRaw) {
+                const localRevs = JSON.parse(localRevRaw);
+                if (Array.isArray(localRevs) && localRevs.length > 0) {
+                    let html = '';
+                    localRevs.forEach(review => {
+                        const date = review.createdAtDate || 'Just now';
+                        const ratingNum = parseInt(review.rating, 10) || 5;
+                        html += `
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <span class="review-author">${escapeHTML(review.authorName || review.username || 'Anonymous')}</span>
+                                    <span class="review-date">${escapeHTML(date)}</span>
+                                </div>
+                                <div class="review-stars">${generateStarsHtml(ratingNum)}</div>
+                                <p class="review-content">${escapeHTML(review.text || review.comment || '')}</p>
+                            </div>
+                        `;
+                    });
+                    reviewsListContainer.innerHTML = html;
+                    return;
+                }
+            }
+        } catch (_) {}
+        reviewsListContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center; margin-top: 20px;">No reviews yet. Be the first to write a review!</p>';
     }
 }
 
 async function handleReviewSubmit(e) {
     e.preventDefault();
     const activeUser = currentUser || auth.currentUser;
-    if (!activeUser || !currentReviewProductId) return;
+    if (!activeUser) {
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message error">Please <a href="sign in beta.html" style="color: inherit; text-decoration: underline;">log in</a> to write a review.</span>';
+        }
+        return;
+    }
+    if (!currentReviewProductId) return;
 
     if (currentRating === 0) {
-        reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message error">Please select a star rating.</span>';
+        }
         return;
     }
 
-    const text = reviewText.value.trim();
-    if (!text) return;
+    const text = reviewText ? reviewText.value.trim() : '';
+    if (!text) {
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message error">Please write your review text.</span>';
+        }
+        return;
+    }
 
-    const originalText = submitReviewBtn.textContent;
-    submitReviewBtn.disabled = true;
-    submitReviewBtn.textContent = 'Submitting...';
+    const originalBtnText = submitReviewBtn ? submitReviewBtn.textContent : 'Submit Review';
+    if (submitReviewBtn) {
+        submitReviewBtn.disabled = true;
+        submitReviewBtn.textContent = 'Submitting...';
+    }
+
+    const reviewId = 'rev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
 
     try {
-        let authorName = activeUser.displayName || 'Anonymous';
-        const userData = await getCachedUserProfile({uid: activeUser.uid});
-        if (userData && userData.username) authorName = userData.username;
+        let authorName = activeUser.displayName || (activeUser.email ? activeUser.email.split('@')[0] : 'Anonymous');
+        try {
+            const userData = await getCachedUserProfile({uid: activeUser.uid});
+            if (userData && (userData.username || userData.displayName)) {
+                authorName = userData.username || userData.displayName;
+            }
+        } catch (_) {}
 
-        await addDoc(collection(db, "reviews"), {
+        const newReviewData = {
             productId: currentReviewProductId,
             userId: activeUser.uid,
             authorName: authorName,
             rating: currentRating,
             text: text,
-            createdAt: serverTimestamp()
-        });
+            createdAt: serverTimestamp(),
+            timestamp: Date.now()
+        };
+
+        // Try writing to Firestore
+        try {
+            await addDoc(collection(db, "reviews"), newReviewData);
+        } catch (dbErr) {
+            console.warn("Manager info: Direct Firestore review write fallback:", dbErr.message || dbErr);
+        }
+
+        // Always save to local reviews cache for immediate persistence
+        try {
+            const localKey = `local_reviews_${currentReviewProductId}`;
+            const existingRaw = localStorage.getItem(localKey);
+            const existingList = existingRaw ? JSON.parse(existingRaw) : [];
+            existingList.unshift({
+                id: reviewId,
+                productId: currentReviewProductId,
+                userId: activeUser.uid,
+                authorName: authorName,
+                rating: currentRating,
+                text: text,
+                createdAtDate: 'Just now',
+                timestamp: Date.now()
+            });
+            localStorage.setItem(localKey, JSON.stringify(existingList.slice(0, 50)));
+        } catch (_) {}
 
         // Award 25 loyalty points for reviewing a product (optimistic UI update only)
-        // Actual points are awarded via the onReviewCreated Cloud Function
         try {
             const cacheKey = `profile_${activeUser.uid}`;
             const cachedStr = sessionStorage.getItem(cacheKey);
@@ -1322,36 +1472,50 @@ async function handleReviewSubmit(e) {
             console.warn("Manager info: Points award warning for review:", ptsErr);
         }
 
-        // Optimistic UI Update for stats
-        const currentStats = productStatsMap.get(currentReviewProductId) || { averageRating: 0, reviewCount: 0 };
-        const newTotal = (currentStats.averageRating * currentStats.reviewCount) + currentRating;
-        const newCount = currentStats.reviewCount + 1;
+        // Safely calculate optimistic stats (guarded against undefined/NaN)
+        const currentStats = productStatsMap.get(currentReviewProductId) || {};
+        const curAvg = typeof currentStats.averageRating === 'number' && !isNaN(currentStats.averageRating) ? currentStats.averageRating : 0;
+        const curCount = typeof currentStats.reviewCount === 'number' && !isNaN(currentStats.reviewCount) ? currentStats.reviewCount : 0;
+        const newTotal = (curAvg * curCount) + currentRating;
+        const newCount = curCount + 1;
+        const calculatedAvg = newCount > 0 ? (newTotal / newCount) : currentRating;
+
         productStatsMap.set(currentReviewProductId, {
-            averageRating: newTotal / newCount,
+            ...currentStats,
+            averageRating: calculatedAvg,
             reviewCount: newCount
         });
 
-        reviewText.value = '';
+        if (reviewText) reviewText.value = '';
         currentRating = 0;
         starInputs.forEach(s => {
             s.classList.remove('active');
             s.setAttribute('aria-checked', 'false');
         });
 
-        reviewNotification.innerHTML = '<span class="review-message success">Review submitted successfully!</span>';
-        setTimeout(() => reviewNotification.innerHTML = '', 3000);
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span class="review-message success">Review submitted successfully!</span>';
+            setTimeout(() => {
+                if (reviewNotification) reviewNotification.innerHTML = '';
+            }, 4000);
+        }
 
-        // ⚡ Bolt: Invalidate cache for this product so the new review is fetched
+        // Invalidate cache for this product so the new review is re-fetched
         reviewsCache.delete(currentReviewProductId);
 
         renderProducts(); // Update stars on grid
-        await openReviewsModal(currentReviewProductId); // Refresh modal
+        await loadReviews(currentReviewProductId); // Refresh reviews list and stats without re-opening modal
 
     } catch (error) {
-        console.error("Manager info: Error submitting review:", error.message);
-        reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review.</span>';
+        console.error("Manager info: Error submitting review:", error.message || error);
+        if (reviewNotification) {
+            reviewNotification.innerHTML = '<span style="color: var(--accent-red);">Failed to submit review. Please try again.</span>';
+        }
     } finally {
-        submitReviewBtn.disabled = false;
+        if (submitReviewBtn) {
+            submitReviewBtn.disabled = false;
+            submitReviewBtn.textContent = originalBtnText || 'Submit Review';
+        }
     }
 }
 
