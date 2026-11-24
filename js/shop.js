@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
-import { generateProductCardHtml } from './ui-utils.js';
+import { generateProductCardHtml } from './ui-utils.js?v=1795490705298';
 import { products, productMap, registerDynamicProduct, setDynamicProducts } from './products-data.js';
 import { getAverageRating } from './review-service.js';
 
@@ -1387,20 +1387,35 @@ fetchProducts().then(() => {
     }
 });
 
-// Initial localCart load
+// Initial localCart load & self-healing sanitization
 try {
     const localCartData = localStorage.getItem('localCart');
+    cart = {};
+    let validCount = 0;
     if (localCartData) {
         const parsed = JSON.parse(localCartData);
-        cart = {};
         for (const [id, q] of Object.entries(parsed || {})) {
+            const prod = productMap.get(id);
+            if (!prod) continue;
             const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
-            if (validQ > 0) cart[id] = validQ;
+            if (validQ > 0) {
+                cart[id] = validQ;
+                validCount += validQ;
+            }
         }
-        localStorage.setItem('localCart', JSON.stringify(cart));
-        renderCart();
     }
-} catch (_) { /* ignore local storage error */ }
+    localStorage.setItem('localCart', JSON.stringify(cart));
+    localStorage.setItem('cartItemCount', validCount.toString());
+    updateCartSummary();
+    renderCart();
+} catch (_) {
+    cart = {};
+    try {
+        localStorage.setItem('localCart', '{}');
+        localStorage.setItem('cartItemCount', '0');
+        updateCartSummary();
+    } catch (_) {}
+}
 
 // Auth and Cart state synchronization
 onAuthStateChanged(auth, async (user) => {

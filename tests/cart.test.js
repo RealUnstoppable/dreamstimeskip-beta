@@ -318,6 +318,20 @@ describe('Cart Business Logic, Pricing & Promo Codes (js/cart.js)', () => {
         const storedCart = JSON.parse(localStorage.getItem('localCart'));
         expect(storedCart['unstoppable-hoodie']).toBe(99);
     });
+
+    it('clears phantom/invalid products and wipes stale cartItemCount (e.g. 64) when empty', () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'non-existent-product-id': 64
+        }));
+        localStorage.setItem('cartItemCount', '64');
+
+        cartModule.loadCartFromStorage();
+        const totals = cartModule.calculateCartTotals();
+
+        expect(totals.itemCount).toBe(0);
+        expect(localStorage.getItem('cartItemCount')).toBe('0');
+        expect(localStorage.getItem('localCart')).toBe('{}');
+    });
 });
 
 describe('Navbar Cart Badge Updates (js/navbar.js)', () => {
@@ -370,6 +384,19 @@ describe('Navbar Cart Badge Updates (js/navbar.js)', () => {
 
         updateNavbarCartBadge(-2);
         expect(badge.style.display).toBe('none');
+    });
+
+    it('wipes stale cartItemCount=64 when localCart is null or empty', () => {
+        localStorage.removeItem('localCart');
+        localStorage.setItem('cartItemCount', '64');
+
+        const { initNavbarCart } = navbarModule;
+        if (typeof initNavbarCart === 'function') {
+            initNavbarCart();
+            expect(localStorage.getItem('cartItemCount')).toBe('0');
+            const badge = document.getElementById('nav-cart-badge');
+            expect(badge.style.display).toBe('none');
+        }
     });
 });
 

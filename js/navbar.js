@@ -340,15 +340,13 @@ function initNavbarCart() {
             const parsed = JSON.parse(raw);
             if (parsed && typeof parsed === 'object') {
                 count = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
-                localStorage.setItem('cartItemCount', count.toString());
-            }
-        } else {
-            const stored = localStorage.getItem('cartItemCount');
-            if (stored !== null && stored !== '') {
-                count = Math.max(0, parseInt(stored, 10) || 0);
             }
         }
-    } catch (_) {}
+        localStorage.setItem('cartItemCount', count.toString());
+    } catch (_) {
+        count = 0;
+        try { localStorage.setItem('cartItemCount', '0'); } catch (_) {}
+    }
     updateNavbarCartBadge(count);
     if (typeof window !== 'undefined' && typeof window.updateLexiCartCount === 'function') {
         window.updateLexiCartCount(count);
@@ -367,7 +365,8 @@ function initNavbarCart() {
                         const parsed = JSON.parse(raw);
                         c = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
                     } else {
-                        c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                        c = 0;
+                        localStorage.setItem('cartItemCount', '0');
                     }
                 } catch (_) {}
             }
@@ -385,7 +384,8 @@ function initNavbarCart() {
                         const parsed = JSON.parse(raw);
                         c = Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
                     } else {
-                        c = parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0;
+                        c = 0;
+                        localStorage.setItem('cartItemCount', '0');
                     }
                 } catch (_) {}
                 updateNavbarCartBadge(c);

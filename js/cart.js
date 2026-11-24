@@ -17,27 +17,39 @@ const getEl = (id) => (typeof document !== 'undefined' ? document.getElementById
  * Load cart state from localStorage and optional session promo
  */
 export function loadCartFromStorage() {
+    let totalCount = 0;
     try {
         const rawCart = localStorage.getItem('localCart');
         const parsed = rawCart ? JSON.parse(rawCart) : {};
         cart = {};
         let modified = false;
         for (const [id, qty] of Object.entries(parsed || {})) {
+            const product = productMap.get(id);
+            if (!product) {
+                modified = true;
+                continue;
+            }
             const validQty = Math.min(99, Math.max(0, parseInt(qty, 10) || 0));
             if (validQty > 0) {
                 cart[id] = validQty;
+                totalCount += validQty;
                 if (validQty !== qty) modified = true;
             } else {
                 modified = true;
             }
         }
-        if (modified) {
+        if (modified || !rawCart) {
             try {
                 localStorage.setItem('localCart', JSON.stringify(cart));
+                localStorage.setItem('cartItemCount', totalCount.toString());
             } catch (_) {}
         }
     } catch (_) {
         cart = {};
+        try {
+            localStorage.setItem('localCart', '{}');
+            localStorage.setItem('cartItemCount', '0');
+        } catch (_) {}
     }
 
     try {

@@ -712,9 +712,10 @@ class SitewideMusicEngine {
                 const parsed = JSON.parse(raw);
                 count = Object.values(parsed || {}).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0);
             } else {
-                count = Math.max(0, parseInt(localStorage.getItem('cartItemCount') || '0', 10) || 0);
+                count = 0;
+                localStorage.setItem('cartItemCount', '0');
             }
-        } catch (_) { /* ignore playback or state error */ }
+        } catch (_) { count = 0; }
         const displayCount = count > 99 ? '99+' : count;
 
         orb.innerHTML = `
@@ -780,11 +781,19 @@ class SitewideMusicEngine {
 
         // Update pill cart count
         try {
-            const count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
+            const raw = localStorage.getItem('localCart');
+            const parsed = raw ? JSON.parse(raw) : null;
+            const count = (parsed && typeof parsed === 'object')
+                ? Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0)
+                : 0;
             const badge = orb.querySelector('#lexi-pill-cart-count');
-            if (badge && count > 0) {
-                badge.textContent = count;
-                badge.style.display = 'inline-block';
+            if (badge) {
+                if (count > 0) {
+                    badge.textContent = count > 99 ? '99+' : count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
             }
         } catch (_) { /* ignore playback or state error */ }
 
@@ -995,11 +1004,15 @@ class SitewideMusicEngine {
         // Update cart badge
         let count = 0;
         try {
-            count = parseInt(localStorage.getItem('cartItemCount') || '0', 10);
-        } catch (_) { /* ignore playback or state error */ }
+            const raw = localStorage.getItem('localCart');
+            const parsed = raw ? JSON.parse(raw) : null;
+            count = (parsed && typeof parsed === 'object')
+                ? Object.values(parsed).reduce((sum, q) => sum + Math.min(99, Math.max(0, parseInt(q, 10) || 0)), 0)
+                : 0;
+        } catch (_) { count = 0; }
         const cartBadge = orb.querySelector('#lexi-cart-badge');
         if (cartBadge) {
-            cartBadge.textContent = count;
+            cartBadge.textContent = count > 99 ? '99+' : count;
             cartBadge.classList.toggle('hidden', count <= 0);
         }
 
