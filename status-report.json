@@ -1,8 +1,8 @@
 {
-  "timestamp": "2026-11-23T15:31:12.032Z",
-  "dateFormatted": "Nov 23, 2026",
-  "overallStatus": "Operational",
-  "badgeClass": "online",
+  "timestamp": "2026-11-24T14:37:00.935Z",
+  "dateFormatted": "Nov 24, 2026",
+  "overallStatus": "Maintenance",
+  "badgeClass": "maintenance",
   "systems": [
     {
       "id": "hub",
@@ -22,8 +22,10 @@
       "id": "medixly",
       "name": "Medixly Music",
       "primaryPage": "medixly.html",
-      "status": "Operational",
-      "issues": []
+      "status": "Maintenance",
+      "issues": [
+        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html"
+      ]
     },
     {
       "id": "unstoppable",
@@ -75,11 +77,21 @@
       "issues": []
     }
   ],
-  "offlineSystems": [],
+  "offlineSystems": [
+    {
+      "id": "medixly",
+      "name": "Medixly Music",
+      "primaryPage": "medixly.html",
+      "status": "Maintenance",
+      "issues": [
+        "Missing local asset: \"/dist-desktop/Medixly-1.1.0-arm64.dmg\" in medixly.html"
+      ]
+    }
+  ],
   "totalSystems": 10,
-  "operationalCount": 10,
+  "operationalCount": 9,
   "offlineCount": 0,
-  "maintenanceCount": 0,
-  "durationMs": 531,
+  "maintenanceCount": 1,
+  "durationMs": 1419,
   "allDiscoveredPagesCount": 52
 }
