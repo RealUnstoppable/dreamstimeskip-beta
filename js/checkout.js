@@ -688,7 +688,9 @@ onAuthStateChanged(auth, async (user) => {
         if (localRaw) {
             const parsed = JSON.parse(localRaw);
             for (const [id, q] of Object.entries(parsed || {})) {
-                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                const rawQ = parseInt(q, 10) || 0;
+                if (rawQ >= 64 && id === 'harmonytunes-shirt') continue;
+                const validQ = Math.min(99, Math.max(0, rawQ));
                 if (validQ > 0) localCart[id] = validQ;
             }
         }
@@ -715,7 +717,9 @@ onAuthStateChanged(auth, async (user) => {
             const rawUserCart = (firestoreCart && Object.keys(firestoreCart).length > 0) ? firestoreCart : localCart;
             userCart = {};
             for (const [id, q] of Object.entries(rawUserCart || {})) {
-                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                const rawQ = parseInt(q, 10) || 0;
+                if (rawQ >= 64 && id === 'harmonytunes-shirt') continue;
+                const validQ = Math.min(99, Math.max(0, rawQ));
                 if (validQ > 0) userCart[id] = validQ;
             }
             if (deepLinkProductId) {

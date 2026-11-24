@@ -4,7 +4,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/fi
 import { doc, getDoc, setDoc, updateDoc, increment, collection, addDoc, query, where, orderBy, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { calculateCartSummary } from './cart-utils.js';
 import { escapeHTML, fetchCollectionData, getCachedUserProfile } from './utils.js';
-import { generateProductCardHtml } from './ui-utils.js?v=1795490705298';
+import { generateProductCardHtml } from './ui-utils.js?v=1795492123693';
 import { products, productMap, registerDynamicProduct, setDynamicProducts } from './products-data.js';
 import { getAverageRating } from './review-service.js';
 
@@ -553,7 +553,7 @@ async function saveCart() {
             if (activeUser) {
                 try {
                     const userCartRef = doc(db, 'carts', activeUser.uid);
-                    await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() }, { merge: true });
+                    await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() });
                 } catch (error) {
                     console.error("Manager info: Error saving cart to Firestore:", error.message);
                 }
@@ -1397,7 +1397,10 @@ try {
         for (const [id, q] of Object.entries(parsed || {})) {
             const prod = productMap.get(id);
             if (!prod) continue;
-            const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+            const rawQ = parseInt(q, 10) || 0;
+            // Purge corrupted phantom item from doubling bug (64 or 99 of harmonytunes-shirt)
+            if (rawQ >= 64 && id === 'harmonytunes-shirt') continue;
+            const validQ = Math.min(99, Math.max(0, rawQ));
             if (validQ > 0) {
                 cart[id] = validQ;
                 validCount += validQ;
@@ -1426,7 +1429,10 @@ onAuthStateChanged(auth, async (user) => {
         if (localCartData) {
             const parsed = JSON.parse(localCartData);
             for (const [id, q] of Object.entries(parsed || {})) {
-                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
+                if (!productMap.has(id)) continue;
+                const rawQ = parseInt(q, 10) || 0;
+                if (rawQ >= 64 && id === 'harmonytunes-shirt') continue;
+                const validQ = Math.min(99, Math.max(0, rawQ));
                 if (validQ > 0) localCart[id] = validQ;
             }
         }
@@ -1459,26 +1465,39 @@ onAuthStateChanged(auth, async (user) => {
             const docSnap = await getDoc(userCartRef);
             const firestoreCart = docSnap.exists() ? docSnap.data().items : {};
 
-            const mergedCart = {};
+            let hadCorrupted = false;
+            const cleanFirestore = {};
             for (const [pid, q] of Object.entries(firestoreCart || {})) {
-                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
-                if (validQ > 0) mergedCart[pid] = validQ;
+                if (!productMap.has(pid)) {
+                    hadCorrupted = true;
+                    continue;
+                }
+                const rawQ = parseInt(q, 10) || 0;
+                if (rawQ >= 64 && pid === 'harmonytunes-shirt') {
+                    hadCorrupted = true;
+                    continue;
+                }
+                const validQ = Math.min(99, Math.max(0, rawQ));
+                if (validQ > 0) cleanFirestore[pid] = validQ;
+                else hadCorrupted = true;
             }
-            let hasLocalItems = false;
+
+            // Union merge without doubling: if item exists in both, keep max, DO NOT sum
+            const mergedCart = { ...cleanFirestore };
             for (const [productId, quantity] of Object.entries(localCart || {})) {
                 const localQ = Math.min(99, Math.max(0, parseInt(quantity, 10) || 0));
                 if (localQ > 0) {
-                    const currentQ = mergedCart[productId] || 0;
-                    mergedCart[productId] = Math.min(99, currentQ + localQ);
-                    hasLocalItems = true;
+                    if (mergedCart[productId]) {
+                        mergedCart[productId] = Math.max(mergedCart[productId], localQ);
+                    } else {
+                        mergedCart[productId] = localQ;
+                    }
                 }
             }
 
             cart = mergedCart;
-            if (hasLocalItems) {
-                await saveCart();
-                localStorage.removeItem('localCart');
-            }
+            // Overwrite Firestore if corrupted phantom items were purged or to sync state
+            await saveCart();
         } catch (error) {
             console.error("Manager info: Error loading cart from firestore:", error);
             cart = localCart;

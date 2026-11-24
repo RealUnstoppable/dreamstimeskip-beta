@@ -1,7 +1,7 @@
 // js/cart.js - Dedicated High-Converting Cart Page Controller
 import { auth, db } from './auth.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 import { productMap, products, getProductPricing } from './products.js';
 import { escapeHTML } from './utils.js';
 
@@ -29,7 +29,13 @@ export function loadCartFromStorage() {
                 modified = true;
                 continue;
             }
-            const validQty = Math.min(99, Math.max(0, parseInt(qty, 10) || 0));
+            const rawVal = parseInt(qty, 10) || 0;
+            // Purge corrupted phantom item from doubling bug (64 or 99 of harmonytunes-shirt)
+            if (rawVal >= 64 && id === 'harmonytunes-shirt') {
+                modified = true;
+                continue;
+            }
+            const validQty = Math.min(99, Math.max(0, rawVal));
             if (validQty > 0) {
                 cart[id] = validQty;
                 totalCount += validQty;
@@ -84,12 +90,13 @@ export async function syncCartState() {
         window.updateLexiCartCount(totalCount);
     }
 
-    // Save to Firestore if user is authenticated
+    // Save to Firestore if user is authenticated (without merge: true so deletions persist)
     const user = currentUser || (auth && auth.currentUser);
     if (user && db) {
         try {
             const userCartRef = doc(db, 'carts', user.uid);
-            await setDoc(userCartRef, { items: cart }, { merge: true });
+            const ts = typeof serverTimestamp === 'function' ? serverTimestamp() : new Date().toISOString();
+            await setDoc(userCartRef, { items: cart, updatedAt: ts });
         } catch (err) {
             console.error('Manager info: Error saving cart to Firestore:', err.message || err);
         }
@@ -157,7 +164,11 @@ export function renderCart() {
     const summaryDiscountEl = getEl('cart-summary-discount');
     const discountCodeTag = getEl('discount-code-tag');
 
+    const headerBar = getEl('cart-items-header-bar');
+    const countLabel = getEl('cart-items-count-label');
+
     if (activeEntries.length === 0) {
+        if (headerBar) headerBar.style.display = 'none';
         if (cartItemsContainer) cartItemsContainer.style.display = 'none';
         if (emptyCartView) emptyCartView.style.display = 'block';
         if (checkoutBtn) {
@@ -167,6 +178,10 @@ export function renderCart() {
         }
         if (mobileStickyBar) mobileStickyBar.classList.remove('visible');
     } else {
+        if (headerBar) headerBar.style.display = 'flex';
+        if (countLabel) {
+            countLabel.textContent = `Review Selected Items (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+        }
         if (emptyCartView) emptyCartView.style.display = 'none';
         if (cartItemsContainer) {
             cartItemsContainer.style.display = 'flex';
@@ -251,6 +266,15 @@ export async function handleRemoveFromCart(productId) {
         renderCart();
         await syncCartState();
     }
+}
+
+/**
+ * Handle clearing all items from cart
+ */
+export async function handleClearCart() {
+    cart = {};
+    renderCart();
+    await syncCartState();
 }
 
 /**
@@ -394,6 +418,13 @@ export function setupCartEventListeners() {
         });
     }
 
+    const clearAllBtn = getEl('cart-clear-all-btn');
+    if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', () => {
+            handleClearCart();
+        });
+    }
+
     // Reactive cross-tab storage sync
     if (typeof window !== 'undefined') {
         window.addEventListener('storage', (e) => {
@@ -420,18 +451,38 @@ export function initCartPage() {
                     const docSnap = await getDoc(userCartRef);
                     if (docSnap.exists()) {
                         const firestoreCart = docSnap.data().items;
-                        if (firestoreCart && Object.keys(firestoreCart).length > 0) {
-                            const sanitizedFirestore = {};
-                            for (const [id, q] of Object.entries(firestoreCart)) {
-                                const validQ = Math.min(99, Math.max(0, parseInt(q, 10) || 0));
-                                if (validQ > 0) sanitizedFirestore[id] = validQ;
+                        let hadCorrupted = false;
+                        const sanitizedFirestore = {};
+                        for (const [id, q] of Object.entries(firestoreCart || {})) {
+                            if (!productMap.has(id)) {
+                                hadCorrupted = true;
+                                continue;
                             }
-                            // Use firestore if local is empty
-                            if (Object.keys(cart).length === 0) {
-                                cart = sanitizedFirestore;
-                                syncCartState();
-                                renderCart();
+                            const rawQ = parseInt(q, 10) || 0;
+                            // Purge phantom/doubling-bug quantities (64 or 99 of harmonytunes-shirt)
+                            if (rawQ >= 64 && id === 'harmonytunes-shirt') {
+                                hadCorrupted = true;
+                                continue;
                             }
+                            const validQ = Math.min(99, Math.max(0, rawQ));
+                            if (validQ > 0) sanitizedFirestore[id] = validQ;
+                            else hadCorrupted = true;
+                        }
+
+                        // If Firestore contained corrupted doubling-bug items, rewrite Firestore immediately
+                        if (hadCorrupted) {
+                            const ts = typeof serverTimestamp === 'function' ? serverTimestamp() : new Date().toISOString();
+                            await setDoc(userCartRef, { items: sanitizedFirestore, updatedAt: ts });
+                        }
+
+                        // If local cart is empty and Firestore has valid items, load them
+                        if (Object.keys(cart).length === 0 && Object.keys(sanitizedFirestore).length > 0) {
+                            cart = sanitizedFirestore;
+                            syncCartState();
+                            renderCart();
+                        } else if (Object.keys(cart).length > 0) {
+                            // If local has items, ensure Firestore is in sync without merge
+                            syncCartState();
                         }
                     }
                 } catch (err) {

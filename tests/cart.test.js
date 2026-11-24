@@ -332,6 +332,34 @@ describe('Cart Business Logic, Pricing & Promo Codes (js/cart.js)', () => {
         expect(localStorage.getItem('cartItemCount')).toBe('0');
         expect(localStorage.getItem('localCart')).toBe('{}');
     });
+
+    it('purges corrupted doubling-bug phantom item (harmonytunes-shirt >= 64 or 99)', () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'harmonytunes-shirt': 99
+        }));
+        localStorage.setItem('cartItemCount', '99');
+
+        cartModule.loadCartFromStorage();
+        const totals = cartModule.calculateCartTotals();
+
+        expect(totals.itemCount).toBe(0);
+        expect(localStorage.getItem('cartItemCount')).toBe('0');
+        expect(localStorage.getItem('localCart')).toBe('{}');
+    });
+
+    it('clears all items when handleClearCart is called', async () => {
+        localStorage.setItem('localCart', JSON.stringify({
+            'unstoppable-hoodie': 2
+        }));
+        cartModule.loadCartFromStorage();
+        expect(cartModule.calculateCartTotals().itemCount).toBe(2);
+
+        await cartModule.handleClearCart();
+
+        expect(cartModule.calculateCartTotals().itemCount).toBe(0);
+        expect(localStorage.getItem('cartItemCount')).toBe('0');
+        expect(localStorage.getItem('localCart')).toBe('{}');
+    });
 });
 
 describe('Navbar Cart Badge Updates (js/navbar.js)', () => {

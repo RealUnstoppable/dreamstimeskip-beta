@@ -2051,7 +2051,7 @@ async function addWishlistItemToCart(productId) {
 
         if (currentUser) {
             const userCartRef = doc(db, 'carts', currentUser.uid);
-            await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() }, { merge: true });
+            await setDoc(userCartRef, { items: cart, updatedAt: serverTimestamp() });
         }
     } catch (err) {
         console.warn("Notice: Wishlist add to cart:", err);

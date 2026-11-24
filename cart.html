@@ -53,6 +53,12 @@
         <div class="cart-layout-grid">
             <!-- Left Column: Itemized List & Trust Card -->
             <div class="cart-items-column" id="cart-items-column">
+                <!-- Cart Items Header Bar with Clear Cart Action -->
+                <div class="cart-items-header-bar" id="cart-items-header-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="cart-items-count-label" id="cart-items-count-label" style="font-size: 0.95rem; color: var(--text-secondary, #a1a1aa); font-weight: 500;">Review Selected Items</span>
+                    <button type="button" id="cart-clear-all-btn" class="cart-clear-all-btn" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25); color: #ef4444; padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" aria-label="Clear all items from cart">Clear Cart</button>
+                </div>
+
                 <!-- Itemized Cart List -->
                 <div id="cart-items-list" class="cart-items-column"></div>
 
@@ -200,7 +206,7 @@
         if (typeof loadNavbar === 'function') loadNavbar();
         if (typeof loadFooter === 'function') loadFooter();
     </script>
-    <script type="module" src="/js/cart.js"></script>
+    <script type="module" src="/js/cart.js?v=1795492123693"></script>
 </body>
 
 </html>
